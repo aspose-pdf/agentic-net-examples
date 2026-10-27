@@ -1,7 +1,9 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -9,7 +11,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "Password"; // name of the password field in the PDF
 
         if (!File.Exists(inputPath))
         {
@@ -17,26 +18,51 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF, modify the password field, and save
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the password field by name
-            PasswordBoxField pwdField = doc.Form[fieldName] as PasswordBoxField;
+            const string fieldName = "PasswordField";
+            const int maxLength = 20;
 
-            if (pwdField != null)
+            // Retrieve the field from the form collection
+            TextBoxField passwordField = doc.Form[fieldName] as TextBoxField;
+
+            if (passwordField != null)
             {
-                // Set maximum length to 20 characters
-                pwdField.MaxLen = 20;
+                // -----------------------------------------------------------------
+                // 1. Enforce maximum length (20 characters) via JavaScript action.
+                //    Use a valid AnnotationActionCollection property – OnModifyCharacter.
+                // -----------------------------------------------------------------
+                string js = $"if (event.value.length > {maxLength}) {{ event.value = event.value.substring(0, {maxLength}); }}";
+                passwordField.Actions.OnModifyCharacter = new JavascriptAction(js);
+
+                // -----------------------------------------------------------------
+                // 2. Set the field to behave as a password (mask input).
+                //    The property may not exist in all versions, so we set it via reflection.
+                // -----------------------------------------------------------------
+                SetOptionalBooleanProperty(passwordField, "IsPassword", true);
             }
             else
             {
                 Console.Error.WriteLine($"Password field '{fieldName}' not found.");
             }
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Password field max length set to 20. Saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+    }
+
+    /// <summary>
+    /// Sets a boolean property on an object using reflection if the property exists and is writable.
+    /// </summary>
+    private static void SetOptionalBooleanProperty(object obj, string propertyName, bool value)
+    {
+        PropertyInfo prop = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+        if (prop != null && prop.CanWrite && (prop.PropertyType == typeof(bool) || prop.PropertyType == typeof(bool?)))
+        {
+            prop.SetValue(obj, value);
+        }
     }
 }

@@ -1,44 +1,82 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor with source and destination files
-        FormEditor formEditor = new FormEditor(inputPdf, outputPdf);
-
-        // Define target rectangle for the "Signature" field on page 5
-        // Example: lower‑right corner with width=150pt, height=50pt, 20pt margin
-        float pageWidth = 595f; // typical A4 width in points
-        float margin = 20f;
-        float fieldWidth = 150f;
-        float fieldHeight = 50f;
-
-        float llx = pageWidth - margin - fieldWidth; // lower‑left X
-        float lly = margin;                         // lower‑left Y
-        float urx = pageWidth - margin;              // upper‑right X
-        float ury = margin + fieldHeight;            // upper‑right Y
-
-        // Move the field named "Signature" to the new rectangle
-        bool moved = formEditor.MoveField("Signature", llx, lly, urx, ury);
-        if (!moved)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            Console.Error.WriteLine("Failed to move the field 'Signature'.");
+            // Verify that the document has at least 5 pages
+            if (doc.Pages.Count < 5)
+            {
+                Console.Error.WriteLine("The document contains fewer than 5 pages.");
+                return;
+            }
+
+            // Locate the form field whose partial name is "Signature"
+            Aspose.Pdf.Forms.Field signatureField = null;
+            foreach (Aspose.Pdf.Forms.Field f in doc.Form.Fields)
+            {
+                if (f.PartialName == "Signature")
+                {
+                    signatureField = f;
+                    break;
+                }
+            }
+
+            if (signatureField == null)
+            {
+                Console.Error.WriteLine("Form field 'Signature' not found.");
+                return;
+            }
+
+            // The field must be a signature field to set its rectangle
+            if (signatureField is Aspose.Pdf.Forms.SignatureField sigField)
+            {
+                // Desired dimensions (in points)
+                const double fieldWidth   = 150; // width of the signature box
+                const double fieldHeight  = 50;  // height of the signature box
+                const double marginRight  = 20;  // distance from the right edge
+                const double marginBottom = 20;  // distance from the bottom edge
+
+                // Get page 5 dimensions
+                Aspose.Pdf.Page page = doc.Pages[5];
+                double pageWidth  = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
+
+                // Calculate lower‑right rectangle coordinates
+                double llx = pageWidth - marginRight - fieldWidth; // lower‑left X
+                double lly = marginBottom;                        // lower‑left Y
+                double urx = pageWidth - marginRight;              // upper‑right X
+                double ury = marginBottom + fieldHeight;           // upper‑right Y
+
+                // Assign the new rectangle to the signature field
+                sigField.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+            }
+            else
+            {
+                Console.Error.WriteLine("The field named 'Signature' is not a signature field.");
+                return;
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        // Save the modified PDF
-        formEditor.Save();
-        Console.WriteLine($"Field moved and saved to '{outputPdf}'.");
+        Console.WriteLine($"Signature field repositioned and saved to '{outputPath}'.");
     }
 }

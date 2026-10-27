@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_metadata.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,40 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add custom key/value pairs to the DocumentInfo dictionary
-            doc.Info.Add("ProcessingId", "12345");
-            doc.Info.Add("SourceSystem", "MyApp");
+            // Update standard document information
+            doc.Info.Title = "Report with Custom XML Metadata";
+            doc.Info.Author = "Acme Corp";
 
-            // Create custom XMP metadata as an XML string
-            string xmpXml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
-<x:xmpmeta xmlns:x=""adobe:ns:meta/"" x:xmptk=""Aspose.Pdf"">
-  <rdf:RDF xmlns:rdf=""http://www.w3.org/1999/02/22-rdf-syntax-ns#"">
-    <rdf:Description rdf:about="""" xmlns:my=""http://example.com/myNamespace#"">
-      <my:ProcessingId>12345</my:ProcessingId>
-      <my:SourceSystem>MyApp</my:SourceSystem>
-    </rdf:Description>
-  </rdf:RDF>
-</x:xmpmeta>";
+            // Add custom XML metadata (key/value pair) to the document info dictionary
+            const string xmlKey = "CustomXml";
+            const string xmlValue = @"<metadata><processId>12345</processId><timestamp>2024-09-28T12:34:56Z</timestamp></metadata>";
 
-            // Write the XML to a memory stream and set it as XMP metadata
-            using (MemoryStream ms = new MemoryStream())
-            {
-                using (StreamWriter writer = new StreamWriter(ms))
-                {
-                    writer.Write(xmpXml);
-                    writer.Flush();
-                    ms.Position = 0; // Reset stream position for reading
-                    doc.SetXmpMetadata(ms);
-                }
-            }
+            // Store custom metadata using the DocumentInfo indexer (supported API)
+            doc.Info[xmlKey] = xmlValue;
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom XML metadata to '{outputPath}'.");
     }
 }

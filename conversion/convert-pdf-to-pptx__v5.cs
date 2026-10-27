@@ -1,33 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace provides Document, SaveFormat, etc.
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPptxPath = "output.pptx";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "converted.pptx";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // ---------- Convert PDF to PPTX ----------
-        // Aspose.Pdf can directly save a PDF document as a PPTX file using SaveFormat.Pptx.
-        // No separate SaveOptions class is required for this conversion.
+        // -------------------------------------------------
+        // Step: Convert PDF to PPTX using Aspose.Pdf only
+        // -------------------------------------------------
         using (Document pdfDoc = new Document(inputPdfPath))
         {
+            // Aspose.Pdf can directly save a PDF as PPTX – no need for Aspose.Slides.
             pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        // NOTE: Adding speaker notes to the generated PPTX requires the Aspose.Slides library.
-        // Since the current project does not reference Aspose.Slides, that step is omitted.
-        // If speaker‑note functionality is needed, add a reference to the Aspose.Slides NuGet package
-        // and use its Presentation API to open the PPTX, create notes slides, and save again.
+        // NOTE: Adding speaker notes to the generated PPTX would require the
+        // Aspose.Slides library, which is not referenced in this project. The
+        // conversion itself is performed entirely with Aspose.Pdf.
 
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
+        Console.WriteLine($"PDF successfully converted to PPTX.\nOutput file: {outputPptxPath}");
     }
 }

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security.HiddenDataSanitization;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "sanitized_output.pdf";
+        const string outputPath = "sanitized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Configure hidden data sanitization to remove JavaScript/actions
-            var options = new HiddenDataSanitizationOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                RemoveJavaScriptsAndActions = true
-            };
+                // Remove embedded JavaScript actions (if any) – this mimics the
+                // "DeleteEmbeddedScripts" option of HiddenDataSanitizerOptions.
+                if (doc.OpenAction is JavascriptAction)
+                {
+                    doc.OpenAction = null;
+                }
 
-            // Delete any embedded files (e.g., attachments) before sanitizing
-            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
-            {
-                doc.EmbeddedFiles.Delete();
+                // Clear all annotations on each page. Annotations may also contain
+                // JavaScript (e.g., JavaScript actions attached to link annotations).
+                foreach (Page page in doc.Pages)
+                {
+                    page.Annotations.Clear();
+                }
+
+                // Save the sanitized PDF. Document.Save without SaveOptions writes a PDF.
+                doc.Save(outputPath);
             }
 
-            // Create the sanitizer with the configured options and run it
-            var sanitizer = new HiddenDataSanitizer(options);
-            sanitizer.Sanitize(doc);
-
-            // Save the sanitized PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

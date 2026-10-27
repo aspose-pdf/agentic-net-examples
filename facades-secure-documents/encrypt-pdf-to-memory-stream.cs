@@ -12,30 +12,52 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, encrypt it, and save the encrypted version to a memory stream.
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Temporary file to hold the encrypted PDF
+        string encryptedTempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+
+        try
         {
-            // Define permissions (e.g., allow printing and content extraction).
-            Aspose.Pdf.Permissions perms = Aspose.Pdf.Permissions.PrintDocument |
-                                          Aspose.Pdf.Permissions.ExtractContent;
+            // Load the PDF document
+            Document doc = new Document(inputPath);
 
-            // Encrypt using AES-256 (preferred algorithm).
-            doc.Encrypt(userPassword, ownerPassword, perms, Aspose.Pdf.CryptoAlgorithm.AESx256);
+            // Define permissions and encrypt the document using AES‑256
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF into a MemoryStream for network transmission.
-            using (MemoryStream encryptedStream = new MemoryStream())
+            // Save the encrypted PDF to a temporary file
+            doc.Save(encryptedTempPath);
+
+            // Load the encrypted PDF into a memory stream for network transmission
+            using (MemoryStream pdfStream = new MemoryStream())
             {
-                doc.Save(encryptedStream);
-                encryptedStream.Position = 0; // Reset for reading elsewhere.
+                using (FileStream fileStream = new FileStream(encryptedTempPath, FileMode.Open, FileAccess.Read))
+                {
+                    fileStream.CopyTo(pdfStream);
+                }
+                pdfStream.Position = 0; // reset stream position
 
-                // Example output: size of the encrypted PDF.
-                Console.WriteLine($"Encrypted PDF size: {encryptedStream.Length} bytes");
-
-                // The 'encryptedStream' now contains the encrypted PDF and can be sent over the network.
+                // At this point 'pdfStream' contains the encrypted PDF bytes and can be sent over the network
+                Console.WriteLine($"Encrypted PDF prepared in memory stream (Length: {pdfStream.Length} bytes).");
+            }
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Password error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Clean up the temporary encrypted file
+            if (File.Exists(encryptedTempPath))
+            {
+                try { File.Delete(encryptedTempPath); } catch { /* ignore cleanup errors */ }
             }
         }
     }

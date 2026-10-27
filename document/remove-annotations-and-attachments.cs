@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -16,35 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF, then strip annotations (comments) and embedded file attachments.
         using (Document doc = new Document(inputPath))
         {
-            // Flatten the document to remove annotations and form fields
-            doc.Flatten();
+            // Remove all annotations from every page.
+            foreach (Page page in doc.Pages)
+            {
+                page.Annotations?.Clear();
+            }
 
-            // Remove any embedded file attachments
+            // Remove all embedded files (attachments) from the document.
             if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                // Delete items from the collection in reverse order using the file name (string)
+                // EmbeddedFileCollection uses 1‑based indexing. Delete each file by its name.
                 for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
                 {
-                    string name = doc.EmbeddedFiles[i].Name;
-                    doc.EmbeddedFiles.Delete(name);
+                    var fileSpec = doc.EmbeddedFiles[i];
+                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                    {
+                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                    }
                 }
             }
 
-            // Optimize resources to discard any now‑unused objects/streams
-            OptimizationOptions optOptions = new OptimizationOptions
-            {
-                RemoveUnusedObjects = true,
-                RemoveUnusedStreams = true
-            };
-            doc.OptimizeResources(optOptions);
-
-            // Save the cleaned PDF
+            // Save the cleaned PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Cleaned PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF cleaned and saved to '{outputPath}'.");
     }
 }

@@ -1,66 +1,53 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files to process
+        // Input PDF files whose vector graphics will be combined
         string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        // Output SVG file that will contain all extracted vector graphics
-        const string outputSvg = "combined_vectors.svg";
+        string outputSvg = "combined.svg";
 
-        StringBuilder sb = new StringBuilder();
-
-        // Iterate over each PDF document
-        foreach (string pdfPath in pdfFiles)
+        // Verify that all source files exist
+        foreach (var path in pdfFiles)
         {
-            if (!File.Exists(pdfPath))
+            if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
+                Console.Error.WriteLine($"File not found: {path}");
+                return;
             }
+        }
 
-            // Load the PDF document (lifecycle rule: use Document constructor with file path)
-            using (Document doc = new Document(pdfPath))
+        // Merge all PDFs into a single Document (first file is the target)
+        using (Document merged = new Document(pdfFiles[0]))
+        {
+            for (int i = 1; i < pdfFiles.Length; i++)
             {
-                // Process each page (Aspose.Pdf uses 1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                using (Document src = new Document(pdfFiles[i]))
                 {
-                    Page page = doc.Pages[i];
-
-                    // Check if the page contains vector graphics
-                    if (!page.HasVectorGraphics())
-                        continue;
-
-                    // Extract SVG strings from the page
-                    SvgExtractor extractor = new SvgExtractor();
-                    // Extract returns a list of SVG strings (one per vector image on the page)
-                    var svgList = extractor.Extract(page);
-
-                    // Append each SVG to the combined output, with simple markers
-                    foreach (string svgContent in svgList)
-                    {
-                        sb.AppendLine($"<!-- Source: {Path.GetFileName(pdfPath)} Page: {i} -->");
-                        sb.AppendLine(svgContent);
-                        sb.AppendLine(); // separate entries
-                    }
+                    merged.Pages.Add(src.Pages);
                 }
             }
-        }
 
-        // Write the combined SVG content to the output file
-        try
-        {
-            File.WriteAllText(outputSvg, sb.ToString(), Encoding.UTF8);
-            Console.WriteLine($"Combined SVG saved to '{outputSvg}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to write SVG file: {ex.Message}");
+            // Prepare SVG save options – combine all pages into one SVG file
+            var svgOptions = new SvgSaveOptions
+            {
+                // Enables CSS style embedding and keeps all pages in a single multi‑page SVG
+                ScaleToPixels = true
+            };
+
+            // SVG conversion may require GDI+ (Windows only); handle gracefully
+            try
+            {
+                merged.Save(outputSvg, svgOptions);
+                Console.WriteLine($"Combined SVG saved to '{outputSvg}'.");
+            }
+            catch (TypeInitializationException)
+            {
+                Console.WriteLine("SVG conversion requires Windows (GDI+). Skipped on this platform.");
+            }
         }
     }
 }

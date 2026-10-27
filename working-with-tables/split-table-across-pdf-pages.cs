@@ -7,39 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Input and output paths (adjust as needed)
         const string outputPath = "table_split.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page (first page is index 1)
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table that will be split across pages
+            // Create a table that can split across pages
             Table table = new Table
             {
-                // Enable table breaking so it can continue on the next page
+                // Enable automatic breaking of the table when it exceeds page height
                 IsBroken = true,
 
-                // Optional visual settings
-                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Gray),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
-            };
+                // Define column widths (percentage of the page width)
+                ColumnWidths = "30% 40% 30%",
 
-            // Define column widths (example: three equal columns)
-            table.ColumnWidths = "100 100 100";
+                // Optional: set border for visual clarity
+                Border = new BorderInfo(BorderSide.All, 0.5f)
+            };
 
             // Add a header row
             Row header = table.Rows.Add();
             header.Cells.Add("Header 1");
             header.Cells.Add("Header 2");
             header.Cells.Add("Header 3");
-            // Mark header row as repeated on each split page (optional)
-            header.IsInNewPage = false; // keep on same page as table start
+            // Make header bold
+            foreach (Cell cell in header.Cells)
+                cell.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
 
-            // Populate many rows to force the table to span multiple pages
+            // Add many data rows to force the table to span multiple pages
             for (int i = 1; i <= 100; i++)
             {
                 Row row = table.Rows.Add();
@@ -48,13 +51,13 @@ class Program
                 row.Cells.Add($"Row {i} - Col 3");
             }
 
-            // Add the table to the page's paragraph collection
+            // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
             // Save the document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with split table saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with split‑able table saved to '{outputPath}'.");
     }
 }

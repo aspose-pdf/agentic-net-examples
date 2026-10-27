@@ -10,61 +10,59 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_form.pdf";
+        const string outputPath = "output_with_form.pdf";
 
+        // Create a simple PDF if the input does not exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document tmpDoc = new Document())
+            {
+                tmpDoc.Pages.Add();
+                tmpDoc.Save(inputPath);
+            }
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has an AcroForm object
-            Form acroForm = doc.Form;
+            // Ensure at least one page exists
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-            // Define the rectangle where the field will be placed
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a text box field on the document
-            TextBoxField txtField = new TextBoxField(doc, fieldRect)
+            // -------------------------------------------------------------
+            // 1. Create a text box form field and add it to the AcroForm
+            // -------------------------------------------------------------
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect)
             {
-                Name = "SampleTextBox",
+                PartialName = "SampleTextField",
                 Value = "Enter text here"
             };
+            // The AcroForm collection is exposed via Document.Form
+            doc.Form.Add(textField);
 
-            // Register the field in the AcroForm
-            acroForm.Add(txtField);
-
-            // ----- Tagged PDF part -----
-            // Access the tagged content API
+            // -------------------------------------------------------------
+            // 2. Create a /Form structure element in the tagged content tree
+            // -------------------------------------------------------------
             ITaggedContent tagged = doc.TaggedContent;
-
-            // Set language and title for the tagged PDF (optional)
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("Form with TextBox");
+            tagged.SetTitle("PDF with Form Field");
 
-            // Get the root structure element
-            StructureElement root = tagged.RootElement;
+            var root = tagged.RootElement; // root of the structure tree
 
-            // Create a Form structure element (represents a widget annotation)
             FormElement formStruct = tagged.CreateFormElement();
-
-            // Associate the widget annotation (the text box field) with the structure element
-            // NOTE: Form fields are themselves annotations, so we pass the field directly.
-            formStruct.Tag(txtField);
-
-            // Provide alternative text for accessibility
-            formStruct.AlternativeText = "Text box for user input";
-
-            // Append the Form element to the structure tree
+            formStruct.AlternativeText = "User input form field";
             root.AppendChild(formStruct);
+
+            // -------------------------------------------------------------
+            // 3. Associate the form field with the /Form structure element
+            // -------------------------------------------------------------
+            // Use the Tag method of FormElement to link the field
+            formStruct.Tag(textField);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with form field to '{outputPath}'.");
+        Console.WriteLine($"PDF with form field saved to '{outputPath}'.");
     }
 }

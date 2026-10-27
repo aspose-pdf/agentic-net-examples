@@ -1,13 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // FormEditor, FieldType, etc.
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // existing PDF
-        const string outputPath = "output_with_print.pdf"; // PDF with new button
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_button.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,23 +17,30 @@ class Program
             return;
         }
 
-        // Open the PDF for form editing
-        using (FormEditor formEditor = new FormEditor())
+        // Load the existing PDF document
+        Document doc = new Document(inputPath);
+
+        // Define the button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+        Rectangle buttonRect = new Rectangle(100, 700, 200, 750);
+
+        // Create a button field (Aspose.Pdf.Forms.ButtonField)
+        ButtonField printButton = new ButtonField(doc.Pages[1], buttonRect)
         {
-            formEditor.BindPdf(inputPath);   // load the document
+            PartialName = "PrintForm",
+            Value = "Print"
+        };
 
-            // Add a push‑button field named "PrintForm" on page 1.
-            // Parameters: field type, name, page number (1‑based), llx, lly, urx, ury
-            formEditor.AddField(FieldType.PushButton, "PrintForm", 1,
-                                100f, 700f, 200f, 750f);
+        // JavaScript that opens the print dialog when the button is pressed
+        string js = "this.print({bUI:true,bSilent:false,bShrinkToFit:true});";
 
-            // Attach JavaScript that opens the print dialog.
-            // "this.print(true);" shows the dialog; false would print silently.
-            formEditor.AddFieldScript("PrintForm", "this.print(true);");
+        // Assign the JavaScript to the button's mouse‑press action (valid property)
+        printButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
 
-            // Save the modified PDF
-            formEditor.Save(outputPath);
-        }
+        // Add the button to the form on page 1 (page numbers are 1‑based)
+        doc.Form.Add(printButton, 1);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"PDF saved with PrintForm button: {outputPath}");
     }

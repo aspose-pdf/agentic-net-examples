@@ -1,93 +1,80 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Predefined list of proper nouns (case‑insensitive lookup) with their correct casing
+    private static readonly Dictionary<string, string> ProperNouns = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+    {
+        { "NASA", "NASA" },
+        { "ASP.NET", "ASP.NET" },
+        { "CSharp", "CSharp" },
+        { "Microsoft", "Microsoft" },
+        { "PDF", "PDF" }
+    };
+
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // ---------------------------------------------------------------------
-        // Create a minimal PDF with a bookmark so the example can run in a sandbox
-        // ---------------------------------------------------------------------
-        CreateSamplePdfWithBookmark(inputPath);
-
-        // List of proper nouns that should retain their original casing
-        var properNouns = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        if (!File.Exists(inputPath))
         {
-            "NASA",
-            "ASP.NET",
-            "PDF",
-            "Aspose"
-        };
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-        // Bind the PDF file to the bookmark editor
+        // Bind the PDF file to the bookmark editor (Facades API)
         PdfBookmarkEditor editor = new PdfBookmarkEditor();
         editor.BindPdf(inputPath);
 
-        // Extract all bookmarks from the document
-        var bookmarks = editor.ExtractBookmarks();
-
-        // Iterate through each bookmark, convert its title to title case,
-        // preserving proper nouns, and apply the modification
-        foreach (var bm in bookmarks)
+        // Extract existing bookmarks, convert each title to title case while preserving proper nouns,
+        // and apply the change via ModifyBookmarks.
+        Bookmarks bookmarks = editor.ExtractBookmarks();
+        foreach (Bookmark bm in bookmarks)
         {
-            string newTitle = ToTitleCaseWithProperNouns(bm.Title, properNouns);
-            // ModifyBookmarks replaces the old title with the new one
-            editor.ModifyBookmarks(bm.Title, newTitle);
+            string originalTitle = bm.Title ?? string.Empty;
+            string newTitle = ConvertToTitleCase(originalTitle);
+            if (!string.Equals(originalTitle, newTitle, StringComparison.Ordinal))
+            {
+                // ModifyBookmarks updates all bookmarks that match the old title.
+                editor.ModifyBookmarks(originalTitle, newTitle);
+            }
         }
 
-        // Save the updated PDF with modified bookmark titles
+        // Save the modified PDF and release resources.
         editor.Save(outputPath);
+        editor.Close();
+
+        Console.WriteLine($"Bookmarks updated and saved to '{outputPath}'.");
     }
 
-    // Creates a one‑page PDF that contains a single bookmark (outline entry).
-    private static void CreateSamplePdfWithBookmark(string path)
+    // Convert a string to title case, preserving predefined proper nouns
+    private static string ConvertToTitleCase(string text)
     {
-        using var doc = new Document();
-        doc.Pages.Add();
-        // Add a simple outline item so there is something to rename.
-        var outline = new OutlineItemCollection(doc.Outlines) { Title = "sample bookmark" };
-        doc.Outlines.Add(outline);
-        doc.Save(path);
-    }
-
-    // Converts a string to title case while keeping proper nouns unchanged
-    static string ToTitleCaseWithProperNouns(string text, HashSet<string> properNouns)
-    {
-        if (string.IsNullOrEmpty(text))
+        if (string.IsNullOrWhiteSpace(text))
             return text;
 
-        var words = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        string[] words = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < words.Length; i++)
         {
             string word = words[i];
 
-            // Preserve the exact casing of known proper nouns
-            if (properNouns.Contains(word))
+            // Preserve proper noun if it exists in the list (case‑insensitive lookup)
+            if (ProperNouns.TryGetValue(word, out string proper))
             {
-                foreach (var pn in properNouns)
-                {
-                    if (string.Equals(pn, word, StringComparison.OrdinalIgnoreCase))
-                    {
-                        word = pn;
-                        break;
-                    }
-                }
-            }
-            else
-            {
-                // Standard title case: first letter uppercase, rest lowercase
-                if (word.Length > 1)
-                    word = char.ToUpper(word[0]) + word.Substring(1).ToLower();
-                else
-                    word = word.ToUpper();
+                words[i] = proper;
+                continue;
             }
 
-            words[i] = word;
+            // Simple title‑case conversion: first char upper, rest lower
+            if (word.Length > 1)
+                words[i] = char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant();
+            else
+                words[i] = word.ToUpperInvariant();
         }
 
         return string.Join(" ", words);

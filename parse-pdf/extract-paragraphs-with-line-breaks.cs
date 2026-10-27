@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "extracted.txt";
 
         if (!File.Exists(inputPath))
@@ -17,48 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Absorb paragraph structures from the whole document
-            ParagraphAbsorber absorber = new ParagraphAbsorber
+            // Load the PDF document inside a using block for proper disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Allow detection of paragraphs that span multiple columns
-                IsMulticolumnParagraphsAllowed = true
-            };
-            absorber.Visit(doc); // process all pages
+                // TextAbsorber extracts text; set options to preserve line breaks
+                TextAbsorber absorber = new TextAbsorber();
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            StringBuilder sb = new StringBuilder();
+                // Apply absorber to all pages
+                doc.Pages.Accept(absorber);
+                string extractedText = absorber.Text;
 
-            // Iterate over each page's markup information
-            foreach (PageMarkup pageMarkup in absorber.PageMarkups)
-            {
-                // Sections contain paragraphs
-                foreach (MarkupSection section in pageMarkup.Sections)
-                {
-                    foreach (MarkupParagraph paragraph in section.Paragraphs)
-                    {
-                        // Each paragraph may consist of multiple lines
-                        foreach (var line in paragraph.Lines)
-                        {
-                            // Concatenate all fragments in the line
-                            foreach (TextFragment fragment in line)
-                            {
-                                sb.Append(fragment.Text);
-                            }
-                            sb.AppendLine(); // preserve line break
-                        }
-
-                        // Add an extra line break after each paragraph for readability
-                        sb.AppendLine();
-                    }
-                }
+                // Write the extracted text (including paragraph breaks) to a .txt file
+                File.WriteAllText(outputPath, extractedText);
             }
 
-            // Write the extracted text (with line breaks) to a .txt file
-            File.WriteAllText(outputPath, sb.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Paragraph text extracted to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Paragraph text extracted to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

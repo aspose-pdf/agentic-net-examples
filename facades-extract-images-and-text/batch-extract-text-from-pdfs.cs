@@ -1,45 +1,60 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf.Facades;
 
-class BatchPdfTextExtractor
+class Program
 {
     static void Main()
     {
-        // Folder containing PDF files to process
+        // Folder containing the PDF files to process
         const string inputFolder = @"C:\PdfInput";
-        // Folder where extracted text files will be saved
-        const string outputFolder = @"C:\PdfTextOutput";
+        // Folder where the extracted text files will be saved
+        const string outputFolder = @"C:\PdfOutput";
 
-        // Ensure the output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
+            return;
+        }
+
+        // Ensure the output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Build the output text file path (same name, .txt extension)
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string txtPath = Path.Combine(outputFolder, fileNameWithoutExt + ".txt");
-
             try
             {
-                // Use PdfExtractor facade to extract text
+                // Use PdfExtractor from Aspose.Pdf.Facades to extract text
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
                     // Bind the PDF file to the extractor
                     extractor.BindPdf(pdfPath);
 
-                    // Extract text using Unicode encoding (covers most languages)
-                    extractor.ExtractText(Encoding.Unicode);
+                    // Extract text from the whole document
+                    extractor.ExtractText();
 
-                    // Save the extracted text to the .txt file
-                    extractor.GetText(txtPath);
+                    // Retrieve the extracted text via a MemoryStream (GetText requires a Stream argument)
+                    string extractedText;
+                    using (MemoryStream textStream = new MemoryStream())
+                    {
+                        extractor.GetText(textStream);
+                        textStream.Position = 0; // rewind to beginning
+                        using (StreamReader reader = new StreamReader(textStream))
+                        {
+                            extractedText = reader.ReadToEnd();
+                        }
+                    }
+
+                    // Build the output .txt file path (same filename, .txt extension)
+                    string txtFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".txt";
+                    string txtPath = Path.Combine(outputFolder, txtFileName);
+
+                    // Write the extracted text to the .txt file
+                    File.WriteAllText(txtPath, extractedText);
                 }
 
-                Console.WriteLine($"Extracted text from '{pdfPath}' to '{txtPath}'.");
+                Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{Path.GetFileNameWithoutExtension(pdfPath)}.txt'");
             }
             catch (Exception ex)
             {
@@ -48,6 +63,6 @@ class BatchPdfTextExtractor
             }
         }
 
-        Console.WriteLine("Batch extraction completed.");
+        Console.WriteLine("Batch text extraction completed.");
     }
 }

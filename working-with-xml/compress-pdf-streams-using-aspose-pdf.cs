@@ -7,34 +7,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "compressed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "compressed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF (e.g., generated from XML)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF generated from XML
+        using (Document doc = new Document(inputPath))
         {
-            // Configure optimization: compress objects and clean up unused resources
-            OptimizationOptions opt = new OptimizationOptions
-            {
-                CompressObjects      = true,
-                RemoveUnusedObjects  = true,
-                RemoveUnusedStreams  = true,
-                LinkDuplicateStreams = true
-            };
+            // Configure optimization to compress streams and images
+            OptimizationOptions opt = OptimizationOptions.All();
+            opt.CompressImages = true;          // compress image streams
+            opt.ImageQuality = 50;               // adjust quality as needed (0‑100)
+            opt.RemoveUnusedObjects = true;     // drop objects not referenced
+            opt.RemoveUnusedStreams = true;     // drop empty/unused streams
 
-            // Apply the optimization strategy
-            pdfDoc.OptimizeResources(opt);
+            // Apply the optimization settings
+            doc.OptimizeResources(opt);
 
-            // Save the compressed PDF
-            pdfDoc.Save(outputPdf);
+            // Save the optimized (compressed) PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
     }
 }

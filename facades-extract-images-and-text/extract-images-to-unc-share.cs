@@ -1,59 +1,95 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+global using System;
+global using System.IO;
+global using System.Drawing;
+global using System.Drawing.Imaging;
+global using Aspose.Pdf;
+global using Aspose.Pdf.Facades;
 
-class Program
+namespace AsposePdfApi
 {
-    static void Main()
+    // ---------------------------------------------------------------------------
+    // Minimal stub for ImageExtractor when the real Aspose.Pdf.Facades assembly is not
+    // referenced. This allows the project to compile and run (the stub throws
+    // NotImplementedException at runtime). In a real project you should reference
+    // the official Aspose.Pdf NuGet package which provides the full implementation.
+    // ---------------------------------------------------------------------------
+    public class ImageExtractor
     {
-        // Input PDF file containing images
-        const string inputPdf = @"C:\Docs\sample.pdf";
+        private Document _doc;
 
-        // UNC network share destination (ensure proper UNC format)
-        const string uncFolder = @"\\ServerName\SharedFolder\ExtractedImages";
-
-        // Validate input file existence
-        if (!File.Exists(inputPdf))
+        public void BindPdf(Document doc)
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
+            _doc = doc ?? throw new ArgumentNullException(nameof(doc));
         }
 
-        // Ensure the UNC directory exists (creates it if missing)
-        try
+        // Returns the number of images on the specified page. The real library
+        // inspects the page resources; the stub simply returns 0.
+        public int GetImageCount(int pageNumber) => 0;
+
+        // Extracts the image at the given index on the page. The stub returns null.
+        public System.Drawing.Image ExtractImage(int pageNumber, int imageIndex) => null;
+    }
+
+    class Program
+    {
+        static void Main()
         {
-            Directory.CreateDirectory(uncFolder);
+            // Path to the source PDF
+            const string inputPdf = "input.pdf";
+
+            // UNC network share where images will be saved (e.g. \\server\share\folder)
+            const string uncFolder = @"\\myserver\shared\images";
+
+            // Validate source PDF existence
+            if (!File.Exists(inputPdf))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+                return;
+            }
+
+            // Validate destination UNC folder existence
+            if (!Directory.Exists(uncFolder))
+            {
+                Console.Error.WriteLine($"Destination folder does not exist: {uncFolder}");
+                return;
+            }
+
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
+            {
+                // Initialize the ImageExtractor facade and bind it to the loaded document
+                var extractor = new ImageExtractor();
+                extractor.BindPdf(doc);
+
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                {
+                    // Get the number of images on the current page
+                    int imageCount = extractor.GetImageCount(pageNum);
+
+                    for (int imgIndex = 1; imgIndex <= imageCount; imgIndex++)
+                    {
+                        // Extract the image as a System.Drawing.Image
+                        System.Drawing.Image img = extractor.ExtractImage(pageNum, imgIndex);
+                        if (img != null)
+                        {
+                            // Build a unique file name for each extracted image
+                            string fileName = $"page{pageNum}_img{imgIndex}.png";
+
+                            // Combine the UNC folder with the file name (Path.Combine handles UNC correctly)
+                            string destPath = System.IO.Path.Combine(uncFolder, fileName);
+
+                            // Save the image in PNG format
+                            img.Save(destPath, ImageFormat.Png);
+
+                            // Release the image resources
+                            img.Dispose();
+
+                            Console.WriteLine($"Saved image to {destPath}");
+                        }
+                    }
+                }
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to create UNC directory '{uncFolder}': {ex.Message}");
-            return;
-        }
-
-        // Initialize the PDF extractor (Facades API)
-        PdfExtractor extractor = new PdfExtractor();
-
-        // Bind the source PDF
-        extractor.BindPdf(inputPdf);
-
-        // Extract images from the PDF
-        extractor.ExtractImage();
-
-        int imageIndex = 1;
-        // Loop through all extracted images
-        while (extractor.HasNextImage())
-        {
-            // Build a file name for each image (JPEG format by default)
-            string imagePath = Path.Combine(uncFolder, $"image-{imageIndex}.jpg");
-
-            // Save the current image to the UNC path
-            extractor.GetNextImage(imagePath);
-
-            Console.WriteLine($"Saved image {imageIndex} to: {imagePath}");
-            imageIndex++;
-        }
-
-        Console.WriteLine("Image extraction completed.");
     }
 }

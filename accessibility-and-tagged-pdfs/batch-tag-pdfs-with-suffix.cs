@@ -8,68 +8,56 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "input_pdfs";
-        // Folder where tagged PDFs will be written
-        const string outputFolder = "output_pdfs";
-        // Suffix added to each output file name
-        const string suffix = "_tagged.pdf";
+        // Folder containing PDFs to process
+        const string inputFolder = @"C:\PdfFolder";
+        // Suffix to add to processed files
+        const string suffix = "_tagged";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
-
-        // Process every PDF file in the input folder
-        foreach (string filePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // Load the PDF (lifecycle rule: use Document constructor)
-                using (Document doc = new Document(filePath))
+                // Open the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Enable automatic tagging (static global settings)
-                    AutoTaggingSettings.Default.EnableAutoTagging = true;
+                    // Access the tagged content API
+                    ITaggedContent taggedContent = doc.TaggedContent;
 
-                    // Access the tagged‑content API
-                    ITaggedContent tagged = doc.TaggedContent;
+                    // Set language and title (title derived from file name)
+                    taggedContent.SetLanguage("en-US");
+                    string title = Path.GetFileNameWithoutExtension(pdfPath);
+                    taggedContent.SetTitle(title);
 
-                    // Set language and title (write‑only setters)
-                    tagged.SetLanguage("en-US");
-                    string title = Path.GetFileNameWithoutExtension(filePath);
-                    tagged.SetTitle(title);
+                    // Get the root structure element (no cast required)
+                    StructureElement root = taggedContent.RootElement;
 
-                    // Ensure a root structure element exists
-                    StructureElement root = tagged.RootElement;
+                    // Add a simple paragraph element if the document has no content
+                    // (this demonstrates adding a tag; in real scenarios you would
+                    //  create appropriate structure based on the PDF content)
+                    ParagraphElement para = taggedContent.CreateParagraphElement();
+                    para.SetText("Document has been auto‑tagged for accessibility.");
+                    root.AppendChild(para);
 
-                    // If the document has no structure, add a simple paragraph
-                    if (root.ChildElements.Count == 0)
-                    {
-                        ParagraphElement para = tagged.CreateParagraphElement();
-                        para.SetText($"Document generated from {title}");
-                        root.AppendChild(para); // AppendChild with one argument
-                    }
+                    // Build output file name with suffix
+                    string dir = Path.GetDirectoryName(pdfPath);
+                    string fileName = Path.GetFileNameWithoutExtension(pdfPath);
+                    string outPath = Path.Combine(dir, $"{fileName}{suffix}.pdf");
 
-                    // Persist any changes to the tagged structure
-                    tagged.Save(); // ITaggedContent.Save()
-
-                    // Build the output file name with the required suffix
-                    string outputPath = Path.Combine(
-                        outputFolder,
-                        Path.GetFileNameWithoutExtension(filePath) + suffix);
-
-                    // Save the PDF (lifecycle rule: use Document.Save(string))
-                    doc.Save(outputPath);
+                    // Save the modified PDF
+                    doc.Save(outPath);
+                    Console.WriteLine($"Tagged PDF saved: {outPath}");
                 }
-
-                Console.WriteLine($"Processed: {Path.GetFileName(filePath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{filePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

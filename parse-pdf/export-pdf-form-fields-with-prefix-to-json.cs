@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,41 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "filtered_fields.json";
-        const string fieldPrefix = "Customer_";
+        // Input PDF containing form fields
+        const string inputPath = "input.pdf";
+        // Output text file with filtered field names and values
+        const string outputPath = "filtered_fields.txt";
+        // Prefix to filter field names
+        const string prefix = "Customer_";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Prepare a dictionary to hold the filtered field names and their values
-            var filteredFields = new Dictionary<string, object>();
-
-            // Iterate over all form fields in the document
-            foreach (Field field in pdfDoc.Form.Fields)
+            // Ensure the document actually contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // Check if the field name starts with the desired prefix
-                if (!string.IsNullOrEmpty(field.Name) && field.Name.StartsWith(fieldPrefix, StringComparison.Ordinal))
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            // Filter fields whose names start with the specified prefix
+            var filteredFields = doc.Form.Fields
+                                   .Where(field => !string.IsNullOrEmpty(field.FullName) &&
+                                                   field.FullName.StartsWith(prefix, StringComparison.Ordinal));
+
+            // Export the filtered fields to a simple CSV‑like text file
+            using (StreamWriter writer = new StreamWriter(outputPath, false))
+            {
+                foreach (var field in filteredFields)
                 {
-                    // Store the field value (null-safe) in the dictionary
-                    filteredFields[field.Name] = field.Value ?? string.Empty;
+                    // Some fields may have null values; handle gracefully
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    writer.WriteLine($"{field.FullName},{value}");
                 }
             }
 
-            // Serialize the filtered fields to JSON with indentation
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string jsonContent = JsonSerializer.Serialize(filteredFields, jsonOptions);
-
-            // Write the JSON output to the specified file
-            File.WriteAllText(outputJsonPath, jsonContent);
+            Console.WriteLine($"Filtered fields saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Filtered fields exported to '{outputJsonPath}'.");
     }
 }

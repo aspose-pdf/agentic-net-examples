@@ -7,63 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // PDF containing the empty signature field
-        const string outputPdfPath = "signed_locked.pdf";  // Resulting PDF
-        const string pfxPath       = "certificate.pfx";   // Signing certificate
-        const string pfxPassword   = "password";          // Certificate password
-        const string fieldName     = "ClientSignature";   // Name of the signature field to lock
+        // Paths – replace with actual file locations
+        const string inputPdfPath   = "input.pdf";
+        const string finalPdfPath   = "final.pdf";
+        const string certPath       = "certificate.pfx";
+        const string certPassword   = "certPassword";
+        const string signatureFieldName = "ClientSignature";
 
+        // Ensure the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(pfxPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
+            // Retrieve the signature field by its partial name
+            SignatureField sigField = doc.Form[signatureFieldName] as SignatureField;
+            if (sigField == null)
             {
-                // Retrieve the signature field by name
-                SignatureField sigField = doc.Form[fieldName] as SignatureField;
-                if (sigField == null)
-                {
-                    Console.Error.WriteLine($"Signature field '{fieldName}' not found.");
-                    return;
-                }
-
-                // Create a PKCS#7 signature object using the certificate
-                PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword)
-                {
-                    Reason   = "Approved by client",
-                    Location = "Client Office",
-                    ContactInfo = "client@example.com",
-                    Date = DateTime.UtcNow
-                };
-
-                // Sign the field
-                sigField.Sign(pkcs7);
-
-                // Lock the field to prevent further changes
-                sigField.ReadOnly = true;
-
-                // Ensure that any further modifications are saved as incremental updates only
-                doc.Form.SignaturesAppendOnly = true;
-
-                // Save the signed and locked PDF
-                doc.Save(outputPdfPath);
+                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found.");
+                return;
             }
 
-            Console.WriteLine($"Document signed and field '{fieldName}' locked successfully.");
+            // Create a PKCS#7 signature using the provided certificate
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+            {
+                Reason = "Document signed by client",
+                Location = "Company HQ",
+                ContactInfo = "contact@example.com"
+            };
+
+            // Sign the field
+            sigField.Sign(pkcs7);
+
+            // Lock the field to prevent further modifications
+            sigField.ReadOnly = true;
+
+            // Save the final PDF with the locked signature field
+            doc.Save(finalPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Document processed. Final file: {finalPdfPath}");
     }
 }

@@ -1,35 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // source PDF containing the original field
-        const string outputPdf = "output.pdf";  // PDF that will receive the copied field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor works with a source and a destination PDF.
-        // It implements IDisposable, so wrap it in a using block.
-        using (FormEditor formEditor = new FormEditor(inputPdf, outputPdf))
+        // Load the PDF document.
+        Document doc = new Document(inputPath);
+
+        // Retrieve the existing field named "AddressBlock".
+        // The Form indexer returns a WidgetAnnotation, so cast it to Field.
+        Field addressField = doc.Form["AddressBlock"] as Field;
+        if (addressField == null)
         {
-            // Copy the outer definition of the field "AddressBlock" to page 3 of the destination PDF.
-            // This creates a new field on page 3 with the same name ("AddressBlock").
-            formEditor.CopyOuterField(inputPdf, "AddressBlock", 3);
-
-            // Rename the newly copied field to "BillingAddress".
-            formEditor.RenameField("AddressBlock", "BillingAddress");
-
-            // Persist the changes to the output file.
-            formEditor.Save();
+            Console.Error.WriteLine("Field 'AddressBlock' not found or is not a form field.");
+            return;
         }
 
-        Console.WriteLine($"Field copied and renamed. Output saved to '{outputPdf}'.");
+        // Extract the rectangle (position and size) of the original field.
+        double llx = addressField.Rect.LLX;
+        double lly = addressField.Rect.LLY;
+        double urx = addressField.Rect.URX;
+        double ury = addressField.Rect.URY;
+
+        // Create a new TextBox field "BillingAddress" on page 3 using the same rectangle
+        // and the same value as the original field.
+        TextBoxField billingField = new TextBoxField(doc.Pages[3], new Rectangle(llx, lly, urx, ury))
+        {
+            PartialName = "BillingAddress",
+            Value = addressField.Value
+        };
+
+        // Add the new field to the form on page 3.
+        doc.Form.Add(billingField, 3);
+
+        // Save the modified PDF.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Field copied to page 3 and saved as '{outputPath}'.");
     }
 }

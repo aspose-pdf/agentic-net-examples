@@ -1,44 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // List of encrypted PDF files to process
-        string[] inputFiles = { "encrypted1.pdf", "encrypted2.pdf" };
-        // Password that unlocks the PDFs (user password)
-        const string userPassword = "user123";
+        // Folder containing encrypted PDFs
+        const string inputFolder = "EncryptedPdfs";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = "ProcessedPdfs";
+        // Password required to open the encrypted PDFs (user password)
+        const string password = "userPassword";
 
-        foreach (string inputPath in inputFiles)
+        if (!Directory.Exists(inputFolder))
         {
-            if (!File.Exists(inputPath))
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
+            try
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                continue;
+                // Load the encrypted PDF providing the user password
+                Document pdfDoc = new Document(pdfPath, password);
+
+                // Remove all bookmarks (outlines) from the document
+                // The Outlines collection represents the PDF bookmarks.
+                pdfDoc.Outlines.Clear();
+
+                // Save the modified PDF to the output folder
+                pdfDoc.Save(outputPath);
+
+                Console.WriteLine($"Processed: {fileName}");
             }
-
-            // Output file name – original name with a suffix
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(inputPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPath) + "_noBookmarks.pdf");
-
-            // Open the encrypted PDF with the password
-            using (Document doc = new Document(inputPath, userPassword))
+            catch (InvalidPasswordException ex)
             {
-                // Bind the opened document to the bookmark editor
-                PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor(doc);
-
-                // Delete all bookmarks in the document
-                bookmarkEditor.DeleteBookmarks();
-
-                // Save the modified PDF (the editor saves the underlying document)
-                bookmarkEditor.Save(outputPath);
+                Console.Error.WriteLine($"Invalid password for {fileName}: {ex.Message}");
             }
-
-            Console.WriteLine($"Bookmarks removed: {inputPath} → {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+            }
         }
     }
 }

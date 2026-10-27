@@ -1,76 +1,48 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace PdfConcatenationService
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
+        // The console version expects file paths as arguments.
+        // Example: dotnet run file1.pdf file2.pdf [file3.pdf ...]
+        if (args.Length < 2)
         {
-            // Simple validation – at least one input PDF is required.
-            if (args.Length == 0)
-            {
-                Console.WriteLine("Usage: PdfConcatenationService <pdf1> <pdf2> ... [output]");
-                return;
-            }
+            Console.WriteLine("Usage: <exe> <pdf1> <pdf2> [<pdf3> ...]");
+            return;
+        }
 
-            // Determine the output file name.
-            // If the last argument ends with .pdf and there is more than one argument, treat it as the output path.
-            // Otherwise default to "merged.pdf".
-            string outputPath;
-            int inputCount;
-            if (args.Length > 1 && args[^1].EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-            {
-                outputPath = args[^1];
-                inputCount = args.Length - 1;
-            }
+        var inputPaths = new List<string>();
+        foreach (var arg in args)
+        {
+            if (File.Exists(arg))
+                inputPaths.Add(arg);
             else
-            {
-                outputPath = "merged.pdf";
-                inputCount = args.Length;
-            }
+                Console.WriteLine($"Warning: file not found '{arg}' – ignored.");
+        }
 
-            // Prepare an array of input streams.
-            Stream[] inputStreams = new Stream[inputCount];
-            try
-            {
-                for (int i = 0; i < inputCount; i++)
-                {
-                    string path = args[i];
-                    if (!File.Exists(path))
-                    {
-                        Console.WriteLine($"File not found: {path}");
-                        return;
-                    }
-                    // Open each PDF as a read‑only stream.
-                    inputStreams[i] = File.OpenRead(path);
-                }
+        if (inputPaths.Count < 2)
+        {
+            Console.WriteLine("At least two existing PDF files are required.");
+            return;
+        }
 
-                // Concatenate the PDFs using Aspose.Pdf.Facades.PdfFileEditor.
-                using (MemoryStream outputStream = new MemoryStream())
-                {
-                    var editor = new PdfFileEditor
-                    {
-                        // Close the input streams automatically after concatenation.
-                        CloseConcatenatedStreams = true
-                    };
+        // Create a temporary file for the merged PDF.
+        string outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
 
-                    editor.Concatenate(inputStreams, outputStream);
-
-                    // Write the merged PDF to the desired output file.
-                    File.WriteAllBytes(outputPath, outputStream.ToArray());
-                    Console.WriteLine($"Merged PDF saved to {outputPath}");
-                }
-            }
-            finally
-            {
-                // Ensure all input streams are disposed in case of an exception or if CloseConcatenatedStreams is false.
-                foreach (var s in inputStreams)
-                {
-                    s?.Dispose();
-                }
-            }
+        try
+        {
+            // PdfFileEditor does not implement IDisposable, so no using block is needed.
+            var editor = new PdfFileEditor();
+            editor.Concatenate(inputPaths.ToArray(), outputPath);
+            Console.WriteLine($"Merged PDF created at: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during concatenation: {ex.Message}");
         }
     }
 }

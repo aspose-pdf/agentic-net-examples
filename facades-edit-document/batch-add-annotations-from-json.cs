@@ -1,136 +1,148 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-namespace BatchAnnotationDemo
+namespace PdfBatchAnnotation
 {
-    // Represents a single annotation definition read from JSON.
+    // Represents a single annotation instruction read from JSON
     public class AnnotationDefinition
     {
-        public string Type { get; set; }          // e.g., "Text", "Link", "Square", "Circle", "Highlight"
-        public int Page { get; set; }             // 1‑based page number
-        public double Llx { get; set; }           // lower‑left X
-        public double Lly { get; set; }           // lower‑left Y
-        public double Urx { get; set; }           // upper‑right X
-        public double Ury { get; set; }           // upper‑right Y
-        public string Contents { get; set; }      // annotation text (if applicable)
-        public string Color { get; set; }         // simple color name (e.g., "Yellow") or hex "#RRGGBB"
+        public string? InputPdf { get; set; }          // Path to source PDF
+        public string? OutputPdf { get; set; }         // Path where annotated PDF will be saved
+        public int PageNumber { get; set; }           // 1‑based page index
+        public string? Type { get; set; }              // "Text", "Link", "Stamp", "Highlight"
+        public double[]? Rect { get; set; }            // [llx, lly, urx, ury] in points
+        public string? Content { get; set; }           // Text for Text/Highlight annotations
+        public string? Url { get; set; }               // Target URL for Link annotations
+        public string? ImagePath { get; set; }         // Image file for Stamp annotations
     }
 
     class Program
     {
         static void Main()
         {
-            const string inputPdfPath = "input.pdf";
-            const string jsonDefPath  = "annotations.json";
-            const string outputPdfPath = "output_annotated.pdf";
+            const string jsonPath = "annotations.json";
 
-            if (!File.Exists(inputPdfPath))
+            if (!File.Exists(jsonPath))
             {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                Console.Error.WriteLine($"Definition file not found: {jsonPath}");
                 return;
             }
 
-            if (!File.Exists(jsonDefPath))
-            {
-                Console.Error.WriteLine($"JSON definition file not found: {jsonDefPath}");
-                return;
-            }
-
-            // Load annotation definitions from JSON.
-            List<AnnotationDefinition> definitions;
+            // Deserialize JSON into a list of annotation definitions
+            List<AnnotationDefinition>? definitions;
             try
             {
-                string json = File.ReadAllText(jsonDefPath);
-                definitions = JsonSerializer.Deserialize<List<AnnotationDefinition>>(json);
-                if (definitions == null) throw new Exception("Deserialized list is null.");
+                string json = File.ReadAllText(jsonPath);
+                definitions = JsonSerializer.Deserialize<List<AnnotationDefinition>>(json,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to read JSON definitions: {ex.Message}");
+                Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
                 return;
             }
 
-            // Open the PDF document inside a using block (lifecycle rule).
-            using (Document doc = new Document(inputPdfPath))
+            if (definitions == null || definitions.Count == 0)
             {
-                foreach (var def in definitions)
+                Console.WriteLine("No annotation definitions found.");
+                return;
+            }
+
+            // Process each definition independently
+            foreach (var def in definitions)
+            {
+                if (string.IsNullOrWhiteSpace(def.InputPdf) || !File.Exists(def.InputPdf))
                 {
-                    // Validate page number (Aspose.Pdf uses 1‑based indexing).
-                    if (def.Page < 1 || def.Page > doc.Pages.Count)
+                    Console.Error.WriteLine($"Input PDF not found: {def.InputPdf}");
+                    continue;
+                }
+
+                // Ensure rectangle coordinates are valid
+                if (def.Rect == null || def.Rect.Length != 4)
+                {
+                    Console.Error.WriteLine($"Invalid rectangle for {def.InputPdf} page {def.PageNumber}");
+                    continue;
+                }
+
+                // Wrap Document in a using block for deterministic disposal
+                using (Document doc = new Document(def.InputPdf))
+                {
+                    // Validate page number (Aspose.Pdf uses 1‑based indexing)
+                    if (def.PageNumber < 1 || def.PageNumber > doc.Pages.Count)
                     {
-                        Console.Error.WriteLine($"Invalid page number {def.Page} for annotation type {def.Type}.");
+                        Console.Error.WriteLine($"Page number {def.PageNumber} out of range for {def.InputPdf}");
                         continue;
                     }
 
-                    // Build the rectangle (fully qualified to avoid ambiguity).
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(def.Llx, def.Lly, def.Urx, def.Ury);
+                    // Build the rectangle using Aspose.Pdf.Rectangle
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                        def.Rect[0], def.Rect[1], def.Rect[2], def.Rect[3]);
 
-                    // Resolve color (fallback to Yellow if parsing fails).
-                    Aspose.Pdf.Color color = ResolveColor(def.Color) ?? Aspose.Pdf.Color.Yellow;
-
-                    // Retrieve the target page.
-                    Page page = doc.Pages[def.Page];
-
-                    // Create and add the appropriate annotation based on the type string.
+                    // Add the appropriate annotation based on the Type field
                     switch (def.Type?.Trim().ToLowerInvariant())
                     {
                         case "text":
                             {
-                                var textAnn = new TextAnnotation(page, rect)
+                                // TextAnnotation displays a pop‑up note
+                                TextAnnotation txtAnn = new TextAnnotation(doc.Pages[def.PageNumber], rect)
                                 {
                                     Title = "Note",
-                                    Contents = def.Contents ?? string.Empty,
-                                    Color = color,
+                                    Contents = def.Content ?? string.Empty,
                                     Open = true,
                                     Icon = TextIcon.Note
                                 };
-                                page.Annotations.Add(textAnn);
+                                doc.Pages[def.PageNumber].Annotations.Add(txtAnn);
                                 break;
                             }
                         case "link":
                             {
-                                // For a simple external link, use GoToURIAction.
-                                var linkAnn = new LinkAnnotation(page, rect)
+                                // LinkAnnotation creates a clickable hyperlink
+                                LinkAnnotation linkAnn = new LinkAnnotation(doc.Pages[def.PageNumber], rect)
                                 {
-                                    Color = color
+                                    Action = new GoToURIAction(def.Url ?? string.Empty)
                                 };
-                                linkAnn.Action = new GoToURIAction(def.Contents ?? "https://example.com");
-                                page.Annotations.Add(linkAnn);
+                                doc.Pages[def.PageNumber].Annotations.Add(linkAnn);
                                 break;
                             }
-                        case "square":
+                        case "stamp":
                             {
-                                var squareAnn = new SquareAnnotation(page, rect)
+                                // StampAnnotation places an image on the page
+                                if (string.IsNullOrEmpty(def.ImagePath) || !File.Exists(def.ImagePath))
                                 {
-                                    Color = color,
-                                    Contents = def.Contents ?? string.Empty
-                                };
-                                page.Annotations.Add(squareAnn);
-                                break;
-                            }
-                        case "circle":
-                            {
-                                var circleAnn = new CircleAnnotation(page, rect)
-                                {
-                                    Color = color,
-                                    Contents = def.Contents ?? string.Empty
-                                };
-                                page.Annotations.Add(circleAnn);
+                                    Console.Error.WriteLine($"Stamp image not found: {def.ImagePath}");
+                                    break;
+                                }
+
+                                ImageStamp stamp = new ImageStamp(def.ImagePath);
+                                // Set size based on rectangle
+                                double width = rect.URX - rect.LLX;
+                                double height = rect.URY - rect.LLY;
+                                stamp.Width = width;
+                                stamp.Height = height;
+                                // Position using alignment + indents (Left/Bottom alignment)
+                                stamp.HorizontalAlignment = HorizontalAlignment.Left;
+                                stamp.VerticalAlignment = VerticalAlignment.Bottom;
+                                stamp.XIndent = rect.LLX;
+                                stamp.YIndent = rect.LLY;
+
+                                // Apply the stamp to the target page
+                                doc.Pages[def.PageNumber].AddStamp(stamp);
                                 break;
                             }
                         case "highlight":
                             {
-                                // HighlightAnnotation expects a QuadPoints array; for simplicity we use the rectangle bounds.
-                                var highlightAnn = new HighlightAnnotation(page, rect)
+                                // HighlightAnnotation highlights a region of text
+                                HighlightAnnotation hlAnn = new HighlightAnnotation(doc.Pages[def.PageNumber], rect)
                                 {
-                                    Color = color,
-                                    Contents = def.Contents ?? string.Empty
+                                    Color = Color.FromRgb(1.0, 1.0, 0.0), // Yellow
+                                    Opacity = 0.5,
+                                    Contents = def.Content ?? string.Empty
                                 };
-                                page.Annotations.Add(highlightAnn);
+                                doc.Pages[def.PageNumber].Annotations.Add(hlAnn);
                                 break;
                             }
                         default:
@@ -139,53 +151,13 @@ namespace BatchAnnotationDemo
                                 break;
                             }
                     }
-                }
 
-                // Save the modified document (lifecycle rule – save inside the using block).
-                doc.Save(outputPdfPath);
-                Console.WriteLine($"Annotated PDF saved to '{outputPdfPath}'.");
-            }
-        }
-
-        // Helper to convert a simple color name or hex string to Aspose.Pdf.Color.
-        private static Aspose.Pdf.Color ResolveColor(string colorStr)
-        {
-            if (string.IsNullOrWhiteSpace(colorStr))
-                return null;
-
-            // Try known named colors.
-            switch (colorStr.Trim().ToLowerInvariant())
-            {
-                case "black":   return Aspose.Pdf.Color.Black;
-                case "blue":    return Aspose.Pdf.Color.Blue;
-                case "cyan":    return Aspose.Pdf.Color.Cyan;
-                case "gray":    return Aspose.Pdf.Color.Gray;
-                case "green":   return Aspose.Pdf.Color.Green;
-                case "magenta": return Aspose.Pdf.Color.Magenta;
-                case "red":     return Aspose.Pdf.Color.Red;
-                case "white":   return Aspose.Pdf.Color.White;
-                case "yellow":  return Aspose.Pdf.Color.Yellow;
-                // Add more named colors as needed.
-            }
-
-            // Try hex format "#RRGGBB".
-            if (colorStr.StartsWith("#") && colorStr.Length == 7)
-            {
-                try
-                {
-                    int r = Convert.ToInt32(colorStr.Substring(1, 2), 16);
-                    int g = Convert.ToInt32(colorStr.Substring(3, 2), 16);
-                    int b = Convert.ToInt32(colorStr.Substring(5, 2), 16);
-                    // Aspose.Pdf.Color.FromRgb expects values in 0‑1 range.
-                    return Aspose.Pdf.Color.FromRgb(r / 255.0, g / 255.0, b / 255.0);
-                }
-                catch
-                {
-                    // fall through to null
+                    // Save the modified PDF; the output path may be the same as input or different
+                    string outputPath = def.OutputPdf ?? def.InputPdf;
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
                 }
             }
-
-            return null; // unknown format
         }
     }
 }

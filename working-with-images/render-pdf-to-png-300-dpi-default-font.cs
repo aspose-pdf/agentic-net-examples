@@ -1,53 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;   // PngDevice resides here
-using Aspose.Pdf.Text;      // SimpleFontSubstitution
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputDir = "output_images";
+        const string outputDir = "PngPages";
 
-        // Verify source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Configure a font substitution so that any missing font is replaced with Arial.
-        // This is the recommended way to set a default font in recent Aspose.Pdf versions.
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
+        // Optional: set a default fallback font for missing glyphs
+        // FontRepository.DefaultFont = FontRepository.FindFont("Arial");
 
-        // Load PDF inside a using block (document-disposal-with-using rule)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Create a 300 DPI resolution object
-            Resolution resolution = new Resolution(300);
-
-            // Initialise the PNG device with the desired resolution
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                Page page = pdfDoc.Pages[pageNum];
-                string outPath = Path.Combine(outputDir, $"page_{pageNum}.png");
+                // Create a PNG device with 300 DPI resolution
+                Resolution resolution = new Resolution(300);
+                PngDevice pngDevice = new PngDevice(resolution);
 
-                // Render the page to PNG and write to file
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                // Define the output file name for the current page
+                string outPath = Path.Combine(outputDir, $"Page_{i}.png");
+
+                // Render the page to a PNG file
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
                 {
-                    pngDevice.Process(page, outStream);
+                    pngDevice.Process(pdfDoc.Pages[i], imageStream);
                 }
+
+                Console.WriteLine($"Rendered page {i} to {outPath}");
             }
         }
-
-        Console.WriteLine("All pages have been rendered to PNG at 300 DPI.");
     }
 }

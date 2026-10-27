@@ -1,41 +1,36 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the facade with source and destination files
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+        // Load the PDF document using the Document class (PdfFileEditor does not expose the needed API).
+        Document pdfDoc = new Document(inputPath);
 
-        // Disable internal exception handling so that errors are thrown
-        fileSecurity.AllowExceptions = false;
+        // Define the permissions using only members that exist in the current Aspose.Pdf version.
+        Permissions permissions = Permissions.PrintDocument |
+                                   Permissions.ExtractContent |
+                                   Permissions.ModifyContent;
 
-        try
-        {
-            // Modify the privilege; this will throw if it fails
-            fileSecurity.SetPrivilege(userPassword, ownerPassword, DocumentPrivilege.Print);
-            Console.WriteLine("Privilege modification succeeded.");
-        }
-        catch (PdfException ex)
-        {
-            Console.Error.WriteLine($"PdfException: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Apply the permissions. Empty passwords keep the original passwords (if any).
+        // Choose any supported CryptoAlgorithm; RC4x128 is used here as an example.
+        pdfDoc.Encrypt(string.Empty, string.Empty, permissions, CryptoAlgorithm.RC4x128);
+
+        // Save the modified PDF.
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Privileges modified and saved to '{outputPath}'.");
     }
 }

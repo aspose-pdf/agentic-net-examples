@@ -1,13 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // needed for FontRepository and TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "bates_numbered.pdf";
+        const string prefix = "PRJ-"; // alphanumeric prefix for tracking
 
         if (!File.Exists(inputPath))
         {
@@ -15,26 +17,37 @@ class Program
             return;
         }
 
-        // Load the PDF, add Bates numbering with a prefix, then save.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Configure and add Bates numbering to every page.
-            doc.Pages.AddBatesNumbering(artifact =>
+            // Aspose.Pdf uses 1‑based page indexing (see global rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                artifact.Prefix          = "PRJ-";               // Alphanumeric prefix
-                artifact.StartNumber     = 1;                    // Starting number
-                artifact.NumberOfDigits = 5;                    // Zero‑pad to 5 digits (e.g., PRJ-00001)
-                artifact.ArtifactHorizontalAlignment = HorizontalAlignment.Right;
-                artifact.ArtifactVerticalAlignment   = VerticalAlignment.Bottom;
-                // Optional: adjust margins if needed
-                artifact.RightMargin = 20;
-                artifact.BottomMargin = 20;
-            });
+                Page page = doc.Pages[i];
 
-            // Save the modified PDF.
+                // Create a TextStamp with the desired Bates number
+                TextStamp stamp = new TextStamp($"{prefix}{i:D4}")
+                {
+                    // Position the stamp (adjust as needed)
+                    XIndent = 20,          // distance from left edge
+                    YIndent = 20,          // distance from bottom edge
+                    // Ensure the stamp appears on top of page content
+                    Background = false
+                };
+
+                // Configure appearance via the existing TextState instance
+                stamp.TextState.Font = FontRepository.FindFont("Arial");
+                stamp.TextState.FontSize = 12;
+                stamp.TextState.ForegroundColor = Color.Black;
+
+                // Add the stamp to the current page
+                page.AddStamp(stamp);
+            }
+
+            // Save the modified PDF (output format is PDF by default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bates numbering added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Bates numbering applied and saved to '{outputPath}'.");
     }
 }

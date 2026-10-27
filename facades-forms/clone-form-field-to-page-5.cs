@@ -1,35 +1,83 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "source.pdf";   // PDF containing the field "TemplateField"
-        const string outputPdf = "cloned.pdf";   // Result PDF with the new field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // 1. Copy the outer definition of "TemplateField" to page 5 of the output PDF
-        using (FormEditor editor = new FormEditor(sourcePdf, outputPdf))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Retrieve the existing field definition (cast to Field)
+        Field templateField = doc.Form["TemplateField"] as Field;
+        if (templateField == null)
         {
-            // CopyOuterField(srcFileName, fieldName, pageNum)
-            editor.CopyOuterField(sourcePdf, "TemplateField", 5);
-            editor.Save(); // Persist changes to outputPdf
+            Console.Error.WriteLine("TemplateField not found or is not a form field.");
+            return;
         }
 
-        // 2. Rename the copied field to "ClonedField"
-        using (Form form = new Form(outputPdf))
+        // Use the same rectangle (position) as the original field
+        Aspose.Pdf.Rectangle rect = templateField.Rect;
+        int targetPageNumber = 5; // 1‑based page number where the clone will be placed
+        string clonedFieldName = "ClonedField";
+
+        // Get the target Page object (Aspose.Pdf expects a Page, not an int)
+        if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
         {
-            form.RenameField("TemplateField", "ClonedField");
-            form.Save(); // Save the renamed field
+            Console.Error.WriteLine($"Target page {targetPageNumber} is out of range.");
+            return;
+        }
+        Page targetPage = doc.Pages[targetPageNumber];
+
+        // Clone the field preserving its runtime type using reflection.
+        Type fieldType = templateField.GetType();
+        // Most field constructors accept (Page page, Rectangle rect)
+        Field clonedField = (Field)Activator.CreateInstance(fieldType, targetPage, rect);
+        clonedField.PartialName = clonedFieldName;
+
+        // Copy type‑specific properties via dynamic dispatch.
+        dynamic src = templateField;
+        dynamic dst = clonedField;
+        string typeName = fieldType.Name;
+        if (typeName == "TextBoxField")
+        {
+            dst.Value = src.Value;
+        }
+        else if (typeName == "CheckBoxField" || typeName == "RadioButtonOptionField")
+        {
+            // Both have a Checked property in supported versions.
+            dst.Checked = src.Checked;
+        }
+        else if (typeName == "ListBoxField")
+        {
+            dst.SelectedItems = src.SelectedItems;
+        }
+        else if (typeName == "ComboBoxField")
+        {
+            dst.SelectedItem = src.SelectedItem;
+        }
+        else
+        {
+            Console.Error.WriteLine($"Field type '{typeName}' is not explicitly handled; only basic properties were copied.");
         }
 
-        Console.WriteLine($"Field cloned to page 5 as 'ClonedField' in '{outputPdf}'.");
+        // Add the cloned field to the document's form.
+        doc.Form.Add(clonedField);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Cloned field created on page {targetPageNumber} and saved to '{outputPath}'.");
     }
 }

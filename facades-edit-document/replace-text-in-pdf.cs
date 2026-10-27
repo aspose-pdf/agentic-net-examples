@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,26 +9,30 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a PdfContentEditor facade and bind it to the loaded document
+            // Load the PDF using the Facades API
             PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
+            editor.BindPdf(inputPath);
 
-            // Replace every occurrence of the word "Draft" with "Final" in the whole document
+            // Replace every occurrence of the word "Draft" with "Final"
             editor.ReplaceText("Draft", "Final");
 
             // Save the modified document
-            doc.Save(outputPath);
-        }
+            editor.Save(outputPath);
 
-        Console.WriteLine($"All occurrences of \"Draft\" have been replaced with \"Final\" and saved to '{outputPath}'.");
+            Console.WriteLine($"All occurrences replaced. Saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

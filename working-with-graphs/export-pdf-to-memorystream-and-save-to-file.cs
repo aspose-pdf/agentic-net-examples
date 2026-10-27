@@ -1,40 +1,40 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF file
-        const string outputFilePath = "output_from_stream.pdf"; // destination file
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_copy.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF and ensure deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Export the PDF to a memory stream
+            // Export PDF content to a memory stream
             using (MemoryStream ms = new MemoryStream())
             {
-                // Save the document into the memory stream (PDF format is default)
-                pdfDoc.Save(ms);
+                // Save the document into the memory stream (PDF format)
+                doc.Save(ms);
 
-                // Ensure the stream position is at the beginning before writing out
+                // Reset stream position before reading
                 ms.Position = 0;
 
-                // Write the memory stream contents to a file on disk
-                using (FileStream fileOut = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
+                // Write the memory stream to a file on disk
+                using (FileStream file = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    ms.CopyTo(fileOut);
+                    ms.CopyTo(file);
                 }
             }
         }
 
-        Console.WriteLine($"PDF exported to memory stream and saved as '{outputFilePath}'.");
+        Console.WriteLine($"PDF exported to memory and saved as '{outputPath}'.");
     }
 }

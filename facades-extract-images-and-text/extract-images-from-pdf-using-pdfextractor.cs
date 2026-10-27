@@ -6,42 +6,51 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        // Folder where extracted images will be saved
-        const string outputFolder = "ExtractedImages";
-
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Use a using block so the PdfExtractor is disposed automatically
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF document to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Extract all images from the document
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            // Retrieve each image while there are more available
-            while (extractor.HasNextImage())
+            // PdfExtractor implements IDisposable, so we can use a using block
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                string imagePath = Path.Combine(outputFolder, $"image-{imageIndex}.png");
-                // Save the next image to the specified file (default format is JPEG;
-                // the file extension can be changed as needed)
-                extractor.GetNextImage(imagePath);
-                imageIndex++;
+                // Bind the source PDF
+                extractor.BindPdf(inputPath);
+
+                // Extract images from the whole document
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                // Iterate through all extracted images
+                while (extractor.HasNextImage())
+                {
+                    // Get the current image via a stream (newer Aspose API overload)
+                    using (MemoryStream imgStream = new MemoryStream())
+                    {
+                        extractor.GetNextImage(imgStream); // writes image to the stream
+                        byte[] imageBytes = imgStream.ToArray();
+
+                        // Save the image (using PNG extension as a generic format)
+                        string outPath = Path.Combine(outputDir, $"Image_{imageIndex}.png");
+                        File.WriteAllBytes(outPath, imageBytes);
+                        Console.WriteLine($"Saved image {imageIndex} to {outPath}");
+                    }
+                    imageIndex++;
+                }
             }
         }
-
-        Console.WriteLine("Image extraction completed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

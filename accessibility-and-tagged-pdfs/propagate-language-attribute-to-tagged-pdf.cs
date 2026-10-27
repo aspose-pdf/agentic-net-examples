@@ -1,6 +1,6 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Added for TextFragment
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
 
@@ -9,53 +9,40 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_tagged.pdf";
         const string language = "en-US";
 
-        // ------------------------------------------------------------
-        // 1. Create a minimal PDF file so the example is self‑contained.
-        // ------------------------------------------------------------
-        using (Document seed = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page with some simple content.
-            Page page = seed.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Sample text for tagging"));
-
-            // Enable tagged PDF structure and set a document‑level language.
-            ITaggedContent seedTagged = seed.TaggedContent;
-            seedTagged.SetLanguage(language);
-
-            // Save the placeholder file that will be re‑opened later.
-            seed.Save(inputPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Load the PDF and propagate the language attribute to every
-        //    structure element in the tagged content tree.
-        // ------------------------------------------------------------
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            ITaggedContent taggedContent = doc.TaggedContent;
+            // Access the tagged content interface
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // (Optional) Ensure the document‑level language is set.
-            taggedContent.SetLanguage(language);
+            // Set the language on the document (root element)
+            tagged.SetLanguage(language);
 
-            // Get the root structure element.
-            StructureElement root = taggedContent.RootElement;
+            // Obtain the root structure element (no cast needed)
+            StructureElement root = tagged.RootElement;
 
-            // Retrieve all structure elements, including the root.
+            // Retrieve all descendant structure elements recursively
             var allElements = root.FindElements<StructureElement>(true);
 
-            // Propagate the language attribute.
+            // Propagate the language attribute to each element
             foreach (StructureElement element in allElements)
             {
                 element.Language = language;
             }
 
-            // Save the modified PDF.
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Language '{language}' propagated and saved to '{outputPath}'.");
+        Console.WriteLine($"Language '{language}' propagated to all elements and saved as '{outputPath}'.");
     }
 }

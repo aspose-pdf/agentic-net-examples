@@ -1,75 +1,51 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
-class PdfToJpegConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdfPath = "input.pdf";
-        // Directory where JPEG images will be saved
-        const string outputDirectory = "Images";
-        // Font to use when the original PDF references missing fonts
-        const string substituteFontName = "Arial";
+        const string outputFolder = "PdfPagesAsJpeg";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
-
-        // ---------------------------------------------------------------------
-        // Create a placeholder PDF if the expected input file does not exist.
-        // This makes the example self‑contained and prevents a FileNotFoundException
-        // in the sandbox environment.
-        // ---------------------------------------------------------------------
         if (!File.Exists(inputPdfPath))
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdfPath);
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
         }
 
-        // Load the source PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdfPath);
+
+        // ------------------------------------------------------------
+        // Font substitution – replace missing fonts with available ones
+        // ------------------------------------------------------------
+        // Example: replace any missing "MyMissingFont" with "Arial"
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("MyMissingFont", "Arial"));
+        // Add more substitutions as needed, e.g.:
+        // FontRepository.Substitutions.Add(new SimpleFontSubstitution("AnotherMissingFont", "Times New Roman"));
+
+        // Set up JPEG conversion device (cross‑platform, no System.Drawing)
+        var jpegDevice = new JpegDevice(
+            new Aspose.Pdf.Devices.Resolution(150), // resolution (dpi)
+            100); // image quality (0‑100)
+
+        // Convert each page to JPEG
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Configure font substitution options
-            PdfSaveOptions saveOptions = new PdfSaveOptions
+            string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpeg");
+            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
             {
-                // Use the specified font for any missing fonts in the source PDF
-                DefaultFontName = substituteFontName,
-                // Font embedding is handled automatically; the FontEmbeddingMode property
-                // is not available in the current Aspose.PDF version and therefore omitted.
-            };
-
-            // Save the PDF with the substitution applied into a memory stream
-            using (MemoryStream pdfStream = new MemoryStream())
-            {
-                pdfDoc.Save(pdfStream, saveOptions);
-                pdfStream.Position = 0; // Reset stream position for reading
-
-                // Initialize the PDF converter facade
-                using (PdfConverter converter = new PdfConverter())
-                {
-                    // Bind the modified PDF stream to the converter
-                    converter.BindPdf(pdfStream);
-                    // Prepare the converter for image extraction
-                    converter.DoConvert();
-
-                    int pageIndex = 1;
-                    // Extract each page as a JPEG image
-                    while (converter.HasNextImage())
-                    {
-#pragma warning disable CA1416 // Suppress platform‑specific warning for ImageFormat.Jpeg
-                        string outputPath = Path.Combine(outputDirectory, $"page_{pageIndex}.jpg");
-                        converter.GetNextImage(outputPath, ImageFormat.Jpeg);
-#pragma warning restore CA1416
-                        pageIndex++;
-                    }
-                }
+                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
+            Console.WriteLine($"Saved page {pageNumber} as JPEG: {outputPath}");
         }
-
-        Console.WriteLine("PDF conversion to JPEG images completed.");
     }
 }

@@ -1,76 +1,92 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "LineGraph.pdf";
+        const string outputPath = "line_chart.pdf";
 
-        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 500 points, height: 300 points)
-            Graph graph = new Graph(500, 300);
+            // Graph size and margins
+            const float graphWidth = 500f;
+            const float graphHeight = 300f;
+            const float marginLeft = 50f;
+            const float marginBottom = 50f;
 
-            // Position the graph on the page (optional: set margins)
-            graph.Left = 50;
-            graph.Top = 500; // Y coordinate from bottom
+            // Create the graph container
+            Graph graph = new Graph(graphWidth, graphHeight);
+            graph.Border = new BorderInfo(BorderSide.All, 1);
+            graph.Title = new TextFragment("Line Chart with Three Series");
 
-            // ------------------------------
-            // Series 1 – Solid red line
-            // ------------------------------
-            // Define points for the line (x1, y1, x2, y2, ...)
-            float[] series1Points = { 0, 0, 100, 80, 200, 120, 300, 180, 400, 150 };
-            Line line1 = new Line(series1Points);
-            line1.GraphInfo = new GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Red,
-                LineWidth = 2f,
-                // Solid line – no dash array needed
-            };
-            graph.Shapes.Add(line1);
+            // Draw axes
+            Line xAxis = new Line(new float[] { marginLeft, marginBottom, marginLeft + graphWidth, marginBottom });
+            xAxis.GraphInfo.Color = Color.Black;
+            graph.Shapes.Add(xAxis);
 
-            // ------------------------------
-            // Series 2 – Dashed green line
-            // ------------------------------
-            float[] series2Points = { 0, 0, 100, 60, 200, 100, 300, 140, 400, 110 };
-            Line line2 = new Line(series2Points);
-            line2.GraphInfo = new GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Green,
-                LineWidth = 2f,
-                // Dash pattern: 6 points on, 4 points off
-                DashArray = new int[] { 6, 4 }
-            };
-            graph.Shapes.Add(line2);
+            Line yAxis = new Line(new float[] { marginLeft, marginBottom, marginLeft, marginBottom + graphHeight });
+            yAxis.GraphInfo.Color = Color.Black;
+            graph.Shapes.Add(yAxis);
 
-            // ------------------------------
-            // Series 3 – Dotted blue line
-            // ------------------------------
-            float[] series3Points = { 0, 0, 100, 40, 200, 80, 300, 100, 400, 70 };
-            Line line3 = new Line(series3Points);
-            line3.GraphInfo = new GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Blue,
-                LineWidth = 2f,
-                // Dotted pattern: 2 points on, 2 points off
-                DashArray = new int[] { 2, 2 }
-            };
-            graph.Shapes.Add(line3);
+            // Data series
+            double[] xValues = { 1, 2, 3, 4, 5 };
+            double[] ySeries1 = { 10, 20, 15, 30, 25 };
+            double[] ySeries2 = { 15, 25, 20, 35, 30 };
+            double[] ySeries3 = { 5, 15, 10, 20, 15 };
+
+            // Simple linear scaling (add some head‑room for Y)
+            double xMin = 1, xMax = 5;
+            double yMin = 0, yMax = 40;
+            double xScale = graphWidth / (xMax - xMin);
+            double yScale = graphHeight / (yMax - yMin);
+
+            // Helper lambdas to convert data points to graph coordinates
+            float ToX(double x) => (float)(marginLeft + (x - xMin) * xScale);
+            float ToY(double y) => (float)(marginBottom + (y - yMin) * yScale);
+
+            // Series 1 – solid blue line
+            graph.Shapes.Add(CreateLine(xValues, ySeries1, ToX, ToY, Color.Blue, null));
+
+            // Series 2 – dashed red line
+            graph.Shapes.Add(CreateLine(xValues, ySeries2, ToX, ToY, Color.Red, new int[] { 4, 2 }));
+
+            // Series 3 – dotted green line
+            graph.Shapes.Add(CreateLine(xValues, ySeries3, ToX, ToY, Color.Green, new int[] { 1, 2 }));
 
             // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Line graph PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
+    }
+
+    private static Line CreateLine(double[] xVals, double[] yVals,
+        Func<double, float> toX, Func<double, float> toY,
+        Color color, int[] dashArray)
+    {
+        if (xVals.Length != yVals.Length)
+            throw new ArgumentException("X and Y arrays must have the same length.");
+
+        float[] points = new float[xVals.Length * 2];
+        for (int i = 0; i < xVals.Length; i++)
+        {
+            points[i * 2] = toX(xVals[i]);
+            points[i * 2 + 1] = toY(yVals[i]);
+        }
+
+        Line line = new Line(points);
+        line.GraphInfo.Color = color;
+        line.GraphInfo.LineWidth = 2f;
+        if (dashArray != null)
+            line.GraphInfo.DashArray = dashArray;
+
+        return line;
     }
 }

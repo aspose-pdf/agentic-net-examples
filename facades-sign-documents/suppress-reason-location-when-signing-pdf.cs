@@ -1,53 +1,54 @@
 using System;
 using System.IO;
-using System.Drawing;                     // for Rectangle
-using Aspose.Pdf.Facades;                // PdfFileSignature
-using Aspose.Pdf.Forms;                  // PKCS1 signature class
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // required for PKCS7 and SignatureCustomAppearance
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed.pdf";
-        const string certFile   = "certificate.pfx";
-        const string certPass   = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        // Verify input files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(certFile))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certFile}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create the facade, bind the PDF and configure the certificate
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        if (!File.Exists(certificatePath))
         {
-            pdfSign.BindPdf(inputPdf);
-            pdfSign.SetCertificate(certFile, certPass);
-
-            // Create a PKCS1 signature object and clear Reason/Location (and ContactInfo)
-            PKCS1 signature = new PKCS1(certFile, certPass);
-            signature.Reason      = "";   // suppress reason text
-            signature.Location    = "";   // suppress location text
-            signature.ContactInfo = "";   // optional: clear contact info
-
-            // Define the visible signature rectangle (x, y, width, height)
-            Rectangle rect = new Rectangle(100, 100, 200, 50);
-
-            // Sign page 1 (visible) using the prepared signature object
-            pdfSign.Sign(page: 1, visible: true, annotRect: rect, sig: signature);
-
-            // Save the signed PDF
-            pdfSign.Save(outputPdf);
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            return;
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        // Bind the PDF to the signature facade
+        var signature = new PdfFileSignature();
+        signature.BindPdf(inputPath);
+
+        // Create a PKCS7 signature object and suppress location/reason/contact text
+        var pkcs = new PKCS7(certificatePath, certificatePassword)
+        {
+            Location = string.Empty,   // suppress location
+            Reason = string.Empty,     // suppress reason
+            ContactInfo = string.Empty // suppress contact info
+        };
+
+        // Optional: hide the labels on the appearance as well
+        pkcs.CustomAppearance = new SignatureCustomAppearance
+        {
+            ShowLocation = false,
+            ShowReason = false,
+            ShowContactInfo = false
+        };
+
+        // Sign the PDF using the PKCS7 object. The overload without SignatureFieldInfo
+        // signs the whole document with a default signature field.
+        signature.Sign(outputPath, pkcs);
+
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

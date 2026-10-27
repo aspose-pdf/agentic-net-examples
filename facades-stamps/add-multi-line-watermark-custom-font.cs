@@ -1,69 +1,70 @@
 using System;
 using System.IO;
-using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // for Color
 
 class Program
 {
     static void Main()
     {
-        // ------------------------------------------------------------
-        // 1. Ensure an input PDF exists – create a minimal one‑page PDF
-        //    because the sandbox does not contain external files.
-        // ------------------------------------------------------------
+        // Ensure there is a PDF to work with. If "input.pdf" does not exist, create a minimal one in memory.
+        byte[] pdfBytes;
         const string inputPath = "input.pdf";
-        if (!File.Exists(inputPath))
+        if (File.Exists(inputPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
-            }
+            pdfBytes = File.ReadAllBytes(inputPath);
+        }
+        else
+        {
+            // Create a placeholder PDF (one blank page) and keep it in a byte array.
+            using var placeholderDoc = new Document();
+            placeholderDoc.Pages.Add();
+            using var ms = new MemoryStream();
+            placeholderDoc.Save(ms);
+            pdfBytes = ms.ToArray();
         }
 
-        // ------------------------------------------------------------
-        // 2. Load the PDF from a memory stream (as the original task
-        //    requires).
-        // ------------------------------------------------------------
-        byte[] pdfBytes = File.ReadAllBytes(inputPath);
-        using (var inputStream = new MemoryStream(pdfBytes))
-        using (var doc = new Document(inputStream))
+        // Load the PDF document directly from the memory stream.
+        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
         {
-            // --------------------------------------------------------
-            // 3. Prepare the multi‑line watermark text with custom font
-            //    size and colour.
-            // --------------------------------------------------------
+            // Reset position to the beginning just in case.
+            inputStream.Position = 0;
+            Document pdfDoc = new Document(inputStream);
+
+            // Multi‑line watermark text.
             string watermarkText = "Confidential\nDo Not Distribute";
-            var formattedText = new Aspose.Pdf.Facades.FormattedText(
-                watermarkText,
-                System.Drawing.Color.Red,               // text colour
-                "Helvetica",                           // font name
-                Aspose.Pdf.Facades.EncodingType.Winansi,
-                false,                                   // embed font flag
-                48f);                                    // font size
 
-            // --------------------------------------------------------
-            // 4. Create a stamp, bind the formatted text and set its
-            //    appearance (background, opacity, position).
-            // --------------------------------------------------------
-            var stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(formattedText);
-            stamp.IsBackground = true;   // place behind page content
-            stamp.Opacity = 0.3f;        // semi‑transparent
-            stamp.SetOrigin(100f, 400f); // X, Y position on the page
+            // Custom font size and color for the watermark.
+            int fontSize = 48;
+            Color watermarkColor = Color.FromRgb(1.0, 0.0, 0.0); // Red
 
-            // --------------------------------------------------------
-            // 5. Apply the stamp to all pages of the document.
-            // --------------------------------------------------------
-            var fileStamp = new Aspose.Pdf.Facades.PdfFileStamp(doc);
-            fileStamp.AddStamp(stamp);
+            // Add the watermark to every page.
+            foreach (Page page in pdfDoc.Pages)
+            {
+                WatermarkArtifact watermark = new WatermarkArtifact();
+                watermark.SetTextAndState(watermarkText, new TextState
+                {
+                    FontSize = fontSize,
+                    ForegroundColor = watermarkColor,
+                    // Choose a font that exists on the system or embed one.
+                    Font = FontRepository.FindFont("Arial")
+                });
+                watermark.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
+                watermark.ArtifactVerticalAlignment = VerticalAlignment.Center;
+                watermark.Opacity = 0.5;               // optional transparency
+                watermark.IsBackground = true;        // render behind page content
 
-            // --------------------------------------------------------
-            // 6. Save the watermarked PDF.
-            // --------------------------------------------------------
-            fileStamp.Save("watermarked.pdf");
-            fileStamp.Close();
+                page.Artifacts.Add(watermark);
+            }
+
+            // Save the modified PDF back to a memory stream (or directly to a file).
+            using (MemoryStream resultStream = new MemoryStream())
+            {
+                pdfDoc.Save(resultStream);
+                File.WriteAllBytes("watermarked_output.pdf", resultStream.ToArray());
+                Console.WriteLine("Watermark added and saved to 'watermarked_output.pdf'.");
+            }
         }
     }
 }

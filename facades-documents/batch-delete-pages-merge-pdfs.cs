@@ -1,68 +1,96 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class BatchPdfProcessor
 {
     static void Main()
     {
-        // Input PDF files to process
-        string[] inputFiles = new string[]
+        // Define input PDF files and the pages to delete from each (1‑based indexing)
+        var filesToProcess = new Dictionary<string, int[]>
         {
-            "doc1.pdf",
-            "doc2.pdf",
-            "doc3.pdf"
+            // Example: delete pages 2 and 4 from "doc1.pdf"
+            { "doc1.pdf", new int[] { 2, 4 } },
+
+            // Example: delete page 1 from "doc2.pdf"
+            { "doc2.pdf", new int[] { 1 } },
+
+            // Add more entries as needed
+            // { "path/to/other.pdf", new int[] { 3, 5, 7 } },
         };
 
-        // Pages to delete from each file (1‑based indexing)
-        // Example: delete pages 2 and 4 from every document
-        int[] pagesToDelete = new int[] { 2, 4 };
+        // Output path for the final concatenated PDF
+        const string finalOutputPath = "merged_cleaned.pdf";
 
-        // Folder for intermediate cleaned PDFs
-        string tempFolder = Path.Combine(Path.GetTempPath(), "CleanedPdfs");
-        Directory.CreateDirectory(tempFolder);
+        // List to hold paths of the intermediate cleaned PDFs
+        var cleanedPdfPaths = new List<string>();
 
-        // Array to hold paths of cleaned PDFs
-        string[] cleanedFiles = new string[inputFiles.Length];
-
-        // Delete specified pages from each input PDF
-        for (int i = 0; i < inputFiles.Length; i++)
+        // Process each source PDF: delete specified pages and save to a temporary file
+        foreach (var kvp in filesToProcess)
         {
-            string inputPath = inputFiles[i];
-            if (!File.Exists(inputPath))
+            string sourcePath = kvp.Key;
+            int[] pagesToDelete = kvp.Value;
+
+            if (!File.Exists(sourcePath))
             {
-                Console.Error.WriteLine($"Input file not found: {inputPath}");
-                return;
+                Console.Error.WriteLine($"Source file not found: {sourcePath}");
+                continue;
             }
 
-            string cleanedPath = Path.Combine(tempFolder, $"cleaned_{i + 1}.pdf");
-            PdfFileEditor editor = new PdfFileEditor();
+            // Create a temporary file for the cleaned PDF
+            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
 
-            // Delete pages and write to a temporary file
-            bool deleted = editor.Delete(inputPath, pagesToDelete, cleanedPath);
-            if (!deleted)
+            // Load the PDF with Document (Aspose.Pdf) – PdfFileEditor has no DeletePages method in this version
+            using (Document pdfDoc = new Document(sourcePath))
             {
-                Console.Error.WriteLine($"Failed to delete pages from: {inputPath}");
-                return;
+                // Sort pages descending so removal does not affect subsequent indices
+                Array.Sort(pagesToDelete);
+                for (int i = pagesToDelete.Length - 1; i >= 0; i--)
+                {
+                    int pageNumber = pagesToDelete[i];
+                    if (pageNumber >= 1 && pageNumber <= pdfDoc.Pages.Count)
+                    {
+                        pdfDoc.Pages.Delete(pageNumber);
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Page {pageNumber} is out of range for file {sourcePath} (1‑{pdfDoc.Pages.Count})");
+                    }
+                }
+
+                // Save the cleaned PDF to the temporary location
+                pdfDoc.Save(tempPath);
             }
 
-            cleanedFiles[i] = cleanedPath;
+            cleanedPdfPaths.Add(tempPath);
         }
 
-        // Concatenate all cleaned PDFs into a single document
-        string outputPath = "merged_output.pdf";
-        PdfFileEditor concatEditor = new PdfFileEditor();
-
-        // Note: In evaluation mode Aspose.Pdf can handle up to 4 pages per document.
-        // If any cleaned PDF exceeds this limit, the operation may throw an IndexOutOfRangeException.
-        // A full license removes this restriction.
-        bool concatenated = concatEditor.Concatenate(cleanedFiles, outputPath);
-        if (!concatenated)
+        if (cleanedPdfPaths.Count == 0)
         {
-            Console.Error.WriteLine("Failed to concatenate cleaned PDFs.");
+            Console.Error.WriteLine("No cleaned PDFs were generated. Exiting.");
             return;
         }
 
-        Console.WriteLine($"Successfully created merged PDF: {outputPath}");
+        // Concatenate all cleaned PDFs into the final document using PdfFileEditor
+        PdfFileEditor concatEditor = new PdfFileEditor();
+        concatEditor.Concatenate(cleanedPdfPaths.ToArray(), finalOutputPath);
+
+        Console.WriteLine($"Merged PDF created at: {finalOutputPath}");
+
+        // Optional: clean up temporary files
+        foreach (string tempFile in cleanedPdfPaths)
+        {
+            try
+            {
+                if (File.Exists(tempFile))
+                    File.Delete(tempFile);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to delete temporary file '{tempFile}': {ex.Message}");
+            }
+        }
     }
 }

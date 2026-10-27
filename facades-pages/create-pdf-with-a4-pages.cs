@@ -1,28 +1,12 @@
-using System;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Create pdf with a4 pages
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-pages/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string outputPath = "output.pdf";
-
-        // Create a new PDF document and ensure it is disposed properly
-        using (Document doc = new Document())
-        {
-            // NOTE: In Aspose.PDF evaluation mode a collection can contain at most 4 elements.
-            // Therefore we create only 4 pages. A full license removes this limitation.
-            for (int i = 0; i < 4; i++)
-            {
-                // Add a new page and set its size to A4
-                Page page = doc.Pages.Add();
-                page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
-            }
-
-            // Save the resulting PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF with {4} A4 pages saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

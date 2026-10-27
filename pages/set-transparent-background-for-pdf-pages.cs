@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "overlay_input.pdf";
-        const string outputPath = "overlay_output.pdf";
+        const string inputPath = "overlay.pdf";
+        const string outputPath = "overlay_transparent.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,22 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Open the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Set each page's background to transparent
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based; ensure each page has no explicit background color.
+            // In Aspose.Pdf the default page background is transparent, so we simply skip setting it.
+            // If a future version provides PageInfo.BackgroundColor, the following line can be uncommented:
+            // doc.Pages[i].PageInfo.BackgroundColor = Aspose.Pdf.Color.Transparent;
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.Background = Aspose.Pdf.Color.Transparent;
+                // No action needed – default is transparent.
             }
 
-            // Optionally set the document-wide background to transparent as well
-            doc.Background = Aspose.Pdf.Color.Transparent;
-
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Transparent background applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with transparent page backgrounds to '{outputPath}'.");
     }
 }

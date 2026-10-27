@@ -1,107 +1,105 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder;
 
-class ViewerPreferenceMapper
+class ViewerPreferencesMapper
 {
-    // Map ViewerPreference flags to readable names
-    private static void DisplayCurrentPreferences(int prefValue)
-    {
-        Console.WriteLine("Current Viewer Preferences:");
-        Console.WriteLine($"Hide Menubar          : {( (prefValue & ViewerPreference.HideMenubar) != 0 )}");
-        Console.WriteLine($"Hide Toolbar          : {( (prefValue & ViewerPreference.HideToolbar) != 0 )}");
-        Console.WriteLine($"Hide Window UI        : {( (prefValue & ViewerPreference.HideWindowUI) != 0 )}");
-        Console.WriteLine($"Fit Window            : {( (prefValue & ViewerPreference.FitWindow) != 0 )}");
-        Console.WriteLine($"Center Window         : {( (prefValue & ViewerPreference.CenterWindow) != 0 )}");
-        Console.WriteLine($"Display Document Title: {( (prefValue & ViewerPreference.DisplayDocTitle) != 0 )}");
-        Console.WriteLine($"Page Mode FullScreen  : {( (prefValue & ViewerPreference.PageModeFullScreen) != 0 )}");
-        Console.WriteLine($"Page Mode Use Outlines : {( (prefValue & ViewerPreference.PageModeUseOutlines) != 0 )}");
-        Console.WriteLine($"Page Mode Use Thumbs   : {( (prefValue & ViewerPreference.PageModeUseThumbs) != 0 )}");
-        Console.WriteLine($"Non‑FullScreen PageMode Outlines : {( (prefValue & ViewerPreference.NonFullScreenPageModeUseOutlines) != 0 )}");
-        Console.WriteLine();
-    }
-
-    // Prompt user for a Y/N answer and return true for Y, false for N
-    private static bool PromptToggle(string description, bool currentValue)
-    {
-        Console.Write($"{description} (currently {(currentValue ? "ON" : "OFF")}) – toggle? (y/n): ");
-        string input = Console.ReadLine()?.Trim().ToLowerInvariant();
-        return input == "y" || input == "yes";
-    }
-
     static void Main()
     {
-        const string inputPdf  = "sample.pdf";
-        const string outputPdf = "sample_modified.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "customized_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block (ensures disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block to ensure proper disposal (document-disposal-with-using rule)
+        using (Document doc = new Document(inputPath))
         {
-            // Initialize PdfContentEditor with the loaded document
-            using (PdfContentEditor editor = new PdfContentEditor(doc))
+            // Attempt to retrieve ViewerPreferences via dynamic to stay compatible with older Aspose.Pdf versions
+            dynamic prefs = null;
+            try
             {
-                // Retrieve current viewer preference flags
-                int currentPref = editor.GetViewerPreference();
+                prefs = ((dynamic)doc).ViewerPreferences;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. The PDF will be saved unchanged.");
+            }
 
-                // Show current settings to the user
-                DisplayCurrentPreferences(currentPref);
-
-                // Prepare a variable to accumulate changed flags
-                int newPref = currentPref;
-
-                // Example toggles – you can extend this list as needed
-                if (PromptToggle("Hide Menubar", (currentPref & ViewerPreference.HideMenubar) != 0))
-                    newPref ^= ViewerPreference.HideMenubar; // toggle flag
-
-                if (PromptToggle("Hide Toolbar", (currentPref & ViewerPreference.HideToolbar) != 0))
-                    newPref ^= ViewerPreference.HideToolbar;
-
-                if (PromptToggle("Hide Window UI", (currentPref & ViewerPreference.HideWindowUI) != 0))
-                    newPref ^= ViewerPreference.HideWindowUI;
-
-                if (PromptToggle("Fit Window", (currentPref & ViewerPreference.FitWindow) != 0))
-                    newPref ^= ViewerPreference.FitWindow;
-
-                if (PromptToggle("Center Window", (currentPref & ViewerPreference.CenterWindow) != 0))
-                    newPref ^= ViewerPreference.CenterWindow;
-
-                if (PromptToggle("Display Document Title", (currentPref & ViewerPreference.DisplayDocTitle) != 0))
-                    newPref ^= ViewerPreference.DisplayDocTitle;
-
-                if (PromptToggle("Full‑Screen Page Mode", (currentPref & ViewerPreference.PageModeFullScreen) != 0))
-                    newPref ^= ViewerPreference.PageModeFullScreen;
-
-                if (PromptToggle("Show Outlines (Page Mode)", (currentPref & ViewerPreference.PageModeUseOutlines) != 0))
-                    newPref ^= ViewerPreference.PageModeUseOutlines;
-
-                if (PromptToggle("Show Thumbnails (Page Mode)", (currentPref & ViewerPreference.PageModeUseThumbs) != 0))
-                    newPref ^= ViewerPreference.PageModeUseThumbs;
-
-                if (PromptToggle("Show Outlines (Non‑FullScreen)", (currentPref & ViewerPreference.NonFullScreenPageModeUseOutlines) != 0))
-                    newPref ^= ViewerPreference.NonFullScreenPageModeUseOutlines;
-
-                // Apply changed preferences if any flag differs
-                if (newPref != currentPref)
+            if (prefs != null)
+            {
+                // Helper to read/write boolean properties via reflection (works for both old and new versions)
+                void SetBool(string propName, bool currentValue)
                 {
-                    // Aspose.Pdf.Facades.ChangeViewerPreference expects a single flag.
-                    // To apply a new set of flags, we clear existing ones and set the new combination.
-                    // First, clear all known flags by resetting the viewer preference to 0.
-                    editor.ChangeViewerPreference(0);
-                    // Then set the combined flags.
-                    editor.ChangeViewerPreference(newPref);
+                    bool newValue = PromptToggle(propName, currentValue);
+                    var prop = prefs.GetType().GetProperty(propName);
+                    if (prop != null && prop.CanWrite)
+                        prop.SetValue(prefs, newValue);
                 }
 
-                // Save the modified PDF
-                editor.Save(outputPdf);
-                Console.WriteLine($"Modified PDF saved to '{outputPdf}'.");
+                // Map known boolean viewer preference properties
+                SetBool(nameof(prefs.HideToolbar), prefs.HideToolbar);
+                SetBool(nameof(prefs.HideMenubar), prefs.HideMenubar);
+                SetBool(nameof(prefs.HideWindowUI), prefs.HideWindowUI);
+                SetBool(nameof(prefs.FitWindow), prefs.FitWindow);
+                SetBool(nameof(prefs.CenterWindow), prefs.CenterWindow);
+                SetBool(nameof(prefs.DisplayDocTitle), prefs.DisplayDocTitle);
+                SetBool(nameof(prefs.NonFullScreenPageMode), prefs.NonFullScreenPageMode);
+
+                // Direction handling – if the enum exists, toggle between RightToLeft and LeftToRight
+                var directionProp = prefs.GetType().GetProperty("Direction");
+                if (directionProp != null && directionProp.CanWrite && directionProp.CanRead)
+                {
+                    var currentDir = directionProp.GetValue(prefs);
+                    // Try to resolve enum names via reflection; fallback to string comparison
+                    string rightToLeftName = "RightToLeft";
+                    string leftToRightName = "LeftToRight";
+                    bool isRtl = currentDir != null && currentDir.ToString().EndsWith(rightToLeftName);
+                    bool newIsRtl = PromptToggle("Right-to-Left Reading Direction", isRtl);
+                    if (newIsRtl)
+                    {
+                        // Set to RightToLeft enum value if possible
+                        var enumType = directionProp.PropertyType;
+                        var rtlValue = Enum.Parse(enumType, rightToLeftName);
+                        directionProp.SetValue(prefs, rtlValue);
+                    }
+                    else
+                    {
+                        var enumType = directionProp.PropertyType;
+                        var ltrValue = Enum.Parse(enumType, leftToRightName);
+                        directionProp.SetValue(prefs, ltrValue);
+                    }
+                }
             }
+
+            // Save the (potentially) modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Customized PDF saved to '{outputPath}'.");
+    }
+
+    // Helper method to prompt the user for a Y/N toggle and return the resulting boolean
+    static bool PromptToggle(string description, bool currentValue)
+    {
+        while (true)
+        {
+            Console.Write($"{description} (current: {(currentValue ? "Y" : "N")}): ");
+            string input = Console.ReadLine()?.Trim().ToUpperInvariant();
+
+            if (string.IsNullOrEmpty(input))
+                return currentValue; // keep current if no input
+
+            if (input == "Y")
+                return true;
+            if (input == "N")
+                return false;
+
+            Console.WriteLine("Please enter 'Y' or 'N'.");
         }
     }
 }

@@ -8,38 +8,52 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputDir = "Thumbnails";
+        const string outputFolder = "Thumbnails";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPath))
+        try
         {
-            // Create a ThumbnailDevice with custom dimensions (e.g., 150x150 pixels)
-            ThumbnailDevice thumbDevice = new ThumbnailDevice(150, 150);
-
-            // Iterate through pages using 1‑based indexing (Aspose.Pdf convention)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                string outPath = Path.Combine(outputDir, $"thumb_page{pageNum}.png");
-
-                // Create the output file stream
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                // Pages are 1‑based; iterate accordingly
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    // Convert the current page to a PNG thumbnail and write to the stream
-                    thumbDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                    // Create a PNG device with thumbnail dimensions (e.g., 150×200 pixels)
+                    // PngDevice does NOT implement IDisposable, so we instantiate it directly.
+                    var pngDevice = new PngDevice(150, 200)
+                    {
+                        // Optional: make background transparent for a cleaner thumbnail
+                        TransparentBackground = true
+                    };
+
+                    string outPath = Path.Combine(outputFolder, $"page_{pageNum}.png");
+                    // Write the PNG image to a file stream inside a using block (the stream *is* disposable)
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        // Convert the specific page to PNG and save it
+                        pngDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                    }
                 }
             }
-        }
 
-        Console.WriteLine("Thumbnail images have been generated successfully.");
+            Console.WriteLine($"Thumbnails saved to '{outputFolder}'.");
+        }
+        catch (TypeInitializationException)
+        {
+            // Image conversion relies on GDI+ and is Windows‑only
+            Console.WriteLine("Image conversion requires Windows (GDI+). Operation skipped on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

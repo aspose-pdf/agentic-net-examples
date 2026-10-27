@@ -7,46 +7,45 @@ class Program
 {
     static void Main()
     {
-        const string originalPath = "original.pdf";
-        const string modifiedPath = "modified.pdf";
-        const string diffPath     = "diff.pdf";
+        const string sourcePath = "source.pdf";
+        const string targetPath = "target.pdf";
+        const string diffPath   = "diff.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(originalPath) || !File.Exists(modifiedPath))
+        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
         {
-            Console.Error.WriteLine("One or both input PDF files are missing.");
+            Console.Error.WriteLine("Source or target PDF not found.");
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1. Load the two PDFs and perform a page‑by‑page comparison.
-        //    The result is saved directly to diffPath.
-        // ------------------------------------------------------------
-        using (Document originalDoc = new Document(originalPath))
-        using (Document modifiedDoc = new Document(modifiedPath))
+        // Load source and target documents
+        using (Document sourceDoc = new Document(sourcePath))
+        using (Document targetDoc = new Document(targetPath))
         {
-            ComparisonOptions options = new ComparisonOptions(); // default options
-            TextPdfComparer.CompareDocumentsPageByPage(originalDoc, modifiedDoc, options, diffPath);
+            // Perform side‑by‑side visual comparison using the static comparer
+            var options = new SideBySideComparisonOptions();
+            SideBySidePdfComparer.Compare(sourceDoc, targetDoc, diffPath, options);
         }
 
-        // ------------------------------------------------------------
-        // 2. Load the generated diff PDF and copy all metadata from the
-        //    original document. DocumentInfo implements IDictionary<string,string>,
-        //    so we can enumerate its entries and assign them to the diff.
-        // ------------------------------------------------------------
-        using (Document originalDoc = new Document(originalPath))
+        // Copy metadata from source to the generated diff PDF
+        using (Document sourceDoc = new Document(sourcePath))
         using (Document diffDoc = new Document(diffPath))
         {
-            // Optional: clear any existing metadata in the diff PDF
-            diffDoc.Info.Clear();
+            // Standard metadata fields
+            diffDoc.Info.Title        = sourceDoc.Info.Title;
+            diffDoc.Info.Author       = sourceDoc.Info.Author;
+            diffDoc.Info.Subject      = sourceDoc.Info.Subject;
+            diffDoc.Info.Keywords     = sourceDoc.Info.Keywords;
+            diffDoc.Info.Creator      = sourceDoc.Info.Creator;
+            diffDoc.Info.Producer     = sourceDoc.Info.Producer;
+            diffDoc.Info.CreationDate = sourceDoc.Info.CreationDate;
+            diffDoc.Info.ModDate      = sourceDoc.Info.ModDate;
 
-            // Copy every metadata entry (Title, Author, CreationDate, etc.)
-            foreach (var kvp in originalDoc.Info)
+            // Custom metadata – use the indexer provided by DocumentInfo
+            foreach (var name in sourceDoc.Info.Keys)
             {
-                diffDoc.Info[kvp.Key] = kvp.Value;
+                diffDoc.Info[name] = sourceDoc.Info[name];
             }
 
-            // Overwrite the diff PDF with the updated metadata
             diffDoc.Save(diffPath);
         }
 

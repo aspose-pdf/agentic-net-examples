@@ -1,51 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed_input.pdf";   // digitally signed PDF
-        const string outputPdf = "signed_with_stamp.pdf";
-        const string stampImagePath = "logo.png";      // image to use as stamp
+        const string inputPath  = "signed.pdf";               // digitally signed PDF
+        const string stampPath  = "stamp.png";                // image to stamp
+        const string outputPath = "signed_with_stamp.pdf";    // result preserving signature
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(stampPath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        if (!File.Exists(stampImagePath))
+        try
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
-            return;
-        }
+            // Copy the original signed PDF to the output location first.
+            // This allows us to open the output file in read/write mode and perform an incremental update.
+            File.Copy(inputPath, outputPath, true);
 
-        // Load the signed PDF (no special load options needed)
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Open the copied PDF with a read/write FileStream so that Save() performs an incremental update.
+            using (FileStream fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite))
+            using (Document doc = new Document(fs))
             {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                Opacity             = 0.5,   // semi‑transparent
-                Background          = false // stamp on top of page content
-            };
+                // Create an image stamp; set it as an overlay with semi‑transparent opacity.
+                ImageStamp imgStamp = new ImageStamp(stampPath)
+                {
+                    Background          = false,
+                    Opacity             = 0.5,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                };
 
-            // Apply the stamp to the first page (or any page you need)
-            Page page = doc.Pages[1];
-            page.AddStamp(imgStamp);
+                // Apply the stamp to every page.
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
 
-            // Save using incremental (append) update to preserve existing digital signatures.
-            // In recent Aspose.PDF versions the incremental‑update behaviour is enabled by default
-            // when the document already contains signatures. Therefore we can simply save the
-            // document without specifying any special option.
-            doc.Save(outputPdf);
+                // Saving without explicit options performs an incremental update because the document
+                // was opened on a read/write stream.
+                doc.Save();
+            }
+
+            Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

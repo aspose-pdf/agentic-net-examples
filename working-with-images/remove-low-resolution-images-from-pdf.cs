@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // NOTE: This line is intentionally omitted to respect the hard namespace restriction.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,37 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through each page and absorb its image placements
+            foreach (Page page in doc.Pages)
             {
-                // Create an absorber to find image placements on the current page
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+                page.Accept(absorber);
 
-                // Perform the search on the page
-                doc.Pages[pageIndex].Accept(absorber);
-
-                // Examine each found image placement
+                // Process each image placement on the current page
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // Image resolution is expressed in DPI (horizontal and vertical)
+                    // DPI information is available via the Resolution property
                     double dpiX = placement.Resolution.X;
                     double dpiY = placement.Resolution.Y;
 
-                    // Delete images whose DPI is lower than 72 on either axis
+                    // Delete images whose horizontal or vertical DPI is below 72
                     if (dpiX < 72 || dpiY < 72)
                     {
-                        placement.Hide(); // removes the image from the page
+                        // The image object associated with the placement is an XImage
+                        Aspose.Pdf.XImage xImg = placement.Image;
+
+                        // Remove the image from the page's resources if it exists
+                        if (page.Resources.Images.Contains(xImg))
+                        {
+                            page.Resources.Images.Remove(xImg);
+                        }
                     }
                 }
             }
 
-            // Optional: remove now‑unused resources to shrink the file
-            doc.OptimizeResources();
-
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

@@ -1,15 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // existing PDF with attachment
-        const string outputPath = "output.pdf";         // PDF after updating description
-        const string newDescription = "Updated attachment description";
+        const string inputPath = "input.pdf";
+        const string outputPath = "updated_attachments.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,46 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            FileAttachmentAnnotation targetAttachment = null;
-
-            // Search for the first FileAttachmentAnnotation in the document
-            foreach (Page page in doc.Pages)
+            // Ensure there is at least one embedded file (attachment)
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
-                foreach (Annotation ann in page.Annotations)
-                {
-                    if (ann is FileAttachmentAnnotation fileAnn)
-                    {
-                        targetAttachment = fileAnn;
-                        break;
-                    }
-                }
-                if (targetAttachment != null) break;
-            }
-
-            if (targetAttachment == null)
-            {
-                Console.Error.WriteLine("No file attachment annotation found in the document.");
+                Console.WriteLine("No embedded files found in the document.");
                 return;
             }
 
-            // Update the description of the attached file
-            if (targetAttachment.File != null)
-            {
-                targetAttachment.File.Description = newDescription;
-            }
-            else
-            {
-                Console.Error.WriteLine("The attachment does not have an associated FileSpecification.");
-                return;
-            }
+            // Update the description of the first embedded file
+            FileSpecification fileSpec = doc.EmbeddedFiles[0]; // collections are zero‑based
+            fileSpec.Description = "Updated description for the attachment.";
 
-            // Save the modified PDF
+            // Save the modified PDF (same format, no SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Attachment description updated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated attachment description to '{outputPath}'.");
     }
 }

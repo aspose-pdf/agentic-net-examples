@@ -1,52 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // for alignment enums
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
+        const string stampPath  = "watermark.png";
         const string outputPath = "watermarked.pdf";
-        const string imagePath  = "logo.png"; // image to use as watermark
 
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
-        if (!File.Exists(imagePath))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(imagePath);
+            // Create an image stamp
+            ImageStamp imgStamp = new ImageStamp(stampPath)
+            {
+                // Center the stamp on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Make the watermark semi‑transparent
+                Opacity = 0.3,
+                // Rotate 90 degrees to achieve a diagonal effect
+                RotateAngle = 90,
+                // Place the stamp over the page content
+                Background = false
+            };
 
-            // Rotate the stamp 90 degrees to achieve a diagonal appearance
-            imgStamp.RotateAngle = 90; // arbitrary angle in degrees
-
-            // Optional: place the stamp at the center of each page
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Optional: make the stamp semi‑transparent
-            imgStamp.Opacity = 0.3;
-
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Apply the stamp to each page individually
+            foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the watermarked PDF
+            pdfDocument.Save(outputPath);
         }
 
         Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");

@@ -1,81 +1,58 @@
 using System;
 using System.IO;
 using System.Drawing;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";               // Path to source PDF
-        const string outputFolder = "ExtractedImages";         // Folder to store PNG files
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        // ------------------------------------------------------------
-        // 1. Ensure a PDF exists – create a minimal PDF with an embedded image
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            // Create a simple 100x100 red bitmap in memory
-            using (var bmp = new Bitmap(100, 100))
-            {
-                using (var g = Graphics.FromImage(bmp))
-                {
-                    g.Clear(System.Drawing.Color.Red);
-                }
-
-                using (var imgStream = new MemoryStream())
-                {
-                    bmp.Save(imgStream, System.Drawing.Imaging.ImageFormat.Png);
-                    imgStream.Position = 0;
-
-                    // Build a PDF and embed the image
-                    using (var doc = new Document())
-                    {
-                        Page page = doc.Pages.Add();
-                        var pdfImg = new Aspose.Pdf.Image { ImageStream = imgStream };
-                        page.Paragraphs.Add(pdfImg);
-                        doc.Save(inputPdfPath);
-                    }
-                }
-            }
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Ensure the output directory exists
-        // ------------------------------------------------------------
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputDir);
 
-        // ------------------------------------------------------------
-        // 3. Load the PDF and extract each image as PNG
-        // ------------------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
                 Page page = pdfDoc.Pages[pageNum];
                 int imageIndex = 1;
 
-                // Iterate over the image resources of the current page
-                foreach (XImage xImg in page.Resources.Images)
+                // Iterate through all images on the page
+                foreach (XImage img in page.Resources.Images)
                 {
-                    string outPath = System.IO.Path.Combine(
-                        outputFolder,
-                        $"page{pageNum}_img{imageIndex}.png");
+                    string fileName = $"page{pageNum}_img{imageIndex}.png";
+                    string outPath = Path.Combine(outputDir, fileName);
 
-                    // Save the image as PNG using a FileStream
-                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    // Save the XImage to a memory stream, then re‑encode as PNG using System.Drawing
+                    using (var ms = new MemoryStream())
                     {
-                        xImg.Save(fs);
+                        img.Save(ms); // XImage.Save accepts a Stream
+                        ms.Position = 0;
+                        // Fully qualify System.Drawing.Image to avoid ambiguity with Aspose.Pdf.Image
+                        using (System.Drawing.Image sysImg = System.Drawing.Image.FromStream(ms))
+                        {
+                            sysImg.Save(outPath, ImageFormat.Png);
+                        }
                     }
 
-                    Console.WriteLine($"Saved image: {outPath}");
                     imageIndex++;
                 }
             }
         }
 
-        Console.WriteLine("Image extraction completed.");
+        Console.WriteLine($"All images have been extracted to '{outputDir}'.");
     }
 }

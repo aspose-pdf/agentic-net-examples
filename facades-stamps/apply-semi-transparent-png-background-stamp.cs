@@ -1,55 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string stampImage = "stamp.png";
+        const string pngPath   = "background.png";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(pngPath))
+        {
+            Console.Error.WriteLine($"Background PNG not found: {pngPath}");
             return;
         }
 
-        if (!File.Exists(stampImage))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Apply the semi‑transparent background image to every page
+        foreach (Page page in pdfDocument.Pages)
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
-            return;
+            ImageStamp stamp = new ImageStamp(pngPath)
+            {
+                // Place the image behind existing page content
+                Background = true,
+                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
+                Opacity = 0.5,
+                // Stretch the image to cover the whole page
+                Width  = page.PageInfo.Width,
+                Height = page.PageInfo.Height,
+                // Align to the lower‑left corner (origin) of the page
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                XIndent = 0,
+                YIndent = 0
+            };
+
+            page.AddStamp(stamp);
         }
 
-        // Initialize the facade for stamping
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
-        {
-            // Load the source PDF
-            fileStamp.BindPdf(inputPdf);
-
-            // Create a stamp and bind the PNG image
-            Stamp stamp = new Stamp();
-            stamp.BindImage(stampImage);
-
-            // Make the stamp semi‑transparent
-            stamp.Opacity = 0.5f;
-
-            // Place the stamp behind the page content
-            stamp.IsBackground = true;
-
-            // Resize the stamp to cover the whole page
-            stamp.SetImageSize((float)fileStamp.PageWidth, (float)fileStamp.PageHeight);
-
-            // Apply the stamp to all pages (null means all pages)
-            stamp.Pages = null;
-
-            // Add the stamp to the document
-            fileStamp.AddStamp(stamp);
-
-            // Save the stamped PDF
-            fileStamp.Save(outputPdf);
-        }
+        // Save the modified PDF
+        pdfDocument.Save(outputPdf);
 
         Console.WriteLine($"Background stamp applied and saved to '{outputPdf}'.");
     }

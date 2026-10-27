@@ -1,57 +1,59 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class ExportTotalPriceToXml
+class Program
 {
     static void Main()
     {
-        // Sample data: list of item prices
-        decimal[] itemPrices = { 19.99m, 5.49m, 12.30m, 7.25m };
-        decimal totalPrice = 0;
-        foreach (decimal price in itemPrices)
-            totalPrice += price;
+        const string inputPdfPath = "invoice.pdf";
+        const string outputXmlPath = "total_price.xml";
 
-        // Create a new PDF document
-        using (Document pdfDoc = new Document())
+        if (!File.Exists(inputPdfPath))
         {
-            // ------------------------------------------------------------
-            // The XML conversion requires a *tagged* PDF.  Mark the document
-            // as tagged and create a minimal structure hierarchy.
-            // ------------------------------------------------------------
-            var tagged = pdfDoc.TaggedContent; // Use 'var' to avoid direct reference to TaggedContent type
-            tagged.SetTitle("Total Price Document");
-            tagged.SetLanguage("en-US");
-
-            // Create a simple tagged structure (root → sect → div → art)
-            var root = tagged.RootElement;
-            var sect = tagged.CreateSectElement();
-            root.AppendChild(sect);
-            var div = tagged.CreateDivElement();
-            sect.AppendChild(div);
-            var art = tagged.CreateArtElement();
-            div.AppendChild(art);
-
-            // Add a page
-            Page page = pdfDoc.Pages.Add();
-
-            // Prepare the text to display the total price
-            string priceText = $"Total Price: {totalPrice:C}";
-            TextFragment fragment = new TextFragment(priceText);
-            fragment.TextState.FontSize = 14;
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Add the text fragment to the page
-            page.Paragraphs.Add(fragment);
-
-            // Save the document as XML using XmlSaveOptions
-            string xmlOutputPath = Path.Combine(Environment.CurrentDirectory, "TotalPrice.xml");
-            XmlSaveOptions xmlOptions = new XmlSaveOptions();
-            pdfDoc.Save(xmlOutputPath, xmlOptions);
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
         }
 
-        Console.WriteLine("Total price exported to XML successfully.");
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPdfPath))
+            {
+                // Extract all text from the document
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages.Accept(absorber);
+                string allText = absorber.Text;
+
+                // Find all monetary values (e.g., $123.45 or 123.45) and sum them
+                decimal totalPrice = 0m;
+                // Regex matches optional currency symbol followed by digits, optional decimal part
+                Regex priceRegex = new Regex(@"\$?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)", RegexOptions.Compiled);
+                foreach (Match match in priceRegex.Matches(allText))
+                {
+                    // Remove commas and possible currency symbol, then parse
+                    string numericPart = match.Groups[1].Value.Replace(",", "");
+                    if (decimal.TryParse(numericPart, out decimal price))
+                    {
+                        totalPrice += price;
+                    }
+                }
+
+                // Store the calculated total price as custom metadata using DocumentInfo indexer
+                doc.Info["TotalPrice"] = totalPrice.ToString("F2");
+
+                // Save the document as XML using the required XmlSaveOptions
+                XmlSaveOptions xmlOptions = new XmlSaveOptions();
+                doc.Save(outputXmlPath, xmlOptions);
+            }
+
+            Console.WriteLine($"Total price exported to XML: {outputXmlPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

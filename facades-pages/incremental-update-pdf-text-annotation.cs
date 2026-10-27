@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_incremental.pdf";
+        const string outputPath = "incremental_updated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +16,41 @@ class Program
             return;
         }
 
-        // Open the PDF with read/write access so that incremental updates can be written.
-        using (FileStream pdfStream = new FileStream(inputPath, FileMode.Open, FileAccess.ReadWrite))
+        try
         {
-            // Load the document from the writable stream.
-            Document doc = new Document(pdfStream);
+            // Copy the original PDF to the output location – incremental update works on an existing file.
+            File.Copy(inputPath, outputPath, true);
 
-            // Example modification: add a text annotation to the first page.
-            Page page = doc.Pages[1];
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            TextAnnotation annotation = new TextAnnotation(page, rect)
+            // Open the copied file with read/write access.
+            using (FileStream fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
-                Title    = "Note",
-                Contents = "Incremental update example",
-                Open     = true,
-                Icon     = TextIcon.Note,
-                Color    = Aspose.Pdf.Color.Yellow
-            };
-            page.Annotations.Add(annotation);
+                // Load the document from the stream.
+                using (Document doc = new Document(fs))
+                {
+                    // Add annotation to the first page.
+                    Page page = doc.Pages[1];
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Save the changes incrementally (writes only the delta to the same stream).
-            doc.Save();
+                    TextAnnotation annotation = new TextAnnotation(page, rect)
+                    {
+                        Title = "Note",
+                        Contents = "Incremental update example.",
+                        Open = true,
+                        Icon = TextIcon.Note
+                    };
+
+                    page.Annotations.Add(annotation);
+
+                    // Parameterless Save performs an incremental update when the document was opened from a read/write stream.
+                    doc.Save();
+                }
+            }
+
+            Console.WriteLine($"Incremental update saved to '{outputPath}'.");
         }
-
-        // Copy the updated file to a new location if a separate output file is desired.
-        File.Copy(inputPath, outputPath, true);
-        Console.WriteLine($"Incrementally updated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

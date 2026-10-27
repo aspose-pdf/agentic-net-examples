@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_modified.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Bind the document to the XMP metadata facade
+            // Load the PDF document
+            Document doc = new Document(inputPath);
+
+            // Use the PdfXmpMetadata facade to work with XMP metadata
             using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
             {
-                // Retrieve the original XMP block as a byte array and log its size
-                byte[] originalData = xmp.GetXmpMetadata();
-                int originalSize = originalData?.Length ?? 0;
-                Console.WriteLine($"Original XMP size: {originalSize} bytes");
+                // Log size before modification
+                byte[] xmpBefore = xmp.GetXmpMetadata();
+                int sizeBefore = xmpBefore?.Length ?? 0;
+                Console.WriteLine($"XMP size before modification: {sizeBefore} bytes");
 
-                // Example modification: add a custom creator entry
-                // The key follows the XMP namespace convention (e.g., "dc:creator")
-                xmp.Add("dc:creator", "Aspose.Pdf Sample");
+                // Register a custom namespace and add a custom property
+                const string customNsPrefix = "custom";
+                const string customNsUri = "http://example.com/custom";
+                xmp.RegisterNamespaceURI(customNsPrefix, customNsUri);
+                xmp.Add($"{customNsPrefix}:Modified", "true");
 
-                // Retrieve the modified XMP block and log its new size
-                byte[] modifiedData = xmp.GetXmpMetadata();
-                int modifiedSize = modifiedData?.Length ?? 0;
-                Console.WriteLine($"Modified XMP size: {modifiedSize} bytes");
+                // Log size after modification
+                byte[] xmpAfter = xmp.GetXmpMetadata();
+                int sizeAfter = xmpAfter?.Length ?? 0;
+                Console.WriteLine($"XMP size after modification: {sizeAfter} bytes");
 
-                // Save the PDF with the updated XMP metadata
+                // Save the PDF with the updated XMP block
                 xmp.Save(outputPath);
-                Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
             }
+
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

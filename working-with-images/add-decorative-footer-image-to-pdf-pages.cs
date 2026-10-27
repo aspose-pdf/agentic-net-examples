@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // required for ImageStamp, alignment enums
 
-class Program
+// The class name matches the executable name expected by the test harness.
+class AsposePdfApi_2f71103e
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF
-        const string outputPdfPath  = "output.pdf";         // result PDF
-        const string footerImagePath = "footer.png";        // decorative footer image
+        const string inputPdfPath = "input.pdf";
+        const string footerImagePath = "footer.png";
+        const string outputPdfPath = "output_with_footer.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -22,35 +24,38 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Determine the page width; height of the footer rectangle can be fixed.
-                double pageWidth = page.PageInfo.Width;
-                double footerHeight = 50; // desired height of the footer area (points)
+                Page page = pdfDoc.Pages[i];
 
-                // Define a rectangle that spans the full width at the bottom of the page.
-                // Rectangle(left, bottom, right, top)
-                Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(
-                    0,                     // left
-                    0,                     // bottom
-                    pageWidth,             // right (full page width)
-                    footerHeight);         // top
-
-                // Add the image; autoAdjustRectangle = true (default) keeps the image proportion.
-                using (FileStream imgStream = File.OpenRead(footerImagePath))
+                // Create a new ImageStamp for each page
+                ImageStamp footerStamp = new ImageStamp(footerImagePath)
                 {
-                    page.AddImage(imgStream, footerRect);
-                }
+                    // Scale the image to match the page width; height is adjusted automatically
+                    Width = page.PageInfo.Width,
+                    // Height = 0 lets Aspose.Pdf preserve the original aspect ratio
+                    Height = 0,
+
+                    // Align the stamp to the bottom centre of the page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+
+                    // Optional margin from the bottom edge (in points)
+                    BottomMargin = 10
+                };
+
+                // Add the stamp to the current page
+                page.AddStamp(footerStamp);
             }
 
-            // Save the modified PDF.
-            doc.Save(outputPdfPath);
+            // Save the modified PDF (still inside the using block)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Decorative footer added to each page. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Footer image added to each page. Saved as '{outputPdfPath}'.");
     }
 }

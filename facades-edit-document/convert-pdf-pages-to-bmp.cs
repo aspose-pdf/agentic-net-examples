@@ -3,59 +3,46 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class PdfToBmpConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
+        const string pdfPath = "input.pdf";
+        const string outputDir = "BmpPages";
 
-        // Output directory for BMP images
-        const string outputDir = "BmpImages";
+        if (!File.Exists(pdfPath))
+        {
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
+        }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // ---------------------------------------------------------------------
-        // Create a minimal PDF if it does not already exist. This makes the
-        // example self‑contained and prevents FileNotFoundException in the sandbox.
-        // ---------------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        try
         {
-            using (var placeholder = new Document())
+            // Document implements IDisposable – use using for proper disposal
+            using (Document doc = new Document(pdfPath))
             {
-                placeholder.Pages.Add(); // add a single blank page
-                placeholder.Save(inputPdfPath);
-            }
-        }
+                // BmpDevice creates 24‑bit BMP images. Resolution can be adjusted as needed.
+                var resolution = new Resolution(150); // 150 DPI – change if required
+                var bmpDevice = new BmpDevice(resolution);
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
-        {
-            // Define the desired resolution (e.g., 300 DPI) – higher DPI yields larger images
-            Resolution resolution = new Resolution(300);
-
-            // Initialise the BMP device with the specified resolution.
-            // The constructor that accepts only a Resolution object creates a 24‑bit BMP by default.
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
-            {
-                // Build the output file name for the current page
-                string outputFile = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-
-                // Create a file stream to write the BMP image
-                using (FileStream bmpStream = new FileStream(outputFile, FileMode.Create))
+                // Pages are 1‑based (global rule)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    // Convert the current page to BMP and write it to the stream
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.bmp");
+                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        // Convert the current page to BMP and write directly to the file stream
+                        bmpDevice.Process(doc.Pages[pageNum], fs);
+                    }
+                    Console.WriteLine($"Saved page {pageNum} as BMP → {outPath}");
                 }
-
-                Console.WriteLine($"Page {pageNumber} saved as BMP: {outputFile}");
             }
         }
-
-        Console.WriteLine("All pages have been converted to BMP images.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -3,7 +3,6 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -18,30 +17,26 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a hidden text box field to store the IP address
-            TextBoxField ipField = new TextBoxField(doc)
+            // Create a hidden text box field to store the IP address.
+            // A zero‑size rectangle makes the field invisible to the user.
+            TextBoxField ipField = new TextBoxField(
+                doc.Pages[1],
+                new Rectangle(0, 0, 0, 0))
             {
-                PartialName = "UserIP",   // field name
-                Value = ""                // initial empty value
+                PartialName = "ipField"
+                // No Flags property is required; the zero‑size rectangle hides the field.
             };
 
-            // Add the field to the form on page 1 (1‑based index)
+            // Add the field to the form on page 1
             doc.Form.Add(ipField, 1);
 
-            // Place the field off‑page so it is not visible to the user
-            // Rectangle(left, bottom, width, height) – using zero size at (0,0)
-            doc.Form.AddFieldAppearance(ipField, 1, new Aspose.Pdf.Rectangle(0, 0, 0, 0));
-
-            // JavaScript to capture the user's IP address on form load.
-            // This is a placeholder; replace with actual JS that obtains the IP.
-            string jsCode = "this.getField('UserIP').value = app.getIP();";
-            JavascriptAction jsAction = new JavascriptAction(jsCode);
-
-            // Attach the JavaScript to the field so it runs when the document is opened
-            ipField.ExecuteFieldJavaScript(jsAction);
+            // JavaScript that runs when the document is opened.
+            // util.getHostIP() returns the client IP in Acrobat JavaScript.
+            doc.OpenAction = new JavascriptAction(
+                "this.getField('ipField').value = util.getHostIP();");
 
             // Save the modified PDF
             doc.Save(outputPath);

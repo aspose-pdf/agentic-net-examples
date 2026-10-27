@@ -16,34 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document contains a form
-            if (doc.Form != null && doc.Form.Count > 0)
+            using (Document doc = new Document(inputPath))
             {
-                // ----- Text field "Name" -----
-                if (doc.Form["Name"] is TextBoxField nameField)
+                var form = doc.Form;
+                if (form != null && form.Count > 0)
                 {
-                    // For TextBoxField the value is set via the Value property
-                    nameField.Value = "John Doe";
+                    // Fill a text box field named "Name"
+                    if (form["Name"] is TextBoxField nameField)
+                    {
+                        nameField.Value = "John Doe";
+                    }
+
+                    // Fill a check box field named "Agree"
+                    if (form["Agree"] is CheckboxField agreeField)
+                    {
+                        agreeField.Checked = true;
+                    }
                 }
 
-                // ----- Checkbox field "Agree" -----
-                if (doc.Form["Agree"] is CheckboxField agreeField)
-                {
-                    // For CheckboxField the checked state is set via the Checked property
-                    agreeField.Checked = true;
-                }
+                // Flatten the form so fields become non‑editable content
+                form?.Flatten();
+
+                // Save the flattened PDF
+                doc.Save(outputPath);
             }
 
-            // Flatten the form – removes fields and places their values directly on the page
-            doc.Form?.Flatten();
-
-            // Save the flattened PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

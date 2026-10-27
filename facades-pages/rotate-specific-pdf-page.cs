@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rotated_page4.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,25 +15,17 @@ class Program
             return;
         }
 
-        // PdfPageEditor is a facade for page-level editing.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the PDF file into the editor.
-            editor.BindPdf(inputPath);
+        // PdfPageEditor does not implement IDisposable, so we instantiate it directly.
+        var pageEditor = new PdfPageEditor();
+        pageEditor.BindPdf(inputPath);
 
-            // Restrict editing to page 4 only.
-            editor.ProcessPages = new int[] { 4 };
+        // Target page 4 (1‑based indexing) and set its rotation to 180°.
+        pageEditor.ProcessPages = new int[] { 4 };
+        pageEditor.Rotation = 180; // allowed values: 0, 90, 180, 270
 
-            // Set rotation to 180 degrees for the selected page(s).
-            editor.Rotation = 180;
+        // Save the modified PDF.
+        pageEditor.Save(outputPath);
 
-            // Apply the rotation change.
-            editor.ApplyChanges();
-
-            // Save the modified document.
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Page 4 rotated 180° and saved to '{outputPath}'.");
+        Console.WriteLine($"Page 4 rotated and saved to '{outputPath}'.");
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,9 +9,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";          // source PDF
-        const string outputPath     = "output_with_bm.pdf"; // PDF after adding bookmarks
-        const int    expectedCount  = 5;                    // expected number of bookmarks
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int expectedBookmarks = 3; // set the expected number of bookmarks
 
         if (!File.Exists(inputPath))
         {
@@ -17,32 +19,35 @@ class Program
             return;
         }
 
-        // Load the source PDF and add bookmarks for all pages
+        // Load the PDF and save it to a new file
         using (Document doc = new Document(inputPath))
         {
-            // PdfBookmarkEditor works on the Document instance
-            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-            {
-                editor.BindPdf(doc);          // initialize the facade with the document
-                editor.CreateBookmarks();     // create a bookmark for each page
-                editor.Save(outputPath);      // persist changes to a new file
-            }
+            doc.Save(outputPath);
         }
 
-        // Re-open the saved PDF and extract its bookmarks
-        using (PdfBookmarkEditor extractor = new PdfBookmarkEditor())
+        // Use PdfBookmarkEditor (Facades) to extract bookmarks to an XML file
+        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        bookmarkEditor.BindPdf(outputPath);
+
+        string tempXml = Path.GetTempFileName();
+        try
         {
-            extractor.BindPdf(outputPath);               // load the saved PDF
-            Bookmarks bookmarks = extractor.ExtractBookmarks(); // get all bookmarks
-            int actualCount = bookmarks.Count;
+            bookmarkEditor.ExtractBookmarks(tempXml);
 
-            Console.WriteLine($"Expected bookmarks: {expectedCount}");
-            Console.WriteLine($"Actual bookmarks  : {actualCount}");
+            // Load the exported XML and count <Bookmark> elements
+            XDocument xdoc = XDocument.Load(tempXml);
+            int actualCount = xdoc.Descendants("Bookmark").Count();
 
-            if (actualCount == expectedCount)
-                Console.WriteLine("Bookmark count validation succeeded.");
+            if (actualCount == expectedBookmarks)
+                Console.WriteLine($"Validation succeeded: {actualCount} bookmarks found.");
             else
-                Console.WriteLine("Bookmark count validation failed.");
+                Console.WriteLine($"Validation failed: expected {expectedBookmarks}, but found {actualCount}.");
+        }
+        finally
+        {
+            // Clean up the temporary XML file
+            if (File.Exists(tempXml))
+                File.Delete(tempXml);
         }
     }
 }

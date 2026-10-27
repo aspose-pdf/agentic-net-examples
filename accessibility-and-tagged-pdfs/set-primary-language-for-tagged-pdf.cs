@@ -9,7 +9,8 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_language.pdf";
+        const string outputPath = "output_tagged.pdf";
+        const string language   = "en-US";
 
         if (!File.Exists(inputPath))
         {
@@ -17,23 +18,19 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content interface
-            ITaggedContent taggedContent = doc.TaggedContent;
+            // Obtain the tagged content interface
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Set the primary language for the whole document
-            taggedContent.SetLanguage("en-US");
+            // Set the primary language for the entire structure tree
+            tagged.SetLanguage(language);
 
-            // Optionally, also set the language on the root structure element
-            StructureElement root = taggedContent.RootElement;
-            root.Language = "en-US";
-
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with language attribute: {outputPath}");
+        Console.WriteLine($"Language '{language}' applied and saved to '{outputPath}'.");
     }
 }

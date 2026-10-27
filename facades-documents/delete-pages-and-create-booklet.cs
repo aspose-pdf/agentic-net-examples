@@ -1,57 +1,62 @@
 using System;
 using System.IO;
+using System.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, pages to remove, and final booklet output
-        const string inputPdf = "input.pdf";
-        const string tempPdf = "temp_deleted.pdf";
-        const string bookletPdf = "booklet_output.pdf";
+        const string sourcePdf = "source.pdf";   // original PDF
+        const string outputPdf = "booklet.pdf";  // final booklet PDF
 
-        // Pages to delete (1‑based indexing). Adjust as needed.
-        int[] pagesToDelete = new int[] { 2, 3 };
-
-        // Ensure the input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // ---------- Delete unwanted pages ----------
-        // PdfFileEditor does NOT implement IDisposable, so we instantiate normally.
-        PdfFileEditor editor = new PdfFileEditor();
+        // Pages to remove (1‑based page numbers). Adjust as needed.
+        int[] pagesToDelete = new int[] { 2, 5 };
 
-        // Delete the specified pages and save to a temporary file.
-        bool deleteSuccess = editor.Delete(inputPdf, pagesToDelete, tempPdf);
-        if (!deleteSuccess)
-        {
-            Console.Error.WriteLine("Failed to delete pages.");
-            return;
-        }
+        // Temporary file that will hold the PDF after page deletion.
+        string tempPdf = Path.GetTempFileName();
 
-        // ---------- Create booklet from the cleaned PDF ----------
-        // Re‑use the same PdfFileEditor instance (or create a new one).
-        bool bookletSuccess = editor.MakeBooklet(tempPdf, bookletPdf);
-        if (!bookletSuccess)
-        {
-            Console.Error.WriteLine("Failed to create booklet.");
-            return;
-        }
-
-        // Optional: clean up the intermediate file
         try
         {
-            File.Delete(tempPdf);
+            // ---------- Delete unwanted pages ----------
+            // Load the PDF with Document (cross‑platform, always available).
+            Document pdfDoc = new Document(sourcePdf);
+
+            // Delete pages in descending order so that page numbers remain valid.
+            foreach (int pageNum in pagesToDelete.OrderByDescending(p => p))
+            {
+                if (pageNum >= 1 && pageNum <= pdfDoc.Pages.Count)
+                {
+                    pdfDoc.Pages.Delete(pageNum);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Page number {pageNum} is out of range and will be ignored.");
+                }
+            }
+
+            // Save the cleaned PDF to a temporary file.
+            pdfDoc.Save(tempPdf);
+
+            // ---------- Create booklet from the cleaned PDF ----------
+            // PdfFileEditor provides the MakeBooklet method that works on all supported platforms.
+            PdfFileEditor editor = new PdfFileEditor();
+            editor.MakeBooklet(tempPdf, outputPdf);
         }
-        catch
+        finally
         {
-            // Ignore any errors during cleanup
+            // Remove the temporary file regardless of success or failure.
+            if (File.Exists(tempPdf))
+                File.Delete(tempPdf);
         }
 
-        Console.WriteLine($"Booklet created successfully: {bookletPdf}");
+        Console.WriteLine($"Booklet created successfully: {outputPdf}");
     }
 }

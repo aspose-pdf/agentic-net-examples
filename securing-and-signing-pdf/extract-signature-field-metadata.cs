@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -15,85 +16,54 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the standard Document constructor)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document contains a form
-            Form form = doc.Form;
-            if (form == null || form.Count == 0)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.WriteLine("No form fields found in the document.");
-                return;
-            }
-
-            // Iterate over all form fields and process only signature fields
-            foreach (Field field in form)
-            {
-                if (field is SignatureField sigField)
+                // Check if the document contains any form fields
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    Console.WriteLine("=== Signature Field ===");
-                    // Basic field metadata
-                    Console.WriteLine($"Name          : {sigField.Name}");
-                    Console.WriteLine($"FullName      : {sigField.FullName}");
-                    Console.WriteLine($"PartialName   : {sigField.PartialName}");
-                    Console.WriteLine($"AlternateName : {sigField.AlternateName}");
-                    Console.WriteLine($"Modified      : {sigField.Modified}");
-                    Console.WriteLine($"ReadOnly      : {sigField.ReadOnly}");
-                    Console.WriteLine($"Required      : {sigField.Required}");
-                    Console.WriteLine($"Exportable    : {sigField.Exportable}");
-                    Console.WriteLine($"SignatureExist: {sigField.Signature != null}");
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
+                }
 
-                    // Signature object details (if present)
-                    if (sigField.Signature != null)
-                    {
-                        var signature = sigField.Signature;
-                        Console.WriteLine("--- Signature Object ---");
-                        Console.WriteLine($"Authority   : {signature.Authority}");
-                        Console.WriteLine($"Date        : {signature.Date}");
-                        Console.WriteLine($"Reason      : {signature.Reason}");
-                        Console.WriteLine($"Location    : {signature.Location}");
-                        Console.WriteLine($"ContactInfo : {signature.ContactInfo}");
-                        Console.WriteLine($"ShowProperties : {signature.ShowProperties}");
-                        Console.WriteLine($"DefaultSignatureLength : {signature.DefaultSignatureLength}");
-                        // ByteRange is an int array; display as comma‑separated list
-                        Console.WriteLine($"ByteRange   : {string.Join(", ", signature.ByteRange ?? new int[0])}");
-                    }
+                bool foundSignature = false;
 
-                    // Extract certificate (if any) and write its size
-                    try
+                // Iterate over all form fields (SignatureField objects are stored in Form.Fields)
+                foreach (Field field in doc.Form.Fields)
+                {
+                    if (field is SignatureField sigField)
                     {
-                        using (Stream certStream = sigField.ExtractCertificate())
+                        foundSignature = true;
+                        // Use PartialName for the field identifier (Signature.Name does not exist)
+                        Console.WriteLine($"Signature Field Name: {sigField.PartialName}");
+
+                        // Extract the certificate attached to the signature, if any
+                        X509Certificate2 cert = sigField.ExtractCertificateObject();
+                        if (cert != null)
                         {
-                            if (certStream != null)
-                            {
-                                Console.WriteLine($"Certificate size: {certStream.Length} bytes");
-                            }
+                            Console.WriteLine($"  Subject        : {cert.Subject}");
+                            Console.WriteLine($"  Issuer         : {cert.Issuer}");
+                            Console.WriteLine($"  Valid From     : {cert.NotBefore}");
+                            Console.WriteLine($"  Valid To       : {cert.NotAfter}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("  No certificate data present.");
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Certificate extraction failed: {ex.Message}");
-                    }
+                }
 
-                    // Extract signature image (if any) and write its size
-                    try
-                    {
-                        using (Stream imgStream = sigField.ExtractImage())
-                        {
-                            if (imgStream != null)
-                            {
-                                Console.WriteLine($"Signature image size: {imgStream.Length} bytes");
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Image extraction failed: {ex.Message}");
-                    }
-
-                    Console.WriteLine(); // blank line between fields
+                if (!foundSignature)
+                {
+                    Console.WriteLine("No signature fields found in the PDF.");
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,73 +8,59 @@ class Program
     {
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string imagePath = "background.png";
+        const string backgroundImage = "background.png";
 
-        // Validate files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(imagePath))
+        if (!File.Exists(backgroundImage))
         {
-            Console.Error.WriteLine($"Background image not found: {imagePath}");
+            Console.Error.WriteLine($"Background image not found: {backgroundImage}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Load the PDF to obtain page count and page rectangles.
-        //    Aspose.Pdf uses 1‑based page indexing.
-        // -----------------------------------------------------------------
-        int pageCount;
-        (double llx, double lly, double urx, double ury)[] pageRects;
-
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            pageCount = doc.Pages.Count;
-            pageRects = new (double, double, double, double)[pageCount];
-
-            for (int i = 1; i <= pageCount; i++)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                var rect = doc.Pages[i].Rect;
-                pageRects[i - 1] = (rect.LLX, rect.LLY, rect.URX, rect.URY);
+                // Iterate through all pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
+                    double pageWidth = page.PageInfo.Width;
+                    double pageHeight = page.PageInfo.Height;
+
+                    // Create an Image object from the PNG file
+                    using (FileStream imgStream = File.OpenRead(backgroundImage))
+                    {
+                        Image img = new Image
+                        {
+                            ImageStream = imgStream,
+                            // Set the image size to cover the whole page
+                            FixWidth = pageWidth,
+                            FixHeight = pageHeight,
+                            // Position at lower‑left corner (0,0)
+                            // No need to set coordinates because FixWidth/FixHeight are used
+                        };
+
+                        // Insert the image as the first element so it appears behind existing content
+                        page.Paragraphs.Insert(0, img);
+                    }
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdf);
             }
+
+            Console.WriteLine($"Background image added to all pages. Saved as '{outputPdf}'.");
         }
-
-        // -----------------------------------------------------------------
-        // 2. Initialise PdfFileMend without the obsolete destination ctor.
-        //    Bind the source PDF, then add images, and finally Save.
-        // -----------------------------------------------------------------
-        PdfFileMend mender = new PdfFileMend();
-        mender.BindPdf(inputPdf);
-
-        // -----------------------------------------------------------------
-        // 3. Iterate over all pages and add the background image.
-        //    Use the stream overload of AddImage and cast coordinates to float.
-        // -----------------------------------------------------------------
-        for (int i = 1; i <= pageCount; i++)
+        catch (Exception ex)
         {
-            var (llx, lly, urx, ury) = pageRects[i - 1];
-
-            using (FileStream imgStream = File.OpenRead(imagePath))
-            {
-                mender.AddImage(
-                    imgStream,
-                    i,
-                    (float)llx,
-                    (float)lly,
-                    (float)urx,
-                    (float)ury);
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // -----------------------------------------------------------------
-        // 4. Save the modified PDF and release resources.
-        // -----------------------------------------------------------------
-        mender.Save(outputPdf);
-        mender.Close();
-
-        Console.WriteLine($"Background image added to all {pageCount} pages. Output saved to '{outputPdf}'.");
     }
 }

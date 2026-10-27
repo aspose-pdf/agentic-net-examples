@@ -11,23 +11,28 @@ class Program
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade with the PDF file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
+        try
         {
-            // Read the Title metadata
-            string title = pdfInfo.Title;
+            // PdfFileInfo implements IDisposable – wrap in using for deterministic cleanup
+            using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+            {
+                // Read the Title metadata property
+                string title = info.Title ?? string.Empty;
 
-            // Prepare log entry
-            string logEntry = $"Title: {(string.IsNullOrEmpty(title) ? "(none)" : title)}";
-
-            // Write the log entry to the specified log file
-            File.WriteAllText(logPath, logEntry);
+                // Append the title to the log file
+                string logEntry = $"Title: {title}{Environment.NewLine}";
+                File.AppendAllText(logPath, logEntry);
+            }
 
             Console.WriteLine($"Title metadata written to '{logPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

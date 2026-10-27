@@ -1,66 +1,89 @@
 using System;
 using System.IO;
-using System.Diagnostics;
 using Aspose.Pdf;
 
-class PdfSanitizer
+class Program
 {
-    // Performs sanitization on a PDF and logs start/end times.
-    public static void Sanitize(string inputPdfPath, string outputPdfPath, string auditLogPath)
+    // Path to the input PDF, output PDF and audit log file
+    private const string InputPdfPath = "input.pdf";
+    private const string OutputPdfPath = "sanitized_output.pdf";
+    private const string LogFilePath = "sanitization_audit.log";
+
+    static void Main()
     {
-        // Ensure the input file exists.
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(InputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {InputPdfPath}");
             return;
         }
 
-        // Open the audit log for appending.
-        using (StreamWriter logWriter = new StreamWriter(auditLogPath, true))
+        // Record the start time of the sanitization operation
+        DateTime operationStart = DateTime.UtcNow;
+        Log($"Sanitization started at {operationStart:O}");
+
+        try
         {
-            // Record start time.
-            DateTime startTime = DateTime.UtcNow;
-            logWriter.WriteLine($"Sanitization started: {startTime:O}");
-
-            // Measure elapsed time.
-            Stopwatch sw = Stopwatch.StartNew();
-
-            // Load the PDF document (lifecycle: load).
-            using (Document doc = new Document(inputPdfPath))
+            // Load, sanitize and save the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(InputPdfPath))
             {
-                // Example sanitization steps:
-                // 1. Enable signature field sanitization (default is true, set explicitly for clarity).
-                doc.EnableSignatureSanitization = true;
+                // ---- Sanitization ----
+                // Remove all annotations from every page (fallback when Document.Sanitize() is unavailable)
+                foreach (Page page in doc.Pages)
+                {
+                    page.Annotations.Clear();
+                }
 
-                // 2. Validate the document against a PDF/A format.
-                //    The Validate method writes its own log; we direct it to the same audit file.
-                //    The return value indicates success (ignored here).
-                doc.Validate(auditLogPath, PdfFormat.PDF_A_1B);
+                // Remove all embedded files (EmbeddedFileCollection uses 1‑based indexing and has no Clear method)
+                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                {
+                    for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                    {
+                        var fileSpec = doc.EmbeddedFiles[i];
+                        if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                        {
+                            doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        }
+                    }
+                }
 
-                // 3. Save the sanitized PDF (lifecycle: save).
-                doc.Save(outputPdfPath);
+                // Optional: clear metadata for privacy (do not assign null to non‑nullable DateTime fields)
+                doc.Info.Title = string.Empty;
+                doc.Info.Author = string.Empty;
+                doc.Info.Subject = string.Empty;
+                doc.Info.Keywords = string.Empty;
+                doc.Info.Creator = string.Empty;
+                doc.Info.Producer = string.Empty;
+                // CreationDate and ModDate are non‑nullable; setting them to DateTime.MinValue effectively clears them
+                doc.Info.CreationDate = DateTime.MinValue;
+                doc.Info.ModDate = DateTime.MinValue;
+
+                // Save the sanitized PDF
+                doc.Save(OutputPdfPath);
             }
-
-            // Stop timing.
-            sw.Stop();
-
-            // Record end time and duration.
-            DateTime endTime = DateTime.UtcNow;
-            logWriter.WriteLine($"Sanitization ended:   {endTime:O}");
-            logWriter.WriteLine($"Duration: {sw.Elapsed}");
-            logWriter.WriteLine(new string('-', 40));
+        }
+        catch (Exception ex)
+        {
+            Log($"Sanitization failed: {ex.Message}");
+            Console.Error.WriteLine($"Error during sanitization: {ex.Message}");
+            return;
         }
 
-        Console.WriteLine($"Sanitization completed. Output: {outputPdfPath}");
+        // Record the end time of the sanitization operation
+        DateTime operationEnd = DateTime.UtcNow;
+        Log($"Sanitization completed at {operationEnd:O}");
+        Log($"Duration: {(operationEnd - operationStart).TotalSeconds:F2} seconds");
     }
 
-    // Example entry point.
-    static void Main()
+    // Simple helper that appends a line to the audit log file
+    private static void Log(string message)
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "sanitized_output.pdf";
-        const string logPath    = "sanitization_audit.log";
-
-        Sanitize(inputPath, outputPath, logPath);
+        try
+        {
+            File.AppendAllText(LogFilePath, $"{DateTime.UtcNow:O} - {message}{Environment.NewLine}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Logging failed: {ex.Message}");
+        }
     }
 }

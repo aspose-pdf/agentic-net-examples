@@ -1,32 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string texFilePath   = "input.tex";
-        const string pdfOutputPath = "output.pdf";
+        const string latexPath = "input.tex";   // Path to the LaTeX source file
+        const string pdfPath   = "output.pdf";  // Desired PDF output path
 
-        // Verify source file exists
-        if (!File.Exists(texFilePath))
+        // Verify the LaTeX file exists before proceeding
+        if (!File.Exists(latexPath))
         {
-            Console.Error.WriteLine($"LaTeX source not found: {texFilePath}");
+            Console.Error.WriteLine($"LaTeX file not found: {latexPath}");
             return;
         }
 
-        // Initialize TeX load options (default settings preserve equations as vector graphics)
-        TeXLoadOptions texLoadOptions = new TeXLoadOptions();
-
-        // Load the .tex file and convert it to a PDF document
-        using (Document pdfDocument = new Document(texFilePath, texLoadOptions))
+        try
         {
-            // Save the resulting PDF
-            pdfDocument.Save(pdfOutputPath);
-        }
+            // Load the LaTeX document using the constructor that accepts TeXLoadOptions.
+            var loadOptions = new TeXLoadOptions();
+            using (var doc = new Document(latexPath, loadOptions))
+            {
+                // Save directly to PDF. No additional SaveOptions are required.
+                doc.Save(pdfPath);
+            }
 
-        Console.WriteLine($"LaTeX file converted successfully to '{pdfOutputPath}'.");
+            Console.WriteLine($"LaTeX successfully converted to PDF: {pdfPath}");
+        }
+        catch (Exception ex)
+        {
+            // Report any errors (parsing failures, missing fonts, etc.)
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

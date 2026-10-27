@@ -1,60 +1,49 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
-class BatchRotateFirstPage
+class Program
 {
     static void Main()
     {
-        // Folder containing PDF files
-        const string inputFolder = @"C:\PdfFolder";
-        // Output folder for rotated PDFs
-        const string outputFolder = @"C:\PdfFolder\Rotated";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where rotated PDFs will be saved
+        const string outputFolder = "RotatedPdfs";
 
-        // Ensure output folder exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string inputPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Build output file name (same name with suffix)
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName + "_rotated.pdf");
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Use PdfPageEditor facade to rotate pages
-                using (PdfPageEditor editor = new PdfPageEditor())
-                {
-                    // Bind the source PDF file
-                    editor.BindPdf(inputPath);
+                // Load the PDF document
+                Document pdfDocument = new Document(pdfPath);
 
-                    // Prepare a dictionary with page‑number → rotation‑degree mapping
-                    // Page numbers are 1‑based; rotate only the first page by 90°
-                    var rotations = new Dictionary<int, int>
-                    {
-                        { 1, 90 } // valid values: 0, 90, 180, 270
-                    };
+                // Rotate the first page (pages are 1‑based) by 90 degrees clockwise
+                // The Rotation enum values are: on0, on90, on180, on270
+                pdfDocument.Pages[1].Rotate = Rotation.on90;
 
-                    // Assign the rotation map to the editor
-                    editor.PageRotations = rotations;
-
-                    // Apply the changes to the document
-                    editor.ApplyChanges();
-
-                    // Save the modified PDF to the output path
-                    editor.Save(outputPath);
-                }
-
-                Console.WriteLine($"Rotated first page: '{inputPath}' → '{outputPath}'");
+                // Save the modified PDF to the output location
+                pdfDocument.Save(outPath);
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch rotation of first pages completed.");
     }
 }

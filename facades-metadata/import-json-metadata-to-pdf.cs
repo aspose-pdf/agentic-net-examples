@@ -4,101 +4,88 @@ using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace PdfMetadataUpdater
 {
-    static void Main()
+    // Represents a single metadata record from the JSON file
+    public class MetadataRecord
     {
-        const string jsonPath = "metadata.json";
+        public string InputPath { get; set; }      // Path to the source PDF
+        public string OutputPath { get; set; }     // Optional: where to save the updated PDF (if null, overwrite InputPath)
+        public string Title { get; set; }
+        public string Author { get; set; }
+        public string Subject { get; set; }
+        public string Keywords { get; set; }
+        // Additional fields can be added as needed (e.g., Language, Creator, etc.)
+    }
 
-        if (!File.Exists(jsonPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-            return;
-        }
+            const string jsonFile = "metadata.json";
 
-        // Load and parse the JSON file.
-        // Expected format:
-        // [
-        //   {
-        //     "File": "doc1.pdf",
-        //     "Title": "Document 1",
-        //     "Author": "John Doe",
-        //     "Subject": "Sample",
-        //     "Keywords": "example, test",
-        //     "Custom": { "Project": "Alpha", "Version": "1.2" }
-        //   },
-        //   { ... }
-        // ]
-        string jsonContent = File.ReadAllText(jsonPath);
-        JsonDocument doc = JsonDocument.Parse(jsonContent);
-        JsonElement root = doc.RootElement;
-
-        if (root.ValueKind != JsonValueKind.Array)
-        {
-            Console.Error.WriteLine("Invalid JSON format: root element must be an array.");
-            return;
-        }
-
-        foreach (JsonElement item in root.EnumerateArray())
-        {
-            if (!item.TryGetProperty("File", out JsonElement fileElem) ||
-                fileElem.GetString() is not string pdfPath ||
-                string.IsNullOrWhiteSpace(pdfPath))
+            if (!File.Exists(jsonFile))
             {
-                Console.Error.WriteLine("Skipping entry without a valid \"File\" property.");
-                continue;
+                Console.Error.WriteLine($"Metadata file not found: {jsonFile}");
+                return;
             }
 
-            if (!File.Exists(pdfPath))
+            // Read and deserialize the JSON file into a list of metadata records
+            List<MetadataRecord> records;
+            try
             {
-                Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-                continue;
+                string jsonContent = File.ReadAllText(jsonFile);
+                records = JsonSerializer.Deserialize<List<MetadataRecord>>(jsonContent,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+                return;
             }
 
-            // Create a PdfFileInfo facade for the target PDF.
-            using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+            if (records == null || records.Count == 0)
             {
-                // Apply standard metadata properties if present.
-                if (item.TryGetProperty("Title", out JsonElement titleElem))
-                    info.Title = titleElem.GetString();
+                Console.WriteLine("No metadata entries found in the JSON file.");
+                return;
+            }
 
-                if (item.TryGetProperty("Author", out JsonElement authorElem))
-                    info.Author = authorElem.GetString();
-
-                if (item.TryGetProperty("Subject", out JsonElement subjectElem))
-                    info.Subject = subjectElem.GetString();
-
-                if (item.TryGetProperty("Keywords", out JsonElement keywordsElem))
-                    info.Keywords = keywordsElem.GetString();
-
-                if (item.TryGetProperty("Creator", out JsonElement creatorElem))
-                    info.Creator = creatorElem.GetString();
-
-                // CreationDate and ModDate must be supplied as PDF‑date formatted strings.
-                if (item.TryGetProperty("CreationDate", out JsonElement creationDateElem) &&
-                    DateTime.TryParse(creationDateElem.GetString(), out DateTime creationDate))
-                    info.CreationDate = creationDate.ToString("yyyyMMddHHmmss");
-
-                if (item.TryGetProperty("ModDate", out JsonElement modDateElem) &&
-                    DateTime.TryParse(modDateElem.GetString(), out DateTime modDate))
-                    info.ModDate = modDate.ToString("yyyyMMddHHmmss");
-
-                // Apply custom metadata (arbitrary name/value pairs).
-                if (item.TryGetProperty("Custom", out JsonElement customElem) &&
-                    customElem.ValueKind == JsonValueKind.Object)
+            foreach (var rec in records)
+            {
+                // Validate source PDF path
+                if (string.IsNullOrWhiteSpace(rec.InputPath) || !File.Exists(rec.InputPath))
                 {
-                    foreach (JsonProperty prop in customElem.EnumerateObject())
-                    {
-                        string name = prop.Name;
-                        string value = prop.Value.GetString() ?? string.Empty;
-                        info.SetMetaInfo(name, value);
-                    }
+                    Console.Error.WriteLine($"Source PDF not found: {rec.InputPath}");
+                    continue;
                 }
 
-                // Save the updated PDF. Overwrite the original file.
-                // SaveNewInfo writes the modified metadata without altering the content.
-                info.SaveNewInfo(pdfPath);
-                Console.WriteLine($"Metadata applied to: {pdfPath}");
+                // Determine the output path (overwrite source if not specified)
+                string outputPath = string.IsNullOrWhiteSpace(rec.OutputPath) ? rec.InputPath : rec.OutputPath;
+
+                try
+                {
+                    // PdfFileInfo works via the Facades API; it does not implement IDisposable,
+                    // so no using block is required.
+                    PdfFileInfo pdfInfo = new PdfFileInfo();
+
+                    // Bind the existing PDF file
+                    pdfInfo.BindPdf(rec.InputPath);
+
+                    // Apply metadata fields if they are provided
+                    if (!string.IsNullOrEmpty(rec.Title))    pdfInfo.Title    = rec.Title;
+                    if (!string.IsNullOrEmpty(rec.Author))   pdfInfo.Author   = rec.Author;
+                    if (!string.IsNullOrEmpty(rec.Subject))  pdfInfo.Subject  = rec.Subject;
+                    if (!string.IsNullOrEmpty(rec.Keywords)) pdfInfo.Keywords = rec.Keywords;
+
+                    // Save the updated PDF (overwrites or creates a new file)
+                    pdfInfo.Save(outputPath);
+
+                    Console.WriteLine($"Metadata applied to '{outputPath}'.");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error processing '{rec.InputPath}': {ex.Message}");
+                }
             }
         }
     }

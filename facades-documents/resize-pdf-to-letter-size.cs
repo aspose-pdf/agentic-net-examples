@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,18 +15,22 @@ class Program
             return;
         }
 
-        // Letter size in points (1 inch = 72 points)
-        double letterWidth = 8.5 * 72; // 612 points
-        double letterHeight = 11 * 72; // 792 points
+        // Load the PDF using the file‑path overload of Document
+        var doc = new Document(inputPath);
 
-        PdfFileEditor editor = new PdfFileEditor();
+        // Letter size in points: 8.5" x 11" => 612 x 792 points
+        const float letterWidth = 612f;
+        const float letterHeight = 792f;
 
-        // Resize all pages to Letter size and save to outputPath
-        bool success = editor.ResizeContents(inputPath, outputPath, null, letterWidth, letterHeight);
+        // Resize every page to Letter dimensions
+        foreach (Page page in doc.Pages)
+        {
+            page.SetPageSize(letterWidth, letterHeight);
+        }
 
-        if (success)
-            Console.WriteLine($"PDF resized to Letter size and saved as '{outputPath}'.");
-        else
-            Console.Error.WriteLine("Failed to resize PDF.");
+        // Save the resized document
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

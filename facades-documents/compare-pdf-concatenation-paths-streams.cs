@@ -1,70 +1,75 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files – ensure they exist in the working directory
-        const string inputFile1 = "file1.pdf";
-        const string inputFile2 = "file2.pdf";
+        // Input PDF files to be concatenated – ensure they exist (create dummy PDFs if missing)
+        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        foreach (var file in inputFiles)
+            EnsurePdfExists(file);
 
-        if (!File.Exists(inputFile1) || !File.Exists(inputFile2))
+        // Output files for the two approaches
+        const string outputPathFile   = "merged_file.pdf";
+        const string outputPathStream = "merged_stream.pdf";
+
+        // ------------------------------------------------------------
+        // 1. Concatenation using file‑path overloads
+        // ------------------------------------------------------------
+        long memBeforeFile = GC.GetTotalMemory(true);
+
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+        var editorFile = new PdfFileEditor();
+        editorFile.Concatenate(inputFiles, outputPathFile);
+
+        long memAfterFile = GC.GetTotalMemory(true);
+        Console.WriteLine($"File‑path concatenation memory delta: {memAfterFile - memBeforeFile} bytes");
+
+        // ------------------------------------------------------------
+        // 2. Concatenation using stream overloads
+        // ------------------------------------------------------------
+        // Open a writable stream for the output PDF
+        using (FileStream outputStream = new FileStream(outputPathStream, FileMode.Create, FileAccess.Write))
         {
-            Console.Error.WriteLine("Input PDF files not found.");
+            // Open read‑only streams for each input PDF
+            Stream[] inputStreams = new Stream[inputFiles.Length];
+            try
+            {
+                for (int i = 0; i < inputFiles.Length; i++)
+                    inputStreams[i] = new FileStream(inputFiles[i], FileMode.Open, FileAccess.Read);
+
+                long memBeforeStream = GC.GetTotalMemory(true);
+
+                var editorStream = new PdfFileEditor();
+                editorStream.Concatenate(inputStreams, outputStream);
+
+                long memAfterStream = GC.GetTotalMemory(true);
+                Console.WriteLine($"Stream concatenation memory delta: {memAfterStream - memBeforeStream} bytes");
+            }
+            finally
+            {
+                // Dispose all input streams even if an exception occurs
+                foreach (var s in inputStreams)
+                    s?.Dispose();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates a minimal one‑page PDF at <paramref name="path"/> if the file does not already exist.
+    /// This prevents FileNotFoundException during the demo run.
+    /// </summary>
+    private static void EnsurePdfExists(string path)
+    {
+        if (File.Exists(path))
             return;
-        }
 
-        // -----------------------------------------------------------------
-        // 1. Concatenation using file paths
-        // -----------------------------------------------------------------
-        string outputPathPath = "concatenated_path.pdf";
-
-        // Capture memory usage before the operation
-        long beforePath = Process.GetCurrentProcess().PrivateMemorySize64;
-
-        // PdfFileEditor does NOT implement IDisposable – do not use 'using'
-        PdfFileEditor editorPath = new PdfFileEditor();
-        // Close streams automatically after operation (not strictly needed here)
-        editorPath.CloseConcatenatedStreams = true;
-
-        // Perform concatenation using file paths
-        bool successPath = editorPath.Concatenate(inputFile1, inputFile2, outputPathPath);
-
-        // Capture memory usage after the operation
-        long afterPath = Process.GetCurrentProcess().PrivateMemorySize64;
-
-        Console.WriteLine($"Path overload success: {successPath}");
-        Console.WriteLine($"Memory used (path overload): {(afterPath - beforePath) / 1024} KB");
-
-        // -----------------------------------------------------------------
-        // 2. Concatenation using streams
-        // -----------------------------------------------------------------
-        string outputPathStream = "concatenated_stream.pdf";
-
-        // Open streams for the two input PDFs and the output PDF
-        using (FileStream stream1 = new FileStream(inputFile1, FileMode.Open, FileAccess.Read))
-        using (FileStream stream2 = new FileStream(inputFile2, FileMode.Open, FileAccess.Read))
-        using (FileStream outStream = new FileStream(outputPathStream, FileMode.Create, FileAccess.Write))
-        {
-            // Capture memory usage before the operation
-            long beforeStream = Process.GetCurrentProcess().PrivateMemorySize64;
-
-            PdfFileEditor editorStream = new PdfFileEditor();
-            editorStream.CloseConcatenatedStreams = true;
-
-            // Perform concatenation using stream overloads
-            bool successStream = editorStream.Concatenate(stream1, stream2, outStream);
-
-            // Capture memory usage after the operation
-            long afterStream = Process.GetCurrentProcess().PrivateMemorySize64;
-
-            Console.WriteLine($"Stream overload success: {successStream}");
-            Console.WriteLine($"Memory used (stream overload): {(afterStream - beforeStream) / 1024} KB");
-        }
-
-        // Note: PdfFileEditor does not need explicit disposal.
+        // Create a simple PDF with a single blank page
+        var doc = new Document();
+        doc.Pages.Add();
+        doc.Save(path);
     }
 }

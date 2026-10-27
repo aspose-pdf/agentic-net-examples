@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_high_compression.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_high.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +16,41 @@ class Program
             return;
         }
 
-        // Get original file size
-        long originalSize = new FileInfo(inputPath).Length;
-
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF, apply high compression, and save it
         using (Document doc = new Document(inputPath))
         {
-            // Create optimization options with high compression settings
-            OptimizationOptions optOptions = OptimizationOptions.All();
-            optOptions.CompressObjects = true;          // compress PDF objects
-            optOptions.SubsetFonts      = true;          // embed only used glyphs
-            optOptions.RemoveUnusedObjects = true;      // drop unused objects
-            optOptions.RemoveUnusedStreams = true;      // drop unused streams
+            // Configure optimization options for high compression
+            OptimizationOptions opt = OptimizationOptions.All();
+            // Image compression settings (new API)
+            opt.ImageCompressionOptions.CompressImages = true;   // compress images
+            opt.ImageCompressionOptions.ImageQuality = 30;       // 0‑100, lower = higher compression
+            // General optimization flags
+            opt.RemoveUnusedObjects = true;      // strip unused objects
+            opt.RemoveUnusedStreams = true;      // strip unused streams
+            // Note: CompressStreams property has been removed; OptimizeResources handles stream compression.
 
             // Apply the optimization to the document
-            doc.OptimizeResources(optOptions);
+            doc.OptimizeResources(opt);
 
-            // Save the optimized PDF using explicit PdfSaveOptions
-            PdfSaveOptions saveOptions = new PdfSaveOptions();
-            doc.Save(outputPath, saveOptions);
+            // Save the optimized document
+            doc.Save(outputPath);
         }
 
-        // Get optimized file size
-        long optimizedSize = new FileInfo(outputPath).Length;
+        // Compare file sizes
+        FileInfo originalInfo = new FileInfo(inputPath);
+        FileInfo compressedInfo = new FileInfo(outputPath);
 
-        // Output size comparison
-        Console.WriteLine($"Original size : {originalSize} bytes");
-        Console.WriteLine($"Optimized size: {optimizedSize} bytes");
-        Console.WriteLine($"Size reduction: {originalSize - optimizedSize} bytes");
+        Console.WriteLine($"Original size   : {originalInfo.Length} bytes");
+        Console.WriteLine($"Compressed size : {compressedInfo.Length} bytes");
+
+        if (originalInfo.Length > 0)
+        {
+            double reduction = 100.0 * (originalInfo.Length - compressedInfo.Length) / originalInfo.Length;
+            Console.WriteLine($"Size reduction  : {reduction:F2}%");
+        }
+        else
+        {
+            Console.WriteLine("Original file size is zero; cannot compute reduction.");
+        }
     }
 }

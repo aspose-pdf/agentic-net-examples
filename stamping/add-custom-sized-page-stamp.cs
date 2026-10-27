@@ -6,53 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Output PDF file path
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(stampPath))
         {
-            // Ensure the document has at least two pages (source and target)
-            if (doc.Pages.Count < 2)
-            {
-                Console.Error.WriteLine("The document must contain at least two pages.");
-                return;
-            }
-
-            // Source page that will be used as the stamp content (first page)
-            Page sourcePage = doc.Pages[1];
-
-            // Create a PdfPageStamp from the source page
-            PdfPageStamp stamp = new PdfPageStamp(sourcePage);
-
-            // Set custom dimensions for the stamp (in points)
-            stamp.Width  = 200; // Desired width
-            stamp.Height = 150; // Desired height
-
-            // Position the stamp on the target page (second page)
-            // XIndent and YIndent are measured from the left and bottom edges respectively
-            stamp.XIndent = 100; // Horizontal offset from the left edge
-            stamp.YIndent = 200; // Vertical offset from the bottom edge
-
-            // Optional: make the stamp appear behind the page content
-            stamp.Background = false; // true = background, false = foreground
-
-            // Apply the stamp to the target page (second page)
-            Page targetPage = doc.Pages[2];
-            targetPage.AddStamp(stamp);
-
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            return;
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
+        {
+            // Create an ImageStamp with custom dimensions
+            ImageStamp imgStamp = new ImageStamp(stampPath)
+            {
+                Width  = 200,   // custom width in points
+                Height = 100,   // custom height in points
+                // Position the stamp within the page region
+                LeftMargin = 50,   // distance from the left edge
+                TopMargin  = 700,  // distance from the bottom edge
+                Background = false, // place stamp over page content
+                HorizontalAlignment = HorizontalAlignment.None,
+                VerticalAlignment   = VerticalAlignment.None
+            };
+
+            // Target a specific page (e.g., page 2)
+            int targetPageNumber = 2;
+            if (targetPageNumber >= 1 && targetPageNumber <= pdfDocument.Pages.Count)
+            {
+                pdfDocument.Pages[targetPageNumber].AddStamp(imgStamp);
+            }
+
+            // Save the modified PDF
+            pdfDocument.Save(outputPath);
+        }
+
+        Console.WriteLine($"Stamp applied and saved to '{outputPath}'.");
     }
 }

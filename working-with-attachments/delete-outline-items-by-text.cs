@@ -1,15 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "portfolio.pdf";
+        const string inputPath = "portfolio.pdf";
         const string outputPath = "portfolio_cleaned.pdf";
-        const string matchText  = "Obsolete Item Description";
+        const string matchText = "Obsolete Item Description";
 
         if (!File.Exists(inputPath))
         {
@@ -17,34 +17,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the collection of outline items (bookmarks)
-            OutlineCollection outlines = doc.Outlines;
-
-            // Collect titles of outline items whose description matches the target text
-            var titlesToDelete = new System.Collections.Generic.List<string>();
-
-            foreach (OutlineItemCollection item in outlines)
+            // Ensure the document actually contains a portfolio (collection of embedded files)
+            if (doc.Collection == null || doc.Collection.Count == 0)
             {
-                // The Title property holds the visible text of the outline entry
-                if (item.Title != null && item.Title.Contains(matchText, StringComparison.OrdinalIgnoreCase))
+                Console.WriteLine("No portfolio items found.");
+                doc.Save(outputPath);
+                return;
+            }
+
+            // Gather the names of the specifications that match the description
+            var namesToRemove = new List<string>();
+            for (int i = 0; i < doc.Collection.Count; i++)
+            {
+                var fileSpec = doc.Collection[i];
+                if (!string.IsNullOrEmpty(fileSpec.Description) &&
+                    fileSpec.Description.IndexOf(matchText, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    titlesToDelete.Add(item.Title);
+                    // The Delete method expects the attachment name (string), not the object itself
+                    namesToRemove.Add(fileSpec.Name);
                 }
             }
 
-            // Delete the matching outline items by title
-            foreach (string title in titlesToDelete)
+            // Remove the matched specifications using the string‑based Delete overload
+            foreach (var name in namesToRemove)
             {
-                outlines.Delete(title);
+                doc.Collection.Delete(name);
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Portfolio cleaned and saved to '{outputPath}'.");
     }
 }

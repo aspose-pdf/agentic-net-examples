@@ -7,68 +7,66 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string pdfPath = "input.pdf";
-
-        // Output HTML file path
-        const string htmlPath = "output.html";
+        const string pdfPath          = "input.pdf";
+        const string htmlPath         = "output.html";
+        const string minifiedHtmlPath = "output.min.html";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
+        // Convert PDF to HTML (Windows only – GDI+ required)
         try
         {
-            // Load the PDF document
-            using (Document pdfDocument = new Document(pdfPath))
+            using (Document doc = new Document(pdfPath))
             {
-                // Configure HTML conversion options
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+                // HtmlSaveOptions must be passed explicitly; otherwise a PDF is written.
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Generate a single HTML file (default)
-                    SplitIntoPages = false,
-
-                    // Embed images as PNG inside SVG to keep a single file
+                    // Embed all resources into a single HTML file.
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Render images as PNGs embedded in SVG (cross‑platform friendly).
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-
-                    // Optional: remove empty top/bottom margins
-                    RemoveEmptyAreasOnTopAndBottom = true
+                    // Produce a single HTML file (set to false if you want one file per page).
+                    SplitIntoPages = false
                 };
 
-                // Convert PDF to HTML
-                pdfDocument.Save(htmlPath, htmlOptions);
+                doc.Save(htmlPath, htmlOpts);
             }
 
-            // Minify the generated HTML
-            string htmlContent = File.ReadAllText(htmlPath);
-
-            // Remove HTML comments
-            htmlContent = Regex.Replace(htmlContent, @"<!--(.*?)-->", string.Empty, RegexOptions.Singleline);
-
-            // Collapse multiple whitespace characters into a single space
-            htmlContent = Regex.Replace(htmlContent, @"\s+", " ");
-
-            // Remove spaces between tags
-            htmlContent = Regex.Replace(htmlContent, @">\s+<", "><");
-
-            // Trim leading/trailing whitespace
-            htmlContent = htmlContent.Trim();
-
-            // Overwrite the HTML file with the minified content
-            File.WriteAllText(htmlPath, htmlContent);
-
-            Console.WriteLine($"PDF successfully converted and minified: {htmlPath}");
+            Console.WriteLine($"PDF converted to HTML: {htmlPath}");
         }
         catch (TypeInitializationException)
         {
-            // HTML conversion requires GDI+ and is Windows‑only
-            Console.Error.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+            // GDI+ not available on non‑Windows platforms.
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping conversion.");
+            return;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during PDF‑to‑HTML conversion: {ex.Message}");
+            return;
+        }
+
+        // Minify the generated HTML file.
+        try
+        {
+            string htmlContent = File.ReadAllText(htmlPath);
+
+            // Simple minification: remove line breaks, tabs, and collapse multiple spaces.
+            // This is a lightweight approach; for more aggressive minification use a dedicated library.
+            string minified = Regex.Replace(htmlContent, @"\s+", " "); // collapse whitespace
+            minified = minified.Replace("> <", "><");               // remove spaces between tags
+
+            File.WriteAllText(minifiedHtmlPath, minified.Trim());
+
+            Console.WriteLine($"Minified HTML saved to: {minifiedHtmlPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during HTML minification: {ex.Message}");
         }
     }
 }

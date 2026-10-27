@@ -16,26 +16,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Verify the attachment exists
-            var fileSpec = doc.EmbeddedFiles.FindByName(attachmentName);
-            if (fileSpec != null)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Delete the attachment by its filename
-                doc.EmbeddedFiles.Delete(attachmentName);
-                Console.WriteLine($"Attachment '{attachmentName}' deleted.");
-            }
-            else
-            {
-                Console.WriteLine($"Attachment '{attachmentName}' not found.");
-            }
+                // Check if the attachment exists
+                bool found = false;
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                {
+                    if (fileSpec.Name.Equals(attachmentName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+                if (found)
+                {
+                    // Delete the attachment by its filename
+                    doc.EmbeddedFiles.Delete(attachmentName);
+
+                    // Save the modified PDF
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Attachment '{attachmentName}' deleted. Saved to '{outputPath}'.");
+                }
+                else
+                {
+                    Console.WriteLine($"Attachment '{attachmentName}' not found in the PDF.");
+                }
+            }
         }
-
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

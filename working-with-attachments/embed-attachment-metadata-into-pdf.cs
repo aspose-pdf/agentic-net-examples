@@ -6,44 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string attachmentFilePath = "attachment.txt";
-        const string outputPdfPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_embedded.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath) || !File.Exists(attachmentFilePath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("Input PDF or attachment file not found.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF (create‑load‑save lifecycle)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Add an embedded file (attachment) to the PDF
-            using (FileStream attachmentStream = File.OpenRead(attachmentFilePath))
+            // OPTIONAL: add an attachment to demonstrate metadata embedding
+            const string attachmentPath = "sample.txt";
+            if (File.Exists(attachmentPath))
             {
-                string attachmentName = Path.GetFileName(attachmentFilePath);
-                // Correct constructor order: (Stream, string)
-                FileSpecification fileSpec = new FileSpecification(attachmentStream, attachmentName);
+                // Create a file specification for the attachment and add it to the document
+                FileSpecification fileSpec = new FileSpecification(attachmentPath);
                 doc.EmbeddedFiles.Add(fileSpec);
+
+                // Embed attachment information into the document information dictionary
+                // Use the DocumentInfo indexer for custom metadata (AdditionalInfo does not exist).
+                doc.Info["AttachmentFileName"] = Path.GetFileName(attachmentPath);
+                doc.Info["AttachmentDescription"] = "Sample text attachment";
             }
 
-            // Store attachment metadata in the document information dictionary
-            doc.Info.Add("AttachmentName", Path.GetFileName(attachmentFilePath));
-            doc.Info.Add("AttachmentDescription", "Sample attachment added via Aspose.Pdf");
-
-            // Configure conversion options to transfer Info entries to Metadata (PDF 1.6 used for compatibility)
-            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.v_1_6);
-            convOptions.IsTransferInfo = true; // embed Info dictionary into Metadata
-
-            // Apply the conversion options (conversion to the same format)
-            doc.Convert(convOptions);
-
-            // Save the modified PDF (create‑save lifecycle)
-            doc.Save(outputPdfPath);
+            // Save the PDF – the custom metadata is stored in the document information dictionary.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with attachment metadata to '{outputPdfPath}'.");
+        Console.WriteLine($"Document saved with embedded attachment metadata to '{outputPath}'.");
     }
 }

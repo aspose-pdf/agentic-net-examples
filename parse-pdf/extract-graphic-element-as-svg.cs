@@ -1,20 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
+using Aspose.Pdf.Drawing; // needed for Color, etc.
+using PdfRect = Aspose.Pdf.Rectangle; // disambiguate Rectangle
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file containing vector graphics.
-        const string inputPdfPath = "input.pdf";
-
-        // Index of the graphic element to extract (0‑based).
-        const int elementIndex = 2; // example: third element
-
-        // Output SVG file path.
-        const string outputSvgPath = "extracted_element.svg";
+        const string inputPdfPath = "input.pdf";      // source PDF
+        const string outputSvgPath = "extracted.svg"; // destination SVG
+        const int graphicIndex = 1;                    // 1‑based index of the graphic element on the page
 
         if (!File.Exists(inputPdfPath))
         {
@@ -22,39 +18,60 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Open the PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Ensure the requested page exists (using first page as example).
+            // Ensure the document has at least one page
             if (pdfDoc.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The document has no pages.");
+                Console.Error.WriteLine("The PDF contains no pages.");
                 return;
             }
 
-            // Choose the page from which to extract the graphic element.
-            Page page = pdfDoc.Pages[1]; // 1‑based indexing
+            // For this example we look at the first page only
+            Page page = pdfDoc.Pages[1]; // 1‑based indexing (global rule)
 
-            // SvgExtractor extracts all vector graphics on the page as SVG strings.
-            SvgExtractor extractor = new SvgExtractor();
+            // Locate the graphic by its 1‑based index
+            int currentIndex = 0;
+            XImage? targetImage = null;
 
-            // Get the list of SVG strings; each entry corresponds to one graphic element.
-            var svgStrings = extractor.Extract(page);
-
-            // Validate the requested index.
-            if (elementIndex < 0 || elementIndex >= svgStrings.Count)
+            foreach (XImage img in page.Resources.Images)
             {
-                Console.Error.WriteLine($"Invalid element index. Page contains {svgStrings.Count} graphic elements.");
+                currentIndex++;
+                if (currentIndex == graphicIndex)
+                {
+                    targetImage = img;
+                    break;
+                }
+            }
+
+            if (targetImage == null)
+            {
+                Console.Error.WriteLine($"Graphic element #{graphicIndex} not found on page 1.");
                 return;
             }
 
-            // Retrieve the SVG content for the specified element.
-            string selectedSvg = svgStrings[elementIndex];
+            // Create a temporary PDF that contains only the extracted image
+            Document svgDoc = new Document();
+            Page newPage = svgDoc.Pages.Add();
 
-            // Save the SVG string to a file.
-            File.WriteAllText(outputSvgPath, selectedSvg);
+            // Save the XImage into a memory stream and add it to the new page resources
+            using (MemoryStream imgStream = new MemoryStream())
+            {
+                targetImage.Save(imgStream);
+                imgStream.Position = 0; // reset stream position
+                string imgName = newPage.Resources.Images.Add(imgStream);
 
-            Console.WriteLine($"Graphic element #{elementIndex} saved as SVG to '{outputSvgPath}'.");
+                // Define a rectangle that covers the whole page (or adjust as needed)
+                PdfRect rect = new PdfRect(0, 0, newPage.PageInfo.Width, newPage.PageInfo.Height);
+                newPage.AddImage(imgName, rect);
+            }
+
+            // Save the temporary PDF as SVG
+            SvgSaveOptions svgOpts = new SvgSaveOptions();
+            svgDoc.Save(outputSvgPath, svgOpts);
+
+            Console.WriteLine($"Graphic element #{graphicIndex} saved as SVG to '{outputSvgPath}'.");
         }
     }
 }

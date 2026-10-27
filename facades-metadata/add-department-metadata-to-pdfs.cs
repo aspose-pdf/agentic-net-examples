@@ -1,47 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade classes for PDF metadata manipulation
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing input PDF files
-        const string inputFolder  = @"C:\InputPdfs";
-        // Folder where updated PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
+        // Base directory of the executable (works for both Windows and Linux)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Ensure output directory exists
+        // Resolve input and output folders relative to the base directory
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
+
+        // Validate the input folder – if it does not exist, inform the user and stop.
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine("Create the folder and place PDF files inside before running the program.");
+            return;
+        }
+
+        // Ensure the output folder exists.
         Directory.CreateDirectory(outputFolder);
 
-        // Custom metadata value to assign (could be dynamic per file)
-        const string departmentValue = "Finance";
-
-        // Iterate over all PDF files in the input folder
+        // Loop through all PDF files in the input folder.
         foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Derive output file path (same name, different folder)
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
-
             try
             {
-                // Initialize the PdfFileInfo facade with the source PDF
-                using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-                {
-                    // Set custom metadata field "Department"
-                    pdfInfo.SetMetaInfo("Department", departmentValue);
+                // Determine output file path (same name, different folder).
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-                    // Save the updated PDF to the output location
-                    // SaveNewInfo writes only the changed metadata without altering other content
-                    pdfInfo.SaveNewInfo(outputPath);
-                }
+                // Use PdfFileInfo (Facades API) to bind the PDF and set custom metadata.
+                PdfFileInfo pdfInfo = new PdfFileInfo();
+                pdfInfo.BindPdf(inputPath);                     // Load the PDF
+                pdfInfo.SetMetaInfo("Department", "Finance"); // Add custom metadata field
 
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {outputPath}");
+                // Save the modified PDF to the output location.
+                pdfInfo.Save(outputPath);
+
+                Console.WriteLine($"Processed '{Path.GetFileName(inputPath)}' -> '{outputPath}'");
             }
             catch (Exception ex)
             {
+                // Log the error but continue processing the remaining files.
                 Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("All PDFs have been processed.");
     }
 }

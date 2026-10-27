@@ -2,69 +2,74 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "images.json";
+        string pdfPath = "input.pdf";
+        string jsonPath = "images.json";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // List to hold image metadata and base64 data
-        var imageList = new List<object>();
+        var images = new List<Dictionary<string, object>>();
+        int imageIndex = 0;
 
-        // Use PdfExtractor to extract images from the PDF
+        // Load the document to know the total page count
+        Document doc = new Document(pdfPath);
+        int totalPages = doc.Pages.Count;
+
+        // Use a single extractor instance; we will set the page range for each iteration
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPdfPath);
+            extractor.BindPdf(pdfPath);
 
-            // Start the image extraction process
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-
-            // Iterate over all extracted images
-            while (extractor.HasNextImage())
+            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
             {
-                // Store each image in a memory stream in PNG format
-                using (MemoryStream imageStream = new MemoryStream())
+                // Restrict extraction to the current page only
+                extractor.StartPage = pageNumber;
+                extractor.EndPage   = pageNumber;
+                extractor.ExtractImage();
+
+                while (extractor.HasNextImage())
                 {
-                    // The ImageFormat enum lives in System.Drawing.Imaging
-                    extractor.GetNextImage(imageStream, ImageFormat.Png);
-                    byte[] imageBytes = imageStream.ToArray();
-
-                    // Convert image bytes to a Base64 string
-                    string base64Data = Convert.ToBase64String(imageBytes);
-
-                    // Add metadata and Base64 data to the list
-                    imageList.Add(new
+                    using (MemoryStream imgStream = new MemoryStream())
                     {
-                        Index = imageIndex,
-                        Format = "png",
-                        Data = base64Data
-                    });
-                }
+                        // Retrieve the next image into the stream
+                        extractor.GetNextImage(imgStream);
+                        imgStream.Position = 0;
+                        byte[] imgBytes = imgStream.ToArray();
+                        string base64 = Convert.ToBase64String(imgBytes);
 
-                imageIndex++;
+                        // Since PdfExtractor no longer provides GetImageInfo or GetImagePageNumber,
+                        // we use the loop variables for page number and leave format/size as null.
+                        var imgObj = new Dictionary<string, object>
+                        {
+                            ["index"]   = imageIndex,
+                            ["page"]    = pageNumber,
+                            ["base64"]  = base64,
+                            ["format"]  = null,   // format information not directly available
+                            ["width"]   = null,   // width information not directly available
+                            ["height"]  = null    // height information not directly available
+                        };
+
+                        images.Add(imgObj);
+                        imageIndex++;
+                    }
+                }
             }
         }
 
-        // Serialize the list to a formatted JSON string
-        string jsonOutput = JsonSerializer.Serialize(imageList, new JsonSerializerOptions { WriteIndented = true });
-
-        // Write the JSON to the output file
-        File.WriteAllText(outputJsonPath, jsonOutput);
-
-        Console.WriteLine($"Extracted {imageList.Count} images to '{outputJsonPath}'.");
+        // Serialize the list to JSON
+        var options = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(images, options);
+        File.WriteAllText(jsonPath, json);
+        Console.WriteLine($"Extracted {images.Count} images to {jsonPath}");
     }
 }

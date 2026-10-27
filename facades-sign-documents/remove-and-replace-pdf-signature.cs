@@ -1,24 +1,19 @@
 using System;
 using System.IO;
-using System.Drawing; // for Rectangle
+using System.Drawing;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that may already contain a signature
-        const string inputPdf = "input.pdf";
-        // Output PDF after removing old signature(s) and applying a new one
-        const string outputPdf = "signed_updated.pdf";
-        // Path to the new certificate (PFX) and its password
+        const string inputPdf = "signed_input.pdf";
+        const string outputPdf = "resigned_output.pdf";
         const string certPath = "new_certificate.pfx";
-        const string certPassword = "newPassword";
+        const string certPassword = "certPassword";
 
-        // Optional: image to be used as visible signature appearance
-        const string signatureImage = "signature.png";
-
-        // Verify input files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -30,38 +25,51 @@ class Program
             return;
         }
 
-        // Use PdfFileSignature facade to manipulate signatures
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        try
         {
-            // Bind the existing PDF document
-            pdfSign.BindPdf(inputPdf);
+            // Bind the PDF to the signature facade
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
+            {
+                pdfSignature.BindPdf(inputPdf);
 
-            // Remove all existing signatures (if any)
-            pdfSign.RemoveSignatures();
+                // Remove all existing signatures (if any)
+                var existingSignatures = pdfSignature.GetSignatureNames(true);
+                foreach (var sigName in existingSignatures)
+                {
+                    pdfSignature.RemoveSignature(sigName);
+                }
 
-            // Set the new certificate for signing
-            pdfSign.SetCertificate(certPath, certPassword);
+                // Create PKCS7 signature object with the new certificate
+                PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+                {
+                    Reason = "Document updated",
+                    ContactInfo = "contact@example.com",
+                    Location = "New York"
+                };
 
-            // Optional: set a visual appearance for the signature
-            if (File.Exists(signatureImage))
-                pdfSign.SignatureAppearance = signatureImage;
+                // Optional: customise visual appearance of the signature
+                SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
+                {
+                    ShowContactInfo = true,
+                    ShowLocation = true
+                };
+                pkcs7.CustomAppearance = customAppearance;
 
-            // Define signature properties
-            int pageNumber = 1;                     // 1‑based page index
-            string reason = "Document updated";
-            string contact = "admin@example.com";
-            string location = "Head Office";
-            bool visible = true;                    // make signature visible
-            // Rectangle defines the position and size of the signature on the page
-            Rectangle rect = new Rectangle(100, 100, 200, 100); // x, y, width, height
+                // Sign the PDF on the first page at the desired rectangle.
+                // System.Drawing.Rectangle uses (x, y, width, height).
+                // The original Aspose rectangle (100,100,250,150) translates to width=150, height=50.
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 150, 50);
+                pdfSignature.Sign(1, true, rect, pkcs7);
 
-            // Apply the new signature
-            pdfSign.Sign(pageNumber, reason, contact, location, visible, rect);
+                // Save the updated PDF
+                pdfSignature.Save(outputPdf);
+            }
 
-            // Save the signed PDF
-            pdfSign.Save(outputPdf);
+            Console.WriteLine($"PDF re-signed successfully: {outputPdf}");
         }
-
-        Console.WriteLine($"Signature removed and new signature applied. Output saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

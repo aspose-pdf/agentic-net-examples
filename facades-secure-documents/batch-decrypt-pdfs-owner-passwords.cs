@@ -1,91 +1,62 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
+        // Path to the configuration file.
+        // Each line should contain: <pdfPath>|<ownerPassword>
         const string configPath = "decrypt_config.txt";
 
-        // Verify configuration file exists
         if (!File.Exists(configPath))
         {
             Console.Error.WriteLine($"Configuration file not found: {configPath}");
             return;
         }
 
-        // Load input PDF paths and their corresponding owner passwords
-        Dictionary<string, string> pdfEntries = LoadConfig(configPath);
-
-        foreach (KeyValuePair<string, string> entry in pdfEntries)
+        // Process each entry in the configuration file.
+        foreach (string rawLine in File.ReadLines(configPath))
         {
-            string inputPdf = entry.Key;
-            string ownerPassword = entry.Value;
+            // Skip empty lines or comments.
+            if (string.IsNullOrWhiteSpace(rawLine) || rawLine.TrimStart().StartsWith("#"))
+                continue;
 
-            // Skip missing source files
-            if (!File.Exists(inputPdf))
+            // Expected format: inputPdfPath|ownerPassword
+            string[] parts = rawLine.Split('|');
+            if (parts.Length != 2)
             {
-                Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+                Console.Error.WriteLine($"Invalid line (expected 'path|password'): {rawLine}");
                 continue;
             }
 
-            // Determine output file name (e.g., MyDoc_decrypted.pdf)
-            string outputPdf = GetDecryptedPath(inputPdf);
+            string inputPdf = parts[0].Trim();
+            string ownerPassword = parts[1].Trim();
+
+            if (!File.Exists(inputPdf))
+            {
+                Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+                continue;
+            }
+
+            // Build output file name (original name with "_decrypted" suffix).
+            string outputPdf = Path.Combine(
+                Path.GetDirectoryName(inputPdf) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(inputPdf) + "_decrypted.pdf");
 
             try
             {
-                // PdfFileSecurity handles opening, decrypting, and saving the file.
-                using (PdfFileSecurity security = new PdfFileSecurity(inputPdf, outputPdf))
-                {
-                    bool decrypted = security.DecryptFile(ownerPassword);
-                    if (decrypted)
-                    {
-                        Console.WriteLine($"Successfully decrypted: {inputPdf} → {outputPdf}");
-                    }
-                    else
-                    {
-                        Console.Error.WriteLine($"Decryption failed for: {inputPdf}");
-                    }
-                }
+                // Load the encrypted PDF using the owner password.
+                Document pdfDoc = new Document(inputPdf, ownerPassword);
+                // Saving without providing a password writes an unencrypted PDF.
+                pdfDoc.Save(outputPdf);
+                Console.WriteLine($"Decrypted: {inputPdf} → {outputPdf}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPdf}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to decrypt '{inputPdf}': {ex.Message}");
             }
         }
-    }
-
-    // Reads a simple configuration file where each line is:
-    // <inputPdfPath>|<ownerPassword>
-    // Lines starting with '#' are treated as comments.
-    static Dictionary<string, string> LoadConfig(string configFile)
-    {
-        var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (string rawLine in File.ReadAllLines(configFile))
-        {
-            string line = rawLine.Trim();
-            if (line.Length == 0 || line.StartsWith("#"))
-                continue;
-
-            string[] parts = line.Split(new[] { '|' }, 2);
-            if (parts.Length == 2)
-            {
-                string pdfPath = parts[0].Trim();
-                string password = parts[1].Trim();
-                map[pdfPath] = password;
-            }
-        }
-        return map;
-    }
-
-    // Generates an output file name by inserting "_decrypted" before the extension.
-    static string GetDecryptedPath(string inputPath)
-    {
-        string directory = Path.GetDirectoryName(inputPath);
-        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
-        string extension = Path.GetExtension(inputPath);
-        return Path.Combine(directory, $"{fileNameWithoutExt}_decrypted{extension}");
     }
 }

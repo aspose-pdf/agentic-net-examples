@@ -6,46 +6,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string watermarkImg = "watermark.png";
-        const string outputPdf  = "watermarked.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string watermarkPath = "watermark.png";   // fully opaque image to use as watermark
+        const string outputPdfPath = "watermarked.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(watermarkImg))
-        {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(watermarkPath))
         {
-            // Create an image stamp – fully opaque (Opacity default is 1.0, set explicitly)
-            ImageStamp stamp = new ImageStamp(watermarkImg);
-            stamp.Opacity = 1.0;               // fully opaque
-            stamp.Background = false;          // place on top of page content
+            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
+            return;
+        }
 
-            // Apply the stamp to every page
-            foreach (Page page in doc.Pages)
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Create an ImageStamp from the watermark image
+            ImageStamp imgStamp = new ImageStamp(watermarkPath)
             {
-                // Resize the stamp to cover the whole page (optional – adjust as needed)
-                stamp.Width  = page.PageInfo.Width;
-                stamp.Height = page.PageInfo.Height;
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment   = VerticalAlignment.Center;
+                // Fully opaque (opacity range 0.0‑1.0)
+                Opacity = 1.0,
 
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+                // Place the stamp in the foreground (over the page content)
+                Background = false,
+
+                // Center the stamp on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Apply the stamp to every page in the document
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(imgStamp);
             }
 
-            // Save the watermarked PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
     }
 }

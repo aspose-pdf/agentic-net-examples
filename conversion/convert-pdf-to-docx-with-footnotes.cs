@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDocx = "output.docx";
 
         if (!File.Exists(inputPdf))
@@ -15,24 +15,26 @@ class Program
             return;
         }
 
-        // Load the PDF, convert to DOCX with enhanced flow mode to preserve footnotes
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Configure DOCX save options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Output format: DOCX
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Use the most accurate recognition mode (supports footnotes, tables, etc.)
-                Mode = DocSaveOptions.RecognitionMode.EnhancedFlow,
-                // Optional: improve bullet detection
-                RecognizeBullets = true
-            };
+                // Configure DOCX save options. The 'Mode' property selects the
+                // recognition mode. 'Flow' provides the most accurate layout
+                // extraction and preserves footnotes.
+                var docOptions = new DocSaveOptions();
+                docOptions.Mode = DocSaveOptions.RecognitionMode.Flow;
 
-            // Save the document as DOCX
-            pdfDoc.Save(outputDocx, saveOptions);
+                // Save as DOCX with the specified options.
+                pdfDoc.Save(outputDocx, docOptions);
+            }
+
+            Console.WriteLine($"Conversion completed: {outputDocx}");
         }
-
-        Console.WriteLine($"PDF successfully converted to DOCX: '{outputDocx}'");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

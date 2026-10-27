@@ -6,47 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF into a memory stream
+        byte[] pdfBytes = File.ReadAllBytes(inputPath);
+        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
         {
-            // Load the PDF into a memory stream
-            using (FileStream fileStream = File.OpenRead(inputPath))
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                fileStream.CopyTo(memoryStream);
-                memoryStream.Position = 0; // reset for reading
+            // Bind the stream to PdfFileInfo for metadata manipulation
+            PdfFileInfo pdfInfo = new PdfFileInfo();
+            pdfInfo.BindPdf(inputStream);
 
-                // Initialize PdfFileInfo with the memory stream
-                using (PdfFileInfo pdfInfo = new PdfFileInfo(memoryStream))
-                {
-                    // Modify metadata properties
-                    pdfInfo.Title   = "Updated Title";
-                    pdfInfo.Author  = "John Doe";
-                    pdfInfo.Subject = "Metadata Update Example";
-                    pdfInfo.Keywords = "Aspose.Pdf, Facades, Metadata";
+            // Modify metadata fields
+            pdfInfo.Title = "Updated Title";
+            pdfInfo.Author = "John Doe";
+            pdfInfo.Subject = "Sample Subject";
+            pdfInfo.Keywords = "Aspose, PDF, Metadata";
 
-                    // Optionally set a custom property
-                    pdfInfo.SetMetaInfo("CustomProperty", "CustomValue");
-
-                    // Save the updated PDF to a new file
-                    bool success = pdfInfo.SaveNewInfo(outputPath);
-                    Console.WriteLine(success
-                        ? $"Metadata updated and saved to '{outputPath}'."
-                        : $"Failed to save updated PDF to '{outputPath}'.");
-                }
-            }
+            // Save the updated PDF to a new file
+            pdfInfo.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }

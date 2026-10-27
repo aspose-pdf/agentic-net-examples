@@ -1,68 +1,66 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string imagesOutputDir = "ExtractedImages";
-        const string csvOutputPath = "image_index.csv";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExtractedImages";
+        const string csvPath = "images.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the images directory exists
-        Directory.CreateDirectory(imagesOutputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // CSV header
+        var csvBuilder = new StringBuilder();
+        csvBuilder.AppendLine("Filename,PageNumber,Width,Height");
+
+        // Facades class usage (required by task)
+        PdfFileEditor _ = new PdfFileEditor();
 
         // Open the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Absorb image placements from all pages
-            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-            doc.Pages.Accept(absorber);
+            int imageCounter = 1;
 
-            // Prepare CSV writer
-            using (StreamWriter csvWriter = new StreamWriter(csvOutputPath, false))
+            // Iterate pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Write CSV header
-                csvWriter.WriteLine("Filename,PageNumber,Width,Height");
+                Aspose.Pdf.Page page = doc.Pages[pageIndex];
 
-                int globalImageIndex = 1;
-
-                // Iterate over each image placement
-                foreach (ImagePlacement imagePlacement in absorber.ImagePlacements)
+                // Iterate all images on the page
+                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
                 {
-                    // Page number (1‑based)
-                    int pageNumber = imagePlacement.Page.Number;
+                    string fileName = $"image_{imageCounter}.png";
+                    string filePath = Path.Combine(outputDir, fileName);
 
-                    // Image rectangle dimensions
-                    Rectangle rect = imagePlacement.Rectangle;
-                    double width = rect.Width;
-                    double height = rect.Height;
-
-                    // Build a unique filename
-                    string imageFileName = $"page{pageNumber}_img{globalImageIndex}.png";
-                    string imageFilePath = Path.Combine(imagesOutputDir, imageFileName);
-
-                    // Save the image to file (PNG format). XImage.Save writes the image in its native format.
-                    using (FileStream imgStream = new FileStream(imageFilePath, FileMode.Create, FileAccess.Write))
+                    // Save the image to a file using a FileStream (XImage.Save expects a Stream)
+                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                     {
-                        imagePlacement.Image.Save(imgStream);
+                        img.Save(fs);
                     }
 
-                    // Write CSV line
-                    csvWriter.WriteLine($"{imageFileName},{pageNumber},{width},{height}");
+                    // Record image details in CSV
+                    csvBuilder.AppendLine($"{fileName},{pageIndex},{img.Width},{img.Height}");
 
-                    globalImageIndex++;
+                    imageCounter++;
                 }
             }
         }
 
-        Console.WriteLine($"Extraction complete. Images saved to '{imagesOutputDir}'. CSV saved to '{csvOutputPath}'.");
+        // Write CSV file
+        File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
+
+        Console.WriteLine($"Extraction complete. Images saved to '{outputDir}'. CSV saved to '{csvPath}'.");
     }
 }

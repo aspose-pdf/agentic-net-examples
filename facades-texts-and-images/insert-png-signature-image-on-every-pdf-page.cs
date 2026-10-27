@@ -1,51 +1,56 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string signatureImage = "signature.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string signaturePath = "signature.png";
 
-        // Verify that the source PDF and the PNG image exist.
-        if (!File.Exists(inputPdf))
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(signatureImage))
+        if (!File.Exists(signaturePath))
         {
-            Console.Error.WriteLine($"Signature image not found: {signatureImage}");
+            Console.Error.WriteLine($"Signature image not found: {signaturePath}");
             return;
         }
 
-        // PdfFileMend implements IDisposable, so wrap it in a using block.
-        using (PdfFileMend mend = new PdfFileMend())
+        // Preserve the original PDF by working on a copy
+        File.Copy(inputPdfPath, outputPdfPath, true);
+
+        // Load the copied PDF using the high‑level Document API (PdfFileMend does not expose GetPageCount/InsertImage in recent versions)
+        Document doc = new Document(outputPdfPath);
+
+        // Prepare an ImageStamp that will be placed at the bottom‑left corner of each page
+        ImageStamp signatureStamp = new ImageStamp(signaturePath)
         {
-            // Load the PDF file into the facade.
-            mend.BindPdf(inputPdf);
+            // Position the stamp at the lower‑left corner (coordinates are relative to the page margins)
+            // Setting LeftMargin and BottomMargin to 0 places it exactly at (0,0).
+            LeftMargin = 0,
+            BottomMargin = 0,
+            // Keep the original image size; you can scale if required
+            // Width and Height are optional – if omitted the stamp uses the image's native dimensions.
+        };
 
-            // Aspose.Pdf uses 1‑based page indexing.
-            int pageCount = mend.Document.Pages.Count;
-
-            // Add the PNG to every page.
-            // Coordinates are in default PDF points (1/72 inch).
-            // Here we place the image at the bottom‑left corner (0,0) with a size of 100×100 points.
-            for (int page = 1; page <= pageCount; page++)
-            {
-                using (FileStream imgStream = File.OpenRead(signatureImage))
-                {
-                    mend.AddImage(imgStream, page, 0f, 0f, 100f, 100f);
-                }
-            }
-
-            // Persist the changes to a new file.
-            mend.Save(outputPdf);
+        // Insert the stamp on every page
+        foreach (Page page in doc.Pages)
+        {
+            // Add a clone of the stamp to avoid sharing the same instance across pages
+            page.AddStamp(signatureStamp);
         }
 
-        Console.WriteLine($"Signature image added to all pages. Output saved to '{outputPdf}'.");
+        // Save the modified PDF
+        doc.Save(outputPdfPath);
+
+        Console.WriteLine($"Signature image inserted on all {doc.Pages.Count} pages. Output saved to '{outputPdfPath}'.");
     }
 }

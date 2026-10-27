@@ -6,48 +6,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
         const string outputPath = "stamped_output.pdf";
-        const string stampImagePath = "stamp.png";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(stampPath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        if (!File.Exists(stampImagePath))
+        try
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
-            return;
-        }
-
-        // Load the PDF document (1‑based page indexing)
-        using (Document pdfDocument = new Document(inputPath))
-        {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Load the source PDF inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Position the stamp at the bottom‑right corner
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Optional: set size, opacity, background
-                // Width = 100,
-                // Height = 50,
-                Opacity = 0.5,          // semi‑transparent
-                Background = false      // stamp on top of page content
-            };
+                // Configure the image stamp (position, opacity, background).
+                ImageStamp imgStamp = new ImageStamp(stampPath)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    Opacity = 0.5,
+                    Background = false
+                };
 
-            // Apply the stamp to each page individually
-            foreach (Page page in pdfDocument.Pages)
-            {
-                page.AddStamp(imgStamp);
+                // Apply the stamp to every existing page.
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
+
+                // Stamping does not modify the /PageLabels dictionary,
+                // so the original page labels remain unchanged automatically.
+                pdfDoc.Save(outputPath);
             }
 
-            // Save the modified PDF; page labels remain unchanged
-            pdfDocument.Save(outputPath);
+            Console.WriteLine($"Image stamp applied. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Image stamp added. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

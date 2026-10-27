@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,41 +9,76 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string jsonPath = "data.json";
-        const string outputPdf = "filled_flattened.pdf";
+        const string inputPdfPath = "form_template.pdf";
+        const string jsonDataPath = "data.json";
+        const string outputPdfPath = "filled_flattened.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
+        if (!File.Exists(jsonDataPath))
+        {
+            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
+            return;
+        }
+
+        // Load JSON data into a dictionary (field name -> value)
+        Dictionary<string, string>? fieldValues;
         try
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            string json = File.ReadAllText(jsonDataPath);
+            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+            if (fieldValues == null)
             {
-                // Populate form fields from the JSON file
-                doc.Form.ImportFromJson(jsonPath);
-
-                // Flatten the form to make fields non‑editable
-                doc.Form.Flatten();
-
-                // Save the updated PDF
-                doc.Save(outputPdf);
+                Console.Error.WriteLine("JSON deserialization returned null.");
+                return;
             }
-
-            Console.WriteLine($"Form filled and flattened PDF saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read JSON data: {ex.Message}");
+            return;
+        }
+
+        // Load the PDF form, populate fields, then flatten
+        try
+        {
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Populate each form field that exists in the PDF
+                foreach (var kvp in fieldValues)
+                {
+                    string fieldName = kvp.Key;
+                    string fieldValue = kvp.Value ?? string.Empty;
+
+                    // Retrieve the field from the document's form collection as a Field object
+                    Field? field = pdfDoc.Form[fieldName] as Field;
+                    if (field != null)
+                    {
+                        // Set the field value using the Field.Value property
+                        field.Value = fieldValue;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Warning: Field '{fieldName}' not found in the PDF form.");
+                    }
+                }
+
+                // Flatten the form to make fields non‑editable
+                pdfDoc.Flatten();
+
+                // Save the resulting PDF
+                pdfDoc.Save(outputPdfPath);
+            }
+
+            Console.WriteLine($"Form populated and flattened successfully: {outputPdfPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

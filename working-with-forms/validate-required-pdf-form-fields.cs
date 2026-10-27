@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "validated_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,38 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Validate that all required form fields have a value
-            bool allRequiredFilled = true;
+            // Assume the PDF contains AcroForm fields
+            bool allRequiredFieldsFilled = true;
 
-            // Iterate over the form fields collection (Aspose.Pdf.Forms)
+            // Iterate over all form fields
             foreach (Field field in doc.Form.Fields)
             {
-                // Check only fields marked as required
+                // Only validate fields that are marked as required
                 if (field.Required)
                 {
-                    // The Value property holds the field's content; it may be null
-                    string fieldValue = field.Value?.ToString() ?? string.Empty;
-
-                    if (string.IsNullOrWhiteSpace(fieldValue))
+                    // Field.Value may be null; treat null/empty as not filled
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(value))
                     {
-                        allRequiredFilled = false;
-                        Console.WriteLine($"Required field \"{field.PartialName}\" is empty.");
+                        Console.Error.WriteLine($"Required field '{field.FullName}' is empty.");
+                        allRequiredFieldsFilled = false;
                     }
                 }
             }
 
-            if (!allRequiredFilled)
+            if (!allRequiredFieldsFilled)
             {
-                Console.WriteLine("Document contains empty required fields. Save operation aborted.");
-                return; // Prevent saving
+                Console.Error.WriteLine("PDF not saved because one or more required fields are missing.");
+                return;
             }
 
-            // All required fields are filled – proceed to save
+            // All required fields are present; save the PDF
             doc.Save(outputPath);
-            Console.WriteLine($"Document saved successfully to '{outputPath}'.");
+            Console.WriteLine($"PDF saved successfully to '{outputPath}'.");
         }
     }
 }

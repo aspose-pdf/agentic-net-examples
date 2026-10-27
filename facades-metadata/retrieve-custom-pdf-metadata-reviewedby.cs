@@ -6,22 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade for the PDF document
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Retrieve the custom metadata property "ReviewedBy"
-            string reviewedBy = pdfInfo.GetMetaInfo("ReviewedBy");
+        // PdfFileInfo provides access to document metadata without loading the full PDF.
+        PdfFileInfo info = new PdfFileInfo(pdfPath);
 
-            // Log the value (empty string if the property does not exist)
-            Console.WriteLine($"ReviewedBy: {(string.IsNullOrEmpty(reviewedBy) ? "(not set)" : reviewedBy)}");
+        // Retrieve the custom metadata entry named "ReviewedBy".
+        string reviewedBy = info.GetMetaInfo("ReviewedBy");
+
+        // Log the result for audit purposes.
+        if (!string.IsNullOrEmpty(reviewedBy))
+        {
+            Console.WriteLine($"ReviewedBy: {reviewedBy}");
+        }
+        else
+        {
+            Console.WriteLine("ReviewedBy metadata not found.");
         }
     }
 }

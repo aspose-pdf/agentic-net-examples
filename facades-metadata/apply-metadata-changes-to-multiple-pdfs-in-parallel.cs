@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Aspose.Pdf.Facades;
 
@@ -7,41 +8,66 @@ class Program
 {
     static void Main()
     {
-        // Input directory containing PDF files
-        const string inputDirectory = @"C:\InputPdfs";
-        // Output directory where updated PDFs will be saved
-        const string outputDirectory = @"C:\OutputPdfs";
+        // Determine a reliable base directory (the folder where the executable resides)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        // Resolve input folder – if the expected folder does not exist, fall back to the base directory
+        string inputDir = Path.Combine(baseDir, "InputPdfs");
+        if (!Directory.Exists(inputDir))
+        {
+            Console.WriteLine($"Input folder '{inputDir}' not found. Falling back to base directory.");
+            inputDir = baseDir;
+        }
 
-        // Get all PDF files from the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
+        // Get PDF files – if none are found, inform the user and exit gracefully
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine($"No PDF files found in '{inputDir}'. Nothing to process.");
+            return;
+        }
 
-        // Define the metadata values to apply
-        const string newTitle   = "Updated Title";
-        const string newAuthor  = "Updated Author";
-        const string newSubject = "Updated Subject";
+        // Resolve (and create) output folder
+        string outputDir = Path.Combine(baseDir, "OutputPdfs");
+        Directory.CreateDirectory(outputDir);
 
-        // Process each PDF file in parallel using TPL
+        // Metadata values to apply
+        const string newTitle    = "Processed Document";
+        const string newAuthor   = "Automation";
+        const string newSubject  = "Batch Metadata Update";
+        const string newKeywords = "Aspose,PDF,Metadata";
+
+        // Process each file in parallel
         Parallel.ForEach(pdfFiles, pdfPath =>
         {
-            // Determine the output file path (same file name, different folder)
-            string outputPath = Path.Combine(outputDirectory, Path.GetFileName(pdfPath));
-
-            // Load the PDF with PdfFileInfo facade, modify metadata, and save
-            using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
+            try
             {
-                // Apply metadata changes
-                pdfInfo.Title   = newTitle;
-                pdfInfo.Author  = newAuthor;
-                pdfInfo.Subject = newSubject;
+                // Verify the file still exists (it could have been moved/deleted between enumeration and processing)
+                if (!File.Exists(pdfPath))
+                {
+                    Console.Error.WriteLine($"File not found: {pdfPath}");
+                    return;
+                }
 
-                // Save the updated PDF (Save writes a PDF regardless of extension)
-                pdfInfo.Save(outputPath);
+                // Load file info using Facades API
+                PdfFileInfo info = new PdfFileInfo(pdfPath);
+
+                // Apply metadata changes
+                info.Title    = newTitle;
+                info.Author   = newAuthor;
+                info.Subject  = newSubject;
+                info.Keywords = newKeywords;
+
+                // Save the updated PDF to the output folder
+                string outPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
+                info.Save(outPath);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         });
 
-        Console.WriteLine("Metadata update completed for all PDFs.");
+        Console.WriteLine("Metadata update completed.");
     }
 }

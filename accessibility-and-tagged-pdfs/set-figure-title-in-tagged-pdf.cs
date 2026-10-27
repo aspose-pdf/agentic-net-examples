@@ -10,6 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string figureDescription = "Concise description of the figure";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +18,32 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
+            // Access the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Create a figure element in the logical structure
+            // Optional: set document language and title
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+
+            // Get the root structure element (no cast required)
+            StructureElement root = tagged.RootElement;
+
+            // Create a FigureElement which represents an image/figure in the structure tree
             FigureElement figure = tagged.CreateFigureElement();
 
-            // Set a concise description using the Title property
-            figure.Title = "Sample Figure: Revenue Chart";
+            // Set the concise description using the AlternativeText property
+            figure.AlternativeText = figureDescription;
 
-            // Optional: provide alternative text for accessibility
-            figure.AlternativeText = "Bar chart showing quarterly revenue";
-
-            // Append the figure element to the root of the structure tree
-            StructureElement root = tagged.RootElement;
+            // Attach the figure to the root (or any appropriate parent) using AppendChild
             root.AppendChild(figure);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with figure title to '{outputPath}'.");
+        Console.WriteLine($"Figure title set and saved to '{outputPath}'.");
     }
 }

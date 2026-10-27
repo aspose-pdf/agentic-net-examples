@@ -2,84 +2,57 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf.Facades; // PdfFileInfo facade
-
-// Simple POCO to hold metadata for JSON serialization
-public class PdfMetadata
-{
-    public string? FileName { get; set; }
-    public string? Title { get; set; }
-    public string? Author { get; set; }
-    public string? Subject { get; set; }
-    public string? Keywords { get; set; }
-    public string? Creator { get; set; }
-    public string? Producer { get; set; }
-    // PdfFileInfo returns dates as PDF‑formatted strings, not DateTime objects
-    public string? CreationDate { get; set; }
-    public string? ModDate { get; set; }
-    public int NumberOfPages { get; set; }
-    public bool IsEncrypted { get; set; }
-    public bool HasOpenPassword { get; set; }
-    public bool HasEditPassword { get; set; }
-    public bool HasCollection { get; set; }
-    // Header is exposed by PdfFileInfo as a Dictionary<string,string>
-    public Dictionary<string, string>? Header { get; set; }
-    public string? PasswordType { get; set; }
-}
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputFolder = @"C:\PdfFolder";          // folder containing PDFs
-        const string outputJson = @"C:\PdfFolder\metadata.json";
+        // Folder containing PDF files
+        const string folderPath = "pdfs";
+        // Output JSON file path
+        const string outputJson = "metadata.json";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(folderPath))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
             return;
         }
 
-        var metadataList = new List<PdfMetadata>();
+        // List to hold metadata dictionaries for each PDF
+        var metadataList = new List<Dictionary<string, object>>();
 
-        // Iterate over all PDF files in the folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Enumerate all PDF files in the folder
+        foreach (string filePath in Directory.EnumerateFiles(folderPath, "*.pdf"))
         {
-            // Use PdfFileInfo facade to read metadata
-            using (PdfFileInfo info = new PdfFileInfo())
+            // PdfFileInfo reads document metadata without loading the full PDF
+            PdfFileInfo info = new PdfFileInfo(filePath);
+
+            var meta = new Dictionary<string, object>
             {
-                info.BindPdf(pdfPath); // initialize with the PDF file
+                ["FileName"]          = Path.GetFileName(filePath),
+                ["Title"]             = info.Title,
+                ["Author"]            = info.Author,
+                ["Subject"]           = info.Subject,
+                ["Keywords"]          = info.Keywords,
+                ["CreationDate"]      = info.CreationDate,
+                // Correct property name for modification date in PdfFileInfo
+                ["ModificationDate"] = info.ModDate,
+                ["Producer"]          = info.Producer,
+                ["Creator"]           = info.Creator,
+                // PdfFileInfo does not expose a version property; if needed, load the document to get it.
+                // ["Version"]        = info.Version // removed – property does not exist
+            };
 
-                PdfMetadata meta = new PdfMetadata
-                {
-                    FileName = Path.GetFileName(pdfPath),
-                    Title = info.Title,
-                    Author = info.Author,
-                    Subject = info.Subject,
-                    Keywords = info.Keywords,
-                    Creator = info.Creator,
-                    Producer = info.Producer,
-                    // Dates are strings in PDF format, keep them as strings
-                    CreationDate = info.CreationDate,
-                    ModDate = info.ModDate,
-                    NumberOfPages = info.NumberOfPages,
-                    IsEncrypted = info.IsEncrypted,
-                    HasOpenPassword = info.HasOpenPassword,
-                    HasEditPassword = info.HasEditPassword,
-                    HasCollection = info.HasCollection,
-                    Header = info.Header, // Dictionary<string,string>
-                    PasswordType = info.PasswordType.ToString()
-                };
-
-                metadataList.Add(meta);
-            }
+            metadataList.Add(meta);
         }
 
-        // Serialize the list to JSON and write to file
+        // Serialize the list to formatted JSON
         JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
         string json = JsonSerializer.Serialize(metadataList, jsonOptions);
-        File.WriteAllText(outputJson, json);
 
+        // Write JSON to the output file
+        File.WriteAllText(outputJson, json);
         Console.WriteLine($"Metadata exported to '{outputJson}'.");
     }
 }

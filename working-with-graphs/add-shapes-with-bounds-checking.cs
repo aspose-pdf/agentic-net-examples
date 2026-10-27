@@ -1,102 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "graph_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF (or create a new one if empty)
-            using (Document doc = new Document(inputPath))
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Ensure there is at least one page
-                Page page;
-                if (doc.Pages.Count == 0)
-                {
-                    page = doc.Pages.Add();
-                }
-                else
-                {
-                    page = doc.Pages[1]; // 1‑based indexing
-                }
+                Page page = doc.Pages[i];
 
-                // Create a Graph that covers the whole page
-                double pageWidth  = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
-                Graph graph = new Graph((float)pageWidth, (float)pageHeight);
-
-                // Enable bounds checking – throw if a shape does not fit the page
-                graph.Shapes.UpdateBoundsCheckMode(
-                    Aspose.Pdf.BoundsCheckMode.ThrowExceptionIfDoesNotFit,
-                    pageWidth,
-                    pageHeight);
-
-                // Helper to add a shape with exception handling
-                void AddShape(Shape shape, string description)
+                var testRectangles = new[]
                 {
+                    new { LLX = -10.0, LLY = 100.0, URX = 200.0, URY = 300.0 }, // left out of bounds
+                    new { LLX = 50.0,  LLY = 50.0,  URX = 600.0, URY = 800.0 }, // may exceed page size
+                    new { LLX = 100.0, LLY = 100.0, URX = 200.0, URY = 200.0 }  // valid rectangle
+                };
+
+                foreach (var rc in testRectangles)
+                {
+                    // Aspose.Pdf.Rectangle expects double values; use it for annotation bounds.
+                    var annotRect = new Aspose.Pdf.Rectangle(rc.LLX, rc.LLY, rc.URX, rc.URY);
+
+                    // Use SquareAnnotation – the correct annotation type for rectangular shapes.
+                    var rectAnnot = new SquareAnnotation(page, annotRect);
+
                     try
                     {
-                        graph.Shapes.Add(shape);
-                        Console.WriteLine($"{description} added successfully.");
+                        // Adding the annotation may throw if coordinates are outside page bounds.
+                        page.Annotations.Add(rectAnnot);
                     }
-                    catch (Aspose.Pdf.BoundsOutOfRangeException ex)
+                    catch (PdfException ex) // bounds‑checking exception from Aspose.Pdf
                     {
-                        Console.WriteLine($"{description} out of bounds: {ex.Message}");
+                        Console.WriteLine($"Page {i}: Shape out of bounds – LLX={rc.LLX}, LLY={rc.LLY}, URX={rc.URX}, URY={rc.URY}. Exception: {ex.Message}");
+                    }
+                    catch (ArgumentException ex) // generic argument error
+                    {
+                        Console.WriteLine($"Page {i}: Invalid shape coordinates – LLX={rc.LLX}, LLY={rc.LLY}, URX={rc.URX}, URY={rc.URY}. Exception: {ex.Message}");
                     }
                 }
-
-                // Rectangle shape (left, bottom, width, height)
-                var rectShape = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 100);
-                rectShape.GraphInfo = new GraphInfo
-                {
-                    FillColor = Aspose.Pdf.Color.LightGray,
-                    Color = Aspose.Pdf.Color.Black,
-                    LineWidth = 2
-                };
-                AddShape(rectShape, "Rectangle");
-
-                // Ellipse shape (left, bottom, width, height)
-                var ellipseShape = new Aspose.Pdf.Drawing.Ellipse(250, 0, 150, 100);
-                ellipseShape.GraphInfo = new GraphInfo
-                {
-                    FillColor = Aspose.Pdf.Color.Yellow,
-                    Color = Aspose.Pdf.Color.Red,
-                    LineWidth = 1.5f
-                };
-                AddShape(ellipseShape, "Ellipse");
-
-                // Line shape (array: x1, y1, x2, y2)
-                var lineShape = new Aspose.Pdf.Drawing.Line(new float[] { 0, 200, 300, 200 });
-                lineShape.GraphInfo = new GraphInfo
-                {
-                    Color = Aspose.Pdf.Color.Blue,
-                    LineWidth = 2
-                };
-                AddShape(lineShape, "Line");
-
-                // Add the graph (which contains the shapes) to the page
-                page.Paragraphs.Add(graph);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
-                Console.WriteLine($"Graph PDF saved to '{outputPath}'.");
             }
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Processing completed. Output saved to '{outputPath}'.");
     }
 }

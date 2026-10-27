@@ -1,55 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;   // ImageStamp resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string logoImage = "logo.png";       // company logo file
-        const string outputPdf = "output_with_header.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string logoImagePath = "logo.png";
+        const string outputPdfPath = "output_with_header.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(logoImage))
+        if (!File.Exists(logoImagePath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImage}");
+            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the existing PDF inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing).
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Create an image stamp from the logo file
-                ImageStamp logoStamp = new ImageStamp(logoImage)
+                Page page = pdfDoc.Pages[i];
+
+                // Create an ImageStamp for the logo.
+                ImageStamp logoStamp = new ImageStamp(logoImagePath)
                 {
-                    // Position the logo at the top‑center of the page
+                    // Position the stamp at the top of the page.
+                    // Origin (0,0) is bottom‑left, so TopMargin = page height - desired height.
+                    TopMargin    = page.PageInfo.Height - 50, // 50 points height for the header
+                    LeftMargin   = 0,
+                    Width        = page.PageInfo.Width,
+                    Height       = 50,
+                    // Align the image within the stamp rectangle.
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Top,
-                    // Optional: set margins or explicit offsets
-                    TopMargin    = 20,   // distance from the top edge
-                    // Ensure the stamp is drawn over the page content
-                    Background   = false,
-                    Opacity      = 1.0f
+                    // Ensure the stamp is drawn over the page content.
+                    Background = false
+                    // BackgroundColor property does not exist on ImageStamp; omitted.
                 };
 
-                // Add the stamp to the current page
+                // Add the stamp to the current page.
                 page.AddStamp(logoStamp);
             }
 
-            // Save the modified document (PDF format)
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Header with logo added to all pages. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Header with logo added to all pages. Saved as '{outputPdfPath}'.");
     }
 }

@@ -16,40 +16,29 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Set DPI and default font for rendering
+        var resolution = new Resolution(300);
+        var renderOpts = new RenderingOptions { DefaultFontName = "Times New Roman" };
+
+        // PngDevice constructor takes a Resolution; assign RenderingOptions separately
+        var pngDevice = new PngDevice(resolution);
+        pngDevice.RenderingOptions = renderOpts;
+
+        // Load the PDF with deterministic disposal
+        using (var doc = new Document(inputPdf))
         {
-            // Define the resolution for the rasterized images (e.g., 300 DPI)
-            var resolution = new Resolution(300);
-
-            // Create a PNG device – this is the core API for page‑to‑image conversion
-            var pngDevice = new PngDevice(resolution)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Set rendering options with the desired default font
-                RenderingOptions = new RenderingOptions
-                {
-                    DefaultFontName = "Times New Roman"
-                }
-            };
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
-            {
-                string outPath = Path.Combine(outputDir, $"Page_{pageNum}.png");
-
-                // Render the current page to a PNG file
-                using (var outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                {
-                    pngDevice.Process(pdfDoc.Pages[pageNum], outStream);
-                }
-
-                Console.WriteLine($"Saved page {pageNum} → {outPath}");
+                string outPath = Path.Combine(outputDir, $"page_{i}.png");
+                pngDevice.Process(doc.Pages[i], outPath);
+                Console.WriteLine($"Saved page {i} as image: {outPath}");
             }
         }
 
-        Console.WriteLine("All pages have been converted to images.");
+        Console.WriteLine("All pages have been rendered to images.");
     }
 }

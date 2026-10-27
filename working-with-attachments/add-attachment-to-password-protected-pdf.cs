@@ -1,48 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "protected.pdf";   // Existing password‑protected PDF
-        const string outputPdf  = "protected_with_attachment.pdf";
-        const string password   = "user123";         // Correct user password
-        const string attachFile = "attachment.txt";  // File to embed as attachment
+        const string inputPath = "protected.pdf";
+        const string outputPath = "protected_with_attachment.pdf";
+        const string attachmentPath = "attachment.txt";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
-        if (!File.Exists(attachFile))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachFile}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
         try
         {
-            // Open the encrypted PDF using the user password.
-            using (Document doc = new Document(inputPdf, password))
+            // Open the encrypted PDF using the user password
+            using (Document doc = new Document(inputPath, userPassword))
             {
-                // Create a file specification for the attachment.
-                FileSpecification fileSpec = new FileSpecification(attachFile);
+                // Create a FileSpecification for the attachment
+                var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath));
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
 
-                // Add the file specification to the EmbeddedFiles collection.
+                // Add the file to the EmbeddedFiles collection (the correct API for attachments)
                 doc.EmbeddedFiles.Add(fileSpec);
 
-                // Save the modified PDF (still encrypted with the same password).
-                doc.Save(outputPdf);
+                // Re‑encrypt the document (preserve original passwords and permissions)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+            Console.WriteLine($"Attachment added and saved to '{outputPath}'.");
         }
         catch (InvalidPasswordException ex)
         {
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
         catch (Exception ex)
         {

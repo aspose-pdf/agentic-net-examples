@@ -6,35 +6,28 @@ class Program
 {
     static void Main()
     {
-        // Directory that contains the source PDF.
-        string dataDir = "YOUR_DATA_DIRECTORY";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.svg";
 
-        // Input PDF file.
-        string pdfFile = Path.Combine(dataDir, "input.pdf");
-
-        // Desired output SVG file.
-        string svgFile = Path.Combine(dataDir, "output.svg");
-
-        if (!File.Exists(pdfFile))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {pdfFile}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(pdfFile))
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Initialize SVG save options.
-            SvgSaveOptions saveOptions = new SvgSaveOptions();
+            // Configure SVG output options – enable CSS style embedding by scaling to pixels
+            var svgOptions = new SvgSaveOptions
+            {
+                ScaleToPixels = true // embeds CSS styles into the generated SVG
+            };
 
-            // NOTE: SvgSaveOptions does not expose a property for CSS embedding,
-            // because SVG output does not use external CSS. The option is kept
-            // for API compatibility; no additional configuration is required.
-
-            // Save the document as SVG.
-            pdfDocument.Save(svgFile, saveOptions);
+            // Save the PDF directly to SVG using the configured options
+            pdfDoc.Save(outputPath, svgOptions);
         }
 
-        Console.WriteLine($"PDF successfully converted to SVG: {svgFile}");
+        Console.WriteLine($"PDF successfully converted to SVG: {outputPath}");
     }
 }

@@ -1,5 +1,7 @@
 using System;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
@@ -7,57 +9,39 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the content editor facade
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document.
+        Document pdfDocument = new Document(inputPath);
+
+        // Attempt to retrieve ViewerPreferences. The property exists only in newer
+        // versions of Aspose.Pdf, so we use dynamic access and handle the possible
+        // RuntimeBinderException for older library versions.
+        try
         {
-            editor.BindPdf(inputPath);
+            dynamic doc = pdfDocument; // bypass compile‑time member check
+            var prefs = doc.ViewerPreferences; // may throw at runtime if not present
 
-            // Retrieve the viewer preference flags as an integer
-            int pref = editor.GetViewerPreference();
-            Console.WriteLine($"Viewer Preference value: {pref}");
-
-            // Helper to print each flag that is set
-            void PrintFlag(int flag, string name)
-            {
-                if ((pref & flag) != 0)
-                    Console.WriteLine($"- {name}");
-            }
-
-            // Enumerate all known ViewerPreference flags
-            PrintFlag(ViewerPreference.CenterWindow, "CenterWindow");
-            PrintFlag(ViewerPreference.DirectionL2R, "DirectionL2R");
-            PrintFlag(ViewerPreference.DirectionR2L, "DirectionR2L");
-            PrintFlag(ViewerPreference.DisplayDocTitle, "DisplayDocTitle");
-            PrintFlag(ViewerPreference.DuplexFlipLongEdge, "DuplexFlipLongEdge");
-            PrintFlag(ViewerPreference.DuplexFlipShortEdge, "DuplexFlipShortEdge");
-            PrintFlag(ViewerPreference.FitWindow, "FitWindow");
-            PrintFlag(ViewerPreference.HideMenubar, "HideMenubar");
-            PrintFlag(ViewerPreference.HideToolbar, "HideToolbar");
-            PrintFlag(ViewerPreference.HideWindowUI, "HideWindowUI");
-            PrintFlag(ViewerPreference.NonFullScreenPageModeUseNone, "NonFullScreenPageModeUseNone");
-            PrintFlag(ViewerPreference.NonFullScreenPageModeUseOC, "NonFullScreenPageModeUseOC");
-            PrintFlag(ViewerPreference.NonFullScreenPageModeUseOutlines, "NonFullScreenPageModeUseOutlines");
-            PrintFlag(ViewerPreference.NonFullScreenPageModeUseThumbs, "NonFullScreenPageModeUseThumbs");
-            PrintFlag(ViewerPreference.PageLayoutOneColumn, "PageLayoutOneColumn");
-            PrintFlag(ViewerPreference.PageLayoutSinglePage, "PageLayoutSinglePage");
-            PrintFlag(ViewerPreference.PageLayoutTwoColumnLeft, "PageLayoutTwoColumnLeft");
-            PrintFlag(ViewerPreference.PageLayoutTwoColumnRight, "PageLayoutTwoColumnRight");
-            PrintFlag(ViewerPreference.PageModeFullScreen, "PageModeFullScreen");
-            PrintFlag(ViewerPreference.PageModeUseAttachment, "PageModeUseAttachment");
-            PrintFlag(ViewerPreference.PageModeUseNone, "PageModeUseNone");
-            PrintFlag(ViewerPreference.PageModeUseOC, "PageModeUseOC");
-            PrintFlag(ViewerPreference.PageModeUseOutlines, "PageModeUseOutlines");
-            PrintFlag(ViewerPreference.PageModeUseThumbs, "PageModeUseThumbs");
-            PrintFlag(ViewerPreference.PickTrayByPDFSize, "PickTrayByPDFSize");
-            PrintFlag(ViewerPreference.PrintScalingAppDefault, "PrintScalingAppDefault");
-            PrintFlag(ViewerPreference.PrintScalingNone, "PrintScalingNone");
-            PrintFlag(ViewerPreference.Simplex, "Simplex");
+            Console.WriteLine("Viewer Preferences:");
+            Console.WriteLine($"HideToolbar       : {prefs.HideToolbar}");
+            Console.WriteLine($"HideMenubar       : {prefs.HideMenubar}");
+            Console.WriteLine($"HideWindowUI      : {prefs.HideWindowUI}");
+            Console.WriteLine($"FitWindow         : {prefs.FitWindow}");
+            Console.WriteLine($"CenterWindow      : {prefs.CenterWindow}");
+            Console.WriteLine($"DisplayDocTitle   : {prefs.DisplayDocTitle}");
+            Console.WriteLine($"NonFullScreenPageMode : {prefs.NonFullScreenPageMode}");
+            Console.WriteLine($"Direction         : {prefs.Direction}");
+            Console.WriteLine($"PrintScaling      : {prefs.PrintScaling}");
+            Console.WriteLine($"Duplex            : {prefs.Duplex}");
+            Console.WriteLine($"PickTrayByPDFSize : {prefs.PickTrayByPDFSize}");
+        }
+        catch (RuntimeBinderException)
+        {
+            Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
         }
     }
 }

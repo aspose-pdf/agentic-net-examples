@@ -1,58 +1,48 @@
 using System;
 using System.IO;
-using System.Drawing;                     // For System.Drawing.Color
-using Aspose.Pdf.Facades;                // Facade classes: PdfFileStamp, Stamp, FormattedText, EncodingType
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string watermark = "CONFIDENTIAL";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade (no using – it does not implement IDisposable)
-        PdfFileStamp fileStamp = new PdfFileStamp();
+        // Create a text stamp that will be placed behind existing content
+        TextStamp stamp = new TextStamp(watermark)
+        {
+            Background = true,                         // render behind page content
+            Opacity = 0.3,                             // semi‑transparent
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        // TextState is read‑only – modify the existing instance instead of assigning a new one
+        stamp.TextState.FontSize = 72;
+        stamp.TextState.FontStyle = FontStyles.Bold;
+        stamp.TextState.Font = FontRepository.FindFont("Arial");
+        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
-        // Load the source PDF
-        fileStamp.BindPdf(inputPath);
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
 
-        // Create a stamp object
-        Stamp stamp = new Stamp();
+        // Apply the stamp to pages 2 through 5 (inclusive)
+        for (int pageNumber = 2; pageNumber <= 5 && pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        {
+            pdfDocument.Pages[pageNumber].AddStamp(stamp);
+        }
 
-        // Make the stamp a background watermark
-        stamp.IsBackground = true;
+        // Save the result
+        pdfDocument.Save(outputPath);
 
-        // Apply the stamp only to pages 2 through 5 (1‑based indexing)
-        stamp.Pages = new int[] { 2, 3, 4, 5 };
-
-        // Prepare formatted text for the watermark
-        FormattedText ft = new FormattedText(
-            "CONFIDENTIAL",                 // Text to display
-            Color.LightGray,                // Text color (System.Drawing.Color)
-            "Helvetica",                    // Font name
-            EncodingType.Winansi,           // Text encoding
-            false,                          // Do not embed the font
-            72);                            // Font size
-
-        // Bind the formatted text to the stamp
-        stamp.BindLogo(ft);
-
-        // Add the configured stamp to the PDF
-        fileStamp.AddStamp(stamp);
-
-        // Save the resulting PDF
-        fileStamp.Save(outputPath);
-
-        // Release resources
-        fileStamp.Close();
-
-        Console.WriteLine($"Background watermark applied to pages 2‑5 and saved as '{outputPath}'.");
+        Console.WriteLine($"Watermark applied to pages 2‑5 and saved as '{outputPath}'.");
     }
 }

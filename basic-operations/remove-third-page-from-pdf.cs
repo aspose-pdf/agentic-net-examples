@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,17 +15,25 @@ class Program
             return;
         }
 
-        // Load the PDF, delete page 3, and save the result.
-        // Document is wrapped in a using block for deterministic disposal.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // PageCollection uses 1‑based indexing; delete the third page.
-            doc.Pages.Delete(3);
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Delete the third page (page number 3) if it exists.
+            if (doc.Pages.Count >= 3)
+            {
+                doc.Pages.Delete(3);
+            }
+            else
+            {
+                Console.WriteLine("The document has fewer than three pages; no page removed.");
+            }
 
-            // Save the modified document.
+            // Save the modified document. Save() is called inside the using block
+            // so the Document remains alive until the operation completes.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Third page removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Third page removed (if present). Result saved to '{outputPath}'.");
     }
 }

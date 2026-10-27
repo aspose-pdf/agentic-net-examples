@@ -1,46 +1,54 @@
 using System;
 using System.IO;
-using System.Drawing;               // Required for System.Drawing.Rectangle and System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF, add a green circle annotation on page 6, then save.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document.
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Ensure the document has at least 6 pages.
+            if (doc.Pages.Count < 6)
+            {
+                Console.Error.WriteLine("The PDF does not contain a page 6.");
+                return;
+            }
 
-            // System.Drawing.Rectangle that encloses the diagram (example coordinates).
-            // Parameters: x, y, width, height.
-            System.Drawing.Rectangle diagramRect = new System.Drawing.Rectangle(100, 400, 300, 200);
+            // Page 6 (Aspose.Pdf pages are 1‑based).
+            Page page = doc.Pages[6];
 
-            // Create a circle (square = false) with thick green outline (borderWidth = 5).
-            // Contents can be any descriptive text.
-            editor.CreateSquareCircle(
-                diagramRect,               // annotation rectangle (System.Drawing.Rectangle)
-                "Diagram",                // contents (tooltip)
-                System.Drawing.Color.Green, // outline color (System.Drawing.Color)
-                false,                     // false => circle
-                6,                         // target page (1‑based)
-                5                          // border width (thick)
-            );
+            // Define the rectangle that will bound the circle.
+            // (llx, lly) – lower‑left corner, (urx, ury) – upper‑right corner.
+            double llx = 100, lly = 400, urx = 300, ury = 600;
+            Rectangle rect = new Rectangle(llx, lly, urx, ury);
 
-            // Save the modified document.
-            editor.Save(outputPath);
+            // Create the circle annotation.
+            CircleAnnotation circle = new CircleAnnotation(page, rect);
+            // Border (outline) color – green.
+            circle.Color = Color.Green;
+            // Border thickness – 3 points.
+            circle.Border = new Border(circle) { Width = 3 };
+            // No fill color – leave it transparent (default).
+
+            // Add the annotation to the page.
+            page.Annotations.Add(circle);
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Circle annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Circle annotation added. Output saved to '{outputPath}'.");
     }
 }

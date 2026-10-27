@@ -6,63 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string sourcePath      = "source.pdf";          // PDF containing the page to move
-        const string destinationPath = "destination.pdf";     // PDF that will receive the page
-        const string sourceResult    = "source_modified.pdf"; // Source after page removal
-        const string destResult      = "destination_with_page.pdf";
+        const string sourcePath = "source.pdf";   // PDF to take the page from
+        const string targetPath = "target.pdf";   // PDF to receive the page
+        const string outputSource = "source_updated.pdf"; // source after removal
+        const string outputTarget = "target_updated.pdf"; // target after addition
+        const int pageNumber = 2; // 1‑based index of the page to move
 
-        // Validate input files
-        if (!File.Exists(sourcePath))
+        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Load source and destination documents inside using blocks (lifecycle rule)
-        // -----------------------------------------------------------------
-        using (Document srcDoc = new Document(sourcePath))
-        using (Document dstDoc = new Document())
+        // Load both documents; using ensures deterministic disposal
+        using (Document sourceDoc = new Document(sourcePath))
+        using (Document targetDoc = new Document(targetPath))
         {
-            // -----------------------------------------------------------------
-            // Choose the page to move (1‑based indexing – page 1 is the first page)
-            // -----------------------------------------------------------------
-            const int pageNumberToMove = 1; // change as required
-
-            if (pageNumberToMove < 1 || pageNumberToMove > srcDoc.Pages.Count)
+            // Validate page number (Aspose.Pdf uses 1‑based indexing)
+            if (pageNumber < 1 || pageNumber > sourceDoc.Pages.Count)
             {
                 Console.Error.WriteLine("Invalid page number.");
                 return;
             }
 
-            // Retrieve the page object – it already carries its rotation and size
-            Page pageToMove = srcDoc.Pages[pageNumberToMove];
+            // Retrieve the page reference; its size and rotation are preserved
+            Page pageToMove = sourceDoc.Pages[pageNumber];
 
-            // -----------------------------------------------------------------
-            // Insert the page into the destination document.
-            // Insert(pageNumber, Page) keeps the original rotation and size.
-            // -----------------------------------------------------------------
-            // Insert at the end of the destination (position = Count + 1)
-            int insertPosition = dstDoc.Pages.Count + 1;
-            dstDoc.Pages.Insert(insertPosition, pageToMove);
+            // Add the page to the target document
+            targetDoc.Pages.Add(pageToMove);
 
-            // -----------------------------------------------------------------
-            // Remove the page from the source document.
-            // After insertion the page object is no longer part of srcDoc,
-            // but Delete ensures the source collection is consistent.
-            // -----------------------------------------------------------------
-            srcDoc.Pages.Delete(pageNumberToMove);
-            
-            // -----------------------------------------------------------------
-            // Save both documents (save options are not required for PDF output)
-            // -----------------------------------------------------------------
-            srcDoc.Save(sourceResult);
-            dstDoc.Save(destResult);
+            // Remove the page from the source document
+            sourceDoc.Pages.Delete(pageNumber);
+
+            // Save the modified documents
+            targetDoc.Save(outputTarget);   // PDF output, no SaveOptions needed
+            sourceDoc.Save(outputSource);
         }
 
-        Console.WriteLine($"Page moved successfully.");
-        Console.WriteLine($"Modified source saved as: {sourceResult}");
-        Console.WriteLine($"Destination with moved page saved as: {destResult}");
+        Console.WriteLine("Page moved successfully.");
     }
 }

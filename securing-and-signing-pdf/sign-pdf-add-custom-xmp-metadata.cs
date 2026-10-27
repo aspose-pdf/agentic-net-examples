@@ -2,73 +2,73 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string certPath  = "certificate.pfx";
-        const string certPass  = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
+
         if (!File.Exists(certPath))
         {
             Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // -----------------------------------------------------------------
-            // 1. Create a visible signature field on the first page
-            // -----------------------------------------------------------------
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
-            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
-            // Optional visual properties
-            sigField.Color = Aspose.Pdf.Color.LightGray;
-            sigField.Contents = "Signature";
-            // Add the signature field to the page annotations collection
-            doc.Pages[1].Annotations.Add(sigField);
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // ----- XMP metadata (native) -----
+                // Standard properties
+                doc.Metadata["Title"] = "Signed Document";
+                doc.Metadata["CreatorTool"] = "Aspose.Pdf for .NET";
+                // Custom property describing the signing process
+                doc.Metadata["SigningProcess"] = "Document signed with digital certificate using Aspose.Pdf";
 
-            // -----------------------------------------------------------------
-            // 2. Prepare the signature object (PKCS#1 in this example)
-            // -----------------------------------------------------------------
-            PKCS1 pkcs1Signature = new PKCS1(certPath, certPass);
-            pkcs1Signature.Reason   = "Document approval";
-            pkcs1Signature.ContactInfo = "john.doe@example.com";
-            pkcs1Signature.Location = "New York, USA";
-            pkcs1Signature.Date = DateTime.UtcNow;
+                // ----- Digital signature -----
+                string reason = "Document approved";
+                string location = "Company HQ";
 
-            // -----------------------------------------------------------------
-            // 3. Sign the document using the signature field
-            // -----------------------------------------------------------------
-            sigField.Sign(pkcs1Signature);
+                // Create a signature field on the first page
+                Page firstPage = doc.Pages[1];
+                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+                SignatureField signatureField = new SignatureField(firstPage, sigRect)
+                {
+                    PartialName = "Signature1"
+                };
+                // Add the signature field to the document's form (AcroForm)
+                doc.Form.Add(signatureField, 1);
 
-            // -----------------------------------------------------------------
-            // 4. Embed custom XMP metadata describing the signing process
-            // -----------------------------------------------------------------
-            // Document.Metadata provides access to XMP metadata (core API)
-            var xmp = doc.Metadata;
-            // Register a custom namespace (prefix, uri)
-            xmp.RegisterNamespaceUri("custom", "http://example.com/custom/");
-            // Add custom properties using the indexer
-            xmp["custom:SigningProcess"] = "Signed using Aspose.Pdf core API with PKCS#1 signature";
-            xmp["custom:SigningDate"] = DateTime.UtcNow.ToString("o");
+                // Create a concrete PKCS#7 digital signature using the certificate
+                PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+                {
+                    Reason = reason,
+                    Location = location
+                };
 
-            // -----------------------------------------------------------------
-            // 5. Save the signed PDF
-            // -----------------------------------------------------------------
-            doc.Save(outputPdf);
+                // Apply the signature to the field
+                signatureField.Sign(pkcs7);
+
+                // Save the signed PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF signed and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

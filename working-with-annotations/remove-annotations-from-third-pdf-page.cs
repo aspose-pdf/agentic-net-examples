@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -16,23 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages
-            if (doc.Pages.Count < 3)
+            // Aspose.Pdf uses 1‑based page indexing; page 3 is at index 3
+            if (doc.Pages.Count >= 3)
             {
-                Console.Error.WriteLine("The document does not contain a third page.");
-                return;
+                Page page = doc.Pages[3];
+
+                // Remove all annotations from the page
+                page.Annotations.Clear();
+            }
+            else
+            {
+                Console.Error.WriteLine("The document has fewer than 3 pages.");
             }
 
-            // Access the third page (Aspose.Pdf uses 1‑based indexing)
-            Page thirdPage = doc.Pages[3];
-
-            // Remove all annotations from this page
-            thirdPage.Annotations.Clear();
-
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

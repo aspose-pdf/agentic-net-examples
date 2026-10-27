@@ -1,57 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;               // for Resolution
-using System.Drawing.Imaging;          // for ImageFormat
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "Images";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Determine how many pages to process (max 5)
+        int totalPages = pdfDocument.Pages.Count;
+        int endPage = Math.Min(5, totalPages);
+
+        // Set resolution to 200 DPI for JPEG conversion
+        Resolution resolution = new Resolution(200);
+
+        // Convert each selected page to a JPEG image
+        for (int pageNumber = 1; pageNumber <= endPage; pageNumber++)
         {
-            // Initialize the PdfConverter facade (disposable)
-            using (PdfConverter converter = new PdfConverter())
+            string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.jpg");
+            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
             {
-                // Bind the loaded document to the converter
-                converter.BindPdf(pdfDoc);
-
-                // Set the desired resolution (200 DPI) – Resolution is a struct, not an int
-                converter.Resolution = new Resolution(200);
-
-                // Limit conversion to the first five pages (or fewer if the document has less)
-                converter.StartPage = 1;
-                converter.EndPage = Math.Min(5, pdfDoc.Pages.Count);
-
-                // Prepare the conversion process
-                converter.DoConvert();
-
-                int pageNumber = 1;
-                // Iterate through the generated images
-                while (converter.HasNextImage())
-                {
-                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-                    // Save each page as a JPEG image using System.Drawing.Imaging.ImageFormat
-                    converter.GetNextImage(outputPath, ImageFormat.Jpeg);
-                    pageNumber++;
-                }
+                // JpegDevice handles per‑page conversion
+                JpegDevice jpegDevice = new JpegDevice(resolution);
+                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
+            Console.WriteLine($"Saved page {pageNumber} as JPEG to '{outputPath}'.");
         }
 
-        Console.WriteLine("PDF to JPEG conversion completed.");
+        Console.WriteLine("Conversion completed.");
     }
 }

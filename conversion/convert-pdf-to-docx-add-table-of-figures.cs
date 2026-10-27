@@ -2,104 +2,72 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputDocxPath = "output.docx";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the source PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Prepare a list to hold figure descriptions (captions)
-            List<string> figureCaptions = new List<string>();
-
-            // Iterate through all pages and collect images
-            int pageNumber = 1;
-            foreach (Page page in pdfDoc.Pages)
+            // Collect information about each image in the PDF
+            var imageInfos = new List<(int PageNumber, XImage Image)>();
+            for (int pageIdx = 1; pageIdx <= pdfDoc.Pages.Count; pageIdx++) // 1‑based indexing
             {
-                foreach (XImage img in page.Resources.Images)
+                Page page = pdfDoc.Pages[pageIdx];
+                foreach (XImage img in page.Resources.Images) // iterate over XImageCollection
                 {
-                    // Generate a simple caption for the image
-                    string caption = $"Image on page {pageNumber}";
-                    // Store the caption for later table creation
-                    figureCaptions.Add(caption);
-
-                    // Optionally set alternative text directly on the image resource
-                    img.TrySetAlternativeText(caption, page);
+                    imageInfos.Add((pageIdx, img));
                 }
-                pageNumber++;
             }
 
-            // Access the tagged content API
-            ITaggedContent tagged = pdfDoc.TaggedContent;
+            // Insert a blank page at the beginning to hold the Table of Figures
+            pdfDoc.Pages.Insert(1); // creates an empty page at position 1
+            Page tocPage = pdfDoc.Pages[1];
 
-            // Create a table of figures using the tagged content factory
-            StructureElement root = tagged.RootElement;
-
-            // Table element
-            TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Table of Figures";
-            root.AppendChild(table);
-
-            // Table header
-            TableTHeadElement thead = tagged.CreateTableTHeadElement();
-            table.AppendChild(thead);
-            TableTRElement headerRow = tagged.CreateTableTRElement();
-            thead.AppendChild(headerRow);
-
-            TableTHElement th1 = tagged.CreateTableTHElement();
-            th1.SetText("Figure");
-            headerRow.AppendChild(th1);
-
-            TableTHElement th2 = tagged.CreateTableTHElement();
-            th2.SetText("Description");
-            headerRow.AppendChild(th2);
-
-            // Table body
-            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
-            table.AppendChild(tbody);
-
-            // Populate table rows with figure numbers and captions
-            for (int i = 0; i < figureCaptions.Count; i++)
+            // Create a table with two columns: Figure number and Description
+            Table figuresTable = new Table
             {
-                TableTRElement dataRow = tagged.CreateTableTRElement();
-                tbody.AppendChild(dataRow);
-
-                TableTDElement tdNum = tagged.CreateTableTDElement();
-                tdNum.SetText($"Figure {i + 1}");
-                dataRow.AppendChild(tdNum);
-
-                TableTDElement tdDesc = tagged.CreateTableTDElement();
-                tdDesc.SetText(figureCaptions[i]);
-                dataRow.AppendChild(tdDesc);
-            }
-
-            // Convert the PDF to DOCX with appropriate save options
-            DocSaveOptions saveOptions = new DocSaveOptions
-            {
-                // Export as DOCX
-                Format = DocSaveOptions.DocFormat.DocX,
-                // Use Flow mode for better editability
-                Mode = DocSaveOptions.RecognitionMode.Flow,
-                // Enable bullet recognition (optional)
-                RecognizeBullets = true
+                // Set column widths (percentage of page width)
+                ColumnWidths = "30 70"
             };
 
-            pdfDoc.Save(outputDocxPath, saveOptions);
+            // Add header row
+            Row header = figuresTable.Rows.Add();
+            header.Cells.Add("Figure");
+            header.Cells.Add("Description");
+
+            // Populate table rows based on extracted images
+            int figureCounter = 1;
+            foreach (var info in imageInfos)
+            {
+                Row row = figuresTable.Rows.Add();
+                row.Cells.Add($"Figure {figureCounter}");
+                row.Cells.Add($"Image extracted from page {info.PageNumber}");
+                figureCounter++;
+            }
+
+            // Add the table to the newly created page
+            tocPage.Paragraphs.Add(figuresTable);
+
+            // Convert the modified PDF to DOCX using explicit DocSaveOptions
+            DocSaveOptions docxOptions = new DocSaveOptions
+            {
+                Format = DocSaveOptions.DocFormat.DocX
+            };
+            pdfDoc.Save(outputDocxPath, docxOptions);
         }
 
-        Console.WriteLine($"PDF converted to DOCX with a table of figures: {outputDocxPath}");
+        Console.WriteLine($"PDF converted to DOCX with Table of Figures saved at '{outputDocxPath}'.");
     }
 }

@@ -1,53 +1,67 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and image to be added
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string imagePath     = "picture.png";
+        const string outputPdf = "result.pdf";
 
-        // Verify that the source files exist
-        if (!File.Exists(inputPdfPath))
+        // List of allowed image extensions (case‑insensitive)
+        string[] allowedExt = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
+
+        // Example image files – replace with your own paths
+        string[] imageFiles = {
+            "image1.jpg",
+            "image2.png",
+            "image3.tif"
+        };
+
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document())
         {
-            Console.Error.WriteLine($"PDF file not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
+            foreach (string imgPath in imageFiles)
+            {
+                if (!File.Exists(imgPath))
+                {
+                    Console.Error.WriteLine($"File not found: {imgPath}");
+                    continue;
+                }
+
+                // Validate the image format by its file extension
+                string ext = Path.GetExtension(imgPath);
+                if (Array.Exists(allowedExt, e => e.Equals(ext, StringComparison.OrdinalIgnoreCase)))
+                {
+                    // Add a new page for each image (or reuse a page as needed)
+                    Page page = pdfDoc.Pages.Add();
+
+                    // Create an Image object and bind the file stream
+                    using (FileStream imgStream = new FileStream(imgPath, FileMode.Open, FileAccess.Read))
+                    {
+                        Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
+                        {
+                            ImageStream = imgStream,
+                            // Fit the image to the page size while preserving aspect ratio
+                            // (optional – adjust as required)
+                            // Width = page.PageInfo.Width,
+                            // Height = page.PageInfo.Height,
+                            // HorizontalAlignment = HorizontalAlignment.Center,
+                            // VerticalAlignment = VerticalAlignment.Center
+                        };
+                        page.Paragraphs.Add(pdfImage);
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Unsupported image format: {imgPath}");
+                }
+            }
+
+            // Save the resulting PDF
+            pdfDoc.Save(outputPdf);
         }
 
-        // Validate image format – only JPG, PNG, GIF, BMP, or TIFF are allowed
-        string ext = Path.GetExtension(imagePath).ToLowerInvariant();
-        string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tif", ".tiff" };
-        if (Array.IndexOf(allowedExtensions, ext) < 0)
-        {
-            Console.Error.WriteLine($"Unsupported image format: {ext}");
-            return;
-        }
-
-        // Use PdfFileMend (Aspose.Pdf.Facades) to add the image to the PDF
-        PdfFileMend pdfMend = new PdfFileMend();
-        pdfMend.BindPdf(inputPdfPath);                     // Load the PDF document
-        // Add the image to page 1; coordinates are lower‑left (10,10) and upper‑right (200,200)
-        bool success = pdfMend.AddImage(imagePath, 1, 10, 10, 200, 200);
-        if (!success)
-        {
-            Console.Error.WriteLine("Failed to add the image to the PDF.");
-            pdfMend.Close();
-            return;
-        }
-
-        // Save the modified PDF
-        pdfMend.Save(outputPdfPath);
-        pdfMend.Close();
-
-        Console.WriteLine($"Image successfully added. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF created: {outputPdf}");
     }
 }

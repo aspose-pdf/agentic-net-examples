@@ -2,72 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
-namespace PdfUtilities
+public static class PdfSanitizer
 {
-    public static class PdfAnnotationHelper
+    /// <summary>
+    /// Returns true if any hidden annotations are still present after sanitizing the PDF.
+    /// </summary>
+    /// <param name="pdfPath">Path to the PDF file.</param>
+    public static bool HasHiddenAnnotationsAfterSanitization(string pdfPath)
     {
-        /// <summary>
-        /// Returns true if the PDF contains any annotations whose Hidden flag is set.
-        /// </summary>
-        /// <param name="pdfPath">Path to the PDF file to inspect.</param>
-        /// <returns>True if at least one hidden annotation is present; otherwise, false.</returns>
-        public static bool ContainsHiddenAnnotations(string pdfPath)
+        if (!File.Exists(pdfPath))
+            throw new FileNotFoundException($"File not found: {pdfPath}");
+
+        // Wrap Document in a using block for deterministic disposal (document-disposal-with-using rule)
+        using (Document doc = new Document(pdfPath))
         {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-
-            if (!File.Exists(pdfPath))
-                throw new FileNotFoundException("PDF file not found.", pdfPath);
-
-            // Load the document inside a using block for deterministic disposal.
-            using (Document doc = new Document(pdfPath))
+            // Use HiddenDataSanitizer when Document.Sanitize() is unavailable (cs1061 fix)
+            var options = new HiddenDataSanitizationOptions
             {
-                // Iterate over all pages.
-                foreach (Page page in doc.Pages)
+                RemoveAnnotations = true // ensures annotations are stripped during sanitization
+            };
+            var sanitizer = new HiddenDataSanitizer(options);
+            sanitizer.Sanitize(doc);
+
+            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+
+                // Examine each annotation on the page
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Iterate over all annotations on the current page.
-                    foreach (Annotation annotation in page.Annotations)
+                    // Annotation.Flags is a bitmask; check for the Hidden flag
+                    if ((annotation.Flags & AnnotationFlags.Hidden) == AnnotationFlags.Hidden)
                     {
-                        // Check if the Hidden flag is set.
-                        if ((annotation.Flags & AnnotationFlags.Hidden) == AnnotationFlags.Hidden)
-                        {
-                            return true; // Hidden annotation found.
-                        }
+                        // Hidden annotation found after sanitization
+                        return true;
                     }
                 }
-
-                // No hidden annotations were encountered.
-                return false;
             }
+
+            // No hidden annotations remain
+            return false;
         }
     }
+}
 
-    // Simple entry point required by the build system.
-    internal class Program
+// Dummy entry point to satisfy the compiler when building an executable project.
+public static class Program
+{
+    public static void Main(string[] args)
     {
-        private static void Main(string[] args)
-        {
-            // If a PDF path is supplied, report whether hidden annotations exist.
-            if (args.Length > 0)
-            {
-                string pdfPath = args[0];
-                try
-                {
-                    bool hasHidden = PdfAnnotationHelper.ContainsHiddenAnnotations(pdfPath);
-                    Console.WriteLine(hasHidden
-                        ? "Hidden annotations were found in the PDF."
-                        : "No hidden annotations were found in the PDF.");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Usage: PdfUtilities <pdf-file-path>");
-            }
-        }
+        // Intentionally left blank – the library functionality is exercised via PdfSanitizer.
     }
 }

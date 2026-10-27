@@ -1,57 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that already contains the PNG image.
-        const string inputPdfPath = "input.pdf";
-        // GIF image to overlay (semi‑transparent).
-        const string overlayGifPath = "overlay.gif";
-        // Output PDF with the overlay applied.
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "input.pdf";   // PDF that already contains the PNG
+        const string gifPath = "overlay.gif"; // Semi‑transparent GIF to overlay
+        const string outputPath = "output.pdf";
+        const int    pageNumber = 1;            // 1‑based page index
 
-        // Verify required files exist.
-        if (!File.Exists(inputPdfPath))
+        // Validate input files
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(overlayGifPath))
+        if (!File.Exists(gifPath))
         {
-            Console.Error.WriteLine($"Overlay GIF not found: {overlayGifPath}");
+            Console.Error.WriteLine($"GIF not found: {gifPath}");
             return;
         }
 
-        // Use PdfFileMend facade to modify the PDF.
-        using (PdfFileMend mend = new PdfFileMend())
+        // Load the PDF document
+        Document pdfDocument = new Document(pdfPath);
+
+        // Create an ImageStamp for the GIF
+        ImageStamp gifStamp = new ImageStamp(gifPath)
         {
-            // Load the existing PDF.
-            mend.BindPdf(inputPdfPath);
+            // Draw over existing page content
+            Background = false,
+            // Position – XIndent/YIndent are measured from the lower‑left corner (points)
+            XIndent = 100f,
+            YIndent = 200f,
+            // Set semi‑transparent opacity directly on the stamp
+            Opacity = 0.5f // 50 % opacity
+        };
 
-            // Define the rectangle where the GIF will be placed.
-            // Coordinates are in default user space units (points).
-            float lowerLeftX = 50f;   // X of lower‑left corner
-            float lowerLeftY = 500f;  // Y of lower‑left corner
-            float upperRightX = 250f; // X of upper‑right corner
-            float upperRightY = 700f; // Y of upper‑right corner
+        // Add the stamp to the required page (pages are 1‑based)
+        pdfDocument.Pages[pageNumber].AddStamp(gifStamp);
 
-            // Create compositing parameters to achieve a semi‑transparent effect.
-            // BlendMode.Multiply blends the overlay with the underlying PNG.
-            CompositingParameters compParams = new CompositingParameters(BlendMode.Multiply);
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
 
-            // Add the GIF image on page 1 using the compositing parameters.
-            // This overlays the GIF onto the existing PNG at the same coordinates.
-            mend.AddImage(overlayGifPath, 1, lowerLeftX, lowerLeftY, upperRightX, upperRightY, compParams);
-
-            // Save the modified PDF.
-            mend.Save(outputPdfPath);
-            mend.Close();
-        }
-
-        Console.WriteLine($"Overlay completed. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Overlay applied successfully. Saved to '{outputPath}'.");
     }
 }

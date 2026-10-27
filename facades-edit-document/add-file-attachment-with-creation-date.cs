@@ -1,23 +1,19 @@
 using System;
-using System.Drawing;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the file to attach, and the resulting PDF
-        const string sourcePdfPath = "input.pdf";
-        const string attachmentFilePath = "invoice2023.pdf";
-        const string resultPdfPath = "output.pdf";
+        const string inputPdfPath = "input.pdf";               // source PDF
+        const string attachmentFilePath = "Invoice2023.pdf";   // file to attach
+        const string outputPdfPath = "output.pdf";             // result PDF
 
-        // Verify that the required files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify that required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(attachmentFilePath))
@@ -26,39 +22,27 @@ class Program
             return;
         }
 
-        // Bind the existing PDF document
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(sourcePdfPath);
+        // Load the source PDF using the Document class (the recommended way for manipulation).
+        Document pdfDoc = new Document(inputPdfPath);
 
-        // Create a file attachment annotation on page 1.
-        // The rectangle defines where the attachment icon will appear.
-        // PdfContentEditor.CreateFileAttachment expects a System.Drawing.Rectangle.
-        System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, 20, 20); // small icon at top‑left
-        editor.CreateFileAttachment(rect, "Invoice2023", attachmentFilePath, 1, "Graph");
-
-        // Save the intermediate PDF (with the new annotation) to a temporary file
-        string tempPath = Path.GetTempFileName();
-        editor.Save(tempPath);
-
-        // Load the temporary PDF to modify the annotation's creation date
-        Document tempDoc = new Document(tempPath);
-        Page page = tempDoc.Pages[1];
-
-        // Annotations collection is 1‑based; get the last annotation added
-        if (page.Annotations.Count > 0)
+        // Create a FileSpecification for the attachment.
+        // The current Aspose.Pdf API does not expose CreationDate/ModDate on FileSpecification,
+        // so we embed the creation timestamp in the description (or a custom dictionary if needed).
+        var fileSpec = new FileSpecification(Path.GetFileName(attachmentFilePath))
         {
-            Annotation ann = page.Annotations[page.Annotations.Count];
-            if (ann is FileAttachmentAnnotation fileAnn)
-            {
-                // Set the creation date to the current system time
-                fileAnn.CreationDate = DateTime.Now;
-            }
-        }
+            Description = $"Invoice2023 (Created: {DateTime.Now:O})",
+            // Load the file contents into a memory stream as required by the EmbeddedFiles collection.
+            Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath))
+        };
 
-        // Save the final PDF with the updated creation date
-        tempDoc.Save(resultPdfPath);
+        // Add the attachment to the PDF via the EmbeddedFiles collection.
+        pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        // Clean up the temporary file
-        File.Delete(tempPath);
+        // Save the modified PDF, overwriting any existing output file.
+        if (File.Exists(outputPdfPath))
+            File.Delete(outputPdfPath);
+        pdfDoc.Save(outputPdfPath);
+
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text; // needed for TextFragment and FontStyles
 
 class Program
 {
@@ -9,52 +9,74 @@ class Program
     {
         const string outputPath = "graph.pdf";
 
-        // Document lifecycle must be wrapped in a using block for proper disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
             // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width, height) that will hold the line segments
-            Graph graph = new Graph(500, 300);
+            // -----------------------------------------------------------------
+            // Add a title for the graph
+            // -----------------------------------------------------------------
+            TextFragment title = new TextFragment("Continuous Data Series");
+            // Position the title above the graph area (X = 50, Y = 770)
+            title.Position = new Position(50, 770);
+            title.TextState.FontSize = 14;
+            // Correct enum qualification – FontStyles lives in Aspose.Pdf.Text
+            title.TextState.FontStyle = Aspose.Pdf.Text.FontStyles.Bold;
+            page.Paragraphs.Add(title);
 
-            // ----- Segment 1 (red) -----
-            // Define start (50,250) and end (150,150) points
-            float[] seg1 = { 50, 250, 150, 150 };
-            Line line1 = new Line(seg1);
-            line1.GraphInfo = new GraphInfo
+            // -----------------------------------------------------------------
+            // Create a Graph container. Use width/height constructor (double).
+            // The graph will be placed at (50, 500) with a size of 500x250 points.
+            // -----------------------------------------------------------------
+            double graphWidth = 500;   // matches the rectangle width in the original code
+            double graphHeight = 250;  // matches the rectangle height in the original code
+            Graph graph = new Graph(graphWidth, graphHeight);
+
+            // Optionally add a border around the graph area
+            graph.GraphInfo.Color = Aspose.Pdf.Color.Black;
+            graph.GraphInfo.LineWidth = 1;
+
+            // Sample data points for the series (X and Y coordinates)
+            double[] xValues = { 0, 50, 100, 150, 200, 250, 300 };
+            double[] yValues = { 0, 80, 30, 120, 60, 150, 90 };
+
+            // Add line segments between consecutive points, assigning a color per segment
+            for (int i = 0; i < xValues.Length - 1; i++)
             {
-                Color = Color.Red,
-                LineWidth = 2
-            };
-            graph.Shapes.Add(line1);
+                // Define start and end points of the current segment (float array required by Line)
+                float[] points = new float[]
+                {
+                    (float)xValues[i], (float)yValues[i],
+                    (float)xValues[i + 1], (float)yValues[i + 1]
+                };
 
-            // ----- Segment 2 (green) -----
-            // Continue from previous end point to a new point (250,200)
-            float[] seg2 = { 150, 150, 250, 200 };
-            Line line2 = new Line(seg2);
-            line2.GraphInfo = new GraphInfo
-            {
-                Color = Color.Green,
-                LineWidth = 2
-            };
-            graph.Shapes.Add(line2);
+                // Choose a color based on the segment index (example: rotating palette)
+                Aspose.Pdf.Color segmentColor;
+                switch (i % 3)
+                {
+                    case 0: segmentColor = Aspose.Pdf.Color.Red;   break;
+                    case 1: segmentColor = Aspose.Pdf.Color.Green; break;
+                    default: segmentColor = Aspose.Pdf.Color.Blue; break;
+                }
 
-            // ----- Segment 3 (blue) -----
-            // Continue to another point (350,100)
-            float[] seg3 = { 250, 200, 350, 100 };
-            Line line3 = new Line(seg3);
-            line3.GraphInfo = new GraphInfo
-            {
-                Color = Color.Blue,
-                LineWidth = 2
-            };
-            graph.Shapes.Add(line3);
+                // Create the line shape and style it via GraphInfo
+                Line line = new Line(points);
+                line.GraphInfo = new GraphInfo
+                {
+                    Color = segmentColor,
+                    LineWidth = 2
+                };
 
-            // Add the completed graph to the page's paragraph collection
+                // Add the line to the graph
+                graph.Shapes.Add(line);
+            }
+
+            // Insert the graph into the page's content
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 

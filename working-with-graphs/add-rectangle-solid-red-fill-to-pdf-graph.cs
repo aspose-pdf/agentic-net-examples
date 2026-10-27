@@ -6,35 +6,32 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "output.pdf";
+
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a new page
             Page page = doc.Pages.Add();
 
-            // Create a Graph container sized to the page (float values)
-            Graph graph = new Graph((float)page.PageInfo.Width, (float)page.PageInfo.Height);
+            // Create a Graph that spans the whole page – drawing objects must be placed inside a Graph
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Define a rectangle shape with absolute coordinates:
-            // left = 100, bottom = 500, width = 200, height = 100
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100f, 500f, 200f, 100f);
+            // Rectangle with absolute coordinates (llx=100, lly=500, urx=300, ury=700)
+            // The constructor expects (left, bottom, width, height)
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 500, 200, 200);
 
-            // Set visual properties via GraphInfo (solid red fill)
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Aspose.Pdf.Color.Red,
-                Color = Aspose.Pdf.Color.Black, // optional stroke color
-                LineWidth = 1f                    // optional stroke width
-            };
+            // Styling via GraphInfo – solid red fill, no border
+            rect.GraphInfo.FillColor = Aspose.Pdf.Color.Red;
+            rect.GraphInfo.LineWidth = 0; // removes the border
 
-            // Add the rectangle shape to the graph
+            // Add the rectangle to the graph and the graph to the page
             graph.Shapes.Add(rect);
-
-            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
             // Save the PDF
-            doc.Save("output.pdf");
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

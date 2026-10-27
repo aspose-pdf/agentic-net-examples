@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keyword    = "TARGET";      // text to search for
-        const string newText    = "NEW TEXT";    // replacement text
+        const string keyword = "OldValue";      // text to search for
+        const string replacement = "NewValue";  // new text to place
 
         if (!File.Exists(inputPath))
         {
@@ -18,43 +18,87 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TableAbsorber to locate tables on all pages
-            TableAbsorber tableAbsorber = new TableAbsorber();
-
-            // Perform the search on the whole document
-            tableAbsorber.Visit(doc);
-
-            // Iterate over each detected table
-            foreach (var absorbedTable in tableAbsorber.TableList)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Iterate over rows
-                foreach (var row in absorbedTable.RowList)
+                // ----- OPTIONAL: remove any embedded files (fixed according to verified fix) -----
+                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
                 {
-                    // Iterate over cells
-                    foreach (var cell in row.CellList)
+                    for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
                     {
-                        // Each cell may contain one or more TextFragments
-                        foreach (var fragment in cell.TextFragments)
+                        var fileSpec = doc.EmbeddedFiles[i];
+                        if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
                         {
-                            // Check if the fragment contains the keyword
-                            if (!string.IsNullOrEmpty(fragment.Text) && fragment.Text.Contains(keyword))
+                            doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        }
+                    }
+                }
+
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                {
+                    Page page = doc.Pages[pageNum];
+
+                    // Look for tables on the page
+                    foreach (var paragraph in page.Paragraphs)
+                    {
+                        if (paragraph is Table table)
+                        {
+                            // Iterate through rows and cells
+                            foreach (Row row in table.Rows)
                             {
-                                // Replace the text
-                                fragment.Text = newText;
-                                // No need for IsOverrideByFragment – the fragment text replacement is sufficient.
+                                foreach (Cell cell in row.Cells)
+                                {
+                                    bool containsKeyword = false;
+
+                                    // Check each paragraph inside the cell for the keyword
+                                    foreach (var cellParagraph in cell.Paragraphs)
+                                    {
+                                        // Most common case: TextFragment
+                                        if (cellParagraph is TextFragment tf && tf.Text != null && tf.Text.Contains(keyword))
+                                        {
+                                            containsKeyword = true;
+                                            break;
+                                        }
+                                        // If other paragraph types are present, attempt to extract their textual representation via ToString()
+                                        string paraText = cellParagraph?.ToString();
+                                        if (!string.IsNullOrEmpty(paraText) && paraText.Contains(keyword))
+                                        {
+                                            containsKeyword = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (containsKeyword)
+                                    {
+                                        // Remove existing content
+                                        cell.Paragraphs.Clear();
+
+                                        // Create a new TextFragment with the replacement text
+                                        TextFragment newFragment = new TextFragment(replacement);
+
+                                        // (Optional) Preserve basic formatting from the first old paragraph if needed
+                                        // Here we simply use default formatting; you can copy Font, FontSize, Color, etc.
+
+                                        cell.Paragraphs.Add(newFragment);
+                                    }
+                                }
                             }
                         }
                     }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Keyword replacement completed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

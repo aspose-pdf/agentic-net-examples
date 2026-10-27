@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,77 +8,89 @@ class Program
 {
     static void Main()
     {
-        const string pdfTemplate = "template.pdf";   // PDF with form fields
-        const string xmlData     = "data.xml";       // XML containing multiple records
-        const string outputDir   = "Output";
+        const string templatePath = "template.pdf";
+        const string xmlPath = "data.xml";
+        const string outputDir = "Output";
 
-        if (!File.Exists(pdfTemplate))
+        if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Template not found: {pdfTemplate}");
+            Console.Error.WriteLine($"Template PDF not found: {templatePath}");
             return;
         }
-
-        if (!File.Exists(xmlData))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML data not found: {xmlData}");
+            Console.Error.WriteLine($"XML data file not found: {xmlPath}");
             return;
         }
 
         Directory.CreateDirectory(outputDir);
 
-        // Load the XML document that holds one or more <Record> elements
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlData);
-        XmlNodeList records = xmlDoc.SelectNodes("//Record");
-
-        if (records == null || records.Count == 0)
+        XDocument xdoc;
+        try
         {
-            Console.Error.WriteLine("No <Record> elements found in the XML file.");
+            xdoc = XDocument.Load(xmlPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to load XML: {ex.Message}");
             return;
         }
 
-        int recordIndex = 1;
-        foreach (XmlNode recordNode in records)
+        // Expect each record to be a <Record> element whose child element names match PDF field names
+        var records = xdoc.Root?.Elements("Record");
+        if (records == null)
         {
-            // Open a fresh copy of the PDF template for each record
-            using (Document pdfDoc = new Document(pdfTemplate))
+            Console.Error.WriteLine("No <Record> elements found in XML.");
+            return;
+        }
+
+        int index = 1;
+        foreach (var record in records)
+        {
+            // Lifecycle rule: wrap Document in a using block for deterministic disposal
+            using (Document pdfDoc = new Document(templatePath))
             {
-                // If the PDF uses an XFA form, assign the XML fragment directly
-                if (pdfDoc.Form.HasXfa)
+                var form = pdfDoc.Form;
+                if (form != null && form.Fields != null)
                 {
-                    // Build a minimal XFA XML that contains only the current record
-                    XmlDocument xfaFragment = new XmlDocument();
-                    XmlElement datasets = xfaFragment.CreateElement("datasets");
-                    xfaFragment.AppendChild(datasets);
-                    XmlNode imported = xfaFragment.ImportNode(recordNode, true);
-                    datasets.AppendChild(imported);
-
-                    // Apply the XFA data to the form
-                    pdfDoc.Form.AssignXfa(xfaFragment);
-                }
-                else
-                {
-                    // For standard AcroForm fields, map XML element values to field names
-                    foreach (Field field in pdfDoc.Form.Fields)
+                    foreach (Field field in form.Fields)
                     {
-                        // Try to find an element whose name matches the field name
-                        XmlNode valueNode = recordNode.SelectSingleNode($"*[@name='{field.Name}']") ??
-                                            recordNode.SelectSingleNode($"{field.Name}");
+                        // Determine the field name – try the most common properties
+                        string fieldName = field.Name ?? field.FullName ?? field.PartialName ?? string.Empty;
+                        if (string.IsNullOrEmpty(fieldName))
+                            continue;
 
-                        if (valueNode != null)
+                        // Find matching XML element for the current field
+                        var xmlElement = record.Element(fieldName);
+                        if (xmlElement == null)
+                            continue;
+
+                        // Set the field value based on its concrete type
+                        if (field is TextBoxField txt)
                         {
-                            field.Value = valueNode.InnerText;
+                            txt.Value = xmlElement.Value;
                         }
+                        else if (field is CheckboxField chk)
+                        {
+                            chk.Checked = string.Equals(xmlElement.Value, "true", StringComparison.OrdinalIgnoreCase);
+                        }
+                        else if (field is RadioButtonOptionField rad)
+                        {
+                            rad.Value = xmlElement.Value;
+                        }
+                        else if (field is ListBoxField list)
+                        {
+                            list.Value = xmlElement.Value;
+                        }
+                        // Additional field types can be handled here as needed
                     }
                 }
 
-                // Save the filled PDF for this record
-                string outPath = Path.Combine(outputDir, $"filled_{recordIndex}.pdf");
-                pdfDoc.Save(outPath);
-                Console.WriteLine($"Saved: {outPath}");
+                string outPath = Path.Combine(outputDir, $"filled_{index}.pdf");
+                pdfDoc.Save(outPath); // Save as PDF (no SaveOptions needed)
+                Console.WriteLine($"Saved record {index} to {outPath}");
             }
-
-            recordIndex++;
+            index++;
         }
     }
 }

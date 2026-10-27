@@ -1,66 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // for FormattedText and EncodingType
+using Aspose.Pdf.Text; // required for TextState, FontRepository
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, logo image and the output PDF
         const string inputPdf  = "input.pdf";
-        const string logoImage = "logo.png";
         const string outputPdf = "output.pdf";
+        const string logoPath  = "logo.png";
+        const string customText = "Confidential";
 
-        // Verify that required files exist
+        // Validate input files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(logoImage))
+        if (!File.Exists(logoPath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImage}");
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
-        // Create a PdfFileStamp facade and specify input/output files
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.InputFile  = inputPdf;
-        fileStamp.OutputFile = outputPdf;
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
 
-        // Create a Aspose.Pdf.Facades.Stamp object that will hold both image and text
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+        // Create an ImageStamp for the logo
+        ImageStamp imgStamp = new ImageStamp(logoPath)
+        {
+            Background = false,
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment   = VerticalAlignment.Top,
+            XIndent = 20, // distance from left edge
+            YIndent = 20  // distance from top edge
+        };
 
-        // ----- Image part -----
-        // Bind the logo image to the stamp
-        stamp.BindImage(logoImage);
-        // Position the image (origin) and set its size
-        stamp.SetOrigin(100, 700);          // X, Y coordinates (bottom‑left origin)
-        stamp.SetImageSize(100, 100);       // Width, Height in points
-        stamp.Opacity = 0.9f;               // Slightly transparent
-        stamp.IsBackground = false;         // Draw on top of page content
+        // Create a TextStamp for the custom text
+        TextStamp txtStamp = new TextStamp(customText)
+        {
+            Background = false,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment   = VerticalAlignment.Bottom,
+            XIndent = 20, // distance from right edge
+            YIndent = 20  // distance from bottom edge
+        };
+        // Configure text appearance
+        txtStamp.TextState.FontSize = 14;
+        txtStamp.TextState.Font = FontRepository.FindFont("Arial");
+        txtStamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(1, 0, 0); // red
 
-        // ----- Text part -----
-        // Create formatted text for the custom caption
-        FormattedText ft = new FormattedText(
-            "Confidential Document",          // Text
-            System.Drawing.Color.Red,         // Text color (System.Drawing.Color is required)
-            "Helvetica",                      // Font name
-            EncodingType.Winansi,             // Encoding
-            false,                            // Embedded flag
-            24);                              // Font size
+        // Apply both stamps to every page
+        foreach (Page page in pdfDocument.Pages)
+        {
+            page.AddStamp(imgStamp);
+            page.AddStamp(txtStamp);
+        }
 
-        // Bind the formatted text to the same stamp
-        stamp.BindLogo(ft);
+        // Save the result
+        pdfDocument.Save(outputPdf);
 
-        // Add the combined stamp to the PDF file
-        fileStamp.AddStamp(stamp);
-
-        // Close the facade to finalize and write the output PDF
-        fileStamp.Close();
-
-        Console.WriteLine($"Aspose.Pdf.Facades.Stamp with image and text saved to '{outputPdf}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

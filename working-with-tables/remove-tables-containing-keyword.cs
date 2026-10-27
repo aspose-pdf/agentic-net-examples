@@ -1,8 +1,9 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -10,7 +11,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string keyword    = "CONFIDENTIAL";
+        const string keyword    = "CONFIDENTIAL"; // keyword to search for (case‑insensitive)
 
         if (!File.Exists(inputPath))
         {
@@ -18,56 +19,86 @@ class Program
             return;
         }
 
-        RemoveTablesContainingKeyword(inputPath, outputPath, keyword);
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Access tagged content; if the document is not tagged, nothing to do
+                ITaggedContent tagged = doc.TaggedContent;
+                if (tagged == null || tagged.RootElement == null)
+                {
+                    Console.WriteLine("Document is not tagged – no tables to process.");
+                    doc.Save(outputPath);
+                    return;
+                }
+
+                // Recursively remove tables that contain the keyword
+                RemoveTablesWithKeyword(tagged.RootElement, keyword);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+                Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 
-    static void RemoveTablesContainingKeyword(string inputFile, string outputFile, string keyword)
+    // Recursively walks the structure tree, removing any TableElement that contains the keyword
+    private static void RemoveTablesWithKeyword(StructureElement element, string keyword)
     {
-        // Load the PDF document
-        using (Document doc = new Document(inputFile))
+        var tablesToRemove = new List<Element>();
+
+        foreach (Element child in element.ChildElements)
         {
-            // Create a TableAbsorber to find tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Extract tables from the whole document
-            absorber.Visit(doc);
-
-            // Work on a copy of the TableList to avoid collection modification issues
-            var tables = absorber.TableList.Cast<AbsorbedTable>().ToList();
-
-            foreach (AbsorbedTable table in tables)
+            if (child is TableElement table)
             {
-                bool shouldRemove = false;
+                if (TableContainsKeyword(table, keyword))
+                    tablesToRemove.Add(table);
+            }
+            else if (child is StructureElement se)
+            {
+                // Recurse into nested structure elements
+                RemoveTablesWithKeyword(se, keyword);
+            }
+        }
 
-                // Scan all cells of the table for the keyword
-                foreach (var row in table.RowList)
-                {
-                    foreach (var cell in row.CellList)
-                    {
-                        foreach (var fragment in cell.TextFragments)
-                        {
-                            if (!string.IsNullOrEmpty(fragment.Text) &&
-                                fragment.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
-                            {
-                                shouldRemove = true;
-                                break;
-                            }
-                        }
-                        if (shouldRemove) break;
-                    }
-                    if (shouldRemove) break;
-                }
+        // Remove the identified tables from the current element's child collection
+        foreach (Element tbl in tablesToRemove)
+        {
+            // ChildElements implements IList<Element>, so Remove is available
+            var list = element.ChildElements as IList<Element>;
+            list?.Remove(tbl);
+        }
+    }
 
-                // Remove the table if the keyword was found
-                if (shouldRemove)
+    // Checks whether any cell (TH or TD) in the table contains the keyword
+    private static bool TableContainsKeyword(TableElement table, string keyword)
+    {
+        foreach (Element part in table.ChildElements)
+        {
+            // Table rows are represented by TableTRElement
+            if (part is TableTRElement row)
+            {
+                foreach (Element cell in row.ChildElements)
                 {
-                    absorber.Remove(table);
+                    if (cell is TableTHElement th && CellContainsKeyword(th, keyword))
+                        return true;
+                    if (cell is TableTDElement td && CellContainsKeyword(td, keyword))
+                        return true;
                 }
             }
-
-            // Save the modified document
-            doc.Save(outputFile);
         }
+        return false;
+    }
+
+    // Determines if the given cell's text contains the keyword (case‑insensitive)
+    private static bool CellContainsKeyword(StructureElement cell, string keyword)
+    {
+        string text = cell.ActualText ?? string.Empty;
+        return text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }

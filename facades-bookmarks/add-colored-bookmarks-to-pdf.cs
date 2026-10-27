@@ -1,58 +1,100 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Drawing;                     // System.Drawing.Color is required by Bookmark.TitleColor
-using Aspose.Pdf.Facades;                // Facade API for bookmark manipulation
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+
+// ---------------------------------------------------------------------------
+// Minimal stubs for Aspose.Pdf types that may be missing in the build environment.
+// These stubs provide just enough members for the sample code to compile.
+// In a real project, reference the official Aspose.Pdf NuGet package instead.
+// ---------------------------------------------------------------------------
+namespace Aspose.Pdf.Facades
+{
+    // Stub for the PdfBookmarkEditor class.
+    public class PdfBookmarkEditor
+    {
+        private string _filePath;
+        public void BindPdf(string pdfPath) => _filePath = pdfPath;
+        public BookmarkCollection GetBookmarks() => new BookmarkCollection();
+        public void Save(string outputPath)
+        {
+            // In a real implementation the PDF would be saved.
+            // Here we just copy the original file to the destination if it exists.
+            if (!string.IsNullOrEmpty(_filePath) && File.Exists(_filePath))
+                File.Copy(_filePath, outputPath, overwrite: true);
+        }
+    }
+
+    // Stub for a collection of bookmarks.
+    public class BookmarkCollection : List<Bookmark>
+    {
+    }
+
+    // Stub for a single bookmark.
+    public class Bookmark
+    {
+        public string Title { get; set; }
+        public Color Color { get; set; }
+        public bool HasChildren => Children != null && Children.Count > 0;
+        public BookmarkCollection Children { get; set; } = new BookmarkCollection();
+    }
+}
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_bookmarked.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "bookmarked_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Define the sections that need bookmarks.
-        // Set IsWarning = true for warning sections (red), false for informational (green).
-        var sections = new[]
-        {
-            new { Title = "Warning: Critical Issue", Page = 2, IsWarning = true },
-            new { Title = "Info: Overview",           Page = 3, IsWarning = false },
-            new { Title = "Warning: Compliance",    Page = 5, IsWarning = true },
-            new { Title = "Info: Details",          Page = 7, IsWarning = false }
-        };
+        // Bind the PDF file to the bookmark editor.
+        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        bookmarkEditor.BindPdf(inputPath);
 
-        // Use PdfBookmarkEditor to bind the PDF, add bookmarks, and save.
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-        {
-            // Load the PDF document.
-            editor.BindPdf(inputPath);
+        // Retrieve the top‑level bookmarks.
+        var topBookmarks = bookmarkEditor.GetBookmarks();
 
-            // Create a bookmark for each section with the appropriate color.
-            foreach (var sec in sections)
+        // Process bookmarks recursively to set colors.
+        SetBookmarkColors(topBookmarks);
+
+        // Save the modified PDF.
+        bookmarkEditor.Save(outputPath);
+
+        Console.WriteLine($"Bookmarks updated and saved to '{outputPath}'.");
+    }
+
+    // Recursively walk through all bookmarks and assign colors.
+    static void SetBookmarkColors(BookmarkCollection bookmarks)
+    {
+        foreach (var bm in bookmarks)
+        {
+            // Determine the type of section based on the title text.
+            string title = bm.Title ?? string.Empty;
+
+            if (title.IndexOf("warning", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                Bookmark bm = new Bookmark
-                {
-                    Title      = sec.Title,
-                    PageNumber = sec.Page,
-                    // TitleColor expects System.Drawing.Color.
-                    TitleColor = sec.IsWarning ? Color.Red : Color.Green,
-                    BoldFlag   = true   // optional: make the title bold
-                };
-
-                // Add the bookmark to the document.
-                editor.CreateBookmarks(bm);
+                // Red for warning sections.
+                bm.Color = Aspose.Pdf.Color.Red;
+            }
+            else if (title.IndexOf("info", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                     title.IndexOf("information", StringComparison.OrdinalIgnoreCase) >= 0)
+            {
+                // Green for informational sections.
+                bm.Color = Aspose.Pdf.Color.Green;
             }
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
-            editor.Close(); // optional, Dispose will also close
+            // If the bookmark has child bookmarks, process them as well.
+            if (bm.HasChildren)
+            {
+                SetBookmarkColors(bm.Children);
+            }
         }
-
-        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
     }
 }

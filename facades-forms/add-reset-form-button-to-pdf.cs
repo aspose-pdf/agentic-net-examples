@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // Added for correct FieldType enum
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,28 +17,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize FormEditor with the loaded document
-            using (FormEditor formEditor = new FormEditor(doc))
-            {
-                // Add a push button named "ResetForm" on page 1
-                // Rectangle coordinates: llx, lly, urx, ury (example values)
-                // Use the correct enum value for a push button (PushButton)
-                bool buttonAdded = formEditor.AddField(FieldType.PushButton, "ResetForm", 1, 50, 750, 150, 800);
-                if (buttonAdded)
-                {
-                    // Attach JavaScript to clear all form fields when the button is clicked
-                    string resetScript = "this.resetForm();";
-                    formEditor.AddFieldScript("ResetForm", resetScript);
-                }
-                // No explicit Save() needed; changes are applied to the Document instance
-            }
+        // Load the existing PDF
+        Document doc = new Document(inputPath);
 
-            // Save the modified PDF to a new file
-            doc.Save(outputPath);
-        }
+        // Define the button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+        Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 700, 200, 730);
+
+        // Create a button field named "ResetForm"
+        ButtonField resetButton = new ButtonField(doc.Pages[1], buttonRect)
+        {
+            PartialName = "ResetForm",
+            Value = "Reset"
+        };
+
+        // Attach JavaScript that clears all form fields when the button is clicked
+        // Use a valid action property (OnPressMouseBtn or OnReleaseMouseBtn) instead of the non‑existent OnMouseUp
+        resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
+
+        // Add the button to the form (page index is 1‑based)
+        doc.Form.Add(resetButton, 1);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"PDF with ResetForm button saved to '{outputPath}'.");
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -10,7 +11,6 @@ class Program
     {
         const string pdfPath = "input.pdf";
         const string pptxPath = "output.pptx";
-        const string notesTmpPath = "slide_notes.txt";
 
         if (!File.Exists(pdfPath))
         {
@@ -18,73 +18,34 @@ class Program
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Load PDF and extract annotation contents (speaker notes)
-        // -----------------------------------------------------------------
-        var pageNotes = new Dictionary<int, List<string>>(); // page index (1‑based) -> notes
+        // STEP 1: Load PDF and collect annotation contents per page (optional)
+        var pageNotes = new Dictionary<int, string>(); // 1‑based page number
 
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                Page page = pdfDoc.Pages[pageNum];
-                var notesForPage = new List<string>();
+                Page page = pdfDoc.Pages[i];
+                var notes = new List<string>();
 
-                // Annotations collection also uses 1‑based indexing
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[annIdx];
-
-                    // Title is only available on markup annotations; cast safely.
-                    string title = (ann as MarkupAnnotation)?.Title;
-                    string text = string.Empty;
-
-                    if (!string.IsNullOrWhiteSpace(title))
-                        text = title;
-
-                    if (!string.IsNullOrWhiteSpace(ann.Contents))
-                    {
-                        if (!string.IsNullOrWhiteSpace(text))
-                            text += ": ";
-                        text += ann.Contents;
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(text))
-                        notesForPage.Add(text);
+                    if (!string.IsNullOrEmpty(annotation.Contents))
+                        notes.Add(annotation.Contents.Trim());
                 }
 
-                if (notesForPage.Count > 0)
-                    pageNotes[pageNum] = notesForPage;
+                if (notes.Count > 0)
+                    pageNotes[i] = string.Join(Environment.NewLine, notes);
             }
 
-            // -----------------------------------------------------------------
-            // 2. Convert PDF to PPTX using Aspose.Pdf's native SaveFormat
-            // -----------------------------------------------------------------
+            // STEP 2: Convert PDF to PPTX directly with Aspose.Pdf
             pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
 
-        // -----------------------------------------------------------------
-        // 3. (Optional) Persist extracted notes to a text file for reference.
-        // -----------------------------------------------------------------
-        if (pageNotes.Count > 0)
-        {
-            using (var writer = new StreamWriter(notesTmpPath, false))
-            {
-                foreach (var kvp in pageNotes)
-                {
-                    writer.WriteLine($"Page {kvp.Key} notes:");
-                    foreach (var note in kvp.Value)
-                    {
-                        writer.WriteLine($"- {note}");
-                    }
-                    writer.WriteLine();
-                }
-            }
-        }
+        // NOTE: Adding speaker notes to the generated PPTX would require Aspose.Slides,
+        // which is not referenced in this project. The extracted annotation text is
+        // retained in the `pageNotes` dictionary for further processing if needed.
 
-        Console.WriteLine($"PDF converted to PPTX: {pptxPath}");
-        if (File.Exists(notesTmpPath))
-            Console.WriteLine($"Extracted notes saved to: {notesTmpPath}");
+        Console.WriteLine($"Conversion complete. PPTX saved to '{pptxPath}'.");
     }
 }

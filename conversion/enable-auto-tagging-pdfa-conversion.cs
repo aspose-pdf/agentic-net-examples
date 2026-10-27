@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,31 +15,28 @@ class Program
             return;
         }
 
-        // Load the source PDF, configure conversion options with auto‑tagging enabled,
-        // convert to PDF/A, and save the result.
+        // Enable auto‑tagging globally before conversion
+        AutoTaggingSettings.Default.EnableAutoTagging = true;
+        // Example: configure heading detection (optional)
+        // AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
+
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Create conversion options for PDF/A‑1B format.
-            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-
-            // Enable automatic tagging during conversion.
-            convOptions.AutoTaggingSettings = new AutoTaggingSettings
+            // Configure conversion options for PDF/A‑1B
+            PdfFormatConversionOptions convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B)
             {
-                EnableAutoTagging = true
+                OptimizeFileSize = true
+                // PuaSymbolsProcessingStrategy can be set if needed
             };
 
-            // Perform the conversion. Returns true on success.
-            bool success = doc.Convert(convOptions);
-            if (!success)
-            {
-                Console.Error.WriteLine("Conversion failed.");
-                return;
-            }
+            // Convert the document to PDF/A
+            doc.Convert(convOptions);
 
-            // Save the converted PDF/A document.
+            // Save the PDF/A output
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A file saved to '{outputPath}'.");
+        Console.WriteLine($"PDF/A saved to '{outputPath}'.");
     }
 }

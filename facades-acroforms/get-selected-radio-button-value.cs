@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // Path to the PDF containing the form
-        const string fieldName = "RadioGroup1";      // Full name of the radio button group
+        const string pdfPath = "form.pdf";               // input PDF containing the form
+        const string radioFieldName = "Gender";          // name of the radio button group
 
         if (!File.Exists(pdfPath))
         {
@@ -15,13 +15,22 @@ class Program
             return;
         }
 
-        // Open the PDF form using the Facades Form class (IDisposable, so wrap in using)
-        using (Form form = new Form(pdfPath))
+        try
         {
-            // Get the currently selected value of the specified radio button group
-            string selectedValue = form.GetButtonOptionCurrentValue(fieldName);
+            // Form is a Facades class; it does not implement IDisposable, so no using block.
+            Form form = new Form();
 
-            Console.WriteLine($"Current value of radio button '{fieldName}': {selectedValue}");
+            // Load the PDF document into the Form object.
+            form.BindPdf(pdfPath);
+
+            // Retrieve the currently selected option value of the specified radio button group.
+            string selectedValue = form.GetButtonOptionCurrentValue(radioFieldName);
+
+            Console.WriteLine($"Radio button \"{radioFieldName}\" selected value: {selectedValue}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error reading radio button value: {ex.Message}");
         }
     }
 }

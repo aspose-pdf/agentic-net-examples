@@ -1,58 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPdf  = "input.pdf";   // existing PDF or blank file
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string url        = "https://www.example.com";
 
-        // Ensure the input file exists; if not, create a new empty PDF
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add(); // add a blank page
-                doc.Save(inputPdf);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document (lifecycle: load)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             Page page = doc.Pages[1];
 
-            // Create a TextFragment that will hold the segment
-            TextFragment tf = new TextFragment();
-            tf.Position = new Position(100, 600); // place the text on the page
+            // Create a text fragment that will contain the clickable text
+            TextFragment fragment = new TextFragment("Visit Example");
 
-            // Create a TextSegment with the visible text
-            TextSegment segment = new TextSegment("Click here to visit Aspose");
-            // Assign a web hyperlink to the segment (URI action)
-            segment.Hyperlink = new WebHyperlink("https://www.aspose.com");
+            // Optional visual styling for the clickable text
+            fragment.TextState.Underline = true;
+            fragment.TextState.FontSize   = 12;
+            fragment.TextState.Font       = FontRepository.FindFont("Arial");
 
-            // Optionally set visual style for the segment
-            segment.TextState.Font = FontRepository.FindFont("Helvetica");
-            segment.TextState.FontSize = 12;
-            segment.TextState.ForegroundColor = Color.Blue;
-            segment.TextState.Underline = true;
+            // Position the fragment on the page (adjust as needed)
+            fragment.Position = new Position(100, 700);
 
-            // Add the segment to the fragment's segment collection
-            tf.Segments.Add(segment);
+            // Add the fragment to the page's paragraph collection first – this will render the text
+            page.Paragraphs.Add(fragment);
 
-            // Append the fragment (with the clickable segment) to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
+            // Create a link annotation that covers the same rectangle as the text fragment
+            // The rectangle coordinates are (llx, lly, urx, ury) – here we approximate the size
+            double llx = fragment.Position.XIndent;
+            double lly = fragment.Position.YIndent;
+            double urx = llx + fragment.TextState.FontSize * fragment.Text.Length * 0.6; // rough width estimate
+            double ury = lly + fragment.TextState.FontSize;
+            LinkAnnotation link = new LinkAnnotation(page, new Rectangle(llx, lly, urx, ury))
+            {
+                Action = new GoToURIAction(url)
+            };
 
-            // Save the modified PDF (lifecycle: save)
-            doc.Save(outputPdf);
+            // Add the annotation to the page
+            page.Annotations.Add(link);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with clickable text saved to '{outputPdf}'.");
+        Console.WriteLine($"Clickable text added and saved to '{outputPath}'.");
     }
 }

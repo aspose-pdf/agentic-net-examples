@@ -7,42 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document (Document implements IDisposable)
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Collect names of attachments that end with "_old.pdf"
-            List<string> namesToDelete = new List<string>();
-            foreach (var ef in doc.EmbeddedFiles) // use var to avoid compile‑time dependency on EmbeddedFile type
+            // Collect the embedded file specifications that match the pattern
+            var toRemove = new List<FileSpecification>();
+            foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
             {
-                // Use reflection (or dynamic) to read the Name property safely
-                var nameProp = ef?.GetType().GetProperty("Name");
-                if (nameProp == null) continue;
-                var name = nameProp.GetValue(ef) as string;
-                if (!string.IsNullOrEmpty(name) && name.EndsWith("_old.pdf", StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(fileSpec.Name) &&
+                    fileSpec.Name.EndsWith("_old.pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    namesToDelete.Add(name);
+                    toRemove.Add(fileSpec);
                 }
             }
 
-            // Delete the matching attachments
-            foreach (string name in namesToDelete)
+            // Remove the matching attachments using the Delete method (required by Aspose.Pdf)
+            foreach (FileSpecification fileSpec in toRemove)
             {
-                doc.EmbeddedFiles.Delete(name);
+                // The EmbeddedFiles collection does not expose a Remove(FileSpecification) overload.
+                // Use Delete(string name) to remove the attachment by its name.
+                pdfDoc.EmbeddedFiles.Delete(fileSpec.Name);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Attachments ending with '_old.pdf' removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Removed matching attachments and saved to '{outputPath}'.");
     }
 }

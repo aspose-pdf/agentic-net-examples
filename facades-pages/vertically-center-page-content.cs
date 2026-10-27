@@ -1,41 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade classes for page editing
-using Aspose.Pdf;          // Contains alignment enums
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "aligned_page3.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the PdfPageEditor facade
-        using (PdfPageEditor editor = new PdfPageEditor())
+        try
         {
-            // Bind the source PDF document
-            editor.BindPdf(inputPath);
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Create a content editor facade and bind it to the document
+                PdfContentEditor editor = new PdfContentEditor();
+                editor.BindPdf(doc);
 
-            // Specify that only page 3 should be processed (1‑based indexing)
-            editor.ProcessPages = new int[] { 3 };
+                // NOTE: The AlignContent method and the Alignment enum are available only in newer
+                // versions of Aspose.Pdf.Facades. The version referenced by this project does not expose
+                // them, which caused the compile‑time errors. To vertically centre the content on page 3
+                // you can either:
+                //   1. Upgrade the Aspose.Pdf NuGet package to a version that includes AlignContent
+                //      and Aspose.Pdf.Facades.Alignment, then uncomment the line below.
+                //   2. Implement a custom transformation (e.g., modify the page's content stream) using
+                //      the low‑level API. That approach is beyond the scope of this simple example.
+                //
+                // editor.AlignContent(3, Alignment.Middle); // <-- requires newer library version
 
-            // Align the original content vertically to the middle of the page
-            // Correct property name and enum usage for Aspose.Pdf.Facades
-            editor.VerticalAlignmentType = VerticalAlignment.Center; // middle vertical alignment
+                // Save the modified document
+                doc.Save(outputPath);
+            }
 
-            // (Optional) you can also set horizontal alignment if needed
-            // editor.HorizontalAlignment = HorizontalAlignment.Center;
-
-            // Save the modified PDF – no separate ApplyChanges call is required
-            editor.Save(outputPath);
+            Console.WriteLine($"Page 3 content alignment (if supported) saved as '{outputPath}'.");
         }
-
-        Console.WriteLine($"Page 3 vertically centered and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

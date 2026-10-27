@@ -1,46 +1,61 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        // List of PDFs with their original owner password and the new owner password to set.
-        var files = new[]
+        // List of PDF files to process
+        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+
+        // New owner password to apply to all PDFs
+        const string newOwnerPassword = "NewOwnerPass123";
+
+        // Mapping of each PDF to its existing user password
+        var userPasswords = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            new { Input = "input1.pdf", Output = "output1.pdf", OwnerPassword = "oldOwner1", NewOwnerPassword = "newOwner1" },
-            new { Input = "input2.pdf", Output = "output2.pdf", OwnerPassword = "oldOwner2", NewOwnerPassword = "newOwner2" }
-            // Add more entries as needed.
+            { "file1.pdf", "UserPass1" },
+            { "file2.pdf", "UserPass2" },
+            { "file3.pdf", "UserPass3" }
         };
 
-        foreach (var f in files)
+        foreach (string pdfPath in pdfFiles)
         {
-            if (!File.Exists(f.Input))
+            if (!File.Exists(pdfPath))
             {
-                Console.Error.WriteLine($"File not found: {f.Input}");
+                Console.Error.WriteLine($"File not found: {pdfPath}");
                 continue;
             }
 
-            // Initialize the PdfFileSecurity facade.
-            using (PdfFileSecurity security = new PdfFileSecurity())
-            {
-                // Load the source PDF.
-                security.BindPdf(f.Input);
+            // Retrieve the original user password; assume empty string if not provided
+            string userPassword = userPasswords.TryGetValue(pdfPath, out string pwd) ? pwd : string.Empty;
 
-                // Change only the owner password; pass null for newUserPassword to keep the existing user password.
-                bool success = security.ChangePassword(f.OwnerPassword, null, f.NewOwnerPassword);
-                if (!success)
-                {
-                    Console.Error.WriteLine($"Failed to change password for {f.Input}");
-                    continue;
-                }
+            // Load the PDF document using Document (the recommended API)
+            Document pdfDoc = new Document(pdfPath);
 
-                // Save the updated PDF to the output path.
-                security.Save(f.Output);
-            }
+            // Combine the permission flags that are available in the current Aspose.Pdf version.
+            // Flags that are not present in older versions (ModifyAnnotations, FillForms,
+            // AccessibilitySupport, PrintHighResolution) have been removed.
+            Permissions perms =
+                Permissions.PrintDocument |
+                Permissions.ModifyContent |
+                Permissions.ExtractContent |
+                Permissions.AssembleDocument;
 
-            Console.WriteLine($"Processed: {f.Input} → {f.Output}");
+            // Apply the new owner password while keeping the original user password.
+            pdfDoc.Encrypt(userPassword, newOwnerPassword, perms, CryptoAlgorithm.AESx256);
+
+            // Save the updated PDF (writes to a new file to avoid overwriting the source)
+            string outputPath = Path.Combine(
+                Path.GetDirectoryName(pdfPath) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(pdfPath) + "_updated.pdf");
+
+            pdfDoc.Save(outputPath);
+
+            Console.WriteLine($"Updated owner password for '{pdfPath}' → '{outputPath}'");
         }
     }
 }

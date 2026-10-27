@@ -1,62 +1,69 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
-using Aspose.Pdf;
+using System.Xml;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string layoutXmlPath = "layout.xml";     // XML with orientation info
-        const string outputPdfPath = "output.pdf";     // result PDF
+        const string xmlPath = "layout.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        if (!File.Exists(layoutXmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {layoutXmlPath}");
-            return;
-        }
+        // Load the XML layout definition
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
 
-        try
+        // Create a new PDF document
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document())
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
+            // Expect <Page orientation="landscape|portrait" /> elements
+            XmlNodeList pageNodes = xmlDoc.SelectNodes("//Page");
+            if (pageNodes == null || pageNodes.Count == 0)
             {
-                // Load the XML layout definition
-                XDocument layoutDoc = XDocument.Load(layoutXmlPath);
-
-                // Iterate over each <Page> element in the XML
-                foreach (XElement pageElem in layoutDoc.Root.Elements("Page"))
-                {
-                    // Read the page number (1‑based) and desired orientation
-                    int pageNumber = (int?)pageElem.Attribute("number") ?? 0;
-                    string orientation = (string)pageElem.Attribute("orientation") ?? "portrait";
-
-                    // Validate page number
-                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-                        continue; // skip invalid page numbers
-
-                    // Set the page orientation based on the XML attribute
-                    // PageInfo.IsLandscape = true makes the page landscape; false makes it portrait
-                    doc.Pages[pageNumber].PageInfo.IsLandscape = 
-                        orientation.Equals("landscape", StringComparison.OrdinalIgnoreCase);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPdfPath);
+                Console.Error.WriteLine("No <Page> elements found in XML.");
+                return;
             }
 
-            Console.WriteLine($"PDF saved with custom orientations to '{outputPdfPath}'.");
+            foreach (XmlNode pageNode in pageNodes)
+            {
+                // Add a new page to the document
+                Aspose.Pdf.Page page = pdfDoc.Pages.Add();
+
+                // Default A4 portrait dimensions
+                double width = Aspose.Pdf.PageSize.A4.Width;
+                double height = Aspose.Pdf.PageSize.A4.Height;
+
+                // Determine orientation from the XML attribute
+                string orientation = pageNode.Attributes["orientation"]?.Value?.ToLowerInvariant();
+                if (orientation == "landscape")
+                {
+                    // Swap width and height for landscape layout
+                    double temp = width;
+                    width = height;
+                    height = temp;
+                }
+
+                // Apply the calculated page size
+                page.PageInfo.Width = width;
+                page.PageInfo.Height = height;
+
+                // Add a simple label showing the page number and orientation
+                string label = $"Page {pdfDoc.Pages.Count} - {(orientation ?? "portrait")}";
+                Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment(label);
+                tf.Position = new Aspose.Pdf.Text.Position(50, height - 50);
+                page.Paragraphs.Add(tf);
+            }
+
+            // Save the resulting PDF
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }

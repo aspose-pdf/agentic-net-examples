@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
@@ -13,27 +14,40 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF, apply AES‑256 encryption with no permissions (no printing)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // No permissions granted (PrintDocument flag omitted)
-            Permissions perms = 0; // equivalent to no rights
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-            doc.Save(encryptedPath);
-        }
+            // Load the original PDF and apply AES‑256 encryption with no permissions (no printing)
+            using (Document doc = new Document(inputPath))
+            {
+                // No permissions – use a zero‑valued Permissions flag
+                Permissions perms = (Permissions)0;
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                doc.Save(encryptedPath);
+            }
 
-        // Verify that the document is encrypted
-        using (Document encryptedDoc = new Document(encryptedPath, userPassword))
+            // Open the encrypted PDF using the user password and verify security settings
+            using (Document encDoc = new Document(encryptedPath, userPassword))
+            {
+                // Verify that the document is indeed encrypted
+                bool isEncrypted = encDoc.IsEncrypted;
+
+                // Retrieve the permissions that were set during encryption (cast from int)
+                Permissions currentPerms = (Permissions)encDoc.Permissions;
+
+                // Determine whether printing is allowed (should be false)
+                bool canPrint = (currentPerms & Permissions.PrintDocument) == Permissions.PrintDocument;
+
+                Console.WriteLine($"Encrypted: {isEncrypted}");
+                Console.WriteLine($"Printing allowed: {canPrint}");
+            }
+        }
+        catch (Exception ex)
         {
-            Console.WriteLine($"IsEncrypted: {encryptedDoc.IsEncrypted}");
-            // Since no permissions were set, printing is not allowed.
-            // Aspose.Pdf does not expose a direct permission check; the absence of the flag confirms it.
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Encryption completed. Encrypted file saved as '{encryptedPath}'.");
     }
 }

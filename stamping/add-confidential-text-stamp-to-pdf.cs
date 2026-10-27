@@ -7,8 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampText  = "CONFIDENTIAL";
+        const string outputPath = "confidential_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +15,33 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Create a text stamp with the desired label
-            TextStamp textStamp = new TextStamp(stampText);
-            textStamp.Opacity = 0.6; // subtle opacity
+            TextStamp stamp = new TextStamp("Confidential")
+            {
+                // Set opacity to 0.6 for a subtle appearance
+                Opacity = 0.6,
 
-            // Position the stamp (centered on each page)
-            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            textStamp.VerticalAlignment   = VerticalAlignment.Center;
+                // Optional: position the stamp (centered both horizontally and vertically)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
 
-            // Apply the stamp to every page
+                // Optional: make the stamp non‑background so it appears on top of content
+                Background = false
+            };
+
+            // Add the stamp to each page individually (Page.AddStamp, not PageCollection)
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(textStamp);
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
     }
 }

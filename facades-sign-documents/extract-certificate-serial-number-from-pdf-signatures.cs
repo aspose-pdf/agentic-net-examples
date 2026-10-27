@@ -1,12 +1,15 @@
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
+using System.Linq;
 
 class Program
 {
     static void Main()
     {
+        // Path to the PDF that contains a digital signature
         const string pdfPath = "signed_document.pdf";
 
         if (!File.Exists(pdfPath))
@@ -15,38 +18,35 @@ class Program
             return;
         }
 
-        // Initialize the facade and bind the PDF file
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        // Load the PDF document
+        Document pdfDocument = new Document(pdfPath);
+
+        // Ensure the document has a form with fields
+        if (pdfDocument?.Form?.Fields == null || !pdfDocument.Form.Fields.Any())
         {
-            pdfSignature.BindPdf(pdfPath);
+            Console.WriteLine("No form fields (including signatures) found in the PDF.");
+            return;
+        }
 
-            // Verify that the document contains at least one digital signature
-            if (!pdfSignature.ContainsSignature())
+        // Iterate over each form field and process signature fields
+        foreach (Field field in pdfDocument.Form.Fields)
+        {
+            if (field is SignatureField signatureField)
             {
-                Console.WriteLine("No digital signatures found in the PDF.");
-                return;
-            }
+                // Extract the signing certificate from the signature field
+                X509Certificate2 certificate = signatureField.ExtractCertificateObject();
 
-            // Retrieve all signature names (including empty fields if any)
-            // GetSignatureNames returns an array of SignatureName objects, not strings.
-            var signatureNames = pdfSignature.GetSignatureNames(true);
+                string fieldName = signatureField.PartialName ?? "<unknown>";
 
-            foreach (SignatureName sigNameObj in signatureNames)
-            {
-                // The human‑readable name can be obtained via the Name property.
-                string sigName = sigNameObj.Name;
-
-                // Try to extract the X.509 certificate associated with the signature.
-                if (pdfSignature.TryExtractCertificate(sigNameObj, out X509Certificate2 cert))
+                if (certificate != null)
                 {
-                    // SerialNumber is a hexadecimal string representation.
-                    string serialNumber = cert.SerialNumber;
-                    Console.WriteLine($"Signature: {sigName}");
-                    Console.WriteLine($"  Certificate Serial Number: {serialNumber}");
+                    // SerialNumber is a hexadecimal string representation of the certificate's serial number
+                    string serialNumber = certificate.SerialNumber;
+                    Console.WriteLine($"Signature field '{fieldName}' serial number: {serialNumber}");
                 }
                 else
                 {
-                    Console.WriteLine($"Signature: {sigName} - No certificate could be extracted.");
+                    Console.WriteLine($"Signature field '{fieldName}' does not contain a certificate.");
                 }
             }
         }

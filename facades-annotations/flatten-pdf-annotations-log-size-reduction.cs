@@ -1,17 +1,18 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -19,28 +20,28 @@ class Program
         long originalSize = new FileInfo(inputPath).Length;
 
         // Flatten all annotations using PdfAnnotationEditor
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        try
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            editor.BindPdf(inputPath);                 // Load the PDF
-            editor.FlatteningAnnotations();            // Flatten all annotations
-            editor.Save(outputPath);                    // Save the flattened PDF
-        }
-        finally
-        {
-            // Ensure resources are released
-            editor.Close();
+            // Bind the source PDF (can be a file path or a Document instance)
+            editor.BindPdf(inputPath);
+
+            // Flatten the remaining annotations (correct method name)
+            editor.FlatteningAnnotations();
+
+            // Save the flattened PDF
+            editor.Save(outputPath);
         }
 
-        // Record new file size
+        // Record new file size after flattening
         long newSize = new FileInfo(outputPath).Length;
 
-        // Calculate and log size reduction
+        // Compute size reduction
         long reduction = originalSize - newSize;
-        double percent = originalSize > 0 ? (reduction * 100.0 / originalSize) : 0;
+        double reductionPercent = originalSize > 0 ? (double)reduction / originalSize * 100 : 0;
 
+        // Log the audit information
         Console.WriteLine($"Original size: {originalSize} bytes");
         Console.WriteLine($"Flattened size: {newSize} bytes");
-        Console.WriteLine($"Size reduction: {reduction} bytes ({percent:F2}%)");
+        Console.WriteLine($"Size reduction: {reduction} bytes ({reductionPercent:F2}%)");
     }
 }

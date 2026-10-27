@@ -6,25 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string creator    = "My Custom Creator";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf"; // file where updated metadata will be saved
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF file info, modify the Creator property, and save the updated file.
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            pdfInfo.Creator = creator;                     // Set custom Creator metadata
-            bool saved = pdfInfo.SaveNewInfo(outputPath);   // Persist changes to a new file
+        // Load PDF metadata without loading the full document
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
 
-            Console.WriteLine(saved
-                ? $"Creator set and saved to '{outputPath}'."
-                : "Failed to save the updated PDF.");
-        }
+        // Assign a custom Creator value
+        pdfInfo.Creator = "My Custom Creator";
+
+        // Persist the updated metadata back to a PDF file (outputPath is required)
+        pdfInfo.SaveNewInfo(outputPath);
+
+        Console.WriteLine("Creator value has been updated successfully.");
     }
 }

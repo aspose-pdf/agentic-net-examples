@@ -1,38 +1,20 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Text;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string jsonPath = "formdata.json";
+        // JSON string containing form data
+        string json = "{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"age\":30}";
 
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
-            return;
-        }
+        // Path of the output file
+        string outputPath = "formData.json";
 
-        try
-        {
-            // Load the PDF document
-            using (Document doc = new Document(pdfPath))
-            {
-                // Export all form fields to a UTF‑8 encoded JSON file
-                using (FileStream fs = new FileStream(jsonPath, FileMode.Create, FileAccess.Write))
-                {
-                    // Correct API: ExportToJson writes the form data as UTF‑8 JSON
-                    doc.Form.ExportToJson(fs);
-                }
-            }
+        // Save the JSON string to a UTF‑8 encoded file
+        File.WriteAllText(outputPath, json, Encoding.UTF8);
 
-            Console.WriteLine($"Form data exported to '{jsonPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"JSON data saved to '{outputPath}'.");
     }
 }

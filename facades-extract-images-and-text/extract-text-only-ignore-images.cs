@@ -6,38 +6,41 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Output text file path (only text will be extracted)
-        const string outputTxt = "extracted_text.txt";
+        const string inputPath = "input.pdf";
+        const string outputPath = "extracted_text.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfExtractor (Facade API)
-        PdfExtractor extractor = new PdfExtractor();
+        try
+        {
+            // Create the PdfExtractor facade and bind the source PDF
+            PdfExtractor extractor = new PdfExtractor();
+            extractor.BindPdf(inputPath);
 
-        // Bind the PDF document to the extractor
-        extractor.BindPdf(inputPdf);
+            // Enable text extraction only (do NOT call ExtractImage())
+            extractor.ExtractText();
 
-        // -----------------------------------------------------------------
-        // Configure extraction: do NOT call ExtractImage().
-        // By omitting the ExtractImage() call, the extractor will ignore
-        // all images and only process text extraction.
-        // -----------------------------------------------------------------
+            // Extract the text into a memory stream, then read it as a string
+            using (MemoryStream textStream = new MemoryStream())
+            {
+                extractor.GetText(textStream); // write text to the stream
+                textStream.Position = 0;        // rewind for reading
+                using (StreamReader reader = new StreamReader(textStream))
+                {
+                    string extractedText = reader.ReadToEnd();
+                    File.WriteAllText(outputPath, extractedText);
+                }
+            }
 
-        // Extract text from the PDF
-        extractor.ExtractText();
-
-        // Save the extracted text to a file
-        extractor.GetText(outputTxt);
-
-        // Release resources
-        extractor.Close();
-
-        Console.WriteLine($"Text extraction completed. Images were ignored. Output saved to '{outputTxt}'.");
+            Console.WriteLine($"Text extracted (images ignored) and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

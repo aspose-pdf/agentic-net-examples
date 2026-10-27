@@ -6,22 +6,21 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Initialize PdfFileInfo facade for the PDF file
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // PdfFileInfo gives access to document metadata without loading the full PDF.
+        string creator;
+        using (PdfFileInfo info = new PdfFileInfo(pdfPath))
         {
-            // Retrieve the Creator metadata
-            string creator = pdfInfo.Creator;
-
-            // Store or use the creator value as needed
-            Console.WriteLine($"Creator: {creator}");
+            creator = info.Creator; // Retrieve the Creator metadata
         }
+
+        Console.WriteLine($"Creator: {creator}");
     }
 }

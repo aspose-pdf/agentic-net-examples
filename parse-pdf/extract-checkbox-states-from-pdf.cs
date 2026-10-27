@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -9,38 +9,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "checkbox_states.json";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Collect the checked state of each checkbox field
+            // Ensure the document contains a form
+            if (doc.Form == null || doc.Form.Fields == null)
+            {
+                Console.WriteLine("[]"); // No form fields, output empty JSON array
+                return;
+            }
+
             List<bool> checkboxStates = new List<bool>();
 
-            // Iterate over form fields (Field) instead of non‑existent WidgetAnnotation
+            // Iterate over all form fields
             foreach (Field field in doc.Form.Fields)
             {
-                if (field is CheckboxField checkbox)
+                // Identify checkbox fields using the fully qualified type
+                if (field is CheckboxField checkBox)
                 {
-                    // The Checked property returns true if the box is selected
-                    checkboxStates.Add(checkbox.Checked);
+                    // The Checked property indicates the state of the checkbox
+                    checkboxStates.Add(checkBox.Checked);
                 }
             }
 
-            // Serialize the boolean list to JSON and write to file
-            using (FileStream fs = new FileStream(outputJson, FileMode.Create, FileAccess.Write))
-            {
-                JsonSerializer.Serialize(fs, checkboxStates);
-            }
-
-            Console.WriteLine($"Extracted {checkboxStates.Count} checkbox states to '{outputJson}'.");
+            // Serialize the list of booleans to JSON
+            string json = JsonSerializer.Serialize(checkboxStates);
+            Console.WriteLine(json);
         }
     }
 }

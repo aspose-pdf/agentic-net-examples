@@ -7,53 +7,38 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source XML and the output PDF and images
-        const string xmlPath = "source.xml";
-        const string pdfPath = "output.pdf";
-        const string imagesFolder = "PageImages";
+        const string xmlPath = "input.xml";
+        const string outputDir = "ExportedImages";
 
-        // Verify source file exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML source not found: {xmlPath}");
             return;
         }
 
-        // Ensure the images folder exists
-        Directory.CreateDirectory(imagesFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the XML content and convert it to a PDF document
-        using (Document pdfDoc = new Document())
+        // Load the PDF document from its XML representation
+        using (Document pdfDoc = new Document(xmlPath))
         {
-            // Bind the XML to the document (no special load options required)
-            pdfDoc.BindXml(xmlPath);
+            // Desired image resolution (e.g., 300 DPI)
+            Resolution imageResolution = new Resolution(300);
 
-            // Save the intermediate PDF (optional, but useful for verification)
-            pdfDoc.Save(pdfPath);
-
-            // Define the desired image resolution (dots per inch)
-            const int dpi = 300;
-            Resolution imageResolution = new Resolution(dpi);
-
-            // Create a PNG device with the specified resolution.
-            // PNG is chosen for loss‑less output; you can use JpegDevice, BmpDevice, etc.
-            PngDevice pngDevice = new PngDevice(imageResolution);
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            // Export each page as a PNG image using the specified resolution
             for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                string imagePath = Path.Combine(imagesFolder, $"Page_{pageNumber}.png");
+                string imagePath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
 
-                // Export the current page to a PNG image using the defined resolution
                 using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
                 {
+                    // PngDevice respects the Resolution property
+                    PngDevice pngDevice = new PngDevice(imageResolution);
                     pngDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
                 }
 
-                Console.WriteLine($"Exported page {pageNumber} to '{imagePath}' at {dpi} DPI.");
+                Console.WriteLine($"Exported page {pageNumber} to {imagePath}");
             }
         }
-
-        Console.WriteLine("Processing completed.");
     }
 }

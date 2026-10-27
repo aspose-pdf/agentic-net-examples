@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Optimization;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string defaultFont = "Arial";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_no_embed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,16 @@ class Program
             return;
         }
 
-        // Open the PDF document using a FileStream.
-        // No specific load options are required for PDF files.
-        using (FileStream fs = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(fs))
-        {
-            // Create save options and specify a default font.
-            // When a default font is set, Aspose.Pdf substitutes missing fonts
-            // with this font instead of embedding the original fonts.
-            Aspose.Pdf.PdfSaveOptions saveOptions = new Aspose.Pdf.PdfSaveOptions
-            {
-                DefaultFontName = defaultFont
-            };
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-            // Save the document with the custom save options.
-            doc.Save(outputPath, saveOptions);
-        }
+        // Disable font embedding using OptimizationOptions
+        var opt = new OptimizationOptions { UnembedFonts = true };
+        doc.OptimizeResources(opt);
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        // Save the document
+        doc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved without embedded fonts to '{outputPath}'.");
     }
 }

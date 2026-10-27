@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -13,58 +12,64 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the source PDF
+        // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Collect all RichMediaAnnotations from the existing pages
-            List<RichMediaAnnotation> richMediaAnnotations = new List<RichMediaAnnotation>();
+            // Create a new blank page that will serve as the summary page
+            Page summaryPage = doc.Pages.Add();
 
+            // Position where the first cloned annotation will be placed
+            // (adjust as needed; here we start near the top-left corner)
+            double startX = 50;
+            double startY = summaryPage.PageInfo.Height - 50;
+            double offsetY = 150; // vertical spacing between cloned annotations
+
+            // Iterate over all existing pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-                foreach (Annotation ann in page.Annotations)
+                Page srcPage = doc.Pages[i];
+
+                // Examine each annotation on the current page
+                foreach (Annotation annot in srcPage.Annotations)
                 {
-                    if (ann is RichMediaAnnotation rma)
+                    // Process only RichMediaAnnotations
+                    if (annot is RichMediaAnnotation richMedia)
                     {
-                        richMediaAnnotations.Add(rma);
+                        // Clone the annotation.
+                        // RichMediaAnnotation implements ICloneable, so we can use Clone().
+                        RichMediaAnnotation clone = (RichMediaAnnotation)richMedia.Clone();
+
+                        // Place the clone on the summary page.
+                        // Adjust the rectangle so that annotations are stacked vertically.
+                        // Original rectangle is preserved relative to its size.
+                        double width  = clone.Rect.URX - clone.Rect.LLX;
+                        double height = clone.Rect.URY - clone.Rect.LLY;
+
+                        // Define a new rectangle for the clone on the summary page
+                        clone.Rect = new Rectangle(
+                            startX,
+                            startY - height,
+                            startX + width,
+                            startY
+                        );
+
+                        // Add the cloned annotation to the summary page
+                        summaryPage.Annotations.Add(clone);
+
+                        // Update the Y position for the next annotation
+                        startY -= (height + offsetY);
                     }
                 }
             }
 
-            // Add a new blank page that will serve as the summary page
-            Page summaryPage = doc.Pages.Add();
-
-            // Clone each collected RichMediaAnnotation onto the summary page
-            foreach (RichMediaAnnotation original in richMediaAnnotations)
-            {
-                // Create a new RichMediaAnnotation on the summary page with the same rectangle
-                RichMediaAnnotation clone = new RichMediaAnnotation(summaryPage, original.Rect);
-
-                // Copy relevant properties (adjust as needed for your scenario)
-                clone.Contents = original.Contents;
-                clone.Type = original.Type;
-                clone.Color = original.Color;
-                clone.Name = original.Name;
-                clone.ActivateOn = original.ActivateOn;
-                clone.Flags = original.Flags;
-                clone.CustomFlashVariables = original.CustomFlashVariables;
-                clone.CustomPlayer = original.CustomPlayer;
-                clone.Height = original.Height;
-                clone.Width = original.Width;
-                clone.ZIndex = original.ZIndex;
-
-                // Add the cloned annotation to the summary page
-                summaryPage.Annotations.Add(clone);
-            }
-
-            // Save the modified document
+            // Save the modified document (PDF format) inside the using block
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with cloned RichMediaAnnotations on summary page: {outputPath}");
+        Console.WriteLine($"Summary PDF saved to '{outputPath}'.");
     }
 }

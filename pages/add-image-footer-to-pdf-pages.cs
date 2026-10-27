@@ -1,47 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // for ImageStamp if needed (ImageStamp is in Aspose.Pdf)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string footerPath = "footer.png";   // image to use as footer
         const string outputPath = "output.pdf";
-        const string footerImagePath = "footer.png";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(footerImagePath))
+        if (!File.Exists(footerPath))
         {
-            Console.Error.WriteLine($"Footer image not found: {footerImagePath}");
+            Console.Error.WriteLine($"Footer image not found: {footerPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add a footer artifact with the image and desired opacity to each page
+            // Create an ImageStamp for the footer image
+            ImageStamp footerStamp = new ImageStamp(footerPath)
+            {
+                // 30% opacity (0.0 = fully transparent, 1.0 = fully opaque)
+                Opacity = 0.3,
+                // Position the stamp at the bottom center of each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Ensure the stamp is placed on top of page content
+                Background = false
+            };
+
+            // Apply the stamp to every page individually
             foreach (Page page in doc.Pages)
             {
-                FooterArtifact pageFooter = new FooterArtifact();
-                pageFooter.SetImage(footerImagePath);          // set the image source
-                pageFooter.Opacity = 0.3;                      // 30% opacity
-                pageFooter.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
-                pageFooter.ArtifactVerticalAlignment = VerticalAlignment.Bottom;
-                pageFooter.BottomMargin = 10;                  // optional margin from bottom
-
-                page.Artifacts.Add(pageFooter);
+                page.AddStamp(footerStamp);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with image footer saved to '{outputPath}'.");
+        Console.WriteLine($"Footer added and saved to '{outputPath}'.");
     }
 }

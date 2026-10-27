@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -9,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string fieldName = "MyField";
+        const string fieldName = "FieldName";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the AcroForm collection
-            Form acroForm = doc.Form;
+            // Retrieve the form field by name using the indexer and cast to Field
+            Field? field = doc.Form[fieldName] as Field;
 
-            try
+            if (field == null)
             {
-                // Retrieve the form field by name using the indexer
-                WidgetAnnotation widget = acroForm[fieldName];
-
-                // Most form fields are of type Field, which provides a Value property
-                if (widget is Field formField)
-                {
-                    Console.WriteLine($"Field '{fieldName}' value: {formField.Value}");
-                }
-                else
-                {
-                    Console.WriteLine($"Field '{fieldName}' retrieved, but it is not a standard form field.");
-                }
+                Console.WriteLine($"Form field '{fieldName}' not found or is not a form field.");
             }
-            catch (Exception ex)
+            else
             {
-                // The indexer throws if the field is not found
-                Console.WriteLine($"Error retrieving field '{fieldName}': {ex.Message}");
+                // Output field information
+                Console.WriteLine($"Field '{fieldName}' type: {field.GetType().Name}");
+                Console.WriteLine($"Field value: {field.Value}");
             }
         }
     }

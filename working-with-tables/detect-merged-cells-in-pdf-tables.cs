@@ -9,56 +9,80 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber and enable the FlowEngine to detect merged cells
-            TableAbsorber absorber = new TableAbsorber
+            // TableAbsorber extracts tables from the document – it does NOT implement IDisposable
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Visit each page to collect tables
+            foreach (Page page in doc.Pages)
             {
-                UseFlowEngine = true
-            };
+                absorber.Visit(page);
+            }
 
-            // Extract tables from the entire document
-            absorber.Visit(doc);
-
-            int tableIndex = 0;
-
-            // Iterate over each detected table
+            int tableIndex = 1;
             foreach (var table in absorber.TableList)
             {
-                bool hasMergedCells = false;
+                bool hasMerged = false;
+                int rowIndex = 1;
 
-                // Examine each row and each cell within the row
+                // Iterate through rows and cells to check RowSpan and ColumnSpan
                 foreach (var row in table.RowList)
                 {
+                    int colIndex = 1;
                     foreach (var cell in row.CellList)
                     {
-                        // ColSpan > 1 indicates a column merge
-                        if (cell.ColSpan > 1)
-                            hasMergedCells = true;
+                        // Use reflection to obtain RowSpan / ColumnSpan – these members may not be present in older library versions
+                        int rowSpan = GetIntProperty(cell, "RowSpan", 1);
+                        int colSpan = GetIntProperty(cell, "ColumnSpan", 1);
 
-                        // RowSpan may not be present on AbsorbedCell; use reflection to check safely
-                        var rowSpanProp = cell.GetType().GetProperty("RowSpan");
-                        if (rowSpanProp != null)
+                        if (rowSpan > 1 || colSpan > 1)
                         {
-                            int rowSpan = (int)rowSpanProp.GetValue(cell);
-                            if (rowSpan > 1)
-                                hasMergedCells = true;
+                            hasMerged = true;
+                            Console.WriteLine(
+                                $"Table {tableIndex}, Cell at Row {rowIndex}, Column {colIndex} " +
+                                $"has RowSpan={rowSpan}, ColumnSpan={colSpan}");
                         }
+                        colIndex++;
                     }
+                    rowIndex++;
                 }
 
-                Console.WriteLine(
-                    $"Table {++tableIndex} on page {table.PageNum}: " +
-                    (hasMergedCells ? "contains merged cells" : "no merged cells"));
+                if (!hasMerged)
+                {
+                    Console.WriteLine($"Table {tableIndex} contains no merged cells.");
+                }
+
+                tableIndex++;
             }
         }
+    }
+
+    /// <summary>
+    /// Safely retrieves an integer property value via reflection.
+    /// Returns <paramref name="defaultValue"/> if the property does not exist or cannot be read.
+    /// </summary>
+    private static int GetIntProperty(object obj, string propertyName, int defaultValue)
+    {
+        var prop = obj.GetType().GetProperty(propertyName);
+        if (prop != null && prop.PropertyType == typeof(int))
+        {
+            try
+            {
+                return (int)prop.GetValue(obj);
+            }
+            catch
+            {
+                // ignore and fall back to default
+            }
+        }
+        return defaultValue;
     }
 }

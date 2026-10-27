@@ -1,26 +1,28 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class BatchFormFiller
+class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\InputPdfs";
-        // Folder where filled PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
+        // Folder containing the source PDFs
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where the processed PDFs will be saved
+        const string outputFolder = @"C:\PdfOutput";
 
-        // Ensure output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Define the field values to apply to every PDF
-        var fieldValues = new (string Name, string Value)[]
+        // Define the fields to fill and the values to assign (same for every PDF)
+        var fieldValues = new Dictionary<string, string>
         {
-            ("FirstName", "John"),
-            ("LastName",  "Doe"),
-            ("Date",      DateTime.Today.ToString("yyyy-MM-dd"))
+            { "FirstName", "John" },
+            { "LastName",  "Doe" },
+            { "Date",      DateTime.Today.ToString("yyyy-MM-dd") },
+            { "Company",   "Acme Corp" }
         };
 
         // Process each PDF file in the input folder
@@ -28,30 +30,25 @@ class BatchFormFiller
         {
             try
             {
-                // Load the PDF document (using block ensures proper disposal)
+                // Load the PDF document inside a using block for deterministic disposal
                 using (Document doc = new Document(inputPath))
                 {
-                    // Optional: improve performance when many fields are updated
-                    doc.Form.AutoRecalculate = false;
-
-                    // Set each predefined field to its corresponding value
-                    foreach (var (Name, Value) in fieldValues)
+                    // Iterate over the predefined field/value pairs
+                    foreach (var kvp in fieldValues)
                     {
-                        // If the field exists, assign the value using the Field API
-                        if (doc.Form.HasField(Name))
+                        // The Form indexer returns a WidgetAnnotation; cast it to Field safely
+                        Field? field = doc.Form[kvp.Key] as Field;
+                        if (field != null)
                         {
-                            // The indexer returns a Field; assign via the Value property
-                            if (doc.Form[Name] is Field field)
-                            {
-                                field.Value = Value;
-                            }
+                            // Set the field's value
+                            field.Value = kvp.Value;
                         }
                     }
 
-                    // Determine output file path (same name, different folder)
+                    // Build the output file path (same file name, different folder)
                     string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-                    // Save the modified PDF (Document.Save(string) writes PDF)
+                    // Save the modified PDF
                     doc.Save(outputPath);
                 }
 

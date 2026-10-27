@@ -1,17 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string srcPhrase = "old phrase";
-        const string destPhrase = "new phrase";
+        const string oldPhrase  = "old phrase";
+        const string newPhrase  = "new phrase";
 
         if (!File.Exists(inputPath))
         {
@@ -19,36 +19,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document disposal with using)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Find the original font size of the source phrase (first occurrence)
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(srcPhrase);
-            // Search on the first page (page indexing is 1‑based)
-            doc.Pages[1].Accept(absorber);
+            // Locate all occurrences of the phrase to be replaced
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldPhrase);
+            doc.Pages.Accept(absorber);
 
-            // FontSize in Aspose.Pdf.Text.TextState is a float, so use float here
-            float originalFontSize = 12f; // fallback size
-            if (absorber.TextFragments.Count > 0)
+            // Iterate over each found fragment, replace text and apply bold style
+            foreach (TextFragment tf in absorber.TextFragments)
             {
-                // Use the font size from the first text fragment's TextState
-                originalFontSize = absorber.TextFragments[1].TextState.FontSize;
+                tf.Text = newPhrase;                                 // replace the phrase
+                tf.TextState.FontStyle = FontStyles.Bold;            // apply bold while keeping other style unchanged
+                // Font size is left as is; no assignment needed
             }
 
-            // Create a TextState that keeps the original font size and applies Bold style
-            TextState textState = new TextState
-            {
-                FontSize = originalFontSize,
-                FontStyle = FontStyles.Bold
-            };
-
-            // Use PdfContentEditor to replace the phrase and apply the TextState
-            PdfContentEditor editor = new PdfContentEditor();
-            editor.BindPdf(doc);
-            // thePage = 0 means replace on all pages
-            editor.ReplaceText(srcPhrase, 0, destPhrase, textState);
-
-            // Save the modified PDF (using rule: document disposal with using)
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

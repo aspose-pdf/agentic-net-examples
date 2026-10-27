@@ -7,43 +7,37 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
         const string inputPdf = "input.pdf";
+        const string outputFolder = "BmpPages";
 
-        // Directory where BMP images will be saved
-        const string outputDir = "output_images";
-
-        // Verify that the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Create a BmpDevice with default settings (default resolution)
-            BmpDevice bmpDevice = new BmpDevice();
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                // Build the output BMP file path for the current page
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                // BmpDevice with default settings:
+                // - page number is supplied via the Process method, not the constructor
+                // - default resolution is 300 DPI when not specified
+                BmpDevice bmpDevice = new BmpDevice();
 
-                // Open a FileStream for the BMP output; the using block ensures the stream is closed
-                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
-                {
-                    // Convert the current page to BMP and write it to the stream
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
-                }
+                // Build output file name for each page
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNum}.bmp");
+
+                // Convert the current page to BMP
+                bmpDevice.Process(pdfDoc.Pages[pageNum], outputPath);
             }
         }
 
-        Console.WriteLine("PDF has been successfully converted to BMP images.");
+        Console.WriteLine($"PDF pages have been converted to BMP images in '{outputFolder}'.");
     }
 }

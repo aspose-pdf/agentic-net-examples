@@ -1,64 +1,62 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         // Input PDF files to be concatenated
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        // Path for the intermediate concatenated PDF
-        string concatenatedPath = "combined_temp.pdf";
-        // Final output PDF with page numbers
-        string outputPath = "combined_with_page_numbers.pdf";
+        string[] sourceFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Path for the combined PDF (will be overwritten after adding page numbers)
+        const string outputPath = "combined_with_page_numbers.pdf";
 
-        // Verify that all input files exist
-        foreach (string file in inputFiles)
+        // Verify that all source files exist
+        foreach (string path in sourceFiles)
         {
-            if (!File.Exists(file))
+            if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"Input file not found: {file}");
+                Console.Error.WriteLine($"Source file not found: {path}");
                 return;
             }
         }
 
         // ---------- Concatenate PDFs ----------
-        // PdfFileEditor does NOT implement IDisposable, so no using block is required.
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
         PdfFileEditor editor = new PdfFileEditor();
-
-        // Concatenate the input files into a single PDF.
-        // The Concatenate(string[], string) overload writes directly to a file.
-        bool concatSuccess = editor.Concatenate(inputFiles, concatenatedPath);
-        if (!concatSuccess)
-        {
-            Console.Error.WriteLine("Failed to concatenate PDF files.");
-            return;
-        }
+        // Concatenate all source PDFs into the output file
+        editor.Concatenate(sourceFiles, outputPath);
 
         // ---------- Add page numbers ----------
-        // PdfFileStamp implements SaveableFacade (IDisposable), so wrap it in a using block.
-        // The constructor takes the source PDF and the destination PDF.
-        using (PdfFileStamp stamp = new PdfFileStamp(concatenatedPath, outputPath))
+        // Open the concatenated PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(outputPath))
         {
-            // Optional: start numbering from 1 (default) or any other number.
-            stamp.StartingNumber = 1;
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
 
-            // Add page numbers. The format string may contain '#' which will be replaced
-            // by the actual page number. Position constants are defined in PdfFileStamp.
-            stamp.AddPageNumber("Page #", PdfFileStamp.PosBottomMiddle);
-            // Close() finalizes the stamping operation and writes the output file.
-            stamp.Close();
-        }
+                // Create a text fragment containing the page number
+                TextFragment pageNumber = new TextFragment(i.ToString());
 
-        // Clean up the intermediate file if desired
-        try
-        {
-            File.Delete(concatenatedPath);
-        }
-        catch
-        {
-            // Ignored – the file may be in use or deletion may fail; not critical.
+                // Set visual appearance
+                pageNumber.TextState.FontSize = 12;
+                pageNumber.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                pageNumber.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+
+                // Position the fragment at the bottom center of the page
+                double x = page.PageInfo.Width / 2;   // center horizontally
+                double y = 20;                        // 20 points from the bottom edge
+                pageNumber.Position = new Position(x, y);
+
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(pageNumber);
+            }
+
+            // Save the modified document (overwrites the same file)
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDFs concatenated and page numbers added: {outputPath}");

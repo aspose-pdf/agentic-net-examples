@@ -1,36 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Add file attachment to pdf__v2
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-edit-document/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string attachmentPath = "attachment_file.pdf";
-        const string description = "Sample attachment";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-
-        if (!File.Exists(attachmentPath))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
-            return;
-        }
-
-        // Add the file attachment using PdfContentEditor (no annotation)
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            editor.BindPdf(inputPdf);
-            editor.AddDocumentAttachment(attachmentPath, description);
-            editor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

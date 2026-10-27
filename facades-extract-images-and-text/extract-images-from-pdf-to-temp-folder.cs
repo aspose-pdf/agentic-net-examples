@@ -1,48 +1,52 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfExtractor resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        // Create a unique temporary folder for extracted images
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"File not found: {inputPdf}");
+            return;
+        }
+
+        // Create a unique temporary folder for the extracted images
         string tempFolder = Path.Combine(Path.GetTempPath(),
                                          "PdfImages_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempFolder);
 
         try
         {
-            // Initialize the extractor and bind the PDF document
+            // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
             using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.BindPdf(inputPdfPath);
+                // Load the PDF document
+                extractor.BindPdf(inputPdf);
 
-                // Use the default extraction mode (DefinedInResources)
+                // Extract images using the default extraction mode (all pages)
                 extractor.ExtractImage();
 
+                // Save each extracted image to the temporary folder
                 int imageIndex = 1;
-                // Iterate through all extracted images
                 while (extractor.HasNextImage())
                 {
-                    // Build the output file name (default format is JPEG)
-                    string outputImagePath = Path.Combine(tempFolder,
-                                                          $"image-{imageIndex}.jpg");
-
-                    // Save the current image to the temporary folder
-                    extractor.GetNextImage(outputImagePath);
+                    // Build a file name – using PNG extension; Aspose will convert the image accordingly
+                    string imagePath = Path.Combine(tempFolder, $"Image_{imageIndex}.png");
+                    extractor.GetNextImage(imagePath);
                     imageIndex++;
                 }
             }
 
-            Console.WriteLine($"Images extracted to temporary folder: {tempFolder}");
+            Console.WriteLine($"Images have been extracted to: {tempFolder}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during image extraction: {ex.Message}");
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

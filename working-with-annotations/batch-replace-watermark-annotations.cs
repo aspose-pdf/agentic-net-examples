@@ -17,40 +17,43 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Prepare the replacement text that includes the current date
-            string replacementText = $"Updated on {DateTime.Now:yyyy-MM-dd}";
+            // New watermark text that includes the current date
+            string newText = $"Confidential - {DateTime.Now:yyyy-MM-dd}";
 
-            // Define the visual appearance of the watermark text
-            // Use the constructor that accepts font name and size, then set the color separately
-            TextState textState = new TextState("Helvetica", 12);
-            textState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Define a TextState that will be applied to every replaced watermark
+            TextState watermarkState = new TextState
             {
-                Page page = doc.Pages[pageIndex];
+                Font = FontRepository.FindFont("Arial"),
+                FontSize = 36,
+                ForegroundColor = Color.LightGray,
+                // Optional: make the watermark semi‑transparent
+                // Opacity = 0.5f // not available on TextState, handled by annotation appearance if needed
+            };
 
-                // Iterate over all annotations on the current page (also 1‑based)
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based page indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+
+                // Iterate over annotations; replace each WatermarkAnnotation's text
+                for (int j = 0; j < page.Annotations.Count; j++)
                 {
-                    Annotation annotation = page.Annotations[annIndex];
-
-                    // Identify WatermarkAnnotation instances
-                    if (annotation is WatermarkAnnotation watermark)
+                    Annotation annot = page.Annotations[j];
+                    if (annot is WatermarkAnnotation watermark)
                     {
-                        // Replace the watermark text with the new string and apply the TextState
-                        watermark.SetTextAndState(new[] { replacementText }, textState);
+                        // Replace the existing watermark text with the new string and apply the TextState
+                        watermark.SetTextAndState(new[] { newText }, watermarkState);
                     }
                 }
             }
 
-            // Save the modified document
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All WatermarkAnnotations have been updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarks updated and saved to '{outputPath}'.");
     }
 }

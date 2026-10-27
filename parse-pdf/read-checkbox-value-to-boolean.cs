@@ -8,6 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
+        const string fieldName = "myCheckBox";
 
         if (!File.Exists(inputPath))
         {
@@ -15,31 +16,26 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block (document-disposal-with-using rule)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form collection
-            Form form = doc.Form;
+            // Retrieve the checkbox field from the form collection and cast it
+            CheckboxField checkBox = doc.Form[fieldName] as CheckboxField;
 
-            // Retrieve the first field and cast it to CheckboxField
-            // (adjust the index if the checkbox is not the first field)
-            CheckboxField checkbox = form.Fields[0] as CheckboxField;
-            if (checkbox == null)
+            if (checkBox == null)
             {
-                Console.Error.WriteLine("No checkbox field found at index 0.");
+                Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
                 return;
             }
 
-            // Read the Value property (string) of the checkbox
-            string rawValue = checkbox.Value; // e.g., "Off", "On", or a custom export value
+            // The Value property is a string (e.g., "On" when checked, "Off" otherwise)
+            string rawValue = checkBox.Value;
 
-            // Convert the string value to a Boolean.
-            // In Aspose.Pdf a checkbox is considered checked if its value is NOT "Off".
-            bool isChecked = !string.Equals(rawValue, "Off", StringComparison.OrdinalIgnoreCase);
+            // Convert the string value to a Boolean
+            bool isChecked = string.Equals(rawValue, "On", StringComparison.OrdinalIgnoreCase);
 
-            // Output the result
-            Console.WriteLine($"Checkbox Value: \"{rawValue}\"");
-            Console.WriteLine($"Converted to Boolean: {isChecked}");
+            // Example usage of the Boolean variable
+            Console.WriteLine($"Checkbox '{fieldName}' is checked: {isChecked}");
         }
     }
 }

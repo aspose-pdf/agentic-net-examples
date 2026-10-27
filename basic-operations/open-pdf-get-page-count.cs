@@ -1,27 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Verify the file exists before attempting to open it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Use a using block for deterministic disposal of the Document (lifecycle rule)
+        // Open the PDF file using the Document constructor.
+        // Wrapped in a using block for deterministic disposal.
         using (Document doc = new Document(pdfPath))
         {
-            // Pages collection is 1‑based (page-indexing-one-based rule)
+            // Verify the number of pages in the document.
             int pageCount = doc.Pages.Count;
+            Console.WriteLine($"Page count: {pageCount}");
 
-            Console.WriteLine($"The PDF '{pdfPath}' contains {pageCount} page{(pageCount == 1 ? "" : "s")}.");
+            // Simple check: ensure the document contains at least one page.
+            if (pageCount == 0)
+            {
+                Console.WriteLine("The document has no pages.");
+            }
+            else
+            {
+                Console.WriteLine("Document loaded successfully.");
+            }
         }
     }
 }

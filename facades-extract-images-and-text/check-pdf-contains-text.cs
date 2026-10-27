@@ -6,34 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize the extractor facade
+        // PdfExtractor is a Facades class that can extract text from a PDF.
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(inputPdf);
+            // Load the PDF file.
+            extractor.BindPdf(inputPath);
 
-            // Extract all text using Unicode encoding (default)
+            // Perform text extraction.
             extractor.ExtractText();
 
-            // Retrieve the extracted text into a memory stream
-            using (MemoryStream textStream = new MemoryStream())
+            // Store the extracted text in a MemoryStream.
+            using (MemoryStream ms = new MemoryStream())
             {
-                extractor.GetText(textStream);
+                // The Aspose API expects a non‑null stream. The null‑forgiving operator
+                // guarantees the compiler that 'ms' is not null, silencing CS8600.
+                extractor.GetText(ms!);
+                ms.Position = 0; // Ensure the stream is at the beginning.
 
-                // Determine if any text was extracted
-                bool containsText = textStream.Length > 0;
+                // If the stream length is greater than zero, the PDF contains text.
+                bool hasText = ms.Length > 0;
 
-                Console.WriteLine(containsText
-                    ? "The PDF contains text."
-                    : "The PDF does not contain any text.");
+                Console.WriteLine(hasText
+                    ? "PDF contains text."
+                    : "PDF does not contain any text.");
             }
         }
     }

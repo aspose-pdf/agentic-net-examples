@@ -1,52 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor facade and bind the source PDF
-        using (FormEditor editor = new FormEditor())
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPdf);
-
-            // Retrieve the underlying Document object
-            Document doc = editor.Document;
-
-            // Access the form collection from the document (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Forms.Form pdfForm = doc.Form;
-
-            // Retrieve the field named "Email" and cast it to Field
-            Field emailField = pdfForm["Email"] as Field;
+            // Retrieve the TextBox field named "Email"
+            TextBoxField emailField = doc.Form["Email"] as TextBoxField;
             if (emailField == null)
             {
-                Console.Error.WriteLine("Field 'Email' not found or is not a form field.");
+                Console.Error.WriteLine("Field 'Email' not found or is not a TextBoxField.");
                 return;
             }
 
-            // JavaScript to validate email format on blur (loss of focus)
-            string jsCode = @"if (!/^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$/.test(this.value)) {\n    app.alert('Invalid email address');\n    this.value = '';}";
+            // JavaScript that validates the email format on blur (OnLostFocus)
+            string js = @"
+var f = this.getField('Email');
+var val = f.value;
+var pattern = /^[\w\-\.+]+@([\w\-]+\.)+[\w\-]{2,4}$/;
+if (!pattern.test(val)) {
+    app.alert('Invalid email address');
+    f.setFocus();
+}
+";
 
-            // OnLostFocus corresponds to the blur event for form fields
-            emailField.Actions.OnLostFocus = new JavascriptAction(jsCode);
+            // Assign the JavaScript action to the OnLostFocus event
+            emailField.Actions.OnLostFocus = new JavascriptAction(js);
 
-            // Save the modified PDF via the facade
-            editor.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript validation: {outputPdf}");
+        Console.WriteLine($"PDF saved with JavaScript validation to '{outputPath}'.");
     }
 }

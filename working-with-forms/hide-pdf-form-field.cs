@@ -1,15 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_hidden.pdf";
-        const string fieldName = "myField";   // name of the form field to hide
+        const string outputPath = "output.pdf";
+        const string fieldName = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -17,24 +18,25 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the widget annotation that represents the form field
-            WidgetAnnotation widget = doc.Form[fieldName] as WidgetAnnotation;
-            if (widget == null)
+            // The Form indexer returns a WidgetAnnotation; cast it to Field to access field members
+            Field? field = doc.Form[fieldName] as Field;
+            if (field != null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a widget annotation.");
-                return;
+                // Hide the field by setting the Hidden flag on the underlying annotation
+                field.Flags = AnnotationFlags.Hidden;
+            }
+            else
+            {
+                Console.WriteLine($"Form field '{fieldName}' not found.");
             }
 
-            // Hide the field on the rendered page by setting the Hidden flag
-            widget.Flags |= AnnotationFlags.Hidden;
-
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, no SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' hidden and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden field to '{outputPath}'.");
     }
 }

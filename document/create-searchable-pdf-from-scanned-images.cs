@@ -1,39 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "scanned_input.pdf";
-        const string outputPdf = "searchable_output.pdf";
+        const string inputPath = "scanned.pdf";
+        const string outputPath = "searchable.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the scanned PDF (image‑only pages)
-        using (Document doc = new Document(inputPdf))
+        // Load the scanned PDF
+        using (Document doc = new Document(inputPath))
         {
-            // Perform OCR conversion: overlay invisible text (HOCR) on the scanned pages.
-            // The second argument indicates whether to flatten images (false keeps original images).
-            // The lambda receives the image bytes of each page and should return HOCR XML.
-            // In a real scenario you would call an OCR engine here.
-            doc.Convert((imageBytes, pageNumber) =>
+            // Iterate over each page and overlay invisible OCR text
+            foreach (Page page in doc.Pages)
             {
-                // imageBytes – raw image data of the page
-                // pageNumber – 1‑based page index
-                // TODO: integrate an OCR service and return HOCR markup.
-                return string.Empty; // placeholder – no overlay text
-            }, flattenImages: false);
+                // TODO: replace this placeholder with actual OCR result for the current page
+                string ocrText = "Extracted searchable text for this page.";
 
-            // Save the resulting searchable PDF.
-            doc.Save(outputPdf);
+                // Create a TextFragment containing the OCR text
+                TextFragment textFragment = new TextFragment(ocrText);
+
+                // Make the text effectively invisible:
+                //   • Set font size to 0
+                //   • Use a fully transparent color
+                textFragment.TextState.Font = FontRepository.FindFont("Arial");
+                textFragment.TextState.FontSize = 0;
+                textFragment.TextState.ForegroundColor = Color.FromArgb(0, 0, 0, 0);
+
+                // Position the text at the lower‑left corner of the page
+                textFragment.Position = new Position(0, 0);
+
+                // Add the invisible text to the page
+                page.Paragraphs.Add(textFragment);
+            }
+
+            // Save the searchable PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Searchable PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Searchable PDF saved to '{outputPath}'.");
     }
 }

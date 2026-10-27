@@ -2,53 +2,56 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing; // for Rectangle (fully qualified usage below)
 
 class Program
 {
     static void Main()
     {
-        // Define the output PDF path
-        const string outputPath = "dropdown_country.pdf";
+        const string outputPath = "CountryDropdown.pdf";
 
         // Predefined list of country names
-        string[] countries = new string[]
+        string[] countries = new[]
         {
-            "United States", "Canada", "United Kingdom", "Germany",
-            "France", "Australia", "Japan", "China", "India", "Brazil"
+            "United States",
+            "Canada",
+            "Mexico",
+            "United Kingdom",
+            "Germany",
+            "France",
+            "Japan",
+            "Australia"
         };
 
-        // Create a new PDF document (lifecycle rule: use using for disposal)
+        // Create a new PDF document inside a using block (ensures disposal)
         using (Document doc = new Document())
         {
-            // Add a page to host the dropdown field
+            // Add a blank page to host the form field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the ComboBox will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
+            // Define the rectangle where the dropdown will appear (llx, lly, urx, ury)
+            // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
 
-            // Create a ComboBox (dropdown) field on the page
-            ComboBoxField countryField = new ComboBoxField(page, rect);
-
-            // Set the field name (partial name) – this is the identifier used in the form
-            countryField.PartialName = "Country";
-
-            // Populate the dropdown with the country options
-            foreach (string c in countries)
+            // Create the combo box (dropdown) field
+            ComboBoxField countryField = new ComboBoxField(page, rect)
             {
-                countryField.AddOption(c);
+                PartialName = "Country" // field name
+            };
+
+            // Populate the dropdown with the predefined country list using AddOption
+            foreach (string country in countries)
+            {
+                countryField.AddOption(country);
             }
 
-            // Optionally set a default selected value (e.g., first country)
-            countryField.Value = countries[0];
-
-            // Add the field to the document's form
+            // Add the field to the document's form collection
             doc.Form.Add(countryField);
 
-            // Save the PDF (lifecycle rule: save inside using block)
+            // Save the PDF (output format is PDF by default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with dropdown list saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with dropdown field saved to '{outputPath}'.");
     }
 }

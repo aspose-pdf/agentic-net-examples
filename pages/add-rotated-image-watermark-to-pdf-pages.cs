@@ -1,53 +1,64 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for ImageStamp
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
-        const string imagePath = "watermark.png";
+        const string inputPdfPath   = "input.pdf";
+        const string watermarkPath  = "watermark.png";
+        const string outputPdfPath  = "watermarked_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(imagePath))
+        if (!File.Exists(watermarkPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {imagePath}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: load)
-        using (Document doc = new Document(inputPdf))
+        // Open the source PDF inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath))
         {
-            // Apply the watermark to each page
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create an ImageStamp from the image file
-                ImageStamp stamp = new ImageStamp(imagePath);
+                Aspose.Pdf.Page page = doc.Pages[i];
 
-                // Place the stamp over the page content
-                stamp.Background = false;                     // overlay (not background)
-                stamp.Opacity    = 1.0;                       // fully opaque
-                stamp.RotateAngle = 45;                       // rotate 45 degrees
-                stamp.Zoom        = 0.5;                      // scale to 50% of original size
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment   = VerticalAlignment.Center;
+                // Create an ImageStamp for the watermark image
+                Aspose.Pdf.ImageStamp stamp = new Aspose.Pdf.ImageStamp(watermarkPath)
+                {
+                    // Do not place the stamp behind the page content
+                    Background = false,
 
-                // Add the stamp to the current page (lifecycle: modify)
+                    // 50 % opacity makes the watermark semi‑transparent
+                    Opacity = 0.5,
+
+                    // Rotate the image 45 degrees
+                    RotateAngle = 45,
+
+                    // Scale to half of the page size
+                    Width  = page.PageInfo.Width  / 2,
+                    Height = page.PageInfo.Height / 2,
+
+                    // Center the stamp on the page
+                    HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center,
+                    VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Center
+                };
+
+                // Apply the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle: save)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
     }
 }

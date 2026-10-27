@@ -6,46 +6,62 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string logPath = "metadata_log.txt";
+        const string pdfPath = "input.pdf";
+        const string logPath = "metadata_audit.log";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Load PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Access the document's info dictionary (custom metadata stored here)
-                DocumentInfo info = doc.Info;
-
-                // Open a StreamWriter to create the audit log
-                using (StreamWriter writer = new StreamWriter(logPath, false))
+                // Open the log file for appending audit entries
+                using (StreamWriter log = new StreamWriter(logPath, append: true))
                 {
-                    writer.WriteLine($"Metadata audit for '{inputPdf}'");
-                    writer.WriteLine($"Generated on {DateTime.UtcNow:u}");
-                    writer.WriteLine();
+                    log.WriteLine($"Audit Timestamp: {DateTime.UtcNow:u}");
+                    log.WriteLine($"File: {pdfPath}");
 
-                    // Iterate over all entries and write only custom (non‑predefined) keys
-                    foreach (var kvp in info)
+                    // Write standard metadata fields
+                    log.WriteLine($"Title: {doc.Info.Title}");
+                    log.WriteLine($"Author: {doc.Info.Author}");
+                    log.WriteLine($"Subject: {doc.Info.Subject}");
+                    log.WriteLine($"Keywords: {doc.Info.Keywords}");
+
+                    // Iterate over all metadata entries and log custom ones
+                    foreach (var key in doc.Info.Keys)
                     {
-                        if (DocumentInfo.IsPredefinedKey(kvp.Key))
-                            continue; // Skip standard keys like Title, Author, etc.
-
-                        writer.WriteLine($"{kvp.Key}: {kvp.Value}");
+                        if (IsStandardKey(key)) continue; // skip already logged standard keys
+                        string value = doc.Info[key];
+                        log.WriteLine($"Custom Metadata - {key}: {value}");
                     }
-                }
 
-                Console.WriteLine($"Custom metadata written to '{logPath}'.");
+                    log.WriteLine(new string('-', 40));
+                }
             }
+
+            Console.WriteLine($"Metadata audit written to '{logPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
+    }
+
+    // Determines whether a metadata key is one of the standard PDF Info entries
+    static bool IsStandardKey(string key)
+    {
+        return string.Equals(key, "Title", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "Author", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "Subject", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "Keywords", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "Creator", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "Producer", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "CreationDate", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(key, "ModDate", StringComparison.OrdinalIgnoreCase);
     }
 }

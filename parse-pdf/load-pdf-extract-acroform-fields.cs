@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -10,36 +9,31 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        // Verify the file exists before attempting to load it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF into a Document instance.
-        // The using statement ensures the Document is disposed properly.
+        // Load the PDF into a Document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // Access the AcroForm associated with the document.
-            var acroForm = pdfDoc.Form;
+            // Access the form (AcroForm) of the document
+            Form form = pdfDoc.Form;
 
-            // Form.Fields is a property (collection), not a method.
-            var fields = acroForm?.Fields;
-
-            if (fields != null && fields.Count() > 0)
+            // Verify that the form contains fields
+            if (form != null && form.Count > 0)
             {
-                Console.WriteLine($"AcroForm contains {fields.Count()} field(s).");
-
-                // Iterate over each form field and output its name and current value.
-                foreach (Field field in fields)
+                Console.WriteLine($"AcroForm contains {form.Count} fields:");
+                foreach (Field field in form)
                 {
-                    Console.WriteLine($"Field: {field.FullName}, Value: {field.Value}");
+                    // Output field name and its current value
+                    Console.WriteLine($"- {field.Name}: {field.Value}");
                 }
             }
             else
             {
-                Console.WriteLine("The document does not contain an AcroForm or has no fields.");
+                Console.WriteLine("No AcroForm fields found in the PDF.");
             }
         }
     }

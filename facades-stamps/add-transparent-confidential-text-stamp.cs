@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // FontRepository, Font, Color, TextStamp, HorizontalAlignment, VerticalAlignment
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "confidential_output.pdf";
 
-        // Specify the pages that should receive the stamp (1‑based indexing)
+        // Pages on which the stamp should appear (1‑based indexing)
         int[] pagesToStamp = new int[] { 1, 3, 5 };
 
         if (!File.Exists(inputPath))
@@ -19,35 +19,35 @@ class Program
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+        int pageCount = doc.Pages.Count;
+
+        // Configure the text stamp
+        TextStamp stamp = new TextStamp("CONFIDENTIAL")
         {
-            // Initialize the facade with the loaded document
-            PdfFileStamp fileStamp = new PdfFileStamp(doc);
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Center,
+            RotateAngle = 0f,               // no rotation
+            Opacity = 0.7f                  // 70 % opacity
+        };
+        stamp.TextState.Font = FontRepository.FindFont("Arial");
+        stamp.TextState.FontSize = 72;
+        stamp.TextState.ForegroundColor = Color.Red; // use ForegroundColor, not FontColor
+        stamp.TextState.BackgroundColor = Color.Transparent;
 
-            // Create the formatted text that will appear as the stamp
-            // Parameters: text, color (System.Drawing.Color), font name, encoding, embedded flag, font size
-            Aspose.Pdf.Facades.FormattedText formattedText = new Aspose.Pdf.Facades.FormattedText(
-                "CONFIDENTIAL",
-                System.Drawing.Color.Red,
-                "Helvetica",
-                Aspose.Pdf.Facades.EncodingType.Winansi,
-                false,
-                48);
+        // Apply the stamp to each valid page number using Document.Pages[i].AddStamp
+        foreach (int pageNumber in pagesToStamp)
+        {
+            if (pageNumber < 1 || pageNumber > pageCount)
+                continue; // skip invalid page numbers
 
-            // Configure the stamp
-            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-            stamp.BindLogo(formattedText);      // bind the text to the stamp
-            stamp.IsBackground = true;          // place the stamp behind page content
-            stamp.Opacity = 0.7f;               // 70% opacity
-            stamp.Pages = pagesToStamp;         // apply only to selected pages
-
-            // Add the stamp to the document and save
-            fileStamp.AddStamp(stamp);
-            fileStamp.Save(outputPath);
-            fileStamp.Close();
+            doc.Pages[pageNumber].AddStamp(stamp);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Confidential stamp applied. Output saved to '{outputPath}'.");
     }
 }

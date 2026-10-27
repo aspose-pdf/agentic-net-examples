@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -7,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,27 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Gather all PopupAnnotation objects on the current page
-                var popups = new System.Collections.Generic.List<PopupAnnotation>();
-                foreach (Annotation ann in page.Annotations)
+                // Collect popup annotations first to avoid modifying the collection while iterating
+                List<PopupAnnotation> popups = new List<PopupAnnotation>();
+                foreach (Annotation annot in page.Annotations)
                 {
-                    if (ann is PopupAnnotation popup)
-                    {
+                    if (annot is PopupAnnotation popup)
                         popups.Add(popup);
-                    }
                 }
 
-                // Remove each popup annotation; its parent markup annotation stays intact
-                foreach (var popup in popups)
+                // Remove each popup annotation and clear its reference from the parent markup annotation
+                foreach (PopupAnnotation popup in popups)
                 {
+                    // Detach from parent markup annotation, if any
+                    if (popup.Parent is MarkupAnnotation parentMarkup)
+                    {
+                        // The parent markup annotation holds a reference to its popup via the Popup property
+                        parentMarkup.Popup = null;
+                    }
+
+                    // Delete the popup annotation from the page's annotation collection
                     page.Annotations.Delete(popup);
                 }
             }

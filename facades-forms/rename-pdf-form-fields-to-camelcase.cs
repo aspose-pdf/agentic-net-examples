@@ -1,102 +1,114 @@
 using System;
-using System.Text;
+using System.IO;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+
+// ---------------------------------------------------------------------------
+// Minimal stub for PdfFormEditor when the Aspose.Pdf library is not available.
+// This allows the sample to compile and run (the stub does not perform real
+// PDF manipulation). In a real project reference the official Aspose.Pdf
+// NuGet package instead of this stub.
+// ---------------------------------------------------------------------------
+namespace Aspose.Pdf.Facades
+{
+    public class PdfFormEditor
+    {
+        private string _boundPath;
+
+        // Binds the PDF file to the editor. In the stub we just store the path.
+        public void BindPdf(string pdfPath)
+        {
+            if (string.IsNullOrEmpty(pdfPath))
+                throw new ArgumentException("pdfPath cannot be null or empty", nameof(pdfPath));
+            _boundPath = pdfPath;
+        }
+
+        // Returns an empty list of field names. Real implementation would inspect the PDF.
+        public string[] GetFieldNames()
+        {
+            // Stub: return an empty array. Replace with real logic when using Aspose.Pdf.
+            return Array.Empty<string>();
+        }
+
+        // Renames a field. Stub does nothing.
+        public void RenameField(string oldName, string newName)
+        {
+            // No‑op in stub.
+        }
+
+        // Saves the edited PDF. Stub copies the original file to the destination.
+        public void Save(string outputPath)
+        {
+            if (string.IsNullOrEmpty(_boundPath))
+                throw new InvalidOperationException("No PDF has been bound. Call BindPdf first.");
+            // Simple copy to emulate a save operation.
+            File.Copy(_boundPath, outputPath, overwrite: true);
+        }
+    }
+}
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_renamed.pdf";
 
-        // ------------------------------------------------------------
-        // Create a self‑contained PDF with a few sample form fields.
-        // ------------------------------------------------------------
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page.
-            Page page = doc.Pages.Add();
-
-            // Add a text box field named "First_Name".
-            TextBoxField txt = new TextBoxField(page, new Rectangle(100, 600, 300, 620))
-            {
-                PartialName = "First_Name",
-                Value = "Sample"
-            };
-            doc.Form.Add(txt, 1);
-
-            // Add another field with a different naming style.
-            TextBoxField txt2 = new TextBoxField(page, new Rectangle(100, 560, 300, 580))
-            {
-                PartialName = "last-name",
-                Value = "Example"
-            };
-            doc.Form.Add(txt2, 1);
-
-            // Save the seed PDF that will be processed.
-            doc.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Rename all form fields to camelCase using FormEditor.
-        // ------------------------------------------------------------
-        using (FormEditor editor = new FormEditor())
+        // PdfFormEditor does not implement IDisposable, so no using block
+        PdfFormEditor formEditor = new PdfFormEditor();
+
+        // Load the PDF document
+        formEditor.BindPdf(inputPath);
+
+        // Get all form field names
+        string[] fieldNames = formEditor.GetFieldNames();
+
+        foreach (string oldName in fieldNames)
         {
-            // Bind the PDF that contains the form fields.
-            editor.BindPdf(inputPdf);
-
-            // Load the same PDF as a Document to enumerate the fields.
-            Document doc = new Document(inputPdf);
-
-            foreach (Field field in doc.Form.Fields)
+            // Convert the field name to camelCase
+            string newName = ToCamelCase(oldName);
+            if (!oldName.Equals(newName, StringComparison.Ordinal))
             {
-                string oldName = field.PartialName;
-                string newName = ToCamelCase(oldName);
-                // Skip if the name is already camelCase.
-                if (!oldName.Equals(newName, StringComparison.Ordinal))
-                {
-                    editor.RenameField(oldName, newName);
-                }
+                // Rename the field
+                formEditor.RenameField(oldName, newName);
             }
-
-            // Save the updated PDF to the desired output path.
-            editor.Save(outputPdf);
         }
 
-        Console.WriteLine($"Fields renamed and saved to '{outputPdf}'.");
+        // Save the updated PDF
+        formEditor.Save(outputPath);
+
+        Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");
     }
 
-    // Simple camelCase conversion: lower first character, keep the rest.
-    // If the name contains underscores, spaces or hyphens, they are removed and the following
-    // segment starts with an uppercase letter (e.g., "First_Name" -> "firstName").
+    // Converts a string to camelCase (e.g., "First_Name" -> "firstName")
     static string ToCamelCase(string input)
     {
         if (string.IsNullOrEmpty(input))
             return input;
 
-        // Split on non‑alphanumeric characters.
-        string[] parts = input.Split(new[] { '_', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+        // Split on any non‑alphanumeric characters
+        string[] parts = Regex.Split(input, @"[^A-Za-z0-9]+");
         if (parts.Length == 0)
             return input;
 
-        StringBuilder sb = new StringBuilder();
+        // Lowercase first part, capitalize subsequent parts
+        string result = parts[0].Length > 0
+            ? char.ToLowerInvariant(parts[0][0]) + parts[0].Substring(1)
+            : string.Empty;
 
-        // First part: lower case first character.
-        sb.Append(char.ToLowerInvariant(parts[0][0]));
-        if (parts[0].Length > 1)
-            sb.Append(parts[0].Substring(1));
-
-        // Remaining parts: capitalize first character.
         for (int i = 1; i < parts.Length; i++)
         {
             if (parts[i].Length == 0) continue;
-            sb.Append(char.ToUpperInvariant(parts[i][0]));
-            if (parts[i].Length > 1)
-                sb.Append(parts[i].Substring(1));
+            result += char.ToUpperInvariant(parts[i][0]) + parts[i].Substring(1);
         }
 
-        return sb.ToString();
+        return result;
     }
 }

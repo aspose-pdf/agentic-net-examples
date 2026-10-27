@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -15,33 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Check if the document contains any AcroForm fields
-            if (doc.Form == null || doc.Form.Count == 0)
+            var form = doc.Form;
+            // Use LINQ Any() (or Count()) to safely check for the presence of fields
+            if (form == null || form.Fields == null || !form.Fields.Any())
             {
-                Console.WriteLine("No AcroForm fields found in the PDF.");
-            }
-            else
-            {
-                Console.WriteLine("AcroForm field names:");
-                // Enumerate fields via the Form.Fields collection
-                foreach (Field field in doc.Form.Fields)
-                {
-                    // The Name property holds the field's name
-                    Console.WriteLine($"- {field.Name}");
-                }
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
             }
 
-            // If the PDF also contains an XFA form, list its field names
-            if (doc.Form != null && doc.Form.HasXfa && doc.Form.XFA != null)
+            Console.WriteLine("Form field names:");
+            // Enumerate each field and output its name (FullyQualifiedName is not available)
+            foreach (var field in form.Fields)
             {
-                Console.WriteLine("XFA field names:");
-                foreach (string xfaName in doc.Form.XFA.FieldNames)
-                {
-                    Console.WriteLine($"- {xfaName}");
-                }
+                Console.WriteLine($"- {field.Name}");
             }
         }
     }

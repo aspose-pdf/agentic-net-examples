@@ -2,65 +2,76 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added namespace for TextFragment
+
+class PdfMerger
+{
+    // Merges an array of PDF input streams into a single output stream.
+    public static void MergePdfStreams(Stream[] inputStreams, Stream outputStream)
+    {
+        if (inputStreams == null || inputStreams.Length == 0)
+            throw new ArgumentException("No input streams provided.");
+
+        if (outputStream == null)
+            throw new ArgumentNullException(nameof(outputStream));
+
+        // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using.
+        var editor = new PdfFileEditor();
+
+        // Ensure each input stream is positioned at the beginning.
+        foreach (var s in inputStreams)
+        {
+            if (s.CanSeek)
+                s.Position = 0;
+        }
+
+        // Concatenate the PDF streams into the output stream.
+        editor.Concatenate(inputStreams, outputStream);
+
+        // Reset output stream position for further reading if needed.
+        if (outputStream.CanSeek)
+            outputStream.Position = 0;
+    }
+}
 
 class Program
 {
-    // Creates a simple one‑page PDF and returns it as a MemoryStream.
-    private static MemoryStream CreateSamplePdf(string title)
-    {
-        var doc = new Document();
-        var page = doc.Pages.Add();
-        // Add a simple text paragraph so the PDF is not empty.
-        page.Paragraphs.Add(new TextFragment(title));
-        var ms = new MemoryStream();
-        doc.Save(ms);
-        ms.Position = 0; // reset for reading
-        return ms;
-    }
-
-    // Merges multiple PDF streams into a single PDF stream using PdfFileEditor.
-    static void MergePdfStreams(Stream[] inputStreams, Stream outputStream)
-    {
-        // PdfFileEditor does NOT implement IDisposable; instantiate directly.
-        var editor = new PdfFileEditor();
-        // Automatically close the input streams after concatenation.
-        editor.CloseConcatenatedStreams = true;
-        // Perform concatenation. Returns true if successful.
-        bool success = editor.Concatenate(inputStreams, outputStream);
-        if (!success)
-        {
-            throw new InvalidOperationException("PDF concatenation failed.");
-        }
-        // No need to call any Save method; Concatenate writes directly to outputStream.
-    }
-
     static void Main()
     {
-        // Create three sample PDFs in memory.
-        var sampleStreams = new[]
-        {
-            CreateSamplePdf("Sample PDF 1"),
-            CreateSamplePdf("Sample PDF 2"),
-            CreateSamplePdf("Sample PDF 3")
-        };
+        // Paths of the PDFs we want to merge.
+        string[] pdfPaths = { "first.pdf", "second.pdf", "third.pdf" };
 
-        // Output file path for the merged PDF.
-        const string outputFile = "merged.pdf";
-
-        // Merge the PDFs into a file.
-        using (var outStream = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
+        // Ensure every PDF exists – create an empty placeholder if it does not.
+        foreach (var path in pdfPaths)
         {
-            MergePdfStreams(sampleStreams, outStream);
+            if (!File.Exists(path))
+            {
+                // Create a minimal PDF with a single blank page.
+                var placeholder = new Document();
+                placeholder.Pages.Add();
+                placeholder.Save(path);
+                Console.WriteLine($"Placeholder PDF created: {Path.GetFullPath(path)}");
+            }
         }
 
-        // Input streams are closed automatically because CloseConcatenatedStreams = true.
-        // No explicit disposal required, but disposing is safe.
-        foreach (var s in sampleStreams)
+        // Open the PDFs as read‑only streams.
+        Stream[] inputs = new Stream[pdfPaths.Length];
+        for (int i = 0; i < pdfPaths.Length; i++)
         {
+            inputs[i] = File.OpenRead(pdfPaths[i]);
+        }
+
+        // Output will be written to a MemoryStream (any writable stream works).
+        using (var merged = new MemoryStream())
+        {
+            PdfMerger.MergePdfStreams(inputs, merged);
+
+            // Optionally save the merged PDF to a file.
+            File.WriteAllBytes("merged.pdf", merged.ToArray());
+            Console.WriteLine("Merged PDF saved as merged.pdf");
+        }
+
+        // Dispose input streams.
+        foreach (var s in inputs)
             s.Dispose();
-        }
-
-        Console.WriteLine($"Merged PDF saved to '{outputFile}'.");
     }
 }

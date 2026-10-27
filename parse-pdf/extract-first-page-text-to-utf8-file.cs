@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,39 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTxtPath = "page1.txt";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document (lifecycle rule: use using for disposal)
-            using (Document doc = new Document(inputPdf))
+            // Prepare a TextAbsorber to extract text
+            TextAbsorber absorber = new TextAbsorber
             {
-                // Create a TextAbsorber (rule: use TextAbsorber for extraction)
-                TextAbsorber absorber = new TextAbsorber();
+                // Use pure text formatting (no layout information)
+                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+            };
 
-                // Extract text from the first page (pages are 1‑based)
-                doc.Pages[1].Accept(absorber);
+            // Page indexing in Aspose.Pdf is 1‑based; extract from the first page
+            doc.Pages[1].Accept(absorber);
+            string extractedText = absorber.Text ?? string.Empty;
 
-                // Get the extracted text (may be empty)
-                string extracted = absorber.Text ?? string.Empty;
-
-                // Write the text to a UTF‑8 encoded file
-                File.WriteAllText(outputTxt, extracted, Encoding.UTF8);
-            }
-
-            Console.WriteLine($"Extracted text saved to '{outputTxt}'.");
+            // Write the extracted text to a UTF‑8 encoded file
+            File.WriteAllText(outputTxtPath, extractedText, System.Text.Encoding.UTF8);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"First page text saved to '{outputTxtPath}'.");
     }
 }

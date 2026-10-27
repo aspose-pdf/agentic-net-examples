@@ -1,57 +1,68 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // for Stamp if needed (optional)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string backgroundImg = "background.png";
-        const string outputPdfPath = "output.pdf";
+        // Input PDF and background image paths
+        const string inputPdfPath   = "input.pdf";
+        const string backgroundPath = "background.jpg";
+        const string outputPdfPath  = "output.pdf";
 
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
-        if (!File.Exists(backgroundImg))
+        if (!File.Exists(backgroundPath))
         {
-            Console.Error.WriteLine($"Background image not found: {backgroundImg}");
+            Console.Error.WriteLine($"Background image not found: {backgroundPath}");
             return;
         }
 
-        // Load the existing PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Iterate over all pages and add the background artifact
-            foreach (Page page in pdfDoc.Pages)
+            // Load the source PDF
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Create a background artifact
-                BackgroundArtifact bgArtifact = new BackgroundArtifact();
+                // Iterate over all pages and add the background image as a stamp
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    // Create an ImageStamp bound to the background image file
+                    Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(backgroundPath);
 
-                // Set the image for the artifact (the image will be tiled or stretched as needed)
-                bgArtifact.SetImage(backgroundImg);
+                    // Set the stamp as a background element (drawn behind page content)
+                    imgStamp.Background = true;
 
-                // Place the artifact behind page contents
-                bgArtifact.IsBackground = true;
+                    // Adjust opacity for a subtle shading effect
+                    imgStamp.Opacity = 0.5; // 0 = fully transparent, 1 = fully opaque
 
-                // Optional: adjust opacity for a subtle effect (0.0 = fully transparent, 1.0 = opaque)
-                bgArtifact.Opacity = 0.5; // 50% opacity
+                    // Position the image – here we center it on the page.
+                    // Margins are measured from the page edges; setting all to zero lets the image fill the page.
+                    imgStamp.TopMargin    = 0;
+                    imgStamp.BottomMargin = 0;
+                    imgStamp.LeftMargin   = 0;
+                    imgStamp.RightMargin  = 0;
 
-                // NOTE: Aspose.Pdf does not expose a direct BlendMode property for artifacts.
-                // The visual effect can be approximated by adjusting opacity as shown above.
+                    // NOTE: The core Aspose.Pdf.ImageStamp class does not expose a BlendMode property.
+                    // Multiply blend mode is not available via the core API; opacity is used instead.
 
-                // Add the artifact to the page's artifact collection
-                page.Artifacts.Add(bgArtifact);
+                    // Add the stamp to the current page
+                    page.AddStamp(imgStamp);
+                }
+
+                // Save the modified PDF
+                pdfDoc.Save(outputPdfPath);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Background image added and saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"PDF with background image saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

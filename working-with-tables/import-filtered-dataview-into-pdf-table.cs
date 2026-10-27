@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,52 +8,55 @@ class Program
 {
     static void Main()
     {
-        // Prepare sample data in a DataTable
-        DataTable dt = new DataTable("Sample");
-        dt.Columns.Add("ID", typeof(int));
-        dt.Columns.Add("Name", typeof(string));
-        dt.Columns.Add("Score", typeof(double));
+        // Prepare sample data
+        DataTable dataTable = new DataTable("Sample");
+        dataTable.Columns.Add("ID", typeof(int));
+        dataTable.Columns.Add("Name", typeof(string));
+        dataTable.Columns.Add("Score", typeof(double));
 
-        dt.Rows.Add(1, "Alice", 85.5);
-        dt.Rows.Add(2, "Bob", 92.0);
-        dt.Rows.Add(3, "Charlie", 78.0);
-        dt.Rows.Add(4, "Diana", 88.5);
-        dt.Rows.Add(5, "Ethan", 91.0);
+        dataTable.Rows.Add(1, "Alice", 85.5);
+        dataTable.Rows.Add(2, "Bob", 92.0);
+        dataTable.Rows.Add(3, "Charlie", 78.0);
+        dataTable.Rows.Add(4, "David", 88.5);
 
-        // Create a DataView with a filter (e.g., Score >= 85)
-        DataView view = new DataView(dt);
-        view.RowFilter = "Score >= 85";
+        // Create a DataView with a filter (only rows with Score >= 80)
+        DataView view = new DataView(dataTable);
+        view.RowFilter = "Score >= 80";
 
-        // Create a new PDF document
+        // Create PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table and set basic appearance
-            Table table = new Table
+            // Create a Table layout element
+            Table table = new Table();
+
+            // Safely obtain row and column counts (null‑guarded)
+            int rowsCount = view?.Count ?? 0;
+            int columnsCount = view?.Table?.Columns?.Count ?? 0;
+
+            if (rowsCount > 0 && columnsCount > 0)
             {
-                // Optional: set column widths (percentage of page width)
-                ColumnWidths = "100 200 100"
-            };
+                // Define column widths before importing data. Using a simple equal width for each column.
+                // This step prevents a NullReferenceException inside ImportDataView.
+                table.ColumnWidths = string.Join(" ", Enumerable.Repeat("100", columnsCount));
 
-            // Import the filtered DataView into the table
-            // Parameters:
-            //   sourceDataView: the DataView to import
-            //   isColumnNamesImported: true to include column headers as first row
-            //   firstFilledRow: 0 (start at first row of the table)
-            //   firstFilledColumn: 0 (start at first column)
-            //   maxRows: view.Count (import all filtered rows)
-            //   maxColumns: view.Table.Columns.Count (import all columns)
-            table.ImportDataView(view, true, 0, 0, view.Count, view.Table.Columns.Count);
+                // Parameters: (DataView view, bool isColumnNamesImported, int startRow, int startColumn, int rowsCount, int columnsCount)
+                table.ImportDataView(view, true, 0, 0, rowsCount, columnsCount);
+            }
+            else
+            {
+                // Optional: add a placeholder row when the view is empty
+                table.ColumnWidths = "100 150 100"; // simple widths for three columns
+                table.Rows.Add(new Row());
+            }
 
-            // Add the table to the page
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save("DataViewTable.pdf");
         }
-
-        Console.WriteLine("PDF with imported DataView table saved as 'DataViewTable.pdf'.");
     }
 }

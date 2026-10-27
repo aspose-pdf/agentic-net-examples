@@ -1,43 +1,52 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace (contains Document, Permissions, CryptoAlgorithm)
+using Aspose.Pdf;
 
-public static class PdfEncryptionHelper
+namespace PdfEncryptionDemo
 {
-    /// <summary>
-    /// Loads a PDF from a byte array, encrypts it with the specified user password,
-    /// and returns the encrypted PDF as a byte array.
-    /// </summary>
-    /// <param name="pdfBytes">Original PDF content.</param>
-    /// <param name="userPassword">Password required to open the PDF.</param>
-    /// <param name="ownerPassword">Owner password (optional, can be empty).</param>
-    /// <returns>Encrypted PDF bytes.</returns>
-    public static byte[] EncryptPdf(byte[] pdfBytes, string userPassword, string ownerPassword = "")
+    public static class PdfEncryptionHelper
     {
-        // Wrap the input bytes in a MemoryStream for Aspose.Pdf to read.
-        using (var inputStream = new MemoryStream(pdfBytes))
+        /// <summary>
+        /// Loads a PDF from a byte array, encrypts it with the specified user password,
+        /// and returns the encrypted PDF as a byte array.
+        /// </summary>
+        /// <param name="pdfBytes">Original PDF content.</param>
+        /// <param name="userPassword">Password required to open the encrypted PDF.</param>
+        /// <returns>Encrypted PDF bytes.</returns>
+        public static byte[] EncryptPdf(byte[] pdfBytes, string userPassword)
         {
-            // Load the PDF directly from the stream using the Document constructor (no Facades).
-            var doc = new Document(inputStream);
+            if (pdfBytes == null) throw new ArgumentNullException(nameof(pdfBytes));
+            if (string.IsNullOrEmpty(userPassword)) throw new ArgumentException("User password must be provided.", nameof(userPassword));
 
-            // Define desired permissions (example: allow printing and content extraction).
-            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
-
-            // Encrypt the document using the recommended CryptoAlgorithm (AES‑256).
-            doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
-
-            // Save the encrypted document to a new MemoryStream.
-            using (var outputStream = new MemoryStream())
+            // Load the PDF from the input byte array.
+            using (MemoryStream inputStream = new MemoryStream(pdfBytes))
+            using (Document document = new Document(inputStream))
             {
-                doc.Save(outputStream);          // Save to stream (preserves PDF format).
-                return outputStream.ToArray();   // Return the encrypted bytes.
+                // Define permissions (example: allow printing and content extraction).
+                Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Owner password can be empty or a separate strong password.
+                string ownerPassword = "";
+
+                // Encrypt using AES‑256 (recommended).
+                document.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted document to a memory stream and return its bytes.
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    document.Save(outputStream);
+                    return outputStream.ToArray();
+                }
             }
         }
     }
 
-    // Dummy entry point to satisfy the compiler when this file is compiled as a console app.
-    public static void Main()
+    internal class Program
     {
-        // No operation – the class is intended to be used as a library.
+        private static void Main(string[] args)
+        {
+            // Placeholder entry point to satisfy the compiler.
+            // Real usage would call PdfEncryptionHelper.EncryptPdf with appropriate arguments.
+        }
     }
 }

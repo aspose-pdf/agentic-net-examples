@@ -1,78 +1,58 @@
 using System;
+using System.IO;
 using System.Xml;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;          // needed for the Form facade
-using Aspose.Pdf.Forms;            // needed for TextBoxField and other field types
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the temporary files used in this self‑contained example.
         const string pdfTemplatePath = "template.pdf";
-        const string outputPdfPath    = "filled.pdf";
+        const string xmlDataPath = "data.xml";
+        const string outputPdfPath = "filled.pdf";
 
-        // ---------------------------------------------------------------------
-        // 1. Create a sample PDF that contains the required AcroForm fields.
-        // ---------------------------------------------------------------------
-        using (Document seedDoc = new Document())
+        if (!File.Exists(pdfTemplatePath))
         {
-            // Add a page.
-            Page page = seedDoc.Pages.Add();
-
-            // Create a text box for "FirstName".
-            TextBoxField firstNameField = new TextBoxField(page, new Rectangle(100, 700, 200, 720))
-            {
-                PartialName = "FirstName",
-                Value = string.Empty
-            };
-            seedDoc.Form.Add(firstNameField, 1);
-
-            // Create a text box for "LastName".
-            TextBoxField lastNameField = new TextBoxField(page, new Rectangle(100, 650, 200, 670))
-            {
-                PartialName = "LastName",
-                Value = string.Empty
-            };
-            seedDoc.Form.Add(lastNameField, 1);
-
-            // Save the template PDF that will later be filled.
-            seedDoc.Save(pdfTemplatePath);
+            Console.Error.WriteLine($"PDF template not found: {pdfTemplatePath}");
+            return;
         }
 
-        // ---------------------------------------------------------------------
-        // 2. Prepare the XML data (in‑memory – no external file required).
-        // ---------------------------------------------------------------------
-        string xmlContent = @"<Root><FirstName>John</FirstName><LastName>Doe</LastName></Root>";
+        if (!File.Exists(xmlDataPath))
+        {
+            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
+            return;
+        }
+
+        // Load the XML document once
         XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.LoadXml(xmlContent);
+        xmlDoc.Load(xmlDataPath);
 
-        // Helper function to extract a value using an XPath expression.
-        string GetValue(string xpath)
+        // Use the Form facade (implements IDisposable) to work with AcroForm fields
+        using (Form form = new Form())
         {
-            XmlNode node = xmlDoc.SelectSingleNode(xpath);
-            return node?.InnerText ?? string.Empty;
-        }
+            // Bind the PDF that contains the form fields
+            form.BindPdf(pdfTemplatePath);
 
-        // Extract the values for the form fields.
-        string firstName = GetValue("//FirstName");
-        string lastName  = GetValue("//LastName");
+            // Retrieve all field names present in the PDF via the FieldNames property
+            string[] fieldNames = form.FieldNames;
 
-        // ---------------------------------------------------------------------
-        // 3. Fill the AcroForm fields using the Form facade (new API).
-        // ---------------------------------------------------------------------
-        // NOTE: Both Aspose.Pdf.Facades and Aspose.Pdf.Forms contain a type named "Form".
-        // To avoid the CS0104 ambiguous‑reference error we fully qualify the facade class.
-        using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfTemplatePath))
-        {
-            // Populate the fields.
-            form.FillField("FirstName", firstName);
-            form.FillField("LastName",  lastName);
+            foreach (string fieldName in fieldNames)
+            {
+                // Locate the corresponding XML node using XPath.
+                // This example assumes XML elements are named exactly like the PDF fields.
+                XmlNode node = xmlDoc.SelectSingleNode($"//*[local-name()='{fieldName}']");
 
-            // Save the filled PDF to the desired output path.
+                if (node != null)
+                {
+                    // Fill the PDF field with the text from the XML node
+                    form.FillField(fieldName, node.InnerText);
+                }
+            }
+
+            // Save the populated PDF
             form.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form fields have been populated and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"AcroForm fields populated and saved to '{outputPdfPath}'.");
     }
 }

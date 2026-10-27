@@ -2,53 +2,54 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Sample data class that matches the PDF form field names
+    // Sample data class to be serialized to JSON
     public class FormData
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public bool SubscribeNewsletter { get; set; }
-        public int Age { get; set; }
+        // Mark properties as required to satisfy non‑nullable warnings
+        public required string Name { get; set; }
+        public required int Age { get; set; }
+        public required string Email { get; set; }
     }
 
     static void Main()
     {
-        const string inputPdfPath  = "form_template.pdf";   // source PDF with AcroForm fields
-        const string outputPdfPath = "form_filled.pdf";     // destination PDF after import
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Create an instance of the data object and populate it
-        var data = new FormData
+        // Create an instance of the data to import
+        FormData data = new FormData
         {
-            FirstName = "John",
-            LastName = "Doe",
-            SubscribeNewsletter = true,
-            Age = 30
+            Name = "John Doe",
+            Age = 30,
+            Email = "john.doe@example.com"
         };
 
-        // Serialize the object to JSON (UTF‑8) and write it into a memory stream
-        byte[] jsonBytes = JsonSerializer.SerializeToUtf8Bytes(data, new JsonSerializerOptions { WriteIndented = true });
-        using (var jsonStream = new MemoryStream(jsonBytes))
-        {
-            // Initialize the Form facade with source and destination PDF files
-            using (var form = new Aspose.Pdf.Facades.Form(inputPdfPath, outputPdfPath))
-            {
-                // Import the JSON data into the PDF form fields
-                form.ImportJson(jsonStream);
+        // Serialize the object to JSON
+        string jsonString = JsonSerializer.Serialize(data);
+        byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 
-                // Save the modified PDF (the destination file was specified in the constructor)
-                form.Save();
-            }
+        // Wrap the JSON bytes in a memory stream and import via the Facade Form
+        using (MemoryStream jsonStream = new MemoryStream(jsonBytes))
+        using (Document pdfDoc = new Document(inputPdfPath))
+        // Fully‑qualify the Form class to avoid ambiguity with Aspose.Pdf.Forms.Form
+        using (Aspose.Pdf.Facades.Form form = new Aspose.Pdf.Facades.Form(pdfDoc))
+        {
+            // Correct API call – ImportJson expects a Stream
+            form.ImportJson(jsonStream);
+
+            // Save the modified PDF using the facade
+            form.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");

@@ -2,44 +2,48 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "OutputImages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load PDF document within a using block (lifecycle rule)
-        using (Document pdfDocument = new Document(inputPath))
+        try
         {
-            // Create a resolution of 200 DPI
-            Resolution resolution = new Resolution(200);
-            // Initialize BmpDevice with the specified resolution
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-            // Default CoordinateType uses CropBox, no need to change
-
-            // Convert each page to a BMP file
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
-                using (FileStream bmpStream = new FileStream(outPath, FileMode.Create))
+                // 200 DPI resolution – the Resolution struct lives in Aspose.Pdf.Devices
+                var resolution = new Resolution(200);
+                // BmpDevice does NOT implement IDisposable, so instantiate it without a using block
+                var bmpDevice = new BmpDevice(resolution);
+
+                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
                 {
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], bmpStream);
+                    string outPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
+                    // Save the page directly to a BMP file
+                    using (FileStream imageStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        bmpDevice.Process(doc.Pages[pageNumber], imageStream);
+                    }
                 }
             }
-        }
 
-        Console.WriteLine("PDF to BMP conversion completed.");
+            Console.WriteLine("PDF successfully converted to BMP images.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

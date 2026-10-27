@@ -1,51 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // PdfFileEditor resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Splits the input PDF stream from page 1 to the specified endPage (inclusive)
+    // and returns a new MemoryStream containing the resulting PDF.
+    static MemoryStream SplitPdf(Stream inputPdfStream, int endPage)
+    {
+        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
+        if (endPage < 1) throw new ArgumentOutOfRangeException(nameof(endPage), "End page must be >= 1.");
+
+        // PdfFileEditor does NOT implement IDisposable; instantiate directly.
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Output stream will receive the extracted pages.
+        MemoryStream outputStream = new MemoryStream();
+
+        // Use the stream‑based overload of SplitFromFirst to extract pages 1..endPage.
+        // The method returns a bool indicating success; we ignore it here but could check.
+        editor.SplitFromFirst(inputPdfStream, endPage, outputStream);
+
+        // Reset position so the caller can read from the beginning.
+        outputStream.Position = 0;
+        return outputStream;
+    }
+
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath  = "input.pdf";
-        // Output PDF file path (front part up to endPage)
-        const string outputPath = "output.pdf";
-        // Page number up to which the PDF will be split (inclusive)
-        const int endPage = 5; // example: split first 5 pages
+        const string inputPath = "input.pdf";      // source PDF file
+        const string outputPath = "split_output.pdf"; // destination for the split PDF
+        const int endPage = 5;                     // split up to this page (inclusive)
 
-        // Validate input file existence
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Open the source PDF as a read‑only stream.
+        using (FileStream sourceStream = File.OpenRead(inputPath))
         {
-            // Open input and output streams. Using statements ensure proper disposal.
-            using (FileStream inputStream  = new FileStream(inputPath,  FileMode.Open,  FileAccess.Read))
-            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // Perform the in‑memory split.
+            using (MemoryStream splitStream = SplitPdf(sourceStream, endPage))
             {
-                // PdfFileEditor provides the SplitFromFirst method for stream‑based splitting.
-                Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
-
-                // Perform the split. The method returns true on success.
-                bool success = editor.SplitFromFirst(inputStream, endPage, outputStream);
-
-                if (success)
+                // Write the resulting PDF to a file (or further process the stream).
+                using (FileStream destStream = File.Create(outputPath))
                 {
-                    Console.WriteLine($"Successfully split first {endPage} pages to '{outputPath}'.");
-                }
-                else
-                {
-                    Console.Error.WriteLine("Split operation failed.");
+                    splitStream.CopyTo(destStream);
                 }
             }
         }
-        catch (Exception ex)
-        {
-            // Catch any unexpected errors (e.g., I/O issues, corrupted PDF, etc.)
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF split completed. Pages 1‑{endPage} saved to '{outputPath}'.");
     }
 }

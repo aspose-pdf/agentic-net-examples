@@ -6,49 +6,44 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and image file paths
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string imagePath     = "stamp.png";
+        const string inputPath = "input.pdf";
+        const string stampPath = "stamp.png";
+        const string outputPath = "stamped_output.pdf";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(imagePath);
-
-            // Set fixed dimensions (in points) that do not depend on page size
-            imgStamp.Width  = 150; // fixed width
-            imgStamp.Height = 100; // fixed height
-
-            // Optional: position the stamp at a fixed location on each page
-            // Here we set the lower‑left corner 50 points from the left and 50 points from the bottom
-            imgStamp.XIndent = 50;
-            imgStamp.YIndent = 50;
-
-            // Apply the stamp to every page in the document
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++) // 1‑based indexing
+            // Create an ImageStamp with fixed dimensions (points)
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                Page page = pdfDoc.Pages[pageNum];
+                Width = 200,          // Fixed width regardless of page size
+                Height = 100,         // Fixed height regardless of page size
+                LeftMargin = 50,      // Fixed horizontal offset from the left edge
+                BottomMargin = 50,    // Fixed vertical offset from the bottom edge
+                Background = false    // Place stamp on top of existing content
+            };
+
+            // Apply the same stamp to each page individually
+            foreach (Page page in pdfDocument.Pages)
+            {
                 page.AddStamp(imgStamp);
             }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp applied with fixed size. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

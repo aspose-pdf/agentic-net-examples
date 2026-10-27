@@ -6,32 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Ensure the input PDF exists; create a minimal placeholder if it does not.
-        if (!File.Exists(inputPath))
+        // Create a simple PDF in memory (self‑contained example)
+        using (var initialDoc = new Document())
         {
-            using (var placeholder = new Document())
+            // Add a blank page so the PDF is not empty
+            initialDoc.Pages.Add();
+
+            // Save the document to a MemoryStream
+            using (var tempStream = new MemoryStream())
             {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
+                initialDoc.Save(tempStream);
+                // Reset the stream position before reading it back
+                tempStream.Position = 0;
+
+                // Load PDF from the MemoryStream
+                using (var doc = new Document(tempStream))
+                {
+                    // Change the PDF version to 1.4 using Document.Convert
+                    string logPath = "conversion_log.xml"; // optional conversion log
+                    doc.Convert(logPath, PdfFormat.v_1_4, ConvertErrorAction.Delete);
+
+                    // Save the modified PDF to the file system
+                    doc.Save("output.pdf");
+                }
             }
         }
 
-        // Load PDF bytes into a memory stream.
-        byte[] pdfBytes = File.ReadAllBytes(inputPath);
-        using (var memoryStream = new MemoryStream(pdfBytes))
-        {
-            // Load the document from the stream.
-            using (var pdfDoc = new Document(memoryStream))
-            {
-                // Change the PDF version to 1.4 using Convert (Document.Version is read‑only).
-                pdfDoc.Convert("conversion_log.xml", PdfFormat.v_1_4, ConvertErrorAction.Delete);
-
-                // Save the modified PDF to the file system.
-                pdfDoc.Save(outputPath);
-            }
-        }
+        Console.WriteLine("PDF saved with version 1.4.");
     }
 }

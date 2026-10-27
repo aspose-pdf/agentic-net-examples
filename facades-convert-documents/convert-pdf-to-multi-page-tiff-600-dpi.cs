@@ -2,45 +2,43 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // needed for Resolution
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.tiff";
+        const string inputPdfPath = "input.pdf";
+        const string outputTiffPath = "output.tiff";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // PdfConverter implements IDisposable, so wrap it in a using block
             using (PdfConverter converter = new PdfConverter())
             {
-                // Set the desired resolution (600 DPI) for detailed graphics extraction.
-                // PdfConverter.Resolution expects an Aspose.Pdf.Devices.Resolution object.
+                // Load the PDF document.
+                converter.BindPdf(inputPdfPath);
+
+                // Set the desired resolution (600 DPI) using a Resolution object.
                 converter.Resolution = new Resolution(600);
 
-                // Bind the source PDF file to the converter
-                converter.BindPdf(inputPath);
-
-                // Initialize conversion process
+                // Convert the entire document.
                 converter.DoConvert();
 
-                // Convert all pages to a single multi‑page TIFF file
-                converter.SaveAsTIFF(outputPath);
+                // Save as a multi‑page TIFF.
+                converter.SaveAsTIFF(outputTiffPath);
             }
 
-            Console.WriteLine($"TIFF image saved to '{outputPath}'.");
+            Console.WriteLine($"PDF successfully converted to TIFF at 600 DPI: {outputTiffPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

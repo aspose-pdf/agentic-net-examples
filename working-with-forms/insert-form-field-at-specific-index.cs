@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -7,8 +8,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const int insertIndex = 2; // zero‑based position in the Fields collection
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +18,38 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Define the page where the new field will be placed (1‑based index)
-            int targetPageNumber = 1;
-
-            // Define the rectangle (llx, lly, urx, ury) for the field on the target page
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a new text box form field
-            TextBoxField textField = new TextBoxField(doc.Pages[targetPageNumber], fieldRect)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                PartialName = "MyTextField",   // field name
-                Value       = "Default text"   // initial value
-            };
+                // The Form object is obtained from the document; it is never null for a valid PDF.
+                Form form = doc.Form;
 
-            // Add the field to the form at the specified page.
-            // This respects the ordered layout of form fields on that page.
-            doc.Form.Add(textField, targetPageNumber);
+                // Create a new text box form field on the first page
+                TextBoxField txtField = new TextBoxField(
+                    doc.Pages[1],
+                    new Aspose.Pdf.Rectangle(100, 600, 300, 620))
+                {
+                    PartialName = "NewField",
+                    Value = "Default"
+                };
 
-            // Save the modified document (lifecycle rule: save inside using block)
-            doc.Save(outputPath);
+                // Insert the new field at the desired index using the mutable collection returned by Form.Fields
+                // Form.Fields implements IList<Field>, so we can use Insert.
+                IList<Field> fields = form.Fields;
+                int index = Math.Max(0, Math.Min(insertIndex, fields.Count));
+                fields.Insert(index, txtField);
+
+                // Save the modified document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Form field inserted and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Form field inserted and document saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

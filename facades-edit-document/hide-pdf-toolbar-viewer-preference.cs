@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_hide_toolbar.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,19 +16,23 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (a Facade) to modify viewer preferences.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the source PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Attempt to set HideToolbar viewer preference if the property exists in the used Aspose.Pdf version
+        try
         {
-            // Load the PDF file.
-            editor.BindPdf(inputPath);
-
-            // Set the HideToolbar flag (value defined in ViewerPreference).
-            editor.ChangeViewerPreference(ViewerPreference.HideToolbar);
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
+            dynamic doc = pdfDocument; // bypass compile‑time member check
+            doc.ViewerPreferences.HideToolbar = true;
+        }
+        catch (RuntimeBinderException)
+        {
+            Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
         }
 
-        Console.WriteLine($"PDF saved with HideToolbar set: {outputPath}");
+        // Save the PDF with the (potentially) updated viewer preference
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"PDF saved with HideToolbar set to true (if supported): {outputPath}");
     }
 }

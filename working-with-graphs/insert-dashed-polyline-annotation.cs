@@ -1,68 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "polyline_dashed.pdf";
+        const string outputPath = "polyline_graph.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure proper disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Define a graph that covers the whole page (width, height)
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Define the annotation rectangle (position and size on the page)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
-
-            // Define the polyline vertices (points are in page coordinate space)
-            Aspose.Pdf.Point[] vertices = new Aspose.Pdf.Point[]
+            // Define the vertices of the polyline
+            Point[] vertices = new Point[]
             {
-                new Aspose.Pdf.Point(120, 520),
-                new Aspose.Pdf.Point(200, 600),
-                new Aspose.Pdf.Point(300, 550),
-                new Aspose.Pdf.Point(380, 720)
+                new Point(100, 700),
+                new Point(200, 600),
+                new Point(300, 650),
+                new Point(400, 550)
             };
 
-            // Create the polyline annotation
-            PolylineAnnotation polyline = new PolylineAnnotation(page, rect, vertices)
+            // Create a line for each consecutive pair of vertices
+            for (int i = 0; i < vertices.Length - 1; i++)
             {
-                // Optional: set the annotation color
-                Color = Aspose.Pdf.Color.Blue,
-                // Optional: add a popup text
-                Contents = "Dashed polyline annotation"
-            };
+                float[] lineCoords = new float[]
+                {
+                    (float)vertices[i].X, (float)vertices[i].Y,
+                    (float)vertices[i + 1].X, (float)vertices[i + 1].Y
+                };
 
-            // Create a Border object – it requires the parent annotation in the constructor
-            Border border = new Border(polyline)
-            {
-                // Set border width (thickness)
-                Width = 2,
-                // Apply a dashed pattern: 3 units on, 2 units off
-                Dash = new Dash(3, 2)
-            };
+                Line line = new Line(lineCoords);
+                line.GraphInfo = new GraphInfo
+                {
+                    Color = Color.Black,
+                    LineWidth = 2,
+                    DashArray = new int[] { 5, 3 } // 5 units dash, 3 units gap
+                };
 
-            // Assign the border to the annotation
-            polyline.Border = border;
+                graph.Shapes.Add(line);
+            }
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(polyline);
+            // Add the graph (which now contains the polyline) to the page
+            page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Polyline with dashed style saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with polyline saved to '{outputPath}'.");
     }
 }

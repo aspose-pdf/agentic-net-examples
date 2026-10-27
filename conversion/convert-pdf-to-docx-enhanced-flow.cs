@@ -1,43 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, DocSaveOptions)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath  = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.docx";
 
-        // Output DOCX file path
-        const string outputDocxPath = "output.docx";
-
-        // Verify that the source file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, configure conversion options, and save as DOCX
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Configure DOCX save options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Use the enhanced flow mode which supports complex tables and graphics
-                Mode = DocSaveOptions.RecognitionMode.EnhancedFlow,
+                // Configure DOCX save options. Enhanced recognition mode for complex tables/graphics
+                // is the default behavior.
+                var saveOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.DocX
+                };
 
-                // Optional: preserve the original layout as much as possible
-                // (you can adjust other properties here if needed)
-                // Example: enable bullet recognition
-                RecognizeBullets = true
-            };
+                // Save the PDF as DOCX using the configured options.
+                pdfDoc.Save(outputPath, saveOptions);
+            }
 
-            // Save the document as DOCX using the specified options
-            pdfDocument.Save(outputDocxPath, saveOptions);
+            Console.WriteLine($"Conversion completed: '{outputPath}'");
         }
-
-        Console.WriteLine($"Conversion completed: '{outputDocxPath}'");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

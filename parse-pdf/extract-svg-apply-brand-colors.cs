@@ -1,15 +1,15 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
-using Aspose.Pdf.Vector;
+using System.IO;
+using Aspose.Pdf; // Save options like SvgSaveOptions are in this namespace
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputDir    = "ExtractedSvg";
+        const string tempSvgPath = "temp.svg";
+        const string outputSvgPath = "brand_palette.svg";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -17,43 +17,43 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document (wrapped in using for deterministic disposal)
+        // 1. Load the PDF inside a using block (lifecycle rule)
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
-            {
-                Page page = pdfDoc.Pages[pageIndex];
-
-                // Extract vector graphics as SVG strings using SvgExtractor
-                SvgExtractor extractor = new SvgExtractor();
-                List<string> svgContents = extractor.Extract(page);
-
-                // Process each extracted SVG
-                for (int svgIndex = 0; svgIndex < svgContents.Count; svgIndex++)
-                {
-                    string originalSvg = svgContents[svgIndex];
-
-                    // ---- Brand colour transformation ----
-                    // Example: replace black fill/stroke colours with a brand colour.
-                    // Adjust the search/replace patterns to match the actual SVG colour definitions.
-                    string transformedSvg = originalSvg
-                        .Replace("#000000", "#FF5733")   // black → brand orange
-                        .Replace("rgb(0,0,0)", "rgb(255,87,51)"); // alternative format
-
-                    // Determine a unique file name for the transformed SVG
-                    string svgFileName = $"page_{pageIndex}_graphic_{svgIndex + 1}.svg";
-                    string svgFilePath = Path.Combine(outputDir, svgFileName);
-
-                    // Save the transformed SVG to disk
-                    File.WriteAllText(svgFilePath, transformedSvg);
-                }
-            }
+            // 2. Save the PDF as SVG using explicit SvgSaveOptions (save-to-non-pdf rule)
+            var svgOptions = new SvgSaveOptions();
+            pdfDoc.Save(tempSvgPath, svgOptions);
         }
 
-        Console.WriteLine($"Vector graphics extracted and colour‑transformed SVGs saved to '{outputDir}'.");
+        // 3. Load the generated SVG text
+        string svgContent = File.ReadAllText(tempSvgPath);
+
+        // 4. Define brand palette color replacements (old HEX -> new HEX)
+        var colorMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "#000000", "#1A73E8" }, // black → brand blue
+            { "#FFFFFF", "#F1F3F4" }, // white → light gray
+            { "#FF0000", "#EA4335" }  // red   → brand red
+            // Add more mappings as needed
+        };
+
+        // 5. Perform simple string replacements for each color entry
+        foreach (var kvp in colorMap)
+        {
+            // Replace both uppercase and lowercase occurrences
+            svgContent = svgContent.Replace(kvp.Key, kvp.Value);
+            // Also replace the lowercase version if the source uses it
+            string lowerKey = kvp.Key.ToLowerInvariant();
+            string lowerVal = kvp.Value.ToLowerInvariant();
+            svgContent = svgContent.Replace(lowerKey, lowerVal);
+        }
+
+        // 6. Write the transformed SVG to the final output file
+        File.WriteAllText(outputSvgPath, svgContent);
+
+        // 7. Clean up the temporary SVG file
+        try { File.Delete(tempSvgPath); } catch { /* ignore cleanup errors */ }
+
+        Console.WriteLine($"SVG with brand palette saved to '{outputSvgPath}'.");
     }
 }

@@ -1,48 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string metadataOutput = "metadata.txt";
-        const string svgOutput = "output.svg";
+        const string inputPath = "input.pdf";
+        const string outputDir = "VectorPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPdf))
+        Directory.CreateDirectory(outputDir);
+
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Retrieve basic metadata (author, title, subject, keywords, creation date).
-            string author = doc.Info.Author ?? string.Empty;
-            string title = doc.Info.Title ?? string.Empty;
-            string subject = doc.Info.Subject ?? string.Empty;
-            string keywords = doc.Info.Keywords ?? string.Empty;
-            // CreationDate is a non‑nullable DateTime; format it directly.
-            string created = doc.Info.CreationDate.ToString("u");
+            // Retrieve basic metadata
+            string author = doc.Info.Author;
+            string title  = doc.Info.Title;
 
-            // Write metadata to a simple text file for documentation.
-            File.WriteAllText(metadataOutput,
-                $"Title   : {title}{Environment.NewLine}" +
-                $"Author  : {author}{Environment.NewLine}" +
-                $"Subject : {subject}{Environment.NewLine}" +
-                $"Keywords: {keywords}{Environment.NewLine}" +
-                $"Created : {created}{Environment.NewLine}");
+            Console.WriteLine($"Author: {author}");
+            Console.WriteLine($"Title : {title}");
 
-            Console.WriteLine($"Metadata written to '{metadataOutput}'.");
+            // Extract each page as an SVG file (vector representation)
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            {
+                string svgPath = Path.Combine(outputDir, $"Page_{i}.svg");
+                SvgSaveOptions svgOptions = new SvgSaveOptions(); // all SaveOptions are in Aspose.Pdf namespace
 
-            // Extract vector representation by saving the PDF as SVG.
-            // No additional raster‑image options are set because the property
-            // does not exist in the current Aspose.Pdf version.
-            var svgOptions = new SvgSaveOptions();
-            doc.Save(svgOutput, svgOptions);
-            Console.WriteLine($"Vector data saved as SVG to '{svgOutput}'.");
+                // Create a temporary single‑page document to save only the current page
+                using (Document singlePageDoc = new Document())
+                {
+                    singlePageDoc.Pages.Add(doc.Pages[i]);
+                    singlePageDoc.Save(svgPath, svgOptions);
+                }
+
+                Console.WriteLine($"Saved vector page {i} to '{svgPath}'.");
+            }
         }
     }
 }

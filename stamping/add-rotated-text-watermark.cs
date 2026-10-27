@@ -16,22 +16,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp with the desired watermark text
+            // Create a text stamp that will serve as the watermark
             TextStamp stamp = new TextStamp("CONFIDENTIAL");
 
-            // Rotate the stamp 30 degrees to achieve a slanted watermark
-            stamp.RotateAngle = 30;
-
-            // Optional visual settings for better appearance
-            stamp.Opacity = 0.3; // semi‑transparent
+            // Configure appearance
             stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment = VerticalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+            stamp.RotateAngle = 30f;               // rotate 30 degrees for slanted effect
+            stamp.Opacity = 0.3f;                  // make it semi‑transparent
+
+            // Configure text style via the existing TextState instance
             stamp.TextState.FontSize = 72;
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+            stamp.TextState.FontStyle = FontStyles.Bold;
+            stamp.TextState.ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)

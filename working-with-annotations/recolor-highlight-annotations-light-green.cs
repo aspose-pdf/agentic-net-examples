@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "highlighted_green.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Iterate through all annotations on the page (1‑based indexing)
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                // Iterate over all annotations on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[j];
-
-                    // Process only HighlightAnnotation instances
-                    if (ann is HighlightAnnotation highlight)
+                    // Process only highlight annotations
+                    if (annot is HighlightAnnotation highlight)
                     {
-                        // Change the annotation color to LightGreen
+                        // Set the highlight color to light green (cross‑platform Aspose.Pdf.Color)
                         highlight.Color = Aspose.Pdf.Color.LightGreen;
                     }
                 }
@@ -42,6 +40,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All highlight annotations recolored and saved to '{outputPath}'.");
+        Console.WriteLine($"All highlight annotations recolored to light green and saved to '{outputPath}'.");
     }
 }

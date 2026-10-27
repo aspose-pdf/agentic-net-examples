@@ -1,13 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened_first5.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,42 @@ class Program
             return;
         }
 
-        // Use PdfAnnotationEditor (Facade) to manipulate annotations.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the source PDF
+        Document srcDoc = new Document(inputPath);
+
+        // ---------------------------------------------------------------------
+        // 1. Extract the first five pages (or fewer if the document is shorter)
+        // ---------------------------------------------------------------------
+        Document firstPart = new Document();
+        int maxPage = Math.Min(5, srcDoc.Pages.Count);
+        for (int i = 1; i <= maxPage; i++)
         {
-            // Load the PDF document.
-            editor.BindPdf(inputPath);
-
-            // Get all possible annotation types.
-            AnnotationType[] allTypes = (AnnotationType[])Enum.GetValues(typeof(AnnotationType));
-
-            // Flatten annotations on pages 1 through 5 for all annotation types.
-            editor.FlatteningAnnotations(1, 5, allTypes);
-
-            // Save the resulting PDF.
-            editor.Save(outputPath);
+            firstPart.Pages.Add(srcDoc.Pages[i]);
         }
 
-        Console.WriteLine($"Annotations on the first five pages have been flattened and saved to '{outputPath}'.");
+        // ---------------------------------------------------------------
+        // 2. Flatten annotations on the extracted pages using PdfAnnotationEditor
+        // ---------------------------------------------------------------
+        using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
+        {
+            annotEditor.BindPdf(firstPart);          // bind the Document instance
+            annotEditor.FlatteningAnnotations();     // correct method name
+        }
+
+        // ---------------------------------------------------------------
+        // 3. Build the final document: flattened first part + remaining pages unchanged
+        // ---------------------------------------------------------------
+        Document result = new Document();
+        result.Pages.Add(firstPart.Pages); // add the flattened first‑five pages
+
+        // Append the rest of the original document (if any)
+        for (int i = maxPage + 1; i <= srcDoc.Pages.Count; i++)
+        {
+            result.Pages.Add(srcDoc.Pages[i]);
+        }
+
+        // Save the combined PDF
+        result.Save(outputPath);
+        Console.WriteLine($"Annotations on pages 1‑{maxPage} have been flattened. Output saved to '{outputPath}'.");
     }
 }

@@ -7,53 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string inputXmlPath  = "pagesize.xml";
-        const string outputPdfPath = "output.pdf";
+        const string xmlPath = "pagesize.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify that the XML source exists
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        if (!File.Exists(inputXmlPath))
-        {
-            Console.Error.WriteLine($"XML not found: {inputXmlPath}");
-            return;
-        }
-
-        // Load page size values from the XML file.
+        // Load the XML and read width/height values (in points)
+        XDocument xdoc = XDocument.Load(xmlPath);
         // Expected XML format:
         // <PageSize>
         //     <Width>595</Width>
         //     <Height>842</Height>
         // </PageSize>
-        XDocument xmlDoc = XDocument.Load(inputXmlPath);
-        XElement sizeElem = xmlDoc.Root;
-        double width  = double.Parse(sizeElem.Element("Width")?.Value ?? "0");
-        double height = double.Parse(sizeElem.Element("Height")?.Value ?? "0");
+        double width = (double?)xdoc.Root.Element("Width") ?? 595;   // default A4 width
+        double height = (double?)xdoc.Root.Element("Height") ?? 842; // default A4 height
 
-        if (width <= 0 || height <= 0)
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine("Invalid page size values in XML.");
-            return;
+            // Add a blank page (first page is at index 1)
+            Page page = doc.Pages.Add();
+
+            // Apply the size extracted from the XML
+            page.SetPageSize(width, height);
+
+            // Example content (optional)
+            // TextFragment tf = new TextFragment($"Page size: {width} x {height}");
+            // page.Paragraphs.Add(tf);
+
+            // Save the PDF
+            doc.Save(outputPdf);
         }
 
-        // Load the PDF, adjust each page size, and save.
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Aspose.Pdf uses 1‑based page indexing.
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
-            {
-                Page page = pdfDoc.Pages[i];
-                // Set the page size using the SetPageSize method.
-                page.SetPageSize(width, height);
-            }
-
-            pdfDoc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"Page size set to {width}x{height} and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF created with page size {width}x{height} points at '{outputPdf}'.");
     }
 }

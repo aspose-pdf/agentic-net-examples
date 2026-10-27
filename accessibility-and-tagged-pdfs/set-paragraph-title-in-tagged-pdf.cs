@@ -8,44 +8,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_paragraph_title.pdf";
+        const string outputPath = "paragraph_title.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Access the tagged content interface to enable accessibility features
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");                     // Set document language
+            tagged.SetTitle("Document with Paragraph Title"); // Set document title
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the tagged content API
-            ITaggedContent taggedContent = doc.TaggedContent;
+            // The root of the structure tree (no cast needed)
+            StructureElement root = tagged.RootElement;
 
-            // Optionally set document language and title (metadata)
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Create a paragraph structure element via the ITaggedContent factory
+            ParagraphElement paragraph = tagged.CreateParagraphElement();
+            paragraph.SetText("This paragraph has a title attribute for accessibility."); // Set visible text
 
-            // Get the root structure element (no cast needed)
-            StructureElement root = taggedContent.RootElement;
+            // Set the Title property on the paragraph to provide a concise summary
+            paragraph.Title = "Summary of paragraph content";
 
-            // Create a new paragraph structure element
-            ParagraphElement paragraph = taggedContent.CreateParagraphElement();
-
-            // Set the visible text of the paragraph
-            paragraph.SetText("This paragraph provides a concise summary of the document.");
-
-            // Set the Title property on the paragraph (used for accessibility)
-            paragraph.Title = "Summary Paragraph";
-
-            // Append the paragraph to the root element
+            // Attach the paragraph to the root element
             root.AppendChild(paragraph);
 
-            // Save the modified PDF
+            // Save the PDF; no PreSave() call is required
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with paragraph title to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

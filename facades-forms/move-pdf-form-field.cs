@@ -1,46 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            // FormEditor is a disposable facade; wrap it in a using block.
-            using (FormEditor formEditor = new FormEditor())
+            // Retrieve the form field and cast it to Aspose.Pdf.Forms.Field
+            Field? field = doc.Form["DateField"] as Field;
+            if (field == null)
             {
-                // Bind the source PDF.
-                formEditor.BindPdf(inputPath);
-
-                // Move the field named "DateField" to (100,200) with width 150 and height 20.
-                // llx = 100, lly = 200, urx = 250 (100 + 150), ury = 220 (200 + 20)
-                bool moved = formEditor.MoveField("DateField", 100f, 200f, 250f, 220f);
-
-                if (!moved)
-                {
-                    Console.Error.WriteLine("Failed to move the field 'DateField'.");
-                }
-
-                // Save the modified PDF.
-                formEditor.Save(outputPath);
+                Console.Error.WriteLine("Field 'DateField' not found or is not a form field.");
+                return;
             }
 
-            Console.WriteLine($"Field moved and PDF saved to '{outputPath}'.");
+            // Define the new rectangle: lower‑left (100,200), upper‑right (250,220)
+            var newRect = new Rectangle(100, 200, 250, 220); // width = 150, height = 20
+
+            // Apply the new rectangle to the field
+            field.Rect = newRect;
+
+            // Move the field to page 2 – use AddFieldAppearance because Field has no PageNumber property
+            doc.Form.AddFieldAppearance(field, 2, newRect);
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Field moved and saved to '{outputPath}'.");
     }
 }

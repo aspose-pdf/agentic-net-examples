@@ -1,47 +1,50 @@
 using System;
 using System.IO;
-using System.Text;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect a single argument: path to the PDF file
-        if (args.Length != 1)
+        // Verify that a PDF path was provided
+        if (args.Length < 1)
         {
-            Console.Error.WriteLine("Usage: PdfTextExtract <pdf-file-path>");
+            Console.Error.WriteLine("Usage: ExtractText <pdf-path>");
             return;
         }
 
         string pdfPath = args[0];
 
+        // Ensure the file exists before attempting to open it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"Error: File not found - {pdfPath}");
             return;
         }
 
-        // Use PdfExtractor (a Facade) to extract text
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Extract text using Unicode encoding (default mode)
-            extractor.ExtractText();
-
-            // Retrieve the extracted text into a memory stream
-            using (MemoryStream ms = new MemoryStream())
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                extractor.GetText(ms);
+                // Create a TextAbsorber to extract text from the document
+                TextAbsorber absorber = new TextAbsorber();
 
-                // Convert the stream bytes to a string (Unicode)
-                string extractedText = Encoding.Unicode.GetString(ms.ToArray());
+                // Optional: configure extraction options (pure text without formatting)
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-                // Output the text to standard output
-                Console.Write(extractedText);
+                // Apply the absorber to all pages
+                doc.Pages.Accept(absorber);
+
+                // Output the extracted text to standard output
+                Console.Write(absorber.Text);
             }
+        }
+        catch (Exception ex)
+        {
+            // Report any unexpected errors
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

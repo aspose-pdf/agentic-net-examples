@@ -6,45 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImg  = "stamp.png";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "stamped_output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(stampImg))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: using block for disposal)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(stampPath))
         {
-            // Create an image stamp (core API)
-            ImageStamp imgStamp = new ImageStamp(stampImg)
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPath))
+        {
+            // Create the image stamp once
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                // Optional visual settings
-                Background = false,
-                Opacity   = 0.5,
+                Background          = false,   // place stamp on top of page content
+                Opacity             = 0.5,     // semi‑transparent
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center
             };
 
             // Apply the stamp to every page using a foreach loop
-            foreach (Page page in doc.Pages)
+            foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (lifecycle rule)
-            doc.Save(outputPdf);
+            // Save the modified PDF while the document is still alive
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp applied to all pages. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied to all pages. Saved as '{outputPath}'.");
     }
 }

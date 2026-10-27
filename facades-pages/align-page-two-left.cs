@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "aligned_page2.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_aligned.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,26 +16,13 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize PdfPageEditor with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Specify that only page 2 should be processed
-                editor.ProcessPages = new int[] { 2 };
+        // Align the content of page 2 to the left using PdfPageEditor
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
+        editor.ProcessPages = new int[] { 2 }; // 1‑based page index
+        editor.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Left;
+        editor.Save(outputPath);
 
-                // Set horizontal alignment to left (explicitly)
-                editor.HorizontalAlignment = HorizontalAlignment.Left;
-
-                // Apply the changes to the document
-                editor.ApplyChanges();
-            }
-
-            // Save the modified document (PDF format)
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Page 2 aligned left and saved to '{outputPath}'.");
+        Console.WriteLine($"Page 2 content left‑aligned and saved to '{outputPath}'.");
     }
 }

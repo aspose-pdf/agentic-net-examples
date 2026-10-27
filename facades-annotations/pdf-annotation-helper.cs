@@ -1,134 +1,139 @@
 using System;
+using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations;
 
 namespace PdfUtilities
 {
     /// <summary>
-    /// Helper class for common annotation operations using Aspose.Pdf.Facades.PdfAnnotationEditor.
+    /// Helper class that encapsulates common annotation operations using Aspose.Pdf.Facades.
+    /// Supports binding a PDF, deleting all annotations, flattening annotations, and saving the result.
     /// </summary>
-    public sealed class PdfAnnotationHelper : IDisposable
+    public class PdfAnnotationHelper : IDisposable
     {
         private readonly PdfAnnotationEditor _editor;
         private bool _isBound;
 
-        /// <summary>
-        /// Initializes a new instance of the helper.
-        /// </summary>
         public PdfAnnotationHelper()
         {
-            // Create the facade; it implements IDisposable.
+            // PdfAnnotationEditor does not implement IDisposable, but we provide a Dispose pattern
+            // in case future resources need cleanup.
             _editor = new PdfAnnotationEditor();
+            _isBound = false;
         }
 
         /// <summary>
         /// Binds the helper to an existing PDF file.
         /// </summary>
-        /// <param name="pdfPath">Path to the source PDF.</param>
+        /// <param name="pdfPath">Full path to the source PDF.</param>
         public void Bind(string pdfPath)
         {
             if (string.IsNullOrWhiteSpace(pdfPath))
-                throw new ArgumentException("PDF path must be a non‑empty string.", nameof(pdfPath));
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException("Source PDF not found.", pdfPath);
 
             _editor.BindPdf(pdfPath);
             _isBound = true;
         }
 
         /// <summary>
-        /// Deletes all annotations in the bound document.
+        /// Deletes all annotations from the bound PDF.
         /// </summary>
         public void DeleteAllAnnotations()
         {
             EnsureBound();
+            // DeleteAnnotations removes every annotation present in the document.
             _editor.DeleteAnnotations();
         }
 
         /// <summary>
-        /// Deletes all annotations of a specific type (e.g., "Text", "Link").
-        /// </summary>
-        /// <param name="annotationType">Annotation type name as defined by Aspose.Pdf.</param>
-        public void DeleteAnnotationsByType(string annotationType)
-        {
-            EnsureBound();
-            if (string.IsNullOrWhiteSpace(annotationType))
-                throw new ArgumentException("Annotation type must be a non‑empty string.", nameof(annotationType));
-
-            _editor.DeleteAnnotations(annotationType);
-        }
-
-        /// <summary>
-        /// Flattens all annotations in the document.
+        /// Flattens all annotations, converting them into regular page content.
         /// </summary>
         public void FlattenAllAnnotations()
         {
             EnsureBound();
+            // Correct method name is FlatteningAnnotations (not FlattenAnnotations).
             _editor.FlatteningAnnotations();
-        }
-
-        /// <summary>
-        /// Flattens annotations of specified types within a page range.
-        /// </summary>
-        /// <param name="startPage">1‑based start page index.</param>
-        /// <param name="endPage">1‑based end page index.</param>
-        /// <param name="types">Array of annotation types to flatten.</param>
-        public void FlattenAnnotations(int startPage, int endPage, Aspose.Pdf.Annotations.AnnotationType[] types)
-        {
-            EnsureBound();
-            if (types == null || types.Length == 0)
-                throw new ArgumentException("At least one annotation type must be provided.", nameof(types));
-
-            // Aspose.Pdf uses 1‑based page indexing.
-            if (startPage < 1 || endPage < startPage)
-                throw new ArgumentOutOfRangeException(nameof(startPage), "Invalid page range.");
-
-            _editor.FlatteningAnnotations(startPage, endPage, types);
         }
 
         /// <summary>
         /// Saves the modified PDF to the specified output path.
         /// </summary>
-        /// <param name="outputPath">Path where the PDF will be saved.</param>
+        /// <param name="outputPath">Full path where the PDF will be saved.</param>
         public void Save(string outputPath)
         {
             EnsureBound();
-            if (string.IsNullOrWhiteSpace(outputPath))
-                throw new ArgumentException("Output path must be a non‑empty string.", nameof(outputPath));
 
-            // PdfAnnotationEditor inherits SaveableFacade, so Save(string) writes a PDF.
+            if (string.IsNullOrWhiteSpace(outputPath))
+                throw new ArgumentException("Output path must be provided.", nameof(outputPath));
+
+            // Ensure the directory exists.
+            string directory = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
             _editor.Save(outputPath);
         }
 
         /// <summary>
-        /// Ensures that a PDF has been bound before performing operations.
+        /// Convenience method that performs bind, delete, flatten, and save in one call.
         /// </summary>
+        /// <param name="inputPdf">Path to the source PDF.</param>
+        /// <param name="outputPdf">Path where the processed PDF will be saved.</param>
+        /// <param name="deleteAnnotations">If true, all annotations will be removed.</param>
+        /// <param name="flattenAnnotations">If true, annotations will be flattened.</param>
+        public void Process(string inputPdf, string outputPdf, bool deleteAnnotations = false, bool flattenAnnotations = false)
+        {
+            Bind(inputPdf);
+
+            if (deleteAnnotations)
+                DeleteAllAnnotations();
+
+            if (flattenAnnotations)
+                FlattenAllAnnotations();
+
+            Save(outputPdf);
+        }
+
         private void EnsureBound()
         {
             if (!_isBound)
-                throw new InvalidOperationException("No PDF is bound. Call Bind() first.");
+                throw new InvalidOperationException("No PDF has been bound. Call Bind() before performing operations.");
         }
 
-        /// <summary>
-        /// Disposes the underlying PdfAnnotationEditor.
-        /// </summary>
+        // Implement IDisposable to follow best practices, even though the underlying editor has no unmanaged resources.
         public void Dispose()
         {
-            _editor?.Dispose();
+            // No unmanaged resources to release, but reset state to prevent further use.
+            _isBound = false;
         }
     }
 
-    /// <summary>
-    /// Minimal console entry point required for a C# executable project.
-    /// The library itself does not need to run any code; this stub satisfies the compiler.
-    /// </summary>
+    // A minimal entry point so the project compiles as an executable.
+    // In real usage the helper would be referenced from another project or from a test harness.
     internal static class Program
     {
         private static void Main(string[] args)
         {
-            // Example usage (commented out to keep the stub side‑effect free):
-            // using var helper = new PdfAnnotationHelper();
-            // helper.Bind("input.pdf");
-            // helper.DeleteAllAnnotations();
-            // helper.Save("output.pdf");
+            // Example usage (no real files are required for compilation).
+            // Users of the library should replace the paths with actual PDF locations.
+            try
+            {
+                string input = args.Length > 0 ? args[0] : "input.pdf";
+                string output = args.Length > 1 ? args[1] : "output.pdf";
+
+                using (var helper = new PdfAnnotationHelper())
+                {
+                    helper.Process(input, output, deleteAnnotations: true, flattenAnnotations: true);
+                }
+                Console.WriteLine("Processing completed.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
         }
     }
 }

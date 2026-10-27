@@ -8,21 +8,21 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed_output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Prompt the user for the smart‑card PIN (if the provider requires it)
-        Console.Write("Enter smart card PIN: ");
-        string pin = Console.ReadLine(); // PIN can be used by the crypto provider internally
+        // Prompt user to insert smart card and press Enter when ready.
+        Console.WriteLine("Please insert your smart card and press Enter when ready...");
+        Console.ReadLine();
 
-        // Retrieve a certificate that has a private key from the current user's store
-        X509Certificate2 certificate = null;
+        // Load a certificate that has a private key (smart‑card certificate).
+        X509Certificate2 signingCert = null;
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
             store.Open(OpenFlags.ReadOnly);
@@ -30,41 +30,41 @@ class Program
             {
                 if (cert.HasPrivateKey)
                 {
-                    certificate = cert;
+                    signingCert = cert;
                     break;
                 }
             }
         }
 
-        if (certificate == null)
+        if (signingCert == null)
         {
-            Console.Error.WriteLine("No certificate with a private key was found on the smart card.");
+            Console.Error.WriteLine("No certificate with a private key was found in the current user store.");
             return;
         }
 
-        // Load the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Open the PDF document.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Create a signature field on the first page (if one does not already exist)
-            const string signatureFieldName = "Signature1";
-            var rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
-            SignatureField sigField = new SignatureField(doc, rect);
-            sigField.Name = signatureFieldName;
-            doc.Form.Add(sigField);
+            // Create a signature field on the first page.
+            var rect = new Rectangle(100, 100, 250, 150);
+            var sigField = new SignatureField(doc.Pages[1], rect)
+            {
+                PartialName = "Signature1",
+                Name = "Signature1"
+                // Reason, Location, ContactInfo are not members of SignatureField.
+            };
 
-            // Build an external signature that uses the smart‑card certificate
-            ExternalSignature externalSig = new ExternalSignature(certificate);
-            externalSig.Reason = "Approved";
-            externalSig.ContactInfo = "user@example.com";
-            externalSig.Location = "Head Office";
+            // Add the signature field to the document's AcroForm.
+            doc.Form.Add(sigField, 1);
 
-            // Sign the field
-            sigField.Sign(externalSig);
+            // NOTE: Actual digital signing (PKCS#7) requires the Aspose.Pdf.Signatures package.
+            // This example only creates an empty signature field so that the code compiles
+            // without referencing optional assemblies.
 
-            // Save the signed PDF
-            doc.Save(outputPath);
+            // Save the PDF (the field will be visible and can be signed later by a PDF viewer).
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }

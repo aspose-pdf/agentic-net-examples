@@ -1,21 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // required for form field classes
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // destination PDF
-
-        // Field specifications
-        const string fieldName = "MyTextField";
-        const int    pageNum   = 1;               // 1‑based page index
-        const float  llx       = 100f;            // lower‑left X
-        const float  lly       = 200f;            // lower‑left Y
-        const float  urx       = 300f;            // upper‑right X
-        const float  ury       = 250f;            // upper‑right Y
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_field.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -23,20 +16,27 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination files
-        using (FormEditor formEditor = new FormEditor(inputPath, outputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Add a text field to the specified page and coordinates
-            bool success = formEditor.AddField(FieldType.Text, fieldName, pageNum, llx, lly, urx, ury);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to add the text field.");
-            }
+            // Define the rectangle where the text field will appear (coordinates in points)
+            // Lower‑left (llx, lly) = (100, 500), Upper‑right (urx, ury) = (300, 530)
+            Rectangle fieldRect = new Rectangle(100, 500, 300, 530);
 
-            // Persist changes
-            formEditor.Save();
+            // Create a text box field on the first page
+            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect)
+            {
+                PartialName = "MyTextField",
+                Value = "Enter text" // default value shown in the field
+            };
+
+            // Add the field to the document's form collection (page numbers are 1‑based)
+            doc.Form.Add(textField, 1);
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text field '{fieldName}' added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text field added and saved to '{outputPath}'.");
     }
 }

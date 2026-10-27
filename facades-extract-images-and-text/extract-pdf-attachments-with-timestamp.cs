@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -12,56 +9,49 @@ class Program
         const string pdfPath = "input.pdf";
         const string outputDir = "ExtractedAttachments";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Create a minimal PDF with an attachment if it does not already exist
         if (!File.Exists(pdfPath))
         {
-            using (var doc = new Document())
-            {
-                doc.Pages.Add();
-
-                // Create a simple text attachment in memory
-                string attachmentContent = "This is a sample attachment.";
-                byte[] attachmentBytes = Encoding.UTF8.GetBytes(attachmentContent);
-                using (var ms = new MemoryStream(attachmentBytes))
-                {
-                    // Add the attachment to the PDF using EmbeddedFiles collection
-                    var fileSpec = new FileSpecification("sample.txt", "Sample attachment");
-                    fileSpec.Contents = ms; // assign the stream containing the file data
-                    doc.EmbeddedFiles.Add(fileSpec);
-                }
-
-                doc.Save(pdfPath);
-            }
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
         }
 
-        // Extract attachments and rename each with a timestamp prefix
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Ensure the output directory exists.
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document.
+        Document pdfDoc = new Document(pdfPath);
+
+        // Check if there are any embedded files (attachments).
+        if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
         {
-            extractor.BindPdf(pdfPath);
-            extractor.ExtractAttachment();
+            Console.WriteLine("No attachments found in the PDF.");
+            return;
+        }
 
-            IList<string> attachmentNames = extractor.GetAttachNames();
-            MemoryStream[] attachmentStreams = extractor.GetAttachment();
+        int index = 0;
+        foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+        {
+            // Original attachment name.
+            string originalName = fileSpec.Name;
 
-            for (int i = 0; i < attachmentStreams.Length; i++)
+            // Create a timestamp prefix; include an index to guarantee uniqueness.
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+            string newFileName = $"{timestamp}_{index}_{originalName}";
+            string outputPath = Path.Combine(outputDir, newFileName);
+
+            // Write the embedded file's contents to disk.
+            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                string originalName = attachmentNames[i];
-                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff") + "_";
-                string newFileName = timestamp + originalName;
-                string outputPath = Path.Combine(outputDir, newFileName);
-
-                // Ensure the stream is positioned at the beginning
-                attachmentStreams[i].Position = 0;
-                using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                if (fileSpec.Contents != null)
                 {
-                    attachmentStreams[i].CopyTo(fs);
+                    if (fileSpec.Contents.CanSeek)
+                        fileSpec.Contents.Position = 0;
+                    fileSpec.Contents.CopyTo(outStream);
                 }
-
-                Console.WriteLine($"Saved attachment: {outputPath}");
             }
+
+            Console.WriteLine($"Extracted and renamed: {newFileName}");
+            index++;
         }
     }
 }

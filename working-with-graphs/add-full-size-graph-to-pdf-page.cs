@@ -1,56 +1,41 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Drawing; // Graph and drawing shapes live here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "graph_page.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a new page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document (using rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the first page (1‑based indexing per rule: page-indexing-one-based)
-            Page page = doc.Pages[1];
-
-            // Retrieve page dimensions
-            double pageWidth = page.PageInfo.Width;
+            // Retrieve the page dimensions via PageInfo (Width/Height are not direct members of Page)
+            double pageWidth  = page.PageInfo.Width;
             double pageHeight = page.PageInfo.Height;
 
-            // Instantiate a Graph that matches the page size (Graph constructor accepts double)
+            // Instantiate a Graph that matches the page size
             Graph graph = new Graph(pageWidth, pageHeight);
 
-            // OPTIONAL: add a rectangle shape that fills the page (demonstrates usage)
-            // Rectangle constructor expects float values, so cast the doubles
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(
-                0f,
-                0f,
-                (float)pageWidth,
-                (float)pageHeight);
-            rectShape.GraphInfo = new GraphInfo
-            {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 1f // float literal as required
-            };
-            graph.Shapes.Add(rectShape);
+            // Create a rectangle shape (left, bottom, width, height)
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 500, 200, 100);
+            // Style the rectangle through its GraphInfo property
+            rect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;   // Fill colour
+            rect.GraphInfo.Color     = Aspose.Pdf.Color.DarkGray;    // Border colour
+            rect.GraphInfo.LineWidth = 1;                           // Border width
 
-            // Add the Graph to the page's paragraph collection
+            // Add the rectangle to the graph and the graph to the page
+            graph.Shapes.Add(rect);
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF (saving inside the using block)
+            // Save the document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Graph added and PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with Graph saved to '{outputPath}'.");
     }
 }

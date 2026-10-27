@@ -4,70 +4,72 @@ using System.Security.Cryptography;
 using System.Text;
 using Aspose.Pdf;
 
-class BatchEncrypt
+class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs to encrypt
-        const string inputDir = "InputPdfs";
-        // Output folder for encrypted PDFs
-        const string outputDir = "EncryptedPdfs";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where encrypted PDFs will be saved
+        const string outputFolder = "EncryptedPdfs";
 
-        if (!Directory.Exists(inputDir))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Use UTC date in yyyyMMdd format as part of the password seed
-        string datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+        // Retrieve all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        // Process each PDF file in the input directory
-        foreach (string filePath in Directory.GetFiles(inputDir, "*.pdf"))
+        foreach (string pdfPath in pdfFiles)
         {
-            string fileName = Path.GetFileName(filePath);
-
-            // Generate a password by hashing the file name combined with the date
-            string password = ComputeHash(fileName + datePart);
-
-            string outputPath = Path.Combine(outputDir, fileName);
-
             try
             {
-                // Load the PDF document (lifecycle rule: use using for disposal)
-                using (Document doc = new Document(filePath))
+                // Build a password from the file name and current UTC date (yyyyMMdd)
+                string fileName = Path.GetFileNameWithoutExtension(pdfPath);
+                string datePart = DateTime.UtcNow.ToString("yyyyMMdd");
+                string rawPassword = $"{fileName}_{datePart}";
+                string password = GenerateHashPassword(rawPassword);
+
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+
+                // Load the PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
                     // Define desired permissions (example: allow printing and content extraction)
                     Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    // Encrypt using the same password for user and owner, AES-256 algorithm
+                    // Encrypt using AES‑256; user and owner passwords are the same derived password
                     doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
 
-                    // Save the encrypted PDF (lifecycle rule: use Save inside using)
+                    // Save the encrypted PDF
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Encrypted: {fileName}");
+                Console.WriteLine($"Encrypted: '{pdfPath}' → '{outputPath}'");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to encrypt {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }
 
-    // Computes a SHA-256 hash of the input string and returns it as a hex string
-    static string ComputeHash(string input)
+    // Generates a 16‑character password from a SHA‑256 hash of the input string
+    private static string GenerateHashPassword(string input)
     {
-        using (SHA256 sha = SHA256.Create())
+        using (SHA256 sha256 = SHA256.Create())
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(input);
-            byte[] hash = sha.ComputeHash(bytes);
-            StringBuilder sb = new StringBuilder(hash.Length * 2);
-            foreach (byte b in hash)
-                sb.Append(b.ToString("x2"));
+            byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+            // Convert to hex and take the first 16 characters for a manageable password length
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < hash.Length && sb.Length < 16; i++)
+            {
+                sb.Append(hash[i].ToString("x2"));
+            }
             return sb.ToString();
         }
     }

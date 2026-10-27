@@ -1,60 +1,69 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facade classes for PDF editing
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // for Resolution struct
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "zoomed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputDir = "ZoomedPages";
 
-        // Define a zoom factor for each page (1.0 = 100%)
-        // Example: page 1 -> 100%, page 2 -> 150%, page 3 -> 75%
-        float[] pageZooms = { 1.0f, 1.5f, 0.75f };
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure the number of zoom values matches the number of pages
-        // We'll determine the page count after binding the PDF.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document once – it will be reused for each page.
+        using (Document doc = new Document(inputPath))
         {
-            // Bind the source PDF file to the editor facade
-            editor.BindPdf(inputPdf);
+            int pageCount = doc.Pages.Count;
 
-            // Get total page count (pages are 1‑based)
-            int pageCount = editor.GetPages();
-
-            if (pageZooms.Length != pageCount)
-            {
-                Console.Error.WriteLine($"Zoom array length ({pageZooms.Length}) does not match page count ({pageCount}).");
-                return;
-            }
-
-            // Iterate over each page and apply its specific zoom factor
             for (int i = 1; i <= pageCount; i++)
             {
-                // Restrict editing to the current page only
-                editor.ProcessPages = new int[] { i };
+                // Calculate a different zoom factor for each page (100%, 120%, 140%, …).
+                float zoomFactor = 1.0f + (i - 1) * 0.2f; // 1.0 = 100%
 
-                // Set the zoom coefficient for this page
-                editor.Zoom = pageZooms[i - 1];
+                // -----------------------------------------------------------------
+                // 1️⃣ Apply the zoom to the current page using PdfPageEditor.
+                // -----------------------------------------------------------------
+                string tempPdfPath = Path.Combine(outputDir, $"temp_page_{i}.pdf");
+                using (PdfPageEditor editor = new PdfPageEditor())
+                {
+                    editor.BindPdf(doc);
+                    editor.ProcessPages = new int[] { i };
+                    editor.Zoom = zoomFactor; // e.g., 1.2f = 120%
+                    editor.Save(tempPdfPath);
+                }
 
-                // Apply the change to the bound document
-                editor.ApplyChanges();
+                // -----------------------------------------------------------------
+                // 2️⃣ Convert the temporary (zoom‑applied) PDF page to an image.
+                // -----------------------------------------------------------------
+                using (PdfConverter converter = new PdfConverter())
+                {
+                    converter.BindPdf(tempPdfPath);
+                    converter.StartPage = 1;
+                    converter.EndPage   = 1;
+                    converter.Resolution = new Resolution(150); // DPI – adjust as needed
+                    converter.DoConvert();
+
+                    string outPath = Path.Combine(outputDir,
+                        $"Page_{i}_Zoom{(int)(zoomFactor * 100)}.tiff");
+
+                    // SaveAsTIFF is the supported method in Aspose.Pdf.Facades.
+                    converter.SaveAsTIFF(outPath);
+                }
+
+                // Clean‑up the temporary PDF – it is no longer needed.
+                File.Delete(tempPdfPath);
+
+                Console.WriteLine($"Saved page {i} with zoom {zoomFactor * 100}% to '{outputDir}'.");
             }
-
-            // Save the modified PDF to the output path
-            editor.Save(outputPdf);
-            // Close the facade (optional, as using will dispose it)
-            editor.Close();
         }
-
-        Console.WriteLine($"Zoomed PDF saved to '{outputPdf}'.");
     }
 }

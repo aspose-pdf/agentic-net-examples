@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -15,23 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a page number stamp.
-            // Default format is "#" which will be replaced by the page number.
-            PageNumberStamp stamp = new PageNumberStamp();
-            stamp.StartingNumber = 1;                                 // start numbering at 1
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;   // center horizontally
-            stamp.VerticalAlignment = VerticalAlignment.Bottom;       // place at bottom (optional)
-
-            // Apply the stamp to every page in the document.
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.AddStamp(stamp);
+                // Create a TextStamp with the current page number
+                TextStamp pageNumberStamp = new TextStamp(i.ToString())
+                {
+                    // Center horizontally on the page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    // Position near the bottom (you can adjust VerticalAlignment as needed)
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // Optional: set margin from the bottom edge
+                    BottomMargin        = 20,
+                    // Optional: set font size and color for better visibility
+                    TextState = { FontSize = 12, ForegroundColor = Color.Black }
+                };
+
+                // Add the stamp to the current page (must be called per page)
+                doc.Pages[i].AddStamp(pageNumberStamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

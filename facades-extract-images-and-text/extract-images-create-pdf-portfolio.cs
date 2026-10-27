@@ -1,108 +1,90 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging; // needed for ImageFormat when saving XImage
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "portfolio.pdf";
+        const string portfolioPath = "portfolio.pdf";
+        const string tempImageDir = "temp_images";
 
-        // ------------------------------------------------------------
-        // 1. Create a minimal input PDF (self‑contained example).
-        //    The PDF contains a single page with a simple generated image
-        //    so that the extractor has something to work with.
-        // ------------------------------------------------------------
-        CreateSamplePdfWithImage(inputPdfPath);
-
-        // ------------------------------------------------------------
-        // 2. Extract all images from the source PDF into memory streams.
-        // ------------------------------------------------------------
-        List<MemoryStream> imageStreams = new List<MemoryStream>();
-        using (PdfExtractor extractor = new PdfExtractor())
+        if (!File.Exists(inputPdfPath))
         {
-            extractor.BindPdf(inputPdfPath);
-            extractor.ExtractImage();
-
-            while (extractor.HasNextImage())
-            {
-                MemoryStream imgStream = new MemoryStream();
-                extractor.GetNextImage(imgStream);
-                imgStream.Position = 0; // reset for later reading
-                imageStreams.Add(imgStream);
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 3. Create a new PDF document where each page contains one
-        //    extracted image (PDF portfolio).
-        // ------------------------------------------------------------
-        using (Document portfolioDoc = new Document())
+        // Ensure a temporary folder exists for extracted images
+        Directory.CreateDirectory(tempImageDir);
+
+        // List to keep track of extracted image file paths
+        List<string> extractedImages = new List<string>();
+
+        // Extract images from the source PDF
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            foreach (MemoryStream imgStream in imageStreams)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageNum = 1; pageNum <= srcDoc.Pages.Count; pageNum++)
             {
-                // Add a new blank page.
-                Page page = portfolioDoc.Pages.Add();
+                Page page = srcDoc.Pages[pageNum];
+                int imgCounter = 1;
 
-                // Define a rectangle that covers the whole page.
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    0,
-                    0,
-                    page.PageInfo.Width,
-                    page.PageInfo.Height);
-
-                // Add the image to the page – the image will be stretched to fill the page.
-                page.AddImage(imgStream, rect);
-            }
-
-            // Save the resulting PDF portfolio.
-            portfolioDoc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"Portfolio PDF created: {outputPdfPath}");
-    }
-
-    /// <summary>
-    /// Generates a one‑page PDF that contains a simple generated bitmap image.
-    /// This method guarantees that the example runs in an isolated sandbox where
-    /// no external files are present.
-    /// </summary>
-    private static void CreateSamplePdfWithImage(string path)
-    {
-        // Create a 100x100 red square bitmap in memory.
-        using (Bitmap bmp = new Bitmap(100, 100))
-        {
-            using (Graphics g = Graphics.FromImage(bmp))
-            {
-                // Fully qualify System.Drawing.Color to avoid ambiguity with Aspose.Pdf.Color.
-                g.Clear(System.Drawing.Color.Red);
-            }
-
-            using (MemoryStream imgStream = new MemoryStream())
-            {
-                // Save bitmap as PNG to the stream.
-                bmp.Save(imgStream, System.Drawing.Imaging.ImageFormat.Png);
-                imgStream.Position = 0;
-
-                // Build a PDF and place the image on the first page.
-                using (Document doc = new Document())
+                // XImageCollection is iterated directly (no dictionary)
+                foreach (XImage img in page.Resources.Images)
                 {
-                    Page page = doc.Pages.Add();
-                    // Define a rectangle where the image will be placed (centered).
-                    double imgWidth = 200.0;
-                    double imgHeight = 200.0;
-                    double llx = (page.PageInfo.Width - imgWidth) / 2.0;
-                    double lly = (page.PageInfo.Height - imgHeight) / 2.0;
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, llx + imgWidth, lly + imgHeight);
+                    // Save each image as PNG to the temporary folder using a FileStream
+                    string imgPath = Path.Combine(
+                        tempImageDir,
+                        $"page{pageNum}_img{imgCounter}.png");
 
-                    page.AddImage(imgStream, rect);
-                    doc.Save(path);
+                    using (FileStream fs = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
+                    {
+                        img.Save(fs, ImageFormat.Png);
+                    }
+
+                    extractedImages.Add(imgPath);
+                    imgCounter++;
                 }
             }
         }
+
+        // Create a new PDF document that will act as the portfolio
+        Document portfolioDoc = new Document();
+        // Initialise the collection that holds embedded files (portfolio entries)
+        if (portfolioDoc.Collection == null)
+            portfolioDoc.Collection = new Collection();
+
+        // Add each extracted image file to the portfolio as an attachment
+        foreach (string imgFile in extractedImages)
+        {
+            var fileSpec = new FileSpecification(imgFile, Path.GetFileName(imgFile))
+            {
+                // Load the file bytes into the specification
+                Contents = new MemoryStream(File.ReadAllBytes(imgFile))
+            };
+            portfolioDoc.Collection.Add(fileSpec);
+        }
+
+        // Optional: give the portfolio a title/description
+        portfolioDoc.Info.Title = "Image Portfolio";
+
+        // Save the portfolio PDF
+        portfolioDoc.Save(portfolioPath);
+
+        // Clean up temporary image files
+        foreach (string imgFile in extractedImages)
+        {
+            try { File.Delete(imgFile); } catch { /* ignore cleanup errors */ }
+        }
+
+        // Remove the temporary directory if empty
+        try { Directory.Delete(tempImageDir, true); } catch { /* ignore */ }
+
+        Console.WriteLine($"PDF portfolio created at: {portfolioPath}");
     }
 }

@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // required for PdfPageEditor
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_transitions.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,45 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        int pageCount = pdfDocument.Pages.Count; // 1‑based collection
+
+        // Apply a custom transition to each page based on its index using PdfPageEditor
+        using (PdfPageEditor editor = new PdfPageEditor(pdfDocument))
         {
-            // Initialize the PdfPageEditor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
+            for (int i = 1; i <= pageCount; i++)
             {
-                // Bind the loaded document to the editor
-                editor.BindPdf(doc);
+                // Select the current page
+                editor.ProcessPages = new int[] { i };
 
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                int pageCount = doc.Pages.Count;
-                for (int i = 1; i <= pageCount; i++)
+                // Choose transition type and duration
+                if (i % 2 == 0) // even pages → Box transition (integer value 3)
                 {
-                    // Apply transition only to the current page
-                    editor.ProcessPages = new int[] { i };
-
-                    // Set a common transition duration (seconds)
-                    editor.TransitionDuration = 2;
-
-                    // Choose transition type based on page index
-                    // Even pages: vertical blinds, odd pages: left‑right wipe
-                    if (i % 2 == 0)
-                    {
-                        editor.TransitionType = PdfPageEditor.BLINDV; // vertical blinds
-                    }
-                    else
-                    {
-                        editor.TransitionType = PdfPageEditor.LRWIPE; // left‑right wipe
-                    }
-
-                    // Commit the changes for this page
-                    editor.ApplyChanges();
+                    editor.TransitionType = 3; // Box
+                    editor.TransitionDuration = 2; // 2 seconds
+                }
+                else // odd pages → Fly transition (integer value 7)
+                {
+                    editor.TransitionType = 7; // Fly
+                    editor.TransitionDuration = 1; // 1 second
                 }
 
-                // Save the modified PDF with the applied transitions
-                editor.Save(outputPath);
+                // Apply the changes for the selected page
+                editor.ApplyChanges();
             }
         }
 
-        Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");
+        // Save the modified PDF with the applied transitions
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
     }
 }

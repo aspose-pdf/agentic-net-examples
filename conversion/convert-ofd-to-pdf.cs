@@ -6,22 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.ofd";
-        const string outputPath = "output.pdf";
+        const string ofdPath = "input.ofd";
+        const string pdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(ofdPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {ofdPath}");
             return;
         }
 
-        // Load OFD file with default OFD load options and convert to PDF
-        using (Document doc = new Document(inputPath, new OfdLoadOptions()))
+        try
         {
-            // Save the resulting PDF
-            doc.Save(outputPath);
-        }
+            // Load the OFD file with default load options
+            using (Document doc = new Document(ofdPath, new OfdLoadOptions()))
+            {
+                // Save the document as PDF using default settings
+                doc.Save(pdfPath);
+            }
 
-        Console.WriteLine($"OFD converted to PDF: '{outputPath}'");
+            Console.WriteLine($"Successfully converted '{ofdPath}' to PDF at '{pdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

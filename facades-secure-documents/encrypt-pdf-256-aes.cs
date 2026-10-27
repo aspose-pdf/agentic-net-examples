@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // DocumentPrivilege enum
-using Aspose.Pdf.Facades;      // PdfFileSecurity, KeySize
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -18,23 +17,18 @@ class Program
             return;
         }
 
-        // Initialize the security facade with source and destination files
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(inputPath, outputPath);
+        // Load the PDF document.
+        Document doc = new Document(inputPath);
 
-        // Encrypt using 256‑bit AES; allow printing as an example privilege
-        bool encrypted = fileSecurity.EncryptFile(
-            userPassword,
-            ownerPassword,
-            DocumentPrivilege.Print,
-            KeySize.x256);
+        // Define desired permissions (e.g., allow printing and content extraction).
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        if (!encrypted)
-        {
-            Console.Error.WriteLine("Encryption failed.");
-        }
-        else
-        {
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-        }
+        // Encrypt using 256‑bit AES.
+        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+        // Save the encrypted PDF.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

@@ -1,42 +1,36 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF, apply AES‑256 encryption and restrict printing/copying
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            {
-                // No permissions granted (printing and copying are disabled)
-                Permissions perms = (Permissions)0;
+            // No permissions granted (printing and copying are disabled)
+            Permissions perms = (Permissions)0; // equivalent to "no permissions"
 
-                // Encrypt with AES‑256
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // Encrypt with AES‑256 algorithm
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            // Save the encrypted PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

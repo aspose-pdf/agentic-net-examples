@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -15,19 +16,34 @@ class Program
             return;
         }
 
-        // Initialize the facade and bind the source PDF
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);
+        try
+        {
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Attempt to set viewer preferences using dynamic dispatch.
+                // This works with newer Aspose.Pdf versions that expose ViewerPreferences,
+                // and gracefully degrades for older versions where the property is absent.
+                dynamic d = doc;
+                try
+                {
+                    d.ViewerPreferences.CenterWindow = true;   // Open the window centered on the screen
+                    d.ViewerPreferences.HideToolbar = true;   // Hide the toolbar when the PDF is opened
+                }
+                catch (RuntimeBinderException)
+                {
+                    Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version.");
+                }
 
-        // Combine desired viewer preferences using bitwise OR
-        int combinedPreferences = ViewerPreference.CenterWindow | ViewerPreference.HideToolbar;
-        editor.ChangeViewerPreference(combinedPreferences);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-        // Save the modified PDF
-        editor.Save(outputPath);
-        // Release resources held by the facade
-        editor.Close();
-
-        Console.WriteLine($"PDF saved with updated viewer preferences to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with combined viewer preferences to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

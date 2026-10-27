@@ -1,46 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextStamp
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        Document doc = new Document(inputPath);
 
-        // Prepare the header stamp – display the file name of the PDF
-        string fileName = Path.GetFileName(inputPath);
-        TextStamp headerStamp = new TextStamp(fileName)
-        {
-            // Position the stamp at the top of the page (header)
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Top,
-            YIndent = 20f // distance from the top edge
-        };
-        // Configure the visual appearance of the stamp
-        headerStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-        headerStamp.TextState.FontSize = 12;
-        headerStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+        // Create a HeaderFooter object that will act as the header
+        HeaderFooter header = new HeaderFooter();
 
-        // Add the stamp to every page in the document
-        foreach (Page page in pdfDocument.Pages)
+        // Use the {file_name} placeholder – Aspose.Pdf replaces it with the actual file name when rendering.
+        // If the placeholder is not supported in the used version, you can replace it manually:
+        // string fileName = Path.GetFileName(inputPath);
+        // TextFragment tf = new TextFragment(fileName);
+        TextFragment tf = new TextFragment("{file_name}");
+        tf.TextState.Font = FontRepository.FindFont("Arial");
+        tf.TextState.FontSize = 12;
+        tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+        header.Paragraphs.Add(tf);
+
+        // Assign the header to every page in the document
+        foreach (Page page in doc.Pages)
         {
-            page.AddStamp(headerStamp);
+            page.Header = header;
         }
 
-        // Save the stamped PDF
-        pdfDocument.Save(outputPath);
+        // Save the modified PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }

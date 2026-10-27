@@ -6,15 +6,11 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "protected.pdf";
-        const string outputPath = "protected_updated.pdf";
-
-        // Current owner password (must be known to change passwords)
-        const string currentOwnerPassword = "owner123";
-
-        // New passwords to set
-        const string newUserPassword  = "newUser456";
-        const string newOwnerPassword = "newOwner789";
+        const string inputPath      = "protected.pdf";
+        const string outputPath     = "updated.pdf";
+        const string oldUserPwd     = "oldUser123";
+        const string newUserPwd     = "newUser456";
+        const string ownerPwd       = "owner789";
 
         if (!File.Exists(inputPath))
         {
@@ -24,21 +20,25 @@ class Program
 
         try
         {
-            // Open the encrypted PDF using the owner password
-            using (Document doc = new Document(inputPath, currentOwnerPassword))
+            // Open the PDF with the existing user password.
+            using (Document doc = new Document(inputPath, oldUserPwd))
             {
-                // Change the user and owner passwords
-                doc.ChangePasswords(currentOwnerPassword, newUserPassword, newOwnerPassword);
+                // Define desired permissions (adjust as needed).
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Save the PDF with the updated credentials
+                // Re‑encrypt the document with the new user password.
+                // Owner password remains the same; AES‑256 is recommended.
+                doc.Encrypt(newUserPwd, ownerPwd, perms, CryptoAlgorithm.AESx256);
+
+                // Save the PDF with the updated credentials.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Password updated successfully. Saved to '{outputPath}'.");
+            Console.WriteLine($"Password updated and saved to '{outputPath}'.");
         }
-        catch (InvalidPasswordException ex)
+        catch (InvalidPasswordException)
         {
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+            Console.Error.WriteLine("The provided password is incorrect.");
         }
         catch (Exception ex)
         {

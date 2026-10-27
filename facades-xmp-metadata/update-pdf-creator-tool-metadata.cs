@@ -1,20 +1,19 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least the folder path; optional second argument is the new CreatorTool value.
-        if (args.Length < 1)
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: UpdateCreator <folderPath> [creatorTool]");
+            Console.WriteLine("Usage: UpdateCreatorTool <folderPath> <creatorToolValue>");
             return;
         }
 
         string folderPath = args[0];
-        string newCreator = args.Length >= 2 ? args[1] : "Aspose.Pdf.Facades Utility";
+        string creatorTool = args[1];
 
         if (!Directory.Exists(folderPath))
         {
@@ -22,32 +21,23 @@ class Program
             return;
         }
 
-        // Get all PDF files in the specified folder (non‑recursive).
         string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
-
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Load the PDF metadata using the PdfFileInfo facade.
-                using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+                // Load the PDF document, update its Creator metadata, and save back.
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    // Update the Creator property.
-                    info.Creator = newCreator;
-
-                    // Save the updated metadata back to the same file.
-                    // SaveNewInfo overwrites the original PDF with the modified info.
-                    info.SaveNewInfo(pdfPath);
+                    pdfDoc.Info.Creator = creatorTool; // Correct property for Creator metadata
+                    pdfDoc.Save(pdfPath);               // Overwrite the original file
                 }
-
                 Console.WriteLine($"Updated Creator for: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to update {pdfPath}: {ex.Message}");
             }
         }
-
-        Console.WriteLine("Processing complete.");
     }
 }

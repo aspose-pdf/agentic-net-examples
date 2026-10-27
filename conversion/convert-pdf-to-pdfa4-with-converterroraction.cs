@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa4.pdf";
-        const string logPath    = "conversion_log.txt";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -18,21 +18,25 @@ class Program
 
         try
         {
-            // Load the source PDF
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑4, keep problematic objects (ConvertErrorAction.None)
-                doc.Convert(logPath, PdfFormat.PDF_A_4, ConvertErrorAction.None);
-
-                // Save the converted document
+#if CONVERT_ERROR_ACTION_CONVERT_AVAILABLE
+                // Newer Aspose.PDF versions expose ConvertErrorAction.Convert
+                doc.Convert(logPath, PdfFormat.PDF_A_4, ConvertErrorAction.Convert);
+#else
+                // Older versions only support Delete as a fallback action
+                doc.Convert(logPath, PdfFormat.PDF_A_4, ConvertErrorAction.Delete);
+#endif
+                // Save the converted PDF/A‑4 document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Conversion completed. Output saved to '{outputPath}'. Log written to '{logPath}'.");
+            Console.WriteLine($"PDF successfully converted to PDF/A‑4. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

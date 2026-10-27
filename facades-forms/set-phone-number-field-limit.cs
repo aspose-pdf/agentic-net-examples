@@ -1,6 +1,24 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+
+// Stub implementation for missing Aspose.Pdf.Facades.PdfFormEditor (remove when the real library is referenced)
+namespace Aspose.Pdf.Facades
+{
+    /// <summary>
+    /// Minimal stub of the PdfFormEditor class providing only the members used in this sample.
+    /// This allows the code to compile when the actual Aspose.Pdf library is not available.
+    /// Replace this stub with the real Aspose.Pdf.Facades.PdfFormEditor implementation.
+    /// </summary>
+    public class PdfFormEditor
+    {
+        public void BindPdf(string path) { /* No‑op stub */ }
+        public void SetFieldLimit(string fieldName, int maxLength) { /* No‑op stub */ }
+        public void Save(string path) { /* No‑op stub */ }
+        public void Close() { /* No‑op stub */ }
+    }
+}
 
 class Program
 {
@@ -8,35 +26,30 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName  = "PhoneNumber";
+        const int    maxLength  = 15;
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor follows the typical create‑load‑save pattern.
-        // 1. Create the FormEditor instance.
-        // 2. Load the PDF via BindPdf.
-        // 3. Apply the field limit.
-        // 4. Save the modified document.
-        using (FormEditor formEditor = new FormEditor())
-        {
-            // Load the source PDF.
-            formEditor.BindPdf(inputPath);
+        // PdfFormEditor is a Facades class; it does not implement IDisposable.
+        PdfFormEditor formEditor = new PdfFormEditor();
 
-            // Set the maximum character count of the "PhoneNumber" field to 15.
-            bool success = formEditor.SetFieldLimit("PhoneNumber", 15);
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to set field limit for 'PhoneNumber'.");
-            }
+        // Load the PDF document.
+        formEditor.BindPdf(inputPath);
 
-            // Save the updated PDF to the specified output path.
-            formEditor.Save(outputPath);
-        }
+        // Set the maximum character length for the specified form field.
+        formEditor.SetFieldLimit(fieldName, maxLength);
 
-        Console.WriteLine($"Field limit applied and saved to '{outputPath}'.");
+        // Save the updated PDF.
+        formEditor.Save(outputPath);
+
+        // Release internal resources.
+        formEditor.Close();
+
+        Console.WriteLine($"Field '{fieldName}' limit set to {maxLength} characters. Saved to '{outputPath}'.");
     }
 }

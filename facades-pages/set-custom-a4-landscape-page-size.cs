@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -10,39 +9,31 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output_widescreen.pdf";
 
-        // Ensure the source PDF exists – create a minimal placeholder if it does not.
         if (!File.Exists(inputPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
-            }
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        // Initialize the facade and bind the source PDF
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // A4 size in points: 595 (width) x 842 (height). Landscape swaps them.
+        const double a4LandscapeWidth = 842;  // points
+        const double a4LandscapeHeight = 595; // points
+
+        // Load the PDF document.
+        Document pdfDocument = new Document(inputPath);
+
+        // Set each page to the custom A4 landscape dimensions.
+        foreach (Page page in pdfDocument.Pages)
         {
-            editor.BindPdf(inputPath);
-
-            // Convert millimetres to points (1 inch = 72 points, 1 mm = 72/25.4 points)
-            const double mmToPoints = 72.0 / 25.4;
-
-            // A4 landscape dimensions: width = 297 mm, height = 210 mm
-            double width = 297 * mmToPoints;   // ≈ 842.52 points
-            double height = 210 * mmToPoints;  // ≈ 595.28 points
-
-            // Set a custom page size using Width and Height (landscape A4)
-            PageSize customSize = new PageSize((float)width, (float)height);
-            editor.PageSize = customSize;
-
-            // Apply the size change to all pages
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+            page.PageInfo.Width = a4LandscapeWidth;
+            page.PageInfo.Height = a4LandscapeHeight;
+            // Optional: mark the page as landscape (not required for size change).
+            page.PageInfo.IsLandscape = true;
         }
 
-        Console.WriteLine($"PDF saved with custom A4 landscape size to '{outputPath}'.");
+        // Save the modified PDF.
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Widescreen PDF saved to '{outputPath}'.");
     }
 }

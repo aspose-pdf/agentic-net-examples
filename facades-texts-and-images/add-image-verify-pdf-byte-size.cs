@@ -1,10 +1,9 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using NUnit.Framework; // Added to bring stub attributes into scope
+using NUnit.Framework;
 
-// Minimal NUnit stubs so the test project can compile without the real NUnit package.
+// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -13,102 +12,127 @@ namespace NUnit.Framework
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class TestAttribute : Attribute { }
 
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class SetUpAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class TearDownAttribute : Attribute { }
+
+    public delegate void TestDelegate();
+
     public static class Assert
     {
-        public static void IsTrue(bool condition, string? message = null)
+        // Throws<T> stub (from verified fixes)
+        public static T Throws<T>(TestDelegate code) where T : Exception
         {
-            if (!condition)
-                throw new Exception(message ?? "Assert.IsTrue failed.");
+            try
+            {
+                code();
+            }
+            catch (T ex)
+            {
+                return ex;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Assert.Throws failed. Expected {typeof(T)} but got {ex.GetType()}.", ex);
+            }
+            throw new Exception($"Assert.Throws failed. No exception thrown. Expected {typeof(T)}.");
         }
 
-        public static void Greater(int actual, int expected, string? message = null)
+        // Greater<T> stub used in the test
+        public static void Greater<T>(T actual, T expected, string message = null) where T : IComparable<T>
         {
-            if (actual <= expected)
-                throw new Exception(message ?? $"Assert.Greater failed. Expected greater than {expected}, but was {actual}.");
+            if (actual.CompareTo(expected) <= 0)
+            {
+                throw new Exception(message ?? $"Assert.Greater failed. Expected > {expected}, but got {actual}.");
+            }
         }
     }
 }
 
-namespace AsposePdfTests
+public class PdfModificationTests
 {
-    [TestFixture]
-    public class PdfFileMendTests
+    // Minimal 1x1 pixel PNG (transparent) byte array
+    private static readonly byte[] SamplePng = new byte[]
     {
-        // A tiny 1x1 pixel PNG (transparent) encoded in base64.
-        private static readonly byte[] SamplePng = Convert.FromBase64String(
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/5+BAQAE/wJ" +
-            "Z6VYAAAAASUVORK5CYII=");
+        0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A,
+        0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,
+        0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,
+        0x08,0x06,0x00,0x00,0x00,0x1F,0x15,0xC4,
+        0x89,0x00,0x00,0x00,0x0A,0x49,0x44,0x41,
+        0x54,0x78,0x9C,0x63,0x60,0x00,0x00,0x00,
+        0x02,0x00,0x01,0xE2,0x21,0xBC,0x33,0x00,
+        0x00,0x00,0x00,0x49,0x45,0x4E,0x44,0xAE,
+        0x42,0x60,0x82
+    };
 
-        [Test]
-        public void AddingImage_IncreasesPdfByteSize()
+    private string CreateTempPng()
+    {
+        string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".png");
+        File.WriteAllBytes(tempPath, SamplePng);
+        return tempPath;
+    }
+
+    [Test]
+    public void AddingImageIncreasesPdfSize()
+    {
+        // Create a simple PDF with a single blank page
+        using (Document originalDoc = new Document())
         {
-            // ------------------------------------------------------------
-            // Step 1: Create a minimal PDF document (one blank page)
-            // ------------------------------------------------------------
-            byte[] originalPdfBytes;
-            using (Document doc = new Document())
+            originalDoc.Pages.Add();
+
+            // Save original PDF to a memory stream to capture its size
+            using (MemoryStream originalStream = new MemoryStream())
             {
-                // Add a single blank page
-                doc.Pages.Add();
+                originalDoc.Save(originalStream);
+                long originalSize = originalStream.Length;
 
-                // Save the document to a memory stream
-                using (MemoryStream originalStream = new MemoryStream())
+                // Reset stream position before re‑loading the document
+                originalStream.Position = 0;
+
+                // Prepare a temporary PNG image
+                string imagePath = CreateTempPng();
+
+                // Load the PDF from the original stream and add the image using ImageStamp
+                using (Document modifiedDoc = new Document(originalStream))
                 {
-                    doc.Save(originalStream);
-                    originalPdfBytes = originalStream.ToArray();
+                    ImageStamp imgStamp = new ImageStamp(imagePath)
+                    {
+                        // Position the image using XIndent/YIndent and alignment properties
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment   = VerticalAlignment.Bottom,
+                        XIndent = 100, // distance from the left edge in points
+                        YIndent = 100, // distance from the bottom edge in points
+                        Width = 100,
+                        Height = 100,
+                        Background = false
+                    };
+
+                    // Add the stamp to the first page
+                    modifiedDoc.Pages[1].AddStamp(imgStamp);
+
+                    // Save the modified PDF to another memory stream
+                    using (MemoryStream modifiedStream = new MemoryStream())
+                    {
+                        modifiedDoc.Save(modifiedStream);
+                        long modifiedSize = modifiedStream.Length;
+
+                        // Clean up temporary image file
+                        File.Delete(imagePath);
+
+                        // Verify that the modified PDF is larger than the original
+                        Assert.Greater(modifiedSize, originalSize,
+                            "PDF size should increase after adding an image.");
+                    }
                 }
-            }
-
-            // Record the original size
-            int originalSize = originalPdfBytes.Length;
-
-            // ------------------------------------------------------------
-            // Step 2: Bind the PDF to PdfFileMend and add an image
-            // ------------------------------------------------------------
-            // Bind the existing PDF from a memory stream
-            using (PdfFileMend pdfMend = new PdfFileMend())
-            {
-                using (MemoryStream sourceStream = new MemoryStream(originalPdfBytes))
-                {
-                    pdfMend.BindPdf(sourceStream);
-                }
-
-                // Add the sample PNG to page 1 at coordinates (10,10)-(100,100)
-                using (MemoryStream imageStream = new MemoryStream(SamplePng))
-                {
-                    bool added = pdfMend.AddImage(imageStream, 1, 10f, 10f, 100f, 100f);
-                    Assert.IsTrue(added, "Image should be added successfully.");
-                }
-
-                // ------------------------------------------------------------
-                // Step 3: Save the modified PDF to a new memory stream
-                // ------------------------------------------------------------
-                byte[] modifiedPdfBytes;
-                using (MemoryStream modifiedStream = new MemoryStream())
-                {
-                    pdfMend.Save(modifiedStream);
-                    modifiedPdfBytes = modifiedStream.ToArray();
-                }
-
-                // Record the modified size
-                int modifiedSize = modifiedPdfBytes.Length;
-
-                // ------------------------------------------------------------
-                // Step 4: Verify that the PDF size increased after adding the image
-                // ------------------------------------------------------------
-                Assert.Greater(modifiedSize, originalSize,
-                    $"Modified PDF size ({modifiedSize} bytes) should be greater than original size ({originalSize} bytes).");
             }
         }
     }
-}
 
-// Dummy entry point to satisfy the compiler when building as an executable.
-public static class Program
-{
+    // Dummy entry point to satisfy the compiler when the project is built as an executable.
     public static void Main(string[] args)
     {
-        // No runtime logic required – tests are discovered and run by the test runner.
-        // This method exists solely to provide a valid entry point for the project.
+        // No runtime logic required – tests are executed by the test runner.
     }
 }

@@ -8,7 +8,6 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const int pageNumber = 1; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -16,24 +15,21 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: wrap in using)
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Validate page number (pages are 1‑based)
-            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            // Pages are 1‑based
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Console.Error.WriteLine("Invalid page number.");
-                return;
+                Page page = doc.Pages[i];
+
+                // Count only WatermarkArtifact objects on the page
+                int watermarkCount = page.Artifacts
+                                          .OfType<WatermarkArtifact>()
+                                          .Count();
+
+                Console.WriteLine($"Page {i}: {watermarkCount} watermark artifact(s)");
             }
-
-            Page page = doc.Pages[pageNumber];
-
-            // Count only WatermarkArtifact instances on the page
-            int watermarkCount = page.Artifacts
-                                      .OfType<WatermarkArtifact>()
-                                      .Count();
-
-            Console.WriteLine($"Page {pageNumber} contains {watermarkCount} watermark artifact(s).");
         }
     }
 }

@@ -1,71 +1,80 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace as required
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed.pdf";
-        const string outputHtml = "signature_report.html";
+        const string inputPdfPath = "signed_document.pdf";
+        const string outputHtmlPath = "signature_report.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // StringBuilder to compose the HTML report
+        StringBuilder htmlBuilder = new StringBuilder();
+        htmlBuilder.AppendLine("<!DOCTYPE html>");
+        htmlBuilder.AppendLine("<html lang=\"en\">");
+        htmlBuilder.AppendLine("<head><meta charset=\"UTF-8\"><title>Signature Images Report</title></head>");
+        htmlBuilder.AppendLine("<body>");
+        htmlBuilder.AppendLine("<h1>Extracted Signature Images</h1>");
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Bind the PDF that contains signatures
-            using (var pdfSignature = new Aspose.Pdf.Facades.PdfFileSignature())
+            int imageCounter = 1;
+
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                pdfSignature.BindPdf(inputPdf);
+                Page page = pdfDoc.Pages[pageIndex];
 
-                // Retrieve all non‑empty signature names
-                var signatureNames = pdfSignature.GetSignatureNames();
-
-                var html = new StringBuilder();
-                html.AppendLine("<!DOCTYPE html>");
-                html.AppendLine("<html><head><meta charset=\"UTF-8\"><title>Signature Report</title></head><body>");
-                html.AppendLine("<h1>Signature Images</h1>");
-
-                foreach (Aspose.Pdf.Facades.SignatureName sigName in signatureNames)
+                // XImageCollection is not a dictionary; iterate directly
+                foreach (XImage img in page.Resources.Images)
                 {
-                    // Extract the image (JPEG) for the current signature
-                    using (Stream imageStream = pdfSignature.ExtractImage(sigName))
+                    // Save the image to a memory stream
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        html.AppendLine($"<h2>{sigName}</h2>");
+                        img.Save(ms);
+                        byte[] imageBytes = ms.ToArray();
 
-                        if (imageStream != null)
-                        {
-                            // Convert the image stream to a Base64 string for embedding
-                            using (var ms = new MemoryStream())
-                            {
-                                imageStream.CopyTo(ms);
-                                string base64 = Convert.ToBase64String(ms.ToArray());
-                                html.AppendLine(
-                                    $"<img src=\"data:image/jpeg;base64,{base64}\" alt=\"Signature {sigName}\"/>");
-                            }
-                        }
-                        else
-                        {
-                            html.AppendLine("<p>No image available for this signature.</p>");
-                        }
+                        // Determine MIME type based on image format (fallback to png)
+                        string mimeType = "image/png";
+
+                        // Encode image as Base64 for embedding in HTML
+                        string base64 = Convert.ToBase64String(imageBytes);
+                        string dataUrl = $"data:{mimeType};base64,{base64}";
+
+                        // Append image to HTML
+                        htmlBuilder.AppendLine($"<div style=\"margin-bottom:20px;\">");
+                        htmlBuilder.AppendLine($"<p>Image {imageCounter} (Page {pageIndex})</p>");
+                        htmlBuilder.AppendLine($"<img src=\"{dataUrl}\" alt=\"Signature Image {imageCounter}\" style=\"max-width:100%; height:auto;\"/>");
+                        htmlBuilder.AppendLine($"</div>");
+
+                        imageCounter++;
                     }
                 }
-
-                html.AppendLine("</body></html>");
-
-                // Write the HTML report to disk
-                File.WriteAllText(outputHtml, html.ToString());
-                Console.WriteLine($"Signature report generated: {outputHtml}");
             }
+        }
+
+        htmlBuilder.AppendLine("</body>");
+        htmlBuilder.AppendLine("</html>");
+
+        // Write the HTML report to disk
+        try
+        {
+            File.WriteAllText(outputHtmlPath, htmlBuilder.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Signature report generated: {outputHtmlPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Failed to write HTML report: {ex.Message}");
         }
     }
 }

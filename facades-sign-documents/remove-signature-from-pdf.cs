@@ -6,29 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_removed.pdf";
+        const string inputPath = "signed.pdf";
+        const string outputPath = "unsigned.pdf";
+        const string signatureName = "ApprovalSignature";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Initialize the facade and bind the PDF file
-            PdfFileSignature pdfSignature = new PdfFileSignature();
-            pdfSignature.BindPdf(inputPath);
+            // PdfFileSignature implements IDisposable; ensure deterministic disposal
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
+            {
+                // Load the PDF document
+                pdfSignature.BindPdf(inputPath);
 
-            // Remove the signature named "ApprovalSignature" using the string overload
-            pdfSignature.RemoveSignature("ApprovalSignature");
+                // Remove the signature with the specified name
+                pdfSignature.RemoveSignature(signatureName);
 
-            // Save the modified PDF
-            pdfSignature.Save(outputPath);
-            pdfSignature.Close();
+                // Save the updated PDF
+                pdfSignature.Save(outputPath);
+            }
 
-            Console.WriteLine($"Signature removed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Signature '{signatureName}' removed. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

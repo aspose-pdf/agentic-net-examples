@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // needed for TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "bates_numbered.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,24 +16,42 @@ class Program
             return;
         }
 
-        // Load the PDF, add Bates numbering, and save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Add Bates numbering to every page.
-            // Start at 1000, use a dash as suffix, and display 4 digits.
-            doc.Pages.AddBatesNumbering(artifact =>
+            using (Document doc = new Document(inputPath))
             {
-                artifact.StartNumber   = 1000;   // first Bates number
-                artifact.NumberOfDigits = 4;     // ensures numbers like 1000, 1001, ...
-                artifact.Suffix        = "-";    // dash separator after the number
-                // Optional: set alignment or margins if needed
-                // artifact.ArtifactHorizontalAlignment = HorizontalAlignment.Right;
-            });
+                // Starting number for Bates numbering
+                int batesNumber = 1000;
 
-            // Save the modified PDF.
-            doc.Save(outputPath);
+                // Add a TextStamp to each page with the current Bates number and a dash separator
+                foreach (Page page in doc.Pages)
+                {
+                    // Create the stamp with the current number
+                    TextStamp stamp = new TextStamp($"{batesNumber}-");
+
+                    // Positioning
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+
+                    // Configure the appearance via the read‑only TextState object
+                    stamp.TextState.FontSize = 12;
+                    stamp.TextState.ForegroundColor = Color.Black;
+
+                    // Add the stamp to the page
+                    page.AddStamp(stamp);
+
+                    batesNumber++; // increment for next page
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Bates numbering added. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Bates-numbered PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

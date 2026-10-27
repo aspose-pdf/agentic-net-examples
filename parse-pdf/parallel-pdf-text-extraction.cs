@@ -1,75 +1,65 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Threading;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-public static class PdfTextParallelExtractor
+class Program
 {
-    /// <summary>
-    /// Extracts text from multiple PDF files in parallel.
-    /// </summary>
-    /// <param name="pdfFilePaths">Array of PDF file paths to process.</param>
-    /// <param name="cancellationToken">Optional token to cancel the operation.</param>
-    /// <returns>
-    /// A task that resolves to a dictionary where the key is the PDF file path
-    /// and the value is the extracted text for that document.
-    /// </returns>
-    public static async Task<Dictionary<string, string>> ExtractTextsAsync(
-        string[] pdfFilePaths,
-        CancellationToken cancellationToken = default)
+    static void Main()
     {
-        if (pdfFilePaths == null) throw new ArgumentNullException(nameof(pdfFilePaths));
+        // Directory containing PDF files to process
+        const string inputFolder = @"C:\PdfFiles";
 
-        var results = new Dictionary<string, string>();
-        var lockObj = new object();
-        var extractionTasks = new List<Task>();
-
-        foreach (var path in pdfFilePaths)
+        if (!Directory.Exists(inputFolder))
         {
-            string pdfPath = path;
-            if (!File.Exists(pdfPath))
-                continue;
-
-            extractionTasks.Add(Task.Run(() =>
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-
-                using (var doc = new Document(pdfPath))
-                {
-                    var absorber = new TextAbsorber();
-                    doc.Pages.Accept(absorber);
-                    string extractedText = absorber.Text ?? string.Empty;
-
-                    lock (lockObj)
-                    {
-                        results[pdfPath] = extractedText;
-                    }
-                }
-            }, cancellationToken));
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            return;
         }
 
-        await Task.WhenAll(extractionTasks).ConfigureAwait(false);
-        return results;
-    }
-}
-
-public static class Program
-{
-    public static async Task Main(string[] args)
-    {
-        // Determine the folder to scan – first argument or current directory.
-        string folder = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
-        string[] pdfFiles = Directory.GetFiles(folder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        var texts = await PdfTextParallelExtractor.ExtractTextsAsync(pdfFiles);
-
-        foreach (var kvp in texts)
+        // Collect all PDF file paths
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
         {
-            Console.WriteLine($"File: {kvp.Key}");
-            Console.WriteLine($"Extracted characters: {kvp.Value.Length}");
+            Console.WriteLine("No PDF files found.");
+            return;
+        }
+
+        // Thread‑safe collection to store extracted text per file
+        var results = new ConcurrentDictionary<string, string>();
+
+        // Parallel extraction using TPL
+        Parallel.ForEach(pdfFiles, pdfPath =>
+        {
+            try
+            {
+                // Ensure deterministic disposal of the Document
+                using (Document doc = new Document(pdfPath))
+                {
+                    // TextAbsorber extracts text from the whole document
+                    TextAbsorber absorber = new TextAbsorber();
+
+                    // Accept the absorber on all pages (pages are 1‑based)
+                    doc.Pages.Accept(absorber);
+
+                    // Store the extracted text keyed by file name
+                    results[Path.GetFileName(pdfPath)] = absorber.Text;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                results[Path.GetFileName(pdfPath)] = string.Empty;
+            }
+        });
+
+        // Output results
+        foreach (var kvp in results)
+        {
+            Console.WriteLine($"--- {kvp.Key} ---");
+            Console.WriteLine(kvp.Value);
+            Console.WriteLine();
         }
     }
 }

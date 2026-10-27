@@ -1,23 +1,34 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
+using Aspose.Pdf.Security; // Permissions and CryptoAlgorithm enums
 
 class Program
 {
     static void Main()
     {
-        // Paths for input XML and output encrypted PDF
-        const string xmlPath      = "input.xml";
-        const string encryptedPdf = "secure_output.pdf";
+        const string xmlPath = "source.xml";
+        const string encryptedPdfPath = "secure_output.pdf";
+        const string asposeDll = "Aspose.PDF.dll";
 
-        // Passwords for encryption
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
+        // Verify that the Aspose.PDF assembly is available before any Aspose types are used.
+        if (!File.Exists(asposeDll))
+        {
+            Console.Error.WriteLine($"Required assembly not found: {asposeDll}. Ensure the Aspose.PDF NuGet package is installed or the DLL is copied to the output folder.");
+            return;
+        }
+        // Load the assembly explicitly to provide a clearer error if it cannot be loaded.
+        try
+        {
+            Assembly.LoadFrom(Path.GetFullPath(asposeDll));
+        }
+        catch (Exception loadEx)
+        {
+            Console.Error.WriteLine($"Failed to load {asposeDll}: {loadEx.Message}");
+            return;
+        }
 
-        // Permissions to allow printing and content extraction
-        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-        // Verify input file exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
@@ -26,20 +37,24 @@ class Program
 
         try
         {
-            // Create an empty PDF document
-            using (Document pdfDoc = new Document())
+            // Load the XML and convert it directly to a PDF document
+            using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
             {
-                // Load XML content into the document (recommended approach)
-                pdfDoc.BindXml(xmlPath);
+                // Define the permissions that will be allowed for the end user
+                Permissions perms = Permissions.PrintDocument |
+                                     Permissions.ModifyContent |
+                                     Permissions.ExtractContent;
 
-                // Apply encryption using AES-256 algorithm
-                pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Apply DRM encryption using AES‑256
+                string userPassword = "user123";
+                string ownerPassword = "owner123";
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
-                pdfDoc.Save(encryptedPdf);
+                // Save the encrypted PDF for secure distribution
+                doc.Save(encryptedPdfPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdf}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdfPath}'.");
         }
         catch (Exception ex)
         {

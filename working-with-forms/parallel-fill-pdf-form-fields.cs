@@ -5,79 +5,104 @@ using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class BatchPdfFieldFiller
 {
+    // Define the fields to fill and their values (same for all PDFs in this example)
+    private static readonly Dictionary<string, string> FieldValues = new Dictionary<string, string>
+    {
+        { "Name", "John Doe" },
+        { "Date", DateTime.Today.ToString("yyyy-MM-dd") },
+        { "Company", "Acme Corp" }
+    };
+
     static void Main()
     {
-        // Base directory of the application (works cross‑platform)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-
         // Input folder containing PDFs to process
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        // Output folder for the filled PDFs
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
+        const string inputFolder = @"C:\PdfBatch\Input";
+        // Output folder where filled PDFs will be saved
+        const string outputFolder = @"C:\PdfBatch\Output";
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Validate the input directory – if it does not exist, fall back to the current directory
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: '{inputFolder}'. Using current directory instead.");
-            inputFolder = Directory.GetCurrentDirectory();
-        }
-
-        // Define the field names and the values to set
-        var fieldValues = new Dictionary<string, string>
-        {
-            { "Name", "John Doe" },
-            { "Date", DateTime.Today.ToShortDateString() }
-        };
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'." );
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        // Process each PDF in parallel to improve batch performance
-        Parallel.ForEach(pdfFiles, inputPath =>
+        Directory.CreateDirectory(outputFolder);
+
+        // Gather all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
+
+        // Parallel options – limit degree of parallelism to avoid overwhelming the system
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
+
+        // Process each PDF concurrently
+        Parallel.ForEach(pdfFiles, parallelOptions, inputPath =>
         {
             try
             {
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputFolder, $"{fileName}_filled.pdf");
+                // Determine output file path (preserve original name)
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-                // Load the PDF document
+                // Load the PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(inputPath))
                 {
-                    // Iterate over the fields to fill
-                    foreach (KeyValuePair<string, string> kvp in fieldValues)
+                    // Iterate over the predefined field/value pairs
+                    foreach (var kvp in FieldValues)
                     {
-                        // Retrieve the field by name; cast to the appropriate field type
-                        TextBoxField? textBox = doc.Form[kvp.Key] as TextBoxField;
-                        if (textBox != null)
+                        // Retrieve the form field by name; the Form indexer returns a WidgetAnnotation, so cast to Field
+                        Field field = doc.Form[kvp.Key] as Field;
+                        if (field != null)
                         {
-                            // Set the field value
-                            textBox.Value = kvp.Value;
+                            // Handle common field types – currently only TextBoxField, CheckboxField and RadioButtonOptionField are used
+                            if (field is TextBoxField txtField)
+                            {
+                                txtField.Value = kvp.Value;
+                            }
+                            else if (field is CheckboxField chkField)
+                            {
+                                // Example: set check box based on a boolean string ("true"/"false")
+                                chkField.Checked = string.Equals(kvp.Value, "true", StringComparison.OrdinalIgnoreCase);
+                            }
+                            else if (field is RadioButtonOptionField radioField)
+                            {
+                                // Example: set selected option by value
+                                radioField.Value = kvp.Value;
+                            }
+                            else
+                            {
+                                // Fallback: attempt to set generic Value property via dynamic cast
+                                try
+                                {
+                                    dynamic dyn = field;
+                                    dyn.Value = kvp.Value;
+                                }
+                                catch { /* ignore unsupported field types */ }
+                            }
                         }
-                        // Add handling for other field types if needed (e.g., CheckBoxField, RadioButtonField)
+                        else
+                        {
+                            Console.WriteLine($"Field '{kvp.Key}' not found in '{Path.GetFileName(inputPath)}'.");
+                        }
                     }
 
-                    // Save the modified PDF
+                    // Save the modified PDF; Document.Save(string) writes PDF regardless of extension
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} -> {Path.GetFileName(outputPath)}");
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(inputPath)}': {ex.Message}");
             }
         });
 
-        Console.WriteLine("Batch processing completed.");
+        Console.WriteLine("Batch field filling completed.");
     }
 }

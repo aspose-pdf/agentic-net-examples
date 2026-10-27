@@ -16,25 +16,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Always wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to work with
-            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+            // Create a new text fragment
+            TextFragment fragment = new TextFragment("Line 1\nLine 2\nLine 3");
 
-            // Create a TextFragment with multiple lines
-            TextFragment tf = new TextFragment("First line\nSecond line\nThird line");
+            // Set a custom line spacing (e.g., 1.5 times the default)
+            fragment.TextState.LineSpacing = 1.5f; // LineSpacing is the correct property
 
-            // Set a custom line height (line spacing) via TextState
-            tf.TextState.LineSpacing = 20f; // line height in points
+            // Optionally set other text properties
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Add the text fragment to the page
-            page.Paragraphs.Add(tf);
+            // Position the fragment on the first page
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(fragment);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom line height to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom line spacing to '{outputPath}'.");
     }
 }

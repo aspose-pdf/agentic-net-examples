@@ -9,85 +9,94 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_table.pdf";
 
-        // Load existing PDF or create a new one if the file does not exist
-        Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document();
-        if (doc.Pages.Count == 0) doc.Pages.Add();
-
-        // Use the first page for the table
-        Page page = doc.Pages[1];
-
-        // -------------------------------------------------
-        // Visual table (appears in the PDF)
-        // -------------------------------------------------
-        Table table = new Table
+        if (!File.Exists(inputPath))
         {
-            ColumnWidths = "100 200",          // two columns
-            RepeatingColumnsCount = 1         // repeat first column on each new page
-        };
-
-        // Header row (visual)
-        Row visualHeader = table.Rows.Add();
-        visualHeader.Cells.Add("Header 1");
-        visualHeader.Cells.Add("Header 2");
-
-        // Sample data rows
-        for (int i = 1; i <= 20; i++)
-        {
-            Row r = table.Rows.Add();
-            r.Cells.Add($"Item {i}");
-            r.Cells.Add($"Value {i}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        // Add the visual table to the page
-        page.Paragraphs.Add(table);
-
-        // -------------------------------------------------
-        // Tagged structure (accessibility)
-        // -------------------------------------------------
-        ITaggedContent tagged = doc.TaggedContent;
-        StructureElement root = tagged.RootElement;
-
-        // Create a table structure element and enable column repeat
-        TableElement tableElem = tagged.CreateTableElement();
-        tableElem.RepeatingColumnsCount = 1; // repeat first column on each new page
-        root.AppendChild(tableElem);
-
-        // Create the table header (THead) – this will be repeated on each page fragment
-        TableTHeadElement thead = tagged.CreateTableTHeadElement();
-        tableElem.AppendChild(thead);
-        TableTRElement headerRow = tagged.CreateTableTRElement();
-        thead.AppendChild(headerRow);
-
-        // Mark the first column as a header cell (TH)
-        TableTHElement th1 = tagged.CreateTableTHElement();
-        th1.SetText("Header 1");
-        headerRow.AppendChild(th1);
-
-        // Second column header (also a TH for consistency)
-        TableTHElement th2 = tagged.CreateTableTHElement();
-        th2.SetText("Header 2");
-        headerRow.AppendChild(th2);
-
-        // Table body rows
-        TableTBodyElement tbody = tagged.CreateTableTBodyElement();
-        tableElem.AppendChild(tbody);
-        for (int i = 1; i <= 20; i++)
+        try
         {
-            TableTRElement bodyRow = tagged.CreateTableTRElement();
-            tbody.AppendChild(bodyRow);
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Access the tagged content API
+                ITaggedContent taggedContent = doc.TaggedContent;
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            TableTDElement td1 = tagged.CreateTableTDElement();
-            td1.SetText($"Item {i}");
-            bodyRow.AppendChild(td1);
+                // Root element of the structure tree
+                StructureElement root = taggedContent.RootElement;
 
-            TableTDElement td2 = tagged.CreateTableTDElement();
-            td2.SetText($"Value {i}");
-            bodyRow.AppendChild(td2);
+                // Create a table element
+                TableElement table = taggedContent.CreateTableElement();
+                table.AlternativeText = "Sample data table with repeating header column";
+                // NOTE: The TableElement class in the current Aspose.Pdf version does not expose a
+                //       RepeatHeaders property. Column header repetition is achieved by marking the
+                //       first column cells as <TH> elements (TableTHElement). The PDF viewer will
+                //       keep these header cells visible on each new page when the table spans
+                //       multiple pages.
+
+                // Attach the table to the document root
+                root.AppendChild(table);
+
+                // ----- Create table header (first row) -----
+                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+                table.AppendChild(thead);
+
+                TableTRElement headerRow = taggedContent.CreateTableTRElement();
+                thead.AppendChild(headerRow);
+
+                // First column header (will be repeated as a column header)
+                TableTHElement thHeader = taggedContent.CreateTableTHElement();
+                thHeader.SetText("Header Column");
+                headerRow.AppendChild(thHeader);
+
+                // Additional column headers (regular cells)
+                TableTHElement thCol2 = taggedContent.CreateTableTHElement();
+                thCol2.SetText("Column 2");
+                headerRow.AppendChild(thCol2);
+
+                TableTHElement thCol3 = taggedContent.CreateTableTHElement();
+                thCol3.SetText("Column 3");
+                headerRow.AppendChild(thCol3);
+
+                // ----- Create table body -----
+                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+                table.AppendChild(tbody);
+
+                // Example: add three data rows
+                for (int i = 1; i <= 3; i++)
+                {
+                    TableTRElement dataRow = taggedContent.CreateTableTRElement();
+                    tbody.AppendChild(dataRow);
+
+                    // First column cell (treated as a header cell for the column)
+                    TableTHElement thCell = taggedContent.CreateTableTHElement();
+                    thCell.SetText($"Row {i}");
+                    dataRow.AppendChild(thCell);
+
+                    // Regular data cells
+                    TableTDElement tdCell2 = taggedContent.CreateTableTDElement();
+                    tdCell2.SetText($"Data {i}-2");
+                    dataRow.AppendChild(tdCell2);
+
+                    TableTDElement tdCell3 = taggedContent.CreateTableTDElement();
+                    tdCell3.SetText($"Data {i}-3");
+                    dataRow.AppendChild(tdCell3);
+                }
+
+                // Save the modified PDF (no PreSave call needed)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with table saved to '{outputPath}'.");
         }
-
-        // Save the resulting PDF
-        doc.Save(outputPath);
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

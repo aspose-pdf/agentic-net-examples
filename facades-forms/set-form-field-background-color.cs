@@ -1,13 +1,14 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using System.Drawing; // Required for System.Drawing.Color
+using Aspose.Pdf.Annotations; // Required for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +17,21 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with input and output PDF files
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create a new facade to define visual attributes
-            editor.Facade = new FormFieldFacade();
+            // FormEditor works with form fields in the document
+            FormEditor formEditor = new FormEditor(doc);
 
-            // Set the background color of the field to light green
-            editor.Facade.BackgroundColor = Color.LightGreen;
+            // Set the appearance of the field named "Status".
+            // The available overload takes the field name and an AnnotationFlags value.
+            // Here we use AnnotationFlags.Print to ensure the field is printed.
+            formEditor.SetFieldAppearance("Status", AnnotationFlags.Print);
 
-            // Apply the visual attributes to the specific field named "Status"
-            editor.DecorateField("Status");
-
-            // Persist the changes to the output PDF
-            editor.Save();
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background color of field \"Status\" set to light green. Saved to '{outputPath}'.");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

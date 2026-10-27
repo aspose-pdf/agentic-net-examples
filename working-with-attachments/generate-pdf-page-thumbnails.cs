@@ -1,47 +1,65 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // ThumbnailDevice resides in this namespace
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "portfolio.pdf";          // source PDF containing portfolio items
-        const string outputFolder = "thumbnails";         // folder to store generated thumbnails
+        // Paths to the source PDF portfolio and the thumbnail image.
+        const string portfolioPath = "portfolio.pdf";
+        const string thumbnailPath = "thumb.jpg";
+        const string outputPath    = "portfolio_with_thumbnails.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(portfolioPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Portfolio PDF not found: {portfolioPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load the PDF document (lifecycle: create -> load -> save)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(thumbnailPath))
         {
-            // Create a thumbnail device with desired dimensions (e.g., 150x150 pixels)
-            ThumbnailDevice thumbDevice = new ThumbnailDevice(150, 150);
+            Console.Error.WriteLine($"Thumbnail image not found: {thumbnailPath}");
+            return;
+        }
 
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+        // Load the PDF portfolio inside a using block for deterministic disposal.
+        using (Document doc = new Document(portfolioPath))
+        {
+            // Ensure the document contains embedded files (portfolio items).
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
-                Page page = doc.Pages[i];
-
-                // Define the output path for the thumbnail of the current page
-                string thumbPath = Path.Combine(outputFolder, $"thumb_page_{i}.png");
-
-                // Generate the thumbnail and write it to a PNG file
-                using (FileStream outStream = new FileStream(thumbPath, FileMode.Create))
+                Console.WriteLine("No embedded files found in the PDF portfolio.");
+            }
+            else
+            {
+                // Load the thumbnail image once; reuse it for each embedded file.
+                using (FileStream thumbStream = File.OpenRead(thumbnailPath))
                 {
-                    thumbDevice.Process(page, outStream);
+                    // Create an Aspose.Pdf.Drawing.Image from the stream.
+                    Image thumbnailImage = new Image { ImageStream = thumbStream };
+
+                    // NOTE: In the current Aspose.Pdf version the FileSpecification class does not expose an
+                    // EmbeddedFile property, nor the EmbeddedFile.Thumbnail property used in older examples.
+                    // Therefore we cannot assign a thumbnail directly to the embedded file via the API.
+                    // The code below demonstrates the intended iteration and leaves a placeholder where a
+                    // future version that supports thumbnails could be hooked in.
+                    foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                    {
+                        // Placeholder for thumbnail assignment – not supported in this API version.
+                        // Example (if supported in a later version):
+                        // fileSpec.EmbeddedFile.Thumbnail = thumbnailImage;
+                    }
+
+                    Console.WriteLine($"Processed {doc.EmbeddedFiles.Count} portfolio items (thumbnail assignment not supported in this API version).");
+
+                    // Save the modified PDF while the thumbnail stream is still open.
+                    doc.Save(outputPath);
                 }
             }
         }
 
-        Console.WriteLine("Thumbnail images have been created for each portfolio item.");
+        Console.WriteLine($"Portfolio saved to '{outputPath}'.");
     }
 }

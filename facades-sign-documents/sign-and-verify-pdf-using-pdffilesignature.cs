@@ -1,89 +1,82 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf;
+using System.Drawing;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
+        // Paths for the source PDF, the signed output, and the signing certificate (PFX)
         const string inputPdf = "input.pdf";
         const string signedPdf = "signed.pdf";
-        const string certFile = "certificate.pfx";
+        const string certPath = "certificate.pfx";
         const string certPassword = "password";
 
-        // ------------------------------------------------------------
-        // 1. Ensure a source PDF exists (create a minimal placeholder)
-        // ------------------------------------------------------------
+        // Verify that required files exist before proceeding
         if (!File.Exists(inputPdf))
         {
-            var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdf);
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Ensure a signing certificate exists (create a self‑signed PFX)
-        // ------------------------------------------------------------
-        if (!File.Exists(certFile))
+        try
         {
-            using RSA rsa = RSA.Create(2048);
-            var req = new CertificateRequest(
-                "cn=AsposeTest",
-                rsa,
-                HashAlgorithmName.SHA256,
-                RSASignaturePadding.Pkcs1);
-
-            // Basic constraints – self‑signed, not a CA
-            req.CertificateExtensions.Add(
-                new X509BasicConstraintsExtension(false, false, 0, false));
-            // Key usage – digital signature
-            req.CertificateExtensions.Add(
-                new X509KeyUsageExtension(X509KeyUsageFlags.DigitalSignature, false));
-
-            var cert = req.CreateSelfSigned(DateTimeOffset.Now.AddDays(-1), DateTimeOffset.Now.AddYears(1));
-            byte[] pfxBytes = cert.Export(X509ContentType.Pfx, certPassword);
-            File.WriteAllBytes(certFile, pfxBytes);
-        }
-
-        // ------------------------------------------------------------
-        // 3. Sign the PDF and immediately verify the signature
-        // ------------------------------------------------------------
-        using (PdfFileSignature signer = new PdfFileSignature())
-        {
-            // Load the source PDF
+            // ------------------------------------------------------------
+            // 1. Sign the PDF
+            // ------------------------------------------------------------
+            PdfFileSignature signer = new PdfFileSignature();
             signer.BindPdf(inputPdf);
 
-            // Set the certificate used for signing (load from the generated PFX)
-            signer.SetCertificate(certFile, certPassword);
+            // Prepare the PKCS#1 certificate object (used for signing)
+            PKCS1 pkcs1 = new PKCS1(certPath, certPassword);
 
-            // Define the visible signature rectangle (System.Drawing.Rectangle)
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 200, 100);
+            // Define a visible signature rectangle (System.Drawing.Rectangle)
+            // (x, y, width, height) – coordinates are in points (1/72 inch)
+            Rectangle signatureRect = new Rectangle(100, 100, 200, 50);
 
-            // Create a visible signature on page 1
+            // Sign the PDF on the first page. Use positional arguments because the
+            // overload does not expose parameter names that can be used as named
+            // arguments in the version of Aspose.Pdf.Facades referenced.
             signer.Sign(
-                page: 1,
-                SigReason: "Document approved",
-                SigContact: "john.doe@example.com",
-                SigLocation: "New York",
-                visible: true,
-                annotRect: rect);
+                1,                     // page number (1‑based)
+                "Document approved", // reason
+                "",                   // contact info
+                "Office",            // location
+                true,                  // visible signature flag
+                signatureRect,        // signature rectangle
+                pkcs1);                // certificate
 
-            // Save the signed PDF
+            // Save the signed document
             signer.Save(signedPdf);
 
-            // Verify all signatures present in the document
-            IList<SignatureName> signatureNames = signer.GetSignatureNames(true);
-            foreach (SignatureName sigName in signatureNames)
+            // ------------------------------------------------------------
+            // 2. Verify the signature that was just added
+            // ------------------------------------------------------------
+            // Re‑bind the signer to the newly created signed PDF
+            signer.BindPdf(signedPdf);
+
+            var signatureNames = signer.GetSignatureNames(); // IList<SignatureName>
+            bool isValid = false;
+            if (signatureNames != null && signatureNames.Count > 0)
             {
-                bool isValid = signer.VerifySignature(sigName);
-                Console.WriteLine($"Signature '{sigName.Name}' validity: {isValid}");
+                // Verify using the first (and only) signature name
+                isValid = signer.VerifySignature(signatureNames[0]);
             }
+
+            Console.WriteLine(isValid
+                ? "Signature verification succeeded."
+                : "Signature verification failed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

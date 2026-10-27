@@ -1,69 +1,43 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
+        // Paths (adjust as needed)
         const string outputPath = "TitlePage.pdf";
 
-        // Create a new empty PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Set the PDF document title (metadata)
-            doc.Info.Title = "Sample PDF with Custom Title Page";
-
             // Add a new page (this will be the title page)
             Page titlePage = doc.Pages.Add();
 
-            // -------------------------------------------------
-            // Add a colored background rectangle using Graph
-            // -------------------------------------------------
-            // Create a Graph container (size matches the page)
-            Graph graph = new Graph(titlePage.PageInfo.Width, titlePage.PageInfo.Height);
+            // Create a TextFragment for the title text
+            TextFragment title = new TextFragment("My Custom Title");
 
-            // Define a rectangle shape that covers the whole page (float parameters required)
-            var backgroundRect = new Aspose.Pdf.Drawing.Rectangle(
-                0f,
-                0f,
-                (float)titlePage.PageInfo.Width,
-                (float)titlePage.PageInfo.Height)
-            {
-                GraphInfo = new GraphInfo
-                {
-                    FillColor = Color.LightBlue,   // Background fill color
-                    Color = Color.LightBlue        // Border color (same as fill to hide border)
-                }
-            };
+            // Set custom font – using a built‑in font (Helvetica). 
+            // For external TTF fonts use FontRepository.OpenFont("path/to/font.ttf")
+            Font font = FontRepository.FindFont("Helvetica");
+            title.TextState.Font = font;
 
-            // Add the rectangle shape to the graph
-            graph.Shapes.Add(backgroundRect);
+            // Set custom font size
+            title.TextState.FontSize = 36;
 
-            // Add the Graph to the page
-            titlePage.Paragraphs.Add(graph);
+            // Set custom text color (using Aspose.Pdf.Color, not System.Drawing.Color)
+            title.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.2, 0.5, 0.8); // Light blue
 
-            // -------------------------------------------------
-            // Add the title text with custom font, size, and color
-            // -------------------------------------------------
-            // Create a TextFragment for the title
-            TextFragment titleFragment = new TextFragment("My Custom Title")
-            {
-                // Position the text (centered horizontally, near the top)
-                Position = new Position(titlePage.PageInfo.Width / 2, titlePage.PageInfo.Height - 100)
-            };
+            // Center the title on the page
+            title.HorizontalAlignment = HorizontalAlignment.Center;
+            title.VerticalAlignment = VerticalAlignment.Center;
 
-            // Set appearance via TextState
-            titleFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            titleFragment.TextState.FontSize = 36;
-            titleFragment.TextState.ForegroundColor = Color.DarkBlue;
-            titleFragment.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+            // Add the TextFragment to the page's paragraph collection
+            titlePage.Paragraphs.Add(title);
 
-            // Add the TextFragment to the page
-            titlePage.Paragraphs.Add(titleFragment);
-
-            // Save the document (PDF format)
+            // Save the document as PDF
             doc.Save(outputPath);
         }
 

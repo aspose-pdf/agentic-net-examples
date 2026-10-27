@@ -1,53 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Provides Document, HtmlLoadOptions, CrashReportOptions, PdfException
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class CrashReportGenerator
 {
     static void Main()
     {
-        // Path for the generated PDF report
-        const string outputPdfPath = "CrashReport.pdf";
+        const string outputPath = "crash_report.pdf";
 
         try
         {
-            // Example code that throws an exception
-            int zero = 0;
-            int _ = 1 / zero; // Triggers DivideByZeroException
+            // Simulate an operation that throws an exception
+            ThrowSampleException();
         }
         catch (Exception ex)
         {
-            // ---------------------------------------------------------------
-            // 1. Build crash‑report options based on the caught exception
-            // ---------------------------------------------------------------
-            CrashReportOptions reportOptions = new CrashReportOptions(ex)
+            // Build the crash report content
+            string report = $"Exception Message:{Environment.NewLine}{ex.Message}{Environment.NewLine}{Environment.NewLine}" +
+                            $"Stack Trace:{Environment.NewLine}{ex.StackTrace}";
+
+            // Create a new PDF document
+            using (Document doc = new Document())
             {
-                // Store the HTML report in the same folder as the final PDF
-                CrashReportDirectory = Path.GetDirectoryName(Path.GetFullPath(outputPdfPath)),
-                // Optional: give the HTML file a friendly name
-                CrashReportFilename = "CrashReport.html",
-                // Optional: add any custom message you want to appear in the report
-                CustomMessage = "An unexpected error occurred while processing the document."
-            };
+                // Add a page to the document
+                Page page = doc.Pages.Add();
 
-            // ---------------------------------------------------------------
-            // 2. Generate the HTML crash report (static utility method)
-            // ---------------------------------------------------------------
-            PdfException.GenerateCrashReport(reportOptions);
+                // Create a text fragment containing the report
+                TextFragment tf = new TextFragment(report);
+                tf.TextState.FontSize = 12;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                tf.Margin = new MarginInfo { Top = 20, Bottom = 20, Left = 20, Right = 20 };
 
-            // ---------------------------------------------------------------
-            // 3. Load the generated HTML and save it as a PDF
-            // ---------------------------------------------------------------
-            string htmlReportPath = reportOptions.CrashReportPath; // full path to the HTML file
+                // Add the text fragment to the page
+                page.Paragraphs.Add(tf);
 
-            // Load the HTML using the appropriate load options (required for HTML input)
-            using (Document htmlDoc = new Document(htmlReportPath, new HtmlLoadOptions()))
-            {
-                // Save as PDF – the default format is PDF
-                htmlDoc.Save(outputPdfPath);
+                // Save the PDF
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Crash report PDF created at: {Path.GetFullPath(outputPdfPath)}");
+            Console.WriteLine($"Crash report saved to '{outputPath}'.");
         }
+    }
+
+    static void ThrowSampleException()
+    {
+        // Example exception to demonstrate the crash report
+        throw new InvalidOperationException("Sample operation failed.");
     }
 }

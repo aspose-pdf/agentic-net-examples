@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // JavascriptAction resides here
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,14 +19,17 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page to attach the script (1‑based indexing)
-            int pageNumber = 1;
-            Page page = doc.Pages[pageNumber];
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
 
-            // Assign JavaScript that runs when the page becomes visible
-            page.Actions.OnOpen = new JavascriptAction($"app.alert('You have reached page {pageNumber}.');");
+                // Create a JavaScript action that shows an alert when the page is opened
+                string script = $"app.alert('You have opened page {i}');";
+                page.Actions.OnOpen = new JavascriptAction(script); // note: "JavascriptAction" (lowercase 's')
+            }
 
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
             doc.Save(outputPath);
         }
 

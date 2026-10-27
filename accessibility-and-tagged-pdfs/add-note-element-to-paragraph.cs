@@ -17,33 +17,37 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Open the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content API
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access the tagged content (creates a tagged structure if none exists)
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Get the root structure element (no cast needed)
-            StructureElement root = tagged.RootElement;
+            // Set language and title (optional)
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Create a paragraph element and set its visible text
-            ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This is the main paragraph content.");
+            // Get the root element of the structure tree
+            StructureElement root = taggedContent.RootElement;
 
-            // Create a note element (footnote/endnote) and set its text
-            NoteElement note = tagged.CreateNoteElement();
-            note.SetText("Supplemental information provided as a note.");
+            // Create a paragraph element
+            ParagraphElement paragraph = taggedContent.CreateParagraphElement();
+            paragraph.SetText("This is the main paragraph text.");
 
-            // Attach the note as a child of the paragraph
-            paragraph.AppendChild(note); // bool parameter omitted (default)
+            // Create a note element as a child of the paragraph
+            NoteElement note = taggedContent.CreateNoteElement();
+            note.SetText("Supplemental information provided in the note.");
 
-            // Attach the paragraph (with its note) to the document root
+            // Attach the note to the paragraph
+            paragraph.AppendChild(note); // one-argument AppendChild
+
+            // Attach the paragraph (with its note) to the root
             root.AppendChild(paragraph);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with note element: {outputPath}");
+        Console.WriteLine($"PDF saved with note element: '{outputPath}'");
     }
 }

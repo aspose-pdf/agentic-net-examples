@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
 
@@ -9,55 +10,78 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string outputPath = "tagged_table.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF (lifecycle rule: using block for disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access tagged content (no extra casting)
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Table with Header");
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Access tagged content (creates structure if not present)
+                ITaggedContent taggedContent = doc.TaggedContent;
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the logical structure tree
-            StructureElement root = tagged.RootElement;
+                // Root element of the structure tree
+                StructureElement root = taggedContent.RootElement;
 
-            // Create a table element and attach it to the root
-            TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Sample data table";
-            root.AppendChild(table); // AppendChild with one argument
+                // Create a table element and attach it to the root
+                TableElement table = taggedContent.CreateTableElement();
+                table.AlternativeText = "Sample data table";
+                root.AppendChild(table);
 
-            // Create the table header (THead) and attach it to the table
-            TableTHeadElement thead = tagged.CreateTableTHeadElement();
-            table.AppendChild(thead);
+                // ----- Header row (TH) -----
+                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+                table.AppendChild(thead);
 
-            // Create a header row (TR) inside the THead
-            TableTRElement headerRow = tagged.CreateTableTRElement();
-            thead.AppendChild(headerRow);
+                TableTRElement headerRow = taggedContent.CreateTableTRElement();
+                thead.AppendChild(headerRow);
 
-            // First header cell that spans two columns
-            TableTHElement th1 = tagged.CreateTableTHElement();
-            th1.SetText("Merged Header");          // Visible text
-            th1.ActualText = "Merged Header";      // /ActualText for accessibility
-            th1.ColSpan = 2;                       // Merge two cells
-            headerRow.AppendChild(th1);
+                // First header cell
+                TableTHElement th1 = taggedContent.CreateTableTHElement();
+                th1.SetText("Product");
+                th1.ActualText = "Product"; // set /ActualText attribute
+                headerRow.AppendChild(th1);
 
-            // Second header cell (single column)
-            TableTHElement th2 = tagged.CreateTableTHElement();
-            th2.SetText("Column 3");
-            th2.ActualText = "Column 3";
-            headerRow.AppendChild(th2);
+                // Second header cell
+                TableTHElement th2 = taggedContent.CreateTableTHElement();
+                th2.SetText("Revenue");
+                th2.ActualText = "Revenue";
+                headerRow.AppendChild(th2);
 
-            // Save the modified PDF (PDF format, no extra SaveOptions needed)
-            doc.Save(outputPath);
+                // ----- Body rows (TD) -----
+                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+                table.AppendChild(tbody);
+
+                // Example data row
+                TableTRElement dataRow = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
+
+                TableTDElement td1 = taggedContent.CreateTableTDElement();
+                td1.SetText("Widget A");
+                td1.ActualText = "Widget A";
+                dataRow.AppendChild(td1);
+
+                TableTDElement td2 = taggedContent.CreateTableTDElement();
+                td2.SetText("$50,000");
+                td2.ActualText = "$50,000";
+                dataRow.AppendChild(td2);
+
+                // Save the modified PDF (no PreSave required)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Tagged PDF with table saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

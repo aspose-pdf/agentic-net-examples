@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_adjusted.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_sound_adjusted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,50 +16,57 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[pageNum];
-
-                // Iterate over a copy of the annotation collection because we will modify items
-                int annotationCount = page.Annotations.Count;
-                for (int i = 1; i <= annotationCount; i++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Annotation ann = page.Annotations[i];
+                    Page page = doc.Pages[i];
 
-                    // Process only SoundAnnotation instances
-                    if (ann is SoundAnnotation soundAnn)
+                    // Iterate over all annotations on the page
+                    foreach (Annotation annot in page.Annotations)
                     {
-                        // Original rectangle
-                        Aspose.Pdf.Rectangle oldRect = soundAnn.Rect;
+                        // Process only SoundAnnotation instances
+                        if (annot is SoundAnnotation soundAnnot)
+                        {
+                            // Use the correct property 'Rect' for annotation bounds
+                            Aspose.Pdf.Rectangle rect = soundAnnot.Rect;
 
-                        // Calculate center point
-                        double centerX = (oldRect.LLX + oldRect.URX) / 2.0;
-                        double centerY = (oldRect.LLY + oldRect.URY) / 2.0;
+                            double width = rect.URX - rect.LLX;
+                            double height = rect.URY - rect.LLY;
 
-                        // Increase width and height by 20%
-                        double newWidth  = (oldRect.URX - oldRect.LLX) * 1.20;
-                        double newHeight = (oldRect.URY - oldRect.LLY) * 1.20;
+                            // Increase clickable area by 20%
+                            double newWidth = width * 1.20;
+                            double newHeight = height * 1.20;
 
-                        // Build new rectangle keeping the same center
-                        double newLLX = centerX - newWidth  / 2.0;
-                        double newLLY = centerY - newHeight / 2.0;
-                        double newURX = centerX + newWidth  / 2.0;
-                        double newURY = centerY + newHeight / 2.0;
+                            double deltaW = (newWidth - width) / 2.0;
+                            double deltaH = (newHeight - height) / 2.0;
 
-                        // Assign the expanded rectangle back to the annotation
-                        soundAnn.Rect = new Aspose.Pdf.Rectangle(newLLX, newLLY, newURX, newURY);
+                            // Create a new rectangle centered on the original
+                            Aspose.Pdf.Rectangle enlarged = new Aspose.Pdf.Rectangle(
+                                rect.LLX - deltaW,
+                                rect.LLY - deltaH,
+                                rect.URX + deltaW,
+                                rect.URY + deltaH);
+
+                            // Apply the enlarged rectangle back to the annotation
+                            soundAnnot.Rect = enlarged;
+                        }
                     }
                 }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"Adjusted SoundAnnotations saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Adjusted SoundAnnotations saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,13 +1,14 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "large_input.pdf";
+        const string pdfPath = "large.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -15,29 +16,18 @@ class Program
             return;
         }
 
-        // Measure the time taken to bind the PDF and retrieve XMP metadata
-        Stopwatch sw = new Stopwatch();
+        // Measure the time required to read XMP metadata
+        Stopwatch stopwatch = Stopwatch.StartNew();
 
-        // PdfXmpMetadata implements SaveableFacade (IDisposable), so use using for deterministic disposal
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            sw.Start();
+        // Use the PdfXmpMetadata facade (Aspose.Pdf.Facades) to read XMP metadata
+        var xmpFacade = new PdfXmpMetadata();
+        // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string
+        byte[] xmpBytes = xmpFacade.GetXmpMetadata(pdfPath);
+        string xmpMetadata = xmpBytes != null ? Encoding.UTF8.GetString(xmpBytes) : null;
 
-            // Bind the PDF file to the facade
-            xmp.BindPdf(pdfPath);
+        stopwatch.Stop();
 
-            // Retrieve the full XMP metadata as a byte array
-            byte[] metadataBytes = xmp.GetXmpMetadata();
-
-            sw.Stop();
-
-            // Convert metadata to a UTF-8 string for display (optional)
-            string metadataXml = System.Text.Encoding.UTF8.GetString(metadataBytes);
-
-            Console.WriteLine("XMP Metadata (excerpt):");
-            Console.WriteLine(metadataXml.Length > 500 ? metadataXml.Substring(0, 500) + "..." : metadataXml);
-            Console.WriteLine();
-            Console.WriteLine($"Time elapsed: {sw.Elapsed.TotalMilliseconds} ms");
-        }
+        Console.WriteLine($"XMP metadata length: {(xmpMetadata?.Length ?? 0)} characters");
+        Console.WriteLine($"Elapsed time: {stopwatch.ElapsedMilliseconds} ms");
     }
 }

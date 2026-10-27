@@ -1,66 +1,59 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, PdfPageStamp, etc.)
+using Aspose.Pdf;
+using Aspose.Pdf.Devices; // for converting a PDF page to an image
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string sourcePdfPath = "source.pdf";   // PDF containing the page to be used as a stamp template
-        const string targetPdfPath = "target.pdf";   // PDF where the stamp will be applied
-        const string outputPdfPath = "output.pdf";   // Resulting PDF
+        const string templatePdfPath = "template.pdf";   // PDF containing the page to use as a stamp
+        const string sourcePdfPath   = "source.pdf";     // PDF to which the stamp will be applied
+        const string outputPdfPath   = "stamped_output.pdf";
 
-        // Verify input files exist
+        if (!File.Exists(templatePdfPath))
+        {
+            Console.Error.WriteLine($"Template file not found: {templatePdfPath}");
+            return;
+        }
         if (!File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
             return;
         }
-        if (!File.Exists(targetPdfPath))
-        {
-            Console.Error.WriteLine($"Target file not found: {targetPdfPath}");
-            return;
-        }
 
-        try
+        // Load the PDF that provides the stamp page (template)
+        using (Document templateDoc = new Document(templatePdfPath))
+        // Load the PDF that will receive the stamp
+        using (Document targetDoc = new Document(sourcePdfPath))
         {
-            // Load the source document (the page that will become the stamp)
-            using (Document sourceDoc = new Document(sourcePdfPath))
+            // Convert the first page of the template PDF to an image (PNG) in memory.
+            // This image will be used as a stamp for the target document.
+            ImageStamp pageStamp;
+            using (var imageStream = new MemoryStream())
             {
-                // Aspose.Pdf uses 1‑based page indexing
-                Page stampTemplatePage = sourceDoc.Pages[1];
-
-                // Load the target document (the document to receive the stamp)
-                using (Document targetDoc = new Document(targetPdfPath))
-                {
-                    // Choose the page on which the stamp will be placed
-                    Page targetPage = targetDoc.Pages[1];
-
-                    // Create a PdfPageStamp from the template page
-                    PdfPageStamp pageStamp = new PdfPageStamp(stampTemplatePage)
-                    {
-                        // Example property customizations
-                        Background = false,                                 // Stamp appears on top
-                        Opacity = 0.7f,                                     // Semi‑transparent
-                        HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center,
-                        VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Center,
-                        // You can also set margins, zoom, rotation, etc., as needed
-                    };
-
-                    // Apply the stamp to the target page
-                    targetPage.AddStamp(pageStamp);
-
-                    // Save the modified document
-                    targetDoc.Save(outputPdfPath);
-                }
+                // 300 DPI gives a good quality image; adjust as needed.
+                var resolution = new Resolution(300);
+                var pngDevice = new PngDevice(resolution);
+                pngDevice.Process(templateDoc.Pages[1], imageStream);
+                imageStream.Position = 0; // rewind the stream for reading
+                pageStamp = new ImageStamp(imageStream);
+                pageStamp.Background = true; // place the stamp behind existing content
+                // Optionally set the stamp dimensions/position here, e.g.:
+                // pageStamp.Width = targetDoc.Pages[1].PageInfo.Width;
+                // pageStamp.Height = targetDoc.Pages[1].PageInfo.Height;
             }
 
-            Console.WriteLine($"Stamp applied successfully. Output saved to '{outputPdfPath}'.");
+            // Apply the image‑based stamp to every page of the target PDF.
+            for (int i = 1; i <= targetDoc.Pages.Count; i++)
+            {
+                targetDoc.Pages[i].AddStamp(pageStamp);
+            }
+
+            // Save the modified PDF
+            targetDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }

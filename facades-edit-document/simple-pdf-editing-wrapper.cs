@@ -1,143 +1,212 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
-/// <summary>
-/// Simple wrapper around Aspose.Pdf.Facades.PdfContentEditor to provide a streamlined editing workflow.
-/// </summary>
-public class SimplePdfEditor : IDisposable
+namespace PdfEditingWrapper
 {
-    private readonly PdfContentEditor _editor;
-    private readonly Document _document;
-    private bool _disposed;
-
-    /// <summary>
-    /// Loads a PDF file and initializes the underlying PdfContentEditor.
-    /// </summary>
-    /// <param name="inputPath">Path to the source PDF.</param>
-    public SimplePdfEditor(string inputPath)
+    // Wrapper that simplifies common PDF editing operations using the high‑level Document API.
+    public class PdfEditor : IDisposable
     {
-        // Load PDF using the standard Document constructor (load rule)
-        _document = new Document(inputPath);
-        // Initialize the editor with the loaded document
-        _editor = new PdfContentEditor(_document);
-    }
+        private Document? _document; // Made nullable to satisfy the non‑nullable warning.
+        private bool _isLoaded = false;
 
-    /// <summary>
-    /// Replaces all occurrences of <paramref name="oldText"/> with <paramref name="newText"/> in the entire document.
-    /// </summary>
-    public void ReplaceText(string oldText, string newText)
-    {
-        _editor.ReplaceText(oldText, newText);
-    }
+        public PdfEditor() { }
 
-    /// <summary>
-    /// Replaces text on a specific page. Optionally applies a <see cref="TextState"/> for styling.
-    /// </summary>
-    public void ReplaceText(string oldText, int pageNumber, string newText, TextState textState = null)
-    {
-        if (textState != null)
+        // Loads a PDF file into the editor.
+        public void Load(string pdfPath)
         {
-            _editor.ReplaceText(oldText, pageNumber, newText, textState);
-        }
-        else
-        {
-            _editor.ReplaceText(oldText, pageNumber, newText);
-        }
-    }
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException($"PDF file not found: {pdfPath}");
 
-    /// <summary>
-    /// Deletes all images from the PDF.
-    /// </summary>
-    public void DeleteAllImages()
-    {
-        _editor.DeleteImage();
-    }
-
-    /// <summary>
-    /// Deletes specific images on a given page.
-    /// </summary>
-    /// <param name="pageNumber">1‑based page index.</param>
-    /// <param name="imageIndexes">Array of image indexes to delete.</param>
-    public void DeleteImages(int pageNumber, int[] imageIndexes)
-    {
-        _editor.DeleteImage(pageNumber, imageIndexes);
-    }
-
-    /// <summary>
-    /// Adds a file attachment to the PDF without creating an annotation.
-    /// </summary>
-    /// <param name="filePath">Path to the file to attach.</param>
-    /// <param name="description">Description of the attachment.</param>
-    public void AddAttachment(string filePath, string description)
-    {
-        _editor.AddDocumentAttachment(filePath, description);
-    }
-
-    /// <summary>
-    /// Saves the edited PDF to the specified output path.
-    /// </summary>
-    /// <param name="outputPath">Destination file path.</param>
-    public void Save(string outputPath)
-    {
-        // Use the Save method provided by SaveableFacade (lifecycle rule)
-        _editor.Save(outputPath);
-    }
-
-    /// <summary>
-    /// Releases all resources held by the editor and the underlying document.
-    /// </summary>
-    public void Dispose()
-    {
-        if (!_disposed)
-        {
-            // Close the facade first
-            _editor?.Close();
-            // Dispose the Document (document‑disposal‑with‑using rule)
-            _document?.Dispose();
-            _disposed = true;
-        }
-    }
-}
-
-// Example usage of the wrapper
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "sample.pdf";
-        const string outputPdf = "sample_edited.pdf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
+            _document = new Document(pdfPath);
+            _isLoaded = true;
         }
 
-        try
+        // Adds plain text to a page using a rectangle for positioning.
+        public void AddText(int pageNumber, string text, double llx, double lly, double urx, double ury)
         {
-            using (SimplePdfEditor editor = new SimplePdfEditor(inputPdf))
+            EnsureLoaded();
+            if (pageNumber < 1 || pageNumber > _document!.Pages.Count)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range.");
+
+            TextFragment fragment = new TextFragment(text)
             {
-                // Replace a phrase throughout the document
-                editor.ReplaceText("Hello", "Hi");
-
-                // Delete all images
-                editor.DeleteAllImages();
-
-                // Add a text file as an attachment
-                editor.AddAttachment("attachment.txt", "Sample attachment");
-
-                // Persist changes
-                editor.Save(outputPdf);
-            }
-
-            Console.WriteLine($"Edited PDF saved to '{outputPdf}'.");
+                // Position is the lower‑left corner of the text.
+                Position = new Position(llx, lly)
+            };
+            // Optional: you can also set the rectangle via fragment.Rectangle if you need clipping.
+            _document.Pages[pageNumber].Paragraphs.Add(fragment);
         }
-        catch (Exception ex)
+
+        // Overload that adds text using the default placement (top‑left of the page).
+        public void AddText(int pageNumber, string text)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            EnsureLoaded();
+            if (pageNumber < 1 || pageNumber > _document!.Pages.Count)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range.");
+
+            TextFragment fragment = new TextFragment(text);
+            _document.Pages[pageNumber].Paragraphs.Add(fragment);
+        }
+
+        // Inserts an image onto a page within the specified rectangle.
+        // Implemented with ImageStamp because Aspose.Pdf.Image no longer exposes a Rectangle property.
+        public void AddImage(int pageNumber, string imagePath, double llx, double lly, double urx, double ury)
+        {
+            EnsureLoaded();
+            if (!File.Exists(imagePath))
+                throw new FileNotFoundException($"Image file not found: {imagePath}");
+            if (pageNumber < 1 || pageNumber > _document!.Pages.Count)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range.");
+
+            // Use ImageStamp for absolute positioning.
+            ImageStamp imgStamp = new ImageStamp(imagePath)
+            {
+                // Position the stamp using alignment + indent values.
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                XIndent = (float)llx,
+                YIndent = (float)lly,
+                // Optionally fix width/height to match the rectangle size.
+                // The stamp will be scaled to fit the rectangle defined by the indents.
+                // Aspose.Pdf does not provide a direct Rectangle property for ImageStamp.
+            };
+            _document.Pages[pageNumber].AddStamp(imgStamp);
+        }
+
+        // Adds a stamp (e.g., watermark) to a page within the specified rectangle.
+        // Implemented with ImageStamp using alignment and margin properties.
+        public void AddStamp(int pageNumber, string stampPath, double llx, double lly, double urx, double ury)
+        {
+            EnsureLoaded();
+            if (!File.Exists(stampPath))
+                throw new FileNotFoundException($"Stamp file not found: {stampPath}");
+            if (pageNumber < 1 || pageNumber > _document!.Pages.Count)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range.");
+
+            ImageStamp stamp = new ImageStamp(stampPath)
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                XIndent = (float)llx,
+                YIndent = (float)lly,
+                // Margins can be used to fine‑tune placement relative to the rectangle.
+                // For example, to keep the stamp inside the rectangle defined by (llx,lly,urx,ury):
+                // LeftMargin = (float)llx, BottomMargin = (float)lly, etc.
+                // Here we simply use the indents for positioning.
+                Background = false
+            };
+            _document.Pages[pageNumber].AddStamp(stamp);
+        }
+
+        // Deletes a page from the PDF.
+        public void DeletePage(int pageNumber)
+        {
+            EnsureLoaded();
+            if (pageNumber < 1 || pageNumber > _document!.Pages.Count)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range.");
+
+            _document.Pages.Delete(pageNumber);
+        }
+
+        // Inserts a page from another PDF at the given position.
+        public void InsertPage(int pageNumber, string sourcePdfPath)
+        {
+            EnsureLoaded();
+            if (!File.Exists(sourcePdfPath))
+                throw new FileNotFoundException($"Source PDF not found: {sourcePdfPath}");
+            if (pageNumber < 1 || pageNumber > _document!.Pages.Count + 1)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number is out of range.");
+
+            Document sourceDoc = new Document(sourcePdfPath);
+            // Insert the first page of the source document at the specified position.
+            _document.Pages.Insert(pageNumber, sourceDoc.Pages[1]);
+        }
+
+        // Saves the edited PDF to the specified output path.
+        public void Save(string outputPath)
+        {
+            EnsureLoaded();
+            _document!.Save(outputPath);
+        }
+
+        // Dispose pattern – Document implements IDisposable.
+        public void Dispose()
+        {
+            _document?.Dispose();
+        }
+
+        private void EnsureLoaded()
+        {
+            if (!_isLoaded || _document == null)
+                throw new InvalidOperationException("No PDF has been loaded. Call Load() first.");
+        }
+    }
+
+    // Example usage of the PdfEditor wrapper.
+    class Program
+    {
+        static void Main()
+        {
+            const string inputPdf = "sample.pdf";
+            const string outputPdf = "sample_edited.pdf";
+            const string imagePath = "logo.png";
+            const string stampPath = "stamp.png";
+
+            try
+            {
+                using (PdfEditor editor = new PdfEditor())
+                {
+                    editor.Load(inputPdf);
+
+                    // Add a header text to page 1.
+                    editor.AddText(
+                        pageNumber: 1,
+                        text: "Confidential Document",
+                        llx: 50,   // lower‑left X
+                        lly: 750,  // lower‑left Y
+                        urx: 550,  // upper‑right X (unused for TextFragment positioning)
+                        ury: 800   // upper‑right Y (unused for TextFragment positioning)
+                    );
+
+                    // Insert an image on page 2.
+                    editor.AddImage(
+                        pageNumber: 2,
+                        imagePath: imagePath,
+                        llx: 100,
+                        lly: 500,
+                        urx: 300,
+                        ury: 700
+                    );
+
+                    // Apply a stamp on page 3.
+                    editor.AddStamp(
+                        pageNumber: 3,
+                        stampPath: stampPath,
+                        llx: 200,
+                        lly: 200,
+                        urx: 400,
+                        ury: 400
+                    );
+
+                    // Delete page 4 (if it exists).
+                    try { editor.DeletePage(4); } catch { /* ignore if page does not exist */ }
+
+                    // Insert an extra page from another PDF after page 2.
+                    editor.InsertPage(3, "extra_page.pdf");
+
+                    // Persist changes.
+                    editor.Save(outputPdf);
+                }
+
+                Console.WriteLine($"Edited PDF saved to '{outputPdf}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
         }
     }
 }

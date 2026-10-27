@@ -8,7 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string outputJsonPath = "images.json";     // JSON with base64 strings
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,38 +17,34 @@ class Program
             return;
         }
 
-        // List to hold Base64 strings of extracted images
-        List<string> base64Images = new List<string>();
-
-        // Use PdfExtractor (implements IDisposable) to extract images
+        // PdfExtractor implements IDisposable – wrap in using for deterministic cleanup
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file
+            // Bind the PDF file to the extractor
             extractor.BindPdf(inputPdfPath);
 
-            // Prepare for image extraction
+            // Extract all images from the document
             extractor.ExtractImage();
 
-            // Iterate through all images in the PDF
+            List<string> base64Images = new List<string>();
+
+            // Iterate over each extracted image
             while (extractor.HasNextImage())
             {
-                // Retrieve the next image into a memory stream
+                // GetNextImage writes the image data into the provided stream
                 using (MemoryStream imageStream = new MemoryStream())
                 {
                     extractor.GetNextImage(imageStream);
-
-                    // Convert the stream content to a Base64 string
+                    // Convert the raw bytes to a Base64 string for JSON transmission
                     string base64 = Convert.ToBase64String(imageStream.ToArray());
                     base64Images.Add(base64);
                 }
             }
 
-            // Release resources held by the extractor
-            extractor.Close();
+            // Serialize the list of Base64 strings to JSON
+            string json = JsonSerializer.Serialize(base64Images, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(outputJsonPath, json);
+            Console.WriteLine($"Extracted {base64Images.Count} images and saved to '{outputJsonPath}'.");
         }
-
-        // Serialize the list of Base64 strings to JSON for transmission
-        string jsonPayload = JsonSerializer.Serialize(base64Images);
-        Console.WriteLine(jsonPayload);
     }
 }

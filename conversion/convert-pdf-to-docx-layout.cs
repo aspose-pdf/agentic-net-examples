@@ -1,39 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core API (Document, DocSaveOptions, etc.)
+using Aspose.Pdf;               // All SaveOptions subclasses are in this namespace
 
-class PdfToDocxConverter
+class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdfPath  = "input.pdf";
-        // Output DOCX file path
         const string outputDocxPath = "output.docx";
 
-        // Verify that the source file exists
+        // Verify the source file exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF, convert, and save as DOCX
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Configure conversion options
-            DocSaveOptions saveOptions = new DocSaveOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Preserve the original layout (standard/textbox mode)
-                Mode = DocSaveOptions.RecognitionMode.Textbox,
-                // Output format – DOCX
-                Format = DocSaveOptions.DocFormat.DocX
-            };
+                // Configure DOCX save options.
+                // - Format specifies DOCX output.
+                // - RecognitionMode (standard) preserves the original layout.
+                DocSaveOptions docOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.DocX,
+                    // The property name may vary by version; the intent is to use the standard mode.
+                    // Uncomment the line below if the enum exists in your version:
+                    // ContentRecognitionMode = DocSaveOptions.RecognitionMode.Standard
+                };
 
-            // Save the document as DOCX using the specified options
-            pdfDocument.Save(outputDocxPath, saveOptions);
+                // Save as DOCX using the explicit options (required for non‑PDF formats)
+                pdfDoc.Save(outputDocxPath, docOptions);
+            }
+
+            Console.WriteLine($"Conversion successful: {outputDocxPath}");
         }
-
-        Console.WriteLine($"Conversion completed: '{outputDocxPath}'");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

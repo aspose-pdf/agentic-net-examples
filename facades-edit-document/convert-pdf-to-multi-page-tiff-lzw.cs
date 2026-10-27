@@ -1,30 +1,47 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // CompressionType enum for TIFF
+using Aspose.Pdf.Devices; // for CompressionType and Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputTiff = "output.tiff";
+        const string inputPdfPath = "input.pdf";
+        const string outputTiffPath = "output.tiff";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Create a PdfConverter, bind the PDF, perform conversion, and save as multi‑page TIFF with LZW compression
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            converter.BindPdf(inputPdf);   // Load PDF
-            converter.DoConvert();         // Prepare conversion
-            converter.SaveAsTIFF(outputTiff, CompressionType.LZW); // Save TIFF with LZW compression
-        }
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Initialize the PdfConverter which supports TIFF output
+                using (PdfConverter converter = new PdfConverter())
+                {
+                    // Optional: set DPI resolution for the TIFF images
+                    // converter.Resolution = new Resolution(300);
 
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
+                    converter.BindPdf(pdfDoc);
+                    converter.DoConvert();
+
+                    // Save the whole PDF as a multi‑page TIFF using LZW compression
+                    converter.SaveAsTIFF(outputTiffPath, CompressionType.LZW);
+                    converter.Close();
+                }
+            }
+
+            Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiffPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

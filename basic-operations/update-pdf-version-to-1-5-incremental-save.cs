@@ -7,7 +7,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string logPath = "conversion_log.xml"; // optional log file for conversion
+        const string outputPath = "output_incremental.pdf";
+        const string conversionLog = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -18,16 +19,16 @@ class Program
         // Load the PDF
         using (Document doc = new Document(inputPath))
         {
-            // Change PDF version to 1.5 using the Convert method (Version property is read‑only)
-            doc.Convert(logPath, PdfFormat.v_1_5, ConvertErrorAction.Delete);
+            // Change PDF version to 1.5 using Document.Convert
+            doc.Convert(conversionLog, PdfFormat.v_1_5, ConvertErrorAction.Delete);
 
-            // Save the document back to the same file using incremental update.
-            // In recent Aspose.PDF versions the IncrementalUpdate flag is enabled by default when
-            // saving to the original file, and the property is not present in older library versions.
-            var saveOptions = new PdfSaveOptions();
-            doc.Save(inputPath, saveOptions);
+            // Save with incremental update – open a read/write stream and call parameterless Save()
+            using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.ReadWrite))
+            {
+                doc.Save(fs); // parameterless Save performs incremental update on the stream
+            }
         }
 
-        Console.WriteLine("PDF version updated to 1.5 with incremental save.");
+        Console.WriteLine($"PDF saved with version 1.5 and incremental update to '{outputPath}'.");
     }
 }

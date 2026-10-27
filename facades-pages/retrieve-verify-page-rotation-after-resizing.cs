@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,36 +15,34 @@ class Program
             return;
         }
 
-        // Bind the source PDF to the PdfPageEditor facade
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the original PDF and read its rotation
+        int rotationBefore;
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Rotation is exposed via the Page.Rotate property (enum Rotation)
+            rotationBefore = (int)doc.Pages[1].Rotate;
+            Console.WriteLine($"Rotation before resizing: {rotationBefore} degrees");
 
-            // Retrieve the original rotation of the first page (pages are 1‑based)
-            int originalRotation = editor.GetPageRotation(1);
-            Console.WriteLine($"Original rotation of page 1: {originalRotation} degrees");
+            // Change the page size – A4 size is 595 x 842 points
+            // SetPageSize expects width and height as double values, not a PageSize object.
+            doc.Pages[1].SetPageSize(595.0, 842.0);
 
-            // Change the page size (example: A4 landscape – 842×595 points)
-            editor.PageSize = new PageSize(842, 595);
-
-            // Apply changes and save the modified PDF
-            editor.Save(outputPath);
-            editor.Close();
-
-            // Verify that the rotation value is unchanged after resizing
-            using (PdfPageEditor verifier = new PdfPageEditor())
-            {
-                verifier.BindPdf(outputPath);
-                int newRotation = verifier.GetPageRotation(1);
-                Console.WriteLine($"Rotation after resizing: {newRotation} degrees");
-
-                if (originalRotation == newRotation)
-                    Console.WriteLine("Rotation unchanged after page size modification.");
-                else
-                    Console.WriteLine("Rotation changed unexpectedly.");
-
-                verifier.Close();
-            }
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
+
+        // Load the modified PDF and verify that rotation is unchanged
+        int rotationAfter;
+        using (Document doc = new Document(outputPath))
+        {
+            rotationAfter = (int)doc.Pages[1].Rotate;
+            Console.WriteLine($"Rotation after resizing: {rotationAfter} degrees");
+        }
+
+        // Simple check
+        if (rotationBefore == rotationAfter)
+            Console.WriteLine("Rotation value remained unchanged after resizing.");
+        else
+            Console.WriteLine("Rotation value changed after resizing.");
     }
 }

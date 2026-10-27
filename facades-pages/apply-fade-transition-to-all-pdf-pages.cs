@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Document class
-using Aspose.Pdf.Facades;            // PdfPageEditor facade
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_fade.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,28 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+
+        // Apply a Fade transition to every page using PdfPageEditor.
+        // In recent Aspose.Pdf versions the transition is set via the integer
+        // value of the TransitionType property (11 = Fade). The duration is
+        // specified in seconds.
+        using (PdfPageEditor editor = new PdfPageEditor(pdfDoc))
         {
-            // Initialize the PdfPageEditor facade
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Bind the document to the editor
-                editor.BindPdf(doc);
+            editor.TransitionType = 11;          // Fade transition
+            editor.TransitionDuration = 2;      // 2‑second duration
 
-                // Set the transition type to Fade (DISSOLVE) for all pages
-                editor.TransitionType = PdfPageEditor.DISSOLVE;
+            // Apply the transition to all pages (1‑based page numbers).
+            int pageCount = pdfDoc.Pages.Count;
+            int[] allPages = new int[pageCount];
+            for (int i = 0; i < pageCount; i++)
+                allPages[i] = i + 1;
+            editor.ProcessPages = allPages;
 
-                // Set a uniform transition duration (e.g., 2 seconds)
-                editor.TransitionDuration = 2;
-
-                // Apply the changes to the document pages
-                editor.ApplyChanges();
-            }
-
-            // Save the modified document (PDF format)
-            doc.Save(outputPath);
+            editor.ApplyChanges();
         }
+
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
 
         Console.WriteLine($"Fade transition applied to all pages. Saved as '{outputPath}'.");
     }

@@ -7,53 +7,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string outputPdf = "output.pdf";     // result PDF
-        const string videoFile = "sample.mp4";     // video to embed
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string videoPath = "sample.mp4";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(videoPath))
+        {
+            Console.Error.WriteLine($"Video file not found: {videoPath}");
             return;
         }
 
-        if (!File.Exists(videoFile))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Video file not found: {videoFile}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Ensure the document has at least three pages
+            // Verify that the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document does not contain a third page.");
+                Console.Error.WriteLine("The document contains fewer than 3 pages.");
                 return;
             }
 
-            // Get page three (Aspose.Pdf uses 1‑based indexing)
+            // Retrieve page three
             Page page = doc.Pages[3];
 
-            // Define the rectangle where the screen annotation will appear
-            // (left, bottom, width, height) – adjust values as needed
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 200);
+            // Define the rectangle where the annotation will be placed (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the ScreenAnnotation with the video file
-            ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFile);
+            // Create a ScreenAnnotation and associate the video file via the constructor
+            ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoPath);
 
-            // Optionally set a title or contents
-            screenAnn.Title    = "Sample Video";
-            screenAnn.Contents = "Click to play the video.";
+            // Optional title displayed in the annotation UI
+            screen.Title = "Sample Video";
 
-            // Add the annotation to the page
-            page.Annotations.Add(screenAnn);
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(screen);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Screen annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Screen annotation added and saved to '{outputPath}'.");
     }
 }

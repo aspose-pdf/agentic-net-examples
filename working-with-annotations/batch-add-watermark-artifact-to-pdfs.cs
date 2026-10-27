@@ -2,51 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class BatchWatermark
+class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs and the watermark image file
-        const string inputFolder = @"C:\InputPdfs";
-        const string outputFolder = @"C:\OutputPdfs";
-        const string watermarkImagePath = @"C:\Resources\watermark.png";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where watermarked PDFs will be written
+        const string outputFolder = "OutputPdfs";
+        // Path to the image that will be used as the watermark
+        const string watermarkImagePath = "watermark.png";
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-
-        foreach (string pdfPath in pdfFiles)
+        if (!Directory.Exists(inputFolder))
         {
-            // Load each PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
-            {
-                // Add the same watermark artifact to every page
-                foreach (Page page in doc.Pages)
-                {
-                    // Create a watermark artifact instance
-                    WatermarkArtifact watermark = new WatermarkArtifact();
-
-                    // Use the same image file for all artifacts (reference reuse)
-                    watermark.SetImage(watermarkImagePath);
-
-                    // Optional visual settings
-                    watermark.IsBackground = true;   // place behind page content
-                    watermark.Opacity = 0.3f;        // semi‑transparent
-
-                    // Attach the artifact to the current page
-                    page.Artifacts.Add(watermark);
-                }
-
-                // Save the modified PDF to the output folder
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
         }
 
-        Console.WriteLine("Batch watermarking completed.");
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Create a single ImageStamp instance to reuse for all documents.
+        // Reusing the same instance avoids reloading the image file repeatedly.
+        ImageStamp watermarkStamp = new ImageStamp(watermarkImagePath)
+        {
+            Opacity = 0.5,                     // 50% transparent
+            Background = false,                // place on top of page content
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Center,
+            // Optional: Scale = 0.5, // 50% of original size
+            // Optional: Rotate = 45   // degrees
+        };
+
+        // Iterate over every PDF file in the input folder.
+        foreach (string sourcePdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName   = Path.GetFileName(sourcePdfPath);
+            string targetPath = Path.Combine(outputFolder, fileName);
+
+            // Load the PDF, add the watermark to each page, and save.
+            using (Document doc = new Document(sourcePdfPath))
+            {
+                foreach (Page page in doc.Pages)
+                {
+                    // Add the same ImageStamp instance to each page.
+                    page.AddStamp(watermarkStamp);
+                }
+
+                // Save the modified PDF.
+                doc.Save(targetPath);
+            }
+
+            Console.WriteLine($"Watermarked PDF saved: {targetPath}");
+        }
     }
 }

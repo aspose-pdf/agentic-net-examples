@@ -6,54 +6,64 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputDir = "SplitParts";
 
-        // Verify the source file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Build descriptive output filenames based on the source name
-        string baseName   = Path.GetFileNameWithoutExtension(inputPath);
-        string part1Path  = $"{baseName}_part1.pdf";
-        string part2Path  = $"{baseName}_part2.pdf";
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the source PDF (using block ensures proper disposal)
-        using (Document src = new Document(inputPath))
+        try
         {
-            int totalPages = src.Pages.Count;
-
-            // Ensure there are at least 10 pages to split at
-            if (totalPages < 10)
+            // Load the source PDF (1‑based page indexing)
+            using (Document src = new Document(inputPdf))
             {
-                Console.Error.WriteLine("Document has fewer than 10 pages; cannot split as requested.");
-                return;
-            }
+                int totalPages = src.Pages.Count;
+                int splitPage   = 10; // split after this page
 
-            // ---------- First part: pages 1 through 10 ----------
-            using (Document part1 = new Document())
-            {
-                for (int i = 1; i <= 10; i++)               // 1‑based indexing
+                // ---------- Part 1: pages 1 … splitPage ----------
+                using (Document part1 = new Document())
                 {
-                    part1.Pages.Add(src.Pages[i]);           // copy page to new document
-                }
-                part1.Save(part1Path);                       // save as PDF
-            }
+                    // Add pages 1 through splitPage (or up to totalPages if fewer)
+                    for (int i = 1; i <= Math.Min(splitPage, totalPages); i++)
+                    {
+                        part1.Pages.Add(src.Pages[i]);
+                    }
 
-            // ---------- Second part: pages 11 through end ----------
-            using (Document part2 = new Document())
-            {
-                for (int i = 11; i <= totalPages; i++)       // continue from page 11
-                {
-                    part2.Pages.Add(src.Pages[i]);           // copy page to new document
+                    string part1Path = Path.Combine(outputDir, $"part1_pages_1-{Math.Min(splitPage, totalPages)}.pdf");
+                    part1.Save(part1Path);
+                    Console.WriteLine($"Saved part 1 → {part1Path}");
                 }
-                part2.Save(part2Path);                       // save as PDF
+
+                // ---------- Part 2: pages splitPage+1 … end ----------
+                if (totalPages > splitPage)
+                {
+                    using (Document part2 = new Document())
+                    {
+                        for (int i = splitPage + 1; i <= totalPages; i++)
+                        {
+                            part2.Pages.Add(src.Pages[i]);
+                        }
+
+                        string part2Path = Path.Combine(outputDir, $"part2_pages_{splitPage + 1}-end.pdf");
+                        part2.Save(part2Path);
+                        Console.WriteLine($"Saved part 2 → {part2Path}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Source PDF has fewer pages than the split point; only part 1 was created.");
+                }
             }
         }
-
-        Console.WriteLine($"First part saved to '{part1Path}'.");
-        Console.WriteLine($"Second part saved to '{part2Path}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during split: {ex.Message}");
+        }
     }
 }

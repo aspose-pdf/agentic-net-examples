@@ -7,34 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputTextPath = "output.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Initialize PdfExtractor and bind the PDF document
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Initialize the PdfExtractor (Aspose.Pdf.Facades)
+        PdfExtractor extractor = new PdfExtractor();
+
+        // Load the PDF document
+        extractor.BindPdf(inputPdf);
+
+        // Extract all text from the document
+        extractor.ExtractText();
+
+        // Retrieve the extracted text via a stream (required overload)
+        string extractedText;
+        using (MemoryStream textStream = new MemoryStream())
         {
-            extractor.BindPdf(pdfPath);
-
-            // Extract text using UTF-8 encoding
-            extractor.ExtractText(Encoding.UTF8);
-
-            // Retrieve the extracted text into a memory stream
-            using (MemoryStream ms = new MemoryStream())
+            extractor.GetText(textStream); // write text to the stream
+            textStream.Position = 0; // rewind for reading
+            using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
             {
-                extractor.GetText(ms);
-                string extractedText = Encoding.UTF8.GetString(ms.ToArray());
-
-                // Save the text to a file with UTF-8 encoding
-                File.WriteAllText(outputTextPath, extractedText, Encoding.UTF8);
+                extractedText = reader.ReadToEnd();
             }
         }
 
-        Console.WriteLine($"Extracted text saved to '{outputTextPath}'.");
+        // Save the text to a file using UTF‑8 encoding for international characters
+        File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
+
+        Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
     }
 }

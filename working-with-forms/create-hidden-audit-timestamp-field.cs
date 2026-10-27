@@ -1,7 +1,6 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -9,29 +8,30 @@ class Program
     {
         const string outputPath = "audit_timestamp.pdf";
 
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (required for placing the field)
+            // Add a blank page (Aspose.Pdf uses 1‑based page indexing)
             Page page = doc.Pages.Add();
 
-            // Zero‑size rectangle – field will be hidden
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            // Define a zero‑size rectangle for the hidden field (position is irrelevant)
+            Rectangle rect = new Rectangle(0, 0, 0, 0);
 
-            // Create a DateField on the page
-            DateField timestampField = new DateField(page, rect)
-            {
-                PartialName = "CreationTimestamp",
-                Value = DateTime.Now,
-                Flags = AnnotationFlags.Hidden
-            };
+            // Create a text box form field that will hold the creation timestamp
+            TextBoxField timestampField = new TextBoxField(page, rect);
+            timestampField.PartialName = "CreationTimestamp";
+            timestampField.Value = DateTime.UtcNow.ToString("o"); // ISO‑8601 timestamp
 
-            // Add the field to the document's form
-            doc.Form.Add(timestampField);
+            // No need to set Flags; a zero‑size rectangle makes the field invisible to the user
+            // timestampField.Flags = FieldFlag.Hidden; // <-- removed
 
-            // Save the PDF
+            // Add the field to the document's AcroForm on page 1
+            doc.Form.Add(timestampField, 1);
+
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with hidden audit timestamp saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with hidden timestamp saved to '{outputPath}'.");
     }
 }

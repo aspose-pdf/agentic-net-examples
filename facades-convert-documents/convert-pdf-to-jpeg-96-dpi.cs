@@ -1,50 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // required for Resolution
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputFolder = "Images";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "JpegPages";
 
-        // Verify source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // PdfConverter implements IDisposable, so use a using block
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document (Document implements IDisposable, so a using block is fine)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document into the converter
-            converter.BindPdf(inputPdf);
+            // Define the resolution (96 DPI) and JPEG quality (0‑100)
+            var resolution = new Resolution(96);
+            const int jpegQuality = 90;
 
-            // Set desired resolution (96 DPI) for image conversion.
-            // PdfConverter.Resolution expects an Aspose.Pdf.Devices.Resolution object.
-            converter.Resolution = new Resolution(96);
+            // JpegDevice does NOT implement IDisposable – instantiate it directly
+            var jpegDevice = new JpegDevice(resolution, jpegQuality);
 
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Extract each page as a JPEG image (default format inferred from file extension)
-            while (converter.HasNextImage())
+            // Convert each page to a separate JPEG file
+            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
             {
                 string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
-                converter.GetNextImage(outputPath);
-                pageNumber++;
+                // Dispose only the stream; JpegDevice is reused for all pages
+                using (var imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                }
+                Console.WriteLine($"Page {pageNumber} saved as {outputPath}");
             }
-
-            // Release resources held by the converter (also done by using)
-            converter.Close();
         }
+
+        Console.WriteLine("PDF to JPEG conversion completed.");
     }
 }

@@ -2,15 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_form.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,49 +16,24 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF, add a text box form field with placeholder text, and save.
         using (Document doc = new Document(inputPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Create a TextBoxField (form field) on the first page
-            // -----------------------------------------------------------------
-            Page page = doc.Pages[1]; // 1‑based indexing
-            // Define the rectangle where the field will appear (llx, lly, urx, ury)
+            // Define the field rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
             Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
 
-            // Create the field; use the constructor that takes Document + Rectangle
-            TextBoxField textBox = new TextBoxField(doc, fieldRect)
-            {
-                // Set a placeholder value that will be shown when the field is empty
-                Value = "Enter your text here..."
-            };
+            // Create a TextBoxField on the first page.
+            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect);
+            textField.PartialName = "MyTextField"; // set the field name
+            textField.Value = "Enter your name here..."; // placeholder / default text
 
-            // Add the field to the document's form collection
-            doc.Form.Add(textBox);
+            // Associate the field with the document's /Form (AcroForm) element.
+            doc.Form.Add(textField);
 
-            // -----------------------------------------------------------------
-            // 2. Create a /Form structure element and associate it with the field
-            // -----------------------------------------------------------------
-            ITaggedContent taggedContent = doc.TaggedContent;
-
-            // Ensure the document has a tagged structure root
-            StructureElement root = taggedContent.RootElement;
-
-            // Create a FormElement (represents a widget annotation in the logical structure)
-            FormElement formElement = taggedContent.CreateFormElement();
-
-            // Append the FormElement to the root of the structure tree
-            root.AppendChild(formElement);
-
-            // Bind the form field annotation to the FormElement
-            formElement.Tag(textBox);
-
-            // -----------------------------------------------------------------
-            // 3. Save the modified PDF
-            // -----------------------------------------------------------------
+            // Save the updated PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with form field saved to '{outputPath}'.");
+        Console.WriteLine($"Form field added and saved to '{outputPath}'.");
     }
 }

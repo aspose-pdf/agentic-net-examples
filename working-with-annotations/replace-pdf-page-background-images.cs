@@ -1,50 +1,68 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // ImageStamp resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string newImagePath = "newBackground.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string newImagePath = "newImage.jpg";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(newImagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {newImagePath}");
+            Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
             return;
         }
 
-        // Load the PDF document (1‑based page indexing)
-        using (Document doc = new Document(inputPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over all artifacts on the current page
-                foreach (Artifact artifact in page.Artifacts)
+                Page page = doc.Pages[i];
+
+                // Collect background artifacts first because we will modify the collection while iterating
+                List<BackgroundArtifact> bgArtifacts = new List<BackgroundArtifact>();
+                foreach (Artifact art in page.Artifacts)
                 {
-                    // Check if the artifact is a background artifact
-                    if (artifact is BackgroundArtifact bgArtifact)
+                    if (art is BackgroundArtifact bg)
+                        bgArtifacts.Add(bg);
+                }
+
+                foreach (BackgroundArtifact bg in bgArtifacts)
+                {
+                    // Preserve the original rectangle (position and size)
+                    Aspose.Pdf.Rectangle rect = bg.Rectangle;
+
+                    // Remove the original background artifact using Delete (no out parameter needed)
+                    page.Artifacts.Delete(bg);
+
+                    // Create an ImageStamp that occupies the same rectangle
+                    ImageStamp stamp = new ImageStamp(newImagePath)
                     {
-                        // Replace the background image while preserving all other properties
-                        // SetImage accepts a file path or a stream; using the path here
-                        bgArtifact.SetImage(newImagePath);
-                    }
+                        XIndent = rect.LLX,
+                        YIndent = rect.LLY,
+                        Width = rect.Width,
+                        Height = rect.Height,
+                        Background = true // place it on the page background
+                    };
+
+                    // Add the new image stamp to the page
+                    page.AddStamp(stamp);
                 }
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with updated background images to '{outputPath}'.");
+        Console.WriteLine($"Background artifacts replaced and saved to '{outputPdf}'.");
     }
 }

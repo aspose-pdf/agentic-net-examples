@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -16,28 +17,48 @@ class Program
             return;
         }
 
-        // Create formatted text with custom line spacing (extra spacing after each line)
-        FormattedText formattedText = new FormattedText();
-        formattedText.AddNewLineText("CONFIDENTIAL", 5f);          // 5 points extra spacing
-        formattedText.AddNewLineText("DO NOT DISTRIBUTE", 5f);
-        formattedText.AddNewLineText("FOR INTERNAL USE ONLY", 5f);
-
-        // Create a stamp and bind the formatted text to it
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindLogo(formattedText);
-
-        // Position the stamp (XIndent, YIndent) and set appearance
-        stamp.SetOrigin(100, 400);   // place near the center of the page
-        stamp.Opacity = 0.3f;        // semi‑transparent
-        stamp.IsBackground = true;  // draw behind page content
-
-        // Apply the stamp to all pages using PdfFileStamp facade
-        using (PdfFileStamp fileStamp = new PdfFileStamp())
+        // Load the PDF to obtain page dimensions (required for positioning the stamps)
+        using (Document doc = new Document(inputPath))
         {
-            fileStamp.BindPdf(inputPath);   // load source PDF
-            fileStamp.AddStamp(stamp);      // add the prepared stamp
-            fileStamp.Save(outputPath);     // save the result
-            fileStamp.Close();              // close resources
+            // Assume we watermark the first page; adjust as needed
+            int pageNumber = 1;
+            Page page = doc.Pages[pageNumber];
+            double pageHeight = page.PageInfo.Height;
+            double pageWidth = page.PageInfo.Width;
+
+            // Watermark configuration
+            string[] watermarkLines = { "CONFIDENTIAL", "DO NOT DISTRIBUTE", "AUTHORIZED PERSONNEL ONLY" };
+            double marginTop = 100;               // distance from top edge
+            double lineHeight = 30;               // custom line spacing between lines
+            double startY = pageHeight - marginTop; // Y coordinate of the first line (from bottom)
+            // X position is handled by HorizontalAlignment = Center, so XIndent stays 0
+
+            // Add each line as a separate TextStamp with calculated Y position
+            for (int i = 0; i < watermarkLines.Length; i++)
+            {
+                TextStamp stamp = new TextStamp(watermarkLines[i])
+                {
+                    // Center the text horizontally
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    // Position the stamp; YIndent is measured from the bottom of the page
+                    YIndent = startY - i * lineHeight,
+                    // Optional: keep XIndent at 0 because we use Center alignment
+                    XIndent = 0
+                };
+
+                // Optional: style the watermark text
+                stamp.TextState.Font = FontRepository.FindFont("Arial");
+                stamp.TextState.FontSize = 36;
+                stamp.TextState.FontStyle = FontStyles.Bold;
+                stamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // red
+                stamp.Opacity = 0.5; // semi‑transparent
+
+                // Apply the stamp to the specified page
+                page.AddStamp(stamp);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");

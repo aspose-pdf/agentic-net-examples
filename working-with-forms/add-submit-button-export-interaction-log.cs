@@ -1,69 +1,64 @@
 using System;
 using System.IO;
+using System.Xml;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "form.pdf";               // source PDF with form fields
-        const string outputPdf = "form_with_submit.pdf";  // PDF after adding submit button
-        const string interactionLog = "interaction_log.xfdf"; // XFDF (XML) log file
+        const string pdfPath = "filled_form.pdf";
+        const string xmlLogPath = "form_interaction_log.xml";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1. Load the PDF and add a submit button that posts XFDF data.
-        // ------------------------------------------------------------
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Choose the page where the button will be placed (first page)
-            Page page = doc.Pages[1];
-
-            // Define button rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-
-            // Create a button field and configure its appearance
-            ButtonField submitBtn = new ButtonField(page, rect)
+            using (Document doc = new Document(pdfPath))
             {
-                PartialName = "SubmitBtn",
-                NormalCaption = "Submit"
-            };
-
-            // Create a SubmitFormAction that sends data as XFDF (XML)
-            SubmitFormAction submitAction = new SubmitFormAction
-            {
-                Url = new FileSpecification("https://example.com/receive"), // server endpoint
-                Flags = SubmitFormAction.Xfdf        // export as XFDF (XML)
-            };
-
-            // Attach the action to the button (use OnActivated for button fields)
-            submitBtn.OnActivated = submitAction;
-
-            // Add the button to the document's form collection
-            doc.Form.Add(submitBtn);
-
-            // Save the modified PDF (contains the submit button)
-            doc.Save(outputPdf);
+                // Verify that the document contains an AcroForm with fields
+                if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
+                {
+                    Console.WriteLine("No form fields detected in the PDF.");
+                }
+                else
+                {
+                    // Export the form field values (interaction log) to an XML file
+                    ExportFormFieldsToXml(doc, xmlLogPath);
+                    Console.WriteLine($"Form interaction log exported to '{xmlLogPath}'.");
+                }
+            }
         }
-
-        // ------------------------------------------------------------
-        // 2. After the form is submitted, export the interaction log.
-        //    ExportAnnotationsToXfdf writes an XML‑based XFDF file that
-        //    contains field names, values, and annotation data.
-        // ------------------------------------------------------------
-        using (Document doc = new Document(outputPdf))
+        catch (Exception ex)
         {
-            // Export all annotations (including the submit action) to XFDF
-            doc.ExportAnnotationsToXfdf(interactionLog);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
 
-        Console.WriteLine("Form prepared and interaction log exported to XML (XFDF).");
+    private static void ExportFormFieldsToXml(Document doc, string xmlPath)
+    {
+        // Use XmlWriter to create a simple XML representation of the form data
+        using (var writer = XmlWriter.Create(xmlPath, new XmlWriterSettings { Indent = true }))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("FormFields");
+
+            foreach (Field field in doc.Form.Fields)
+            {
+                writer.WriteStartElement("Field");
+                writer.WriteAttributeString("Name", field.Name ?? field.FullName ?? string.Empty);
+                writer.WriteAttributeString("Value", field.Value?.ToString() ?? string.Empty);
+                writer.WriteEndElement(); // </Field>
+            }
+
+            writer.WriteEndElement(); // </FormFields>
+            writer.WriteEndDocument();
+        }
     }
 }

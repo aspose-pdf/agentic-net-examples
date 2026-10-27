@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // JavaScript to display an alert when the document opens
-            string script = "app.alert('Document opened!');";
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // JavaScript executed when the document is opened
+                doc.OpenAction = new JavascriptAction("app.alert('Document opened');");
 
-            // Create a JavascriptAction with the script
-            JavascriptAction jsAction = new JavascriptAction(script);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-            // Assign the action to the document's OpenAction property
-            doc.OpenAction = jsAction;
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with JavaScript action: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

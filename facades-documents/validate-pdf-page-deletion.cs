@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facades API for page editing and deletion
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        // Pages to delete (1‑based indexing)
-        int[] pagesToDelete = new int[] { 2, 3 };
+        const string outputPath = "output_deleted.pdf";
+        const int pageToDelete = 1; // 1‑based page number to remove
 
         if (!File.Exists(inputPath))
         {
@@ -17,44 +16,43 @@ class Program
             return;
         }
 
-        // ---------- Get page count before deletion ----------
-        int beforeCount;
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
+        try
         {
-            pageEditor.BindPdf(inputPath);
-            beforeCount = pageEditor.GetPages(); // returns total pages (1‑based)
+            // Load original document and get the initial page count
+            int originalPageCount;
+            using (Document srcDoc = new Document(inputPath))
+            {
+                originalPageCount = srcDoc.Pages.Count;
+                Console.WriteLine($"Original page count: {originalPageCount}");
+
+                // Delete the specified page directly via the Document API
+                srcDoc.Pages.Delete(pageToDelete);
+
+                // Save the modified document
+                srcDoc.Save(outputPath);
+            }
+
+            // Load the resulting document to obtain the new page count
+            int newPageCount;
+            using (Document dstDoc = new Document(outputPath))
+            {
+                newPageCount = dstDoc.Pages.Count;
+                Console.WriteLine($"New page count after deletion: {newPageCount}");
+            }
+
+            // Validate that the page count decreased by exactly one
+            if (newPageCount == originalPageCount - 1)
+            {
+                Console.WriteLine("Delete operation successful: page count reduced by one.");
+            }
+            else
+            {
+                Console.WriteLine("Delete operation failed: unexpected page count.");
+            }
         }
-
-        // ---------- Perform deletion ----------
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
-        var fileEditor = new PdfFileEditor();
-        bool deleteResult = fileEditor.TryDelete(inputPath, pagesToDelete, outputPath);
-
-        if (!deleteResult)
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Delete operation failed.");
-            return;
-        }
-
-        // ---------- Get page count after deletion ----------
-        int afterCount;
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
-        {
-            pageEditor.BindPdf(outputPath);
-            afterCount = pageEditor.GetPages();
-        }
-
-        // ---------- Validate ----------
-        Console.WriteLine($"Pages before delete: {beforeCount}");
-        Console.WriteLine($"Pages after  delete: {afterCount}");
-
-        if (afterCount < beforeCount)
-        {
-            Console.WriteLine("Delete operation succeeded: page count reduced.");
-        }
-        else
-        {
-            Console.WriteLine("Delete operation did not reduce page count.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

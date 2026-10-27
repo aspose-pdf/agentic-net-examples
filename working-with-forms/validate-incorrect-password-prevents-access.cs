@@ -1,78 +1,77 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "protected.pdf";
-        const string userPwd   = "user123";
-        const string ownerPwd  = "owner123";
-        const string wrongPwd  = "wrongpwd";
+        const string originalPath   = "original.pdf";
+        const string encryptedPath  = "protected.pdf";
+        const string correctUserPwd = "user123";
+        const string correctOwnerPwd = "owner123";
+        const string wrongUserPwd   = "wrongPwd";
 
-        // -----------------------------------------------------------------
-        // Create a PDF with a password box field and encrypt it.
-        // -----------------------------------------------------------------
+        // ------------------------------------------------------------
+        // 1. Create a simple PDF with some text
+        // ------------------------------------------------------------
         using (Document doc = new Document())
         {
-            // Add a page.
             Page page = doc.Pages.Add();
+            TextFragment tf = new TextFragment("Secret content that should be protected.");
+            page.Paragraphs.Add(tf);
 
-            // Create a text box field that will act as a password field (partial name "pwdField").
-            TextBoxField pwdField = new TextBoxField(
-                page,
-                new Aspose.Pdf.Rectangle(100, 600, 300, 650))
-            {
-                PartialName = "pwdField",
-                // The value is stored in the PDF; in a real UI it would be masked.
-                Value = "SecretValue"
-            };
-
-            // Add the field to the document's form.
-            doc.Form.Add(pwdField);
-
-            // Encrypt the document using AES-256.
+            // --------------------------------------------------------
+            // 2. Encrypt the document using AES-256
+            // --------------------------------------------------------
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-            doc.Encrypt(userPwd, ownerPwd, perms, CryptoAlgorithm.AESx256);
-
-            // Save the encrypted PDF.
-            doc.Save(pdfPath);
+            doc.Encrypt(correctUserPwd, correctOwnerPwd, perms, CryptoAlgorithm.AESx256);
+            doc.Save(encryptedPath);
         }
 
-        // -----------------------------------------------------------------
-        // Attempt to open the encrypted PDF with an incorrect password.
-        // Expect InvalidPasswordException.
-        // -----------------------------------------------------------------
+        // ------------------------------------------------------------
+        // 3. Attempt to open the encrypted PDF with an incorrect password
+        // ------------------------------------------------------------
         try
         {
-            using (Document wrongDoc = new Document(pdfPath, wrongPwd))
+            // This will throw InvalidPasswordException because the password is wrong
+            using (Document wrongDoc = new Document(encryptedPath, wrongUserPwd))
             {
-                // If the document opens (it shouldn't), try to read the field.
-                var field = (TextBoxField)wrongDoc.Form["pwdField"];
-                Console.WriteLine("Unexpectedly accessed field value: " + field.Value);
+                // If no exception, attempt to read (should not happen)
+                TextAbsorber absorber = new TextAbsorber();
+                wrongDoc.Pages.Accept(absorber);
+                Console.WriteLine("Unexpectedly accessed content: " + absorber.Text);
             }
         }
-        catch (InvalidPasswordException ex)
+        catch (InvalidPasswordException)
         {
-            Console.WriteLine("Access denied with wrong password: " + ex.Message);
-        }
-
-        // -----------------------------------------------------------------
-        // Open the PDF with the correct user password and read the field.
-        // -----------------------------------------------------------------
-        try
-        {
-            using (Document correctDoc = new Document(pdfPath, userPwd))
-            {
-                var field = (TextBoxField)correctDoc.Form["pwdField"];
-                Console.WriteLine("Field value with correct password: " + field.Value);
-            }
+            Console.WriteLine("Access denied: incorrect password prevented opening the document.");
         }
         catch (Exception ex)
         {
             Console.WriteLine("Unexpected error: " + ex.Message);
+        }
+
+        // ------------------------------------------------------------
+        // 4. Open the encrypted PDF with the correct password and verify access
+        // ------------------------------------------------------------
+        try
+        {
+            using (Document correctDoc = new Document(encryptedPath, correctUserPwd))
+            {
+                // Decrypt the document (optional, Decrypt() takes no parameters)
+                correctDoc.Decrypt();
+
+                // Extract text to confirm successful access
+                TextAbsorber absorber = new TextAbsorber();
+                correctDoc.Pages.Accept(absorber);
+                Console.WriteLine("Access granted: extracted text -> " + absorber.Text);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Failed to open with correct password: " + ex.Message);
         }
     }
 }

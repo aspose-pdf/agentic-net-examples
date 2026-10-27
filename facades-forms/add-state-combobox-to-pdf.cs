@@ -1,55 +1,53 @@
 using System;
-using System.IO;
-using Aspose.Pdf.Facades;   // FormEditor, FieldType
-using Aspose.Pdf;          // Document (if needed)
-
-// Ensure Aspose.Pdf license is set if required
-// Aspose.Pdf.License license = new Aspose.Pdf.License();
-// license.SetLicense("Aspose.Pdf.lic");
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "template.pdf";   // existing PDF to add the combo box to
-        const string outputPdfPath = "output_with_state_combobox.pdf";
+        const string outputPath = "StateComboBox.pdf";
 
-        // Verify the input PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Create a new PDF document and add a blank page.
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
+            doc.Pages.Add(); // ensure at least one page
 
-        // List of US state abbreviations
-        string[] usStates = new string[]
-        {
-            "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
-            "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
-            "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
-            "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-            "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
-        };
+            // Define the rectangle where the combo box will appear (llx, lly, urx, ury).
+            // Use the fully‑qualified Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle.
+            Aspose.Pdf.Rectangle comboRect = new Aspose.Pdf.Rectangle(100, 600, 200, 620);
 
-        // Use FormEditor to bind the existing PDF, add a combo box field, populate it, and save.
-        // FormEditor implements SaveableFacade, so we can use a using block for deterministic disposal.
-        using (FormEditor formEditor = new FormEditor(inputPdfPath, outputPdfPath))
-        {
-            // Add a combo box field named "State" on page 1.
-            // Parameters: field type, field name, page number (1‑based), lower‑left X, lower‑left Y, upper‑right X, upper‑right Y.
-            // Adjust the rectangle coordinates as needed for your layout.
-            formEditor.AddField(FieldType.ComboBox, "State", 1, 100f, 700f, 200f, 720f);
-
-            // Populate the combo box with the state abbreviations.
-            foreach (string state in usStates)
+            // Create the combo box field.
+            ComboBoxField combo = new ComboBoxField(doc.Pages[1], comboRect)
             {
-                formEditor.AddListItem("State", state);
+                PartialName = "State",
+                Value = string.Empty // optional default value
+            };
+
+            // Add the field to the document's form (page index is 1‑based).
+            doc.Form.Add(combo, 1);
+
+            // List of US state abbreviations.
+            string[] states = new string[]
+            {
+                "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA",
+                "HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+                "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ",
+                "NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+                "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+            };
+
+            // Populate the combo box with each state abbreviation.
+            foreach (string state in states)
+            {
+                // ComboBoxField uses the Options collection. AddOption(value, displayText) adds an entry.
+                combo.AddOption(state, state);
             }
 
-            // Save the modified PDF.
-            formEditor.Save();
+            // Save the resulting PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Combo box \"State\" added and populated. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with State combo box saved to '{outputPath}'.");
     }
 }

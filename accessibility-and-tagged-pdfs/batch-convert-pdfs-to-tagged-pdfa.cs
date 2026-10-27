@@ -1,65 +1,64 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the application (works cross‑platform)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing the source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where the tagged PDFs will be written
+        const string outputFolder = "TaggedPdfs";
 
-        // Input folder containing untagged PDFs
-        string inputFolder = Path.Combine(baseDir, "input_pdfs");
-        // Output folder for tagged PDFs
-        string outputFolder = Path.Combine(baseDir, "tagged_pdfs");
-
-        // Ensure the input and output directories exist
         if (!Directory.Exists(inputFolder))
         {
-            Directory.CreateDirectory(inputFolder);
-            Console.WriteLine($"Input folder not found. Created empty folder at '{inputFolder}'. Place PDFs there and re‑run.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
+
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Enable auto‑tagging globally (static default instance)
+        // Enable global auto‑tagging – this setting is consulted during Document.Save()
         AutoTaggingSettings.Default.EnableAutoTagging = true;
+        // Optional: configure heading detection strategy
+        // AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'. Nothing to process.");
-            return;
-        }
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileNameWithoutExt + "_tagged.pdf");
 
-        foreach (string inputPath in pdfFiles)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_tagged.pdf");
-
-            try
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document (lifecycle rule: use using for disposal)
-                using (Document doc = new Document(inputPath))
+                // Determine whether the document is already tagged by checking TaggedContent
+                bool alreadyTagged = doc.TaggedContent != null;
+
+                if (alreadyTagged)
                 {
-                    // Prepare conversion options with auto‑tagging enabled
-                    PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-                    options.AutoTaggingSettings = AutoTaggingSettings.Default; // use the static default
-
-                    // Convert the document; this applies auto‑tagging and produces a tagged PDF/A
-                    doc.Convert(options);
-
-                    // Save the newly tagged PDF
+                    // Already tagged – just copy to the output location
                     doc.Save(outputPath);
+                    Console.WriteLine($"Copied already tagged PDF: {fileNameWithoutExt}");
                 }
+                else
+                {
+                    // Document is not tagged – auto‑tagging will be applied on Save()
+                    // Optional: set accessibility metadata after the document becomes tagged
+                    // (metadata can be set before Save when auto‑tagging is enabled)
+                    ITaggedContent tagged = doc.TaggedContent; // will be created by auto‑tagging on Save
+                    if (tagged != null)
+                    {
+                        tagged.SetLanguage("en-US");
+                        tagged.SetTitle(fileNameWithoutExt);
+                    }
 
-                Console.WriteLine($"Converted '{inputPath}' → '{outputPath}'");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Auto‑tagged PDF saved: {outputPath}");
+                }
             }
         }
     }

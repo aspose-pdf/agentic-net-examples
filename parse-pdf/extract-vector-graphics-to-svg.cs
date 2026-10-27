@@ -1,48 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputRoot = "VectorGraphics";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "ExtractedSvg";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Create root folder for extracted SVG files
-        Directory.CreateDirectory(outputRoot);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load PDF document (wrapped in using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Configure extractor to generate a separate SVG for each sub‑path
-            SvgExtractionOptions extractionOptions = new SvgExtractionOptions {
-                ExtractEverySubPathToSvg = true
-            };
-            SvgExtractor extractor = new SvgExtractor(extractionOptions);
-
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                Page page = doc.Pages[i];
+                // Iterate through each page (1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+                {
+                    // Create a temporary document that contains only the current page
+                    Document singlePageDoc = new Document();
+                    // Import the page – this copies the page into the new document without removing it from the source
+                    singlePageDoc.Pages.Add(pdfDoc.Pages[pageIndex]);
 
-                // Create a sub‑directory for the current page's SVG files
-                string pageDir = Path.Combine(outputRoot, $"Page_{i}");
-                Directory.CreateDirectory(pageDir);
+                    // Build a unique file name for the SVG output of this page
+                    string svgFilePath = Path.Combine(outputFolder, $"Page_{pageIndex}.svg");
 
-                // Extract all vector graphics from the page into individual SVG files
-                extractor.Extract(page, pageDir);
+                    // Configure SVG save options – enable CSS style embedding via ScaleToPixels
+                    SvgSaveOptions svgOptions = new SvgSaveOptions
+                    {
+                        ScaleToPixels = true
+                    };
+
+                    // Save the single‑page document as an SVG file
+                    singlePageDoc.Save(svgFilePath, svgOptions);
+
+                    Console.WriteLine($"Extracted SVG for page {pageIndex} -> {svgFilePath}");
+                }
             }
-        }
 
-        Console.WriteLine("Vector graphics extraction completed.");
+            Console.WriteLine("Vector graphic extraction completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

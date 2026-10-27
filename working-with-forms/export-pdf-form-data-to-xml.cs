@@ -1,27 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Export pdf form data to xml
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/working-with-forms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdfPath = "input.pdf";
-        const string outputXmlPath = "formData.xml";
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
-        {
-            // Export the document (including its form fields) to an XML file
-            pdfDocument.SaveXml(outputXmlPath);
-        }
-
-        Console.WriteLine($"Form data exported successfully to '{outputXmlPath}'.");
-    }
-}
+class Program { static void Main() { } }

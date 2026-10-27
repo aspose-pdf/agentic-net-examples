@@ -1,66 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Annotations; // for ImageStamp
+using Aspose.Pdf.Text;   // needed for Font, FontRepository, FontStyles, TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";               // existing PDF
-        const string watermarkImagePath = "watermark.png"; // watermark image file
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string watermarkText = "CONFIDENTIAL";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(watermarkImagePath))
+        try
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
-            return;
-        }
-
-        // Load the existing PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create a new optional content group (layer) that will hold the watermark
-            Layer wmLayer = new Layer("WatermarkLayer", "OCG_WM");
-
-            // Prepare the image stamp that will act as the watermark
-            ImageStamp imgStamp = new ImageStamp(watermarkImagePath)
+            // Load the original PDF
+            using (Document doc = new Document(inputPath))
             {
-                // Position and size – you can adjust these values as needed
-                // Width/Height are in points (1/72 inch). Here we set a modest size.
-                Width = 200,
-                Height = 100,
-                // Center the stamp on the page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                // Make the watermark semi‑transparent
-                Opacity = 0.3f
-            };
+                // Iterate over all pages and add a TextStamp watermark
+                foreach (Page page in doc.Pages)
+                {
+                    // Create a new TextStamp for each page
+                    TextStamp stamp = new TextStamp(watermarkText);
 
-            // Add the watermark layer and the stamp to each page, then merge layers
-            foreach (Page page in doc.Pages)
-            {
-                // Attach the watermark layer to the page
-                page.Layers.Add(wmLayer);
+                    // Position and appearance
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Center;
+                    stamp.RotateAngle         = 45;               // diagonal
+                    stamp.Opacity             = 0.3;              // semi‑transparent
+                    stamp.Background          = false;            // no background box
 
-                // Add the image stamp (watermark) to the page content
-                page.AddStamp(imgStamp);
+                    // Configure the TextState (read‑only property – set its members)
+                    stamp.TextState.Font      = FontRepository.FindFont("Arial");
+                    stamp.TextState.FontSize  = 72;
+                    stamp.TextState.FontStyle = FontStyles.Bold;
+                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
-                // Merge all layers on this page into a single layer named "MergedLayer"
-                page.MergeLayers("MergedLayer");
+                    // Apply the stamp to the current page
+                    page.AddStamp(stamp);
+                }
+
+                // Save the watermarked PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF (lifecycle rule: use using, then Save)
-            doc.Save(outputPdf);
+            Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with watermark layer saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

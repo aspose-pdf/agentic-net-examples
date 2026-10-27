@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_pronunciation.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,32 +17,35 @@ class Program
             return;
         }
 
-        // Open the PDF document (lifecycle managed by using)
+        // Open the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access the tagged content interface
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Optional: set the document language
-            tagged.SetLanguage("en-US");
+            // Set language and title for accessibility (optional)
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Create a Span element (inline text structure)
-            SpanElement span = tagged.CreateSpanElement();
+            // Get the root structure element (no cast required)
+            StructureElement root = taggedContent.RootElement;
 
-            // Set the visible text of the span (if needed)
-            span.SetText("example");
+            // Create a span element
+            SpanElement span = taggedContent.CreateSpanElement();
 
-            // Supply hidden pronunciation text via ActualText
-            span.ActualText = "ɪɡˈzæmpəl";
+            // Visible text that will appear in the PDF
+            span.SetText("Bonjour");
 
-            // Attach the span to the root of the structure tree
-            StructureElement root = tagged.RootElement;
-            root.AppendChild(span); // AppendChild with one argument (default bool)
+            // Hidden pronunciation text (e.g., phonetic spelling)
+            span.ActualText = "bɔ̃ʒuʁ";
+
+            // Append the span to the document's structure tree
+            root.AppendChild(span);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with ActualText set: {outputPath}");
     }
 }

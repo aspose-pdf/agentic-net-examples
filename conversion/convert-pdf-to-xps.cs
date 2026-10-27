@@ -1,30 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // All SaveOptions, including XpsSaveOptions, are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXps = "output.xps";
+        const string inputPdfPath  = "input.pdf";
+        const string outputXpsPath = "output.xps";
 
-        if (!File.Exists(inputPdf))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document within a using block for proper disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Create XpsSaveOptions with default settings
-            XpsSaveOptions xpsOptions = new XpsSaveOptions();
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // XpsSaveOptions with default settings
+                XpsSaveOptions xpsOptions = new XpsSaveOptions();
 
-            // Save the document as XPS, passing the SaveOptions explicitly
-            pdfDoc.Save(outputXps, xpsOptions);
+                // Save as XPS; must pass the SaveOptions subclass because Document.Save(string) alone always writes PDF
+                pdfDoc.Save(outputXpsPath, xpsOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to XPS: {outputXpsPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to XPS: {outputXps}");
+        catch (Exception ex)
+        {
+            // Generic error handling – in production you might want more specific catches
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

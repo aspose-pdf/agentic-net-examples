@@ -1,16 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // <-- required for PdfFileInfo
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string decryptedPath  = "decrypted.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -18,28 +19,29 @@ class Program
             return;
         }
 
-        // Load PDF meta‑information to check encryption status
-        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
-        {
-            bool isEncrypted = fileInfo.IsEncrypted;
-            Console.WriteLine($"IsEncrypted: {isEncrypted}");
+        // Check encryption status using PdfFileInfo (Facades)
+        PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
+        bool isEncrypted = fileInfo.IsEncrypted;
+        Console.WriteLine($"IsEncrypted: {isEncrypted}");
 
-            if (!isEncrypted)
-            {
-                // PDF is not encrypted – encrypt it using Document.Encrypt with Permissions
-                Document doc = new Document(inputPath);
-                // Allow printing only; combine other permissions with bitwise OR if needed
-                Permissions perms = Permissions.PrintDocument;
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx128);
-                doc.Save(outputPath);
-            }
-            else
-            {
-                // PDF is already encrypted – decrypt it by opening with the owner password and saving without encryption
-                Document doc = new Document(inputPath, ownerPassword);
-                // Saving without calling Encrypt removes protection
-                doc.Save(outputPath);
-            }
+        if (!isEncrypted)
+        {
+            // Encrypt the PDF if it is not already encrypted
+            Document doc = new Document(inputPath);
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            doc.Save(encryptedPath);
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
+        }
+        else
+        {
+            // Decrypt the PDF if it is already encrypted using PdfFileSecurity
+            PdfFileSecurity security = new PdfFileSecurity();
+            security.BindPdf(inputPath);
+            // Decrypt with the user password (or owner password if required)
+            security.DecryptFile(userPassword);
+            security.Save(decryptedPath);
+            Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
         }
     }
 }

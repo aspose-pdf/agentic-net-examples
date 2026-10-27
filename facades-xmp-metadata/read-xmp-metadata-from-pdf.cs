@@ -1,29 +1,36 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify that the PDF file exists before proceeding.
-        if (!System.IO.File.Exists(inputPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create a PdfXmpMetadata facade and bind it to the PDF file.
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            xmp.BindPdf(inputPath);
+        // Create a new PdfXmpMetadata object (facade for XMP handling)
+        PdfXmpMetadata xmpMetadata = new PdfXmpMetadata();
 
-            // Retrieve the entire XMP metadata as a byte array.
-            byte[] metadataBytes = xmp.GetXmpMetadata();
+        // Bind the existing PDF file to the XMP metadata instance
+        xmpMetadata.BindPdf(inputPath);
 
-            // Example output: display the size of the retrieved metadata.
-            Console.WriteLine($"XMP metadata size: {metadataBytes.Length} bytes");
-        }
+        // -----------------------------------------------------------------
+        // At this point you can read or modify the XMP packet, e.g.:
+        // string currentXmp = xmpMetadata.GetXmpMetadata();
+        // xmpMetadata.SetXmpMetadata(modifiedXmp);
+        // -----------------------------------------------------------------
+
+        // Save the PDF (with any XMP changes) to a new file
+        xmpMetadata.Save(outputPath);
+
+        Console.WriteLine($"PDF with bound XMP metadata saved to '{outputPath}'.");
     }
 }

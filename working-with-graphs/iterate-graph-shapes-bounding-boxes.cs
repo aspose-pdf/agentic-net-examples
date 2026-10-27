@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,67 +7,64 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
-        using (Document doc = new Document())
+        const string inputPath = "input.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a graph with specified width and height
-            // Graph constructor expects width and height as double values
-            Graph graph = new Graph(400.0, 200.0);
-
-            // ----- Add a rectangle shape -----
-            // Rectangle(left, bottom, width, height)
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(0.0F, 0.0F, 100.0F, 50.0F);
-            rectShape.GraphInfo = new GraphInfo
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 2.0F
-            };
-            graph.Shapes.Add(rectShape);
+                Page page = doc.Pages[i];
 
-            // ----- Add an ellipse shape -----
-            // Ellipse(left, bottom, width, height)
-            Ellipse ellipseShape = new Ellipse(150.0F, 100.0F, 200.0F, 150.0F);
-            ellipseShape.GraphInfo = new GraphInfo
-            {
-                FillColor = Aspose.Pdf.Color.Yellow,
-                Color = Aspose.Pdf.Color.Red,
-                LineWidth = 1.5F
-            };
-            graph.Shapes.Add(ellipseShape);
-
-            // Add the graph to the page's paragraphs
-            page.Paragraphs.Add(graph);
-
-            // ----- Iterate through all shapes in the graph and log their bounding boxes -----
-            Console.WriteLine("Shape bounding boxes in the graph:");
-            foreach (Shape shape in graph.Shapes)
-            {
-                // Determine shape type and extract bounding information accordingly
-                if (shape is Aspose.Pdf.Drawing.Rectangle r)
+                // Iterate over all paragraphs on the page
+                foreach (var paragraph in page.Paragraphs)
                 {
-                    Console.WriteLine($"Rectangle - Left: {r.Left}, Bottom: {r.Bottom}, Width: {r.Width}, Height: {r.Height}");
-                }
-                else if (shape is Ellipse e)
-                {
-                    Console.WriteLine($"Ellipse - Left: {e.Left}, Bottom: {e.Bottom}, Width: {e.Width}, Height: {e.Height}");
-                }
-                else if (shape is Aspose.Pdf.Drawing.Path p)
-                {
-                    // Path does not expose direct coordinates; log its type only
-                    Console.WriteLine("Path shape - bounding box not directly accessible");
-                }
-                else
-                {
-                    Console.WriteLine($"Shape of type {shape.GetType().Name} - bounding box not directly accessible");
+                    // Graph objects are added as paragraphs; check the type
+                    if (paragraph is Graph graph)
+                    {
+                        // Each shape in the graph is stored in the Shapes collection
+                        foreach (var shape in graph.Shapes)
+                        {
+                            // Rectangle shape – compute its bounding box from Left/Bottom/Width/Height
+                            if (shape is Aspose.Pdf.Drawing.Rectangle rectShape)
+                            {
+                                double llx = rectShape.Left;
+                                double lly = rectShape.Bottom;
+                                double urx = rectShape.Left + rectShape.Width;
+                                double ury = rectShape.Bottom + rectShape.Height;
+                                Console.WriteLine(
+                                    $"Page {i}: Rectangle – LLX:{llx}, LLY:{lly}, URX:{urx}, URY:{ury}");
+                            }
+                            else if (shape is Line line)
+                            {
+                                // PositionArray holds the points of the line: x1, y1, x2, y2, ...
+                                var pts = line.PositionArray;
+                                Console.WriteLine(
+                                    $"Page {i}: Line – Points:{string.Join(",", pts)}");
+                            }
+                            else if (shape is Curve curve)
+                            {
+                                var pts = curve.PositionArray;
+                                Console.WriteLine(
+                                    $"Page {i}: Curve – Points:{string.Join(",", pts)}");
+                            }
+                            else
+                            {
+                                // For other shape types we only log the type name
+                                Console.WriteLine(
+                                    $"Page {i}: Shape {shape.GetType().Name} (bounding box not directly available)");
+                            }
+                        }
+                    }
                 }
             }
-
-            // Save the PDF (optional, can be omitted if only logging is required)
-            doc.Save("GraphWithShapes.pdf");
         }
     }
 }

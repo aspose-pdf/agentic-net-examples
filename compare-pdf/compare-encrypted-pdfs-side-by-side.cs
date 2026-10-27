@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
@@ -7,38 +8,54 @@ class Program
 {
     static void Main()
     {
-        // Paths to the encrypted PDF files
-        const string firstPdfPath  = "encrypted1.pdf";
-        const string secondPdfPath = "encrypted2.pdf";
-        // Passwords for the encrypted PDFs (user passwords)
-        const string firstPassword  = "userPass1";
-        const string secondPassword = "userPass2";
-        // Path where the comparison result will be saved
-        const string resultPdfPath = "comparison_result.pdf";
+        const string pdfPath1 = "encrypted1.pdf";
+        const string pdfPath2 = "encrypted2.pdf";
+        const string password1 = "userPass1";
+        const string password2 = "userPass2";
 
-        // Verify that input files exist
-        if (!File.Exists(firstPdfPath))
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
-            Console.Error.WriteLine($"File not found: {firstPdfPath}");
-            return;
-        }
-        if (!File.Exists(secondPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {secondPdfPath}");
+            Console.Error.WriteLine("One or both PDF files not found.");
             return;
         }
 
-        // Load the encrypted documents by providing the passwords to the constructors
-        using (Document doc1 = new Document(firstPdfPath, firstPassword))
-        using (Document doc2 = new Document(secondPdfPath, secondPassword))
+        try
         {
-            // Create comparison options (default settings)
-            SideBySideComparisonOptions options = new SideBySideComparisonOptions();
+            // Load the encrypted PDFs by providing passwords to the constructors
+            using (Document doc1 = new Document(pdfPath1, password1))
+            using (Document doc2 = new Document(pdfPath2, password2))
+            {
+                // ---------- Text‑based comparison (gives diff operations) ----------
+                var diffs = TextPdfComparer.CompareDocumentsPageByPage(
+                    doc1,
+                    doc2,
+                    new ComparisonOptions()
+                );
 
-            // Perform side‑by‑side comparison and save the result PDF
-            SideBySidePdfComparer.Compare(doc1, doc2, resultPdfPath, options);
+                bool isEqual = diffs.All(pageDiff => pageDiff.Count == 0);
+                int differencesCount = diffs.Sum(pageDiff => pageDiff.Count);
+
+                Console.WriteLine($"Documents are equal: {isEqual}");
+                Console.WriteLine($"Number of differences: {differencesCount}");
+
+                // ---------- Visual side‑by‑side comparison (produces a PDF) ----------
+                const string visualDiffPath = "comparison_result.pdf";
+                SideBySidePdfComparer.Compare(
+                    doc1,
+                    doc2,
+                    visualDiffPath,
+                    new SideBySideComparisonOptions()
+                );
+                Console.WriteLine($"Visual comparison saved to '{visualDiffPath}'.");
+            }
         }
-
-        Console.WriteLine($"Comparison completed. Result saved to '{resultPdfPath}'.");
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

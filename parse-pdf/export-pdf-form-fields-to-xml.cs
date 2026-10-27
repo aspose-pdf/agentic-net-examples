@@ -1,38 +1,60 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputXml = "form_fields.xml";
 
-        // Output XML file that will contain the document (including form fields) representation
-        const string outputXmlPath = "form_fields.xml";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document pdfDocument = new Document(inputPdfPath))
+            // Ensure the document actually contains a form with at least one field.
+            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
             {
-                // Save the entire document model as XML.
-                // This XML includes the form field definitions and their current values.
-                pdfDocument.SaveXml(outputXmlPath);
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
             }
 
-            Console.WriteLine($"Form fields exported to XML: '{outputXmlPath}'");
+            // Create a FileStream for the XML output and write a custom XML representation of the form fields.
+            using (FileStream fs = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
+            using (XmlWriter writer = XmlWriter.Create(fs, new XmlWriterSettings { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("FormFields");
+
+                foreach (var field in doc.Form.Fields)
+                {
+                    writer.WriteStartElement("Field");
+                    // Use the field's Name if available, otherwise fall back to FullName.
+                    string fieldName = field.Name ?? field.FullName ?? string.Empty;
+                    writer.WriteAttributeString("Name", fieldName);
+                    writer.WriteAttributeString("Type", field.GetType().Name);
+
+                    // Write the field's value as element text (empty string if null).
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    writer.WriteString(value);
+
+                    writer.WriteEndElement(); // </Field>
+                }
+
+                writer.WriteEndElement(); // </FormFields>
+                writer.WriteEndDocument();
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form fields exported to XML: {outputXml}");
     }
 }

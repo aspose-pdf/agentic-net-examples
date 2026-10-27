@@ -15,43 +15,40 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block (ensures proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate using 1‑based page indexing (Aspose.Pdf uses 1‑based indexes)
+            for (int i = 1; i <= doc.Pages.Count; i += 2) // odd‑numbered pages
             {
-                // Process only odd‑numbered pages
-                if (i % 2 == 1)
-                {
-                    Page page = doc.Pages[i];
+                Page page = doc.Pages[i];
 
-                    // Determine current orientation via PageInfo.IsLandscape
-                    if (page.PageInfo.IsLandscape)
-                    {
-                        // Retrieve current MediaBox dimensions
-                        Aspose.Pdf.Rectangle mb = page.MediaBox;
-                        double llx = mb.LLX;
-                        double lly = mb.LLY;
-                        double urx = mb.URX;
-                        double ury = mb.URY;
-                        double width  = urx - llx;
-                        double height = ury - lly;
+                // Current MediaBox dimensions
+                double llx = page.MediaBox.LLX;
+                double lly = page.MediaBox.LLY;
+                double urx = page.MediaBox.URX;
+                double ury = page.MediaBox.URY;
 
-                        // Swap width and height to convert to portrait
-                        double newUrx = llx + height;
-                        double newUry = lly + width;
+                double width  = urx - llx;
+                double height = ury - lly;
 
-                        // Apply the new MediaBox
-                        page.MediaBox = new Aspose.Pdf.Rectangle(llx, lly, newUrx, newUry);
+                // If the page is already portrait, no change needed
+                if (height >= width)
+                    continue;
 
-                        // Update the PageInfo flag
-                        page.PageInfo.IsLandscape = false;
-                    }
-                }
+                // Swap width and height to make it portrait
+                // New upper‑right coordinates: llx + height, lly + width
+                Aspose.Pdf.Rectangle newBox = new Aspose.Pdf.Rectangle(
+                    llx,
+                    lly,
+                    llx + height,
+                    lly + width
+                );
+
+                page.MediaBox = newBox;
             }
 
-            // Save the modified document (PDF format)
+            // Save the modified PDF (saving without options writes PDF)
             doc.Save(outputPath);
         }
 

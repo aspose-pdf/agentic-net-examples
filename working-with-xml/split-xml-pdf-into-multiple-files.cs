@@ -1,81 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input XML file and optional XSL (null means direct conversion)
+        // Path to the large XML dataset
         const string xmlPath = "large_dataset.xml";
-        // Directory where split PDFs will be written
+
+        // Directory where the split PDFs will be saved
         const string outputDir = "SplitPdfs";
 
-        // Maximum number of pages per split PDF (adjust as needed)
-        const int maxPagesPerFile = 100;
+        // Maximum number of PDF pages per output file (adjust as needed)
+        const int maxPagesPerPdf = 100;
 
+        // Verify input file exists
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"Input XML not found: {xmlPath}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the XML into a PDF document using XmlLoadOptions
+        // Load the XML as a PDF document using XmlLoadOptions
         XmlLoadOptions loadOptions = new XmlLoadOptions();
         using (Document sourceDoc = new Document(xmlPath, loadOptions))
         {
+            // Total pages generated from the XML
             int totalPages = sourceDoc.Pages.Count;
-            int currentPage = 1;      // 1‑based index of the next page to copy
-            int fileIndex = 1;        // Sequential output file number
 
-            while (currentPage <= totalPages)
+            // Sequential part number for output files
+            int partNumber = 1;
+
+            // Iterate over the source pages in chunks of maxPagesPerPdf
+            for (int startPage = 1; startPage <= totalPages; startPage += maxPagesPerPdf)
             {
-                // Create a new document that will hold a chunk of pages
+                // Create a new PDF document for the current chunk
                 using (Document partDoc = new Document())
                 {
-                    // Determine the last page for this chunk
-                    int lastPage = Math.Min(currentPage + maxPagesPerFile - 1, totalPages);
+                    // Determine the last page index for this chunk (1‑based indexing)
+                    int endPage = Math.Min(startPage + maxPagesPerPdf - 1, totalPages);
 
-                    // Copy pages from the source document into the part document
-                    for (int i = currentPage; i <= lastPage; i++)
+                    // Copy pages from the source document to the part document
+                    for (int i = startPage; i <= endPage; i++)
                     {
-                        partDoc.Pages.Add(sourceDoc.Pages[i]); // Pages are 1‑based
+                        // Pages collection is 1‑based; Add copies the page into the target document
+                        partDoc.Pages.Add(sourceDoc.Pages[i]);
                     }
 
-                    // Add page numbers that continue across all parts
-                    PageNumberStamp pageNumberStamp = new PageNumberStamp
-                    {
-                        // The first page of this part should be numbered as the global page number
-                        StartingNumber = currentPage,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Bottom
-                    };
-                    // Optional styling of the page number text
-                    pageNumberStamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                    pageNumberStamp.TextState.FontSize = 12;
-                    pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    // Build the output file name with zero‑padded sequential numbering
+                    string outputPath = Path.Combine(outputDir, $"Part_{partNumber:D3}.pdf");
 
-                    // Apply the stamp to every page in the part document
-                    foreach (Page page in partDoc.Pages)
-                    {
-                        page.AddStamp(pageNumberStamp);
-                    }
+                    // Save the part document (PDF format)
+                    partDoc.Save(outputPath);
 
-                    // Save the part document
-                    string outPath = Path.Combine(outputDir, $"Part_{fileIndex}.pdf");
-                    partDoc.Save(outPath);
-                    Console.WriteLine($"Saved {outPath} (pages {currentPage}-{lastPage})");
-
-                    // Prepare for the next chunk
-                    fileIndex++;
-                    currentPage = lastPage + 1;
+                    Console.WriteLine($"Saved {outputPath} (pages {startPage}-{endPage})");
                 }
+
+                partNumber++;
             }
         }
 
-        Console.WriteLine("XML pagination and splitting completed.");
+        Console.WriteLine("Pagination complete.");
     }
 }

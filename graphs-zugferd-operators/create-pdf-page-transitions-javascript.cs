@@ -1,7 +1,7 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -9,36 +9,34 @@ class Program
     {
         const string outputPath = "PageTransitions.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add three pages with different transition effects using JavaScript actions
+            // Add three pages with simple identifying text
             for (int i = 1; i <= 3; i++)
             {
-                // Add a blank page
                 Page page = doc.Pages.Add();
-
-                // Add simple text to identify the page
-                TextFragment tf = new TextFragment($"Page {i}");
-                tf.TextState.FontSize = 24;
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                tf.TextState.ForegroundColor = Color.Blue;
-                page.Paragraphs.Add(tf);
-
-                // Define JavaScript that sets the page transition when the page is opened
-                string jsCode = i switch
-                {
-                    1 => "this.setPageTransition({type:'Dissolve', duration:2});",
-                    2 => "this.setPageTransition({type:'Split', duration:3});",
-                    3 => "this.setPageTransition({type:'Box', duration:1});",
-                    _ => string.Empty
-                };
-
-                // Attach the JavaScript action to the page's OnOpen event
-                page.Actions.OnOpen = new JavascriptAction(jsCode);
+                page.Paragraphs.Add(new TextFragment($"Page {i}"));
             }
 
-            // Save the PDF with the defined page transitions
+            // JavaScript that defines a transition for each page.
+            // The method setPageTransition(pageIndex, style, duration) uses
+            // zero‑based page indexes, style names like "Dissolve", "Wipe", "Split",
+            // and duration in seconds.
+            string js = @"
+function setTransitions()
+{
+    this.setPageTransition(0, 'Dissolve', 2); // Page 1: dissolve, 2 seconds
+    this.setPageTransition(1, 'Wipe', 3);    // Page 2: wipe, 3 seconds
+    this.setPageTransition(2, 'Split', 1);   // Page 3: split, 1 second
+}
+setTransitions();
+";
+
+            // Attach the JavaScript to the document; it runs when the PDF is opened
+            doc.OpenAction = new JavascriptAction(js);
+
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

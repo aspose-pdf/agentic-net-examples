@@ -1,45 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade API for PDF conversion
-using Aspose.Pdf;          // Needed for ImageFormat enum (if used)
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // Source PDF file
-        const string outputDir = "output_images";      // Folder for JPEG files
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "OutputImages";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // PdfConverter is a Facade that extracts each page as an image.
-        // It implements IDisposable, so wrap it in a using block.
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the PDF file to the converter.
-            converter.BindPdf(inputPdf);
-
-            // Prepare the converter for image extraction.
-            converter.DoConvert();
-
-            int pageNumber = 1;
-            // Iterate over all pages; GetNextImage saves each page as JPEG by default.
-            while (converter.HasNextImage())
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-                converter.GetNextImage(outputPath);   // Default format = JPEG
-                pageNumber++;
+                // JpegDevice does NOT implement IDisposable, so instantiate it directly
+                JpegDevice jpegDevice = new JpegDevice();
+
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                foreach (Page page in pdfDoc.Pages)
+                {
+                    string outputPath = Path.Combine(outputFolder, $"Page_{page.Number}.jpg");
+
+                    // Save the page as JPEG using the device
+                    using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+                    {
+                        jpegDevice.Process(page, imageStream);
+                    }
+
+                    Console.WriteLine($"Saved page {page.Number} as JPEG: {outputPath}");
+                }
             }
         }
-
-        Console.WriteLine($"Conversion complete. JPEG images saved to '{outputDir}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

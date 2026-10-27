@@ -7,36 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string pdfPath = "input.pdf";
+        const string txtPath = "output.txt";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        try
+        // PdfExtractor implements IDisposable, so wrap it in a using block.
+        using (var extractor = new PdfExtractor())
         {
-            // PdfExtractor implements IDisposable, so use a using block for deterministic cleanup
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Load the PDF document.
+            extractor.BindPdf(pdfPath);
+
+            // Extract all text from the PDF.
+            extractor.ExtractText();
+
+            // Get the extracted text via a stream (PdfExtractor.GetText requires a Stream).
+            string extractedText;
+            using (var textStream = new MemoryStream())
             {
-                // Load the PDF document
-                extractor.BindPdf(inputPdf);
-
-                // Extract text using UTF‑8 encoding
-                extractor.ExtractText(Encoding.UTF8);
-
-                // Save the extracted text to a UTF‑8 encoded .txt file
-                extractor.GetText(outputTxt);
+                extractor.GetText(textStream); // write text to the stream
+                textStream.Position = 0; // rewind for reading
+                using (var reader = new StreamReader(textStream, Encoding.UTF8))
+                {
+                    extractedText = reader.ReadToEnd();
+                }
             }
 
-            Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
+            // Write the text to a UTF‑8 encoded file.
+            File.WriteAllText(txtPath, extractedText, Encoding.UTF8);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text extracted to '{txtPath}'.");
     }
 }

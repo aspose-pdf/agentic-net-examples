@@ -1,52 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the output PDF and the QR code image.
-        const string outputPdfPath = "qr_watermarked.pdf";
-        const string qrImagePath   = "qr_code.png";
+        // Paths – adjust as needed
+        const string outputPdfPath = "WatermarkedQR.pdf";
+        const string qrImagePath    = "qr_code.png";   // QR code image file
 
-        // Verify that the QR code image exists.
         if (!File.Exists(qrImagePath))
         {
             Console.Error.WriteLine($"QR code image not found: {qrImagePath}");
             return;
         }
 
-        // Create a new PDF document.
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page to the document.
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a WatermarkArtifact instance.
+            // Margin from the page edges (points)
+            const double margin = 20.0;
+
+            // Create the watermark artifact
             WatermarkArtifact watermark = new WatermarkArtifact();
-
-            // Set the QR code image for the artifact.
-            // The SetImage method accepts a file path or a stream.
-            watermark.SetImage(qrImagePath);
-
-            // Position the artifact at the top‑right corner.
-            // Alignments are used when Position is not set explicitly.
+            // Assign the QR code image via SetImage (Image is read‑only)
+            using (FileStream imgStream = File.OpenRead(qrImagePath))
+            {
+                watermark.SetImage(imgStream);
+            }
+            // Position it at the top‑right corner
             watermark.ArtifactHorizontalAlignment = HorizontalAlignment.Right;
             watermark.ArtifactVerticalAlignment   = VerticalAlignment.Top;
+            watermark.RightMargin = margin;
+            watermark.TopMargin   = margin;
+            // Optional: make it slightly transparent
+            watermark.Opacity = 0.8;
 
-            // Optional margins (in points) from the page edges.
-            watermark.RightMargin = 20; // 20 points from the right edge
-            watermark.TopMargin   = 20; // 20 points from the top edge
-
-            // Ensure the watermark appears above page content.
-            watermark.IsBackground = false;
-
-            // Add the artifact to the page's artifact collection.
+            // Add the watermark to the page's artifacts collection
             page.Artifacts.Add(watermark);
 
-            // Save the PDF document.
+            // Save the PDF
             doc.Save(outputPdfPath);
         }
 

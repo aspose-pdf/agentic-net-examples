@@ -7,37 +7,53 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the PDF and where GIFs will be saved
-        const string dataDir = @"YOUR_DATA_DIRECTORY";
-        // PDF file name
-        const string pdfFile = @"YOUR_PDF_FILE";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "GifPages";
 
-        string pdfPath = Path.Combine(dataDir, pdfFile);
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using ensures proper disposal)
-        using (Document pdfDocument = new Document(pdfPath))
-        {
-            // GifDevice with default resolution (no parameters)
-            GifDevice gifDevice = new GifDevice();
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        try
+        {
+            // Load PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                string outPath = Path.Combine(dataDir, $"image{pageNumber}_out.gif");
-                // Create the output stream for each GIF image
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                // Iterate using 1‑based page indexing (Aspose.Pdf rule)
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    // Convert the current page to GIF and write to the stream
-                    gifDevice.Process(pdfDocument.Pages[pageNumber], outStream);
+                    Page page = pdfDoc.Pages[pageNum];
+
+                    // Build output file name for each page
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.gif");
+
+                    // GifDevice is a concrete implementation of ImageDevice for GIF output
+                    GifDevice gifDevice = new GifDevice();
+
+                    // Render the page to GIF with default parameters
+                    gifDevice.Process(page, outPath);
                 }
             }
-        }
 
-        Console.WriteLine("PDF successfully converted to GIF images.");
+            Console.WriteLine($"PDF successfully converted to GIF images in '{outputDir}'.");
+        }
+        // GDI+ (required for image rendering) is Windows‑only; handle cross‑platform scenarios
+        catch (TypeInitializationException)
+        {
+            Console.WriteLine("Image conversion requires GDI+ and is only supported on Windows.");
+        }
+        catch (DllNotFoundException)
+        {
+            Console.WriteLine("Required GDI+ library not found. Image conversion skipped.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Drawing;
 using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -9,99 +8,72 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";               // Source PDF
-        const string watermarkImgPath = "watermark.png";       // Watermark image to overlay
-        const string tempWatermarkedPdf = "temp_watermarked.pdf"; // Intermediate PDF with watermark
-        const string outputImageDir = "ExtractedImages";       // Folder for extracted images
+        const string inputPdf = "input.pdf";
+        const string extractedFolder = "extracted_images";
+        const string watermarkedFolder = "watermarked_images";
 
-        // -----------------------------------------------------------------
-        // Ensure we have a minimal input PDF (self‑contained example)
-        // -----------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            using var seed = new Document();
-            seed.Pages.Add();
-            // Add a sample image to the page so there is something to extract later
-            var sampleImg = CreateSampleImage();
-            var img = new Aspose.Pdf.Image { ImageStream = new MemoryStream(sampleImg) };
-            seed.Pages[1].Paragraphs.Add(img);
-            seed.Save(inputPdfPath);
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
         }
 
-        // -----------------------------------------------------------------
-        // Ensure we have a simple watermark image (self‑contained example)
-        // -----------------------------------------------------------------
-        if (!File.Exists(watermarkImgPath))
-        {
-            using var bmp = new Bitmap(200, 50);
-            using var g = Graphics.FromImage(bmp);
-            g.Clear(System.Drawing.Color.Transparent);
-            using var font = new System.Drawing.Font("Arial", 20, System.Drawing.FontStyle.Bold);
-            g.DrawString("WATERMARK", font, System.Drawing.Brushes.Red, new PointF(0, 0));
-            bmp.Save(watermarkImgPath, ImageFormat.Png);
-        }
+        // Ensure output directories exist
+        Directory.CreateDirectory(extractedFolder);
+        Directory.CreateDirectory(watermarkedFolder);
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputImageDir);
-
-        // -----------------------------------------------------------------
-        // Step 1: Add watermark image to each page of the PDF using PdfFileMend
-        // -----------------------------------------------------------------
-        using (PdfFileMend mend = new PdfFileMend())
-        {
-            mend.BindPdf(inputPdfPath);
-
-            // Retrieve page count via Document (PdfFileMend does not expose it directly)
-            int pageCount;
-            using (Document doc = new Document(inputPdfPath))
-            {
-                pageCount = doc.Pages.Count;
-            }
-
-            // Add the watermark image to every page.
-            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
-            {
-                // Position the watermark at the bottom‑right corner (adjust as needed)
-                mend.AddImage(watermarkImgPath, pageNum, 400, 10, 600, 60);
-            }
-
-            mend.Save(tempWatermarkedPdf);
-        }
-
-        // -----------------------------------------------------------------
-        // Step 2: Extract images from the watermarked PDF using PdfExtractor
-        // -----------------------------------------------------------------
+        // ---------------------------------------------------------------------
+        // 1. Extract images from the PDF using PdfExtractor (recommended API).
+        // ---------------------------------------------------------------------
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(tempWatermarkedPdf);
+            extractor.BindPdf(inputPdf);
             extractor.ExtractImage();
 
-            int imageIndex = 1;
+            int imageIndex = 0;
             while (extractor.HasNextImage())
             {
-                string outputImagePath = Path.Combine(outputImageDir, $"image_{imageIndex}.png");
-                // Use the overload without ImageFormat to avoid platform‑specific warnings.
-                extractor.GetNextImage(outputImagePath);
                 imageIndex++;
+                string outPath = Path.Combine(extractedFolder, $"image_{imageIndex}.png");
+                // Save each image as PNG – ImageFormat comes from System.Drawing.Imaging
+                extractor.GetNextImage(outPath, ImageFormat.Png);
+                Console.WriteLine($"Extracted image saved: {outPath}");
             }
         }
 
-        // Optional: clean up the temporary watermarked PDF
-        if (File.Exists(tempWatermarkedPdf))
+        // ---------------------------------------------------------------------
+        // 2. Apply a text watermark to each extracted image.
+        // ---------------------------------------------------------------------
+        foreach (string imagePath in Directory.GetFiles(extractedFolder))
         {
-            File.Delete(tempWatermarkedPdf);
+            using (System.Drawing.Bitmap bitmap = new System.Drawing.Bitmap(imagePath))
+            using (System.Drawing.Graphics graphics = System.Drawing.Graphics.FromImage(bitmap))
+            {
+                const string watermarkText = "Sample Watermark";
+                using (System.Drawing.Font font = new System.Drawing.Font(
+                    "Arial", 20f, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Pixel))
+                {
+                    // Measure text size to position it at bottom‑right
+                    System.Drawing.SizeF textSize = graphics.MeasureString(watermarkText, font);
+                    float x = bitmap.Width - textSize.Width - 10;
+                    float y = bitmap.Height - textSize.Height - 10;
+
+                    // Semi‑transparent white brush for the watermark
+                    using (System.Drawing.Brush brush = new System.Drawing.SolidBrush(
+                        System.Drawing.Color.FromArgb(128, 255, 255, 255)))
+                    {
+                        graphics.DrawString(watermarkText, font, brush, x, y);
+                    }
+                }
+
+                // Save the watermarked image (PNG preserves quality)
+                string fileName = Path.GetFileName(imagePath);
+                string outPath = Path.Combine(watermarkedFolder, fileName);
+                bitmap.Save(outPath, ImageFormat.Png);
+                Console.WriteLine($"Watermarked image saved: {outPath}");
+            }
         }
 
-        Console.WriteLine("Image extraction with watermark overlay completed.");
-    }
-
-    // Helper: creates a 1×1 pixel PNG (used for the sample PDF image)
-    private static byte[] CreateSampleImage()
-    {
-        using var bmp = new Bitmap(1, 1);
-        bmp.SetPixel(0, 0, System.Drawing.Color.Blue);
-        using var ms = new MemoryStream();
-        bmp.Save(ms, ImageFormat.Png);
-        return ms.ToArray();
+        Console.WriteLine("Image extraction and watermarking completed.");
     }
 }

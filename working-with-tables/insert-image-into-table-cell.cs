@@ -1,19 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextFragment if needed
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input image file to be placed inside the table cell
-        const string imagePath = "image.jpg";
+        const string outputPath = "output_with_image.pdf";
+        const string imagePath = "sample.jpg"; // external image file
 
-        // Output PDF file
-        const string outputPdf = "table_with_image.pdf";
-
-        // Verify the image file exists
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
@@ -21,59 +17,47 @@ class Program
         }
 
         // Create a new PDF document
-        using (Document pdfDoc = new Document())
+        using (Document doc = new Document())
         {
-            // Add a blank page to host the table
-            Page page = pdfDoc.Pages.Add();
+            // Set basic document metadata (avoid properties that may not exist in older versions)
+            doc.Info.Title = "PDF with Image in Table Cell";
 
-            // ------------------------------------------------------------
-            // Create a table with two columns (adjust widths as needed)
-            // ------------------------------------------------------------
+            // Add a page to the document
+            Page page = doc.Pages.Add();
+
+            // Create a table with a single column (width can be adjusted as needed)
             Table table = new Table
             {
-                // Define column widths (in points). Example: 200pt each.
-                ColumnWidths = "200 200"
+                ColumnWidths = "200" // width of the single column in points
             };
+
+            // Add a row to the table
+            Row row = table.Rows.Add();
+
+            // Add a cell (TD) to the row
+            Cell cell = row.Cells.Add();
+
+            // Load the external image and add it to the cell using the Image class
+            using (FileStream imgStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+            {
+                Image img = new Image
+                {
+                    ImageStream = imgStream,
+                    // Optional: set explicit size (in points). Adjust as required.
+                    FixWidth = 180,
+                    FixHeight = 180
+                };
+                // Add the image to the cell's paragraph collection
+                cell.Paragraphs.Add(img);
+            }
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // ------------------------------------------------------------
-            // Create a header row (optional)
-            // ------------------------------------------------------------
-            Row headerRow = table.Rows.Add();
-            Cell headerCell1 = headerRow.Cells.Add();
-            headerCell1.Paragraphs.Add(new TextFragment("Product"));
-            Cell headerCell2 = headerRow.Cells.Add();
-            headerCell2.Paragraphs.Add(new TextFragment("Image"));
-
-            // ------------------------------------------------------------
-            // Create a data row and insert the image into the second cell
-            // ------------------------------------------------------------
-            Row dataRow = table.Rows.Add();
-
-            // First cell – some text
-            Cell textCell = dataRow.Cells.Add();
-            textCell.Paragraphs.Add(new TextFragment("Sample Item"));
-
-            // Second cell – the image
-            Cell imageCell = dataRow.Cells.Add();
-
-            // Create an Image object, set its source file, and add it to the cell
-            Image img = new Image
-            {
-                File = imagePath,
-                // Optional: scale the image to fit the cell
-                ImageScale = 0.5f
-            };
-            imageCell.Paragraphs.Add(img);
-
-            // ------------------------------------------------------------
-            // Save the resulting PDF
-            // ------------------------------------------------------------
-            pdfDoc.Save(outputPdf);
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with image in table cell saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}' with the image inserted into a table cell.");
     }
 }

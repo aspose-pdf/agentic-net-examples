@@ -1,41 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Import xfdf annotations into pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-annotations/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        // Paths – adjust as needed
-        const string inputPdf  = "input.pdf";
-        const string xfdfFile  = "annotations.xfdf";
-        const string outputPdf = "output.pdf";
-
-        // Verify files exist
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(xfdfFile))
-        {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfFile}");
-            return;
-        }
-
-        // Use PdfAnnotationEditor (facade) to bind the PDF, import XFDF annotations, and save.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            // Load the target PDF document.
-            editor.BindPdf(inputPdf);
-
-            // Import all annotations from the XFDF file.
-            editor.ImportAnnotationsFromXfdf(xfdfFile);
-
-            // Save the resulting PDF with imported annotations.
-            editor.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Annotations imported and saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

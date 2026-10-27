@@ -15,17 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Insert a blank page at position 3 (pages are 1‑based)
-            Page insertedPage = doc.Pages.Insert(3);
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Insert a new blank page at position 3 (before the original page 3).
+            doc.Pages.Insert(3); // overload creates a blank page automatically
 
-            // Optional: adjust page size if needed
-            // insertedPage.PageInfo.Width = doc.Pages[1].PageInfo.Width;
-            // insertedPage.PageInfo.Height = doc.Pages[1].PageInfo.Height;
-
-            // Save the updated document
+            // Save the modified document
             doc.Save(outputPath);
         }
 

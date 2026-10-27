@@ -1,59 +1,52 @@
 using System;
 using System.IO;
-using System.Text;
-using Aspose.Pdf.Facades; // PdfExtractor resides here
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // Included as per requirement
 
 class Program
 {
     static void Main()
     {
-        // Path to the source PDF file
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Create a temporary file for the extracted text
-        string tempTextFile = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".txt");
-
-        // Use PdfExtractor (Facade) to extract text
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the PDF and extract its text
+        string extractedText;
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Bind the PDF document
-            extractor.BindPdf(inputPdf);
+            TextAbsorber absorber = new TextAbsorber();
+            // Accept the absorber for all pages (pages are 1‑based)
+            doc.Pages.Accept(absorber);
+            extractedText = absorber.Text;
+        }
 
-            // Perform the extraction (Unicode encoding is default)
-            extractor.ExtractText();
+        // Save the extracted text to a temporary file
+        string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".txt");
+        File.WriteAllText(tempFilePath, extractedText);
 
-            // 1) Extract text to a memory stream to keep the original string in memory
-            string originalText;
-            using (MemoryStream memStream = new MemoryStream())
-            {
-                extractor.GetText(memStream);
-                originalText = Encoding.Unicode.GetString(memStream.ToArray());
-            }
+        // Read the text back from the temporary file
+        string readBackText = File.ReadAllText(tempFilePath);
 
-            // 2) Save the extracted text to the temporary file
-            extractor.GetText(tempTextFile);
-
-            // Read the text back from the temporary file
-            string fileText = File.ReadAllText(tempTextFile, Encoding.Unicode);
-
-            // Verify that both strings are identical
-            bool isMatch = string.Equals(originalText, fileText, StringComparison.Ordinal);
-            Console.WriteLine(isMatch
-                ? "Verification succeeded: extracted text matches the file content."
-                : "Verification failed: mismatch between extracted text and file content.");
+        // Verify that the saved and read text match the original extraction
+        if (extractedText == readBackText)
+        {
+            Console.WriteLine("Verification succeeded: extracted text matches the saved content.");
+        }
+        else
+        {
+            Console.WriteLine("Verification failed: mismatch between extracted and saved text.");
         }
 
         // Clean up the temporary file
         try
         {
-            if (File.Exists(tempTextFile))
-                File.Delete(tempTextFile);
+            File.Delete(tempFilePath);
         }
         catch (Exception ex)
         {

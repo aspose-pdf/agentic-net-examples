@@ -6,30 +6,25 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPath = "input.pdf";
-        // Output PDF file path (booklet)
+        const string inputPath = "source.pdf";
         const string outputPath = "booklet.pdf";
 
-        // Define left and right page sequences for the booklet
-        int[] leftPages  = new int[] { 1, 2, 3, 4, 5 };
-        int[] rightPages = new int[] { 6, 7, 8, 9, 10 };
-
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Create the PdfFileEditor facade and generate the booklet
+        // Use the MakeBooklet overload that does not require a PageSize argument.
+        // It returns a bool indicating success.
         PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.MakeBooklet(inputPath, outputPath, leftPages, rightPages);
-
-        // Report the outcome
-        if (result)
-            Console.WriteLine($"Booklet created successfully: {outputPath}");
-        else
+        bool success = editor.MakeBooklet(inputPath, outputPath);
+        if (!success)
+        {
             Console.Error.WriteLine("Failed to create booklet.");
+            return;
+        }
+
+        Console.WriteLine($"Booklet created successfully at '{outputPath}'.");
     }
 }

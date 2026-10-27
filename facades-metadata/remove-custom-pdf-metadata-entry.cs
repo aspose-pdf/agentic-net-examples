@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,19 +15,23 @@ class Program
             return;
         }
 
-        // Initialize the PdfFileInfo facade and bind the PDF
-        PdfFileInfo pdfInfo = new PdfFileInfo();
-        pdfInfo.BindPdf(inputPath);
+        try
+        {
+            // Load the PDF using the Facades API
+            PdfFileInfo pdfInfo = new PdfFileInfo();
+            pdfInfo.BindPdf(inputPath);
 
-        // Remove the custom metadata entry by setting its value to empty
-        pdfInfo.SetMetaInfo("ObsoleteField", string.Empty);
+            // Clear the custom metadata entry "ObsoleteField"
+            pdfInfo.SetMetaInfo("ObsoleteField", string.Empty);
 
-        // Save the PDF with the updated metadata
-        pdfInfo.SaveNewInfo(outputPath);
+            // Save the updated PDF
+            pdfInfo.Save(outputPath);
 
-        // Clean up the facade
-        pdfInfo.Close();
-
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+            Console.WriteLine($"Metadata 'ObsoleteField' cleared. Saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

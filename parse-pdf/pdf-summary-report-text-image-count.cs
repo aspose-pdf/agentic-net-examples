@@ -1,16 +1,21 @@
 using System;
 using System.IO;
+using System.Collections;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class SummaryReport
+class Program
 {
     static void Main(string[] args)
     {
-        // If no arguments are provided, use a default PDF file name.
-        string[] pdfFiles = args.Length > 0 ? args : new[] { "sample.pdf" };
+        // If no arguments are supplied, inform the user.
+        if (args.Length == 0)
+        {
+            Console.WriteLine("Usage: Program <pdfFile1> [<pdfFile2> ...]");
+            return;
+        }
 
-        foreach (string pdfPath in pdfFiles)
+        foreach (string pdfPath in args)
         {
             if (!File.Exists(pdfPath))
             {
@@ -18,38 +23,62 @@ class SummaryReport
                 continue;
             }
 
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // ---------- Text extraction ----------
-                // TextAbsorber extracts all text from the document.
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages.Accept(absorber);
-                // Total length of extracted text (character count).
-                int totalTextLength = absorber.Text?.Length ?? 0;
-
-                // ---------- Image counting ----------
-                int totalImageCount = 0;
-                foreach (Page page in doc.Pages)
+                // Open the PDF document inside a using block for deterministic disposal.
+                using (Document doc = new Document(pdfPath))
                 {
-                    // page.Resources.Images is a collection of XImage objects.
-                    totalImageCount += page.Resources.Images.Count;
+                    // ---------- Text extraction ----------
+                    TextAbsorber absorber = new TextAbsorber();
+                    doc.Pages.Accept(absorber);
+                    string extractedText = absorber.Text ?? string.Empty;
+                    int totalTextLength = extractedText.Length;
+
+                    // ---------- Image counting ----------
+                    int imageCount = 0;
+                    // Pages are 1‑based in Aspose.Pdf.
+                    for (int i = 1; i <= doc.Pages.Count; i++)
+                    {
+                        Page page = doc.Pages[i];
+                        foreach (XImage img in page.Resources.Images)
+                        {
+                            imageCount++;
+                        }
+                    }
+
+                    // ---------- Graphics (vector objects) counting ----------
+                    // The Resources.XObjects collection may not exist in older versions of Aspose.Pdf.
+                    // To keep the code compatible we use reflection to discover the property at runtime.
+                    int graphicsCount = 0;
+                    for (int i = 1; i <= doc.Pages.Count; i++)
+                    {
+                        Page page = doc.Pages[i];
+                        var resources = page.Resources;
+                        var xObjectsProp = resources.GetType().GetProperty("XObjects");
+                        if (xObjectsProp != null)
+                        {
+                            var xObjects = xObjectsProp.GetValue(resources) as IEnumerable;
+                            if (xObjects != null)
+                            {
+                                foreach (var _ in xObjects)
+                                {
+                                    graphicsCount++;
+                                }
+                            }
+                        }
+                    }
+
+                    // ---------- Report ----------
+                    Console.WriteLine($"PDF: {Path.GetFileName(pdfPath)}");
+                    Console.WriteLine($"  Extracted graphics (XObjects) : {graphicsCount}");
+                    Console.WriteLine($"  Total text length (characters): {totalTextLength}");
+                    Console.WriteLine($"  Image count                    : {imageCount}");
+                    Console.WriteLine();
                 }
-
-                // ---------- Graphics counting ----------
-                // Aspose.Pdf does not expose a direct API for counting vector graphics.
-                // As a placeholder, we set the count to zero. Replace this with
-                // appropriate logic if a future version provides such an API.
-                int totalGraphicsCount = 0;
-
-                // ---------- Report ----------
-                Console.WriteLine("--------------------------------------------------");
-                Console.WriteLine($"PDF File          : {Path.GetFileName(pdfPath)}");
-                Console.WriteLine($"Total Pages       : {doc.Pages.Count}");
-                Console.WriteLine($"Extracted Graphics: {totalGraphicsCount}");
-                Console.WriteLine($"Total Text Length : {totalTextLength} characters");
-                Console.WriteLine($"Image Count       : {totalImageCount}");
-                Console.WriteLine("--------------------------------------------------");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

@@ -4,73 +4,58 @@ using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Program
+class ExtractLinksToCsv
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputCsv = "links.csv";
+        const string inputPdfPath = "input.pdf";
+        const string outputCsvPath = "links.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Collect all URLs from LinkAnnotations across all pages
+            List<string> urls = new List<string>();
+
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                var records = new List<(int PageNumber, string Url)>();
-
-                // Pages are 1‑based
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = pdfDoc.Pages[i];
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Page page = doc.Pages[i];
-
-                    // Annotations collection is also 1‑based
-                    for (int j = 1; j <= page.Annotations.Count; j++)
+                    // We are interested only in link annotations
+                    if (annotation is LinkAnnotation linkAnno && linkAnno.Action != null)
                     {
-                        Annotation ann = page.Annotations[j];
-
-                        // We are interested only in link annotations
-                        if (ann is LinkAnnotation link)
+                        // Go‑to URI actions contain the target URL
+                        if (linkAnno.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
                         {
-                            string url = null;
-
-                            // Extract URL from GoToURIAction if present
-                            if (link.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
-                            {
-                                url = uriAction.URI;
-                            }
-
-                            if (!string.IsNullOrEmpty(url))
-                            {
-                                records.Add((i, url));
-                            }
+                            urls.Add(uriAction.URI);
                         }
                     }
                 }
-
-                // Write results to CSV
-                using (StreamWriter writer = new StreamWriter(outputCsv, false))
-                {
-                    writer.WriteLine("Page,URL");
-                    foreach (var rec in records)
-                    {
-                        // Escape commas in URL if any
-                        string escapedUrl = rec.Url.Contains(",") ? $"\"{rec.Url}\"" : rec.Url;
-                        writer.WriteLine($"{rec.PageNumber},{escapedUrl}");
-                    }
-                }
-
-                Console.WriteLine($"Extracted {records.Count} link(s) to '{outputCsv}'.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+
+            // Write the collected URLs to a CSV file
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
+            {
+                // CSV header
+                writer.WriteLine("URL");
+
+                foreach (string url in urls)
+                {
+                    // Escape double quotes by doubling them, then wrap the field in quotes
+                    string escaped = $"\"{url.Replace("\"", "\"\"")}\"";
+                    writer.WriteLine(escaped);
+                }
+            }
+
+            Console.WriteLine($"Extracted {urls.Count} link(s) to '{outputCsvPath}'.");
         }
     }
 }

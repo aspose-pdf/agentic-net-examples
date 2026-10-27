@@ -1,87 +1,77 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
-        const string inputPdfPath = "input.pdf";
+        const string pdfPath   = "input.pdf";                 // source PDF
+        const string outDir    = "HtmlPages";                 // folder for HTML pages
+        const string baseName  = "output";                    // base name for HTML files
 
-        // Directory where the split HTML pages and the index will be placed
-        const string outputDirectory = "output_html";
-
-        // Base name for the generated HTML files (Aspose.Pdf will append page numbers)
-        const string baseHtmlFileName = "page.html";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outDir);
 
-        // Full path for the base HTML file (used only as a naming seed)
-        string baseHtmlPath = Path.Combine(outputDirectory, baseHtmlFileName);
-
-        // Load the PDF and convert it to HTML with one file per page
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            HtmlSaveOptions htmlOptions = new HtmlSaveOptions
+            // Load PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                SplitIntoPages = true               // one HTML file per PDF page
-                // Other options can be set here if needed
-            };
+                // Configure HTML conversion – split each page into a separate file
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    SplitIntoPages = true,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                };
 
-            // Save – this creates multiple HTML files in the same folder as baseHtmlPath
-            pdfDocument.Save(baseHtmlPath, htmlOptions);
-        }
-
-        // After conversion, collect all generated HTML page files (excluding the index if it already exists)
-        var pageFiles = Directory.GetFiles(outputDirectory, "*_page*.html")
-                                 .OrderBy(f => f)
-                                 .ToList();
-
-        // Fallback: if the naming pattern differs, take all .html files except index.html
-        if (!pageFiles.Any())
-        {
-            pageFiles = Directory.GetFiles(outputDirectory, "*.html")
-                                 .Where(f => !Path.GetFileName(f).Equals("index.html", StringComparison.OrdinalIgnoreCase))
-                                 .OrderBy(f => f)
-                                 .ToList();
-        }
-
-        // Create an index.html that links to each page file
-        string indexPath = Path.Combine(outputDirectory, "index.html");
-        using (StreamWriter writer = new StreamWriter(indexPath, false))
-        {
-            writer.WriteLine("<!DOCTYPE html>");
-            writer.WriteLine("<html lang=\"en\">");
-            writer.WriteLine("<head>");
-            writer.WriteLine("    <meta charset=\"UTF-8\">");
-            writer.WriteLine("    <title>PDF Pages Index</title>");
-            writer.WriteLine("</head>");
-            writer.WriteLine("<body>");
-            writer.WriteLine("    <h1>PDF Pages</h1>");
-            writer.WriteLine("    <ul>");
-
-            int pageNumber = 1;
-            foreach (string filePath in pageFiles)
-            {
-                string fileName = Path.GetFileName(filePath);
-                writer.WriteLine($"        <li><a href=\"{fileName}\">Page {pageNumber}</a></li>");
-                pageNumber++;
+                // Save the PDF as HTML pages
+                string firstPagePath = Path.Combine(outDir, $"{baseName}.html");
+                pdfDoc.Save(firstPagePath, htmlOpts);
             }
 
-            writer.WriteLine("    </ul>");
-            writer.WriteLine("</body>");
-            writer.WriteLine("</html>");
-        }
+            // After conversion, create an index.html that links to each page file
+            string indexPath = Path.Combine(outDir, "index.html");
+            using (StreamWriter writer = new StreamWriter(indexPath, false))
+            {
+                writer.WriteLine("<!DOCTYPE html>");
+                writer.WriteLine("<html lang=\"en\">");
+                writer.WriteLine("<head><meta charset=\"UTF-8\"><title>PDF Pages Index</title></head>");
+                writer.WriteLine("<body>");
+                writer.WriteLine("<h1>PDF Pages</h1>");
+                writer.WriteLine("<ul>");
 
-        Console.WriteLine($"Conversion complete. HTML pages and index.html are located in '{outputDirectory}'.");
+                // Determine number of pages from the original PDF (same as number of HTML files)
+                using (Document pdfDoc = new Document(pdfPath))
+                {
+                    int pageCount = pdfDoc.Pages.Count; // 1‑based indexing
+                    for (int i = 1; i <= pageCount; i++)
+                    {
+                        string fileName = i == 1 ? $"{baseName}.html" : $"{baseName}_{i}.html";
+                        writer.WriteLine($"  <li><a href=\"{fileName}\">Page {i}</a></li>");
+                    }
+                }
+
+                writer.WriteLine("</ul>");
+                writer.WriteLine("</body>");
+                writer.WriteLine("</html>");
+            }
+
+            Console.WriteLine($"HTML pages and index created in '{outDir}'.");
+        }
+        catch (TypeInitializationException)
+        {
+            // HTML conversion uses GDI+ and is Windows‑only
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

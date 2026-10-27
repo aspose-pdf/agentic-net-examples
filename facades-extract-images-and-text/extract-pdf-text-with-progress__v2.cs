@@ -1,14 +1,26 @@
 using System;
 using System.IO;
-using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Simple console progress bar
+    static void ShowProgress(int currentPage, int totalPages)
+    {
+        int percent = (int)((double)currentPage / totalPages * 100);
+        const int barWidth = 50;
+        int filled = percent * barWidth / 100;
+        string bar = new string('#', filled) + new string('-', barWidth - filled);
+        Console.Write($"\r[{bar}] {percent}%");
+        if (currentPage == totalPages)
+            Console.WriteLine(); // move to next line when done
+    }
+
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputDir  = "ExtractedPages";    // folder for per‑page text files
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,38 +28,52 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output file is empty before appending page texts
+        File.WriteAllText(outputTxt, string.Empty);
 
-        // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
+        // Get total page count via Document (PdfExtractor has no PageCount property)
+        int pageCount;
+        using (var doc = new Document(inputPdf))
+        {
+            pageCount = doc.Pages.Count;
+        }
+
+        // PdfExtractor implements IDisposable – wrap in using per lifecycle rule
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor
+            // Bind the source PDF
             extractor.BindPdf(inputPdf);
 
-            // Extract all text (Unicode encoding) – required before calling GetNextPageText / HasNextPageText
-            extractor.ExtractText(Encoding.Unicode);
-
-            // Total number of pages in the document (1‑based indexing)
-            int totalPages = extractor.Document.Pages.Count;
-
-            int currentPage = 1;
-            while (extractor.HasNextPageText())
+            // Process each page individually to report progress
+            for (int page = 1; page <= pageCount; page++)
             {
-                // Build output file name for the current page
-                string outPath = Path.Combine(outputDir, $"Page_{currentPage}.txt");
+                // Set the range to a single page using properties
+                extractor.StartPage = page;
+                extractor.EndPage   = page;
 
-                // Save the text of the current page
-                extractor.GetNextPageText(outPath);
+                // Extract text from the current page
+                extractor.ExtractText();
 
-                // Calculate and display progress percentage
-                int percent = (int)((double)currentPage / totalPages * 100);
-                Console.WriteLine($"Processed page {currentPage}/{totalPages} ({percent}%)");
+                // Retrieve extracted text via stream overload
+                string pageText;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    extractor.GetText(ms);
+                    ms.Position = 0;
+                    using (StreamReader reader = new StreamReader(ms))
+                    {
+                        pageText = reader.ReadToEnd();
+                    }
+                }
 
-                currentPage++;
+                // Append page text to the output file
+                File.AppendAllText(outputTxt, pageText);
+
+                // Update progress bar
+                ShowProgress(page, pageCount);
             }
         }
 
-        Console.WriteLine("Extraction completed.");
+        Console.WriteLine($"Text extraction completed. Output saved to '{outputTxt}'.");
     }
 }

@@ -1,96 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
-    static void Main()
-    {
-        const string inputPdfPath = "form.pdf";
-        const string outputPdfPath = "form_checked.pdf";
-        const long maxFileSizeBytes = 5L * 1024 * 1024; // 5 MB
+    // Maximum allowed file size: 5 MB (in bytes)
+    private const long MaxFileSizeBytes = 5L * 1024 * 1024;
 
-        if (!File.Exists(inputPdfPath))
+    static void Main(string[] args)
+    {
+        // Expect a file path as the first argument
+        if (args.Length == 0)
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.WriteLine("Usage: program <pdf-file-path>");
             return;
         }
 
-        // Optional safety net – limit memory loading to 5 MB
-        Document.FileSizeLimitToMemoryLoading = 5; // value is in megabytes
+        string filePath = args[0];
 
-        // Load the PDF form
-        using (Document doc = new Document(inputPdfPath))
+        // Ensure the file exists
+        if (!File.Exists(filePath))
         {
-            // Locate the file‑select box field (adjust the field name as needed)
-            const string fileFieldName = "fileSelect";
-            FileSelectBoxField fileField = doc.Form[fileFieldName] as FileSelectBoxField;
-
-            if (fileField == null)
-            {
-                Console.Error.WriteLine($"FileSelectBoxField '{fileFieldName}' not found.");
-                doc.Save(outputPdfPath);
-                return;
-            }
-
-            // The field value holds the selected file path (may be empty)
-            string selectedFilePath = fileField.Value?.ToString();
-
-            if (string.IsNullOrEmpty(selectedFilePath) || !File.Exists(selectedFilePath))
-            {
-                Console.WriteLine("No file selected or file does not exist. Form can be submitted.");
-                doc.Save(outputPdfPath);
-                return;
-            }
-
-            long selectedFileSize = new FileInfo(selectedFilePath).Length;
-
-            if (selectedFileSize > maxFileSizeBytes)
-            {
-                // Add a warning annotation to inform the user
-                Page firstPage = doc.Pages[1];
-                Aspose.Pdf.Rectangle warningRect = new Aspose.Pdf.Rectangle(100, 700, 500, 750);
-                TextAnnotation warning = new TextAnnotation(firstPage, warningRect)
-                {
-                    Title = "File Too Large",
-                    Contents = $"Selected file size ({selectedFileSize / (1024 * 1024)} MB) exceeds the 5 MB limit.",
-                    Color = Aspose.Pdf.Color.Red,
-                    Open = true,
-                    Icon = TextIcon.Note
-                };
-                firstPage.Annotations.Add(warning);
-
-                Console.WriteLine("File size exceeds limit; submission blocked.");
-            }
-            else
-            {
-                // Add a submit button (or ensure one exists) to allow form submission
-                Page firstPage = doc.Pages[1];
-                Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 600, 200, 630);
-                ButtonField submitBtn = new ButtonField(doc, btnRect)
-                {
-                    PartialName = "submitBtn",
-                    NormalCaption = "Submit"
-                };
-
-                // Create a SubmitFormAction that posts the form to a URL
-                SubmitFormAction submitAction = new SubmitFormAction();
-                submitAction.Url = new FileSpecification("https://example.com/submit");
-                // Assign the action to the button's activation event
-                submitBtn.OnActivated = submitAction;
-
-                // Add the button to the form on the first page
-                doc.Form.Add(submitBtn, 1);
-
-                Console.WriteLine("File size within limit; submission enabled.");
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"File not found: {filePath}");
+            return;
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPdfPath}'.");
+        // Validate the file size against the 5 MB limit
+        if (!IsFileSizeValid(filePath))
+        {
+            Console.WriteLine("The selected file exceeds the 5 MB size limit.");
+            return;
+        }
+
+        // At this point the file size is acceptable; proceed with further processing
+        // Example: load the PDF with Aspose.Pdf core API and display page count
+        Document pdfDocument = new Document(filePath);
+        Console.WriteLine($"PDF loaded successfully. Page count: {pdfDocument.Pages.Count}");
+
+        // Example: save a copy of the PDF (could be any further processing)
+        string outputPath = Path.Combine(Path.GetDirectoryName(filePath) ?? string.Empty, "processed.pdf");
+        pdfDocument.Save(outputPath);
+        Console.WriteLine($"Processed file saved to: {outputPath}");
+    }
+
+    private static bool IsFileSizeValid(string path)
+    {
+        FileInfo info = new FileInfo(path);
+        return info.Length <= MaxFileSizeBytes;
     }
 }

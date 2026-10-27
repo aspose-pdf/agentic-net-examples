@@ -1,16 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing; // needed for System.Drawing.Rectangle
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string url = "https://www.example.com";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_linked.pdf";
+        const string url        = "https://www.example.com";
 
         if (!File.Exists(inputPath))
         {
@@ -18,21 +17,29 @@ class Program
             return;
         }
 
-        // Bind the PDF, add a web link, and save the result
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Get the first page (pages are 1‑based)
+        Page page = pdfDocument.Pages[1];
+
+        // Define the clickable area (coordinates are in points, origin at bottom‑left)
+        // Use fully qualified Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing
+        Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
+
+        // Create a link annotation that opens an external URL.
+        // The constructor requires the owning Page and the rectangle bounds.
+        LinkAnnotation link = new LinkAnnotation(page, linkRect)
         {
-            editor.BindPdf(inputPath);
+            Action = new GoToURIAction(url)
+        };
 
-            // Define the clickable area (x, y, width, height) using System.Drawing.Rectangle
-            System.Drawing.Rectangle linkRect = new System.Drawing.Rectangle(100, 500, 200, 50);
+        // Add the annotation to the page
+        page.Annotations.Add(link);
 
-            // Create a web link on page 1 (the rectangle type must be System.Drawing.Rectangle)
-            editor.CreateWebLink(linkRect, url, 1);
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
 
-            // Persist changes
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Web link added and saved to '{outputPath}'.");
+        Console.WriteLine($"Link annotation added and saved to '{outputPath}'.");
     }
 }

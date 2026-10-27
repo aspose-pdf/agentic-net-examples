@@ -1,38 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf;          // Core API (Document, HtmlSaveOptions, XmlLoadOptions)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string xmlInputPath  = "input.xml";   // XML source that generates a PDF
-        const string htmlOutputPath = "preview.html";
+        const string inputPdfPath  = "input_from_xml.pdf";   // PDF generated from XML
+        const string outputHtmlPath = "preview.html";
 
-        // Verify input file exists
-        if (!File.Exists(xmlInputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the XML and create a PDF document in memory
-        using (Document pdfDoc = new Document(xmlInputPath, new XmlLoadOptions()))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Prepare HTML save options (required to produce HTML, not PDF)
+            // Configure HTML conversion options
             HtmlSaveOptions htmlOpts = new HtmlSaveOptions
             {
-                // Example: embed all resources into a single HTML file
+                // Embed all resources (fonts, images) into the HTML file
                 PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                // Example: save raster images as PNGs embedded in SVG wrappers
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                // Render images as PNGs embedded into SVG (cross‑browser friendly)
+                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                // Optional: split each PDF page into a separate HTML file
+                // SplitIntoPages = true
             };
 
-            // Save the document as HTML for web preview
-            pdfDoc.Save(htmlOutputPath, htmlOpts);
+            // HTML conversion relies on GDI+ and works only on Windows.
+            // Wrap the save call to handle non‑Windows platforms gracefully.
+            try
+            {
+                pdfDoc.Save(outputHtmlPath, htmlOpts);
+                Console.WriteLine($"HTML preview saved to '{outputHtmlPath}'.");
+            }
+            catch (TypeInitializationException)
+            {
+                Console.WriteLine("HTML conversion requires GDI+ (Windows only). Operation skipped on this platform.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error during HTML conversion: {ex.Message}");
+            }
         }
-
-        Console.WriteLine($"HTML preview generated at '{htmlOutputPath}'.");
     }
 }

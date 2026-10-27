@@ -1,48 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Text;
 
-class PdfTextComparison
+class Program
 {
     static void Main()
     {
-        // Paths to the two PDF files that have the same content but different compression settings
-        const string pdfPathA = "document_compressed_a.pdf";
-        const string pdfPathB = "document_compressed_b.pdf";
+        // Paths to the two PDFs that have the same content but different compression settings
+        const string pdfPath1 = "doc_compressed1.pdf";
+        const string pdfPath2 = "doc_compressed2.pdf";
 
         // Verify that both files exist before proceeding
-        if (!File.Exists(pdfPathA))
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
-            Console.Error.WriteLine($"File not found: {pdfPathA}");
-            return;
-        }
-        if (!File.Exists(pdfPathB))
-        {
-            Console.Error.WriteLine($"File not found: {pdfPathB}");
+            Console.Error.WriteLine("One or both PDF files were not found.");
             return;
         }
 
-        // Load the two PDF documents inside using blocks for deterministic disposal
-        using (Document docA = new Document(pdfPathA))
-        using (Document docB = new Document(pdfPathB))
+        // Extract textual content from each PDF
+        string text1 = ExtractText(pdfPath1);
+        string text2 = ExtractText(pdfPath2);
+
+        // Compare the extracted texts; compression should not affect the result
+        bool textsAreIdentical = string.Equals(text1, text2, StringComparison.Ordinal);
+
+        Console.WriteLine(textsAreIdentical
+            ? "Texts are identical; compression differences do not affect textual content."
+            : "Texts differ; compression may have altered content or extraction differs.");
+
+        // Optional diagnostics: show lengths of extracted text
+        Console.WriteLine($"Length of PDF1 text: {text1.Length}");
+        Console.WriteLine($"Length of PDF2 text: {text2.Length}");
+    }
+
+    // Helper method that extracts pure text from a PDF using TextAbsorber
+    static string ExtractText(string pdfPath)
+    {
+        // Document is wrapped in a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Create comparison options – default settings are sufficient for text comparison
-            ComparisonOptions options = new ComparisonOptions();
+            TextAbsorber absorber = new TextAbsorber();
 
-            // Perform a flat (whole‑document) text comparison.
-            // This method concatenates the text of all pages before comparing,
-            // so differences caused only by compression are ignored.
-            var diffOperations = TextPdfComparer.CompareFlatDocuments(docA, docB, options);
+            // Use pure text formatting mode to ignore layout and formatting differences
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Output the result – number of textual differences found
-            Console.WriteLine($"Textual differences detected: {diffOperations.Count}");
+            // Apply the absorber to all pages (pages are 1‑based internally)
+            doc.Pages.Accept(absorber);
 
-            // Iterate over the diff list and display details using the provided ToString() representation
-            foreach (var diff in diffOperations)
-            {
-                Console.WriteLine(diff.ToString());
-            }
+            // Return the concatenated text from the entire document
+            return absorber.Text;
         }
     }
 }

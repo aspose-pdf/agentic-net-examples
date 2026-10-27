@@ -6,47 +6,45 @@ class Program
 {
     static void Main()
     {
-        const string referencePath = "template.pdf";
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_resized.pdf";
+        const string templatePath = "template.pdf";
+        const string sourcePath   = "source.pdf";
+        const string outputPath   = "resized.pdf";
 
-        if (!File.Exists(referencePath))
+        if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Reference file not found: {referencePath}");
+            Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source not found: {sourcePath}");
             return;
         }
 
-        // Load the reference PDF to obtain the desired page dimensions.
-        using (Document referenceDoc = new Document(referencePath))
+        // Load the reference PDF and obtain its first page dimensions.
+        double templateWidth, templateHeight;
+        using (Document templateDoc = new Document(templatePath))
         {
-            // Use the first page of the template as the size source.
-            Page refPage = referenceDoc.Pages[1];
-            Aspose.Pdf.Rectangle refRect = refPage.Rect;
+            // Assuming all template pages share the same size.
+            Page templatePage = templateDoc.Pages[1];
+            templateWidth  = templatePage.PageInfo.Width;
+            templateHeight = templatePage.PageInfo.Height;
+        }
 
-            // Create a PageSize object from the reference rectangle.
-            PageSize targetSize = new PageSize((float)refRect.Width, (float)refRect.Height);
-
-            // Load the document whose pages need to be resized.
-            using (Document targetDoc = new Document(inputPath))
+        // Load the PDF to be resized, adjust each page, and save the result.
+        using (Document sourceDoc = new Document(sourcePath))
+        {
+            // Aspose.Pdf uses 1‑based page indexing.
+            for (int i = 1; i <= sourceDoc.Pages.Count; i++)
             {
-                // Pages collection is 1‑based; iterate through all pages.
-                for (int i = 1; i <= targetDoc.Pages.Count; i++)
-                {
-                    Page page = targetDoc.Pages[i];
-                    // Resize each page to match the template size.
-                    page.Resize(targetSize);
-                }
-
-                // Save the resized PDF.
-                targetDoc.Save(outputPath);
+                Page page = sourceDoc.Pages[i];
+                // Resize the page to match the template dimensions.
+                page.SetPageSize(templateWidth, templateHeight);
             }
+
+            sourceDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        Console.WriteLine($"All pages resized and saved to '{outputPath}'.");
     }
 }

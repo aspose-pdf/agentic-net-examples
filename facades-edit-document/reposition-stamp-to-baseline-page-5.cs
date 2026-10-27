@@ -1,71 +1,73 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImage = "stamp.png";
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf) || !File.Exists(stampImage))
+        if (!File.Exists(inputPath) || !File.Exists(stampImagePath))
         {
             Console.Error.WriteLine("Input PDF or stamp image not found.");
             return;
         }
 
-        // Load the PDF to obtain the baseline Y coordinate of the first text fragment on page 5
+        // Load the PDF document
+        Document pdf = new Document(inputPath);
+
+        // Determine the baseline position of the first text fragment on page 5
+        // (using the PDF object model directly – avoids the external AsposePdfApi process)
         double baselineY = 0;
-        using (Document doc = new Document(inputPdf))
+        double baselineX = 0;
         {
-            if (doc.Pages.Count < 5)
+            // Pages collection is 1‑based
+            Page page = pdf.Pages[5];
+            TextFragment firstFragment = null;
+
+            // Iterate over the page paragraphs until we find a TextFragment
+            foreach (var paragraph in page.Paragraphs)
             {
-                Console.Error.WriteLine("PDF has less than 5 pages.");
-                return;
+                if (paragraph is TextFragment tf)
+                {
+                    firstFragment = tf;
+                    break;
+                }
             }
 
-            // Extract text fragments from page 5
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-            doc.Pages[5].Accept(absorber);
-
-            if (absorber.TextFragments.Count > 0)
+            if (firstFragment != null)
             {
-                // Use the rectangle of the first fragment to get the lower‑left Y (baseline) coordinate
-                // TextFragmentAbsorber returns a collection that is zero‑based.
-                baselineY = absorber.TextFragments[0].Rectangle.LLY;
+                baselineY = firstFragment.Position.YIndent; // baseline (approx.)
+                baselineX = firstFragment.Position.XIndent; // start of the fragment
             }
             else
             {
-                Console.Error.WriteLine("No text found on page 5.");
+                Console.Error.WriteLine("No text fragments found on page 5.");
                 return;
             }
         }
 
-        // Add an image stamp to the PDF (initial position will be adjusted later)
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindImage(stampImage);
-        stamp.SetOrigin(0, 0);          // temporary origin – will be moved later
-        stamp.IsBackground = false;    // stamp on top of content
-        fileStamp.AddStamp(stamp);
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
+        // Create an image stamp and align it with the text baseline
+        ImageStamp stamp = new ImageStamp(stampImagePath)
+        {
+            Background = false,                     // place stamp over existing content
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Bottom,
+            XIndent = (float)baselineX,            // distance from the left edge
+            YIndent = (float)baselineY             // distance from the bottom edge (baseline)
+        };
 
-        // Reposition the stamp on page 5 to align with the text baseline
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(outputPdf);
-        // MoveStamp(pageNumber, stampIndex, x, y)
-        // The stamp we added is the first (and only) stamp on the page – index is 0‑based.
-        double desiredX = 50; // horizontal offset from the left edge
-        editor.MoveStamp(5, 0, desiredX, baselineY);
-        editor.Save(outputPdf);
-        editor.Close();
+        // Add the stamp to page 5 (pages are 1‑based)
+        pdf.Pages[5].AddStamp(stamp);
 
-        Console.WriteLine($"Stamp repositioned and saved to '{outputPdf}'.");
+        // Save the modified PDF
+        pdf.Save(outputPath);
+
+        Console.WriteLine($"Stamp repositioned and saved to '{outputPath}'.");
     }
 }

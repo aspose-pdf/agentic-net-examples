@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,47 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_footer.pdf";
 
-        // ------------------------------------------------------------
-        // Ensure a source PDF exists – the sandbox does not contain any
-        // external files. If the file is missing we create a minimal one‑page
-        // PDF that can be used for the demonstration.
-        // ------------------------------------------------------------
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the (now guaranteed) PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            int totalPages = doc.Pages.Count;
+            int totalPages = doc.Pages.Count; // total page count
 
-            // Add a footer to each page showing "Page X of Y"
-            foreach (Page page in doc.Pages)
+            // Iterate using 1‑based indexing (Aspose.Pdf pages are 1‑based)
+            for (int i = 1; i <= totalPages; i++)
             {
-                TextFragment footer = new TextFragment($"Page {page.Number} of {totalPages}");
-                // Position the footer near the bottom of the page (Y measured from the bottom)
-                footer.Position = new Position(0, 20); // X is ignored when using Center alignment
-                footer.HorizontalAlignment = HorizontalAlignment.Center;
-                // Optional styling (uncomment if needed)
-                // footer.TextState.Font = FontRepository.FindFont("Helvetica");
-                // footer.TextState.FontSize = 10;
-                // footer.TextState.ForegroundColor = Color.Gray;
+                Page page = doc.Pages[i];
 
-                page.Paragraphs.Add(footer);
+                // Create footer text "Page X of Y"
+                string footerText = $"Page {i} of {totalPages}";
+                TextFragment tf = new TextFragment(footerText);
+
+                // Style the footer (optional)
+                tf.TextState.FontSize = 9;
+                tf.TextState.Font = FontRepository.FindFont("Arial");
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+
+                // Position the footer near the bottom of the page
+                // y-coordinate is measured from the bottom; adjust as needed
+                tf.Position = new Position(0, 20); // 20 points from bottom, centered horizontally
+
+                // Center the text horizontally
+                tf.HorizontalAlignment = HorizontalAlignment.Center;
+
+                // Add the footer to the page's paragraphs collection
+                page.Paragraphs.Add(tf);
             }
 
-            // Save the modified PDF with footers
+            // Save the modified PDF (Document.Save writes PDF regardless of extension)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom footers to '{outputPath}'.");
+        Console.WriteLine($"PDF with footers saved to '{outputPath}'.");
     }
 }

@@ -6,60 +6,57 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";   // Path to the encrypted PDF
-        const string userPassword = "userpass";    // User password for opening the PDF
-        const string outputDir = "ExtractedImages"; // Directory to store extracted images
+        const string encryptedPdfPath = "encrypted.pdf";   // input encrypted PDF
+        const string userPassword     = "user123";        // user password for decryption
+        const string outputFolder     = "ExtractedImages"; // folder to store extracted images
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
         try
         {
-            // Open the encrypted PDF using the user password
-            using (Document doc = new Document(inputPath, userPassword))
+            // Open the encrypted PDF with the user password using a stream overload
+            using (FileStream pdfStream = new FileStream(encryptedPdfPath, FileMode.Open, FileAccess.Read))
+            using (Document doc = new Document(pdfStream, userPassword))
             {
-                // Decrypt the document (removes encryption)
+                // Remove encryption from the document
                 doc.Decrypt();
 
-                // Optionally save a decrypted copy (not required for image extraction)
-                string decryptedPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty, "decrypted.pdf");
-                using (FileStream decryptedStream = new FileStream(decryptedPath, FileMode.Create, FileAccess.Write))
+                int imageCounter = 1;
+
+                // Iterate over all pages
+                foreach (Page page in doc.Pages)
                 {
-                    doc.Save(decryptedStream);
-                }
-
-                int imageIndex = 1;
-
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
-                {
-                    Page page = doc.Pages[pageNum];
-
-                    // Iterate over all images defined in the page resources
+                    // Iterate over all images on the current page
                     foreach (XImage img in page.Resources.Images)
                     {
-                        // Save each image as PNG (you can change the extension if needed)
-                        string imagePath = Path.Combine(outputDir, $"page{pageNum}_img{imageIndex}.png");
+                        // Save each image as PNG using a FileStream (XImage.Save expects a Stream)
+                        string imagePath = Path.Combine(outputFolder, $"image_{imageCounter}.png");
                         using (FileStream imgStream = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                         {
                             img.Save(imgStream);
                         }
-                        Console.WriteLine($"Saved image: {imagePath}");
-                        imageIndex++;
+                        Console.WriteLine($"Saved image {imageCounter} to '{imagePath}'");
+                        imageCounter++;
                     }
                 }
             }
+
+            Console.WriteLine("Image extraction completed successfully.");
+        }
+        catch (InvalidPasswordException)
+        {
+            Console.Error.WriteLine("The provided password is incorrect.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"An error occurred: {ex.Message}");
         }
     }
 }

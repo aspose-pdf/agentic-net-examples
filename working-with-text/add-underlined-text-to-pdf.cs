@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,36 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "underlined.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "underlined_output.pdf";
+        const string text = "Underlined text example";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a text fragment with the desired content
-            TextFragment tf = new TextFragment("This text is underlined");
+        // Load the PDF, add underlined text, and save.
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a text fragment with the desired content.
+            TextFragment fragment = new TextFragment(text);
+            // Enable underline via the TextState.
+            fragment.TextState.Underline = true;
+            // Optional styling.
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Enable underlining via the TextState property
-            tf.TextState.Underline = true;
+            // Insert the fragment into the first page (1‑based indexing).
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(fragment);
 
-            // Optional styling
-            tf.TextState.FontSize = 12;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Set the position of the text fragment on the page
-            tf.Position = new Position(100, 700);
-
-            // Append the fragment to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
-
-            // Save the PDF document
+            // Save the modified document.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Underlined text added and saved to '{outputPath}'.");
     }
 }

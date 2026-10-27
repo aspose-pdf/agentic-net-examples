@@ -7,37 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_durations.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Obtain the total number of pages via Document (PdfPageEditor does not expose this).
+        int pageCount;
+        using (var doc = new Document(inputPath))
         {
-            // PdfPageEditor works on a Document instance
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Iterate over pages (1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
-                {
-                    // Edit only the current page
-                    editor.ProcessPages = new int[] { pageIndex };
-                    // Set display duration: increase by 1 second per page
-                    editor.DisplayDuration = pageIndex; // seconds
-                    // Apply the change to the document
-                    editor.ApplyChanges();
-                }
-            }
-
-            // Save the modified document
-            doc.Save(outputPath);
+            pageCount = doc.Pages.Count;
         }
 
-        Console.WriteLine($"Document saved with per‑page display durations to '{outputPath}'.");
+        // Use PdfPageEditor to set a different DisplayDuration for each page.
+        using (var editor = new PdfPageEditor())
+        {
+            editor.BindPdf(inputPath);
+
+            for (int i = 1; i <= pageCount; i++)
+            {
+                // Specify the page to edit (1‑based indexing).
+                editor.ProcessPages = new[] { i };
+                // Set the duration (in seconds) for the selected page.
+                editor.DisplayDuration = i; // page 1 => 1 s, page 2 => 2 s, …
+                // Apply the change before moving to the next page.
+                editor.ApplyChanges();
+            }
+
+            // Save the modified PDF.
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Saved with updated display durations to '{outputPath}'.");
     }
 }

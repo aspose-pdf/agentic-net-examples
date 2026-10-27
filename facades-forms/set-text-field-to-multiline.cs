@@ -1,12 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,19 +16,22 @@ class Program
             return;
         }
 
-        // Initialize FormEditor with source and destination PDF files
-        FormEditor formEditor = new FormEditor(inputPath, outputPath);
+        // Load the PDF document.
+        Document pdfDocument = new Document(inputPath);
 
-        // Convert the "Comments" text field to a multiline field
-        bool success = formEditor.Single2Multiple("Comments");
-        if (!success)
+        // Retrieve the "Comments" text field and set it to multiline.
+        if (pdfDocument.Form["Comments"] is TextBoxField commentsField)
         {
-            Console.Error.WriteLine("Unable to set multiline property for field 'Comments'.");
+            commentsField.Multiline = true; // Allow line breaks.
+        }
+        else
+        {
+            Console.Error.WriteLine("Field 'Comments' not found or is not a text box.");
         }
 
-        // Persist changes to the output PDF
-        formEditor.Save();
+        // Save the modified PDF.
+        pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Multiline property set for field 'Comments'. Saved to '{outputPath}'.");
     }
 }

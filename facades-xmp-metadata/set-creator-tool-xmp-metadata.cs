@@ -1,17 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using System.Reflection;
+using Aspose.Pdf; // Core Aspose.Pdf namespace provides PDF document handling and metadata access
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Example version string – replace with your actual application version if needed
-        string appVersion = "MyApp 1.0";
 
         if (!File.Exists(inputPath))
         {
@@ -19,19 +16,20 @@ class Program
             return;
         }
 
-        // Load the PDF, modify its XMP metadata, and save the result
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
+        // Retrieve the current application version
+        string version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0.0";
+
+        // Load the PDF document inside a using block to ensure proper disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Bind the existing PDF file
-            xmp.BindPdf(inputPath);
+            // Set the CreatorTool property in XMP metadata via the Metadata dictionary
+            // The XMP key for CreatorTool is "xmp:CreatorTool"
+            pdfDoc.Metadata["xmp:CreatorTool"] = $"MyApp {version}";
 
-            // Set the xmp:CreatorTool property
-            xmp.Add(DefaultMetadataProperties.CreatorTool, new XmpValue(appVersion));
-
-            // Save the updated PDF (overwrites or creates a new file)
-            xmp.Save(outputPath);
+            // Save the updated PDF
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"CreatorTool set to \"{appVersion}\" and saved to \"{outputPath}\".");
+        Console.WriteLine($"CreatorTool set to 'MyApp {version}' and saved to '{outputPath}'.");
     }
 }

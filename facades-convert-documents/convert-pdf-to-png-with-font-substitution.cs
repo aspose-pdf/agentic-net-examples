@@ -1,42 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // <-- PngDevice lives here in recent versions
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "PngOutput";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Set up font substitution: replace missing Helvetica with Times New Roman
-        SimpleFontSubstitution substitution = new SimpleFontSubstitution("Helvetica", "Times New Roman", false);
-        FontRepository.Substitutions.Add(substitution);
+        // Font substitution: replace missing Helvetica with Times New Roman
+        // The Substitutions collection works with SimpleFontSubstitution objects.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Times New Roman"));
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Create a PNG device for rendering pages
-            PngDevice pngDevice = new PngDevice(); // default resolution (96 DPI). Adjust if needed.
+            // Define the resolution for the PNG images (150 DPI is a good default)
+            var resolution = new Resolution(150);
+            // PngDevice renders a page to a PNG stream without requiring System.Drawing
+            var pngDevice = new PngDevice(resolution);
 
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                string outPath = Path.Combine(outputDir, $"page_{i}.png");
+                // Build the output PNG file path
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+
                 // Render the current page to a PNG file
-                pngDevice.Process(doc.Pages[i], outPath);
-                Console.WriteLine($"Saved {outPath}");
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                {
+                    pngDevice.Process(doc.Pages[pageNumber], outStream);
+                }
             }
         }
+
+        Console.WriteLine("PDF successfully converted to PNG images.");
     }
 }

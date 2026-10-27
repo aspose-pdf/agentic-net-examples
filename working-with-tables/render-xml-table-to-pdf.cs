@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Data;
 using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
@@ -10,82 +9,80 @@ class Program
 {
     static void Main()
     {
+        // Input XML that defines the table structure
         const string xmlPath = "tableDefinition.xml";
-        const string outputPdf = "output.pdf";
+        // Output PDF file
+        const string pdfPath = "tableOutput.pdf";
 
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML definition not found: {xmlPath}");
             return;
         }
 
-        // Parse the XML file into a DataTable.
-        DataTable dataTable = new DataTable();
-
-        try
+        // Load the XML document
+        XDocument xDoc = XDocument.Load(xmlPath);
+        XElement root = xDoc.Root; // Expected <Table> root element
+        if (root == null)
         {
-            XDocument xDoc = XDocument.Load(xmlPath);
-            // Expected format:
-            // <Table>
-            //   <Row><Cell>...</Cell><Cell>...</Cell>...</Row>
-            //   <Row>...</Row>
-            // </Table>
-
-            var rowElements = xDoc.Root?.Elements("Row");
-            if (rowElements == null || !rowElements.Any())
-                throw new Exception("No <Row> elements found in XML.");
-
-            // Determine the maximum number of cells in any row.
-            int maxColumns = rowElements.Max(r => r.Elements("Cell").Count());
-
-            // Create columns.
-            for (int i = 0; i < maxColumns; i++)
-                dataTable.Columns.Add($"Column{i + 1}", typeof(string));
-
-            // Fill rows.
-            foreach (var rowElem in rowElements)
-            {
-                DataRow dr = dataTable.NewRow();
-                int colIndex = 0;
-                foreach (var cellElem in rowElem.Elements("Cell"))
-                {
-                    dr[colIndex++] = cellElem.Value;
-                }
-                dataTable.Rows.Add(dr);
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error parsing XML: {ex.Message}");
+            Console.Error.WriteLine("Invalid XML: missing root element.");
             return;
         }
 
-        // Create a PDF document and render the table.
+        // Create a new PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a page to the document.
+            // Add a blank page (Pages are 1‑based)
             Page page = pdfDoc.Pages.Add();
 
-            // Create a Table instance.
-            Table table = new Table
+            // Create an Aspose.Pdf.Table instance
+            Table table = new Table();
+
+            // Determine column count from the first <Row> element
+            int columnCount = 0;
+            XElement firstRow = root.Element("Row");
+            if (firstRow != null)
             {
-                // Set column widths proportionally (example: 100 units each).
-                ColumnWidths = string.Join(" ", Enumerable.Repeat("100", dataTable.Columns.Count)),
-                // Add a simple border to all cells.
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
-            };
+                columnCount = firstRow.Elements("Cell").Count();
+                if (columnCount > 0)
+                {
+                    // Set equal column widths (optional: adjust as needed)
+                    double[] columnWidths = new double[columnCount];
+                    for (int i = 0; i < columnCount; i++)
+                        columnWidths[i] = 1.0 / columnCount;
+                    // ColumnWidths property expects a comma‑separated string
+                    table.ColumnWidths = string.Join(",", columnWidths.Select(w => w.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                }
+            }
 
-            // Import the DataTable into the Aspose.Pdf.Table.
-            // Parameters: (DataTable, includeColumnNames, firstFilledRow, firstFilledColumn)
-            table.ImportDataTable(dataTable, true, 0, 0);
+            // Iterate over each <Row> element in the XML
+            foreach (XElement rowElem in root.Elements("Row"))
+            {
+                // Create a new row in the PDF table
+                Row pdfRow = table.Rows.Add();
 
-            // Add the table to the page.
+                // Iterate over each <Cell> within the current row
+                foreach (XElement cellElem in rowElem.Elements("Cell"))
+                {
+                    // Create a new cell in the PDF table
+                    Cell pdfCell = pdfRow.Cells.Add();
+
+                    // Extract the cell text (trim to avoid whitespace issues)
+                    string cellText = (cellElem.Value ?? string.Empty).Trim();
+
+                    // Add the text to the cell using a TextFragment
+                    TextFragment tf = new TextFragment(cellText);
+                    pdfCell.Paragraphs.Add(tf);
+                }
+            }
+
+            // Add the constructed table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF.
-            pdfDoc.Save(outputPdf);
+            // Save the PDF document
+            pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF with rendered table saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with table saved to '{pdfPath}'.");
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,46 +6,30 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF file paths
-        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPath))
+        // Use a using block for deterministic disposal of the Document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a new page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Create a TextFragment that contains several lines (\n for line breaks)
+            TextFragment fragment = new TextFragment("First line.\nSecond line.\nThird line.");
 
-            // Create a new TextParagraph instance
-            TextParagraph paragraph = new TextParagraph();
+            // Configure the visual appearance of the text
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            fragment.TextState.FontSize = 12;
+            fragment.TextState.ForegroundColor = Color.FromRgb(0, 0, 0); // black
+            fragment.TextState.LineSpacing = 14; // custom leading (line spacing)
 
-            // Define the rectangle where the paragraph will be placed
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 600, 200, 700);
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(fragment);
 
-            // Set word‑wrapping mode (optional, but demonstrates property usage)
-            paragraph.FormattingOptions.WrapMode = TextFormattingOptions.WordWrapMode.ByWords;
-
-            // Append multiple lines of text
-            paragraph.AppendLine("The quick brown fox jumps over the lazy dog.");
-            paragraph.AppendLine("Line two of the paragraph.");
-            paragraph.AppendLine("Line three of the paragraph.");
-
-            // Use TextBuilder to add the paragraph to the page
-            TextBuilder textBuilder = new TextBuilder(page);
-            textBuilder.AppendParagraph(paragraph);
-
-            // Save the modified PDF (saving without SaveOptions writes PDF)
+            // Save the document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Multi‑line paragraph added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

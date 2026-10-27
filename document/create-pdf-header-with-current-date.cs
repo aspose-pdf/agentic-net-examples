@@ -7,39 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "HeaderDate.pdf";
+        const string outputPath = "HeaderWithDate.pdf";
 
         using (Document doc = new Document())
         {
-            // Add the first page
+            // Add a single page (default size A4).
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the date will appear (top of the page)
-            Rectangle dateRect = new Rectangle(
-                50,                                 // left (lower‑left X)
-                page.PageInfo.Height - 50,          // bottom (lower‑left Y)
-                200,                                // right (upper‑right X)
-                page.PageInfo.Height - 20);         // top (upper‑right Y)
+            // Define a rectangle for the header field (top of the page).
+            // Coordinates: lower‑left X, lower‑left Y, upper‑right X, upper‑right Y.
+            // A4 width ≈ 595 points, height ≈ 842 points.
+            Aspose.Pdf.Rectangle headerRect = new Aspose.Pdf.Rectangle(0, 750, 595, 800);
 
-            // Create a shared DateField that will be shown on every page
-            DateField dateField = new DateField(page, dateRect);
-            dateField.PartialName = "HeaderDate"; // give the field a known name
-            dateField.IsSharedField = true;        // same field on all pages
-            dateField.ReadOnly = true;             // user cannot edit
+            // Create a read‑only text box field that will hold the date.
+            TextBoxField dateField = new TextBoxField(page, headerRect)
+            {
+                PartialName = "dateHeader",   // field name used in JavaScript
+                Value = "",                   // initial value (will be set by script)
+                ReadOnly = true,
+                Color = Aspose.Pdf.Color.Transparent // optional: make background transparent
+            };
+
+            // The Border property expects an Aspose.Pdf.Annotations.Border instance.
+            dateField.Border = new Border(dateField) { Width = 0 };
+
+            // Add the field to the document's form collection (not directly to page annotations).
             doc.Form.Add(dateField);
-            dateField.Init(page);
 
-            // JavaScript that sets the field value to the current date when the page is opened
-            string jsCode = "this.getField('HeaderDate').value = util.printd('mm/dd/yyyy', new Date());";
-            page.Actions.OnOpen = new JavascriptAction(jsCode);
+            // JavaScript that runs when the document is opened.
+            // It sets the value of the "dateHeader" field to the current date.
+            string js = "this.getField('dateHeader').value = (new Date()).toLocaleDateString();";
+            doc.OpenAction = new JavascriptAction(js);
 
-            // Add a second page to demonstrate that the header appears on all pages
-            doc.Pages.Add();
-
-            // Save the PDF
+            // Save the PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with header date saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with date header saved to '{outputPath}'.");
     }
 }

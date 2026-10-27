@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // for VerticalAlignment enum
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_aligned.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "aligned_page3.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +16,18 @@ class Program
             return;
         }
 
-        // Load the PDF document within a using block for proper disposal
-        using (Document doc = new Document(inputPath))
-        // Initialize the PdfPageEditor facade
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Use PdfPageEditor with ProcessPages to target specific pages
+        using (PdfPageEditor pageEditor = new PdfPageEditor())
         {
-            // Bind the editor to the loaded document
-            editor.BindPdf(doc);
-
-            // Specify that only page 3 should be processed
-            editor.ProcessPages = new int[] { 3 };
-
-            // Set vertical alignment to Top for the selected page(s)
-            editor.VerticalAlignmentType = VerticalAlignment.Top;
-
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified document
-            editor.Save(outputPath);
+            pageEditor.BindPdf(inputPath);
+            // Specify the page(s) to edit – 1‑based indexing
+            pageEditor.ProcessPages = new int[] { 3 };
+            // Align the page content to the top
+            pageEditor.VerticalAlignmentType = Aspose.Pdf.VerticalAlignment.Top;
+            // Save the modified PDF
+            pageEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 3 vertically aligned to top and saved as '{outputPath}'.");
+        Console.WriteLine($"Page 3 aligned to top and saved as '{outputPath}'.");
     }
 }

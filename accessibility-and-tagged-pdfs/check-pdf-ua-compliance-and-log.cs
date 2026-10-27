@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string logPath   = "ua_compliance_log.txt";
+        const string logPath = "validation.log"; // optional log file for validation details
 
         if (!File.Exists(inputPath))
         {
@@ -15,24 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF document (Document implements IDisposable)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Check PDF/UA compliance
-            bool isUaCompliant = doc.IsPdfUaCompliant;
+            // Perform PDF/UA‑1 validation. The Validate method returns a bool indicating compliance.
+            bool isPdfUaCompliant = doc.Validate(logPath, PdfFormat.PDF_UA_1);
 
-            // Log to console
-            Console.WriteLine($"PDF/UA compliant: {isUaCompliant}");
-
-            // Append result to a log file for further processing
-            try
-            {
-                File.AppendAllText(logPath, $"{DateTime.UtcNow:u} - {inputPath} - UA compliant: {isUaCompliant}{Environment.NewLine}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to write log: {ex.Message}");
-            }
+            // Log the boolean result for further processing
+            Console.WriteLine($"PDF/UA compliance: {isPdfUaCompliant}");
         }
     }
 }

@@ -6,55 +6,64 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the resulting portfolio PDF
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "portfolio.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "portfolio.pdf";
 
-        // Files that will be embedded into the portfolio
-        string[] filesToEmbed = { "file1.txt", "image1.png", "doc1.docx" };
+        // Files that will be embedded into the PDF portfolio
+        string[] filesToEmbed = { "file1.txt", "image1.jpg", "data.xlsx" };
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Verify that each attachment file exists
-        foreach (string attachment in filesToEmbed)
+        // Verify each file to embed exists
+        foreach (var f in filesToEmbed)
         {
-            if (!File.Exists(attachment))
+            if (!File.Exists(f))
             {
-                Console.Error.WriteLine($"Attachment file not found: {attachment}");
+                Console.Error.WriteLine($"Embedded file not found: {f}");
                 return;
             }
         }
 
-        // Open the existing PDF inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
+        try
         {
-            // Ensure the document has at least one page (required for a portfolio)
-            if (pdfDoc.Pages.Count == 0)
+            // Load the original PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                pdfDoc.Pages.Add();
+                // Ensure the document has a Collection (required for PDF Portfolio)
+                if (doc.Collection == null)
+                    doc.Collection = new Collection();
+
+                // Add each file as an embedded file (FileSpecification) to the collection
+                foreach (string filePath in filesToEmbed)
+                {
+                    // Create a FileSpecification with a display name and description
+                    var fileSpec = new FileSpecification(Path.GetFileName(filePath), $"Embedded file: {Path.GetFileName(filePath)}")
+                    {
+                        // Load the file contents into a memory stream
+                        Contents = new MemoryStream(File.ReadAllBytes(filePath))
+                    };
+
+                    // Add the specification to the portfolio collection
+                    doc.Collection.Add(fileSpec);
+                }
+
+                // Optionally set some document metadata
+                doc.Info.Title = "PDF Portfolio with embedded files";
+
+                // Save the resulting PDF portfolio
+                doc.Save(outputPdf);
             }
 
-            // Add each file as an embedded file (FileSpecification) to the document
-            foreach (string filePath in filesToEmbed)
-            {
-                // Create a FileSpecification for the attachment
-                Aspose.Pdf.FileSpecification fileSpec = new Aspose.Pdf.FileSpecification(filePath);
-                // Optional: set a description (displayed in PDF viewers)
-                fileSpec.Description = Path.GetFileName(filePath);
-
-                // Add the file specification to the EmbeddedFiles collection
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
-            }
-
-            // Save the modified document; the presence of embedded files makes it a PDF Portfolio
-            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Portfolio PDF saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Portfolio PDF created successfully at '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,49 +1,69 @@
 using System;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf; // Document, Save, Decrypt
-// Note: CertificateEncryptionOptions resides in Aspose.Pdf.Security, but the namespace does not exist for a using directive.
-// Use the fully qualified name instead.
+using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "encrypted_certificate.pdf";
-        const string outputPdfPath = "decrypted.pdf";
-        const string publicCertPath = "public_certificate.cer";
+        const string inputPath = "encrypted.pdf";
+        const string outputPath = "decrypted.pdf";
+        const string certThumbprint = "YOUR_CERT_THUMBPRINT"; // replace with actual thumbprint
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure the public certificate file exists
-        if (!File.Exists(publicCertPath))
+        // Load the certificate (with private key) from the hardware token / smart card
+        X509Certificate2 cert = GetCertificateFromStore(certThumbprint);
+        if (cert == null)
         {
-            Console.Error.WriteLine($"Public certificate not found: {publicCertPath}");
+            Console.Error.WriteLine("Certificate not found or does not contain a private key.");
             return;
         }
 
-        // Create CertificateEncryptionOptions to access the private key from the hardware token.
-        // The StoreName and StoreLocation specify where the private key is stored (e.g., My store of the current user).
-        Aspose.Pdf.Security.CertificateEncryptionOptions certOptions = new Aspose.Pdf.Security.CertificateEncryptionOptions(
-            publicCertPath,
-            StoreName.My,
-            StoreLocation.CurrentUser);
-
-        // Open the encrypted PDF using the certificate options, decrypt it, and save the result.
-        using (Document doc = new Document(inputPdfPath, certOptions))
+        try
         {
-            // Decrypt the document (no parameters needed).
-            doc.Decrypt();
+            // Prepare options that tell Aspose.Pdf how to use the certificate for decryption
+            var certOptions = new CertificateEncryptionOptions(cert, StoreName.My, StoreLocation.CurrentUser);
 
-            // Save the decrypted PDF.
-            doc.Save(outputPdfPath);
+            // Open the encrypted PDF using a stream and the certificate options
+            using (FileStream fs = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+            using (Document doc = new Document(fs, certOptions))
+            {
+                // Remove encryption
+                doc.Decrypt();
+
+                // Save the decrypted PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
 
-        Console.WriteLine($"Decrypted PDF saved to '{outputPdfPath}'.");
+    // Retrieves a certificate with a private key from the current user's personal store
+    static X509Certificate2 GetCertificateFromStore(string thumbprint)
+    {
+        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        {
+            store.Open(OpenFlags.ReadOnly);
+            foreach (X509Certificate2 cert in store.Certificates)
+            {
+                if (string.Equals(cert.Thumbprint, thumbprint, StringComparison.OrdinalIgnoreCase) && cert.HasPrivateKey)
+                {
+                    return cert;
+                }
+            }
+        }
+        return null;
     }
 }

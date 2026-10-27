@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_custom_size.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,19 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; get the first page
+            // Aspose.Pdf uses 1‑based page indexing
             Page firstPage = doc.Pages[1];
 
-            // Change the page size to 500 × 700 points
-            firstPage.SetPageSize(500, 700);
+            // Set the page size to 500 × 700 points.
+            // MediaBox defines the visible page area; using a fully qualified Rectangle avoids ambiguity.
+            firstPage.MediaBox = new Aspose.Pdf.Rectangle(0, 0, 500, 700);
+
+            // Optionally also update CropBox to match the new size
+            firstPage.CropBox = new Aspose.Pdf.Rectangle(0, 0, 500, 700);
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom first‑page size to '{outputPath}'.");
+        Console.WriteLine($"First page resized and saved to '{outputPath}'.");
     }
 }

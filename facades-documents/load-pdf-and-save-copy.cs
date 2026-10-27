@@ -1,27 +1,52 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";      // source PDF file
-        const string outputPath = "output_copy.pdf"; // destination (optional)
+        // Paths for the destination PDF, a source PDF to insert, and the resulting output PDF
+        const string destinationPdfPath = "destination.pdf";
+        const string sourcePdfPath      = "source.pdf";
+        const string outputPdfPath      = "merged.pdf";
 
-        // Verify the source file exists
-        if (!File.Exists(inputPath))
+        // Verify that the required files exist
+        if (!File.Exists(destinationPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Destination PDF not found: {destinationPdfPath}");
+            return;
+        }
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        // Load the PDF document using the Document class (PdfFileEditor does not support BindPdf/Save/Close)
-        Document pdfDoc = new Document(inputPath);
+        try
+        {
+            // Use Document to obtain the page count of the source PDF (PdfFileEditor has no GetPageCount in this version)
+            Document srcDoc = new Document(sourcePdfPath);
+            int sourcePageCount = srcDoc.Pages.Count;
 
-        // Example operation: save a copy of the loaded PDF
-        pdfDoc.Save(outputPath);
+            // Build an array with all page numbers that should be inserted
+            int[] pagesToInsert = Enumerable.Range(1, sourcePageCount).ToArray();
 
-        Console.WriteLine($"PDF loaded from '{inputPath}' and saved to '{outputPath}'.");
+            // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Insert the source PDF into the destination PDF.
+            // Signature: Insert(string sourceFile, int startPage, string destinationFile, int[] pages, string outputFile)
+            // startPage = 1 means insertion at the beginning of the destination PDF.
+            editor.Insert(sourcePdfPath, 1, destinationPdfPath, pagesToInsert, outputPdfPath);
+
+            Console.WriteLine($"Inserted '{sourcePdfPath}' into '{destinationPdfPath}' and saved as '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

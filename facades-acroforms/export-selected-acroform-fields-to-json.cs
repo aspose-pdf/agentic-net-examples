@@ -2,79 +2,49 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Nodes;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
-class ExportSelectedFormFields
+class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdfPath = "input.pdf";
+        const string pdfPath = "input.pdf";
+        const string jsonPath = "selected_fields.json";
 
-        // Output JSON file that will contain only the selected fields
-        const string outputJsonPath = "selected_fields.json";
+        // List of form field names to export
+        string[] selectedFields = new[] { "FirstName", "LastName", "Email" };
 
-        // List of fully‑qualified field names to export
-        var fieldsToExport = new List<string>
+        if (!File.Exists(pdfPath))
         {
-            "CustomerName",
-            "OrderDate",
-            "TotalAmount"
-        };
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            using (var document = new Document(inputPdfPath))
+            Document doc = new Document(pdfPath);
+
+            // Collect only the requested fields
+            var selectedData = new Dictionary<string, string>();
+
+            foreach (Field field in doc.Form?.Fields ?? Array.Empty<Field>())
             {
-                // Initialise the Facades Form object on the loaded document
-                using (var form = new Form(document))
+                // Prefer the Name property; fallback to FullName if Name is null
+                string fieldName = field.Name ?? field.FullName;
+                if (Array.IndexOf(selectedFields, fieldName) >= 0)
                 {
-                    // Export all form data to a memory stream first
-                    using (var allJsonStream = new MemoryStream())
-                    {
-                        // ExportJson writes the whole form (all fields) to the stream
-                        form.ExportJson(allJsonStream, indented: true);
-                        allJsonStream.Position = 0; // rewind for reading
-
-                        // Parse the exported JSON
-                        var rootNode = JsonNode.Parse(allJsonStream);
-
-                        // The JSON structure produced by Aspose.Pdf is an object where each
-                        // property name corresponds to a form field name.
-                        // Build a new JSON object that contains only the requested fields.
-                        var filteredObject = new JsonObject();
-
-                        if (rootNode is JsonObject rootObj)
-                        {
-                            foreach (string fieldName in fieldsToExport)
-                            {
-                                if (rootObj.TryGetPropertyValue(fieldName, out JsonNode? fieldValue))
-                                {
-                                    filteredObject.Add(fieldName, fieldValue);
-                                }
-                            }
-                        }
-
-                        // Write the filtered JSON to the final output file
-                        using (var outputFile = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
-                        using (var writer = new Utf8JsonWriter(outputFile, new JsonWriterOptions { Indented = true }))
-                        {
-                            filteredObject.WriteTo(writer);
-                        }
-
-                        Console.WriteLine($"Selected fields exported to '{outputJsonPath}'.");
-                    }
+                    selectedData[fieldName] = field.Value?.ToString() ?? string.Empty;
                 }
             }
+
+            // Serialize the selected fields to JSON (indented for readability)
+            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(selectedData, jsonOptions);
+            File.WriteAllText(jsonPath, json);
+
+            Console.WriteLine($"Selected form fields exported to '{jsonPath}'.");
         }
         catch (Exception ex)
         {

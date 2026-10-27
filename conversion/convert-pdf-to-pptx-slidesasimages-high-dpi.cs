@@ -6,33 +6,39 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Output PPTX file path
-        const string outputPptx = "output.pptx";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pptx";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Configure PPTX save options
-            PptxSaveOptions pptxOptions = new PptxSaveOptions
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Render each slide as a raster image (one image per PDF page)
-                SlidesAsImages = true,
-                // Set high‑resolution DPI for the generated images (e.g., 300 DPI)
-                ImageResolution = 300
-            };
+                // Configure PPTX save options: render each slide as an image
+                // and set a high resolution (DPI) for the rasterized images
+                var pptxOptions = new PptxSaveOptions
+                {
+                    SlidesAsImages = true,
+                    // The property that controls image resolution for PPTX conversion
+                    // is ImageResolution (DPI). Adjust as needed for high‑quality output.
+                    ImageResolution = 300
+                };
 
-            // Save the document as PPTX using the specified options
-            pdfDoc.Save(outputPptx, pptxOptions);
+                // Save the PDF as PPTX using the specified options
+                pdfDoc.Save(outputPath, pptxOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptx}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

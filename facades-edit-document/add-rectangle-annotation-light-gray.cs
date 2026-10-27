@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
@@ -17,32 +16,26 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the annotation editor facade with the loaded document
-            PdfAnnotationEditor annotEditor = new PdfAnnotationEditor(doc);
+        // Load the PDF document.
+        Document pdfDoc = new Document(inputPath);
 
-            // Define the rectangle area for the annotation using Aspose.Pdf.Rectangle
-            // Lower‑left (100, 500), width 200, height 100 => upper‑right (300, 600)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+        // Define rectangle coordinates (lower‑left x, lower‑left y, upper‑right x, upper‑right y).
+        // Use the fully‑qualified Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle.
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-            // Create a square (rectangle) annotation on page 1
-            SquareAnnotation square = new SquareAnnotation(doc.Pages[1], rect);
+        // Create a square (rectangle) annotation.
+        SquareAnnotation square = new SquareAnnotation(pdfDoc.Pages[1], rect);
+        // Light gray fill color – use the InteriorColor property (FillColor is not available).
+        square.InteriorColor = Aspose.Pdf.Color.LightGray;
+        // Border with solid style and 1 pt width – Border requires the parent annotation in its constructor.
+        square.Border = new Border(square) { Width = 1, Style = BorderStyle.Solid };
 
-            // Set the interior (fill) color to light gray
-            square.InteriorColor = Aspose.Pdf.Color.LightGray;
+        // Add the annotation to the first page.
+        pdfDoc.Pages[1].Annotations.Add(square);
 
-            // Set the border width to 1 pt
-            square.Border = new Border(square) { Width = 1 };
+        // Save the modified PDF.
+        pdfDoc.Save(outputPath);
 
-            // Add the annotation to the page's annotation collection
-            doc.Pages[1].Annotations.Add(square);
-
-            // Save the modified PDF via the facade (lifecycle rule: use Save on the facade)
-            annotEditor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Rectangle annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle annotation added and saved to '{outputPath}'.");
     }
 }

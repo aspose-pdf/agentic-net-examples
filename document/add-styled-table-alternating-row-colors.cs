@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for FontRepository, FontStyles, TextState
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";      // existing PDF (can be empty)
+        const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,65 +16,59 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to host the table
-            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
             // Create a table
-            Table table = new Table();
-
-            // Define three equal-width columns
-            table.ColumnWidths = "100 100 100";
-
-            // Style the table border using the BorderInfo constructor
-            table.Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black);
-
-            // Style the default cell border using the BorderInfo constructor
-            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Gray);
-
-            // Add some padding inside cells
-            table.DefaultCellPadding = new MarginInfo
+            Table table = new Table
             {
-                Top = 5,
-                Bottom = 5,
-                Left = 5,
-                Right = 5
+                // Define three equal columns
+                ColumnWidths = "100 100 100",
+
+                // Set a thin border around the whole table
+                Border = new BorderInfo(BorderSide.All, 0.5f),
+
+                // Default cell border and padding
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
             };
 
-            // ----- Header row -----
-            Row header = new Row
-            {
-                // Header background
-                BackgroundColor = Aspose.Pdf.Color.LightBlue,
-                // Header text style
-                DefaultCellTextState = new TextState
-                {
-                    Font = FontRepository.FindFont("Helvetica"),
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold,
-                    ForegroundColor = Aspose.Pdf.Color.White
-                }
-            };
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
-            table.Rows.Add(header);
+            // Header row
+            Row header = table.Rows.Add();
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray; // distinct header background
+            header.Cells.Add("Product");
+            header.Cells.Add("Quantity");
+            header.Cells.Add("Price");
 
-            // ----- Data rows with alternating background colors -----
-            for (int i = 0; i < 5; i++)
+            // Sample data rows
+            string[,] data = new string[,]
             {
-                Row row = new Row
-                {
-                    // Alternate row background: white, then light gray
-                    BackgroundColor = (i % 2 == 0) ? Aspose.Pdf.Color.White : Aspose.Pdf.Color.LightGray
-                };
-                row.Cells.Add($"Row {i + 1} Col 1");
-                row.Cells.Add($"Row {i + 1} Col 2");
-                row.Cells.Add($"Row {i + 1} Col 3");
-                table.Rows.Add(row);
+                { "Widget A", "10", "$5.00" },
+                { "Widget B", "7",  "$7.50" },
+                { "Widget C", "3",  "$12.00" },
+                { "Widget D", "15", "$3.20" }
+            };
+
+            for (int i = 0; i < data.GetLength(0); i++)
+            {
+                Row row = table.Rows.Add();
+
+                // Alternate row background colors
+                if (i % 2 == 0)
+                    row.BackgroundColor = Aspose.Pdf.Color.FromRgb(0.95, 0.95, 0.95); // light gray
+
+                // Add cells
+                row.Cells.Add(data[i, 0]);
+                row.Cells.Add(data[i, 1]);
+                row.Cells.Add(data[i, 2]);
             }
+
+            // Position the table on the page (optional)
+            // Here we place it 50 points from the left and 700 points from the bottom
+            table.Margin = new MarginInfo(50, 0, 0, 700);
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);

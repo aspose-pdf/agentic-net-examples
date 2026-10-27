@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
-        const string watermark   = "CONFIDENTIAL";
+        const string watermark = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,34 +17,36 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a TextStamp with the desired watermark text
-                TextStamp stamp = new TextStamp(watermark);
+                // Create a diagonal text stamp
+                TextStamp stamp = new TextStamp(watermark)
+                {
+                    // Rotation angle for diagonal appearance
+                    RotateAngle = 45f,
+                    // Place the stamp behind page content
+                    Background = true,
+                    // Semi‑transparent so underlying content remains readable
+                    Opacity = 0.3f
+                };
 
-                // Configure stamp appearance
-                stamp.Background   = true;               // place behind page content
-                stamp.Opacity      = 0.2;                // semi‑transparent
-                stamp.RotateAngle  = -45;                // diagonal orientation
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment   = VerticalAlignment.Center;
-
-                // Set text style
-                stamp.TextState.Font       = FontRepository.FindFont("Helvetica");
-                stamp.TextState.FontSize   = 72;
-                stamp.TextState.ForegroundColor = Color.Red;
+                // Configure text appearance
+                stamp.TextState.Font = FontRepository.FindFont("Arial");
+                stamp.TextState.FontSize = 72;
+                stamp.TextState.FontStyle = FontStyles.Bold;
+                stamp.TextState.ForegroundColor = Color.FromRgb(0.5, 0.5, 0.5);
 
                 // Add the stamp to the current page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

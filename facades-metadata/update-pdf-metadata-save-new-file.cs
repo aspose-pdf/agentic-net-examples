@@ -6,32 +6,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_updated.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Create a PdfFileInfo instance bound to the existing PDF
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-        {
-            // Update desired metadata fields
-            pdfInfo.Title    = "Updated Title";
-            pdfInfo.Author   = "John Doe";
-            pdfInfo.Subject  = "Sample subject";
-            pdfInfo.Keywords = "Aspose, PDF, metadata";
-            pdfInfo.Creator  = "My Application";
-            pdfInfo.ModDate  = DateTime.Now.ToString("yyyyMMddHHmmsszzz");
+        // Load the PDF file information
+        PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath);
 
-            // Save the PDF with the new metadata to a new file
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Metadata successfully saved to '{outputPath}'."
-                : $"Failed to save metadata to '{outputPath}'.");
-        }
+        // Update metadata fields
+        pdfInfo.Title    = "Updated Document Title";
+        pdfInfo.Author   = "Jane Smith";
+        pdfInfo.Subject  = "Updated Subject";
+        pdfInfo.Keywords = "Aspose, PDF, Metadata";
+
+        // Persist the changes back to the PDF file (provide the output path)
+        pdfInfo.SaveNewInfo(pdfPath);
+
+        Console.WriteLine($"Metadata updated and saved to '{pdfPath}'.");
     }
 }

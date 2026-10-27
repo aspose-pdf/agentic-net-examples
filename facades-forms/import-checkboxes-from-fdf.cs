@@ -1,43 +1,47 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";          // Existing PDF with form fields
-        const string fdfPath   = "checkboxes.fdf";    // FDF containing checkbox definitions/values
-        const string outputPath = "merged_output.pdf"; // Resulting PDF
+        const string inputPdfPath = "input.pdf";   // existing PDF with form fields
+        const string fdfPath = "checkboxes.fdf"; // FDF containing checkbox definitions
+        const string outputPdfPath = "merged_output.pdf";
 
-        // Verify source files exist
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF not found: {fdfPath}");
             return;
         }
 
-        // Initialize the Form facade with source PDF and target PDF
-        Form form = new Form(pdfPath, outputPath);
-
-        // Import checkbox definitions (and their values) from the FDF stream.
-        // ImportFdf merges the incoming fields with existing ones without creating duplicates.
-        using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Open, FileAccess.Read))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            form.ImportFdf(fdfStream);
+            // Bind the PDF to the Form facade
+            using (Form pdfForm = new Form())
+            {
+                pdfForm.BindPdf(pdfDoc);
+
+                // Import the FDF data. ImportFdf expects a Stream, so we open the file as a FileStream.
+                using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Open, FileAccess.Read))
+                {
+                    pdfForm.ImportFdf(fdfStream);
+                }
+            }
+
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // Persist the merged document.
-        form.Save();
-
-        // Release resources held by the facade.
-        form.Close();
-
-        Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
     }
 }

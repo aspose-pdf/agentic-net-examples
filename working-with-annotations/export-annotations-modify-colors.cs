@@ -1,66 +1,48 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output_modified.pdf";
-        const string tempXfdfPath   = "annotations.xfdf";
+        const string inputPdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
         const string modifiedXfdfPath = "annotations_modified.xfdf";
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Export existing annotations to XFDF
+            using (FileStream exportStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
             {
-                // Export existing annotations to XFDF
-                pdfDoc.ExportAnnotationsToXfdf(tempXfdfPath);
+                pdfDoc.ExportAnnotationsToXfdf(exportStream);
             }
 
-            // Load the exported XFDF XML
-            XmlDocument xfdfXml = new XmlDocument();
-            xfdfXml.Load(tempXfdfPath);
-
-            // Change all annotation colors to green (RGB = 0,255,0)
-            // XFDF stores colors as hexadecimal strings without the leading '#'
-            XmlNodeList colorNodes = xfdfXml.SelectNodes("//color");
-            foreach (XmlNode colorNode in colorNodes)
+            // Load the XFDF XML, change all annotation colors to red (RGB 1 0 0)
+            XDocument xfdfXml = XDocument.Load(xfdfPath);
+            foreach (XElement colorElem in xfdfXml.Descendants("color"))
             {
-                // Set to green (00FF00)
-                colorNode.InnerText = "00FF00";
+                // XFDF stores color as three space‑separated numbers (0‑1 range)
+                colorElem.Value = "1 0 0";
             }
-
-            // Save the modified XFDF to a new file
             xfdfXml.Save(modifiedXfdfPath);
 
-            // Re‑open the original PDF and import the modified annotations
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                pdfDoc.ImportAnnotationsFromXfdf(modifiedXfdfPath);
-                pdfDoc.Save(outputPdfPath);
-            }
+            // Import the modified XFDF back into the PDF
+            pdfDoc.ImportAnnotationsFromXfdf(modifiedXfdfPath);
 
-            Console.WriteLine($"Annotations exported, colors changed, and PDF saved to '{outputPdfPath}'.");
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            // Clean up temporary files (optional)
-            try { if (File.Exists(tempXfdfPath)) File.Delete(tempXfdfPath); } catch { }
-            try { if (File.Exists(modifiedXfdfPath)) File.Delete(modifiedXfdfPath); } catch { }
-        }
+
+        Console.WriteLine($"Annotations exported, colors changed, and PDF saved to '{outputPdfPath}'.");
     }
 }

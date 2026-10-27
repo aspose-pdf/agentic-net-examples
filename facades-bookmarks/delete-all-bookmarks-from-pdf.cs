@@ -15,14 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF, delete all bookmarks, and save the result
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
-        {
-            editor.BindPdf(inputPath);   // load PDF into the facade
-            editor.DeleteBookmarks();    // remove every bookmark
-            editor.Save(outputPath);     // persist changes
-        }
+        // PdfBookmarkEditor does not implement IDisposable, so no using block is needed.
+        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
 
-        Console.WriteLine($"All bookmarks deleted. Saved to '{outputPath}'.");
+        // Bind the source PDF, delete all its bookmarks, and save the result to a new file.
+        bookmarkEditor.BindPdf(inputPath);
+        bookmarkEditor.DeleteBookmarks();
+        bookmarkEditor.Save(outputPath);
+
+        Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
     }
 }

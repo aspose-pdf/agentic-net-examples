@@ -1,15 +1,16 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for bookmark color
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for destination types
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_heading.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string headingTitle = "New Section";
+        const int targetPageNumber = 2; // page where the bookmark should point (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +18,37 @@ class Program
             return;
         }
 
-        // Open the existing PDF
         using (Document doc = new Document(inputPath))
         {
-            // Create a new outline (bookmark) item.
-            // The constructor requires the root OutlineCollection (doc.Outlines).
-            OutlineItemCollection newBookmark = new OutlineItemCollection(doc.Outlines)
+            // Validate page number (Aspose.Pdf uses 1‑based indexing)
+            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Title = "New Section",                     // bookmark title
-                Bold  = true,                               // optional styling
-                Color = System.Drawing.Color.Blue           // bookmark color uses System.Drawing.Color
+                Console.Error.WriteLine("Target page number is out of range.");
+                return;
+            }
+
+            // Get the target page instance
+            Page targetPage = doc.Pages[targetPageNumber];
+
+            // Create a GoToAction that points to the desired page.
+            // The constructor expects a Page object; the destination type defaults to FitH.
+            GoToAction goTo = new GoToAction(targetPage);
+
+            // Create a new outline (bookmark) item. The constructor expects the parent OutlineCollection.
+            OutlineItemCollection newOutline = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = headingTitle,
+                Action = goTo,
+                Italic = true // optional visual style
             };
 
-            // Set the destination of the bookmark to the first page (page 1) at default zoom.
-            // XYZExplicitDestination(page, left, top, zoom)
-            Page targetPage = doc.Pages[1]; // 1‑based indexing
-            newBookmark.Destination = new XYZExplicitDestination(targetPage, 0, 0, 1);
+            // Add the new outline to the document's root outline collection.
+            doc.Outlines.Add(newOutline);
 
-            // Insert the new bookmark at the end of the outline hierarchy.
-            // You can also use Insert(index, ...) to place it at a specific position.
-            doc.Outlines.Add(newBookmark);
-
-            // Save the modified PDF
+            // Save the updated PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with new outline entry: '{outputPath}'.");
+        Console.WriteLine($"Outline updated and saved to '{outputPath}'.");
     }
 }

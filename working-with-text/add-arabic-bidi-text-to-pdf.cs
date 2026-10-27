@@ -8,42 +8,38 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_bidi.pdf";
+        const string outputPath = "bidirectional_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the existing PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Aspose.Pdf.Page page = doc.Pages[1];
+            // Add a new page where the bidirectional text will be placed
+            Page page = doc.Pages.Add();
 
-            // Arabic text (right‑to‑left). Unicode characters are used directly.
-            string arabicText = "\u0645\u0631\u062D\u0628\u0627 \u0627\u0644\u0639\u0627\u0644\u0645"; // "مرحبا العالم"
+            // Mixed left‑to‑right (English) and right‑to‑left (Arabic, Hebrew) Unicode text
+            string bidiText = "English text, العربية, שלום";
 
-            // Create a TextFragment containing the Arabic string
-            Aspose.Pdf.Text.TextFragment textFragment = new Aspose.Pdf.Text.TextFragment(arabicText);
+            // Create a TextFragment containing the Unicode sequence
+            TextFragment fragment = new TextFragment(bidiText);
 
-            // Position the fragment on the page (baseline coordinates)
-            textFragment.Position = new Aspose.Pdf.Text.Position(100, 520);
-
-            // Configure the text appearance via the fragment's TextState
-            // (TextState is read‑only; we modify its properties directly)
-            textFragment.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Arial Unicode MS");
-            textFragment.TextState.FontSize = 14;
-            textFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Use a Unicode font that supports Arabic and Hebrew characters.
+            // Aspose.PDF automatically renders RTL scripts when a suitable font is used.
+            fragment.TextState.Font = FontRepository.FindFont("Arial Unicode MS");
+            fragment.TextState.FontSize = 14;
 
             // Add the fragment to the page's paragraph collection
-            page.Paragraphs.Add(textFragment);
+            page.Paragraphs.Add(fragment);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bidirectional text added and saved to '{outputPath}'.");
+        Console.WriteLine($"Bidirectional PDF saved to '{outputPath}'.");
     }
 }

@@ -6,52 +6,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "portfolio.pdf";
+        const string pdfPath = "portfolio.pdf";
         const string outputDir = "ExtractedFiles";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Load the PDF document (lifecycle rule: use using for disposal)
-            using (Document doc = new Document(inputPdf))
+            // Wrap Document in a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Access the collection of embedded files
-                var embeddedFiles = doc.EmbeddedFiles;
-
-                // If there are no embedded files, inform the user
-                if (embeddedFiles == null || embeddedFiles.Count == 0)
+                // The EmbeddedFiles collection holds files attached to a PDF portfolio
+                if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
                 {
-                    Console.WriteLine("No embedded files found in the PDF portfolio.");
+                    Console.WriteLine("No embedded files found in the PDF.");
                     return;
                 }
 
-                // Iterate over each embedded file and save it to the output directory
-                foreach (var embeddedFile in embeddedFiles)
+                // Iterate over each embedded file (FileSpecification) and save it to the output directory
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    // Use reflection to avoid a direct dependency on the EmbeddedFile type
-                    var nameProp = embeddedFile.GetType().GetProperty("Name");
-                    var getStreamMethod = embeddedFile.GetType().GetMethod("GetFileStream");
+                    // Use the original file name if available; otherwise generate a unique name
+                    string fileName = string.IsNullOrEmpty(fileSpec.Name) ? Guid.NewGuid().ToString() : fileSpec.Name;
+                    string destPath = Path.Combine(outputDir, fileName);
 
-                    string fileName = nameProp?.GetValue(embeddedFile) as string ?? "unknown";
-                    string outputPath = Path.Combine(outputDir, fileName);
-
-                    // Retrieve the file stream from the embedded file and write it to disk
-                    using (Stream sourceStream = getStreamMethod?.Invoke(embeddedFile, null) as Stream)
-                    using (FileStream destStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    // Save the embedded file to disk using its Contents stream
+                    using (FileStream outStream = File.Create(destPath))
+                    using (Stream content = fileSpec.Contents)
                     {
-                        sourceStream?.CopyTo(destStream);
+                        content.CopyTo(outStream);
                     }
 
-                    Console.WriteLine($"Extracted: {fileName}");
+                    Console.WriteLine($"Extracted: {destPath}");
                 }
             }
         }

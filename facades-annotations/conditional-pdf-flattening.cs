@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "flattened_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,31 +19,43 @@ class Program
 
         try
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Use PdfFileSignature facade to check for digital signatures
-                using (PdfFileSignature signatureFacade = new PdfFileSignature())
+                // Detect digital signature fields by inspecting Form.Fields collection
+                bool hasSignature = false;
+                if (pdfDoc.Form != null && pdfDoc.Form.Fields != null)
                 {
-                    signatureFacade.BindPdf(inputPath);
-                    bool hasSignature = signatureFacade.ContainsSignature();
-
-                    if (hasSignature)
+                    foreach (var field in pdfDoc.Form.Fields)
                     {
-                        // PDF contains signatures – skip flattening to preserve them
-                        Console.WriteLine("Document contains digital signatures; flattening skipped.");
-                    }
-                    else
-                    {
-                        // No signatures – safe to flatten form fields and annotations
-                        doc.Flatten();
-                        Console.WriteLine("Document flattened successfully.");
+                        if (field is SignatureField)
+                        {
+                            hasSignature = true;
+                            break;
+                        }
                     }
                 }
 
-                // Save the (possibly flattened) document
-                doc.Save(outputPath);
-                Console.WriteLine($"Saved result to '{outputPath}'.");
+                if (hasSignature)
+                {
+                    Console.WriteLine("PDF contains digital signatures. Skipping flattening to preserve signature validity.");
+                    // Copy the original file to the output location
+                    File.Copy(inputPath, outputPath, overwrite: true);
+                    Console.WriteLine($"Original PDF copied to '{outputPath}'.");
+                    return;
+                }
+
+                // No signatures – flatten form fields
+                pdfDoc.Form?.Flatten();
+
+                // Flatten annotations using PdfAnnotationEditor (correct API)
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    editor.BindPdf(pdfDoc);
+                    editor.FlatteningAnnotations();
+                }
+
+                pdfDoc.Save(outputPath);
+                Console.WriteLine($"Flattening completed. Output saved to '{outputPath}'.");
             }
         }
         catch (Exception ex)

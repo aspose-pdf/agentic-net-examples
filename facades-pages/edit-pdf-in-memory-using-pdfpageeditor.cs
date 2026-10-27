@@ -1,47 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Create a simple source PDF entirely in memory – no external files are required.
-        using (var sourceDoc = new Document())
+        const string inputPath = "input.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Add at least one page so the PDF is valid.
-            sourceDoc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Save the source PDF to a memory stream.
-            using (var sourceStream = new MemoryStream())
+        // Load the PDF and modify it inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Example modification: add a simple text annotation on the first page
+            Page page = doc.Pages[1];
+            var rect = new Rectangle(100, 500, 300, 550);
+            var annotation = new TextAnnotation(page, rect)
             {
-                sourceDoc.Save(sourceStream);
-                sourceStream.Position = 0; // Reset for reading.
+                Title    = "Note",
+                Contents = "This PDF was processed in memory.",
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+            page.Annotations.Add(annotation);
 
-                // Prepare the output stream that will hold the edited PDF.
-                using (var outputStream = new MemoryStream())
-                {
-                    // PdfPageEditor can work with a stream via BindPdf(Stream).
-                    using (var editor = new PdfPageEditor())
-                    {
-                        // Bind the in‑memory source PDF.
-                        editor.BindPdf(sourceStream);
+            // Save the modified PDF directly to a MemoryStream (no file I/O)
+            using (MemoryStream pdfStream = new MemoryStream())
+            {
+                doc.Save(pdfStream, SaveFormat.Pdf);
+                pdfStream.Position = 0; // reset for reading
 
-                        // Example modification – set a zoom factor (any other edits can be applied here).
-                        editor.Zoom = 0.5f;
+                Console.WriteLine($"Modified PDF size in memory: {pdfStream.Length} bytes");
 
-                        // Save the edited PDF directly into the output stream.
-                        editor.Save(outputStream);
-                    }
-
-                    // At this point outputStream contains the modified PDF.
-                    // Reset the position if the stream will be read later.
-                    outputStream.Position = 0;
-
-                    // Optional verification (commented out to avoid disk I/O):
-                    // File.WriteAllBytes("modified.pdf", outputStream.ToArray());
-                }
+                // At this point pdfStream can be passed to other APIs (e.g., HTTP response, further processing)
             }
         }
     }

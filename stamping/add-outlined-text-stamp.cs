@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TextState, TextRenderingMode, FontRepository
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document (using statement ensures proper disposal)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Create a text stamp with the desired value
-            TextStamp stamp = new TextStamp("OUTLINE");
+            // Create a text stamp with the desired text
+            Aspose.Pdf.TextStamp textStamp = new Aspose.Pdf.TextStamp("Outlined Text");
 
-            // Draw the stamp as graphic operators (required for rendering mode)
-            stamp.Draw = true;
+            // Position the stamp (XIndent = left offset, YIndent = bottom offset)
+            textStamp.XIndent = 100; // distance from the left side of the page
+            textStamp.YIndent = 500; // distance from the bottom of the page
 
-            // Configure the text rendering mode to stroke (outline)
-            stamp.TextState.RenderingMode = TextRenderingMode.StrokeText;
+            // Configure the visual appearance of the stamp
+            // Use a bold font to simulate an outlined effect (StrokeColor / TextRenderingMode are not available)
+            textStamp.TextState.Font = FontRepository.FindFont("Helvetica-Bold");
+            textStamp.TextState.FontSize = 36;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red; // simulated outline color
 
-            // Optional styling: font, size, color, outline width
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-            stamp.TextState.FontSize = 48;
-            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            stamp.OutlineWidth = 1.0; // thickness of the outline
-
-            // Position the stamp (centered on the page)
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Add the stamp to the first page
-            doc.Pages[1].AddStamp(stamp);
+            // Add the stamp to the first page (change index to apply to other pages)
+            doc.Pages[1].AddStamp(textStamp);
 
             // Save the modified PDF
             doc.Save(outputPath);

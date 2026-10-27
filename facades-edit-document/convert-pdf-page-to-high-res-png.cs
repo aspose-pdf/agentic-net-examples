@@ -1,42 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputPng = "page7_300dpi.png";   // output PNG file
+        const string pdfPath = "input.pdf";
+        const string pngPath = "page7.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // PdfConverter is a Facade class; wrap it in a using block for proper disposal
-        using (PdfConverter converter = new PdfConverter())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Bind the PDF file to the converter
-            converter.BindPdf(inputPdf);
+            // Verify that the document has at least 7 pages
+            if (pdfDoc.Pages.Count < 7)
+            {
+                Console.Error.WriteLine("The PDF does not contain a page 7.");
+                return;
+            }
 
-            // Set the page range to only page 7 (Aspose.Pdf uses 1‑based indexing)
-            converter.StartPage = 7;
-            converter.EndPage   = 7;
+            // Get the seventh page (Aspose.Pdf pages are 1‑based)
+            var page = pdfDoc.Pages[7];
 
-            // Set the desired resolution (300 DPI) – requires a Resolution object
-            converter.Resolution = new Resolution(300);
+            // Configure the PNG device with a 300 DPI resolution
+            var pngDevice = new PngDevice(new Resolution(300));
 
-            // Prepare the converter for image extraction
-            converter.DoConvert();
+            // Render the page to a PNG file
+            using (FileStream imageStream = new FileStream(pngPath, FileMode.Create))
+            {
+                pngDevice.Process(page, imageStream);
+            }
 
-            // Save the extracted page as a PNG image.
-            // The overload without ImageFormat infers the format from the file extension.
-            converter.GetNextImage(outputPng);
+            Console.WriteLine($"Page 7 successfully saved as high‑resolution PNG: {pngPath}");
         }
-
-        Console.WriteLine($"Page 7 saved as high‑resolution PNG: {outputPng}");
     }
 }

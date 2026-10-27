@@ -1,14 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "resized.pdf";
+
+        // Desired page dimensions (points). 1 point = 1/72 inch.
+        const double newWidth  = 595; // A4 width 8.27in * 72
+        const double newHeight = 842; // A4 height 11.69in * 72
 
         if (!File.Exists(inputPath))
         {
@@ -16,24 +19,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Initialize the PdfPageEditor with the loaded document
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // Set the desired page size (width, height) in points.
-                // Example: A4 size = 595 x 842 points.
-                editor.PageSize = new PageSize(595, 842);
+            // Load the PDF document. All annotations, form fields, links, etc. are preserved.
+            Document pdfDocument = new Document(inputPath);
 
-                // Apply the changes to all pages (default behavior).
-                editor.ApplyChanges();
+            // Iterate over each page and set the new dimensions.
+            foreach (Page page in pdfDocument.Pages)
+            {
+                page.PageInfo.Width  = newWidth;
+                page.PageInfo.Height = newHeight;
             }
 
-            // Save the modified document; annotations are preserved automatically.
-            doc.Save(outputPath);
-        }
+            // Save the modified PDF.
+            pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

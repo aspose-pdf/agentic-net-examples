@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string attachmentName = "example.txt"; // name of the attachment to remove
+        const string attachmentName = "remove_me.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +16,39 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Remove the specific embedded file by its filename
-            // EmbeddedFiles is an EmbeddedFileCollection which provides Delete(string)
-            doc.EmbeddedFiles.Delete(attachmentName);
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                bool removed = false;
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Iterate over the embedded files collection to find the target by filename
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                {
+                    if (string.Equals(fileSpec.Name, attachmentName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Remove the attachment while keeping others intact
+                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        removed = true;
+                        break;
+                    }
+                }
+
+                if (!removed)
+                {
+                    Console.WriteLine($"Attachment '{attachmentName}' not found in the PDF.");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved without '{attachmentName}' to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Attachment '{attachmentName}' removed. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

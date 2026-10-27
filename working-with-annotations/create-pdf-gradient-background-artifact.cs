@@ -1,57 +1,74 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf;                     // Core PDF classes
+using Aspose.Pdf.Drawing;            // Graph, Rectangle shape, colors
 
 class Program
 {
     static void Main()
     {
-        // Output PDF path
+        // Output file path
         const string outputPath = "gradient_background.pdf";
+
+        // Ensure the output directory exists
+        string outputDir = System.IO.Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a single page (default size A4)
             Page page = doc.Pages.Add();
 
-            // Create a BackgroundArtifact
-            BackgroundArtifact bgArtifact = new BackgroundArtifact
+            // -----------------------------------------------------------------
+            // Create a Graph that will act as the background and fill it with a
+            // simulated linear gradient (multiple thin rectangles). The Graph is
+            // added as the first paragraph so it appears behind any subsequent
+            // content.
+            // -----------------------------------------------------------------
+            double pageWidth = page.PageInfo.Width;
+            double pageHeight = page.PageInfo.Height;
+
+            // Graph dimensions must be double (float overload is obsolete)
+            var backgroundGraph = new Graph(pageWidth, pageHeight);
+
+            // Gradient definition – start and end colors (RGB values 0‑1)
+            const double startR = 0.9, startG = 0.9, startB = 1.0; // Light blue
+            const double endR   = 0.5, endG   = 0.5, endB   = 0.8; // Darker blue
+
+            const int steps = 100; // Number of thin rectangles to simulate the gradient
+            double stepHeight = pageHeight / steps;
+
+            for (int i = 0; i < steps; i++)
             {
-                // Place the artifact behind page contents
-                IsBackground = true,
-                // Set opacity (0..1). 1 = fully opaque
-                Opacity = 1.0,
-                // Solid background color as a placeholder (gradient not directly supported via this property)
-                BackgroundColor = Color.LightGray
-            };
+                double t = (double)i / (steps - 1); // interpolation factor 0‑1
+                double r = startR + (endR - startR) * t;
+                double g = startG + (endG - startG) * t;
+                double b = startB + (endB - startB) * t;
 
-            // Add the artifact to the page's artifact collection
-            page.Artifacts.Add(bgArtifact);
+                // Create a rectangle that spans the full width and a slice of the height
+                var rect = new Aspose.Pdf.Drawing.Rectangle(
+                    0f,
+                    (float)(i * stepHeight),
+                    (float)pageWidth,
+                    (float)((i + 1) * stepHeight));
 
-            // OPTIONAL: If you need a gradient fill, you can create a Form (XForm) with a rectangle
-            // that uses a shading pattern and assign it to the artifact via SetPdfPage.
-            // The following demonstrates creating a simple rectangle shape; replace with gradient logic as needed.
-            /*
-            Graph graph = new Graph(500, 800);
-            Rectangle rect = new Rectangle(0, 0, 500, 800);
-            // Example: set a solid fill; replace with gradient fill using appropriate API if available
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightBlue,
-                Color = Color.Blue,
-                LineWidth = 0
-            };
-            graph.Shapes.Add(rect);
-            // Convert the graph to a form and assign it to the artifact
-            // Note: This requires additional steps to create an XForm; omitted for brevity.
-            */
+                // Apply the interpolated fill color; no border
+                rect.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(r, g, b);
+                rect.GraphInfo.Color = Aspose.Pdf.Color.Transparent;
+                rect.GraphInfo.LineWidth = 0;
 
-            // Save the PDF document
+                backgroundGraph.Shapes.Add(rect);
+            }
+
+            // Insert the graph as the first paragraph so it becomes the page background
+            page.Paragraphs.Insert(0, backgroundGraph);
+
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with background artifact saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with gradient background saved to '{outputPath}'.");
     }
 }

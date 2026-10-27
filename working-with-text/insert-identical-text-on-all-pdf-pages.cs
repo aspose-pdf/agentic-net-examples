@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string text = "Sample plain text";
+        const string textToInsert = "Sample plain text";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +17,37 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
             {
-                Page page = doc.Pages[i];
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Aspose.Pdf.Page page = doc.Pages[i];
 
-                // Create a TextFragment containing the identical text
-                TextFragment tf = new TextFragment(text);
+                    // Create a TextFragment containing the plain text
+                    Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment(textToInsert);
 
-                // Set the position where the text will appear on the page
-                tf.Position = new Position(100, 700);
+                    // Optional: set position, font, size, etc.
+                    // tf.Position = new Aspose.Pdf.Text.Position(100, 700);
+                    // tf.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Arial");
+                    // tf.TextState.FontSize = 12;
 
-                // Optional: define basic text appearance
-                tf.TextState.FontSize = 12;
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                tf.TextState.ForegroundColor = Color.Black;
+                    // Add the fragment to the page's Paragraphs collection
+                    page.Paragraphs.Add(tf);
+                }
 
-                // Add the fragment to the page's Paragraphs collection
-                page.Paragraphs.Add(tf);
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF (PDF format is the default)
-            doc.Save(outputPath);
+            Console.WriteLine($"Text inserted on all pages. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text added to all pages and saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

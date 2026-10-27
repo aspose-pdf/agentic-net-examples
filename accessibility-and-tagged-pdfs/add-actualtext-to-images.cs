@@ -9,8 +9,9 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_actualtext.pdf";
-        const string altText    = "Screen‑reader description of the image";
+        const string outputPath = "output.pdf";
+        const string altText    = "Description of the image for screen readers.";
+        const string actualText = "Image caption or actual text";
 
         if (!File.Exists(inputPath))
         {
@@ -18,41 +19,39 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access tagged‑content API
-            ITaggedContent tagged = doc.TaggedContent;
-            // Ensure the document is marked as tagged (no explicit setter needed)
-            // Set language for accessibility (optional)
-            tagged.SetLanguage("en-US");
-
-            // Root element of the structure tree
-            StructureElement root = tagged.RootElement;
-
-            // Iterate over all pages and their image resources
-            foreach (Page page in doc.Pages)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                foreach (XImage img in page.Resources.Images)
-                {
-                    // Create a FigureElement (illustration structure element)
-                    FigureElement figure = tagged.CreateFigureElement();
+                // Access the tagged content API
+                ITaggedContent tagged = doc.TaggedContent;
+                // Optional: set language and title for the document
+                tagged.SetLanguage("en-US");
+                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-                    // Set the ActualText attribute – this is the text a screen reader will read
-                    figure.ActualText = altText;
+                // Get the root of the structure tree (no cast needed)
+                StructureElement root = tagged.RootElement;
 
-                    // Bind the structure element to the actual XImage on the page
-                    figure.Tag(img);
+                // Create a Figure element representing the image
+                FigureElement figure = tagged.CreateFigureElement();
+                // Set the alternate text (used by assistive technologies)
+                figure.AlternativeText = altText;
+                // Set the ActualText attribute (explicit textual representation)
+                figure.ActualText = actualText;
 
-                    // Attach the figure element to the structure tree
-                    root.AppendChild(figure);
-                }
+                // Attach the figure element to the document structure
+                root.AppendChild(figure);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF with image ActualText saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with ActualText attributes: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

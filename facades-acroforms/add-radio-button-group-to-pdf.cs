@@ -1,42 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // FormEditor, FieldType
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // <-- required for form field classes
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // existing PDF to edit
-        const string outputPath = "output_with_radio.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "radio_output.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Initialize FormEditor with source and destination files
-        FormEditor formEditor = new FormEditor(inputPath, outputPath);
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Get the first page (or any page you want the radio button to appear on)
+            Page page = doc.Pages[1];
 
-        // Configure the radio button group
-        formEditor.RadioGap = 5;                         // gap between buttons (pixels)
-        formEditor.RadioHoriz = true;                    // arrange horizontally
-        formEditor.Items = new string[] { "Option1", "Option2", "Option3" };
+            // Create a radio button field attached to the page
+            RadioButtonField radio = new RadioButtonField(page);
+            // Set the field's partial name (identifier)
+            radio.PartialName = "SampleRadioGroup";
 
-        // Add the radio button field:
-        //   FieldType.Radio – type of field
-        //   "MyRadioGroup" – logical name of the group
-        //   "Option2"      – default selected option (must match one of Items)
-        //   1              – page number (1‑based)
-        //   100,500,250,520 – rectangle coordinates (llx,lly,urx,ury)
-        formEditor.AddField(FieldType.Radio, "MyRadioGroup", "Option2", 1, 100, 500, 250, 520);
+            // Add three options to the radio button group
+            radio.AddOption("Option1");
+            radio.AddOption("Option2");
+            radio.AddOption("Option3");
 
-        // Persist changes to the output PDF
-        formEditor.Save();
+            // Set the default selected option (1‑based index). Here we select the second option.
+            radio.Selected = 2;
 
-        // Release resources
-        formEditor.Close();
+            // Add the radio button field to the document's form collection (position 1 on the page)
+            doc.Form.Add(radio, 1);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
         Console.WriteLine($"Radio button group added and saved to '{outputPath}'.");
     }

@@ -1,50 +1,83 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using System.Text.Json;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // needed for Document.Form extensions
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF with form fields
-        const string outputPdfPath = "output.pdf";  // PDF after importing JSON data
-        const string jsonFilePath  = "data.json";   // JSON file containing field values
+        const string pdfPath = "form.pdf";
+        const string jsonPath = "data.json";
+        const string outputPath = "filled_form.pdf";
 
-        // Verify that required files exist before proceeding
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source PDF and JSON files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(jsonFilePath))
+        if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"Error: JSON file not found – {jsonFilePath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
         try
         {
-            // Initialize the Form facade and bind it to the source PDF
-            using (Form form = new Form())
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
             {
-                form.BindPdf(inputPdfPath);
+                // ------------------------------------------------------------
+                // Import form field values from the JSON file.
+                // Aspose.Pdf.Forms.Form does not expose an ImportDataFromJson
+                // method, so we read the JSON ourselves and assign the values
+                // to the corresponding fields via the Form.Fields collection.
+                // ------------------------------------------------------------
+                var jsonContent = File.ReadAllText(jsonPath);
+                var fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
 
-                // Open the JSON stream and import the data into the PDF form fields
-                using (FileStream jsonStream = new FileStream(jsonFilePath, FileMode.Open, FileAccess.Read))
+                if (fieldValues != null && doc.Form?.Fields != null)
                 {
-                    form.ImportJson(jsonStream);
+                    foreach (var kvp in fieldValues)
+                    {
+                        // Find the field with the matching name (case‑sensitive)
+                        var field = doc.Form.Fields.FirstOrDefault(f => f.Name == kvp.Key);
+                        if (field != null)
+                        {
+                            // Most field types expose a Value property that accepts an object.
+                            // Converting the string to the appropriate type is left to the caller.
+                            field.Value = kvp.Value;
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Warning: No form field named '{kvp.Key}' was found in the PDF.");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine("No form fields or JSON data to import.");
                 }
 
-                // Save the modified PDF to the output path
-                form.Save(outputPdfPath);
+                // Save the updated PDF to a new file
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Form data imported successfully. Output saved to '{outputPath}'.");
+        }
+        catch (JsonException ex)
+        {
+            // Thrown when the JSON is malformed or cannot be deserialized into a dictionary
+            Console.Error.WriteLine($"Invalid JSON data: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // Handle any unexpected errors (e.g., malformed JSON, I/O issues)
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            // Catch‑all for any other errors (e.g., I/O, parsing)
+            Console.Error.WriteLine($"Error processing PDF form: {ex.Message}");
         }
     }
 }

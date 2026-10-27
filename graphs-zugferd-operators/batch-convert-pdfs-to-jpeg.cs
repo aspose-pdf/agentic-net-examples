@@ -7,45 +7,44 @@ class Program
 {
     static void Main()
     {
-        // Directory containing PDF files
-        const string inputDirectory = @"C:\PdfInput";
+        // Directory containing PDF files – change as needed or read from args
+        string sourceDirectory = @"C:\PdfFiles";
         // Directory where JPEG images will be saved
-        const string outputDirectory = @"C:\JpegOutput";
+        string outputDirectory = Path.Combine(sourceDirectory, "JpegImages");
 
-        // Ensure the output directory exists
+        if (!Directory.Exists(sourceDirectory))
+        {
+            Console.Error.WriteLine($"Source directory does not exist: {sourceDirectory}");
+            return;
+        }
+
         Directory.CreateDirectory(outputDirectory);
 
-        // Get all PDF files in the input directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        // Define the resolution for the JPEG images (e.g., 300 DPI)
-        Resolution resolution = new Resolution(300);
-        // Create a JpegDevice with the desired resolution
-        JpegDevice jpegDevice = new JpegDevice(resolution);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the source directory
+        foreach (string pdfPath in Directory.GetFiles(sourceDirectory, "*.pdf"))
         {
-            // Extract the file name without extension for naming output images
             string baseFileName = Path.GetFileNameWithoutExtension(pdfPath);
 
-            // Open the PDF document inside a using block for deterministic disposal
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document pdfDocument = new Document(pdfPath))
             {
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                // Create a JPEG device once (it does not implement IDisposable, so no using)
+                JpegDevice jpegDevice = new JpegDevice(new Resolution(300));
+
+                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
                 for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
                 {
-                    // Build the output JPEG file path: e.g., MyDoc_page1.jpeg
+                    // Build output file name: <source>_page<pageNumber>.jpg
                     string jpegPath = Path.Combine(
                         outputDirectory,
-                        $"{baseFileName}_page{pageNumber}.jpeg");
+                        $"{baseFileName}_page{pageNumber}.jpg");
 
-                    // Convert the current page to JPEG and write to the file stream
-                    using (FileStream jpegStream = new FileStream(jpegPath, FileMode.Create))
-                    {
-                        jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
-                    }
+                    // Convert the specific page to JPEG and save
+                    jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegPath);
                 }
             }
+
+            Console.WriteLine($"Converted '{pdfPath}' to JPEG images.");
         }
 
         Console.WriteLine("Batch conversion completed.");

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,25 +8,31 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newTitle = "My Updated PDF Title";
+        const string newTitle = "Updated Document Title";
 
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF metadata facade
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        try
         {
-            // Update the Title property
-            pdfInfo.Title = newTitle;
+            // Load PDF file information via Facades API
+            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+            {
+                // Update the Title metadata
+                pdfInfo.Title = newTitle;
 
-            // Save the PDF with the updated metadata
-            bool saved = pdfInfo.SaveNewInfo(outputPath);
-            Console.WriteLine(saved
-                ? $"Title updated and saved to '{outputPath}'."
-                : $"Failed to save updated PDF to '{outputPath}'.");
+                // Save the PDF with the updated information
+                pdfInfo.SaveNewInfo(outputPath);
+            }
+
+            Console.WriteLine($"Title updated and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

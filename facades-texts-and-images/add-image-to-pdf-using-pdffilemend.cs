@@ -1,47 +1,40 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "logo.png";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify required files exist
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!System.IO.File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the PdfFileMend facade
+        // PdfFileMend does NOT implement IDisposable, so we use try‑finally.
         PdfFileMend mend = new PdfFileMend();
 
         try
         {
-            // Bind the source PDF document
-            mend.BindPdf(inputPdf);
+            // Load the source PDF.
+            mend.BindPdf(inputPath);
 
-            // Example operation: add an image to page 1
-            // Parameters: image file path, page number, lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
-            mend.AddImage(imagePath, 1, 100f, 500f, 300f, 700f);
+            // Perform any desired modifications here.
+            // Example: (no modification) just save the bound document.
 
-            // Save the modified PDF
-            mend.Save(outputPdf);
+            // Save the (potentially) modified PDF.
+            mend.Save(outputPath);
         }
         finally
         {
-            // Ensure the facade is closed and resources are released
+            // Ensure that all resources are released and changes are flushed.
             mend.Close();
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

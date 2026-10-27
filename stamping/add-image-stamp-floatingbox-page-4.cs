@@ -7,46 +7,64 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string stampImg = "stamp.png";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string imagePath  = "stamp.png";
 
-        if (!File.Exists(inputPdf) || !File.Exists(stampImg))
+        // Verify required files exist
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("Input PDF or stamp image not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(imagePath))
+        {
+            Console.Error.WriteLine($"Image stamp not found: {imagePath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Verify that page 4 exists (pages are 1‑based)
+            // Ensure the document has at least four pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 4)
             {
-                Console.Error.WriteLine("The document has fewer than 4 pages.");
+                Console.Error.WriteLine("The document contains fewer than 4 pages.");
                 return;
             }
 
+            // Retrieve page 4
             Page page = doc.Pages[4];
 
-            // Create a FloatingBox sized to the page (constructor expects float values)
-            FloatingBox box = new FloatingBox((float)page.PageInfo.Width, (float)page.PageInfo.Height)
+            // Create a FloatingBox that will cover the whole page
+            FloatingBox floatingBox = new FloatingBox
             {
-                Left = 0,
-                Top = 0
+                Width               = page.PageInfo.Width,
+                Height              = page.PageInfo.Height,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Bottom
             };
 
-            // Load the image and assign it as the background of the FloatingBox
-            Image background = new Image { File = stampImg };
-            box.BackgroundImage = background;
+            // Add the image as the first element inside the FloatingBox – it will act as a background
+            Image backgroundImage = new Image
+            {
+                File      = imagePath,
+                // Use FixWidth/FixHeight to set the size (Width/Height properties are not available in newer versions)
+                FixWidth  = page.PageInfo.Width,
+                FixHeight = page.PageInfo.Height,
+                // Align the image to the bottom‑left of the FloatingBox (covers the whole area)
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Bottom
+            };
+            floatingBox.Paragraphs.Add(backgroundImage);
 
             // Add the FloatingBox to the page's paragraph collection
-            page.Paragraphs.Add(box);
+            page.Paragraphs.Add(floatingBox);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp added as background in a FloatingBox on page 4. Saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied as background inside a FloatingBox on page 4. Saved to '{outputPath}'.");
     }
 }

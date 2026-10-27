@@ -1,52 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API (Document, Page, ImageStamp)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF
-        const string stampImg  = "logo.png";       // image to use as stamp
-        const string outputPdf = "output.pdf";     // result PDF
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampImg))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Choose the page to stamp (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Create an ImageStamp and set absolute X/Y coordinates
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            {
+                // Disable alignment to use absolute positioning
+                HorizontalAlignment = HorizontalAlignment.None,
+                VerticalAlignment   = VerticalAlignment.None,
+                // Exact position in points from the bottom‑left corner of the page
+                XIndent = 150, // X coordinate
+                YIndent = 300, // Y coordinate
+                // Optional visual settings
+                Background = false,
+                Opacity    = 0.8
+            };
 
-            // Create an ImageStamp from a file path
-            ImageStamp imgStamp = new ImageStamp(stampImg);
-
-            // Set custom coordinates (XIndent = distance from left, YIndent = distance from bottom)
-            imgStamp.XIndent = 150;   // 150 points from the left edge
-            imgStamp.YIndent = 300;   // 300 points from the bottom edge
-
-            // Optional: set size or zoom if needed
-            // imgStamp.Width  = 100;   // explicit width in points
-            // imgStamp.Height = 50;    // explicit height in points
-            // imgStamp.Opacity = 0.8;  // semi‑transparent
-
-            // Add the stamp to the selected page
+            // Apply the stamp to the first page (change index for other pages)
+            Page page = pdfDoc.Pages[1];
             page.AddStamp(imgStamp);
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp placed and saved to '{outputPath}'.");
     }
 }

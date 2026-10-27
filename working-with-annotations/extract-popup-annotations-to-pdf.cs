@@ -9,6 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
+        const string outputPath = "popup_extracted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,48 +17,57 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the source PDF inside a using block (deterministic disposal)
         using (Document srcDoc = new Document(inputPath))
         {
-            int popupIndex = 0;
+            bool popupFound = false;
 
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= srcDoc.Pages.Count; pageNum++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= srcDoc.Pages.Count && !popupFound; i++)
             {
-                Page page = srcDoc.Pages[pageNum];
+                Page page = srcDoc.Pages[i];
 
-                // Iterate through all annotations on the page (1‑based indexing)
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Iterate all annotations on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[annIdx];
-
-                    // Check if the annotation is a PopupAnnotation
-                    if (ann is PopupAnnotation popup)
+                    // Identify a PopupAnnotation
+                    if (annot is PopupAnnotation popupAnnot)
                     {
-                        popupIndex++;
+                        // The popup text is stored in the parent markup annotation's Contents property
+                        string popupText = popupAnnot.Parent?.Contents ?? string.Empty;
 
-                        // Create a new PDF document to hold the popup content
-                        using (Document popupDoc = new Document())
+                        if (!string.IsNullOrEmpty(popupText))
                         {
-                            // Add a blank page
-                            Page newPage = popupDoc.Pages.Add();
+                            // Create a new PDF document for the extracted popup
+                            using (Document popupDoc = new Document())
+                            {
+                                // Add a blank page to host the popup text
+                                Page newPage = popupDoc.Pages.Add();
 
-                            // Retrieve the popup's text (Contents) and add it as a TextFragment
-                            string popupText = popup.Contents ?? string.Empty;
-                            TextFragment tf = new TextFragment(popupText);
-                            newPage.Paragraphs.Add(tf);
+                                // Insert the popup text as a TextFragment
+                                TextFragment tf = new TextFragment(popupText)
+                                {
+                                    // Optional formatting – adjust as needed
+                                    TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
+                                };
+                                newPage.Paragraphs.Add(tf);
 
-                            // Save the new PDF (one file per popup annotation)
-                            string outputPath = $"popup_{popupIndex}.pdf";
-                            popupDoc.Save(outputPath);
-                            Console.WriteLine($"Saved popup annotation #{popupIndex} to '{outputPath}'.");
+                                // Save the new PDF
+                                popupDoc.Save(outputPath);
+                            }
+
+                            Console.WriteLine($"Popup annotation saved to '{outputPath}'.");
+                            popupFound = true;
+                            break; // Exit inner foreach – we already processed a popup
                         }
                     }
                 }
             }
 
-            if (popupIndex == 0)
-                Console.WriteLine("No popup annotations found in the document.");
+            if (!popupFound)
+            {
+                Console.WriteLine("No popup annotation with content found in the document.");
+            }
         }
     }
 }

@@ -7,35 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "colored_text.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists (handle possible null from GetDirectoryName)
+        string outDir = Path.GetDirectoryName(outputPath) ?? string.Empty;
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (first page)
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Create a TextFragment with the desired text
+            TextFragment fragment = new TextFragment("Highlighted text with background color");
 
-            // Create a text fragment and set its background color via TextState
-            TextFragment fragment = new TextFragment("Hello, world with background!");
-            fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow; // apply background
+            // Set the background color using Aspose.Pdf.Color (cross‑platform)
+            fragment.TextState.BackgroundColor = Aspose.Pdf.Color.Yellow;
 
-            // Position the fragment (optional – here we place it at coordinates 100, 700)
-            fragment.Position = new Position(100, 700);
+            // Optional: set additional text properties
+            fragment.TextState.FontSize = 14;
 
-            // Add the fragment to the page
+            // Add the fragment to the page's paragraph collection
             page.Paragraphs.Add(fragment);
 
-            // Save the modified document (lifecycle rule: use Document.Save)
+            // Save the PDF; Document.Save writes PDF regardless of extension
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with background-colored text to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

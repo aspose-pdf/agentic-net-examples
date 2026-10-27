@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "annotated_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string logPath = "annotation_log.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +17,45 @@ class Program
             return;
         }
 
-        // Initialize the annotation editor and bind the PDF file
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Ensure the log file is empty before we start
+        File.WriteAllText(logPath, string.Empty);
+
+        // Load the PDF document inside a using block (document-disposal-with-using rule)
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
-
-            // Access the underlying Document object
-            Document doc = editor.Document;
-
-            // Iterate over all pages and their annotations
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate over all pages (1‑based indexing rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNum];
+                Page page = doc.Pages[i];
 
-                for (int annIdx = 1; annIdx <= page.Annotations.Count; annIdx++)
+                // Each page may contain multiple annotations
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Annotation ann = page.Annotations[annIdx];
+                    // Only markup annotations have a modification timestamp property
+                    if (annotation is MarkupAnnotation markup)
+                    {
+                        // Update the modification timestamp (use Modified property, not ModifiedDate)
+                        markup.Modified = DateTime.UtcNow;
 
-                    // Log the previous modification timestamp
-                    Console.WriteLine(
-                        $"Page {pageNum}, Annotation {annIdx}, Type {ann.GetType().Name}, Previous Modified: {ann.Modified}");
-
-                    // Update the Modified property to the current time
-                    ann.Modified = DateTime.Now;
+                        // Log the annotation type and its new timestamp
+                        string logEntry = $"Page {i}, Annotation {annotation.GetType().Name}, Modified = {markup.Modified:O}";
+                        File.AppendAllText(logPath, logEntry + Environment.NewLine);
+                        Console.WriteLine(logEntry);
+                    }
+                    else
+                    {
+                        // For non‑markup annotations just log that they were inspected
+                        string logEntry = $"Page {i}, Annotation {annotation.GetType().Name} (no modification timestamp)";
+                        File.AppendAllText(logPath, logEntry + Environment.NewLine);
+                        Console.WriteLine(logEntry);
+                    }
                 }
             }
 
-            // Save the PDF with updated annotation timestamps
-            editor.Save(outputPath);
+            // Save the modified PDF (still inside the using block)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation timestamps updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Processing complete. Modified PDF saved to '{outputPath}'. Log written to '{logPath}'.");
     }
 }

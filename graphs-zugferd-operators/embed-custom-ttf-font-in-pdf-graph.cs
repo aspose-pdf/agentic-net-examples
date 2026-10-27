@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
@@ -7,44 +9,115 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_with_custom_font.pdf";
+        // Path to the custom TrueType font file
+        const string fontPath = "MyCustomFont.ttf";
+        // Output PDF file
+        const string outputPdf = "graph_with_custom_font.pdf";
 
-        // Load a TrueType font that is available on the system and ensure it is embedded.
-        // Using FontRepository.FindFont avoids the need for an external file.
-        Font customFont = FontRepository.FindFont("Arial"); // replace "Arial" with any installed TTF font name if needed
-        customFont.IsEmbedded = true; // ensure embedding
+        if (!File.Exists(fontPath))
+        {
+            Console.Error.WriteLine($"Font file not found: {fontPath}");
+            return;
+        }
+
+        // Load the custom font and ensure it will be embedded
+        Font customFont = FontRepository.OpenFont(fontPath);
+        customFont.IsEmbedded = true;
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a graph (container for drawing shapes)
-            Graph graph = new Graph(400.0, 200.0); // use double values as required by the API
+            // -----------------------------------------------------------------
+            // Add chart title using the custom font
+            // -----------------------------------------------------------------
+            TextFragment title = new TextFragment("Sample Bar Chart");
+            title.TextState.Font = customFont;
+            title.TextState.FontSize = 20;
+            title.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+            page.Paragraphs.Add(title);
 
-            // Define a rectangle shape for the graph
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(50f, 150f, 300f, 100f);
-            rect.GraphInfo = new GraphInfo
+            // -----------------------------------------------------------------
+            // Add X‑axis title using the custom font
+            // -----------------------------------------------------------------
+            TextFragment xAxisTitle = new TextFragment("Categories");
+            xAxisTitle.TextState.Font = customFont;
+            xAxisTitle.TextState.FontSize = 12;
+            // Positioning will be handled later (simple flow layout)
+
+            // -----------------------------------------------------------------
+            // Add Y‑axis title (rotated) using the custom font
+            // -----------------------------------------------------------------
+            TextFragment yAxisTitle = new TextFragment("Values");
+            yAxisTitle.TextState.Font = customFont;
+            yAxisTitle.TextState.FontSize = 12;
+            yAxisTitle.TextState.Rotation = 90;
+
+            // -----------------------------------------------------------------
+            // Create a simple bar chart using the Graph drawing container
+            // -----------------------------------------------------------------
+            const float graphWidth = 500f;
+            const float graphHeight = 300f;
+            Graph graph = new Graph(graphWidth, graphHeight);
+
+            double[] data = new double[] { 10, 20, 30, 25, 15 };
+            float barWidth = 40f;
+            float barSpacing = 20f;
+            float startX = 50f;
+            float baseY = 20f;
+            float yScale = (float)(graphHeight - 40) / 30f; // assuming max value ~30
+
+            // Store bar labels to add after the graph
+            List<TextFragment> barLabels = new List<TextFragment>();
+
+            for (int i = 0; i < data.Length; i++)
             {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 1f
-            };
-            graph.Shapes.Add(rect);
+                float barHeight = (float)data[i] * yScale;
+                float x1 = startX + i * (barWidth + barSpacing);
+                float y1 = baseY;
+                float x2 = x1 + barWidth;
+                float y2 = baseY + barHeight;
+
+                // Draw a filled rectangle to represent the bar
+                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(x1, y1, x2, y2)
+                {
+                    GraphInfo = new GraphInfo
+                    {
+                        Color = Color.Blue,
+                        FillColor = Color.LightBlue,
+                        LineWidth = 1
+                    }
+                };
+                graph.Shapes.Add(rect);
+
+                // Create label for the bar
+                TextFragment barLabel = new TextFragment((i + 1).ToString());
+                barLabel.TextState.Font = customFont;
+                barLabel.TextState.FontSize = 10;
+                barLabel.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+                // Position will be handled after the graph is placed
+                barLabels.Add(barLabel);
+            }
+
+            // Add the graph drawing to the page
             page.Paragraphs.Add(graph);
 
-            // Add a text fragment using the custom font
-            TextFragment tf = new TextFragment("Custom Font Text");
-            tf.TextState.Font = customFont;
-            tf.TextState.FontSize = 24;
-            tf.Position = new Position(100, 300); // position on the page
-            page.Paragraphs.Add(tf);
+            // Add axis titles after the graph (simple layout for demonstration)
+            page.Paragraphs.Add(xAxisTitle);
+            page.Paragraphs.Add(yAxisTitle);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Add bar labels after the axis titles
+            foreach (var lbl in barLabels)
+            {
+                page.Paragraphs.Add(lbl);
+            }
+
+            // Save the PDF; the custom font will be embedded automatically
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}' with embedded custom TrueType font.");
+        Console.WriteLine($"PDF saved to '{outputPdf}' with embedded custom TrueType font.");
     }
 }

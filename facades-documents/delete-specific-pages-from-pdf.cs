@@ -6,29 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Paths to the source PDF and the resulting PDF
+        const string sourcePath = "input.pdf";
+        const string resultPath = "output.pdf";
 
-        // Pages to delete (1‑based indexing)
-        int[] pagesToDelete = new int[] { 2, 3 };
+        // Pages to delete (1‑based indexing as required by Aspose.Pdf.Facades)
+        int[] pagesToDelete = new int[] { 2, 4 };
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        // Open streams with deterministic disposal
-        using (FileStream inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-        {
-            // PdfFileEditor does NOT implement IDisposable; instantiate directly
-            PdfFileEditor editor = new PdfFileEditor();
+        // Create the PdfFileEditor instance (it does NOT implement IDisposable)
+        PdfFileEditor editor = new PdfFileEditor();
 
-            // Delete the specified pages; the method returns void, so just invoke it
-            editor.Delete(inputStream, pagesToDelete, outputStream);
-        }
+        // Correct overload: Delete(string inputFile, int[] pages, string outputFile)
+        editor.Delete(sourcePath, pagesToDelete, resultPath);
 
-        Console.WriteLine($"Deleted pages {string.Join(", ", pagesToDelete)}. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Pages {string.Join(", ", pagesToDelete)} deleted. Result saved to '{resultPath}'.");
     }
 }

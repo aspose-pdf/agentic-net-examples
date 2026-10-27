@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using System.Drawing.Imaging;
 
 class Program
 {
@@ -16,19 +15,28 @@ class Program
             return;
         }
 
-        // Use PdfExtractor to extract images from a specific page
+        // PdfExtractor implements IDisposable, so wrap it in a using block.
         using (PdfExtractor extractor = new PdfExtractor())
         {
+            // Bind the source PDF.
             extractor.BindPdf(inputPdf);
-            extractor.StartPage = 2; // page numbers are 1‑based
-            extractor.EndPage   = 2;
+
+            // Limit extraction to page 2 only.
+            extractor.StartPage = 2; // first page to extract (1‑based)
+            extractor.EndPage   = 2; // last page to extract
+
+            // Optional: enable resource‑based image extraction.
+            // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+
+            // Extract images from the specified page.
             extractor.ExtractImage();
 
-            // Retrieve the first image on page 2 and save it as PNG
+            // Save the first extracted image, if any.
             if (extractor.HasNextImage())
             {
-                extractor.GetNextImage(outputPng, ImageFormat.Png);
-                Console.WriteLine($"First image from page 2 saved as '{outputPng}'.");
+                // GetNextImage writes the current image to the supplied file path.
+                extractor.GetNextImage(outputPng);
+                Console.WriteLine($"First image from page 2 saved to '{outputPng}'.");
             }
             else
             {

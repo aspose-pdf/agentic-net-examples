@@ -15,16 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF, modify metadata, and save.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Replace the Author metadata with the current user name.
+            // Replace the Author metadata with the current user name
             doc.Info.Author = Environment.UserName;
 
-            // Save the updated document.
+            // Save the updated document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Author metadata updated and saved to '{outputPath}'.");
     }
 }

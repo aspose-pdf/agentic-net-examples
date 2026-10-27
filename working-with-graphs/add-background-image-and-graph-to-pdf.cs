@@ -8,68 +8,66 @@ class Program
     static void Main()
     {
         const string outputPath = "graph_with_background.pdf";
-        const string backgroundImagePath = "background.jpg";
+        const string backgroundImagePath = "background.png"; // path to the background image
 
-        // Ensure the background image file exists
         if (!File.Exists(backgroundImagePath))
         {
             Console.Error.WriteLine($"Background image not found: {backgroundImagePath}");
             return;
         }
 
-        // Create a new PDF document and add a single page
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            Aspose.Pdf.Page page = doc.Pages.Add();
+            // Add a single page (pages are 1‑based)
+            Page page = doc.Pages.Add();
 
-            // ---------- Add background image as a page artifact ----------
-            // Create a background artifact (type Background, subtype Background)
-            Aspose.Pdf.Artifact bgArtifact = new Aspose.Pdf.Artifact(
-                Aspose.Pdf.Artifact.ArtifactType.Background,
-                Aspose.Pdf.Artifact.ArtifactSubtype.Background);
-
-            // Set the image for the artifact
-            bgArtifact.SetImage(backgroundImagePath);
-            // Mark it as background so it is rendered behind page contents
-            bgArtifact.IsBackground = true;
-
-            // Add the artifact to the page
-            page.Artifacts.Add(bgArtifact);
-
-            // ---------- Create a graph (graphics container) ----------
-            // Graph constructor takes width and height (double)
-            Aspose.Pdf.Drawing.Graph graph = new Aspose.Pdf.Drawing.Graph(400, 200);
-            // Position the graph on the page (optional)
-            graph.Left = 50;   // distance from left edge
-            graph.Top = 500;   // distance from bottom edge
-            // Ensure the graph is drawn above the background artifact
-            graph.ZIndex = 1;   // any positive value will be on top of background
-
-            // ---------- Add shapes to the graph ----------
-            // Example: a filled rectangle
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 150, 80);
-            rect.GraphInfo = new Aspose.Pdf.GraphInfo
+            // ------------------------------------------------------------
+            // Add the background image as a stamp placed behind page content
+            // ------------------------------------------------------------
+            ImageStamp bgStamp = new ImageStamp(backgroundImagePath)
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 1
+                // Place the stamp behind existing content
+                Background = true,
+                // Stretch the image to fill the whole page
+                Width = page.PageInfo.Width,
+                Height = page.PageInfo.Height,
+                // Align to the page origin (lower‑left corner)
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom
             };
+            // Add the background stamp to the page
+            page.AddStamp(bgStamp);
+
+            // ------------------------------------------------------------
+            // Draw shapes on top of the background image using a Graph container
+            // ------------------------------------------------------------
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+
+            // Example: a red rectangle with a light‑gray fill
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 300, 200, 100); // left, bottom, width, height
+            rect.GraphInfo.Color = Aspose.Pdf.Color.Red;               // border color
+            rect.GraphInfo.LineWidth = 2f;                             // border thickness
+            rect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;    // fill color
             graph.Shapes.Add(rect);
 
-            // Example: a red line drawn over the rectangle
-            float[] linePoints = { 0, 0, 150, 80 };
-            Aspose.Pdf.Drawing.Line line = new Aspose.Pdf.Drawing.Line(linePoints);
-            line.GraphInfo = new Aspose.Pdf.GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Red,
-                LineWidth = 2
-            };
+            // Example: a blue ellipse with a custom fill color
+            Ellipse ellipse = new Ellipse(350, 350, 200, 200); // left, bottom, width, height
+            ellipse.GraphInfo.Color = Aspose.Pdf.Color.Blue;
+            ellipse.GraphInfo.LineWidth = 2f;
+            ellipse.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(0.2f, 0.6f, 0.9f);
+            graph.Shapes.Add(ellipse);
+
+            // Example: a green line
+            Line line = new Line(new float[] { 100, 300, 500, 300 }); // x1, y1, x2, y2
+            line.GraphInfo.Color = Aspose.Pdf.Color.Green;
+            line.GraphInfo.LineWidth = 3f;
             graph.Shapes.Add(line);
 
-            // Add the graph (with its shapes) to the page
+            // Add the graph (which now contains the shapes) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the document
+            // Save the PDF
             doc.Save(outputPath);
         }
 

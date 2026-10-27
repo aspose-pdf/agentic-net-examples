@@ -17,29 +17,34 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
+            using (Document doc = new Document(inputPdf))
             {
-                // Initialize HTML save options
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions();
+                // Configure HTML conversion options.
+                // The PngBackground property was removed in newer Aspose.Pdf versions;
+                // rendering of page backgrounds as PNG is now controlled via RasterImagesSavingMode.
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Render raster images (including page backgrounds) as PNG embedded into SVG.
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    // Embed all resources directly into the HTML file.
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
+                };
 
-                // Render each page background as a single PNG image (embedded per page)
-                htmlOptions.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
-
-                // Save the document as HTML using explicit save options (required for non‑PDF output)
-                pdfDoc.Save(outputHtml, htmlOptions);
+                // HTML conversion requires GDI+ (Windows only). Handle platforms that lack it gracefully.
+                try
+                {
+                    doc.Save(outputHtml, htmlOpts);
+                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
             }
-
-            Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
-        }
-        // HTML conversion relies on GDI+ and may fail on non‑Windows platforms
-        catch (TypeInitializationException)
-        {
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

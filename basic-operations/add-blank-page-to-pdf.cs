@@ -15,13 +15,13 @@ class Program
             return;
         }
 
-        // Load the existing PDF, add a blank page, and save the result.
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add an empty page to the end of the document.
+            // Add a new blank page at the end of the document
             doc.Pages.Add();
 
-            // Save the updated PDF.
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 

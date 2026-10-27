@@ -4,93 +4,77 @@ using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
-class CreateIndexedPdf
+class Program
 {
     static void Main()
     {
-        // Output file path
-        const string outputPath = "IndexedDocument.pdf";
+        const string outputPath = "ClickableIndex.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // -------------------------------------------------
-            // 1. Create the Index page (page 1)
-            // -------------------------------------------------
+            // -----------------------------------------------------------------
+            // 1. Create the Index page (first page)
+            // -----------------------------------------------------------------
             Page indexPage = doc.Pages.Add();
 
-            // Add a title for the index
-            TextFragment indexTitle = new TextFragment("Table of Contents")
-            {
-                // Center the title
-                TextState = { FontSize = 20, FontStyle = FontStyles.Bold },
-                Position = new Position(0, 800) // X=0 (centered), Y=800
-            };
+            // Title for the index
+            TextFragment indexTitle = new TextFragment("Document Index");
+            indexTitle.TextState.FontSize = 20;
+            indexTitle.Position = new Position(50, 800);
             indexPage.Paragraphs.Add(indexTitle);
 
-            // Define vertical spacing for entries
-            double entryY = 750;
-            double entryStep = 30;
+            // -----------------------------------------------------------------
+            // 2. Define sections that will be linked from the index
+            // -----------------------------------------------------------------
+            string[] sections = { "Section 1: Introduction", "Section 2: Details", "Section 3: Conclusion" };
 
-            // -------------------------------------------------
-            // 2. Create Section pages and corresponding index entries
-            // -------------------------------------------------
-            for (int i = 1; i <= 3; i++)
+            // Vertical position for the first link entry
+            double linkY = 750;
+
+            for (int i = 0; i < sections.Length; i++)
             {
-                // Add a new page for the section
+                // -------------------------------------------------------------
+                // a) Create a new page for the current section
+                // -------------------------------------------------------------
                 Page sectionPage = doc.Pages.Add();
 
                 // Add a heading to the section page
-                TextFragment heading = new TextFragment($"Section {i}")
-                {
-                    TextState = { FontSize = 18, FontStyle = FontStyles.Bold },
-                    Position = new Position(0, 800) // Centered at top
-                };
+                TextFragment heading = new TextFragment(sections[i]);
+                heading.TextState.FontSize = 16;
+                heading.Position = new Position(50, 800);
                 sectionPage.Paragraphs.Add(heading);
 
-                // Add some placeholder body text
-                TextFragment body = new TextFragment($"This is the content of section {i}.")
-                {
-                    TextState = { FontSize = 12 },
-                    Position = new Position(50, 750)
-                };
-                sectionPage.Paragraphs.Add(body);
+                // -------------------------------------------------------------
+                // b) Add a visible link entry on the index page
+                // -------------------------------------------------------------
+                // Text that will appear on the index page
+                TextFragment linkText = new TextFragment(sections[i]);
+                linkText.Position = new Position(55, linkY);
+                linkText.TextState.FontSize = 12;
+                linkText.TextState.Underline = true;
+                linkText.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+                indexPage.Paragraphs.Add(linkText);
 
-                // -------------------------------------------------
-                // 3. Add an entry on the Index page that links to this section
-                // -------------------------------------------------
-                // Create a visible rectangle for the link annotation
-                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(50, entryY - 15, 300, entryY + 5);
+                // Rectangle that defines the clickable area (fully qualified to avoid ambiguity)
+                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(50, linkY - 15, 300, linkY + 5);
 
-                // Create the link annotation
-                LinkAnnotation link = new LinkAnnotation(indexPage, linkRect)
-                {
-                    // Use GoToAction to navigate to the target page
-                    Action = new GoToAction(sectionPage)
-                };
+                // Create a link annotation on the index page
+                LinkAnnotation link = new LinkAnnotation(indexPage, linkRect);
 
-                // Optional: give the link a visible underline style
-                link.Color = Aspose.Pdf.Color.Blue;
-                link.Border = new Border(link) { Width = 0 }; // No border
+                // Set the action to go to the corresponding section page
+                link.Action = new GoToAction(sectionPage.Number);
 
-                // Add the link annotation to the index page
+                // Add the annotation to the index page
                 indexPage.Annotations.Add(link);
 
-                // Add the textual representation of the entry
-                TextFragment entry = new TextFragment($"Section {i} ........................................... {i + 1}")
-                {
-                    TextState = { FontSize = 12, Underline = true },
-                    Position = new Position(50, entryY)
-                };
-                indexPage.Paragraphs.Add(entry);
-
-                // Move to next entry position
-                entryY -= entryStep;
+                // Move down for the next link entry
+                linkY -= 30;
             }
 
-            // -------------------------------------------------
-            // 4. Save the document as PDF
-            // -------------------------------------------------
+            // -----------------------------------------------------------------
+            // 3. Save the document
+            // -----------------------------------------------------------------
             doc.Save(outputPath);
         }
 

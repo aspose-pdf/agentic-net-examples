@@ -6,39 +6,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "image.png";
+        const string pdfPath    = "input.pdf";
+        const string imagePath  = "image.png";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Absolute coordinates (lower‑left corner) in points (1 point = 1/72 inch)
+        const double llx   = 100; // X position from left
+        const double lly   = 200; // Y position from bottom
+        const double width = 300; // Desired image width
+        const double height = 200; // Desired image height
+
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Image not found: {imagePath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Select the target page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Load the existing PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
+            {
+                // Aspose.Pdf uses 1‑based page indexing
+                Page page = doc.Pages[1];
 
-            // Define the rectangle where the image will be placed.
-            // Coordinates are absolute: lower‑left (llx, lly) and upper‑right (urx, ury).
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+                // Create an ImageStamp for the raster image
+                ImageStamp imgStamp = new ImageStamp(imagePath)
+                {
+                    // Set absolute position on the page
+                    XIndent = llx,
+                    YIndent = lly,
+                    // Set the size of the image
+                    Width   = width,
+                    Height  = height,
+                    // Place the image over the page content (false = foreground)
+                    Background = false
+                };
 
-            // Insert the raster image at the specified rectangle.
-            page.AddImage(imagePath, rect);
+                // Add the stamp to the selected page
+                page.AddStamp(imgStamp);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Image inserted and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Raster image inserted and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,77 +1,81 @@
 using System;
-using System.Drawing; // System.Drawing.Color is used for DefaultAppearance
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document (lifecycle rule)
+        const string outputPath = "template.pdf";
+
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a single page (first page)
             Page page = doc.Pages.Add();
 
-            // Define rectangles for the placeholder fields – fully qualified to avoid ambiguity
-            Aspose.Pdf.Rectangle nameFieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
-            Aspose.Pdf.Rectangle emailFieldRect = new Aspose.Pdf.Rectangle(100, 650, 300, 680);
-            Aspose.Pdf.Rectangle addressFieldRect = new Aspose.Pdf.Rectangle(100, 550, 500, 640);
+            // ----- Create placeholder form fields -----
 
-            // Create a TextBoxField for "Name" placeholder (note: pass the page, not the document)
-            TextBoxField nameField = new TextBoxField(page, nameFieldRect)
+            // Name field
+            Aspose.Pdf.Rectangle nameRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
+            TextBoxField nameField = new TextBoxField(page, nameRect)
             {
                 PartialName = "Name",
-                Value = "" // empty value as placeholder
+                Value = "«Name»",
+                // Border property expects an Aspose.Pdf.Annotations.Border; omitted for simplicity
+                Margin = new MarginInfo { Top = 2, Bottom = 2, Left = 2, Right = 2 }
             };
-            nameField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-
-            // Create a TextBoxField for "Email" placeholder
-            TextBoxField emailField = new TextBoxField(page, emailFieldRect)
-            {
-                PartialName = "Email",
-                Value = ""
-            };
-            emailField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-
-            // Create a TextBoxField for "Address" placeholder (multiline)
-            TextBoxField addressField = new TextBoxField(page, addressFieldRect)
-            {
-                PartialName = "Address",
-                Value = "",
-                Multiline = true
-            };
-            addressField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-
-            // Add the fields to the document's form
             doc.Form.Add(nameField);
-            doc.Form.Add(emailField);
-            doc.Form.Add(addressField);
 
-            // Optionally, add visual labels using TextFragment
+            // Date field
+            Aspose.Pdf.Rectangle dateRect = new Aspose.Pdf.Rectangle(100, 650, 300, 670);
+            TextBoxField dateField = new TextBoxField(page, dateRect)
+            {
+                PartialName = "Date",
+                Value = "«Date»",
+                Margin = new MarginInfo { Top = 2, Bottom = 2, Left = 2, Right = 2 }
+            };
+            doc.Form.Add(dateField);
+
+            // Amount field
+            Aspose.Pdf.Rectangle amountRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+            TextBoxField amountField = new TextBoxField(page, amountRect)
+            {
+                PartialName = "Amount",
+                Value = "«Amount»",
+                Margin = new MarginInfo { Top = 2, Bottom = 2, Left = 2, Right = 2 }
+            };
+            doc.Form.Add(amountField);
+
+            // ----- Add labels for the fields -----
+
             TextFragment nameLabel = new TextFragment("Name:")
             {
-                Position = new Position(100, 735)
+                Position = new Position(50, 710),
+                TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial") }
             };
             page.Paragraphs.Add(nameLabel);
 
-            TextFragment emailLabel = new TextFragment("Email:")
+            TextFragment dateLabel = new TextFragment("Date:")
             {
-                Position = new Position(100, 685)
+                Position = new Position(50, 660),
+                TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial") }
             };
-            page.Paragraphs.Add(emailLabel);
+            page.Paragraphs.Add(dateLabel);
 
-            TextFragment addressLabel = new TextFragment("Address:")
+            TextFragment amountLabel = new TextFragment("Amount:")
             {
-                Position = new Position(100, 645)
+                Position = new Position(50, 610),
+                TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial") }
             };
-            page.Paragraphs.Add(addressLabel);
+            page.Paragraphs.Add(amountLabel);
 
-            // Save the template PDF (save rule)
-            const string outputPath = "Template.pdf";
+            // Save the PDF template
             doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF template created at '{outputPath}'.");
     }
 }

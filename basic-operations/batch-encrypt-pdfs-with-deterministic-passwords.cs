@@ -2,73 +2,79 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using Aspose.Pdf; // Aspose.Pdf namespace contains Document, Permissions, CryptoAlgorithm
+using Aspose.Pdf;
 
-class BatchPdfEncryptor
+class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs to encrypt
-        const string inputFolder = @"C:\PdfInput";
-        // Output folder where encrypted PDFs will be saved
-        const string outputFolder = @"C:\PdfEncrypted";
-        // Path to the log file that will store file‑name → password mappings
-        const string logFilePath = @"C:\PdfEncrypted\encryption_log.txt";
+        // Base directory of the application (works for both Windows and Linux)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Input folder containing PDFs to encrypt (created if missing)
+        string inputDir = Path.Combine(baseDir, "InputPdfs");
+        // Output folder for encrypted PDFs (created if missing)
+        string outputDir = Path.Combine(baseDir, "EncryptedPdfs");
+        // Secure log file that records filename and generated password
+        string logPath = Path.Combine(baseDir, "encryption_log.txt");
 
-        // Open the log file for appending (creates it if it does not exist)
-        using (StreamWriter logWriter = new StreamWriter(logFilePath, append: true))
+        // Ensure the required directories exist
+        Directory.CreateDirectory(inputDir);
+        Directory.CreateDirectory(outputDir);
+
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            // Process each PDF file in the input folder
-            foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+            Console.WriteLine($"No PDF files found in '{inputDir}'. Place PDFs there and rerun the program.");
+            return;
+        }
+
+        // Open the log file once and keep it open for the batch
+        using (StreamWriter logWriter = new StreamWriter(logPath, append: true, Encoding.UTF8))
+        {
+            foreach (string pdfPath in pdfFiles)
             {
-                // Derive a password from the file name (e.g., SHA‑256 hash, first 16 characters)
-                string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-                string password = GeneratePasswordFromFileName(fileName);
-
-                // Build the output file path (same name, different folder)
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-
-                // Encrypt the PDF using Aspose.Pdf
-                using (Document doc = new Document(pdfPath))
+                try
                 {
-                    // Define permissions (adjust as needed)
-                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                    string fileName = Path.GetFileNameWithoutExtension(pdfPath);
+                    // Generate a deterministic password from the file name
+                    string password = GeneratePasswordFromFileName(fileName);
 
-                    // Encrypt with the same password for user and owner; use AES‑256
-                    doc.Encrypt(userPassword: password,
-                                ownerPassword: password,
-                                permissions: perms,
-                                cryptoAlgorithm: CryptoAlgorithm.AESx256);
+                    string outputPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
 
-                    // Save the encrypted document
-                    doc.Save(outputPath);
+                    // Encrypt the PDF using AES‑256 and basic permissions
+                    using (Document doc = new Document(pdfPath))
+                    {
+                        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                        doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
+                        doc.Save(outputPath);
+                    }
+
+                    // Record the mapping in the secure log
+                    logWriter.WriteLine($"{Path.GetFileName(pdfPath)}\t{password}");
+                    Console.WriteLine($"Encrypted: {Path.GetFileName(pdfPath)}");
                 }
-
-                // Record the password in the log (format: FileName:Password)
-                logWriter.WriteLine($"{fileName}:{password}");
-                Console.WriteLine($"Encrypted '{fileName}.pdf' → '{outputPath}'");
+                catch (Exception ex)
+                {
+                    // Log the error but continue processing the remaining files
+                    Console.Error.WriteLine($"[Error] Failed to process '{Path.GetFileName(pdfPath)}': {ex.Message}");
+                }
             }
         }
 
-        Console.WriteLine("Batch encryption completed. Passwords stored in log file.");
+        Console.WriteLine("Batch encryption completed.");
     }
 
-    // Generates a deterministic password from a file name using SHA‑256.
-    // Returns a 16‑character hexadecimal string (suitable for PDF passwords).
-    private static string GeneratePasswordFromFileName(string fileName)
+    // Creates a 16‑character password from the SHA‑256 hash of the file name
+    static string GeneratePasswordFromFileName(string name)
     {
-        using (SHA256 sha256 = SHA256.Create())
+        using (SHA256 sha = SHA256.Create())
         {
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(fileName));
-            // Convert first 8 bytes (16 hex chars) to a string
+            byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(name));
             StringBuilder sb = new StringBuilder(16);
-            for (int i = 0; i < 8; i++)
-            {
-                sb.Append(hashBytes[i].ToString("x2"));
-            }
+            for (int i = 0; i < 8; i++) // first 8 bytes => 16 hex chars
+                sb.Append(hash[i].ToString("x2"));
             return sb.ToString();
         }
     }

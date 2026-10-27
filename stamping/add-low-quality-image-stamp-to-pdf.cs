@@ -1,19 +1,20 @@
 using System;
 using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";   // source PDF
-        const string stampImagePath = "stamp.png";   // image to use as stamp
-        const string outputPdfPath  = "output.pdf";  // result PDF
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPath = "stamped_output.pdf";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
         if (!File.Exists(stampImagePath))
@@ -22,29 +23,59 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Compress the stamp image to low JPEG quality (10%) in memory
+        byte[] lowQualityImageBytes = GetLowQualityJpegBytes(stampImagePath, 10L);
+        using (var lowQualityImageStream = new MemoryStream(lowQualityImageBytes))
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImagePath);
+            // Create an ImageStamp from the low‑quality image stream
+            ImageStamp imgStamp = new ImageStamp(lowQualityImageStream)
+            {
+                Background = false,                    // draw on top of page content
+                Opacity = 0.5,                         // optional semi‑transparent effect
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
 
-            // Set low quality (10 %) to improve performance on large PDFs
-            imgStamp.Quality = 10;
-
-            // Optional: position the stamp (centered on each page)
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Apply the stamp to every page (pages are 1‑based)
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to each page individually
+            foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified document (lifecycle rule: use Save with path)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF while still inside the using block
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+    }
+
+    /// <summary>
+    /// Loads an image from the given path and re‑encodes it as a JPEG with the specified quality.
+    /// Returns the JPEG bytes.
+    /// </summary>
+    private static byte[] GetLowQualityJpegBytes(string imagePath, long quality)
+    {
+        // Fully qualify System.Drawing.Image to avoid ambiguity with Aspose.Pdf.Image
+        using (System.Drawing.Image original = System.Drawing.Image.FromFile(imagePath))
+        using (var ms = new MemoryStream())
+        {
+            ImageCodecInfo jpegCodec = GetEncoder(ImageFormat.Jpeg);
+            var encoderParams = new EncoderParameters(1);
+            encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+            original.Save(ms, jpegCodec, encoderParams);
+            return ms.ToArray();
+        }
+    }
+
+    private static ImageCodecInfo GetEncoder(ImageFormat format)
+    {
+        ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+        foreach (ImageCodecInfo codec in codecs)
+        {
+            if (codec.FormatID == format.Guid)
+                return codec;
+        }
+        return null;
     }
 }

@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string rootTitle  = "Accessible Document Title";
+        const string newTitle   = "Accessible Document Title";
 
         if (!File.Exists(inputPath))
         {
@@ -18,20 +18,22 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (no casting needed)
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access the tagged content interface
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Get the root structure element and set its Title property
-            StructureElement root = tagged.RootElement;
-            root.Title = rootTitle;
+            // Set the document title metadata (applies to the root structure element)
+            taggedContent.SetTitle(newTitle);
 
-            // Save the modified PDF
+            // Optionally, you can also set the language if needed
+            // taggedContent.SetLanguage("en-US");
+
+            // No need to call PreSave(); just save the document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with root title to '{outputPath}'.");
+        Console.WriteLine($"Document saved with title set to \"{newTitle}\" at '{outputPath}'.");
     }
 }

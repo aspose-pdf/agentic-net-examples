@@ -6,55 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Paths for source PDF, JSON data to import and the resulting PDF
-        const string srcPdfPath = "input.pdf";
-        const string jsonDataPath = "data.json";
-        const string outPdfPath = "output.pdf";
+        const string pdfPath = "form.pdf";
+        const string fdfPath = "data.fdf";
+        const string outputPath = "filled_form.pdf";
 
-        // Verify that source files exist
-        if (!File.Exists(srcPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath) || !File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {srcPdfPath}");
-            return;
-        }
-        if (!File.Exists(jsonDataPath))
-        {
-            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
+            Console.Error.WriteLine("Required input files not found.");
             return;
         }
 
-        // Use the Form facade with the constructor that only takes the source PDF.
-        // The Form class implements IDisposable, so we wrap it in a using block.
-        using (Form form = new Form(srcPdfPath))
+        try
         {
-            try
+            // Use Aspose.Pdf.Facades.Form to work with PDF forms
+            using (Form form = new Form(pdfPath))
             {
-                // Import field values from a JSON stream.
-                using (FileStream jsonStream = File.OpenRead(jsonDataPath))
+                // Import form data (e.g., FDF). Missing fields throw an exception with a FieldName property.
+                try
                 {
-                    form.ImportJson(jsonStream);
+                    using (FileStream fdfStream = File.OpenRead(fdfPath))
+                    {
+                        form.ImportFdf(fdfStream);
+                    }
                 }
-            }
-            // FormException no longer exists; catch generic Exception and extract the missing field name via reflection.
-            catch (Exception ex)
-            {
-                var fieldProp = ex.GetType().GetProperty("FieldName");
-                if (fieldProp != null)
+                catch (Exception ex)
                 {
-                    var missingField = fieldProp.GetValue(ex) as string;
-                    Console.Error.WriteLine($"Missing form field: {missingField}");
+                    // Attempt to read the optional FieldName property via reflection.
+                    var fieldProp = ex.GetType().GetProperty("FieldName");
+                    var missingField = fieldProp?.GetValue(ex) as string;
+                    Console.Error.WriteLine($"Missing form field: {missingField ?? "<unknown>"}");
                 }
-                else
-                {
-                    Console.Error.WriteLine($"Error during import: {ex.Message}");
-                }
-                return; // stop processing on error
-            }
 
-            // Save the updated PDF using the overload that accepts the destination path.
-            form.Save(outPdfPath);
+                // Save the updated PDF with imported data
+                form.Save(outputPath);
+            }
         }
-
-        Console.WriteLine($"Form fields imported successfully. Output saved to '{outPdfPath}'.");
+        catch (Exception ex)
+        {
+            // General error handling
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

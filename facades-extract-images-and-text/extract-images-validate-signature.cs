@@ -4,94 +4,99 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Determines image format by inspecting the file header (magic numbers).
-    static string GetImageFormat(string filePath)
-    {
-        byte[] header = new byte[8];
-        using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
-        {
-            // Read up to 8 bytes; fewer bytes are possible for very small files.
-            int bytesRead = fs.Read(header, 0, header.Length);
-        }
-
-        // JPEG: FF D8 FF
-        if (header.Length >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-            return "jpg";
-
-        // PNG: 89 50 4E 47 0D 0A 1A 0A
-        if (header.Length >= 8 &&
-            header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47 &&
-            header[4] == 0x0D && header[5] == 0x0A && header[6] == 0x1A && header[7] == 0x0A)
-            return "png";
-
-        // GIF: 47 49 46 38
-        if (header.Length >= 4 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
-            return "gif";
-
-        // BMP: 42 4D
-        if (header.Length >= 2 && header[0] == 0x42 && header[1] == 0x4D)
-            return "bmp";
-
-        // TIFF (little endian): 49 49 2A 00
-        if (header.Length >= 4 && header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00)
-            return "tif";
-
-        // TIFF (big endian): 4D 4D 00 2A
-        if (header.Length >= 4 && header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A)
-            return "tif";
-
-        // Unknown or corrupted format
-        return null;
-    }
-
     static void Main()
     {
-        const string inputPdf   = "sample.pdf";               // PDF containing images
-        const string outputDir  = "ExtractedImages";
+        const string pdfPath = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor (Facade) to pull images from the PDF.
-        using (Aspose.Pdf.Facades.PdfExtractor extractor = new Aspose.Pdf.Facades.PdfExtractor())
+        // Bind the PDF and extract all images using Aspose.Pdf.Facades
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(inputPdf);
-            extractor.ExtractImage(); // Prepare extraction of images.
+            extractor.BindPdf(pdfPath);
+            // The ExtractImageMode property does not exist in the referenced Aspose.Pdf version.
+            // Calling ExtractImage() extracts all images by default, so we simply invoke it.
+            extractor.ExtractImage();
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                // Temporary file without extension; will be renamed after validation.
-                string tempPath = Path.Combine(outputDir, $"image_{imageIndex}.bin");
-
-                // Save the next image to the temporary file.
+                string tempPath = Path.Combine(outputDir, $"image_{imageIndex}.bin"); // temporary extension
                 extractor.GetNextImage(tempPath);
 
-                // Verify the file signature (magic number) to ensure the image is not corrupted.
-                string format = GetImageFormat(tempPath);
-                if (format == null)
+                bool isValid = IsValidImage(tempPath);
+                Console.WriteLine($"{Path.GetFileName(tempPath)}: {(isValid ? "valid" : "corrupted")}");
+
+                if (isValid)
                 {
-                    Console.WriteLine($"Image {imageIndex}: unknown or corrupted file signature.");
-                    // Optionally delete the invalid file.
-                    File.Delete(tempPath);
+                    // Determine proper extension from file signature and rename
+                    string properExt = GetImageExtension(tempPath);
+                    string finalPath = Path.ChangeExtension(tempPath, properExt);
+                    File.Move(tempPath, finalPath);
+                    Console.WriteLine($"Renamed to {Path.GetFileName(finalPath)}");
                 }
                 else
                 {
-                    // Rename the file with the correct extension.
-                    string finalPath = Path.ChangeExtension(tempPath, format);
-                    File.Move(tempPath, finalPath);
-                    Console.WriteLine($"Image {imageIndex}: extracted as {format.ToUpper()} and appears valid.");
+                    // Optionally delete corrupted files
+                    // File.Delete(tempPath);
                 }
 
                 imageIndex++;
             }
         }
+    }
 
-        Console.WriteLine("Image extraction and validation completed.");
+    // Checks the file header against known image signatures
+    static bool IsValidImage(string path)
+    {
+        byte[] header = new byte[8];
+        using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+        {
+            int read = fs.Read(header, 0, header.Length);
+            if (read < 4) return false;
+        }
+
+        // PNG: 89 50 4E 47 0D 0A 1A 0A
+        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            return true;
+        // JPEG: FF D8 FF
+        if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            return true;
+        // GIF: 47 49 46 38
+        if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            return true;
+        // BMP: 42 4D
+        if (header[0] == 0x42 && header[1] == 0x4D)
+            return true;
+
+        return false;
+    }
+
+    // Returns the appropriate file extension based on the detected signature
+    static string GetImageExtension(string path)
+    {
+        byte[] header = new byte[8];
+        using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+        {
+            fs.Read(header, 0, header.Length);
+        }
+
+        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            return ".png";
+        if (header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
+            return ".jpg";
+        if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
+            return ".gif";
+        if (header[0] == 0x42 && header[1] == 0x4D)
+            return ".bmp";
+
+        return ".bin";
     }
 }

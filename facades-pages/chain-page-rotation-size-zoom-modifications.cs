@@ -1,51 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_modified.pdf";
 
-        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Apply rotation, size, and a simulated zoom to each page
+        foreach (Page page in pdfDocument.Pages)
         {
-            // Bind the document to PdfPageEditor (also disposable)
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
-            {
-                // ---- Chain of page modifications ----
+            // 1. Rotate 90 degrees clockwise
+            page.Rotate = Rotation.on90; // valid enum values: on90, on180, on270, None
 
-                // 1. Rotate all pages by 90 degrees (allowed values: 0, 90, 180, 270)
-                editor.Rotation = 90;
+            // 2. Set page size to A4 using width/height doubles (required overload)
+            page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
 
-                // 2. Set zoom factor (1.0 = 100%). Here we use 75% zoom.
-                editor.Zoom = 0.75f;
-
-                // 3. Change the output page size to A4.
-                //    PageSize enum is defined in Aspose.Pdf namespace.
-                editor.PageSize = PageSize.A4;
-
-                // 4. Optionally move the origin of the original content.
-                //    This shifts the content 50 points to the right and 30 points up.
-                editor.MovePosition(50, 30);
-
-                // Apply all the above changes to the bound document.
-                editor.ApplyChanges();
-
-                // Save the modified PDF to the specified output file.
-                editor.Save(outputPath);
-            }
+            // 3. Simulate a zoom factor of 150% by scaling the page dimensions
+            //    (Zoom is a viewer‑side concept; to reflect it in the file we enlarge the page size)
+            const double zoomFactor = 1.5;
+            page.PageInfo.Width  = page.PageInfo.Width  * zoomFactor;
+            page.PageInfo.Height = page.PageInfo.Height * zoomFactor;
         }
+
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }

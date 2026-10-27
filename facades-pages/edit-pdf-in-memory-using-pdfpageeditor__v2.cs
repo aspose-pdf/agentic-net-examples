@@ -2,53 +2,56 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added namespace for TextFragment
 
 class Program
 {
     static void Main()
     {
         // ------------------------------------------------------------
-        // 1. Create a simple PDF in memory – this replaces the missing
-        //    "source.pdf" file and makes the example self‑contained.
+        // 1. Create a minimal PDF in memory (acts as the "input" PDF).
         // ------------------------------------------------------------
-        byte[] sourcePdfBytes;
-        using (var seedDoc = new Document())
+        byte[] inputPdfBytes;
+        using (var doc = new Document())
         {
-            // Add a single page with a text fragment so the PDF is not empty.
-            var page = seedDoc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Hello, Aspose.Pdf!"));
+            // Add a single blank page – you can add any content you need here.
+            doc.Pages.Add();
 
-            // Save the document to a MemoryStream and capture the byte array.
             using (var ms = new MemoryStream())
             {
-                seedDoc.Save(ms);
-                sourcePdfBytes = ms.ToArray();
+                doc.Save(ms);
+                inputPdfBytes = ms.ToArray();
             }
         }
 
         // ------------------------------------------------------------
         // 2. Edit the PDF entirely in memory using PdfPageEditor.
         // ------------------------------------------------------------
-        using (var inputStream = new MemoryStream(sourcePdfBytes))
-        using (var outputStream = new MemoryStream())
-        using (var editor = new PdfPageEditor())
+        using (var sourceStream = new MemoryStream(inputPdfBytes))
+        using (var destStream   = new MemoryStream())
         {
-            // Bind the in‑memory PDF to the editor.
-            editor.BindPdf(inputStream);
+            // Ensure the source stream is positioned at the beginning.
+            sourceStream.Position = 0;
 
-            // Example edits: zoom to 50% and rotate every page by 90°.
-            editor.Zoom = 0.5f;      // 0.5 = 50%
-            editor.Rotation = 90;   // allowed values: 0, 90, 180, 270
+            // PdfPageEditor does not implement IDisposable, so we instantiate it directly.
+            var pageEditor = new PdfPageEditor();
 
-            // Apply the pending changes.
-            editor.ApplyChanges();
+            // Bind the PDF document from the source memory stream.
+            pageEditor.BindPdf(sourceStream);
 
-            // Save the edited PDF back into another MemoryStream.
-            editor.Save(outputStream);
+            // Specify which page(s) to affect – 1‑based indexing.
+            pageEditor.ProcessPages = new int[] { 1 };
 
-            // Optional: write the result to a file so you can inspect it.
-            File.WriteAllBytes("edited.pdf", outputStream.ToArray());
+            // Rotation angle in degrees (allowed values: 0, 90, 180, 270).
+            pageEditor.Rotation = 90;
+
+            // Save the edited PDF into the destination memory stream.
+            pageEditor.Save(destStream);
+
+            // Reset the position of the destination stream for further use.
+            destStream.Position = 0;
+
+            // Optional: write the edited PDF to a file for verification.
+            File.WriteAllBytes("output.pdf", destStream.ToArray());
         }
     }
 }

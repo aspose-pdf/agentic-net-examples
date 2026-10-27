@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";      // existing PDF or can be a blank PDF
+        const string outputPath = "output_with_link.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,48 +18,79 @@ class Program
             return;
         }
 
-        // Load the PDF (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure there is at least one page
-            Page page = doc.Pages[1];
-
-            // Create a simple table and add it to the page
-            Table table = new Table();
-            page.Paragraphs.Add(table);
-
-            // Define column widths – this replaces the read‑only Cell.Width property
-            // Table.ColumnWidths expects a comma‑separated string, not a float array.
-            table.ColumnWidths = "200";
-
-            // Add a row
-            Row row = table.Rows.Add();
-
-            // Add a cell with visible text
-            Cell cell = row.Cells.Add("Click here");
-
-            // Define the rectangle that will act as the clickable area.
-            // In a real scenario you would calculate this based on the cell's position.
-            // Here we use a fixed rectangle for demonstration purposes.
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 200, 520);
-
-            // Create a LinkAnnotation that points to an external URL.
-            LinkAnnotation link = new LinkAnnotation(page, linkRect)
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Action = new GoToURIAction("https://www.example.com"),
-                Color = Aspose.Pdf.Color.Blue
-            };
+                // Access tagged content (creates a tagged structure if not present)
+                ITaggedContent taggedContent = doc.TaggedContent;
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle("PDF with Hyperlink in Table Cell");
 
-            // Optional: add a visible border around the link area
-            link.Border = new Border(link) { Width = 1 };
+                // Root element of the structure tree
+                StructureElement root = taggedContent.RootElement;
 
-            // Add the annotation to the page (the annotation is visually linked to the cell text)
-            page.Annotations.Add(link);
+                // Create a table element and attach it to the root
+                TableElement table = taggedContent.CreateTableElement();
+                table.AlternativeText = "Sample data table with hyperlink";
+                root.AppendChild(table);
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            doc.Save(outputPath);
+                // ----- Table Header -----
+                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+                table.AppendChild(thead);
+
+                TableTRElement headerRow = taggedContent.CreateTableTRElement();
+                thead.AppendChild(headerRow);
+
+                TableTHElement th1 = taggedContent.CreateTableTHElement();
+                th1.SetText("Item");
+                headerRow.AppendChild(th1);
+
+                TableTHElement th2 = taggedContent.CreateTableTHElement();
+                th2.SetText("Link");
+                headerRow.AppendChild(th2);
+
+                // ----- Table Body -----
+                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+                table.AppendChild(tbody);
+
+                TableTRElement dataRow = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
+
+                // First cell: plain text
+                TableTDElement tdItem = taggedContent.CreateTableTDElement();
+                tdItem.SetText("Example");
+                dataRow.AppendChild(tdItem);
+
+                // Second cell: text that will be hyperlinked
+                TableTDElement tdLink = taggedContent.CreateTableTDElement();
+                // Create a paragraph element for the cell content
+                ParagraphElement para = taggedContent.CreateParagraphElement();
+                para.SetText("Visit Example.com");
+                tdLink.AppendChild(para);
+                dataRow.AppendChild(tdLink);
+
+                // Add a LinkAnnotation that covers the cell area.
+                // For demonstration we use static coordinates; in a real scenario
+                // you would calculate the rectangle based on the cell position.
+                Page firstPage = doc.Pages[1];
+                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 250, 520);
+                LinkAnnotation link = new LinkAnnotation(firstPage, linkRect)
+                {
+                    Action = new GoToURIAction("https://www.example.com")
+                };
+                firstPage.Annotations.Add(link);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with hyperlink: '{outputPath}'");
         }
-
-        Console.WriteLine($"PDF saved with hyperlink at '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

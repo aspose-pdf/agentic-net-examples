@@ -7,44 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_subset.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_subset.pdf";
+        const string fontPath  = "MyCustomFont.ttf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF (no special load options needed for plain PDF)
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(fontPath))
         {
-            // ------------------------------------------------------------
-            // Low‑level font handling
-            // ------------------------------------------------------------
-            // Find the custom font (replace "Arial" with the actual font name or path if needed)
-            Font customFont = FontRepository.FindFont("Arial");
-            // Mark the font to be embedded
-            customFont.IsEmbedded = true;
-
-            // Add a text fragment that uses the custom font – this forces the font to be part of the resources
-            TextFragment tf = new TextFragment("Sample text using custom font");
-            tf.TextState.Font = customFont;
-            tf.Position = new Position(100, 700); // place near top of the first page
-            doc.Pages[1].Paragraphs.Add(tf);
-
-            // ------------------------------------------------------------
-            // Subset the fonts – keep only glyphs actually used in the document
-            // ------------------------------------------------------------
-            // Subset all fonts (embedded and non‑embedded) to reduce file size
-            doc.FontUtilities.SubsetFonts(FontSubsetStrategy.SubsetAllFonts);
-
-            // ------------------------------------------------------------
-            // Save the resulting PDF
-            // ------------------------------------------------------------
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Font file not found: {fontPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved with subsetted fonts to '{outputPath}'.");
+        // Load the source PDF inside a using block (deterministic disposal)
+        using (Document doc = new Document(inputPdf))
+        {
+            // Load the custom TrueType font via the low‑level FontRepository API
+            // OpenFont returns a Font object that can be configured for embedding/subsetting
+            Font customFont = FontRepository.OpenFont(fontPath);
+
+            // Request embedding and enable subset mode to keep only used glyphs
+            customFont.IsEmbedded = true;   // embed the font into the PDF
+            customFont.IsSubset   = true;   // embed only the glyphs that are actually used
+
+            // Create a text fragment that uses the subset font
+            TextFragment fragment = new TextFragment("Hello, subset font!");
+            fragment.TextState.Font = customFont;
+            fragment.TextState.FontSize = 12;
+
+            // Use 1‑based page indexing (first page is Pages[1])
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(fragment);
+
+            // Save the modified PDF (PDF format, no SaveOptions needed)
+            doc.Save(outputPdf);
+        }
+
+        Console.WriteLine($"PDF saved with subset font: {outputPdf}");
     }
 }

@@ -1,31 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Export pdf form data to fdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-acroforms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class ExportFormToFdf
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "output.fdf";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
-            return;
-        }
-
-        // Initialize the Form facade with the source PDF
-        using (Form form = new Form(pdfPath))
-        {
-            // Create a file stream for the FDF output
-            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
-            {
-                // Export all form field data to the FDF stream
-                form.ExportFdf(fdfStream);
-            }
-        }
-
-        Console.WriteLine($"Form data successfully exported to '{fdfPath}'.");
-    }
-}
+class Program { static void Main() { } }

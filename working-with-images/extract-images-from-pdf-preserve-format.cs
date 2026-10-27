@@ -6,54 +6,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string pdfPath = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Open the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
-            {
-                Page page = pdfDoc.Pages[pageNumber];
-                int imageCounter = 1;
+            int imageCounter = 1;
 
-                // Iterate over all images defined in the page resources
-                foreach (XImage xImage in page.Resources.Images)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            {
+                Page page = doc.Pages[pageNum];
+
+                // Iterate over the XImage collection – NOT as a dictionary
+                foreach (XImage img in page.Resources.Images)
                 {
                     // Save the image to a memory stream first
                     using (var ms = new MemoryStream())
                     {
-                        xImage.Save(ms);
-                        ms.Position = 0;
+                        img.Save(ms);
+                        byte[] imageBytes = ms.ToArray();
 
-                        // Determine the original image format by inspecting the header bytes
-                        string extension = GetImageExtension(ms);
+                        // Determine original image format by inspecting the header bytes
+                        string extension = DetectExtensionFromHeader(imageBytes);
 
-                        // Build a unique file name for each extracted image
-                        string outputPath = Path.Combine(
-                            outputFolder,
-                            $"page{pageNumber}_img{imageCounter}{extension}");
+                        // Build a unique file name with the detected extension
+                        string fileName = $"Image_{imageCounter}{extension}";
+                        string outputPath = Path.Combine(outputDir, fileName);
 
-                        // Write the image bytes to disk preserving the original format
-                        using (var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                        {
-                            ms.CopyTo(fileStream);
-                        }
+                        // Write the image bytes to disk
+                        File.WriteAllBytes(outputPath, imageBytes);
 
-                        Console.WriteLine($"Extracted image saved to: {outputPath}");
+                        Console.WriteLine($"Saved {outputPath}");
+                        imageCounter++;
                     }
-
-                    imageCounter++;
                 }
             }
         }
@@ -61,43 +57,40 @@ class Program
         Console.WriteLine("Image extraction completed.");
     }
 
-    /// <summary>
-    /// Inspects the first bytes of a stream to infer the image file extension.
-    /// Returns ".bin" when the format cannot be identified.
-    /// </summary>
-    private static string GetImageExtension(Stream imageStream)
+    // Detects common image formats by examining the first few bytes (file header)
+    private static string DetectExtensionFromHeader(byte[] data)
     {
-        // Read up to 8 bytes (enough for PNG, JPEG, etc.)
-        byte[] header = new byte[8];
-        int bytesRead = imageStream.Read(header, 0, header.Length);
-        // Reset position for later copying
-        imageStream.Position = 0;
+        if (data.Length < 4)
+            return ".bin";
 
-        if (bytesRead >= 3 && header[0] == 0xFF && header[1] == 0xD8 && header[2] == 0xFF)
-            return ".jpg"; // JPEG
-        if (bytesRead >= 8 && header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
-            return ".png"; // PNG
-        if (bytesRead >= 6 && header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46 && header[3] == 0x38)
-            return ".gif"; // GIF
-        if (bytesRead >= 2 && header[0] == 0x42 && header[1] == 0x4D)
-            return ".bmp"; // BMP
-        if (bytesRead >= 4 && ((header[0] == 0x49 && header[1] == 0x49 && header[2] == 0x2A && header[3] == 0x00) ||
-                               (header[0] == 0x4D && header[1] == 0x4D && header[2] == 0x00 && header[3] == 0x2A)))
-            return ".tiff"; // TIFF
-        // Simple SVG detection – SVG files are XML text that start with '<' and contain "<svg"
-        if (bytesRead >= 4 && header[0] == 0x3C) // '<'
-        {
-            // Read a small chunk as text to look for "<svg"
-            using (var reader = new StreamReader(imageStream, leaveOpen: true))
-            {
-                char[] buffer = new char[100];
-                int charRead = reader.ReadBlock(buffer, 0, buffer.Length);
-                string snippet = new string(buffer, 0, charRead).ToLowerInvariant();
-                imageStream.Position = 0; // reset again for copying
-                if (snippet.Contains("<svg"))
-                    return ".svg";
-            }
-        }
-        return ".bin"; // fallback
+        // JPEG: FF D8 FF E0 or FF D8 FF E1 ...
+        if (data[0] == 0xFF && data[1] == 0xD8)
+            return ".jpg";
+
+        // PNG: 89 50 4E 47
+        if (data[0] == 0x89 && data[1] == 0x50 && data[2] == 0x4E && data[3] == 0x47)
+            return ".png";
+
+        // GIF: 47 49 46 38
+        if (data[0] == 0x47 && data[1] == 0x49 && data[2] == 0x46 && data[3] == 0x38)
+            return ".gif";
+
+        // TIFF (little endian): 49 49 2A 00
+        // TIFF (big endian):    4D 4D 00 2A
+        if ((data[0] == 0x49 && data[1] == 0x49 && data[2] == 0x2A && data[3] == 0x00) ||
+            (data[0] == 0x4D && data[1] == 0x4D && data[2] == 0x00 && data[3] == 0x2A))
+            return ".tif";
+
+        // BMP: 42 4D
+        if (data[0] == 0x42 && data[1] == 0x4D)
+            return ".bmp";
+
+        // JPEG2000: 00 00 00 0C 6A 50 20 20 (or similar)
+        if (data.Length >= 8 && data[0] == 0x00 && data[1] == 0x00 && data[2] == 0x00 && data[3] == 0x0C &&
+            data[4] == 0x6A && data[5] == 0x50 && data[6] == 0x20 && data[7] == 0x20)
+            return ".jp2";
+
+        // Fallback to generic binary extension
+        return ".bin";
     }
 }

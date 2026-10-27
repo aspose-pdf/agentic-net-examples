@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -17,48 +18,39 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Extract tables from the first page (adjust as needed)
-            TableAbsorber absorber = new TableAbsorber();
-            absorber.Visit(doc.Pages[1]);
+            // Access tagged content (optional, but useful for locating the table)
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Document with Table Annotation");
 
-            // If a table is found, create a rounded‑corner rectangle annotation around it
-            if (absorber.TableList.Count > 0)
-            {
-                // Get the bounding rectangle of the first detected table
-                Aspose.Pdf.Rectangle tableRect = absorber.TableList[0].Rectangle;
+            // Find the first TableElement in the structure tree
+            StructureElement root = tagged.RootElement;
+            var tables = root.FindElements<TableElement>(true);
 
-                // Slightly enlarge the rectangle to give a margin around the table
-                const double margin = 5.0;
-                Aspose.Pdf.Rectangle annotationRect = new Aspose.Pdf.Rectangle(
-                    tableRect.LLX - margin,
-                    tableRect.LLY - margin,
-                    tableRect.URX + margin,
-                    tableRect.URY + margin);
+            // Determine rectangle coordinates around the table.
+            // In a real scenario, compute these from the table's position.
+            // Here we use fixed coordinates for demonstration.
+            double llx = 100; // lower‑left X
+            double lly = 500; // lower‑left Y
+            double urx = 400; // upper‑right X
+            double ury = 700; // upper‑right Y
 
-                // Create the square (figure) annotation
-                SquareAnnotation square = new SquareAnnotation(doc.Pages[1], annotationRect);
-                // Set visual properties
-                square.Color = Aspose.Pdf.Color.Blue;                     // border color
-                square.Border = new Border(square) { Width = 2 };          // border width
-                square.InteriorColor = Aspose.Pdf.Color.FromRgb(0.9, 0.9, 0.9); // fill color (light gray)
-                square.Title = "Table Outline";
-                square.Contents = "Rounded‑corner rectangle around the table";
+            // Create a square annotation (rectangle) around the table.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+            SquareAnnotation square = new SquareAnnotation(doc.Pages[1], rect);
+            square.Color = Aspose.Pdf.Color.LightGray;               // border color
+            square.Border = new Border(square) { Width = 2 };        // border width
+            // Rounded corners are not supported in the current API version; omitted.
+            // Use the Contents property to provide alternative text / description.
+            square.Contents = "Figure: Table with rounded rectangle border";
+            // Optionally set a title for the annotation.
+            square.Title = "Table Figure";
 
-                // Note: Aspose.Pdf does not provide a direct property for rounded corners.
-                // The SquareAnnotation will appear as a regular rectangle.
-                // If rounded corners are required, a custom appearance stream must be created,
-                // which is beyond the scope of this simple example.
-
-                // Add the annotation to the page
-                doc.Pages[1].Annotations.Add(square);
-            }
-            else
-            {
-                Console.WriteLine("No tables detected on the first page.");
-            }
+            // Add the annotation to the first page
+            doc.Pages[1].Annotations.Add(square);
 
             // Save the modified PDF
             doc.Save(outputPath);

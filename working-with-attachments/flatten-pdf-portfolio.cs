@@ -6,25 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "portfolio.pdf";   // PDF Portfolio input
-        const string outputPath = "flattened.pdf";   // Standard PDF output
+        const string inputPath  = "portfolio.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF Portfolio, then flatten it to remove interactive collection features
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Flatten removes form fields and interactive elements; for a portfolio this also strips the collection UI
-            doc.Flatten();
+            // Load the PDF portfolio
+            using (Document doc = new Document(inputPath))
+            {
+                // Remove the collection (portfolio) if it exists
+                if (doc.Collection != null)
+                {
+                    doc.Collection = null;
+                }
 
-            // Save as a regular PDF
-            doc.Save(outputPath);
+                // Flatten interactive elements (forms, annotations, etc.)
+                doc.Flatten();
+
+                // Save as a regular PDF (no portfolio)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Portfolio flattened and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Portfolio flattened and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

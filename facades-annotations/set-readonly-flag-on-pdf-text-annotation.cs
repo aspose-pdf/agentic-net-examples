@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
@@ -8,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,34 +18,42 @@ class Program
             return;
         }
 
-        // Load the PDF document to obtain a Page object (required for TextAnnotation ctor)
-        Document doc = new Document(inputPath);
-        Page page = doc.Pages[1];
+        // Load the PDF to access its annotations
+        Document pdfDoc = new Document(inputPath);
+        if (pdfDoc.Pages.Count == 0)
+        {
+            Console.WriteLine("Document contains no pages.");
+            File.Copy(inputPath, outputPath, true);
+            return;
+        }
 
-        // Initialize the annotation editor facade
+        // For this example we work with the first page; adjust as needed
+        Page page = pdfDoc.Pages[1];
+        Annotation[] pageAnnotations = page.Annotations.ToArray();
+
+        if (pageAnnotations == null || pageAnnotations.Length == 0)
+        {
+            Console.WriteLine("No annotations found in the document.");
+            File.Copy(inputPath, outputPath, true);
+            return;
+        }
+
+        // Select the annotation you want to modify (first one here)
+        Annotation targetAnnotation = pageAnnotations[0];
+
+        // Apply the ReadOnly flag
+        targetAnnotation.Flags = AnnotationFlags.ReadOnly;
+
+        // Write the modified annotation back using PdfAnnotationEditor
         using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the same PDF file to the editor
             editor.BindPdf(inputPath);
-
-            // Create an annotation with the ReadOnly flag using the (Page, Rectangle) constructor
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-            TextAnnotation annot = new TextAnnotation(page, rect)
-            {
-                Flags    = AnnotationFlags.ReadOnly, // Apply read‑only flag before ModifyAnnotations
-                Title    = "ReadOnly",
-                Contents = "This annotation is read‑only",
-                Color    = Aspose.Pdf.Color.Yellow,
-                Open     = true
-            };
-
-            // Modify annotations on the desired page range (here page 1 only)
-            editor.ModifyAnnotations(1, 1, annot);
-
-            // Save the modified PDF
+            // PdfAnnotationEditor.ModifyAnnotations expects (pageNumber, annotationIndex, annotation)
+            // page numbers are 1‑based, annotation indexes are 0‑based
+            editor.ModifyAnnotations(1, 0, targetAnnotation);
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Read‑only flag applied and saved to '{outputPath}'.");
     }
 }

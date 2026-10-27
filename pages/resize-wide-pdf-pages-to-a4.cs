@@ -15,25 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdf = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= pdf.Pages.Count; i++)
             {
-                Page page = doc.Pages[i];
-                double pageWidth = page.PageInfo.Width;
+                Page page = pdf.Pages[i];
 
-                // Resize only pages wider than 600 points to A4 size
-                if (pageWidth > 600)
+                // If the page width exceeds 600 points, resize it to A4 (595 x 842 points)
+                if (page.PageInfo.Width > 600)
                 {
-                    // Set page size to A4 (width and height in points)
-                    page.SetPageSize(Aspose.Pdf.PageSize.A4.Width, Aspose.Pdf.PageSize.A4.Height);
+                    page.PageInfo.Width = 595; // A4 width in points
+                    page.PageInfo.Height = 842; // A4 height in points
                 }
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified document (PDF format)
+            pdf.Save(outputPath);
         }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");

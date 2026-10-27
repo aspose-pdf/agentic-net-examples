@@ -1,33 +1,12 @@
-using System;
-using System.IO;
-using System.Text;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Extract xmp metadata from pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/facades-xmp-metadata/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string pdfPath = "input.pdf";
-        const string outputXmlPath = "xmp_metadata.xml";
-
-        if (!File.Exists(pdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
-
-        // Bind the PDF to the XMP metadata facade and retrieve the raw XML bytes
-        using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-        {
-            xmp.BindPdf(pdfPath);
-            byte[] data = xmp.GetXmpMetadata(); // returns XML as byte[]
-
-            // Convert the byte array to a UTF‑8 string
-            string xml = Encoding.UTF8.GetString(data);
-
-            // Save the XML string to a file (optional)
-            File.WriteAllText(outputXmlPath, xml, Encoding.UTF8);
-            Console.WriteLine($"XMP metadata saved to '{outputXmlPath}'.");
-        }
-    }
-}
+class Program { static void Main() { } }

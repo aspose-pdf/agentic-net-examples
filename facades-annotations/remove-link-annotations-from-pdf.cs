@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_links.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,22 +16,27 @@ class Program
             return;
         }
 
-        // Use PdfAnnotationEditor (facade) to work with annotations.
-        // The facade implements IDisposable, so wrap it in a using block.
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF with the Document class (PdfFileEditor does not expose DeleteAnnotations).
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Load the PDF document.
-            editor.BindPdf(inputPath);
+            // Ensure the requested range is within the document page count.
+            int startPage = Math.Max(3, 1);
+            int endPage   = Math.Min(7, pdfDoc.Pages.Count);
 
-            // Delete all link annotations in the document.
-            // The DeleteAnnotations(string) overload removes annotations of the specified type.
-            // According to the task, we target "Link" annotations.
-            editor.DeleteAnnotations("Link");
+            for (int pageNum = startPage; pageNum <= endPage; pageNum++)
+            {
+                // Manual removal of Link annotations because AnnotationCollection.DeleteAll(string) is not available.
+                var annots = pdfDoc.Pages[pageNum].Annotations;
+                for (int i = annots.Count; i >= 1; i--)
+                {
+                    if (annots[i] is LinkAnnotation)
+                        annots.Delete(i);
+                }
+            }
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Link annotations removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Link annotations removed from pages 3-7. Saved to '{outputPath}'.");
     }
 }

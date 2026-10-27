@@ -7,30 +7,29 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "edited_output.pdf";
+        const string outputPath = "edited.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the PdfPageEditor facade and bind the PDF file for editing
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
-        {
-            pageEditor.BindPdf(inputPath);
+        // PdfPageEditor does NOT implement IDisposable, so no using block is needed
+        PdfPageEditor pageEditor = new PdfPageEditor();
 
-            // Example edit: rotate the first page 90 degrees
-            pageEditor.Rotation = 90;               // rotation must be 0, 90, 180 or 270
-            pageEditor.ProcessPages = new int[] {1}; // apply only to page 1 (optional)
+        // Load (bind) the PDF file for editing
+        pageEditor.BindPdf(inputPath);
 
-            // Apply the pending changes
-            pageEditor.ApplyChanges();
+        // Prepare the editor to work on the first page (1‑based index)
+        pageEditor.ProcessPages = new int[] { 1 };
+        // Rotation is specified in degrees: 0, 90, 180, 270
+        pageEditor.Rotation = 90; // rotate first page 90° clockwise
 
-            // Save the edited document
-            pageEditor.Save(outputPath);
-        }
+        // Save the edited PDF to a new file
+        pageEditor.Save(outputPath);
 
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF loaded and edited successfully. Saved to '{outputPath}'.");
     }
 }

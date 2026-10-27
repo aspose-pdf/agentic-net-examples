@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa4.pdf";
+        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -15,32 +16,26 @@ class Program
             return;
         }
 
+        // Enable auto‑tagging globally before conversion
+        AutoTaggingSettings.Default.EnableAutoTagging = true;
+
         try
         {
+            // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Set up conversion options for PDF/A‑4
-                PdfFormatConversionOptions options = new PdfFormatConversionOptions(PdfFormat.PDF_A_4);
-
-                // Enable auto‑tagging using the default settings
-                options.AutoTaggingSettings = AutoTaggingSettings.Default;
-                options.AutoTaggingSettings.EnableAutoTagging = true;
-
-                // Perform the conversion
-                bool converted = doc.Convert(options);
-                if (!converted)
-                {
-                    Console.Error.WriteLine("Conversion reported failure.");
-                }
+                // Convert to PDF/A‑4, delete any conversion errors, and write a log
+                doc.Convert(logPath, PdfFormat.PDF_A_4, ConvertErrorAction.Delete);
 
                 // Save the converted PDF/A‑4 document
                 doc.Save(outputPath);
-                Console.WriteLine($"PDF/A‑4 saved to '{outputPath}'.");
             }
+
+            Console.WriteLine($"PDF successfully converted to PDF/A‑4 with auto‑tagging: {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

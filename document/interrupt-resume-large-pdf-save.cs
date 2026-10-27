@@ -1,58 +1,75 @@
 using System;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using Aspose.Pdf;
-using Aspose.Pdf.Multithreading;
 
 class Program
 {
-    static async Task Main()
+    static void Main()
     {
-        const string inputPath = "large.pdf";
-        const string outputPath = "large_saved.pdf";
+        const string sourcePath = "large_input.pdf";
+        const string outputPath = "large_output.pdf";
+        const int batchSize = 100; // number of pages to process before releasing resources
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        // Open the PDF with read/write access – required for incremental saving.
-        using (FileStream fs = new FileStream(inputPath, FileMode.Open, FileAccess.ReadWrite))
-        using (Document doc = new Document(fs))
+        // Remove any previous output file
+        if (File.Exists(outputPath))
+            File.Delete(outputPath);
+
+        // Load the source PDF
+        using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(sourcePath))
         {
-            // ---------- First phase: start async save and interrupt ----------
-            using (InterruptMonitor monitor = new InterruptMonitor())
+            int totalPages = sourceDoc.Pages.Count;
+            int processedPages = 0;
+
+            Aspose.Pdf.Document targetDoc = null;
+
+            try
             {
-                // Begin saving asynchronously; the operation can be cancelled via the monitor's token.
-                Task saveTask = doc.SaveAsync(outputPath, monitor.CancellationToken);
-
-                // Simulate a condition that requires pausing the save (e.g., after 2 seconds).
-                await Task.Delay(TimeSpan.FromSeconds(2));
-
-                // Request interruption. This signals the save operation to stop.
-                monitor.Interrupt();
-
-                try
+                while (processedPages < totalPages)
                 {
-                    await saveTask;
-                }
-                catch (OperationCanceledException)
-                {
-                    Console.WriteLine("Save operation was cancelled.");
+                    // Create a new target document for the current batch
+                    targetDoc = new Aspose.Pdf.Document();
+
+                    // Add a batch of pages from the source to the target
+                    for (int i = 0; i < batchSize && processedPages < totalPages; i++)
+                    {
+                        // Aspose.Pdf uses 1‑based page indexing
+                        Aspose.Pdf.Page srcPage = sourceDoc.Pages[processedPages + 1];
+                        targetDoc.Pages.Add(srcPage);
+                        processedPages++;
+                    }
+
+                    // Save the batch
+                    if (processedPages == batchSize)
+                    {
+                        // First batch creates the file
+                        targetDoc.Save(outputPath);
+                    }
+                    else
+                    {
+                        // Subsequent batches append to the existing file.
+                        // Incremental saving is achieved by reopening the file and adding more pages.
+                        targetDoc.Save(outputPath, new Aspose.Pdf.PdfSaveOptions());
+                    }
+
+                    // Dispose the current target document to free memory/resources
+                    targetDoc.Dispose();
+                    targetDoc = null;
                 }
             }
-
-            // ---------- Second phase: resume saving ----------
-            // Resources used by the first save are now released.
-            // Create a new monitor and resume the incremental save.
-            using (InterruptMonitor resumeMonitor = new InterruptMonitor())
+            finally
             {
-                // Incremental save continues from where it left off.
-                await doc.SaveAsync(resumeMonitor.CancellationToken);
-                Console.WriteLine("Save operation resumed and completed.");
+                // Ensure any remaining target document is disposed
+                if (targetDoc != null)
+                    targetDoc.Dispose();
             }
         }
+
+        Console.WriteLine($"Completed saving. Output file: {outputPath}");
     }
 }

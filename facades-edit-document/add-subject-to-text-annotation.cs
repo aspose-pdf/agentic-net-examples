@@ -1,6 +1,6 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
@@ -8,45 +8,41 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "annotated_output.pdf";
 
-        // ---------------------------------------------------------------------
-        // Ensure the source PDF exists – create a minimal placeholder if it does not.
-        // ---------------------------------------------------------------------
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(inputPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add(); // add a single blank page
-                placeholder.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document to obtain a Page reference (Aspose.Pdf uses the Document class)
-        Document pdfDoc = new Document(inputPath);
-        Page referencePage = pdfDoc.Pages[1];
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 200, 720);
-
-        // Create a TextAnnotation and set its Subject for easy searching/categorization
-        TextAnnotation newAnnot = new TextAnnotation(referencePage, rect)
+        try
         {
-            Subject  = "ReviewNote",                     // Subject used for searching/categorization
-            Title    = "Reviewer",                       // Optional: author name
-            Contents = "Please review this section.",    // Optional: visible comment text
-            Color    = Aspose.Pdf.Color.Yellow,           // Optional: annotation colour
-            Open     = true                               // Optional: display the annotation open by default
-        };
+            // Load the PDF document
+            Document pdf = new Document(inputPath);
 
-        // Initialize the annotation editor facade and bind the source PDF
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            // Define the rectangle that bounds the annotation (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle annRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create a TextAnnotation (a markup annotation) on the first page
+            TextAnnotation textAnn = new TextAnnotation(pdf.Pages[1], annRect)
+            {
+                Title = "Sample Title",          // Title of the annotation
+                Subject = "Sample Subject",      // Subject property for categorization
+                Contents = "This is the annotation contents." // Popup text
+            };
+
+            // Add the annotation to the page's annotation collection
+            pdf.Pages[1].Annotations.Add(textAnn);
+
+            // Save the modified PDF
+            pdf.Save(outputPath);
+
+            Console.WriteLine($"Annotation added. Output saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
         {
-            editor.BindPdf(inputPath);
-
-            // Apply the annotation to the desired page range (here: all pages)
-            editor.ModifyAnnotations(1, editor.Document.Pages.Count, newAnnot);
-
-            // Save the updated PDF
-            editor.Save(outputPath);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

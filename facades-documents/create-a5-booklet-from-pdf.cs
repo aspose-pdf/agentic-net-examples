@@ -7,32 +7,26 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "source.pdf";
         const string outputPath = "booklet_A5.pdf";
 
-        // Verify that the source PDF exists.
+        // Verify source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // PdfFileEditor does not implement IDisposable, so no using block is required.
-            PdfFileEditor editor = new PdfFileEditor();
+        // PdfFileEditor does NOT implement IDisposable, so no using block is needed
+        PdfFileEditor editor = new PdfFileEditor();
 
-            // Create a booklet with A5 page size using the appropriate overload.
-            bool result = editor.MakeBooklet(inputPath, outputPath, PageSize.A5);
+        // Use the MakeBooklet overload that accepts a source path, destination path, and a PageSize enum.
+        // This method returns a bool indicating success.
+        bool result = editor.MakeBooklet(inputPath, outputPath, PageSize.A5);
 
-            if (result)
-                Console.WriteLine($"Booklet created successfully: {outputPath}");
-            else
-                Console.Error.WriteLine("Failed to create booklet.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        if (result)
+            Console.WriteLine($"Booklet created successfully at '{outputPath}' with A5 page size.");
+        else
+            Console.Error.WriteLine("Failed to create booklet.");
     }
 }

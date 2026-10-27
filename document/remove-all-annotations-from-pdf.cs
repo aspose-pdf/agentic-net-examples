@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_clean.pdf";
+        const string outputPath = "clean_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +15,19 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Iterate over all pages and clear their annotation collections
+            foreach (Page page in doc.Pages)
             {
-                // Pages are 1‑based; iterate through each page
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    // Delete all annotations on the current page
-                    doc.Pages[i].Annotations.Delete();
-                }
-
-                // Save the cleaned PDF (no SaveOptions needed for PDF output)
-                doc.Save(outputPath);
+                page.Annotations.Clear();
             }
 
-            Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
+            // Save the cleaned PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Annotations removed. Clean PDF saved to '{outputPath}'.");
     }
 }

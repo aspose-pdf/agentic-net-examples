@@ -1,49 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;                     // All SaveOptions are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPdfPath  = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
+            // Configure HTML conversion options:
+            // - Embed all resources into a single HTML file
+            // - Render all raster images (including background images) as PNGs embedded into SVG
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
             {
-                // Initialize HTML save options
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions();
+                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+            };
 
-                // Render all background images as a single PNG per page
-                // This uses the AsEmbeddedPartsOfPngPageBackground mode (value 2)
-                htmlOpts.RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsEmbeddedPartsOfPngPageBackground;
-
-                // Optional: embed all resources (CSS, images, fonts) into the HTML file
-                // htmlOpts.PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml;
-
-                // Save the PDF as HTML using the configured options
-                pdfDoc.Save(outputHtml, htmlOpts);
+            // HTML conversion requires GDI+ (Windows only). Wrap in try‑catch to handle other platforms.
+            try
+            {
+                pdfDoc.Save(outputHtmlPath, htmlOpts);
+                Console.WriteLine($"HTML saved to '{outputHtmlPath}'.");
             }
-
-            Console.WriteLine($"PDF successfully converted to HTML with PNG page backgrounds: {outputHtml}");
-        }
-        // HTML conversion relies on GDI+ and is Windows‑only; handle the platform limitation gracefully
-        catch (TypeInitializationException)
-        {
-            Console.WriteLine("HTML conversion requires Windows GDI+. Skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            catch (TypeInitializationException)
+            {
+                Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+            }
+            catch (DllNotFoundException)
+            {
+                Console.WriteLine("GDI+ library not found. HTML conversion is unavailable on this platform.");
+            }
         }
     }
 }

@@ -1,131 +1,77 @@
 using System;
-using System.Reflection;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public static class PdfPageEditorHelper
+public static class PdfTransformer
 {
-    /// <summary>
-    /// Applies rotation, page size, and zoom to a PDF file and saves the result.
-    /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the edited PDF will be saved.</param>
-    /// <param name="rotationDegrees">
-    /// Rotation angle in degrees. Valid values are 0, 90, 180, or 270.
-    /// </param>
-    /// <param name="pageSize">
-    /// Desired page size (e.g., PageSize.A4, PageSize.Letter). Use Aspose.Pdf.PageSize.
-    /// </param>
-    /// <param name="zoomFactor">
-    /// Zoom coefficient where 1.0 = 100%. Values greater than 1 enlarge, less than 1 shrink.
-    /// </param>
-    public static void ApplyPageEdits(
-        string inputPdfPath,
-        string outputPdfPath,
-        int rotationDegrees,
-        PageSize pageSize,
-        double zoomFactor)
+    // Applies rotation, custom page size, and zoom (scale) to all pages of a PDF.
+    // inputPath   : path to the source PDF.
+    // outputPath  : path where the transformed PDF will be saved.
+    // rotation    : rotation angle (None, on90, on180, on270).
+    // width, height: new page dimensions in points (1 point = 1/72 inch). Use 0 to keep original size.
+    // zoom        : scaling factor applied uniformly to page content (e.g., 1.0 = 100%).
+    public static void Transform(string inputPath, string outputPath,
+                                 Rotation rotation,
+                                 double width, double height,
+                                 double zoom)
     {
-        // Validate input arguments (optional but helpful)
-        if (string.IsNullOrWhiteSpace(inputPdfPath))
-            throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
-        if (string.IsNullOrWhiteSpace(outputPdfPath))
-            throw new ArgumentException("Output PDF path must be provided.", nameof(outputPdfPath));
-        if (rotationDegrees != 0 && rotationDegrees != 90 && rotationDegrees != 180 && rotationDegrees != 270)
-            throw new ArgumentException("Rotation must be 0, 90, 180, or 270 degrees.", nameof(rotationDegrees));
-        if (zoomFactor <= 0)
-            throw new ArgumentException("Zoom factor must be greater than zero.", nameof(zoomFactor));
+        if (string.IsNullOrEmpty(inputPath))
+            throw new ArgumentException("Input path is required.", nameof(inputPath));
+        if (string.IsNullOrEmpty(outputPath))
+            throw new ArgumentException("Output path is required.", nameof(outputPath));
+        if (zoom <= 0)
+            throw new ArgumentOutOfRangeException(nameof(zoom), "Zoom must be greater than zero.");
 
-        // Use PdfPageEditor facade to edit the document.
-        // The facade implements IDisposable, so wrap it in a using block for deterministic disposal.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the document – this gives us access to per‑page properties such as rotation and size.
+        Document doc = new Document(inputPath);
+        int pageCount = doc.Pages.Count;
+
+        // Apply rotation and custom size directly on the Document pages.
+        for (int i = 1; i <= pageCount; i++)
         {
-            // Bind the source PDF file.
-            editor.BindPdf(inputPdfPath);
+            // Rotation (use Aspose.Pdf.Rotation enum). Skip if Rotation.None.
+            if (rotation != Rotation.None)
+                doc.Pages[i].Rotate = rotation;
 
-            // Set desired rotation (must be 0, 90, 180, or 270).
-            editor.Rotation = rotationDegrees;
-
-            // Set the output page size.
-            editor.PageSize = pageSize;
-
-            // Set zoom factor (property expects a float).
-            editor.Zoom = (float)zoomFactor;
-
-            // Apply all configured changes to the document.
-            editor.ApplyChanges();
-
-            // Save the edited PDF to the specified output path.
-            editor.Save(outputPdfPath);
+            // Custom page size – only when both dimensions are positive.
+            if (width > 0 && height > 0)
+            {
+                doc.Pages[i].PageInfo.Width = width;
+                doc.Pages[i].PageInfo.Height = height;
+            }
         }
+
+        // If zoom is the default (1.0) we can simply save the modified document.
+        if (Math.Abs(zoom - 1.0) < 0.0001)
+        {
+            doc.Save(outputPath);
+            return;
+        }
+
+        // For zoom we need PdfPageEditor. Bind the *already‑modified* document via its file path.
+        // PdfPageEditor works on the file, so we first save the intermediate result to a temp file.
+        string tempPath = System.IO.Path.GetTempFileName();
+        doc.Save(tempPath);
+
+        var editor = new PdfPageEditor();
+        editor.BindPdf(tempPath);
+        // Apply zoom to all pages.
+        editor.ProcessPages = Enumerable.Range(1, pageCount).ToArray();
+        editor.Zoom = (float)zoom;
+        editor.Save(outputPath);
+
+        // Clean up the temporary file.
+        try { System.IO.File.Delete(tempPath); } catch { /* ignore */ }
     }
 }
 
+// Minimal entry point required for a console‑type project.
 public class Program
 {
-    /// <summary>
-    /// Entry point required for a console‑application build. Demonstrates a simple call to the helper.
-    /// </summary>
     public static void Main(string[] args)
     {
-        // Expected arguments: inputPath outputPath rotation pageSize zoomFactor
-        // Example: "input.pdf" "output.pdf" 90 "A4" 1.25
-        if (args.Length < 5)
-        {
-            Console.WriteLine("Usage: <inputPdf> <outputPdf> <rotation> <pageSize> <zoomFactor>");
-            return;
-        }
-
-        string inputPath = args[0];
-        string outputPath = args[1];
-        if (!int.TryParse(args[2], out int rotation))
-        {
-            Console.WriteLine("Invalid rotation value.");
-            return;
-        }
-
-        // PageSize in Aspose.Pdf is a class with static properties (A4, Letter, etc.), not an enum.
-        // Therefore we cannot use Enum.TryParse. Instead we resolve the property via reflection.
-        PageSize size = ParsePageSize(args[3]);
-        if (size == null)
-        {
-            Console.WriteLine($"Invalid page size '{args[3]}'. Falling back to A4.");
-            size = PageSize.A4;
-        }
-
-        if (!double.TryParse(args[4], out double zoom))
-        {
-            Console.WriteLine("Invalid zoom factor.");
-            return;
-        }
-
-        try
-        {
-            PdfPageEditorHelper.ApplyPageEdits(inputPath, outputPath, rotation, size, zoom);
-            Console.WriteLine($"PDF edited successfully and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Parses a string into an Aspose.Pdf.PageSize instance.
-    /// The method looks for a public static property on the PageSize class that matches the name (case‑insensitive).
-    /// Returns null if no matching property is found.
-    /// </summary>
-    private static PageSize ParsePageSize(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-            return null;
-
-        // Aspose.Pdf.PageSize defines static properties like A4, Letter, Legal, etc.
-        var prop = typeof(PageSize).GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.IgnoreCase);
-        if (prop != null && typeof(PageSize).IsAssignableFrom(prop.PropertyType))
-        {
-            return (PageSize)prop.GetValue(null);
-        }
-        return null;
+        // Example usage (can be removed or replaced by real arguments).
+        // PdfTransformer.Transform("input.pdf", "output.pdf", Rotation.on90, 595, 842, 1.2);
     }
 }

@@ -6,44 +6,45 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the result PDF
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Paths for the source PDF and the result PDF
+        const string sourcePdf = "source.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // Prompt the user for the desired page width and height (in points)
+        // Prompt user for custom page dimensions (points; 1 inch = 72 points)
         Console.Write("Enter page width (points): ");
         if (!double.TryParse(Console.ReadLine(), out double width) || width <= 0)
         {
-            Console.Error.WriteLine("Invalid width value.");
+            Console.Error.WriteLine("Invalid width.");
             return;
         }
 
         Console.Write("Enter page height (points): ");
         if (!double.TryParse(Console.ReadLine(), out double height) || height <= 0)
         {
-            Console.Error.WriteLine("Invalid height value.");
+            Console.Error.WriteLine("Invalid height.");
             return;
         }
 
-        // Load the existing PDF, insert an empty page, set its size, and save
-        using (Document doc = new Document(inputPath))
+        // Open the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(sourcePdf))
         {
             // Add a new empty page at the end of the document
             Page newPage = doc.Pages.Add();
 
-            // Apply the custom size supplied by the user
-            newPage.SetPageSize(width, height);
+            // Set the custom size for the new page
+            newPage.PageInfo.Width = width;
+            newPage.PageInfo.Height = height;
 
             // Save the modified document
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Empty page inserted with size {width}x{height} points. Saved to '{outputPath}'.");
+        Console.WriteLine($"Empty page of size {width}x{height} points added. Saved to '{outputPdf}'.");
     }
 }

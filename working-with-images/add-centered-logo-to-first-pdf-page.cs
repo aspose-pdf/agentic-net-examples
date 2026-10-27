@@ -1,53 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string logoImage = "logo.png";           // company logo file
-        const string outputPdf = "output.pdf";         // result PDF
+        const string inputPdfPath  = "input.pdf";
+        const string logoImagePath = "logo.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(logoImage))
+        if (!File.Exists(logoImagePath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImage}");
+            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: create & load)
-        using (Document doc = new Document(inputPdf))
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             Page firstPage = doc.Pages[1];
 
             // Create an ImageStamp for the logo
-            ImageStamp logoStamp = new ImageStamp(logoImage)
+            ImageStamp logoStamp = new ImageStamp(logoImagePath)
             {
-                // Place the stamp behind the page content (false = foreground)
-                Background = false,
-                // Fully opaque
-                Opacity = 1.0f,
-                // Center the stamp horizontally and vertically
+                // Center the stamp on the page
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center
+                // The stamp keeps the original image size; adjust Width/Height if scaling is required
             };
 
-            // Add the stamp to the first page only
+            // Add the stamp only to the first page
             firstPage.AddStamp(logoStamp);
 
-            // Save the modified PDF (lifecycle: save)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Logo added to first page and saved as '{outputPdf}'.");
+        Console.WriteLine($"Logo added to first page and saved as '{outputPdfPath}'.");
     }
 }

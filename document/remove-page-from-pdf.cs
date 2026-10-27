@@ -6,34 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF
-        const string outputPath = "output.pdf";  // result PDF
-        const int pageToDelete  = 3;             // page number to remove (1‑based)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const int    pageToRemove = 3; // 1‑based page number to delete
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the requested page number is within the document range
-            if (pageToDelete < 1 || pageToDelete > doc.Pages.Count)
+            // Validate the requested page number
+            if (pageToRemove < 1 || pageToRemove > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Invalid page number {pageToDelete}. Document contains {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Invalid page number {pageToRemove}. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
-            // Delete the specified page; Aspose.Pdf automatically renumbers the remaining pages
-            doc.Pages.Delete(pageToDelete);
+            // Remove the specified page; remaining pages are automatically renumbered
+            doc.Pages.Delete(pageToRemove);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page {pageToDelete} removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Page {pageToRemove} removed. Result saved to '{outputPath}'.");
     }
 }

@@ -1,47 +1,59 @@
 using System;
 using System.IO;
-using System.Text;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfExtractor (facade) inside a using block for deterministic disposal
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Optional: load a license to avoid evaluation limitations.
+        try
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
+            // var license = new Aspose.Pdf.License();
+            // license.SetLicense("Aspose.Pdf.lic");
+        }
+        catch (Exception licEx)
+        {
+            Console.Error.WriteLine($"License loading failed: {licEx.Message}");
+            // Continue in evaluation mode.
+        }
 
-            // Extract all text using Unicode encoding (default)
-            extractor.ExtractText();
-
-            // Capture the extracted text into a memory stream
-            using (MemoryStream ms = new MemoryStream())
+        // StringWriter will hold the extracted text for logging integration
+        using (var stringWriter = new StringWriter())
+        {
+            // Load the PDF document; using ensures deterministic disposal
+            using (var doc = new Document(inputPath))
             {
-                // Save extracted text to the stream
-                extractor.GetText(ms);
-
-                // Convert the stream bytes to a string (Unicode)
-                string extractedText = Encoding.Unicode.GetString(ms.ToArray());
-
-                // Write the text to a StringWriter (useful for logging frameworks)
-                using (StringWriter stringWriter = new StringWriter())
+                try
                 {
-                    stringWriter.Write(extractedText);
+                    // Extract all text from the document using TextAbsorber (recommended API)
+                    var absorber = new TextAbsorber();
+                    doc.Pages.Accept(absorber);
 
-                    // Example: output the captured text (replace with actual logging)
-                    Console.WriteLine(stringWriter.ToString());
+                    // Write the extracted text into the StringWriter
+                    stringWriter.Write(absorber.Text);
+                }
+                catch (Exception ex)
+                {
+                    // This catch specifically handles errors that may occur during extraction.
+                    Console.Error.WriteLine($"Error during text extraction: {ex.Message}");
+                    Console.Error.WriteLine("Make sure the Aspose.Pdf NuGet package is referenced and that all native files are present in the output directory.");
+                    return;
                 }
             }
+
+            // The StringWriter now contains the PDF text; it can be passed to any logging framework
+            Console.WriteLine("Extracted text:");
+            Console.WriteLine(stringWriter.ToString());
         }
     }
 }

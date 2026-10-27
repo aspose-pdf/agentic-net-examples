@@ -6,60 +6,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";      // Source PDF
-        const string coverImagePath = "cover.jpg";      // Cover image file
-        const string outputEpubPath = "output.epub";    // Destination EPUB
+        const string inputPdf = "input.pdf";
+        const string outputEpub = "output.epub";
+        const string coverImagePath = "cover.jpg";
 
-        // Verify input files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(coverImagePath))
         {
-            Console.Error.WriteLine($"Error: Cover image not found – {coverImagePath}");
+            Console.Error.WriteLine($"Cover image not found: {coverImagePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // -----------------------------------------------------------------
-            // Set PDF metadata – this information is carried over to the EPUB
-            // -----------------------------------------------------------------
-            pdfDoc.Info.Title  = "My EPUB Title";
-            pdfDoc.Info.Author = "Author Name";
-
-            // ---------------------------------------------------------------
-            // Insert a new page at the beginning to act as the cover page
-            // ---------------------------------------------------------------
-            Page coverPage = pdfDoc.Pages.Insert(1);
-
-            // Add the cover image so that it fills the entire page
-            using (FileStream imgStream = File.OpenRead(coverImagePath))
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                double pageWidth  = coverPage.PageInfo.Width;
-                double pageHeight = coverPage.PageInfo.Height;
+                // Optional: set PDF metadata (these values are also used by the EPUB output)
+                doc.Info.Title = "My EPUB Title";
+                doc.Info.Author = "John Doe";
+                doc.Info.Subject = "Converted from PDF";
+                doc.Info.Keywords = "PDF,EPUB,Conversion";
 
-                // Rectangle uses coordinates: llx, lly, urx, ury
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, pageWidth, pageHeight);
-                coverPage.AddImage(imgStream, rect);
+                // Insert a cover page as the first page of the document
+                doc.Pages.Insert(1);
+                Image cover = new Image { File = coverImagePath };
+                doc.Pages[1].Paragraphs.Add(cover);
+
+                // Configure EPUB save options (Author and CoverImage are not properties of EpubSaveOptions)
+                EpubSaveOptions epubOpts = new EpubSaveOptions
+                {
+                    Title = "My EPUB Title",
+                    ContentRecognitionMode = EpubSaveOptions.RecognitionMode.Flow
+                };
+
+                // Save the document as EPUB using the explicit options
+                doc.Save(outputEpub, epubOpts);
             }
 
-            // ---------------------------------------------------------------
-            // Configure EPUB save options (title and content recognition mode)
-            // ---------------------------------------------------------------
-            EpubSaveOptions epubOptions = new EpubSaveOptions
-            {
-                Title = "My EPUB Title",
-                ContentRecognitionMode = EpubSaveOptions.RecognitionMode.Flow
-            };
-
-            // Save the document as EPUB using the explicit save options
-            pdfDoc.Save(outputEpubPath, epubOptions);
+            Console.WriteLine($"PDF successfully converted to EPUB: {outputEpub}");
         }
-
-        Console.WriteLine($"EPUB file created successfully at '{outputEpubPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

@@ -7,42 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Paths for input XML and output thumbnail image
-        const string xmlPath = "input.xml";
-        const string thumbnailPath = "thumbnail.png";
+        const string pdfPath = "input.pdf";
+        const string thumbnailPath = "thumb.png";
 
-        // Verify input file exists
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the XML file and convert it to a PDF document
-        // XmlLoadOptions is required for XML → PDF conversion
-        using (Document pdfDoc = new Document(xmlPath, new XmlLoadOptions()))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Ensure the document has at least one page
+            // Verify that the document contains at least one page
             if (pdfDoc.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The generated PDF has no pages.");
+                Console.Error.WriteLine("The PDF does not contain any pages.");
                 return;
             }
 
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page firstPage = pdfDoc.Pages[1];
+            // Define the resolution (DPI) for the thumbnail image
+            Resolution resolution = new Resolution(150); // 150 DPI gives a reasonable thumbnail size
 
-            // ThumbnailDevice does NOT implement IDisposable, so instantiate without a using block
-            ThumbnailDevice thumbDevice = new ThumbnailDevice();
+            // Create a PNG device. Width and height set to 0 keep the original page dimensions.
+            PngDevice pngDevice = new PngDevice(0, 0, resolution);
 
-            // Save the thumbnail image to a file stream (stream is disposable)
-            using (FileStream outStream = new FileStream(thumbnailPath, FileMode.Create, FileAccess.Write))
+            // Render the first page to a memory stream
+            using (MemoryStream imageStream = new MemoryStream())
             {
-                // Convert the page to a PNG thumbnail and write it to the stream
-                thumbDevice.Process(firstPage, outStream);
-            }
-        }
+                // Process the first page (pages are 1‑based)
+                pngDevice.Process(pdfDoc.Pages[1], imageStream);
 
-        Console.WriteLine($"Thumbnail image saved to '{thumbnailPath}'.");
+                // Save the resulting PNG bytes to a file
+                File.WriteAllBytes(thumbnailPath, imageStream.ToArray());
+            }
+
+            Console.WriteLine($"Thumbnail image saved to '{thumbnailPath}'.");
+        }
     }
 }

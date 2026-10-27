@@ -1,68 +1,71 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf; // Core Aspose.Pdf namespace (Document, Page, ImageStamp, etc.)
 
-class BatchAddLogo
+class Program
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where the processed PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where processed PDFs will be written
+        const string outputFolder = "OutputPdfs";
         // Path to the company logo PNG
-        const string logoPath = @"C:\Assets\company_logo.png";
+        const string logoPath = "logo.png";
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
+        if (!Directory.Exists(inputFolder))
         {
-            // Bind the PDF, add the logo, and save the result
-            using (PdfFileMend mend = new PdfFileMend())
-            {
-                // Load the PDF into the facade
-                mend.BindPdf(pdfFile);
-
-                // Determine the pages to which the logo will be added (all pages)
-                int pageCount = mend.Document.Pages.Count; // 1‑based indexing
-                int[] allPages = Enumerable.Range(1, pageCount).ToArray();
-
-                // Retrieve page dimensions from the first page (assumes uniform size)
-                Page firstPage = mend.Document.Pages[1];
-                float pageWidth  = (float)firstPage.PageInfo.Width;   // explicit cast from double to float
-                float pageHeight = (float)firstPage.PageInfo.Height;  // explicit cast from double to float
-
-                // Desired logo size (adjust as needed)
-                const float logoWidth  = 100f; // points
-                const float logoHeight = 50f;  // points
-
-                // Position the logo at the top‑right corner with a 10‑point margin
-                float lowerLeftX  = pageWidth  - logoWidth  - 10f;
-                float lowerLeftY  = pageHeight - logoHeight - 10f;
-                float upperRightX = lowerLeftX + logoWidth;
-                float upperRightY = lowerLeftY + logoHeight;
-
-                // Add the logo image to all pages
-                using (FileStream imgStream = File.OpenRead(logoPath))
-                {
-                    mend.AddImage(imgStream, allPages,
-                                  lowerLeftX, lowerLeftY,
-                                  upperRightX, upperRightY);
-                }
-
-                // Save the modified PDF to the output folder
-                string outputPath = Path.Combine(outputFolder,
-                                   Path.GetFileNameWithoutExtension(pdfFile) + "_logo.pdf");
-                mend.Save(outputPath);
-            }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
         }
 
-        Console.WriteLine("Batch processing completed.");
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        if (!File.Exists(logoPath))
+        {
+            Console.Error.WriteLine($"Logo file not found: {logoPath}");
+            return;
+        }
+
+        // Process each PDF file in the input folder
+        foreach (string pdfFilePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName = Path.GetFileName(pdfFilePath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
+            try
+            {
+                // Load the PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfFilePath))
+                {
+                    // ImageStamp lives in the Aspose.Pdf namespace (not Aspose.Pdf.Drawing)
+                    ImageStamp logoStamp = new ImageStamp(logoPath);
+
+                    // Position the stamp at the top‑right corner of each page
+                    logoStamp.HorizontalAlignment = HorizontalAlignment.Right;
+                    logoStamp.VerticalAlignment   = VerticalAlignment.Top;
+
+                    // Optional margins from the page edges (points)
+                    logoStamp.TopMargin   = 10;
+                    logoStamp.RightMargin = 10;
+
+                    // Apply the stamp to every page in the document
+                    foreach (Page page in doc.Pages)
+                    {
+                        page.AddStamp(logoStamp);
+                    }
+
+                    // Save the modified PDF
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Processed: {fileName}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+            }
+        }
     }
 }

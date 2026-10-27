@@ -1,41 +1,83 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Collections.Generic;
+using System.Text.Json;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms; // <-- required for Form fields
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF with form fields
-        const string outputPdfPath = "filled.pdf";  // destination PDF after filling
-        const string jsonPath      = "data.json";   // JSON file: { "FieldName1":"Value1", "FieldName2":"Value2", ... }
+        const string inputPdfPath  = "form.pdf";
+        const string outputPdfPath = "filled_form.pdf";
+        const string jsonPath      = "data.json";
 
-        // Verify that required files exist
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"Error: JSON file not found – {jsonPath}");
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
 
-        // Form facade works with two file names: source and destination.
-        // It implements IDisposable, so wrap it in a using block.
-        using (Form form = new Form(inputPdfPath, outputPdfPath))
+        // Load JSON mapping of field names to values
+        Dictionary<string, string> fieldValues;
+        try
         {
-            // Open the JSON file as a stream and import all field values.
-            using (FileStream jsonStream = new FileStream(jsonPath, FileMode.Open, FileAccess.Read))
-            {
-                form.ImportJson(jsonStream);   // matches fields by their full names
-            }
-
-            // Persist the changes to the output PDF.
-            form.Save();
+            string jsonContent = File.ReadAllText(jsonPath);
+            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent) ?? new Dictionary<string, string>();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read or parse JSON: {ex.Message}");
+            return;
         }
 
-        Console.WriteLine($"Form fields have been populated and saved to '{outputPdfPath}'.");
+        // Load the PDF document
+        Document pdfDocument;
+        try
+        {
+            pdfDocument = new Document(inputPdfPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
+            return;
+        }
+
+        // Fill form fields using the values from the JSON dictionary
+        foreach (var kvp in fieldValues)
+        {
+            // Retrieve the form field by its partial name (the key from JSON)
+            // Document.Form indexer returns a WidgetAnnotation; cast to Aspose.Pdf.Forms.Field to access the Value property.
+            Field formField = pdfDocument.Form[kvp.Key] as Field;
+            if (formField != null)
+            {
+                // Most field types expose a Value property that accepts a string.
+                // For specific types (e.g., CheckBoxField) you may want to set the appropriate property,
+                // but assigning to Value works for the majority of cases.
+                formField.Value = kvp.Value;
+            }
+            else
+            {
+                Console.Error.WriteLine($"Warning: Form field '{kvp.Key}' not found in the PDF.");
+            }
+        }
+
+        // Save the modified PDF
+        try
+        {
+            pdfDocument.Save(outputPdfPath);
+            Console.WriteLine($"Form fields have been filled and saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error saving PDF: {ex.Message}");
+        }
     }
 }

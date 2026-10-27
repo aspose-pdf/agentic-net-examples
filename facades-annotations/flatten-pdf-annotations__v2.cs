@@ -7,30 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Initialize the annotation editor and bind it to the loaded document
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(doc);
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-            // Flatten all annotations – this converts interactive annotations
-            // into static graphics while preserving their visual appearance
-            editor.FlatteningAnnotations();
+        // PdfAnnotationEditor does not implement IDisposable, so we instantiate it directly.
+        // Bind the document, then flatten annotations which copies their appearance streams
+        // to the page content and removes the interactive annotation objects.
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
+        editor.BindPdf(doc);
+        editor.FlatteningAnnotations(); // correct method name
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
+        // Save the flattened PDF
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
     }
 }

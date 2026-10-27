@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // SquareAnnotation, Border, Dash, etc.
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing; // needed for Color
 
 class Program
 {
@@ -17,42 +17,42 @@ class Program
             return;
         }
 
-        // Use PdfContentEditor (facade) to edit the PDF
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+        Page firstPage = pdfDoc.Pages[1];
+
+        // Define the rectangle that will bound the annotation (lower‑left x,y and upper‑right x,y)
+        var annotRect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+
+        // Create a SquareAnnotation (rectangle) on the first page
+        SquareAnnotation rectAnnot = new SquareAnnotation(firstPage, annotRect)
         {
-            // Bind the existing PDF
-            editor.BindPdf(inputPath);
+            // Border (stroke) color
+            Color = Color.Blue,
 
-            // Define rectangle position (x, y, width, height) using System.Drawing.Rectangle
-            // PdfContentEditor.CreateSquareCircle expects a System.Drawing.Rectangle and a System.Drawing.Color
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 500, 200, 150);
+            // Fill (interior) color
+            InteriorColor = Color.LightGray,
 
-            // Create a square (rectangle) annotation on page 1
-            // Parameters: rect, contents, color, square=true, page=1, borderWidth=2
-            editor.CreateSquareCircle(rect, "Aspose.Pdf.Rectangle annotation", System.Drawing.Color.Red, true, 1, 2);
+            // 75% opacity
+            Opacity = 0.75f
+        };
 
-            // Retrieve the annotation just added (last annotation on page 1)
-            Page page = editor.Document.Pages[1];
-            // Annotations collection is 0‑based, so use Count - 1
-            Annotation ann = page.Annotations[page.Annotations.Count - 1];
+        // Configure the border: width, style and custom dash pattern
+        rectAnnot.Border = new Border(rectAnnot)
+        {
+            // Width expects an integer
+            Width = 1,
+            Style = BorderStyle.Solid,
+            // Dash pattern: 3 units on, 2 units off (Dash object expects an int[])
+            Dash = new Dash(new int[] { 3, 2 })
+        };
 
-            if (ann is SquareAnnotation squareAnn)
-            {
-                // Set custom dash pattern (e.g., 3 units on, 2 units off)
-                squareAnn.Border = new Border(squareAnn)
-                {
-                    Width = 2,
-                    Dash = new Dash(new int[] { 3, 2 })
-                };
+        // Add the annotation to the first page
+        firstPage.Annotations.Add(rectAnnot);
 
-                // Set opacity to 75%
-                squareAnn.Opacity = 0.75f;
-            }
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
 
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Aspose.Pdf.Rectangle annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle annotation added to page 1 and saved as '{outputPath}'.");
     }
 }

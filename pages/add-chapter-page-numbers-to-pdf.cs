@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_numbered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a page number stamp with custom prefix "Chapter"
-            PageNumberStamp pageNumberStamp = new PageNumberStamp("Chapter #");
-
-            // Position the stamp at the bottom center of each page
-            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-            pageNumberStamp.BottomMargin        = 20; // 20 points margin from bottom
-
-            // Define visual appearance of the stamp
-            pageNumberStamp.TextState.Font       = FontRepository.FindFont("Helvetica");
-            pageNumberStamp.TextState.FontSize   = 12;
-            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Add the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.AddStamp(pageNumberStamp);
+                Page page = doc.Pages[i];
+
+                // Create a text fragment with the custom prefix and page number
+                TextFragment tf = new TextFragment($"Chapter {i}");
+
+                // Set visual properties
+                tf.TextState.FontSize = 12;
+                tf.TextState.Font = FontRepository.FindFont("Arial");
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Position near the bottom‑right corner
+                double margin = 20;
+                double x = page.PageInfo.Width - margin;
+                double y = margin;
+                tf.Position = new Position(x, y);
+                tf.HorizontalAlignment = HorizontalAlignment.Right;
+                tf.VerticalAlignment = VerticalAlignment.Bottom;
+
+                // Add the fragment to the page
+                page.Paragraphs.Add(tf);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers with prefix \"Chapter\" added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
     }
 }

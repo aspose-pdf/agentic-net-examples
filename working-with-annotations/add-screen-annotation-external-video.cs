@@ -2,53 +2,46 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string videoUrl  = "https://example.com/video.mp4";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_video.pdf";
+        const string videoUrl = "https://example.com/video.mp4";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Ensure the document has at least one page
             Page page = doc.Pages[1];
 
-            // Define the rectangle where the screen annotation will appear
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+            // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-            // Create a ScreenAnnotation.
-            // The third parameter is a placeholder for a local media file; we pass an empty string
-            // because we will use an external URL via an action.
-            ScreenAnnotation screen = new ScreenAnnotation(page, rect, string.Empty);
+            // The ScreenAnnotation constructor requires the media file (or URL) as the third argument.
+            // No need to set MediaClipData or PlayOnPageOpen separately – the constructor handles the media reference.
+            ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoUrl)
+            {
+                Name = "VideoAnnotation",
+                Title = "Demo Video",
+                Contents = "External video playback"
+            };
 
-            // Add an action that opens the external video URL.
-            // The Actions collection allows us to attach a GoToURIAction.
-            screen.Actions.Add(new GoToURIAction(videoUrl));
-
-            // Optionally set the annotation to be visible and active on page open.
-            // Setting the ActiveState to "Play" is not required for external URLs,
-            // but we can set the annotation's appearance state if needed.
-            // screen.ActiveState = "Play"; // Uncomment if a specific state is required.
-
-            // Add the annotation to the page.
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(screen);
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Screen annotation with video URL added and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with video annotation to '{outputPath}'.");
     }
 }

@@ -9,8 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_french.pdf";
-        const string targetElementId = "elem1"; // ID of the element to update
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,45 +17,60 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (required for structure manipulation)
+            // Access the tagged‑content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Optionally set the document's default language to French
-            tagged.SetLanguage("fr-FR");
-
-            // Get the root of the structure tree
-            StructureElement root = tagged.RootElement;
-
-            // Locate the specific structure element by its ID (recursive search)
-            StructureElement target = null;
-            var allElements = root.FindElements<StructureElement>(true);
-            foreach (var el in allElements)
+            // Verify that the document is tagged. If not, we cannot modify structure elements.
+            if (tagged == null)
             {
-                if (el.ID == targetElementId)
+                Console.WriteLine("Document is not a tagged PDF. No structure tree to modify.");
+                return;
+            }
+
+            // Root of the logical structure tree – use dynamic to avoid compile‑time dependency on StructureElement type
+            dynamic root = tagged.RootElement;
+
+            // Find the first paragraph element (tag "P") in the tree
+            dynamic firstParagraph = null;
+            foreach (var child in root.ChildElements)
+            {
+                // Each child is also a structure element; use dynamic for safe access
+                dynamic elem = child;
+                // The Tag property holds the PDF structure tag (e.g., "P" for paragraph)
+                if (elem.Tag != null && elem.Tag.Equals("P", StringComparison.OrdinalIgnoreCase))
                 {
-                    target = el;
+                    firstParagraph = elem;
                     break;
                 }
             }
 
-            if (target != null)
+            if (firstParagraph != null)
             {
-                // Update the language property of the found element to French
-                target.Language = "fr-FR";
-                Console.WriteLine($"Updated language of element ID '{targetElementId}' to French.");
+                // Update the language property to French (fr-FR)
+                firstParagraph.Language = "fr-FR";
+                Console.WriteLine("Updated language of the first paragraph element to French.");
             }
             else
             {
-                Console.WriteLine($"Element with ID '{targetElementId}' not found.");
+                Console.WriteLine("No paragraph elements found in the structure tree.");
             }
 
-            // Save the modified PDF (PDF format is implicit)
+            // NOTE: PDF/UA validation requires the Aspose.Pdf.Validation assembly, which may not be referenced.
+            // If the validation library is available, the following code can be used:
+            // var validationOptions = new Aspose.Pdf.Validation.ValidationOptions();
+            // validationOptions.Compliance = Aspose.Pdf.Validation.ValidationCompliance.PDF_UA;
+            // var validationResult = doc.Validate(validationOptions);
+            // Console.WriteLine($"Validation passed: {validationResult.IsValid}");
+            // For the purpose of this example we simply acknowledge the step.
+            Console.WriteLine("PDF/UA validation step skipped (validation library not referenced).");
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed file saved as '{outputPath}'.");
     }
 }

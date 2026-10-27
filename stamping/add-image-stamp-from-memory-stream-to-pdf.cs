@@ -6,58 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Paths for input PDF and output PDF
         const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output.pdf";
+        const string imagePath     = "stamp.png";
 
-        // Path to the image file that will be loaded into a memory stream
-        const string imageFilePath = "logo.png";
-
-        // Verify that the required files exist
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(imageFilePath))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imageFilePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the image into a MemoryStream (this could also be any other stream source)
-        using (FileStream imgFileStream = File.OpenRead(imageFilePath))
-        using (MemoryStream imgMemoryStream = new MemoryStream())
+        // Load the image into a memory stream (no file path used for the stamp)
+        byte[] imageBytes = File.ReadAllBytes(imagePath);
+        using (MemoryStream imageStream = new MemoryStream(imageBytes))
         {
-            imgFileStream.CopyTo(imgMemoryStream);
-            imgMemoryStream.Position = 0; // reset stream position for reading
-
-            // Create the ImageStamp from the memory stream
-            ImageStamp imgStamp = new ImageStamp(imgMemoryStream)
+            // Create an ImageStamp from the memory stream
+            ImageStamp stamp = new ImageStamp(imageStream)
             {
-                // Example positioning and appearance settings
+                Background          = false,                     // place stamp over content
+                Opacity             = 0.5,                       // semi‑transparent
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                Opacity             = 0.5,   // 50% transparent
-                Background          = false  // stamp appears on top of page content
+                VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Open the PDF document inside a using block (ensures deterministic disposal)
+            // Open the PDF document inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                // Apply the stamp to each page individually (Page.AddStamp, not PageCollection)
+                foreach (Page page in pdfDoc.Pages)
                 {
-                    Page page = pdfDoc.Pages[pageNum];
-                    // Add the image stamp to the current page
-                    page.AddStamp(imgStamp);
+                    page.AddStamp(stamp);
                 }
 
-                // Save the modified PDF (no SaveOptions needed for PDF output)
+                // Save the modified PDF
                 pdfDoc.Save(outputPdfPath);
             }
-
-            Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
         }
+
+        Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
     }
 }

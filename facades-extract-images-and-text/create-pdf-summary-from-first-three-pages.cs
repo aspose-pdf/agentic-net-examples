@@ -8,59 +8,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "summary.pdf";
+        const string inputPath = "source.pdf";
+        const string outputPath = "summary.pdf";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdfPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Extract text from the first three pages using PdfExtractor (Facades API)
+        // -----------------------------------------------------------------
+        // Extract text from the first three pages using PdfExtractor (Facades)
+        // -----------------------------------------------------------------
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(inputPath);
+        extractor.StartPage = 1;   // 1‑based page index
+        extractor.EndPage   = 3;   // inclusive
+        extractor.ExtractText();
+
+        // Get the extracted text via a stream (PdfExtractor has no parameter‑less GetText)
         string extractedText;
-        using (PdfExtractor extractor = new PdfExtractor())
+        using (MemoryStream textStream = new MemoryStream())
         {
-            // Bind the source PDF
-            extractor.BindPdf(inputPdfPath);
-
-            // Limit extraction to pages 1‑3 (1‑based indexing)
-            extractor.StartPage = 1;
-            extractor.EndPage   = 3;
-
-            // Perform text extraction
-            extractor.ExtractText();
-
-            // Retrieve the extracted text into a memory stream
-            using (MemoryStream textStream = new MemoryStream())
+            extractor.GetText(textStream); // write text to the stream
+            textStream.Position = 0;       // rewind for reading
+            using (StreamReader reader = new StreamReader(textStream))
             {
-                extractor.GetText(textStream);
-                extractedText = System.Text.Encoding.UTF8.GetString(textStream.ToArray());
+                extractedText = reader.ReadToEnd();
             }
         }
 
-        // Create a new PDF document that will hold the summary
+        // ---------------------------------------------------------------
+        // Create a new PDF document and add the extracted text as a page
+        // ---------------------------------------------------------------
         using (Document summaryDoc = new Document())
         {
-            // Add a single page to the document
-            summaryDoc.Pages.Add();
+            // Add a blank page to the document
+            Page page = summaryDoc.Pages.Add();
 
             // Create a TextFragment with the extracted text
-            TextFragment fragment = new TextFragment(extractedText);
+            TextFragment fragment = new TextFragment(extractedText)
+            {
+                // Optional formatting
+                TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial") }
+            };
 
-            // Configure appearance via the existing TextState instance (read‑only property)
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Color.Black;
-
-            // Add the fragment to the first page's paragraphs collection
-            summaryDoc.Pages[1].Paragraphs.Add(fragment);
+            // Add the text fragment to the page's paragraph collection
+            page.Paragraphs.Add(fragment);
 
             // Save the summary PDF
-            summaryDoc.Save(outputPdfPath);
+            summaryDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Summary PDF created: {outputPdfPath}");
+        Console.WriteLine($"Summary PDF created: {outputPath}");
     }
 }

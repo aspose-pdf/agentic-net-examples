@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using Aspose.Pdf; // Core Aspose.Pdf namespace (no Facades)
+using System.Collections.Generic;
 
 class Program
 {
     static void Main()
     {
-        const string jsonPath = "formdata.json";   // Input JSON file exported from a PDF form
-        const string csvPath  = "formdata.csv";    // Output CSV file
+        const string jsonPath = "formdata.json";
+        const string csvPath = "formdata.csv";
 
         if (!File.Exists(jsonPath))
         {
@@ -17,85 +17,95 @@ class Program
             return;
         }
 
+        // Read the entire JSON file
+        string jsonContent;
+        using (StreamReader reader = new StreamReader(jsonPath))
+        {
+            jsonContent = reader.ReadToEnd();
+        }
+
+        // Deserialize JSON into a list of dictionaries (field name -> value)
+        List<Dictionary<string, JsonElement>> records;
         try
         {
-            // Read the entire JSON content
-            string jsonContent = File.ReadAllText(jsonPath);
-
-            // Parse the JSON document
-            using (JsonDocument doc = JsonDocument.Parse(jsonContent))
-            using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
-            {
-                // Write CSV header
-                writer.WriteLine("FieldName,Value");
-
-                JsonElement root = doc.RootElement;
-
-                // Case 1: JSON is an object where each property is a field name
-                if (root.ValueKind == JsonValueKind.Object)
-                {
-                    foreach (JsonProperty prop in root.EnumerateObject())
-                    {
-                        string field = EscapeCsv(prop.Name);
-                        string value = EscapeCsv(prop.Value.GetString() ?? prop.Value.ToString());
-                        writer.WriteLine($"{field},{value}");
-                    }
-                }
-                // Case 2: JSON is an array of objects (e.g., [{ "FullName":"Name", "Value":"John" }, ...])
-                else if (root.ValueKind == JsonValueKind.Array)
-                {
-                    foreach (JsonElement element in root.EnumerateArray())
-                    {
-                        string field = "";
-                        string value = "";
-
-                        if (element.TryGetProperty("FullName", out JsonElement nameProp) ||
-                            element.TryGetProperty("Name", out nameProp))
-                        {
-                            field = nameProp.GetString() ?? "";
-                        }
-
-                        if (element.TryGetProperty("Value", out JsonElement valueProp))
-                        {
-                            value = valueProp.GetString() ?? valueProp.ToString();
-                        }
-                        else
-                        {
-                            // Fallback: serialize the whole element as a string
-                            value = element.GetRawText();
-                        }
-
-                        writer.WriteLine($"{EscapeCsv(field)},{EscapeCsv(value)}");
-                    }
-                }
-                else
-                {
-                    Console.Error.WriteLine("Unsupported JSON structure for conversion.");
-                }
-            }
-
-            Console.WriteLine($"CSV file created successfully at '{csvPath}'.");
+            records = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(jsonContent);
         }
-        catch (Exception ex)
+        catch (JsonException ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+            return;
         }
+
+        if (records == null || records.Count == 0)
+        {
+            Console.WriteLine("No data to convert.");
+            return;
+        }
+
+        // Use the keys from the first record as CSV headers
+        var headers = new List<string>(records[0].Keys);
+
+        // Write CSV file
+        using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
+        {
+            // Header line
+            writer.WriteLine(string.Join(",", EscapeCsvValues(headers)));
+
+            // Data rows
+            foreach (var record in records)
+            {
+                var row = new List<string>();
+                foreach (var header in headers)
+                {
+                    if (record.TryGetValue(header, out JsonElement value))
+                        row.Add(ConvertJsonElementToString(value));
+                    else
+                        row.Add(string.Empty);
+                }
+                writer.WriteLine(string.Join(",", EscapeCsvValues(row)));
+            }
+        }
+
+        Console.WriteLine($"CSV file created at: {csvPath}");
     }
 
-    // Escapes a CSV field according to RFC 4180
-    static string EscapeCsv(string input)
+    // Convert a JsonElement to a plain string suitable for CSV
+    private static string ConvertJsonElementToString(JsonElement element)
     {
-        if (input == null) return "";
-
-        bool mustQuote = input.Contains('"') || input.Contains(',') ||
-                         input.Contains('\n') || input.Contains('\r');
-
-        if (mustQuote)
+        return element.ValueKind switch
         {
-            string escaped = input.Replace("\"", "\"\"");
-            return $"\"{escaped}\"";
-        }
+            JsonValueKind.String => element.GetString(),
+            JsonValueKind.Number => element.GetRawText(),
+            JsonValueKind.True => "true",
+            JsonValueKind.False => "false",
+            JsonValueKind.Null => string.Empty,
+            JsonValueKind.Object => element.GetRawText(),
+            JsonValueKind.Array => element.GetRawText(),
+            _ => element.GetRawText()
+        };
+    }
 
-        return input;
+    // Escape CSV values that contain commas, quotes, or newlines
+    private static IEnumerable<string> EscapeCsvValues(IEnumerable<string> values)
+    {
+        foreach (var v in values)
+        {
+            if (v == null)
+            {
+                yield return string.Empty;
+                continue;
+            }
+
+            bool mustQuote = v.Contains(',') || v.Contains('\"') || v.Contains('\n') || v.Contains('\r');
+            if (mustQuote)
+            {
+                string escaped = v.Replace("\"", "\"\"");
+                yield return $"\"{escaped}\"";
+            }
+            else
+            {
+                yield return v;
+            }
+        }
     }
 }

@@ -15,24 +15,38 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Calculate current width and height from MediaBox
-                double width  = page.MediaBox.URX - page.MediaBox.LLX;
-                double height = page.MediaBox.URY - page.MediaBox.LLY;
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
 
-                // Swap width and height to make the page landscape
-                page.SetPageSize(height, width);
+                    // Current MediaBox rectangle
+                    Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
+                    double width  = mediaBox.URX - mediaBox.LLX;
+                    double height = mediaBox.URY - mediaBox.LLY;
+
+                    // Swap width and height to make the page landscape
+                    double newURX = mediaBox.LLX + height;
+                    double newURY = mediaBox.LLY + width;
+
+                    // Assign the new MediaBox (using fully qualified Rectangle to avoid ambiguity)
+                    page.MediaBox = new Aspose.Pdf.Rectangle(mediaBox.LLX, mediaBox.LLY, newURX, newURY);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"All pages converted to landscape and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"All pages converted to landscape and saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

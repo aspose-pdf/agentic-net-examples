@@ -2,137 +2,85 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
-class AttachmentValidator
+class Program
 {
-    // Simple mapping of common file extensions to expected MIME types
+    // Simple mapping of common file extensions to their MIME types.
+    // Extend this dictionary as needed.
     private static readonly Dictionary<string, string> ExtensionToMime = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
     {
+        { ".pdf",  "application/pdf" },
+        { ".doc",  "application/msword" },
+        { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
+        { ".xls",  "application/vnd.ms-excel" },
+        { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" },
         { ".png",  "image/png" },
         { ".jpg",  "image/jpeg" },
         { ".jpeg", "image/jpeg" },
         { ".gif",  "image/gif" },
-        { ".bmp",  "image/bmp" },
-        { ".tif",  "image/tiff" },
-        { ".tiff", "image/tiff" },
-        { ".pdf",  "application/pdf" },
         { ".txt",  "text/plain" },
-        { ".doc",  "application/msword" },
-        { ".docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
-        { ".xls",  "application/vnd.ms-excel" },
-        { ".xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }
-        // Add more mappings as needed
+        { ".zip",  "application/zip" }
+        // Add more mappings as required.
     };
 
-    // Determines MIME type for image files using Aspose.Pdf.Image.GetMimeType
-    private static string GetImageMimeType(string filePath)
-    {
-        // Load the image using System.Drawing.Image and let Aspose.Pdf.Image detect the MIME type
-        using (System.Drawing.Image img = System.Drawing.Image.FromFile(filePath))
-        {
-            return Aspose.Pdf.Image.GetMimeType(img);
-        }
-    }
-
-    // Determines MIME type based on file extension (fallback for non‑image files)
-    private static string GetMimeTypeByExtension(string filePath)
+    // Returns true if the supplied MIME type matches the expected type for the file's extension.
+    private static bool IsMimeTypeValid(string filePath, string suppliedMime)
     {
         string ext = Path.GetExtension(filePath);
-        if (ExtensionToMime.TryGetValue(ext, out string mime))
-            return mime;
-        return "application/octet-stream"; // unknown
-    }
+        if (string.IsNullOrEmpty(ext))
+            return false; // No extension – cannot validate.
 
-    // Validates that the detected MIME type matches the expected MIME type for the extension
-    private static void ValidateMime(string filePath)
-    {
-        string ext = Path.GetExtension(filePath);
-        string expectedMime = GetMimeTypeByExtension(filePath);
-        string actualMime;
+        if (!ExtensionToMime.TryGetValue(ext, out string expectedMime))
+            return false; // Unknown extension – treat as invalid.
 
-        // Use image-specific detection for known image extensions
-        if (ext.Equals(".png", StringComparison.OrdinalIgnoreCase) ||
-            ext.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
-            ext.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-            ext.Equals(".gif", StringComparison.OrdinalIgnoreCase) ||
-            ext.Equals(".bmp", StringComparison.OrdinalIgnoreCase) ||
-            ext.Equals(".tif", StringComparison.OrdinalIgnoreCase) ||
-            ext.Equals(".tiff", StringComparison.OrdinalIgnoreCase))
-        {
-            actualMime = GetImageMimeType(filePath);
-        }
-        else
-        {
-            actualMime = GetMimeTypeByExtension(filePath);
-        }
-
-        if (!string.Equals(expectedMime, actualMime, StringComparison.OrdinalIgnoreCase))
-        {
-            throw new InvalidOperationException(
-                $"MIME type mismatch for '{Path.GetFileName(filePath)}'. Expected: {expectedMime}, Detected: {actualMime}");
-        }
+        return string.Equals(expectedMime, suppliedMime, StringComparison.OrdinalIgnoreCase);
     }
 
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF
-        const string attachmentPath = "sample.png";       // file to attach
-        const string outputPdfPath = "output.pdf";        // result PDF
+        const string pdfPath        = "input.pdf";          // PDF to which the attachment will be added
+        const string attachmentPath = "sample.docx";        // File to attach
+        const string attachmentMime = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        const string outputPdfPath  = "output_with_attachment.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
             return;
         }
 
-        try
+        // Validate MIME type against file extension before insertion.
+        if (!IsMimeTypeValid(attachmentPath, attachmentMime))
         {
-            // Validate MIME type before proceeding
-            ValidateMime(attachmentPath);
+            Console.Error.WriteLine("MIME type does not match file extension. Attachment will not be added.");
+            return;
+        }
 
-            // Load the PDF (using the lifecycle rule for disposal)
-            using (Document doc = new Document(inputPdfPath))
+        // Load the PDF, embed the attachment, and save.
+        using (Document doc = new Document(pdfPath))
+        {
+            // Create a FileSpecification for the attachment.
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
             {
-                // Create a FileSpecification for the attachment (description is optional)
-                FileSpecification fileSpec = new FileSpecification(attachmentPath, "Attached file");
-                fileSpec.Description = "Attachment added by AttachmentValidator";
+                Description = $"Attached file: {Path.GetFileName(attachmentPath)}",
+                MIMEType    = attachmentMime,
+                // The file content is stored in a MemoryStream.
+                Contents    = new MemoryStream(File.ReadAllBytes(attachmentPath))
+            };
 
-                // Add the file to the document's embedded files collection
-                doc.EmbeddedFiles.Add(fileSpec);
+            // Add the file specification to the EmbeddedFiles collection.
+            doc.EmbeddedFiles.Add(fileSpec);
 
-                // Choose a page to place the attachment annotation (first page)
-                Page page = doc.Pages[1];
-
-                // Define the rectangle for the annotation (fully qualified to avoid ambiguity)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
-
-                // Create the file attachment annotation
-                FileAttachmentAnnotation attachmentAnnot = new FileAttachmentAnnotation(page, rect, fileSpec)
-                {
-                    Icon = FileIcon.Paperclip, // visual icon – use FileIcon enum
-                    Color = Aspose.Pdf.Color.Blue,
-                    Contents = $"Attached file: {Path.GetFileName(attachmentPath)}"
-                };
-
-                // Add the annotation to the page
-                page.Annotations.Add(attachmentAnnot);
-
-                // Save the modified PDF (using the provided save rule)
-                doc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
+            // Save the modified PDF.
+            doc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Attachment added successfully. Saved as '{outputPdfPath}'.");
     }
 }

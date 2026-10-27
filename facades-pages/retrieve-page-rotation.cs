@@ -1,29 +1,27 @@
 using System;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Ensure the file exists before processing
-        if (!System.IO.File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Use PdfPageEditor to access page information
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Bind the PDF document to the editor
-            editor.BindPdf(inputPath);
+        // Load the PDF with the Facade class
+        PdfPageEditor pageEditor = new PdfPageEditor();
+        pageEditor.BindPdf(pdfPath);
 
-            // Pages are 1‑based; retrieve rotation of page 4
-            int rotation = editor.GetPageRotation(4);
+        // Aspose.Pdf uses 1‑based page indexing
+        int pageNumber = 4;
+        int rotationAngle = pageEditor.GetPageRotation(pageNumber);
 
-            Console.WriteLine($"Rotation of page 4: {rotation} degrees");
-        }
+        Console.WriteLine($"Page {pageNumber} rotation angle: {rotationAngle} degrees");
     }
 }

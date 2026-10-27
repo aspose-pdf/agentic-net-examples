@@ -9,6 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "right_aligned.pdf";
+        const string text = "Right aligned text";
 
         if (!File.Exists(inputPath))
         {
@@ -16,28 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the first page (Aspose.Pdf uses 1‑based indexing)
+            // Ensure there is at least one page (Aspose.Pdf uses 1‑based indexing)
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
+
+            // Get the first page
             Page page = doc.Pages[1];
 
-            // Create a text fragment with the desired content
-            TextFragment textFragment = new TextFragment("Right aligned text");
+            // Create a TextFragment containing the desired text
+            TextFragment tf = new TextFragment(text);
 
-            // Set the horizontal alignment to Right using the TextState property
-            textFragment.TextState.HorizontalAlignment = HorizontalAlignment.Right;
+            // Right‑align the text by setting HorizontalAlignment on the TextState
+            tf.TextState.HorizontalAlignment = HorizontalAlignment.Right;
 
-            // Position can be set; alignment will be applied relative to the page width
-            textFragment.Position = new Position(0, 0);
+            // Position the fragment (Y coordinate only matters for right alignment)
+            tf.Position = new Position(0, 800); // X is ignored when aligned right
 
-            // Add the fragment to the page's paragraph collection
-            page.Paragraphs.Add(textFragment);
+            // Add the fragment to the page
+            page.Paragraphs.Add(tf);
 
-            // Save the modified document
+            // Save the modified PDF (still inside the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Right‑aligned PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Saved right‑aligned PDF to '{outputPath}'.");
     }
 }

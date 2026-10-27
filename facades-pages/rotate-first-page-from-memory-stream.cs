@@ -1,43 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Create a minimal PDF in memory (placeholder) so we have something to edit.
-        byte[] pdfBytes;
-        using (var doc = new Document())
+        // Input and output file paths (replace with your own paths as needed)
+        const string sourcePath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(sourcePath))
         {
-            doc.Pages.Add(); // add a blank page
-            using (var ms = new MemoryStream())
+            Console.Error.WriteLine($"File not found: {sourcePath}");
+            return;
+        }
+
+        // Load the PDF file into a memory stream
+        byte[] pdfBytes = File.ReadAllBytes(sourcePath);
+        using (MemoryStream memoryStream = new MemoryStream(pdfBytes))
+        {
+            // Load the PDF document from the memory stream (Document implements IDisposable)
+            using (Document doc = new Document(memoryStream))
             {
-                doc.Save(ms);
-                pdfBytes = ms.ToArray();
+                // Example manipulation: delete the first page if the document has more than one page
+                if (doc.Pages.Count > 1)
+                {
+                    // Document.Pages provides Delete method (1‑based index)
+                    doc.Pages.Delete(1);
+                }
+
+                // Example manipulation: insert a blank page at the end of the document
+                // Document.Pages.Add creates a new blank page and returns it
+                Page blankPage = doc.Pages.Add();
+                // Optionally set size of the new page to match the previous last page
+                if (doc.Pages.Count > 1)
+                {
+                    Page reference = doc.Pages[doc.Pages.Count - 1];
+                    blankPage.PageInfo.Width  = reference.PageInfo.Width;
+                    blankPage.PageInfo.Height = reference.PageInfo.Height;
+                }
+
+                // Save the modified document to the output file
+                doc.Save(outputPath);
             }
         }
 
-        const string outputPath = "output.pdf";
-
-        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
-        using (PdfPageEditor pageEditor = new PdfPageEditor())
-        {
-            // Bind the PDF stream to the editor.
-            pageEditor.BindPdf(inputStream);
-
-            // Example manipulation: rotate the first page 90 degrees.
-            pageEditor.ProcessPages = new int[] { 1 };
-            pageEditor.Rotation = 90; // Valid values: 0, 90, 180, 270
-
-            // Apply the changes to the document.
-            pageEditor.ApplyChanges();
-
-            // Save the edited PDF to a file.
-            pageEditor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

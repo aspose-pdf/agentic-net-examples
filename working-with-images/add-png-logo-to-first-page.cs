@@ -7,10 +7,9 @@ class Program
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
         const string logoPng   = "logo.png";
+        const string outputPdf = "output.pdf";
 
-        // Verify that the source files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -22,22 +21,29 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Pages are 1‑based (rule: page-indexing-one-based)
+            // Pages are 1‑based; get the first page
             Page firstPage = doc.Pages[1];
 
-            // Define the rectangle where the PNG will be placed.
-            // Coordinates are (llx, lly, urx, ury) in points.
-            // Adjust these values to the desired position.
-            Aspose.Pdf.Rectangle logoRect = new Aspose.Pdf.Rectangle(50, 750, 150, 850);
+            // Create an ImageStamp for the PNG logo
+            ImageStamp logoStamp = new ImageStamp(logoPng)
+            {
+                // Position the lower‑left corner of the image
+                XIndent = 50,   // distance from the left edge of the page
+                YIndent = 750,  // distance from the bottom edge of the page
+                // Optional: set explicit size (otherwise original image size is used)
+                // Width = 120,
+                // Height = 60,
+                // Place the image above existing content
+                Background = false
+            };
 
-            // Add the PNG image to the first page at the specified rectangle.
-            // Using the overload that takes a file path is the simplest approach.
-            firstPage.AddImage(logoPng, logoRect);
+            // Add the stamp to the first page
+            firstPage.AddStamp(logoStamp);
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 

@@ -1,91 +1,56 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_renamed.pdf";
-        const string csvMappingPath = "field_mapping.csv";
+        const string pdfPath = "input.pdf";
+        const string csvPath = "mapping.csv";
+        const string outputPath = "output.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Create a sample PDF with a form field (self‑contained demo)
-        // ------------------------------------------------------------
-        using (Document seed = new Document())
+        if (!File.Exists(pdfPath))
         {
-            Page page = seed.Pages.Add();
-            // Create a simple text box field named "OldField"
-            var rect = new Rectangle(100, 600, 300, 620);
-            TextBoxField txtField = new TextBoxField(page, rect)
-            {
-                PartialName = "OldField",
-                Value = "Sample"
-            };
-            seed.Form.Add(txtField);
-            seed.Save(inputPdfPath);
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
         }
-
-        // ------------------------------------------------------------
-        // 2. Create a CSV mapping file (oldName,newName)
-        // ------------------------------------------------------------
-        File.WriteAllLines(csvMappingPath, new[] { "OldField,NewField" });
-
-        // ------------------------------------------------------------
-        // 3. Load mapping from CSV (format: oldFieldName,newFieldName per line, optional header)
-        // ------------------------------------------------------------
-        var renameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var line in File.ReadAllLines(csvMappingPath))
+        if (!File.Exists(csvPath))
         {
-            // Skip empty lines
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-
-            // Skip a possible header line (e.g., "OldName,NewName")
-            if (line.TrimStart().StartsWith("Old", StringComparison.OrdinalIgnoreCase) && line.Contains(","))
-                continue;
-
-            var parts = line.Split(new[] { ',' }, 2);
-            if (parts.Length == 2)
-            {
-                var oldName = parts[0].Trim();
-                var newName = parts[1].Trim();
-                if (!string.IsNullOrEmpty(oldName) && !string.IsNullOrEmpty(newName))
-                {
-                    renameMap[oldName] = newName;
-                }
-            }
-        }
-
-        // Ensure there is something to rename
-        if (renameMap.Count == 0)
-        {
-            Console.WriteLine("No field mappings found in the CSV file.");
+            Console.Error.WriteLine($"CSV not found: {csvPath}");
             return;
         }
 
-        // ------------------------------------------------------------
-        // 4. Use FormEditor (facade) to rename fields and save the result
-        //    – Load the PDF into a Document and pass it to FormEditor (non‑obsolete constructor).
-        // ------------------------------------------------------------
-        using (Document srcDoc = new Document(inputPdfPath))
-        using (FormEditor formEditor = new FormEditor(srcDoc))
+        // Load rename mapping from CSV (format: oldFieldName,newFieldName)
+        var renameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var line in File.ReadAllLines(csvPath))
         {
-            foreach (var kvp in renameMap)
-            {
-                // Rename each field according to the mapping
-                formEditor.RenameField(kvp.Key, kvp.Value);
-            }
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
 
-            // Persist changes to the output PDF using the non‑obsolete overload
-            formEditor.Save(outputPdfPath);
+            var parts = line.Split(new[] { ',' }, 2);
+            if (parts.Length != 2)
+                continue;
+
+            var oldName = parts[0].Trim();
+            var newName = parts[1].Trim();
+
+            if (!string.IsNullOrEmpty(oldName) && !string.IsNullOrEmpty(newName))
+                renameMap[oldName] = newName;
         }
 
-        Console.WriteLine($"Field renaming completed. Output saved to '{outputPdfPath}'.");
+        // Use FormEditor (Aspose.Pdf.Facades) to rename form fields
+        FormEditor editor = new FormEditor();
+        editor.BindPdf(pdfPath);
+
+        foreach (var kvp in renameMap)
+        {
+            // RenameField silently skips non‑existent fields
+            editor.RenameField(kvp.Key, kvp.Value);
+        }
+
+        editor.Save(outputPath);
+        Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");
     }
 }

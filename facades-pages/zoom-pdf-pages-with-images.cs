@@ -1,16 +1,16 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using System.IO;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_zoomed.pdf";
-        const float zoomFactor = 1.5f; // 150% zoom
+        const string outputPath = "zoomed_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,38 +18,36 @@ class Program
             return;
         }
 
-        // Find pages that contain at least one image
-        List<int> pagesWithImages = new List<int>();
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the PDF document with deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            extractor.BindPdf(inputPath);
-
-            // Total page count is available via the underlying Document
-            int pageCount = extractor.Document.Pages.Count;
-
-            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
+            // Determine which pages contain at least one image
+            List<int> pagesWithImages = new List<int>();
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                extractor.StartPage = pageNum;
-                extractor.EndPage   = pageNum;
-                extractor.ExtractImage(); // Prepare image extraction for this page
-
-                if (extractor.HasNextImage())
+                Page page = doc.Pages[pageNum];
+                if (page.Resources.Images.Count > 0)
                 {
                     pagesWithImages.Add(pageNum);
                 }
             }
+
+            // Apply zoom only to the identified pages using PdfPageEditor
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(doc);
+
+                if (pagesWithImages.Any())
+                {
+                    editor.ProcessPages = pagesWithImages.ToArray(); // 1‑based page numbers
+                    editor.Zoom = 1.5f; // 150 % zoom for image pages
+                }
+
+                // Save the modified PDF (pages not in ProcessPages remain unchanged)
+                editor.Save(outputPath);
+            }
         }
 
-        // Apply zoom only to the identified pages
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            editor.BindPdf(inputPath);
-            editor.ProcessPages = pagesWithImages.ToArray(); // pages to edit
-            editor.Zoom = zoomFactor;                       // set desired zoom
-            editor.ApplyChanges();                          // commit changes
-            editor.Save(outputPath);                        // save result
-        }
-
-        Console.WriteLine($"Zoom applied to {pagesWithImages.Count} page(s). Output saved to '{outputPath}'.");
+        Console.WriteLine($"Zoom applied to image pages. Output saved to '{outputPath}'.");
     }
 }

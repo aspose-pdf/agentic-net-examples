@@ -1,42 +1,32 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text; // Added for TextFragment
 
-class ExportGraphToPdf
+class Program
 {
     static void Main()
     {
-        // Output PDF path
         const string outputPath = "graph_output.pdf";
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (pages are 1‑based)
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph object with desired width and height (in points)
-            // Use double values as the constructor overload with float is obsolete
-            Graph graph = new Graph(400.0, 200.0);
+            // Create a Graph (vector drawing) using page dimensions
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Example: add a rectangle shape to the graph
-            // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle)
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
-            // Set visual properties via GraphInfo
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 1f
-            };
-            // Add the rectangle to the graph's shape collection
-            graph.Shapes.Add(rect);
+            // Create a line using the constructor that accepts a float array
+            // Coordinates are expressed in the graph's coordinate system (origin at bottom‑left)
+            Line line = new Line(new float[] { 50, 750, 550, 750 });
+            line.GraphInfo.Color = Color.Black;
+            line.GraphInfo.LineWidth = 2;
 
-            // Optionally set a title for the graph (expects a TextFragment)
-            graph.Title = new TextFragment("Sample Graph");
+            // Add the line to the graph's Shapes collection
+            graph.Shapes.Add(line);
 
-            // Add the graph to the page's paragraph collection
+            // Add the graph to the page's paragraphs collection
             page.Paragraphs.Add(graph);
 
             // Save the document as PDF

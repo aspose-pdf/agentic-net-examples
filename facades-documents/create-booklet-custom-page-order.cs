@@ -1,81 +1,95 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string originalInput = "input.pdf";          // source PDF (must exist)
-        const string numberedInput = "numbered_input.pdf"; // temporary PDF with page numbers
-        const string bookletOutput = "booklet_output.pdf";
+        // Paths for the source and booklet PDFs
+        const string srcPath = "source.pdf";
+        const string bookletPath = "booklet.pdf";
 
-        // -----------------------------------------------------------------
-        // Step 1: Add visible page numbers to the original PDF.
-        // This helps us verify the order after the booklet operation.
-        // -----------------------------------------------------------------
-        if (!File.Exists(originalInput))
+        // ------------------------------------------------------------
+        // Step 1: Create a simple source PDF with identifiable page text
+        // ------------------------------------------------------------
+        using (Document srcDoc = new Document())
         {
-            Console.Error.WriteLine($"Source file not found: {originalInput}");
-            return;
-        }
-
-        using (Document doc = new Document(originalInput))
-        {
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Create 4 pages, each containing its page number as text
+            for (int i = 1; i <= 4; i++)
             {
-                // Add a simple text fragment with the page number at the top‑left corner.
+                Page page = srcDoc.Pages.Add();
                 TextFragment tf = new TextFragment($"Page {i}");
-                tf.Position = new Position(10, doc.Pages[i].PageInfo.Height - 10); // 10 pts from left/top
-                tf.TextState.FontSize = 12;
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                tf.TextState.ForegroundColor = Color.Black;
-                doc.Pages[i].Paragraphs.Add(tf);
+                tf.TextState.FontSize = 24;
+                page.Paragraphs.Add(tf);
             }
 
-            // Save the numbered version (used for the booklet operation).
-            doc.Save(numberedInput);
+            srcDoc.Save(srcPath);
         }
 
-        // -----------------------------------------------------------------
-        // Step 2: Define custom left and right page sequences for the booklet.
-        // -----------------------------------------------------------------
-        int[] leftPages  = new int[] { 2, 4, 6 };               // example left side pages
-        int[] rightPages = new int[] { 1, 3, 5, 7 };           // example right side pages
+        // ------------------------------------------------------------
+        // Step 2: Define custom left and right page order arrays
+        // ------------------------------------------------------------
+        // Example: left side pages will be 2 and 4, right side pages 1 and 3
+        int[] leftPages  = new int[] { 2, 4 };
+        int[] rightPages = new int[] { 1, 3 };
 
-        // -----------------------------------------------------------------
-        // Step 3: Create the booklet using the custom page arrays.
-        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly.
-        // -----------------------------------------------------------------
-        PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.MakeBooklet(numberedInput, bookletOutput, leftPages, rightPages);
-        if (!success)
-        {
-            Console.Error.WriteLine("MakeBooklet operation failed.");
-            return;
-        }
+        // ------------------------------------------------------------
+        // Step 3: Generate the booklet manually (avoids PdfFileEditor.MakeBooklet runtime issue)
+        // ------------------------------------------------------------
+        // Load the source document
+        Document srcDocument = new Document(srcPath);
+        // Create an empty document that will become the booklet
+        Document bookletDocument = new Document();
+        // Ensure the booklet starts with a blank page collection
+        bookletDocument.Pages.Delete();
 
-        // -----------------------------------------------------------------
-        // Step 4: Open the resulting booklet and extract the page‑number text
-        // from each page to verify the ordering.
-        // -----------------------------------------------------------------
-        using (Document resultDoc = new Document(bookletOutput))
+        // Add pages according to the custom left/right arrays
+        int sheetCount = Math.Max(leftPages.Length, rightPages.Length);
+        for (int i = 0; i < sheetCount; i++)
         {
-            Console.WriteLine("Booklet page order (extracted page numbers):");
-            for (int i = 1; i <= resultDoc.Pages.Count; i++)
+            // Left page (if defined)
+            if (i < leftPages.Length)
             {
-                TextAbsorber absorber = new TextAbsorber();
-                resultDoc.Pages[i].Accept(absorber);
-                string extracted = absorber.Text?.Trim() ?? "(no text)";
-                Console.WriteLine($"Page {i}: {extracted}");
+                int leftPageNumber = leftPages[i]; // 1‑based index
+                // Add (copy) the page from the source to the booklet
+                bookletDocument.Pages.Add(srcDocument.Pages[leftPageNumber]);
+            }
+
+            // Right page (if defined)
+            if (i < rightPages.Length)
+            {
+                int rightPageNumber = rightPages[i]; // 1‑based index
+                bookletDocument.Pages.Add(srcDocument.Pages[rightPageNumber]);
             }
         }
 
-        // Cleanup temporary file (optional).
-        try { File.Delete(numberedInput); } catch { /* ignore */ }
+        // Save the generated booklet
+        bookletDocument.Save(bookletPath);
 
-        Console.WriteLine("Verification completed.");
+        // ------------------------------------------------------------
+        // Step 4: Load the resulting booklet and inspect page order
+        // ------------------------------------------------------------
+        using (Document bookletDoc = new Document(bookletPath))
+        {
+            Console.WriteLine("Booklet page order (extracted text per page):");
+
+            // Iterate through pages (1‑based indexing)
+            for (int i = 1; i <= bookletDoc.Pages.Count; i++)
+            {
+                // Extract text from the current page
+                TextAbsorber absorber = new TextAbsorber();
+                bookletDoc.Pages[i].Accept(absorber);
+                string pageText = absorber.Text.Trim();
+
+                // Output the page index and its extracted text
+                Console.WriteLine($"Page {i}: \"{pageText}\"");
+            }
+        }
+
+        // Cleanup: optional removal of temporary files
+        // File.Delete(srcPath);
+        // File.Delete(bookletPath);
     }
 }

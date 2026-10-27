@@ -1,45 +1,33 @@
 using System;
 using System.IO;
+using System.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_resized.pdf";
 
-        // Ensure the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open source and destination streams inside using blocks for deterministic disposal
-        using (FileStream srcStream  = new FileStream(inputPath,  FileMode.Open,  FileAccess.Read))
-        using (FileStream dstStream  = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-        {
-            // Create the PdfFileEditor facade
-            PdfFileEditor editor = new PdfFileEditor();
+        // Determine total number of pages using Document (PdfPageEditor no longer exposes page‑count helpers)
+        var document = new Document(inputPath);
+        int pageCount = document.Pages.Count;
+        int[] allPages = Enumerable.Range(1, pageCount).ToArray(); // 1‑based page numbers
 
-            // Apply a negative margin of 5% on all sides.
-            // Negative margins shrink the page contents uniformly.
-            // Passing null for the pages array processes all pages.
-            bool success = editor.AddMarginsPct(
-                srcStream,
-                dstStream,
-                null,   // all pages
-                -5,     // left margin  (-5%)
-                -5,     // right margin (-5%)
-                -5,     // top margin   (-5%)
-                -5);    // bottom margin(-5%)
-
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to resize page contents.");
-            }
-        }
+        // Apply a uniform 5 % shrink to the page contents via Zoom
+        var editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
+        editor.ProcessPages = allPages;   // target every page
+        editor.Zoom = 0.95f;               // shrink content by 5 %
+        editor.Save(outputPath);
 
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }

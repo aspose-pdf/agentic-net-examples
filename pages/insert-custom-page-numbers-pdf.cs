@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_page_numbers.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,48 +16,32 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Configure the PageNumber format: current/total (e.g., 1/10)
-            PageNumber pageNumberFormat = new PageNumber
-            {
-                Delimiter = "/",                     // Use '/' as separator
-                Index = new PageNumber.PageIndex(),   // Placeholder for current page index
-                TotalNum = new PageNumber.PageTotalNum() // Placeholder for total pages
-            };
+            int totalPages = doc.Pages.Count; // 1‑based page count
 
-            int totalPages = doc.Pages.Count;
-
-            // Iterate through all pages (1‑based indexing)
+            // Iterate using 1‑based indexing as required by Aspose.Pdf
             for (int i = 1; i <= totalPages; i++)
             {
-                // Generate the formatted page number string for this page
-                string pageNumberText = pageNumberFormat.GetPageNumberString(i, totalPages);
+                Page page = doc.Pages[i];
 
-                // Create a TextStamp with the generated text
-                TextStamp stamp = new TextStamp(pageNumberText)
-                {
-                    // Position the stamp at the bottom‑right corner
-                    BottomMargin = 20,
-                    RightMargin = 20,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment = VerticalAlignment.Bottom
-                };
+                // Create the page number text in the format "current/total"
+                string pageNumberText = $"{i}/{totalPages}";
 
-                // Set TextState properties (TextState is read‑only, so we modify the existing instance)
-                stamp.TextState.FontSize = 12;
-                stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                stamp.TextState.ForegroundColor = Color.Black;
+                TextFragment tf = new TextFragment(pageNumberText);
+                tf.TextState.FontSize = 12;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                tf.Position = new Position(50, 20); // Adjust X/Y as needed (bottom‑left corner)
 
-                // Apply the stamp to the current page
-                doc.Pages[i].AddStamp(stamp);
+                // Add the text fragment to the page's paragraphs collection
+                page.Paragraphs.Add(tf);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
+        Console.WriteLine($"Page numbers inserted and saved to '{outputPath}'.");
     }
 }

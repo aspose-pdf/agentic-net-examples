@@ -6,45 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";      // source PDF
-        const string overlayPng = "overlay.png";    // transparent PNG to overlay
-        const string outputPdf  = "output.pdf";     // result PDF
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string overlayPng = "overlay.png";       // transparent PNG to overlay
+        const string outputPdf = "output.pdf";         // result PDF
 
-        // Validate input files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
+
         if (!File.Exists(overlayPng))
         {
-            Console.Error.WriteLine($"Overlay image not found: {overlayPng}");
+            Console.Error.WriteLine($"Overlay PNG not found: {overlayPng}");
             return;
         }
 
-        // Load the PDF (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate over all pages (foreach works with 1‑based indexing internally)
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Determine page dimensions
-                double pageWidth  = page.Rect.Width;
-                double pageHeight = page.Rect.Height;
+                // Create an ImageStamp from the transparent PNG
+                ImageStamp stamp = new ImageStamp(overlayPng)
+                {
+                    // Ensure the stamp is drawn on top of existing page content
+                    Background = false   // false = overlay (above), true = background (below)
+                };
 
-                // Define a rectangle that covers the whole page.
-                // Fully qualified type avoids ambiguity with System.Drawing.Rectangle.
-                Aspose.Pdf.Rectangle fullPageRect = new Aspose.Pdf.Rectangle(0, 0, pageWidth, pageHeight);
+                // Optionally stretch the overlay to cover the whole page
+                stamp.Width  = page.PageInfo.Width;
+                stamp.Height = page.PageInfo.Height;
 
-                // Add the transparent PNG on top of existing content.
-                // AddImage appends the image to the page content stream, giving it the highest Z‑order.
-                page.AddImage(overlayPng, fullPageRect);
+                // Add the stamp to the current page; AddStamp works per‑page (not on the collection)
+                page.AddStamp(stamp);
             }
 
-            // Save the modified document (lifecycle rule: save inside using block)
-            doc.Save(outputPdf);
+            // Save the modified PDF; Document.Save writes PDF regardless of extension
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Transparent overlay applied to each page. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
     }
 }

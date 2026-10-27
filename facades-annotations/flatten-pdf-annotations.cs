@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,25 +15,21 @@ class Program
             return;
         }
 
-        // Create the annotation editor facade
+        // PdfAnnotationEditor does not implement IDisposable, so we instantiate it directly.
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        try
-        {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
 
-            // Flatten all annotations (convert them to non‑editable visual elements)
-            editor.FlatteningAnnotations();
+        // Load the PDF document.
+        editor.BindPdf(inputPath);
 
-            // Save the flattened PDF
-            editor.Save(outputPath);
-        }
-        finally
-        {
-            // Release resources held by the facade
-            editor.Close();
-        }
+        // Flatten all annotations into non‑editable visual elements.
+        editor.FlatteningAnnotations();
 
-        Console.WriteLine($"Annotations flattened and saved to '{outputPath}'.");
+        // Save the resulting PDF.
+        editor.Save(outputPath);
+
+        // Release internal resources.
+        editor.Close();
+
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }

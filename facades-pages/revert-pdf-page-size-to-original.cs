@@ -16,28 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Use PdfPageEditor to obtain the original size of page 8
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // Ensure the document has at least 8 pages
+            if (doc.Pages.Count < 8)
             {
-                editor.BindPdf(doc);
-                PageSize originalSize = editor.GetPageSize(8); // pages are 1‑based
-                double originalWidth  = originalSize.Width;
-                double originalHeight = originalSize.Height;
-
-                // -----------------------------------------------------------------
-                // At this point the page size could have been changed elsewhere.
-                // For demonstration we change it to a different size first.
-                // -----------------------------------------------------------------
-                doc.Pages[8].SetPageSize(500, 700); // arbitrary new size
-
-                // Revert page 8 back to its original dimensions
-                doc.Pages[8].SetPageSize(originalWidth, originalHeight);
+                Console.Error.WriteLine("Document does not contain page 8.");
+                return;
             }
 
-            // Save the modified document
+            // Store the original dimensions of page 8 (width and height in points)
+            double originalWidth  = doc.Pages[8].PageInfo.Width;
+            double originalHeight = doc.Pages[8].PageInfo.Height;
+
+            // Example modification: change page 8 size to A4 (595 x 842 points)
+            doc.Pages[8].PageInfo.Width  = 595;
+            doc.Pages[8].PageInfo.Height = 842;
+
+            // ... any other operations could be performed here ...
+
+            // Revert page 8 back to its original dimensions using the stored values
+            doc.Pages[8].PageInfo.Width  = originalWidth;
+            doc.Pages[8].PageInfo.Height = originalHeight;
+
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 

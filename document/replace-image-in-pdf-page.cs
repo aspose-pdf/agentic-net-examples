@@ -1,57 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // Image class lives here
 
-class ReplaceImageExample
+class ReplaceImageInPdf
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string newImagePath  = "newImage.jpg";   // replacement image (JPEG)
-        const string outputPdfPath = "output.pdf";     // result PDF
+        const string inputPdfPath  = "input.pdf";   // source PDF
+        const string outputPdfPath = "output.pdf";  // result PDF
+        const string newImagePath  = "newImage.jpg"; // replacement image
 
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(newImagePath))
         {
             Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the whole PDF document
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Access the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = pdfDoc.Pages[1];
+            // Aspose.Pdf uses 1‑based page indexing – replace images on the first page
+            Page page = doc.Pages[1];
 
-            // Find all image placements on the page
-            ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
-            page.Accept(imgAbsorber);
+            // Read the replacement image once – reuse the byte array for every occurrence
+            byte[] newImageBytes = File.ReadAllBytes(newImagePath);
 
-            // If there is at least one image, replace the first one
-            if (imgAbsorber.ImagePlacements.Count > 0)
+            // Walk through all paragraph elements on the page and replace any Image element
+            foreach (var paragraph in page.Paragraphs)
             {
-                ImagePlacement placement = imgAbsorber.ImagePlacements[0];
-
-                // Replace the image data while keeping its rectangle, rotation, etc.
-                using (FileStream newImgStream = File.OpenRead(newImagePath))
+                if (paragraph is Image img)
                 {
-                    placement.Replace(newImgStream);
+                    // Preserve layout (position, size, margins) – only swap the underlying image data
+                    img.ImageStream = new MemoryStream(newImageBytes);
                 }
             }
-            else
-            {
-                Console.WriteLine("No images found on the first page.");
-            }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image replaced and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image(s) replaced and PDF saved to '{outputPdfPath}'.");
     }
 }

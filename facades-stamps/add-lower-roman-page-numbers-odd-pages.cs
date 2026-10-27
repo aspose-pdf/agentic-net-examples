@@ -1,55 +1,76 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the document.
-        Document doc = new Document(inputPdf);
-        int pageCount = doc.Pages.Count; // 1‑based page count
+        // Load the document once – we will modify it in‑place.
+        Document pdfDoc = new Document(inputPath);
+        int pageCount = pdfDoc.Pages.Count;
 
-        // Iterate over odd pages only and add a lower‑case Roman numeral page number.
-        for (int i = 1; i <= pageCount; i++)
+        // Iterate over odd pages and add a lower‑roman page number stamp.
+        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber += 2)
         {
-            if (i % 2 == 0) // skip even pages
-                continue;
+            // Convert the page index (1‑based) to lower‑roman.
+            string roman = ToLowerRoman(pageNumber);
 
-            // Create a PageNumberStamp that will be replaced by the page number.
-            PageNumberStamp stamp = new PageNumberStamp()
-            {
-                // Position the stamp at the bottom‑center of the page.
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Use lower‑case Roman numerals.
-                NumberingStyle = NumberingStyle.NumeralsRomanLowercase,
-                // Adjust bottom margin (20 points from the bottom).
-                BottomMargin = 20
-            };
-
-            // Configure the visual appearance of the stamp.
-            stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            // Create a TextStamp with the computed number.
+            TextStamp stamp = new TextStamp(roman);
             stamp.TextState.FontSize = 12;
-            stamp.TextState.ForegroundColor = Color.Black;
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment = VerticalAlignment.Bottom;
+            stamp.BottomMargin = 10;
 
-            // Add the stamp to the current page.
-            doc.Pages[i].AddStamp(stamp);
+            // Apply the stamp to the current odd page.
+            pdfDoc.Pages[pageNumber].AddStamp(stamp);
         }
 
-        // Save the modified PDF.
-        doc.Save(outputPdf);
-        Console.WriteLine($"Page numbers added (lower‑roman, odd pages) to '{outputPdf}'.");
+        // Save the modified document.
+        pdfDoc.Save(outputPath);
+        Console.WriteLine($"Page numbers (lower‑roman) added to odd pages. Saved as '{outputPath}'.");
+    }
+
+    // Helper: convert an integer (>=1) to a lower‑case Roman numeral.
+    private static string ToLowerRoman(int number)
+    {
+        if (number <= 0) throw new ArgumentOutOfRangeException(nameof(number));
+        var map = new[]
+        {
+            new { Value = 1000, Numeral = "m" },
+            new { Value = 900,  Numeral = "cm" },
+            new { Value = 500,  Numeral = "d" },
+            new { Value = 400,  Numeral = "cd" },
+            new { Value = 100,  Numeral = "c" },
+            new { Value = 90,   Numeral = "xc" },
+            new { Value = 50,   Numeral = "l" },
+            new { Value = 40,   Numeral = "xl" },
+            new { Value = 10,   Numeral = "x" },
+            new { Value = 9,    Numeral = "ix" },
+            new { Value = 5,    Numeral = "v" },
+            new { Value = 4,    Numeral = "iv" },
+            new { Value = 1,    Numeral = "i" }
+        };
+        var result = string.Empty;
+        foreach (var entry in map)
+        {
+            while (number >= entry.Value)
+            {
+                result += entry.Numeral;
+                number -= entry.Value;
+            }
+        }
+        return result;
     }
 }

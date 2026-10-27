@@ -1,40 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
+        // Input and output PDF file paths
         const string inputPath  = "input.pdf";
-        const string outputPath = "customsize.pdf";
+        const string outputPath = "custom_sized.pdf";
 
-        // Custom page dimensions in points (1 inch = 72 points)
-        const double customWidth  = 500; // e.g., 500 points
-        const double customHeight = 800; // e.g., 800 points
-
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor implements IDisposable, so wrap in using
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Custom page dimensions (in points; 1 point = 1/72 inch)
+        // Example: 8.5 x 11 inches => 612 x 792 points.
+        // Here we use non‑standard dimensions: 500 x 700 points.
+        const double customWidth  = 500.0;
+        const double customHeight = 700.0;
+
+        // Load the PDF document.
+        Document pdfDocument = new Document(inputPath);
+
+        // Iterate through all pages and set the custom size.
+        foreach (Page page in pdfDocument.Pages)
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
-
-            // Set the new page size for all pages (or set ProcessPages to target specific pages)
-            editor.PageSize = new PageSize((float)customWidth, (float)customHeight);
-
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPath);
+            page.PageInfo.Width  = customWidth;
+            page.PageInfo.Height = customHeight;
         }
+
+        // Save the modified PDF with the new page dimensions.
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"PDF saved with custom page size to '{outputPath}'.");
     }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,63 +8,61 @@ class Program
     static void Main()
     {
         // Input files
-        const string sourcePdf = "source.pdf";          // PDF from which pages will be removed
-        const string secondPdf = "second.pdf";          // PDF to concatenate after deletion
-        const string tempPdf   = "temp_deleted.pdf";    // Intermediate file after page deletion
-        const string outputPdf = "final_merged.pdf";    // Resulting merged PDF
+        const string sourcePdfPath   = "source.pdf";      // PDF from which pages will be removed
+        const string secondPdfPath   = "second.pdf";      // PDF to concatenate after editing
+        const string finalOutputPath = "merged_output.pdf";
 
-        // Pages to delete (1‑based indexing). Example: delete pages 2 and 4.
-        int[] pagesToDelete = new int[] { 2, 4 };
-
-        // Verify that input files exist
-        if (!File.Exists(sourcePdf))
+        // Verify files exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"File not found: {sourcePdfPath}");
             return;
         }
-        if (!File.Exists(secondPdf))
+        if (!File.Exists(secondPdfPath))
         {
-            Console.Error.WriteLine($"Second file not found: {secondPdf}");
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
+
+        // Temporary file to hold the edited source PDF
+        string tempEditedPath = Path.GetTempFileName();
 
         try
         {
-            // ------------------------------------------------------------
-            // Step 1: Delete specified pages from the source PDF.
-            // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block.
-            // ------------------------------------------------------------
+            // Load source PDF, delete pages, and save to temporary file
+            using (Document srcDoc = new Document(sourcePdfPath))
+            {
+                // Example: delete page 2 (1‑based indexing)
+                // Adjust or loop as needed for multiple pages
+                if (srcDoc.Pages.Count >= 2)
+                {
+                    srcDoc.Pages.Delete(2);
+                }
+
+                // Save the edited document to the temporary location
+                srcDoc.Save(tempEditedPath);
+            }
+
+            // Concatenate the edited PDF with the second PDF
+            // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Delete pages and write the result to a temporary file.
-            bool deleteSuccess = editor.Delete(sourcePdf, pagesToDelete, tempPdf);
-            if (!deleteSuccess)
-            {
-                Console.Error.WriteLine("Page deletion failed.");
-                return;
-            }
+            // The order of files determines the sequence in the merged result
+            editor.Concatenate(tempEditedPath, secondPdfPath, finalOutputPath);
 
-            // ------------------------------------------------------------
-            // Step 2: Concatenate the edited PDF with the second PDF.
-            // ------------------------------------------------------------
-            bool concatSuccess = editor.Concatenate(tempPdf, secondPdf, outputPdf);
-            if (!concatSuccess)
-            {
-                Console.Error.WriteLine("Concatenation failed.");
-                return;
-            }
-
-            // Optional: clean up the intermediate file.
-            if (File.Exists(tempPdf))
-            {
-                File.Delete(tempPdf);
-            }
-
-            Console.WriteLine($"Successfully created merged PDF: '{outputPdf}'");
+            Console.WriteLine($"Pages deleted and PDFs concatenated successfully. Output: {finalOutputPath}");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Clean up the temporary edited file
+            if (File.Exists(tempEditedPath))
+            {
+                try { File.Delete(tempEditedPath); } catch { /* ignore cleanup errors */ }
+            }
         }
     }
 }

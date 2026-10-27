@@ -1,56 +1,53 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, temporary extracted PDF, and final output PDF paths
-        const string inputPdf   = "input.pdf";
-        const string tempPdf    = "temp_extracted.pdf";
-        const string outputPdf  = "output.pdf";
+        const string sourcePdf = "source.pdf";
+        const string finalPdf  = "selected_rotated.pdf";
+        const string tempPdf   = "temp_extracted.pdf";
 
-        // Pages to keep (1‑based indexing) and rotation angle (0, 90, 180, 270)
+        // 1‑based page numbers to extract
         int[] pagesToExtract = new int[] { 2, 4, 5 };
-        int   rotationDegree = 90;
 
-        // Validate input file existence
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        try
+        // -------------------------------------------------
+        // Extract the selected pages to a temporary PDF file
+        // -------------------------------------------------
+        PdfFileEditor fileEditor = new PdfFileEditor();
+        // NOTE: In the Aspose.Pdf version used, the Extract overload expects
+        // (sourcePath, int[] pageNumbers, outputPath).
+        fileEditor.Extract(sourcePdf, pagesToExtract, tempPdf);
+
+        // -------------------------------------------------
+        // Rotate each page in the extracted PDF
+        // -------------------------------------------------
+        // Load the temporary PDF as a Document to access page objects.
+        Document doc = new Document(tempPdf);
+        for (int i = 1; i <= doc.Pages.Count; i++)
         {
-            // ------------------------------------------------------------
-            // Step 1: Extract the selected pages into a temporary PDF file
-            // ------------------------------------------------------------
-            PdfFileEditor fileEditor = new PdfFileEditor(); // not disposable
-            fileEditor.Extract(inputPdf, pagesToExtract, tempPdf);
-
-            // ------------------------------------------------------------
-            // Step 2: Rotate the extracted pages using PdfPageEditor
-            // ------------------------------------------------------------
-            PdfPageEditor pageEditor = new PdfPageEditor(); // not disposable
-            pageEditor.BindPdf(tempPdf);                 // Load the temporary PDF
-            pageEditor.ProcessPages = pagesToExtract;    // Pages to apply rotation
-            pageEditor.Rotation = rotationDegree;        // Set desired rotation
-            pageEditor.ApplyChanges();                   // Apply modifications
-            pageEditor.Save(outputPdf);                  // Save final PDF
-
-            // ------------------------------------------------------------
-            // Cleanup: delete the temporary file
-            // ------------------------------------------------------------
-            if (File.Exists(tempPdf))
-                File.Delete(tempPdf);
-
-            Console.WriteLine($"Created rotated PDF: '{outputPdf}'");
+            // Rotate 90 degrees clockwise.
+            doc.Pages[i].Rotate = Rotation.on90;
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save the rotated pages back to the temporary file.
+        doc.Save(tempPdf);
+
+        // -------------------------------------------------
+        // Rename the temporary file to the final output name
+        // -------------------------------------------------
+        if (File.Exists(finalPdf))
+            File.Delete(finalPdf);
+        File.Move(tempPdf, finalPdf);
+
+        Console.WriteLine($"Created PDF with selected rotated pages: {finalPdf}");
     }
 }

@@ -2,54 +2,81 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
-public static class PdfGenerator
+class PdfGenerator
 {
-    /// <summary>
-    /// Creates a PDF document in memory, adds a simple graph (rectangle shape), and returns the PDF as a byte array.
-    /// </summary>
     public static byte[] CreatePdfWithGraph()
     {
-        // Output stream that will hold the PDF bytes
-        using (MemoryStream outputStream = new MemoryStream())
+        // MemoryStream will hold the PDF in memory
+        using (MemoryStream ms = new MemoryStream())
         {
-            // Document must be disposed deterministically
+            // Create a new PDF document
             using (Document doc = new Document())
             {
-                // Add a new page to the document
+                // Add a blank page (first page)
                 Page page = doc.Pages.Add();
 
-                // Create a Graph container (width: 400pt, height: 200pt) using double values (new API)
-                Graph graph = new Graph(400.0, 200.0);
+                // Create a graph container of size 400x300 points
+                Graph graph = new Graph(400.0, 300.0);
 
-                // Define a rectangle shape inside the graph using the drawing Rectangle type
-                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0.0f, 0.0f, 100.0f, 50.0f);
-                rect.GraphInfo = new GraphInfo
+                // Sample data points for a simple line graph
+                double[] xValues = new double[] { 10, 30, 50, 70, 90 };
+                double[] yValues = new double[] { 20, 40, 60, 80, 100 };
+
+                // Convert the double values to the coordinate system used by the Graph (points)
+                // The Graph's origin (0,0) is at the lower‑left corner of the container.
+                // We'll simply map the values directly because they already fit within the 0‑100 range.
+                for (int i = 0; i < xValues.Length - 1; i++)
                 {
-                    FillColor = Aspose.Pdf.Color.LightGray,
-                    Color = Aspose.Pdf.Color.Black,
-                    LineWidth = 1.0f
-                };
+                    // Create a line segment between two consecutive points
+                    Line line = new Line(new float[]
+                    {
+                        (float)xValues[i], (float)yValues[i],
+                        (float)xValues[i + 1], (float)yValues[i + 1]
+                    });
 
-                // Add the rectangle to the graph's shape collection
-                graph.Shapes.Add(rect);
+                    // Set visual appearance of the line
+                    line.GraphInfo = new GraphInfo
+                    {
+                        Color = Color.FromRgb(0.2, 0.5, 0.8), // blue‑ish colour
+                        LineWidth = 2
+                    };
 
-                // Add the graph to the page's paragraph collection
+                    // Add the line to the graph
+                    graph.Shapes.Add(line);
+                }
+
+                // Optionally, add axes as simple lines for visual reference
+                // X‑axis
+                Line xAxis = new Line(new float[] { 0, 0, 100, 0 });
+                xAxis.GraphInfo = new GraphInfo { Color = Color.Black, LineWidth = 1 };
+                graph.Shapes.Add(xAxis);
+                // Y‑axis
+                Line yAxis = new Line(new float[] { 0, 0, 0, 100 });
+                yAxis.GraphInfo = new GraphInfo { Color = Color.Black, LineWidth = 1 };
+                graph.Shapes.Add(yAxis);
+
+                // Add the graph to the page
                 page.Paragraphs.Add(graph);
 
-                // Save the PDF into the memory stream (PDF format is implicit)
-                doc.Save(outputStream);
+                // Save the PDF into the memory stream
+                doc.Save(ms);
             }
 
-            // Return the PDF bytes
-            return outputStream.ToArray();
+            // Return the PDF as a byte array
+            return ms.ToArray();
         }
     }
+}
 
-    // Simple entry point for console execution (provides a Main method to satisfy the compiler)
-    public static void Main()
+class Program
+{
+    static void Main()
     {
-        byte[] pdfBytes = CreatePdfWithGraph();
+        byte[] pdfBytes = PdfGenerator.CreatePdfWithGraph();
         Console.WriteLine($"Generated PDF size: {pdfBytes.Length} bytes");
+        // Uncomment the line below to write the PDF to disk for manual inspection
+        // File.WriteAllBytes("graph.pdf", pdfBytes);
     }
 }

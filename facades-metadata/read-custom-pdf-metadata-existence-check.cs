@@ -1,5 +1,6 @@
 using System;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
 
 class Program
 {
@@ -7,26 +8,25 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        // Verify the file exists before proceeding
-        if (!System.IO.File.Exists(pdfPath))
+        if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // PdfFileInfo is a facade for accessing PDF metadata; wrap it in a using block for proper disposal
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath))
+        // Load the PDF document. Document implements IDisposable, so use a using block.
+        using (Document doc = new Document(pdfPath))
         {
-            // GetMetaInfo returns an empty string when the custom key is absent
-            string confidential = pdfInfo.GetMetaInfo("Confidential");
+            // Retrieve the custom metadata value for the key "Confidential" from the document's Info dictionary.
+            string confidentialValue = doc.Info["Confidential"];
 
-            if (string.IsNullOrEmpty(confidential))
+            if (!string.IsNullOrEmpty(confidentialValue))
             {
-                Console.WriteLine("Custom metadata key 'Confidential' does not exist.");
+                Console.WriteLine($"Confidential: {confidentialValue}");
             }
             else
             {
-                Console.WriteLine($"Confidential: {confidential}");
+                Console.WriteLine("Custom metadata key 'Confidential' not found.");
             }
         }
     }

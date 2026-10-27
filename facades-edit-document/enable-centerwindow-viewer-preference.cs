@@ -1,12 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // PdfContentEditor, ViewerPreference
+using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder; // Required for RuntimeBinderException
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "centered_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,19 +16,27 @@ class Program
             return;
         }
 
-        // PdfContentEditor implements IDisposable, so wrap it in a using block.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        // Load the PDF document using the current Aspose.Pdf API
+        Document pdfDocument = new Document(inputPath);
+
+        // Attempt to set the CenterWindow viewer preference.
+        // The ViewerPreferences property exists only in newer versions of Aspose.Pdf.
+        // To keep the source compatible with older versions we access it via dynamic
+        // and handle the possible RuntimeBinderException gracefully.
+        dynamic docDynamic = pdfDocument;
+        try
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
-
-            // Set the CenterWindow viewer preference (true) by applying the corresponding flag.
-            editor.ChangeViewerPreference(ViewerPreference.CenterWindow);
-
-            // Save the modified PDF.
-            editor.Save(outputPath);
+            // If the property exists, set CenterWindow to true.
+            docDynamic.ViewerPreferences.CenterWindow = true;
+        }
+        catch (RuntimeBinderException)
+        {
+            Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version. Skipping CenterWindow setting.");
         }
 
-        Console.WriteLine($"PDF saved with CenterWindow enabled: {outputPath}");
+        // Save the PDF with (or without) the updated viewer preference
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

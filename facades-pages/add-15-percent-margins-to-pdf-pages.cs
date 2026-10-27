@@ -1,51 +1,65 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Collections.Generic;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF (original booklet layout)
-        const string inputPath = "input.pdf";
-        // Output PDF with added margins
-        const string outputPath = "output_booklet.pdf";
+        // Input and output PDF paths
+        const string inputPath  = "input.pdf";
+        const string outputPath = "booklet_output.pdf";
 
-        // Pages to which the margin will be applied.
-        // Set to null to process all pages, or specify an array like new int[] {1,2,3}
-        int[] pages = null;
+        // Define which pages should receive the margin resize (1‑based indexing)
+        // Example: pages 2, 4, 6
+        List<int> selectedPages = new List<int> { 2, 4, 6 };
 
-        // Desired margins: 15 % on each side (left, right, top, bottom)
-        const double leftMargin  = 15;
-        const double rightMargin = 15;
-        const double topMargin   = 15;
-        const double bottomMargin= 15;
-
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the facade object (PdfFileEditor does NOT implement IDisposable)
-        PdfFileEditor editor = new PdfFileEditor();
+        try
+        {
+            // Load the PDF document inside a using block (lifecycle rule)
+            using (Document doc = new Document(inputPath))
+            {
+                // Apply a 15 % margin on each side of the selected pages
+                foreach (int pageNumber in selectedPages)
+                {
+                    // Ensure the page number is within the document range
+                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                    {
+                        Console.WriteLine($"Skipping invalid page number: {pageNumber}");
+                        continue;
+                    }
 
-        // Apply the 15 % margins to the selected pages
-        bool result = editor.AddMarginsPct(
-            inputPath,      // source PDF
-            outputPath,     // destination PDF
-            pages,          // pages to process (null = all)
-            leftMargin,     // left margin in percent
-            rightMargin,    // right margin in percent
-            topMargin,      // top margin in percent
-            bottomMargin); // bottom margin in percent
+                    // Retrieve the original page dimensions (points)
+                    Page page = doc.Pages[pageNumber];
+                    double pageWidth  = page.PageInfo.Width;
+                    double pageHeight = page.PageInfo.Height;
 
-        // No Close() method exists on PdfFileEditor; resources are released automatically.
+                    // Calculate 15 % of width/height for each margin side
+                    double marginLeft   = 0.15 * pageWidth;
+                    double marginRight  = 0.15 * pageWidth;
+                    double marginTop    = 0.15 * pageHeight;
+                    double marginBottom = 0.15 * pageHeight;
 
-        // Inform the user of the outcome
-        Console.WriteLine(result
-            ? $"Margins added successfully. Output saved to '{outputPath}'."
-            : "Failed to add margins to the PDF.");
+                    // Set the new margins for the current page using MarginInfo
+                    page.PageInfo.Margin = new MarginInfo(marginLeft, marginRight, marginTop, marginBottom);
+                }
+
+                // Save the modified document (save rule)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Booklet PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

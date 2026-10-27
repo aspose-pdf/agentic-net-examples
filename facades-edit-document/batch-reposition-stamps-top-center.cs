@@ -1,65 +1,81 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
-class Program
+class BatchStampReposition
 {
     static void Main()
     {
-        // List of PDF files to process
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Input folder containing PDFs to process
+        const string inputFolder = @"C:\InputPdfs";
+        // Output folder for the modified PDFs
+        const string outputFolder = @"C:\OutputPdfs";
 
-        foreach (string inputPath in inputFiles)
+        // Verify input folder exists
+        if (!Directory.Exists(inputFolder))
         {
+            Console.WriteLine($"Input folder does not exist: {inputFolder}");
+            return;
+        }
+
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            // Verify the PDF file exists before loading
             if (!File.Exists(inputPath))
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
+                Console.WriteLine($"File not found, skipping: {inputPath}");
                 continue;
             }
 
-            // Output file name (original name with suffix)
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(inputPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPath) + "_repositioned.pdf");
-
-            // Load the document to obtain page dimensions (using rule for disposal)
+            // Load the PDF with the core Document API (must be disposed via using)
             using (Document doc = new Document(inputPath))
             {
-                // Initialize the content editor and bind the same PDF file
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(inputPath);
+                int pageCount = doc.Pages.Count;
 
-                // Iterate through all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
                 {
-                    // Retrieve page size
-                    var pageInfo = doc.Pages[pageNum].PageInfo;
-                    double pageWidth = pageInfo.Width;
-                    double pageHeight = pageInfo.Height;
+                    Page page = doc.Pages[pageIndex];
 
-                    // Get all stamps on the current page
-                    StampInfo[] stamps = editor.GetStamps(pageNum);
-                    if (stamps == null) continue;
-
-                    // Reposition each stamp to top‑center
-                    for (int i = 0; i < stamps.Length; i++)
+                    // Iterate over a copy of the annotations collection to avoid modification issues
+                    for (int annIndex = page.Annotations.Count; annIndex >= 1; annIndex--)
                     {
-                        // Horizontal center, 10 points below the top edge
-                        double newX = pageWidth / 2.0;
-                        double newY = pageHeight - 10.0;
+                        Annotation annotation = page.Annotations[annIndex];
 
-                        // MoveStamp uses 1‑based stamp index
-                        editor.MoveStamp(pageNum, i + 1, newX, newY);
+                        // Only process stamp annotations
+                        if (annotation is StampAnnotation stamp)
+                        {
+                            // Current stamp dimensions
+                            double stampWidth = stamp.Rect.URX - stamp.Rect.LLX;
+                            double stampHeight = stamp.Rect.URY - stamp.Rect.LLY;
+
+                            // Page dimensions
+                            double pageWidth = page.PageInfo.Width;
+                            double pageHeight = page.PageInfo.Height;
+
+                            // Compute new rectangle: top‑center of the page
+                            double newLlx = (pageWidth - stampWidth) / 2.0;
+                            double newLly = pageHeight - stampHeight; // top edge
+                            double newUrx = newLlx + stampWidth;
+                            double newUry = pageHeight;
+
+                            // Apply the new position
+                            stamp.Rect = new Aspose.Pdf.Rectangle(newLlx, newLly, newUrx, newUry);
+                        }
                     }
                 }
 
-                // Save the modified PDF
-                editor.Save(outputPath);
-                editor.Close();
+                // Save the modified PDF to the output folder
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+                doc.Save(outputPath);
             }
-
-            Console.WriteLine($"Repositioned PDF saved to '{outputPath}'.");
         }
+
+        Console.WriteLine("Batch stamp repositioning completed.");
     }
 }

@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_centered.pdf";
+        const string text = "Centered Text on Page 2";
 
         if (!File.Exists(inputPath))
         {
@@ -16,26 +17,20 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor facade to edit page layout
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+        // Load the PDF document using the high‑level API (Document)
+        Document doc = new Document(inputPath);
 
-            // Target only page 2
-            editor.ProcessPages = new int[] { 2 };
+        // Create a text fragment and set its horizontal alignment to Center
+        TextFragment fragment = new TextFragment(text);
+        fragment.TextState.FontSize = 12;                     // optional size
+        fragment.TextState.Font = FontRepository.FindFont("Arial"); // optional font
+        fragment.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Center the original content horizontally on the result page
-            // Use the non‑obsolete HorizontalAlignment enum (Aspose.Pdf.HorizontalAlignment)
-            editor.HorizontalAlignment = HorizontalAlignment.Center;
+        // Add the fragment to page 2 (Aspose.Pdf uses 1‑based page indexing)
+        doc.Pages[2].Paragraphs.Add(fragment);
 
-            // Apply the changes to the document
-            editor.ApplyChanges();
-
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Page 2 content centered horizontally saved to '{outputPath}'.");
+        // Save the modified PDF
+        doc.Save(outputPath);
+        Console.WriteLine($"Centered content saved to '{outputPath}'.");
     }
 }

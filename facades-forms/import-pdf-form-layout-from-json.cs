@@ -1,110 +1,129 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
-namespace PdfFormLayoutImport
+class FieldDefinition
 {
-    // Represents a single field definition in the JSON layout file
-    public class FieldDefinition
-    {
-        // The properties are required – C# 11 "required" keyword tells the compiler they must be set
-        public required string Name { get; set; }
-        public required string Type { get; set; }
-        public int Page { get; set; }
-        public float Llx { get; set; }
-        public float Lly { get; set; }
-        public float Urx { get; set; }
-        public float Ury { get; set; }
-    }
+    // Mark properties as required to satisfy non‑nullable warnings (C# 11+)
+    public required string Name { get; set; }
+    public required string Type { get; set; }          // "TextBox", "CheckBox", "RadioButton", etc.
+    public int Page { get; set; }                     // 1‑based page number
+    public double Llx { get; set; }                   // lower‑left X
+    public double Lly { get; set; }                   // lower‑left Y
+    public double Urx { get; set; }                   // upper‑right X
+    public double Ury { get; set; }                   // upper‑right Y
+}
 
-    class Program
+class Program
+{
+    static void Main()
     {
-        static void Main()
+        const string jsonPath   = "layout.json";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(jsonPath))
         {
-            const string jsonPath   = "fieldLayout.json";   // JSON file with field layout
-            const string outputPath = "output.pdf";         // Resulting PDF file
+            Console.Error.WriteLine($"JSON layout file not found: {jsonPath}");
+            return;
+        }
 
-            // ---------------------------------------------------------------------
-            // 1️⃣ Create a sample JSON layout file (self‑contained – no external files)
-            // ---------------------------------------------------------------------
-            var sampleFields = new List<FieldDefinition>
-            {
-                new FieldDefinition
-                {
-                    Name = "Customer.Name",
-                    Type = "Text",
-                    Page = 1,
-                    Llx = 100,
-                    Lly = 700,
-                    Urx = 300,
-                    Ury = 720
-                },
-                new FieldDefinition
-                {
-                    Name = "Customer.AcceptTerms",
-                    Type = "CheckBox",
-                    Page = 1,
-                    Llx = 100,
-                    Lly = 650,
-                    Urx = 115,
-                    Ury = 665
-                }
-            };
-            // Serialize the sample layout to the expected file location
-            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            File.WriteAllText(jsonPath, JsonSerializer.Serialize(sampleFields, jsonOptions));
+        // Deserialize field layout
+        List<FieldDefinition>? maybeFields;
+        try
+        {
+            string json = File.ReadAllText(jsonPath);
+            maybeFields = JsonSerializer.Deserialize<List<FieldDefinition>>(json);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+            return;
+        }
 
-            // ---------------------------------------------------------------------
-            // 2️⃣ Load and deserialize the JSON layout (null‑safe)
-            // ---------------------------------------------------------------------
-            List<FieldDefinition> fields;
-            using (FileStream fs = File.OpenRead(jsonPath))
-            {
-                fields = JsonSerializer.Deserialize<List<FieldDefinition>>(fs) ?? new List<FieldDefinition>();
-            }
+        if (maybeFields == null)
+        {
+            Console.Error.WriteLine("JSON deserialization returned null.");
+            return;
+        }
 
-            // ---------------------------------------------------------------------
-            // 3️⃣ Create a new PDF document and add a blank page (required before adding fields)
-            // ---------------------------------------------------------------------
-            using (Document doc = new Document())
-            {
+        List<FieldDefinition> fields = maybeFields;
+
+        // Create a new PDF document with enough pages
+        using (Document doc = new Document())
+        {
+            // Determine the highest page number required
+            int maxPage = 0;
+            foreach (var f in fields)
+                if (f.Page > maxPage) maxPage = f.Page;
+
+            // Add blank pages as needed (Aspose.Pdf starts with one page by default)
+            while (doc.Pages.Count < maxPage)
                 doc.Pages.Add();
 
-                // Bind the FormEditor facade to the newly created document
-                FormEditor formEditor = new FormEditor(doc);
+            foreach (var field in fields)
+            {
+                // Build rectangle for the field
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(field.Llx, field.Lly, field.Urx, field.Ury);
 
-                // -----------------------------------------------------------------
-                // 4️⃣ Add each field according to the layout information
-                // -----------------------------------------------------------------
-                foreach (var f in fields)
+                // Create the appropriate form field and add it to the document form
+                switch (field.Type?.Trim().ToLowerInvariant())
                 {
-                    // Convert the string representation of the field type to the enum value
-                    // Enum.Parse can throw if the value is invalid – guard with TryParse for safety
-                    if (!Enum.TryParse<FieldType>(f.Type, true, out var fieldType))
-                    {
-                        Console.WriteLine($"Unsupported field type '{f.Type}' for field '{f.Name}'. Skipping.");
-                        continue;
-                    }
+                    case "textbox":
+                        var txt = new TextBoxField(doc.Pages[field.Page], rect)
+                        {
+                            PartialName = field.Name
+                        };
+                        doc.Form.Add(txt, field.Page);
+                        break;
 
-                    // Add the field at the specified page and rectangle
-                    formEditor.AddField(
-                        fieldType,
-                        f.Name,
-                        f.Page,
-                        f.Llx,
-                        f.Lly,
-                        f.Urx,
-                        f.Ury);
+                    case "checkbox":
+                        // Correct class name is CheckboxField (lowercase 'b')
+                        var chk = new CheckboxField(doc.Pages[field.Page], rect)
+                        {
+                            PartialName = field.Name
+                        };
+                        doc.Form.Add(chk, field.Page);
+                        break;
+
+                    case "radiobutton":
+                        // RadioButtonField constructor takes only the Page; set rectangle afterwards
+                        var rad = new RadioButtonField(doc.Pages[field.Page])
+                        {
+                            PartialName = field.Name,
+                            Rect = rect
+                        };
+                        doc.Form.Add(rad, field.Page);
+                        break;
+
+                    case "listbox":
+                        var lst = new ListBoxField(doc.Pages[field.Page], rect)
+                        {
+                            PartialName = field.Name
+                        };
+                        doc.Form.Add(lst, field.Page);
+                        break;
+
+                    case "combobox":
+                        var cmb = new ComboBoxField(doc.Pages[field.Page], rect)
+                        {
+                            PartialName = field.Name
+                        };
+                        doc.Form.Add(cmb, field.Page);
+                        break;
+
+                    default:
+                        Console.WriteLine($"Unsupported field type '{field.Type}' for field '{field.Name}'. Skipping.");
+                        break;
                 }
-
-                // Save the populated PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF with imported field layout saved to '{outputPath}'.");
+            // Save the resulting PDF
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with form fields saved to '{outputPath}'.");
     }
 }

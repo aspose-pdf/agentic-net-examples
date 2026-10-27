@@ -7,13 +7,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputPdf = "output.pdf";        // result PDF
-        const string logoPath = "corporate_logo.png"; // new watermark image
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string logoPath = "logo.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -23,52 +23,42 @@ class Program
             return;
         }
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Load logo bytes once – StampAnnotation.Image expects a Stream
-            byte[] logoBytes = File.ReadAllBytes(logoPath);
-
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Iterate backwards through annotations so we can safely delete items while iterating
-                for (int annIndex = page.Annotations.Count; annIndex >= 1; annIndex--)
+                // Iterate annotations backwards to safely remove items
+                for (int i = page.Annotations.Count; i >= 1; i--)
                 {
-                    Annotation ann = page.Annotations[annIndex];
-
-                    // Process only WatermarkAnnotation instances
+                    Annotation ann = page.Annotations[i];
                     if (ann is WatermarkAnnotation watermark)
                     {
-                        // Preserve the existing opacity value
-                        double originalOpacity = watermark.Opacity;
+                        // Preserve the original opacity
+                        double opacity = watermark.Opacity;
 
-                        // Preserve the original rectangle (position & size)
-                        Aspose.Pdf.Rectangle rect = watermark.Rect;
+                        // Remove the existing watermark annotation
+                        page.Annotations.Delete(i);
 
-                        // Remove the old watermark annotation
-                        page.Annotations.Delete(annIndex);
-
-                        // Create a new StampAnnotation that will hold the logo image
-                        var stamp = new StampAnnotation(page, rect)
+                        // Create a new image stamp with the corporate logo
+                        ImageStamp logoStamp = new ImageStamp(logoPath)
                         {
-                            Opacity = originalOpacity,
-                            // Assign a MemoryStream (derived from the logo bytes) to Image
-                            Image = new MemoryStream(logoBytes)
+                            Opacity = opacity,
+                            HorizontalAlignment = HorizontalAlignment.Center,
+                            VerticalAlignment = VerticalAlignment.Center
                         };
 
-                        // Add the new image stamp to the page
-                        page.Annotations.Add(stamp);
+                        // Add the logo stamp to the page
+                        page.AddStamp(logoStamp);
                     }
                 }
             }
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarks replaced and saved to '{outputPdf}'.");
+        Console.WriteLine($"All WatermarkAnnotations replaced with logo. Saved to '{outputPath}'.");
     }
 }

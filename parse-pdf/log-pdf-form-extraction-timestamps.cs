@@ -1,55 +1,54 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "form.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (using the recommended lifecycle pattern)
-        using (Document doc = new Document(inputPath))
+        // Capture start timestamp
+        DateTime startTime = DateTime.UtcNow;
+        Console.WriteLine($"Form extraction started at: {startTime:O}");
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Ensure the document contains a form and has fields
+            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Each page may contain XForm objects (form XObjects)
-                foreach (XForm form in page.Resources.Forms)
+                Console.WriteLine("No form fields found in the document.");
+            }
+            else
+            {
+                // Iterate over all form fields and output their names and values
+                foreach (var field in doc.Form.Fields)
                 {
-                    // Log start timestamp
-                    DateTime startTime = DateTime.UtcNow;
-                    Console.WriteLine($"[Form Extraction] Page {pageIndex}, Form '{form.Name}' started at {startTime:O}");
+                    // Field name
+                    string name = field.FullName;
 
-                    // Extract text from the form using TextAbsorber
-                    TextAbsorber absorber = new TextAbsorber();
-                    absorber.Visit(form); // extracts text from the XForm
+                    // Retrieve the field value as a string (handles different field types)
+                    string value = field.Value?.ToString() ?? string.Empty;
 
-                    // (Optional) Do something with the extracted text
-                    string extractedText = absorber.Text;
-                    // For demonstration, write the text to console (could be saved elsewhere)
-                    Console.WriteLine($"Extracted Text ({form.Name}):");
-                    Console.WriteLine(extractedText);
-
-                    // Log end timestamp
-                    DateTime endTime = DateTime.UtcNow;
-                    Console.WriteLine($"[Form Extraction] Page {pageIndex}, Form '{form.Name}' ended at {endTime:O}");
-                    Console.WriteLine($"Duration: {(endTime - startTime).TotalSeconds:F2} seconds");
-                    Console.WriteLine(new string('-', 60));
+                    Console.WriteLine($"Field: {name}, Value: {value}");
                 }
             }
-
-            // No modifications are made, but if you need to save the document, use the standard Save method
-            // doc.Save("output.pdf"); // Uncomment if saving is required
         }
+
+        // Capture end timestamp
+        DateTime endTime = DateTime.UtcNow;
+        Console.WriteLine($"Form extraction ended at: {endTime:O}");
+
+        // Optionally, display the duration
+        TimeSpan duration = endTime - startTime;
+        Console.WriteLine($"Total extraction time: {duration.TotalSeconds:F2} seconds");
     }
 }

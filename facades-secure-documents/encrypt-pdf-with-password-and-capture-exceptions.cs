@@ -1,17 +1,18 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Paths and passwords
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -20,48 +21,30 @@ class Program
 
         try
         {
-            // PdfFileSecurity implements IDisposable, so use a using block.
-            using (PdfFileSecurity security = new PdfFileSecurity())
-            {
-                // Enable exception capturing instead of throwing.
-                security.AllowExceptions = true;
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPath);
 
-                // Bind the source PDF file.
-                security.BindPdf(inputPath);
+            // Define permissions
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Attempt encryption. Returns true on success.
-                bool encrypted = security.EncryptFile(
-                    userPassword,
-                    ownerPassword,
-                    DocumentPrivilege.Print,
-                    KeySize.x256);
+            // Encrypt using AES‑256
+            pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                if (!encrypted)
-                {
-                    // Encryption failed – retrieve detailed info from LastException.
-                    Exception ex = security.LastException;
-                    Console.Error.WriteLine("Encryption failed.");
-                    if (ex != null)
-                    {
-                        Console.Error.WriteLine($"Message: {ex.Message}");
-                        if (ex.InnerException != null)
-                        {
-                            Console.Error.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                        }
-                    }
-                }
-                else
-                {
-                    // Save the encrypted PDF.
-                    security.Save(outputPath);
-                    Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
-                }
-            }
+            // Save the encrypted PDF
+            pdfDoc.Save(outputPath);
+
+            Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // Catch any unexpected errors (should be rare because AllowExceptions suppresses throws).
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // Log detailed exception information
+            Console.Error.WriteLine("Encryption failed.");
+            Console.Error.WriteLine($"Message: {ex.Message}");
+            Console.Error.WriteLine($"StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.Error.WriteLine($"Inner Exception: {ex.InnerException.Message}");
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -8,60 +7,83 @@ class AnnotationRemovalReport
 {
     static void Main()
     {
-        // Input PDF files (could be read from a directory)
-        string[] pdfFiles = new string[]
+        // ---------------------------------------------------------------------
+        // Resolve folders in a safe, OS‑agnostic way.
+        // ---------------------------------------------------------------------
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
+        const string reportFileName = "annotation_report.txt";
+
+        // If the expected InputPdfs folder does not exist, fall back to the current
+        // working directory and inform the user. This prevents DirectoryNotFoundException
+        // at runtime when the sample is executed out‑of‑the‑box.
+        if (!Directory.Exists(inputFolder))
         {
-            "Document1.pdf",
-            "Document2.pdf",
-            "Document3.pdf"
-        };
+            Console.WriteLine($"Input folder '{inputFolder}' not found. Using current directory as fallback.");
+            inputFolder = Directory.GetCurrentDirectory();
+        }
 
-        // Directory to store PDFs after annotation removal
-        string cleanedDir = "CleanedPdfs";
-        Directory.CreateDirectory(cleanedDir);
+        // Ensure the output folder exists – CreateDirectory is a no‑op if it already does.
+        Directory.CreateDirectory(outputFolder);
 
-        // Path for the report file
-        string reportPath = "AnnotationRemovalReport.txt";
-
-        StringBuilder reportBuilder = new StringBuilder();
-        reportBuilder.AppendLine("FileName,AnnotationsRemoved");
-
-        foreach (string inputPath in pdfFiles)
+        // ---------------------------------------------------------------------
+        // Build the CSV report in memory.
+        // ---------------------------------------------------------------------
+        using (StringWriter reportWriter = new StringWriter())
         {
-            if (!File.Exists(inputPath))
+            reportWriter.WriteLine("FileName,AnnotationsRemoved");
+
+            string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+            if (pdfFiles.Length == 0)
             {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                continue;
+                Console.WriteLine($"No PDF files found in '{inputFolder}'.");
             }
 
-            // Count annotations before deletion
-            int totalAnnotations = 0;
-            using (Document doc = new Document(inputPath))
+            foreach (string inputFile in pdfFiles)
             {
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                try
                 {
-                    Page page = doc.Pages[pageNum];
-                    totalAnnotations += page.Annotations.Count;
+                    string fileName = Path.GetFileName(inputFile);
+                    string outputFile = Path.Combine(outputFolder, fileName);
+
+                    // -----------------------------------------------------------------
+                    // 1. Count existing annotations using the high‑level Document API.
+                    // -----------------------------------------------------------------
+                    int removedCount = 0;
+                    using (Document pdfDoc = new Document(inputFile))
+                    {
+                        foreach (Page page in pdfDoc.Pages)
+                        {
+                            removedCount += page.Annotations.Count;
+                        }
+                    }
+
+                    // -----------------------------------------------------------------
+                    // 2. Delete all annotations and save the cleaned PDF.
+                    // -----------------------------------------------------------------
+                    using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
+                    {
+                        annotEditor.BindPdf(inputFile);
+                        annotEditor.DeleteAnnotations();
+                        annotEditor.Save(outputFile);
+                    }
+
+                    // Record the result in the CSV report.
+                    reportWriter.WriteLine($"{fileName},{removedCount}");
+                }
+                catch (Exception ex)
+                {
+                    // Log the error but continue processing the remaining files.
+                    Console.Error.WriteLine($"Error processing '{inputFile}': {ex.Message}");
                 }
             }
 
-            // Delete all annotations using PdfAnnotationEditor
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string cleanedPath = Path.Combine(cleanedDir, $"{fileName}_cleaned.pdf");
-
-            PdfAnnotationEditor editor = new PdfAnnotationEditor();
-            editor.BindPdf(inputPath);
-            editor.DeleteAnnotations(); // removes all annotations
-            editor.Save(cleanedPath);
-            editor.Close(); // optional, releases resources
-
-            // Record the number of removed annotations
-            reportBuilder.AppendLine($"{Path.GetFileName(inputPath)},{totalAnnotations}");
-            Console.WriteLine($"Processed '{inputPath}': removed {totalAnnotations} annotations.");
+            // Write the report next to the executable (or wherever the base directory points).
+            string reportPath = Path.Combine(baseDir, reportFileName);
+            File.WriteAllText(reportPath, reportWriter.ToString());
         }
 
-        // Write the report to a text file
-        File.WriteAllText(reportPath, reportBuilder.ToString());
-        Console.WriteLine($"Report saved to '{reportPath}'.");
+        Console.WriteLine("Annotation removal completed. Report saved to 'annotation_report.txt'.");
     }
 }

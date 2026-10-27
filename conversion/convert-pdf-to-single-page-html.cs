@@ -6,35 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
         const string inputPdf = "input.pdf";
-        // Output HTML file path (single HTML file containing all pages)
         const string outputHtml = "output.html";
 
+        // Verify source file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Configure HTML save options
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            // Load PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Embed all resources (images, CSS, fonts) into the HTML file
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                // Save fonts as WOFF to preserve original typography
-                FontSavingMode = HtmlSaveOptions.FontSavingModes.AlwaysSaveAsWOFF,
-                // Keep the default behavior of not splitting into multiple pages
-                // (single HTML file will contain the whole document)
-            };
+                // Configure HTML conversion options
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Embed all CSS, fonts and images directly into the HTML file
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Save raster images as PNGs embedded in SVG to preserve quality
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    // Produce a single HTML page (default is false, set explicitly for clarity)
+                    SplitIntoPages = false
+                };
 
-            // Save the PDF as a single-page HTML file
-            pdfDoc.Save(outputHtml, htmlOpts);
+                // HTML conversion relies on GDI+ (Windows only); handle possible platform exceptions
+                try
+                {
+                    doc.Save(outputHtml, htmlOpts);
+                    Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+            }
         }
-
-        Console.WriteLine($"Conversion completed: {outputHtml}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

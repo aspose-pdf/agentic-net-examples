@@ -1,20 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core API
-using Aspose.Pdf.Facades;      // For ImageStamp (inherits from Stamp, already in Aspose.Pdf)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf  = "input.pdf";
-        const string stampImg  = "logo.png";   // Image to use as stamp
+        const string stampImg  = "stamp.png";
         const string outputPdf = "output.pdf";
 
-        // Margin offsets (in points)
-        const double rightOffset = 20;   // distance from right edge
-        const double topOffset   = 20;   // distance from top edge
-
+        // Verify files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -26,33 +22,34 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdf = new Document(inputPdf))
         {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImg);
-
-            // Align to top‑right corner
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Right;   // right side
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;      // top side
-
-            // Apply margin offsets
-            imgStamp.RightMargin = rightOffset;
-            imgStamp.TopMargin   = topOffset;
-
-            // Optionally set opacity (0.0‑1.0) or other visual properties here
-            // imgStamp.Opacity = 0.8;
-
-            // Add the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int i = 1; i <= pdf.Pages.Count; i++)
             {
-                page.AddStamp(imgStamp);
+                Page page = pdf.Pages[i];
+
+                // Create an ImageStamp and configure alignment to top‑right
+                ImageStamp stamp = new ImageStamp(stampImg)
+                {
+                    // Align to the right edge and top edge of the page
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Top,
+
+                    // Margin offsets from the top and right edges (in points)
+                    TopMargin  = 30, // distance from the top edge
+                    RightMargin = 20  // distance from the right edge
+                };
+
+                // Apply the stamp to the current page
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPdf);
+            // Save the modified PDF; Save() is called while the Document is still alive
+            pdf.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp applied. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
     }
 }

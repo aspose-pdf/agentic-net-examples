@@ -1,91 +1,62 @@
 using System;
 using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the PDF files (the image will be generated in memory)
-        const string inputPdfPath  = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "output.pdf";
+        const string stampImagePath = "stamp.png";
 
-        // ---------------------------------------------------------------------
-        // 1. Ensure a source PDF exists – create a minimal one‑page document.
-        // ---------------------------------------------------------------------
+        // Define the rectangle where the stamp should fit (coordinates in points)
+        // Lower‑left (llx, lly) and upper‑right (urx, ury) corners.
+        const double llx = 100;   // left X
+        const double lly = 500;   // lower Y
+        const double urx = 300;   // right X
+        const double ury = 700;   // upper Y
+
         if (!File.Exists(inputPdfPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
-
-        // ---------------------------------------------------------------------
-        // 2. Create a simple sample image in memory (e.g., a red rectangle).
-        // ---------------------------------------------------------------------
-        byte[] imageBytes;
-        using (var bmp = new Bitmap(200, 100))
+        if (!File.Exists(stampImagePath))
         {
-            using (var g = Graphics.FromImage(bmp))
-            {
-                g.Clear(System.Drawing.Color.Transparent);
-                using (var brush = new SolidBrush(System.Drawing.Color.Red))
-                {
-                    g.FillRectangle(brush, 0, 0, bmp.Width, bmp.Height);
-                }
-            }
-            using (var ms = new MemoryStream())
-            {
-                bmp.Save(ms, ImageFormat.Png);
-                imageBytes = ms.ToArray();
-            }
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            return;
         }
 
-        // ---------------------------------------------------------------------
-        // 3. Define the rectangle (in points) where the image stamp should fit.
-        //    Rectangle(left, bottom, right, top)
-        //    Example: place the stamp at (100, 500) with width 200 and height 100.
-        // ---------------------------------------------------------------------
-        double llx = 100; // left
-        double lly = 500; // bottom
-        double urx = llx + 200; // right
-        double ury = lly + 100; // top
-        Aspose.Pdf.Rectangle targetRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-        // ---------------------------------------------------------------------
-        // 4. Load the PDF document, create the ImageStamp from the in‑memory image,
-        //    configure it to fit exactly inside the target rectangle, and save.
-        // ---------------------------------------------------------------------
+        // Use a using block for deterministic disposal of the Document.
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create ImageStamp from the generated image bytes
-            using (var imgStream = new MemoryStream(imageBytes))
+            // Create a fully qualified Rectangle to avoid ambiguity.
+            Aspose.Pdf.Rectangle targetRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+            // Create the image stamp.
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                imgStream.Position = 0; // ensure the stream is at the beginning
-                ImageStamp imgStamp = new ImageStamp(imgStream);
+                // Position the stamp at the rectangle's lower‑left corner.
+                LeftMargin   = targetRect.LLX,
+                BottomMargin = targetRect.LLY,
 
-                // Configure the stamp size and position to match the rectangle
-                imgStamp.Width   = targetRect.Width;   // stamp width
-                imgStamp.Height  = targetRect.Height;  // stamp height
-                imgStamp.XIndent = targetRect.LLX;     // lower‑left X coordinate
-                imgStamp.YIndent = targetRect.LLY;     // lower‑left Y coordinate
+                // Explicitly set the stamp size to match the rectangle.
+                Width  = targetRect.Width,
+                Height = targetRect.Height,
 
-                // Optional settings
-                imgStamp.Background = false; // place on top of page content
-                imgStamp.Opacity    = 1.0;    // fully opaque
+                // Optional: ensure the stamp is placed on top of page content.
+                Background = false
+            };
 
-                // Add the stamp to the first page (pages are 1‑based)
-                pdfDoc.Pages[1].AddStamp(imgStamp);
-            }
+            // Apply the stamp to the first page (or any page you need).
+            Page page = pdfDoc.Pages[1];
+            page.AddStamp(imgStamp);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamp applied and saved to '{outputPdfPath}'.");
     }
 }

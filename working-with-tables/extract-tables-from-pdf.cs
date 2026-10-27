@@ -8,7 +8,6 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +15,32 @@ class Program
             return;
         }
 
-        // Load the PDF document (load rule)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber instance (creation rule)
-            TableAbsorber absorber = new TableAbsorber();
-
-            // Absorb tables from the entire document (Visit overload for Document)
-            absorber.Visit(doc);
-
-            // Iterate over all absorbed tables
-            foreach (AbsorbedTable table in absorber.TableList)
+            // Iterate over each page and absorb tables individually.
+            // This way we know the page number without relying on a non‑existent property.
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Output basic table information
-                Console.WriteLine($"Table found on page {table.PageNum}");
-                Console.WriteLine($"Location: LLX={table.Rectangle.LLX}, LLY={table.Rectangle.LLY}, URX={table.Rectangle.URX}, URY={table.Rectangle.URY}");
+                Page page = doc.Pages[pageIndex];
+                TableAbsorber absorber = new TableAbsorber();
+                absorber.Visit(page);
 
-                // Optional: iterate rows, cells, and text fragments within the table
-                foreach (AbsorbedRow row in table.RowList)
+                foreach (var table in absorber.TableList)
                 {
-                    foreach (AbsorbedCell cell in row.CellList)
+                    Console.WriteLine($"Table found on page {pageIndex}");
+                    Console.WriteLine($"Location: {table.Rectangle}");
+                    Console.WriteLine($"Rows: {table.RowList.Count}");
+
+                    if (table.RowList.Count > 0)
                     {
-                        foreach (TextFragment fragment in cell.TextFragments)
-                        {
-                            Console.WriteLine($"  Cell text: {fragment.Text}");
-                        }
+                        var firstRow = table.RowList[0];
+                        Console.WriteLine($"Cells in first row: {firstRow.CellList.Count}");
                     }
+
+                    Console.WriteLine();
                 }
             }
-
-            // Save the (unchanged) document to a new file (save rule)
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processing completed. Output saved to '{outputPath}'.");
     }
 }

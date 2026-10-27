@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,39 +16,44 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document has at least two pages
-            if (doc.Pages.Count < 2)
+            // Load the existing PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("The PDF does not contain a second page.");
-                return;
+                // Verify that a second page exists (Aspose.Pdf uses 1‑based indexing)
+                if (doc.Pages.Count < 2)
+                {
+                    Console.Error.WriteLine("The document does not contain a second page.");
+                    return;
+                }
+
+                // Retrieve the second page
+                Page page = doc.Pages[2];
+
+                // Create a TextFragment with the desired text
+                TextFragment fragment = new TextFragment("Rotated Text");
+                // Set the position where the text will appear
+                fragment.Position = new Position(100, 500);
+                // Rotate the text by 45 degrees
+                fragment.TextState.Rotation = 45;
+                // Optional styling
+                fragment.TextState.FontSize = 24;
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+
+                // Use TextBuilder to insert the fragment onto the page
+                TextBuilder builder = new TextBuilder(page);
+                builder.AppendText(fragment);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Get the second page (1‑based indexing)
-            Page page = doc.Pages[2];
-
-            // Create a text fragment with the desired content
-            TextFragment tf = new TextFragment("Rotated Text");
-            // Set the position where the text will start
-            tf.Position = new Position(200, 400);
-            // Set font, size and colors
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.FontSize = 24;
-            tf.TextState.ForegroundColor = Color.Blue;
-            tf.TextState.BackgroundColor = Color.LightGray;
-            // Rotate the text by 45 degrees
-            tf.TextState.Rotation = 45;
-
-            // Use TextBuilder to append the fragment to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Rotated text added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Rotated text added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

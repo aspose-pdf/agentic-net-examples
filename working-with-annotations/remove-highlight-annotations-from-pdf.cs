@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_highlights.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +17,38 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Collect all highlight annotations on the current page
-                List<Annotation> highlights = new List<Annotation>();
-                foreach (Annotation annotation in page.Annotations)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    if (annotation is HighlightAnnotation)
-                        highlights.Add(annotation);
+                    Page page = doc.Pages[i];
+
+                    // Collect highlight annotations first to avoid modifying the collection during iteration
+                    List<Annotation> highlights = new List<Annotation>();
+                    foreach (Annotation annot in page.Annotations)
+                    {
+                        if (annot is HighlightAnnotation)
+                            highlights.Add(annot);
+                    }
+
+                    // Remove each collected highlight annotation
+                    foreach (Annotation highlight in highlights)
+                        page.Annotations.Delete(highlight);
                 }
 
-                // Delete each collected highlight annotation
-                foreach (Annotation highlight in highlights)
-                {
-                    page.Annotations.Delete(highlight);
-                }
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified document
-            doc.Save(outputPath);
+            Console.WriteLine($"All highlight annotations removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"All highlight annotations removed. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

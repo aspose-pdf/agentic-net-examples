@@ -1,60 +1,53 @@
 using System;
-using System.Drawing;               // System.Drawing.Rectangle is required by the Sign method
-using Aspose.Pdf.Facades;          // PdfFileSignature facade
-using Aspose.Pdf.Forms;            // PKCS1 signature class
+using System.IO;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
+using System.Drawing;
 
-class HideSignatureAppearance
+class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and certificate details
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed_hidden.pdf";
-        const string certPath  = "certificate.pfx";
-        const string certPwd   = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_hidden.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Ensure the input files exist
-        if (!System.IO.File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!System.IO.File.Exists(certPath))
+
+        if (!File.Exists(certPath))
         {
             Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Create the PdfFileSignature facade
-        using (PdfFileSignature pdfSign = new PdfFileSignature())
+        // Bind the source PDF to the PdfFileSignature object.
+        PdfFileSignature pdfSigner = new PdfFileSignature();
+        pdfSigner.BindPdf(inputPath);
+
+        // Create a concrete PKCS7 signature (Signature is abstract).
+        PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
         {
-            // Bind the PDF to be signed
-            pdfSign.BindPdf(inputPdf);
+            Reason = "Document signed",
+            Location = "Location",
+            ContactInfo = string.Empty
+        };
 
-            // Set the certificate that will be used for signing
-            pdfSign.SetCertificate(certPath, certPwd);
+        // Zero‑size rectangle – makes the visual appearance invisible.
+        // The rectangle type required by PdfFileSignature.Sign is System.Drawing.Rectangle.
+        Rectangle invisibleRect = new Rectangle(0, 0, 0, 0);
 
-            // Define a rectangle for the signature field (required even if invisible)
-            // Position (100,100) with width=200 and height=100 (values are in points)
-            Rectangle rect = new Rectangle(100, 100, 200, 100);
+        // Sign the first page (page index starts at 1). Set isVisible to false.
+        // This creates a cryptographically valid signature with no visible appearance.
+        pdfSigner.Sign(1, false, invisibleRect, pkcs7);
 
-            // Sign the document:
-            // - page 1 (Aspose.Pdf uses 1‑based indexing)
-            // - reason, contact, location are optional strings
-            // - visible = false hides the appearance completely
-            // - rect is still needed but will not be rendered because visible is false
-            pdfSign.Sign(
-                page: 1,
-                SigReason: "Document approved",
-                SigContact: "john.doe@example.com",
-                SigLocation: "New York",
-                visible: false,
-                annotRect: rect);
+        // Save the signed PDF.
+        pdfSigner.Save(outputPath);
 
-            // Save the signed PDF; the signature is cryptographically valid but invisible
-            pdfSign.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}' (signature appearance hidden).");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}' with hidden signature appearance.");
     }
 }

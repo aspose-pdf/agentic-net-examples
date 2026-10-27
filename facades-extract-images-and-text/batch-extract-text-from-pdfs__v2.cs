@@ -1,49 +1,59 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace PdfBatchExtract
 {
-    static void Main(string[] args)
+    class Program
     {
-        // Validate arguments
-        if (args.Length < 1)
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: Program <InputFolder> [OutputFolder]");
-            return;
-        }
+            // Adjust these paths as needed
+            string inputDirectory = @"C:\PDFs";
+            string outputDirectory = @"C:\ExtractedText";
 
-        string inputFolder = args[0];
-        string outputFolder = args.Length > 1 ? args[1] : Path.Combine(inputFolder, "ExtractedText");
+            // Ensure the output directory exists
+            if (!Directory.Exists(outputDirectory))
+                Directory.CreateDirectory(outputDirectory);
 
-        // Verify input folder exists
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
+            // Get all PDF files in the input directory (non‑recursive)
+            string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        // Ensure output folder exists
-        if (!Directory.Exists(outputFolder))
-        {
-            Directory.CreateDirectory(outputFolder);
-        }
-
-        // Process each PDF file in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        foreach (string pdfPath in pdfFiles)
-        {
-            string txtPath = Path.Combine(outputFolder, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
-
-            // Use PdfExtractor to extract text
-            using (PdfExtractor extractor = new PdfExtractor())
+            foreach (string pdfPath in pdfFiles)
             {
-                extractor.BindPdf(pdfPath);
-                extractor.ExtractText();
-                extractor.GetText(txtPath);
-            }
+                string txtPath = Path.Combine(outputDirectory, Path.GetFileNameWithoutExtension(pdfPath) + ".txt");
 
-            Console.WriteLine($"Extracted text from '{pdfPath}' to '{txtPath}'");
+                try
+                {
+                    // PdfExtractor implements IDisposable – use a using block to guarantee disposal
+                    using (PdfExtractor extractor = new PdfExtractor())
+                    {
+                        extractor.BindPdf(pdfPath);
+                        extractor.ExtractText();
+
+                        // GetText requires a destination stream. Write the extracted text to a MemoryStream
+                        // and then read it back as a string.
+                        using (MemoryStream textStream = new MemoryStream())
+                        {
+                            extractor.GetText(textStream);
+                            textStream.Position = 0; // rewind
+                            using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
+                            {
+                                string extractedText = reader.ReadToEnd();
+                                // Write the text to a UTF‑8 encoded file
+                                File.WriteAllText(txtPath, extractedText, Encoding.UTF8);
+                            }
+                        }
+                    }
+
+                    Console.WriteLine($"Extracted: {Path.GetFileName(pdfPath)} → {Path.GetFileName(txtPath)}");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Failed to extract '{pdfPath}': {ex.Message}");
+                }
+            }
         }
     }
 }

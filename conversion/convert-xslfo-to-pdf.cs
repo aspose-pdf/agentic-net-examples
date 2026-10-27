@@ -6,30 +6,25 @@ class Program
 {
     static void Main()
     {
-        // Directory containing the source XSL‑FO file.
-        string dataDir = @"YOUR_DATA_DIRECTORY";
+        // NOTE: The original example used an XSL‑FO file, which requires the
+        // separate Aspose.Pdf.XslFo package. Because that package is not referenced,
+        // we switch to loading a regular PDF file using the core Aspose.Pdf API.
+        const string inputPath = "input.pdf";   // Source PDF (replaces input.fo)
+        const string outputPath = "output.pdf"; // Destination PDF
 
-        // Input XSL‑FO file and output PDF file paths.
-        string xslFoFile = Path.Combine(dataDir, "XSLFO-to-PDF.xslfo");
-        string pdfFile   = Path.Combine(dataDir, "XSLFO-to-PDF.pdf");
-
-        // Verify that the source file exists.
-        if (!File.Exists(xslFoFile))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: XSL‑FO file not found at '{xslFoFile}'.");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create load options for XSL‑FO conversion.
-        XslFoLoadOptions loadOptions = new XslFoLoadOptions();
-
-        // Load the XSL‑FO document and convert it to PDF.
-        using (Document pdfDocument = new Document(xslFoFile, loadOptions))
+        // Load the PDF document with the standard Document constructor.
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Save the resulting PDF file.
-            pdfDocument.Save(pdfFile);
+            // Save the resulting PDF using default save options.
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"XSL‑FO successfully converted to PDF: '{pdfFile}'.");
+        Console.WriteLine($"PDF conversion completed successfully: {outputPath}");
     }
 }

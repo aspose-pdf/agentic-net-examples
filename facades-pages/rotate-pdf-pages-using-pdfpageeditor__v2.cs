@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,17 +15,16 @@ class Program
             return;
         }
 
-        // Rotate all pages of the PDF using PdfPageEditor
         using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Load the source PDF
+            // Load the PDF into the editor
             editor.BindPdf(inputPath);
 
-            // Allowed rotation values: 0, 90, 180, 270
-            editor.Rotation = 90;
+            // Specify which page(s) to rotate (1‑based indexing)
+            editor.ProcessPages = new int[] { 1 };
 
-            // Apply the rotation to the document
-            editor.ApplyChanges();
+            // Set rotation angle in degrees. Allowed values are 0, 90, 180, or 270.
+            editor.Rotation = 90;
 
             // Save the rotated PDF
             editor.Save(outputPath);

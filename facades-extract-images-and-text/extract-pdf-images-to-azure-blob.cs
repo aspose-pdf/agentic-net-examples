@@ -1,38 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;          // PdfExtractor resides here
-using Azure.Storage.Blobs;        // Azure Blob SDK (stub implementation provided below)
+using Aspose.Pdf.Facades;          // PdfExtractor
+using Azure.Storage.Blobs;          // BlobContainerClient, BlobClient
 
 // ---------------------------------------------------------------------------
-// Minimal stub implementation of the Azure.Storage.Blobs SDK.
-// This allows the sample to compile without adding the real NuGet package.
-// In production replace this stub with the official Azure.Storage.Blobs package.
+// Minimal stub definitions for Azure.Storage.Blobs types (used when the NuGet
+// package is not referenced). In a real project you should add the
+// Azure.Storage.Blobs NuGet package instead of these stubs.
 // ---------------------------------------------------------------------------
 namespace Azure.Storage.Blobs
 {
-    public class BlobServiceClient
-    {
-        private readonly string _connectionString;
-        public BlobServiceClient(string connectionString) => _connectionString = connectionString;
-        public BlobContainerClient GetBlobContainerClient(string containerName) => new BlobContainerClient(containerName);
-    }
-
     public class BlobContainerClient
     {
+        private readonly string _connectionString;
         private readonly string _containerName;
-        public BlobContainerClient(string containerName) => _containerName = containerName;
-        public void CreateIfNotExists() { /* No‑op for stub */ }
+
+        public BlobContainerClient(string connectionString, string containerName)
+        {
+            _connectionString = connectionString;
+            _containerName = containerName;
+        }
+
+        // In the real SDK this creates the container if it does not exist.
+        // Here it is a no‑op placeholder.
+        public void CreateIfNotExists() { }
+
         public BlobClient GetBlobClient(string blobName) => new BlobClient(blobName);
     }
 
     public class BlobClient
     {
         private readonly string _blobName;
-        public BlobClient(string blobName) => _blobName = blobName;
-        public void Upload(Stream content, bool overwrite = false)
+
+        public BlobClient(string blobName = null)
         {
-            // In a real implementation this would upload to Azure Blob Storage.
-            // The stub simply discards the data.
+            _blobName = blobName;
+        }
+
+        // In the real SDK this uploads the stream to Azure Blob storage.
+        // The stub simply reads the stream to ensure it is consumable.
+        public void Upload(Stream stream, bool overwrite = false)
+        {
+            // Consume the stream so that any errors surface early.
+            using var ms = new MemoryStream();
+            stream.CopyTo(ms);
+            // No actual upload performed.
         }
     }
 }
@@ -41,9 +53,9 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";                     // source PDF
-        const string connectionString = "YourAzureBlobConnectionString"; // Azure storage connection
-        const string containerName = "pdf-images";              // target container
+        const string pdfPath = "input.pdf";
+        const string azureConnectionString = "<YOUR_AZURE_STORAGE_CONNECTION_STRING>";
+        const string containerName = "pdf-images";
 
         if (!File.Exists(pdfPath))
         {
@@ -51,37 +63,36 @@ class Program
             return;
         }
 
-        // Initialize Azure Blob container (create if it does not exist)
-        BlobServiceClient serviceClient = new BlobServiceClient(connectionString);
-        BlobContainerClient containerClient = serviceClient.GetBlobContainerClient(containerName);
+        // Initialize Azure Blob container client (creates container if it does not exist)
+        BlobContainerClient containerClient = new BlobContainerClient(azureConnectionString, containerName);
         containerClient.CreateIfNotExists();
 
-        // Use PdfExtractor to pull images from the PDF
+        // Extract images from the PDF using Aspose.Pdf.Facades.PdfExtractor
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.BindPdf(pdfPath);   // bind the PDF file
-            extractor.ExtractImage();     // start image extraction
+            extractor.BindPdf(pdfPath);          // Load the PDF
+            extractor.ExtractImage();            // Prepare image extraction
 
             int imageIndex = 1;
             while (extractor.HasNextImage())
             {
-                // Retrieve the next image into a memory stream (default format is JPEG)
                 using (MemoryStream imageStream = new MemoryStream())
                 {
-                    extractor.GetNextImage(imageStream);
-                    imageStream.Position = 0; // reset for upload
+                    extractor.GetNextImage(imageStream); // Write image to stream
+                    imageStream.Position = 0;            // Reset stream position for upload
 
-                    // Upload the image to Azure Blob storage
-                    string blobName = $"image-{imageIndex}.jpg";
+                    // Generate a unique blob name for each image
+                    string blobName = $"image_{imageIndex}.bin";
+
+                    // Upload the image stream to Azure Blob storage
                     BlobClient blobClient = containerClient.GetBlobClient(blobName);
                     blobClient.Upload(imageStream, overwrite: true);
-                    Console.WriteLine($"Uploaded {blobName}");
                 }
 
                 imageIndex++;
             }
         }
 
-        Console.WriteLine("All images extracted and uploaded successfully.");
+        Console.WriteLine("All images extracted and uploaded to Azure Blob storage.");
     }
 }

@@ -1,27 +1,24 @@
 using System;
 using System.IO;
-using System.Text;
-using Aspose.Pdf;                     // Document class for creating a placeholder PDF
-using Aspose.Pdf.Facades;          // PdfExtractor resides here
-using Aspose.Pdf.Text;             // TextFragment resides here
-using Npgsql;                     // PostgreSQL .NET driver (stub provided if package missing)
+using Aspose.Pdf.Facades;
+using Npgsql; // Added using for Npgsql (stub defined below)
 
-// -----------------------------------------------------------------------------
-// Minimal stub implementation for Npgsql types when the real NuGet package is not
-// referenced. This allows the sample to compile and run (the stub does not
-// perform any real database operations). In a production project you should
-// reference the official Npgsql package (e.g., via NuGet) and remove this stub.
-// -----------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Minimal stub implementation for the Npgsql library (PostgreSQL ADO.NET provider)
+// ---------------------------------------------------------------------------
 namespace Npgsql
 {
+    // Simple stub for NpgsqlConnection that implements IDisposable.
     public class NpgsqlConnection : IDisposable
     {
         private readonly string _connectionString;
         public NpgsqlConnection(string connectionString) => _connectionString = connectionString;
-        public void Open() { /* No‑op stub */ }
-        public void Dispose() { /* No‑op stub */ }
+        public void Open() { /* No‑op stub – in real code this would open the DB connection */ }
+        public void Close() { /* No‑op stub */ }
+        public void Dispose() => Close();
     }
 
+    // Simple stub for NpgsqlCommand that implements IDisposable.
     public class NpgsqlCommand : IDisposable
     {
         private readonly string _commandText;
@@ -33,15 +30,18 @@ namespace Npgsql
             Parameters = new NpgsqlParameterCollection();
         }
         public NpgsqlParameterCollection Parameters { get; }
-        public int ExecuteNonQuery() => 0; // Stub returns 0 rows affected
+        // In a real implementation this would execute the SQL against PostgreSQL.
+        // Here we simply return 0 to indicate success.
+        public int ExecuteNonQuery() => 0;
         public void Dispose() { /* No‑op stub */ }
     }
 
+    // Stub collection that mimics the AddWithValue method used in the sample.
     public class NpgsqlParameterCollection
     {
         public void AddWithValue(string parameterName, object value)
         {
-            // Stub – store or ignore the value as needed for compilation.
+            // No‑op stub – parameters are ignored in this mock implementation.
         }
     }
 }
@@ -51,58 +51,58 @@ class Program
     static void Main()
     {
         // Path to the source PDF file
-        const string pdfPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
 
-        // Ensure a PDF exists – create a minimal one if it does not.
-        if (!File.Exists(pdfPath))
+        // PostgreSQL connection string (replace placeholders with real values)
+        const string connectionString = "Host=localhost;Username=postgres;Password=your_password;Database=your_database";
+
+        if (!File.Exists(inputPdfPath))
         {
-            using var seedDoc = new Document();
-            seedDoc.Pages.Add();
-            // Add a simple text fragment so the extractor has something to read.
-            seedDoc.Pages[1].Paragraphs.Add(new TextFragment("Sample text for extraction."));
-            seedDoc.Save(pdfPath);
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
         }
 
-        // PostgreSQL connection string – adjust host, user, password, database as needed
-        const string connectionString = "Host=localhost;Username=postgres;Password=secret;Database=mydb";
-
-        // Extract text from the PDF using Aspose.Pdf.Facades.PdfExtractor
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
+            // ---------- Extract text using Aspose.Pdf.Facades ----------
+            PdfExtractor extractor = new PdfExtractor();
+            extractor.BindPdf(inputPdfPath);          // Load the PDF
+            extractor.ExtractText();                  // Perform text extraction
 
-            // Perform text extraction (Unicode encoding is default)
-            extractor.ExtractText();
-
-            // Retrieve the extracted text into a memory stream
+            // GetText requires a destination stream. Use a MemoryStream and read the text.
+            string extractedText;
             using (MemoryStream textStream = new MemoryStream())
             {
-                extractor.GetText(textStream);
-
-                // Convert the stream bytes to a .NET string (Unicode)
-                string extractedText = Encoding.Unicode.GetString(textStream.ToArray());
-
-                // Store the extracted text into PostgreSQL
-                using (NpgsqlConnection conn = new NpgsqlConnection(connectionString))
+                extractor.GetText(textStream); // write extracted text to the stream
+                textStream.Position = 0;        // rewind for reading
+                using (StreamReader reader = new StreamReader(textStream))
                 {
-                    conn.Open();
-
-                    // Example table: documents(id SERIAL PRIMARY KEY, filename TEXT, content TEXT)
-                    const string insertSql = @"
-                        INSERT INTO documents (filename, content)
-                        VALUES (@filename, @content);";
-
-                    using (NpgsqlCommand cmd = new NpgsqlCommand(insertSql, conn))
-                    {
-                        cmd.Parameters.AddWithValue("filename", Path.GetFileName(pdfPath));
-                        cmd.Parameters.AddWithValue("content", extractedText);
-                        cmd.ExecuteNonQuery();
-                    }
+                    extractedText = reader.ReadToEnd();
                 }
             }
-        }
 
-        Console.WriteLine("Text extraction and database insertion completed.");
+            // ---------- Store extracted text in PostgreSQL ----------
+            using (NpgsqlConnection connection = new NpgsqlConnection(connectionString))
+            {
+                connection.Open();
+
+                const string insertSql = @"
+                    INSERT INTO pdf_documents (document_name, content)
+                    VALUES (@name, @content)";
+
+                using (NpgsqlCommand command = new NpgsqlCommand(insertSql, connection))
+                {
+                    command.Parameters.AddWithValue("name", Path.GetFileName(inputPdfPath));
+                    command.Parameters.AddWithValue("content", extractedText);
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            Console.WriteLine("Text extracted from PDF and stored in PostgreSQL successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

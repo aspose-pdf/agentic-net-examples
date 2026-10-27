@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,61 +8,91 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "signed_output.pdf";  // signed PDF
-        const string pfxPath   = "certificate.pfx";   // PKCS#12 certificate file
-        const string pfxPass   = "password";          // certificate password
+        // Input and output PDF files
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Certificate (PKCS#12) used for signing
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "certPassword";
+
+        // Signature metadata
+        const string reason = "Document approved for release";
+        const string location = "Head Office";
+        const string contact = "compliance@example.com";
+
+        // Custom XML data to embed in the signature (must conform to external standard)
+        const string customXmlSignatureData = @"<SignatureInfo>
+    <ComplianceStandard>ISO-12345</ComplianceStandard>
+    <SignedBy>John Doe</SignedBy>
+    <SignedOn>2024-10-26T12:34:56Z</SignedOn>
+</SignatureInfo>";
+
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(pfxPath))
+        if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Define the rectangle where the signature will appear (coordinates are in points)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPdfPath);
 
-            // Create a signature field on page 1
-            SignatureField sigField = new SignatureField(doc, sigRect)
+            // Create a signature field on the first page (adjust rectangle as needed)
+            // Rectangle(left, bottom, right, top)
+            var signatureRect = new Rectangle(100, 100, 300, 200);
+            SignatureField signatureField = new SignatureField(pdfDocument.Pages[1], signatureRect)
             {
-                PartialName = "Signature1"   // field name
+                PartialName = "Signature1"
             };
-            // Add the signature field to the document (page index is 1‑based)
-            doc.Form.Add(sigField, 1);
+            // Add the field to the document's form (page number is 1‑based)
+            pdfDocument.Form.Add(signatureField, 1);
 
-            // Create a PKCS#7 signature object using the certificate
-            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPass)
+            // Prepare the PKCS7 signature object
+            PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
             {
-                Reason      = "Document approved",          // reason for signing
-                ContactInfo = "contact@example.com",        // contact information
-                Location    = "New York"                    // signing location
+                Reason = reason,
+                Location = location,
+                ContactInfo = contact,
+                CustomAppearance = new SignatureCustomAppearance
+                {
+                    BackgroundColor = Aspose.Pdf.Color.LightGray,
+                    IsForegroundImage = false // no image, just background color
+                }
             };
 
-            // OPTIONAL: embed custom XML signature data.
-            // The CustomSignHash delegate can be used to provide a custom signing routine.
-            // Here we illustrate a placeholder that could embed XML; replace with real logic as needed.
-            // pkcs7.CustomSignHash = (hash) =>
-            // {
-            //     // Generate custom XML signature based on the hash and return the signature bytes.
-            //     // For demonstration we simply return the original hash.
-            //     return hash;
-            // };
+            // Sign the field
+            signatureField.Sign(pkcs7);
 
-            // Sign the document using the signature field and the PKCS#7 object
-            sigField.Sign(pkcs7);
+            // Embed the custom XML as an embedded file (compliance data)
+            using (var xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(customXmlSignatureData)))
+            {
+                var xmlFileSpec = new FileSpecification("SignatureInfo.xml", "Custom XML signature data");
+                xmlFileSpec.Contents = xmlStream;
+                // Optionally set modification date
+                xmlFileSpec.Params.ModDate = DateTime.UtcNow;
+                pdfDocument.EmbeddedFiles.Add(xmlFileSpec);
+            }
 
             // Save the signed PDF
-            doc.Save(outputPdf);
-        }
+            pdfDocument.Save(outputPdfPath);
 
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdf}'.");
+            Console.WriteLine($"PDF signed successfully. Output saved to '{outputPdfPath}'.");
+        }
+        catch (System.Security.Cryptography.CryptographicException ex)
+        {
+            Console.Error.WriteLine($"Certificate error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Signing failed: {ex.Message}");
+        }
     }
 }

@@ -1,34 +1,51 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // for GoToAction and ExplicitDestinationType
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_bookmark.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_bookmarked.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfBookmarkEditor implements IDisposable, so wrap it in a using block
-        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        try
         {
-            // Load the PDF file into the editor
-            editor.BindPdf(inputPath);
+            // Load the PDF document
+            Document doc = new Document(inputPath);
 
-            // Add a bookmark titled "Project Overview" that points to page 5 (1‑based indexing)
-            editor.CreateBookmarkOfPage("Project Overview", 5);
+            // Verify that the document has at least five pages
+            if (doc.Pages.Count < 5)
+            {
+                Console.Error.WriteLine("The document does not contain page 5.");
+                return;
+            }
 
-            // Persist the changes to a new file
-            editor.Save(outputPath);
+            // Create a bookmark that navigates to page 5 (1‑based index)
+            var bookmark = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = "Project Overview",
+                Action = new GoToAction(doc.Pages[5], ExplicitDestinationType.Fit)
+            };
+
+            // Add the bookmark to the document outline
+            doc.Outlines.Add(bookmark);
+
+            // Save the updated PDF
+            doc.Save(outputPath);
+
+            Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

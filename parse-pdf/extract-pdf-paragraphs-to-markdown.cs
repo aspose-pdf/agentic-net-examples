@@ -7,46 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputMd = "output.md";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.md";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load PDF and extract raw text preserving spaces and line breaks
+        using (Document doc = new Document(inputPath))
         {
-            // Create a ParagraphAbsorber to extract paragraph structures from the document
-            ParagraphAbsorber absorber = new ParagraphAbsorber();
+            TextAbsorber absorber = new TextAbsorber();
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            doc.Pages.Accept(absorber);
+            string rawText = absorber.Text;
 
-            // Perform the absorption on the whole document
-            absorber.Visit(doc);
+            // Split into paragraphs (empty line separation)
+            string[] paragraphs = rawText.Split(
+                new[] { "\r\n\r\n", "\n\n", "\r\r" },
+                StringSplitOptions.RemoveEmptyEntries);
 
-            // Open a StreamWriter for the markdown output file
-            using (StreamWriter writer = new StreamWriter(outputMd, false, System.Text.Encoding.UTF8))
+            // Write to markdown, using fenced code blocks to keep indentation
+            using (StreamWriter writer = new StreamWriter(outputPath, false))
             {
-                // Iterate over each page's markup information
-                foreach (PageMarkup pageMarkup in absorber.PageMarkups)
+                foreach (string para in paragraphs)
                 {
-                    // Iterate over each paragraph found on the page
-                    foreach (MarkupParagraph paragraph in pageMarkup.Paragraphs)
-                    {
-                        // The Text property contains the paragraph text including leading spaces,
-                        // which preserves the original indentation.
-                        string text = paragraph.Text;
-
-                        // Write the paragraph to the markdown file
-                        writer.WriteLine(text);
-                        // Add an empty line to separate markdown paragraphs
-                        writer.WriteLine();
-                    }
+                    writer.WriteLine("```");
+                    writer.WriteLine(para.TrimEnd()); // keep leading spaces, remove trailing newline
+                    writer.WriteLine("```");
+                    writer.WriteLine(); // blank line between paragraphs
                 }
             }
-
-            Console.WriteLine($"Markdown file saved to '{outputMd}'.");
         }
+
+        Console.WriteLine($"Markdown file created at '{outputPath}'.");
     }
 }

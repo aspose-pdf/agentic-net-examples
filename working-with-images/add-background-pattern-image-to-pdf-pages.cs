@@ -1,51 +1,56 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core API (Document, Page, BackgroundArtifact)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "output.pdf";         // result PDF
-        const string patternPath = "pattern.png";       // background pattern image
+        const string inputPdf   = "input.pdf";          // source PDF
+        const string outputPdf  = "output.pdf";         // result PDF
+        const string patternImg = "pattern.png";        // background pattern image
 
-        if (!File.Exists(inputPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(patternImg))
+        {
+            Console.Error.WriteLine($"Pattern image not found: {patternImg}");
             return;
         }
 
-        if (!File.Exists(patternPath))
+        // Load the PDF and ensure deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            Console.Error.WriteLine($"Pattern image not found: {patternPath}");
-            return;
-        }
-
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(inputPath))
-        {
-            // Iterate over all pages (1‑based indexing)
+            // Iterate over all pages (PageCollection implements IEnumerable)
             foreach (Page page in doc.Pages)
             {
-                // Create a background artifact
-                BackgroundArtifact bg = new BackgroundArtifact();
+                // Create a stamp from the pattern image
+                ImageStamp stamp = new ImageStamp(patternImg)
+                {
+                    // Place the stamp behind existing page content
+                    Background = true,
+                    // Set opacity to 10 percent for a subtle effect
+                    Opacity = 0.1,
+                    // Stretch the image to cover the whole page
+                    Width  = page.PageInfo.Width,
+                    Height = page.PageInfo.Height,
+                    // Center alignment (required when width/height are set)
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                };
 
-                // Set the image for the artifact (can use file path or stream)
-                bg.SetImage(patternPath);
-
-                // Make the artifact semi‑transparent (10 % opacity)
-                bg.Opacity = 0.1;          // range 0.0 .. 1.0
-                bg.IsBackground = true;   // place behind page content
-
-                // Add the artifact to the page
-                page.Artifacts.Add(bg);
+                // Add the stamp to the current page
+                page.AddStamp(stamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Background pattern applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Background pattern applied and saved to '{outputPdf}'.");
     }
 }

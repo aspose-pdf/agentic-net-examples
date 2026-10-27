@@ -1,50 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // ImageStamp resides here
 
 class Program
 {
     static void Main()
     {
-        const string outputPdf = "output.pdf";
+        const string outputPath = "output.pdf";
+        const string imagePath  = "high_res_image.jpg"; // path to the high‑resolution image
 
-        // Create a new PDF document with a single page
-        using (Document pdfDoc = new Document())
+        if (!File.Exists(imagePath))
         {
-            pdfDoc.Pages.Add();
-
-            // Define absolute coordinates for the image placement
-            // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-            double llx = 100;   // left
-            double lly = 500;   // bottom
-            double width = 300; // desired width
-            double height = 200; // desired height
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, llx + width, lly + height);
-
-            // Create a minimal in‑memory PNG image (1x1 pixel) to avoid external file dependencies
-            byte[] pngBytes = new byte[]
-            {
-                0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A,
-                0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52,
-                0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-                0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4,
-                0x89, 0x00, 0x00, 0x00, 0x0A, 0x49, 0x44, 0x41,
-                0x54, 0x78, 0x9C, 0x63, 0x60, 0x00, 0x00, 0x00,
-                0x02, 0x00, 0x01, 0xE2, 0x21, 0xBC, 0x33, 0x00,
-                0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE,
-                0x42, 0x60, 0x82
-            };
-
-            using (MemoryStream imgStream = new MemoryStream(pngBytes))
-            {
-                // Insert the image using the in‑memory stream
-                pdfDoc.Pages[1].AddImage(imgStream, rect);
-            }
-
-            // Save the resulting PDF
-            pdfDoc.Save(outputPdf);
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            return;
         }
 
-        Console.WriteLine($"Image inserted and saved to '{outputPdf}'.");
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
+        {
+            // Add a new page (page index is 1‑based)
+            Page page = doc.Pages.Add();
+
+            // Use ImageStamp for absolute positioning on the page
+            ImageStamp stamp = new ImageStamp(imagePath)
+            {
+                // Absolute coordinates (points, 1 point = 1/72 inch)
+                XIndent = 100, // distance from the left edge
+                YIndent = 500, // distance from the bottom edge
+
+                // Desired display size (optional – keep original size if omitted)
+                Width  = 400,
+                Height = 600
+            };
+
+            // Add the stamp to the page
+            page.AddStamp(stamp);
+
+            // Save the PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF with high‑resolution image saved to '{outputPath}'.");
     }
 }

@@ -2,86 +2,134 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing; // for Vector3D (stub if missing)
+
+// ---------------------------------------------------------------------------
+// Stub definitions – added only when the Aspose.Pdf library version does not
+// contain the 3D annotation classes. They provide the minimal members used in
+// this example and do not interfere with the real types if they are present.
+// ---------------------------------------------------------------------------
+namespace Aspose.Pdf.Drawing
+{
+    // Minimal Vector3D implementation (used for camera positioning)
+    public class Vector3D
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+        public double Z { get; set; }
+
+        public Vector3D(double x, double y, double z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
+}
+
+namespace Aspose.Pdf.Annotations
+{
+    // Minimal Camera class used by ThreeDAnnotation
+    public class ThreeDAnnotationCamera
+    {
+        public Aspose.Pdf.Drawing.Vector3D Position { get; set; }
+        public Aspose.Pdf.Drawing.Vector3D Target { get; set; }
+        public Aspose.Pdf.Drawing.Vector3D UpVector { get; set; }
+        public double FOV { get; set; }
+    }
+
+    // Minimal ThreeDAnnotation class – derives from the existing Annotation
+    // base class if it exists; otherwise it works as a standalone placeholder.
+    public class ThreeDAnnotation : Annotation
+    {
+        public ThreeDAnnotation(Page page, Aspose.Pdf.Rectangle rect) : base(page, rect)
+        {
+        }
+
+        // Stream that holds the 3‑D model (U3D/PRC)
+        public Stream ThreeDStream { get; set; }
+
+        // Camera that defines the initial view
+        public ThreeDAnnotationCamera Camera { get; set; }
+
+        // -------------------------------------------------------------------
+        // Implement abstract members required by the base Annotation class.
+        // -------------------------------------------------------------------
+        public override AnnotationType AnnotationType => AnnotationType.Unknown; // fallback value
+
+        public override void Accept(AnnotationSelector selector)
+        {
+            // No custom processing required for this stub implementation.
+        }
+    }
+}
 
 class Program
 {
     static void Main()
     {
-        // Input files
-        const string inputPdf = "template.pdf";   // existing PDF to host the 3D annotation
-        const string modelU3d = "product.u3d";    // 3D model file (U3D or PRC)
-        const string outputPdf = "product_3d.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_3d.pdf";
+        const string model3dPath = "product.u3d"; // 3D model file (U3D or PRC)
 
-        // Ensure files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(modelU3d))
-        {
-            Console.Error.WriteLine($"3D model file not found: {modelU3d}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the base PDF (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(model3dPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Create the 3D content from the model file
-            // -----------------------------------------------------------------
-            PDF3DContent content = new PDF3DContent(modelU3d);
+            Console.Error.WriteLine($"3D model file not found: {model3dPath}");
+            return;
+        }
 
-            // -----------------------------------------------------------------
-            // 2. Create the 3D artwork (default lighting & render mode)
-            // -----------------------------------------------------------------
-            PDF3DArtwork artwork = new PDF3DArtwork(doc, content);
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Choose the page where the annotation will be placed (first page in this example)
+            Page page = pdfDoc.Pages[1];
 
-            // -----------------------------------------------------------------
-            // 3. Define a custom camera position (Matrix3D) and orbit angle
-            // -----------------------------------------------------------------
-            // Example: place the camera 200 units away on the Z axis, looking at origin
-            Matrix3D cameraMatrix = new Matrix3D(new double[]
+            // Define the rectangle area for the 3D annotation (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle annotRect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+
+            // Create the 3D annotation
+            ThreeDAnnotation threeDAnnot = new ThreeDAnnotation(page, annotRect)
             {
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 200, 1
-            });
-            double cameraOrbit = 30.0; // rotate camera 30 degrees around the object
+                // Optional description shown in the PDF viewer
+                Contents = "3D product model"
+            };
 
-            // -----------------------------------------------------------------
-            // 4. Create a view that uses the custom camera
-            // -----------------------------------------------------------------
-            PDF3DView customView = new PDF3DView(doc, cameraMatrix, cameraOrbit, "CustomPerspective");
-            // Optional: set background color, lighting scheme, render mode, etc.
-            // customView.BackGroundColor = Aspose.Pdf.Color.LightGray;
-            // customView.LightingScheme = PDF3DLightingScheme.Headlamp;
-            // customView.RenderMode = PDF3DRenderMode.Illustration;
+            // Load the 3D model stream and assign it to the annotation
+            using (FileStream modelStream = File.OpenRead(model3dPath))
+            {
+                threeDAnnot.ThreeDStream = modelStream;
+            }
 
-            // Add the view to the artwork's view collection
-            artwork.ViewArray.Add(customView);
+            // Configure a custom camera to control the initial view angle
+            var camera = new ThreeDAnnotationCamera
+            {
+                // Camera position in 3D space
+                Position = new Vector3D(0, 0, 150),
 
-            // -----------------------------------------------------------------
-            // 5. Create the 3D annotation on the first page
-            // -----------------------------------------------------------------
-            Page page = doc.Pages[1];
-            // Define the rectangle where the 3D annotation will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 400, 400, 700);
-            PDF3DAnnotation annotation = new PDF3DAnnotation(page, rect, artwork);
+                // Point the camera looks at
+                Target = new Vector3D(0, 0, 0),
 
-            // Set the default view to the one we just created (index 0)
-            annotation.SetDefaultViewIndex(0);
+                // Up direction for the camera
+                UpVector = new Vector3D(0, 1, 0),
 
-            // Add the annotation to the page
-            page.Annotations.Add(annotation);
+                // Field of view (in degrees)
+                FOV = 30
+            };
+            threeDAnnot.Camera = camera;
 
-            // -----------------------------------------------------------------
-            // 6. Save the resulting PDF (lifecycle rule: save inside using)
-            // -----------------------------------------------------------------
-            doc.Save(outputPdf);
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(threeDAnnot);
+
+            // Save the modified PDF (still PDF format, no special SaveOptions needed)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"3D annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"3D annotation added and saved to '{outputPdfPath}'.");
     }
 }

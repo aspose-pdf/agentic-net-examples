@@ -1,48 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "portrait.pdf";
-        const string outputPdf = "landscape.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "landscape_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF with PdfPageEditor facade
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // -----------------------------------------------------------------
+        // Step 1: Load the document and convert portrait pages to landscape.
+        // -----------------------------------------------------------------
+        Document doc = new Document(inputPath);
+
+        for (int i = 1; i <= doc.Pages.Count; i++)
         {
-            editor.BindPdf(inputPdf);
+            Page page = doc.Pages[i];
+            double width = page.PageInfo.Width;
+            double height = page.PageInfo.Height;
 
-            // Retrieve original size of the first page (pages are 1‑based)
-            int pageNumber = 1;
-            PageSize originalSize = editor.GetPageSize(pageNumber);
-            Console.WriteLine($"Original size (points): {originalSize.Width} x {originalSize.Height}");
+            // If the page is portrait (height > width) swap dimensions and rotate.
+            if (height > width)
+            {
+                // Swap width and height.
+                page.PageInfo.Width = height;
+                page.PageInfo.Height = width;
 
-            // Set the output page size to landscape by swapping width and height
-            editor.PageSize = new PageSize(originalSize.Height, originalSize.Width);
-
-            // Rotate the page content 90° so it fits the new orientation
-            editor.Rotation = 90;
-
-            // Apply the changes and save the result
-            editor.ApplyChanges();
-            editor.Save(outputPdf);
+                // Rotate the page content 90 degrees clockwise.
+                page.Rotate = Rotation.on90; // Aspose.Pdf.Rotation enum uses the "on" prefix.
+            }
         }
 
-        // Verify dimensions and rotation of the resulting PDF
-        using (Document resultDoc = new Document(outputPdf))
+        // Save the modified PDF.
+        doc.Save(outputPath);
+
+        // -----------------------------------------------------------------
+        // Step 2: Verify dimensions after conversion.
+        // -----------------------------------------------------------------
+        using (Document resultDoc = new Document(outputPath))
         {
-            Page resultPage = resultDoc.Pages[1]; // first page
-            Console.WriteLine($"Result size (points): {resultPage.PageInfo.Width} x {resultPage.PageInfo.Height}");
-            Console.WriteLine($"Result rotation (degrees): {resultPage.Rotate}");
+            Console.WriteLine($"Verification of '{outputPath}':");
+            for (int i = 1; i <= resultDoc.Pages.Count; i++)
+            {
+                Page page = resultDoc.Pages[i];
+                double w = page.PageInfo.Width;
+                double h = page.PageInfo.Height;
+                Console.WriteLine($"Page {i}: Width = {w:F2}, Height = {h:F2}, Rotation = {page.Rotate}");
+            }
         }
     }
 }

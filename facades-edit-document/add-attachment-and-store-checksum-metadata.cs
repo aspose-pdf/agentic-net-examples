@@ -1,76 +1,72 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added namespace for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string attachmentFile = "attachment_file.pdf";
-        const string attachmentDescription = "Sample attachment";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_checksum.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Create a minimal source PDF (input.pdf) – the sandbox has no files.
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            using (Document src = new Document())
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            return;
+        }
+
+        // Load the PDF document.
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Prepare a dictionary to hold checksums for each embedded file.
+            var checksums = new Dictionary<string, string>();
+
+            // Iterate over all embedded files (FileSpecification objects).
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                src.Pages.Add(); // add a blank page
-                src.Save(inputPdf);
-            }
-        }
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                {
+                    // The embedded file name is used as the dictionary key.
+                    string name = fileSpec.Name;
 
-        // ------------------------------------------------------------
-        // 2. Create a minimal attachment PDF (attachment_file.pdf).
-        // ------------------------------------------------------------
-        if (!File.Exists(attachmentFile))
-        {
-            using (Document att = new Document())
+                    // Ensure the file has content.
+                    if (fileSpec.Contents == null)
+                        continue;
+
+                    // Copy the content to a memory stream for hashing.
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        // Reset the source stream position before copying.
+                        if (fileSpec.Contents.CanSeek)
+                            fileSpec.Contents.Position = 0;
+
+                        fileSpec.Contents.CopyTo(ms);
+                        ms.Position = 0; // Reset for hashing.
+
+                        // Compute SHA‑256 checksum.
+                        using (SHA256 sha256 = SHA256.Create())
+                        {
+                            byte[] hash = sha256.ComputeHash(ms);
+                            string checksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                            checksums[name] = checksum;
+                        }
+                    }
+                }
+            }
+
+            // Store each attachment checksum in the PDF's custom metadata using the DocumentInfo indexer.
+            foreach (var kvp in checksums)
             {
-                Page page = att.Pages.Add();
-                // Add a simple paragraph so the file is not empty.
-                page.Paragraphs.Add(new TextFragment("This is a sample attachment PDF."));
-                att.Save(attachmentFile);
+                string metaKey = $"AttachmentChecksum_{kvp.Key}";
+                doc.Info[metaKey] = kvp.Value; // Indexer adds/updates custom metadata.
             }
+
+            // Save the updated PDF.
+            doc.Save(outputPdfPath);
         }
 
-        // ------------------------------------------------------------
-        // 3. Calculate MD5 checksum of the attachment file.
-        // ------------------------------------------------------------
-        string checksum;
-        using (FileStream fs = File.OpenRead(attachmentFile))
-        using (MD5 md5 = MD5.Create())
-        {
-            byte[] hash = md5.ComputeHash(fs);
-            checksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-        }
-
-        // ------------------------------------------------------------
-        // 4. Add the attachment to the PDF using PdfContentEditor (Facades API).
-        // ------------------------------------------------------------
-        using (PdfContentEditor editor = new PdfContentEditor())
-        {
-            editor.BindPdf(inputPdf);
-            editor.AddDocumentAttachment(attachmentFile, attachmentDescription);
-            editor.Save(outputPdf);
-        }
-
-        // ------------------------------------------------------------
-        // 5. Store the checksum in custom metadata using PdfFileInfo.
-        // ------------------------------------------------------------
-        using (PdfFileInfo info = new PdfFileInfo(outputPdf))
-        {
-            info.SetMetaInfo("AttachmentChecksum", checksum);
-            // Save the updated metadata back to the same file.
-            info.SaveNewInfo(outputPdf);
-        }
-
-        Console.WriteLine($"Attachment added and checksum stored: {checksum}");
+        Console.WriteLine($"Checksums added to custom metadata and saved as '{outputPdfPath}'.");
     }
 }

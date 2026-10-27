@@ -1,80 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // <-- added for Resolution
 
-class PdfResizeExample
+class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string resizedPdfPath = "resized.pdf";
-        const string previewImagePath = "page1_resized.tiff"; // TIFF used for cross‑platform conversion
+        const string outputPath = "resized.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF as a read‑only stream
-        using (FileStream srcStream = File.OpenRead(inputPath))
-        // Destination stream will hold the resized PDF in memory
-        using (MemoryStream destStream = new MemoryStream())
+        // Desired dimensions (points; 1 point = 1/72 inch, assuming 72 DPI)
+        const double targetWidth = 1024;   // points
+        const double targetHeight = 768;   // points
+
+        // Load PDF from a stream, resize each page, and save to a stream
+        using (FileStream inputStream = File.OpenRead(inputPath))
+        using (MemoryStream outputStream = new MemoryStream())
         {
-            // PdfFileEditor provides the ResizeContents overload that works with streams
-            PdfFileEditor fileEditor = new PdfFileEditor();
+            // Load the document from the input stream
+            Document doc = new Document(inputStream);
 
-            // Resize all pages (pages == null) to 1024x768 points.
-            // Aspose.Pdf uses points (1/72 inch) as default units; assuming 72 DPI,
-            // 1 point ≈ 1 pixel, so we pass pixel dimensions directly.
-            bool success = fileEditor.ResizeContents(
-                srcStream,          // source PDF stream
-                destStream,         // destination PDF stream
-                null,               // null = all pages (1‑based indexing internally)
-                1024,               // new width in points
-                768);               // new height in points
-
-            if (!success)
+            // Resize every page via the PageInfo object
+            foreach (Page page in doc.Pages)
             {
-                Console.Error.WriteLine("Resize operation failed.");
-                return;
+                page.PageInfo.Width = targetWidth;
+                page.PageInfo.Height = targetHeight;
             }
 
-            // Ensure the destination stream is ready for reading
-            destStream.Position = 0;
+            // Save the resized PDF to the output stream
+            doc.Save(outputStream);
 
-            // Persist the resized PDF to disk (optional, demonstrates save lifecycle)
-            using (FileStream fileOut = File.Create(resizedPdfPath))
+            // Persist the stream to a file
+            File.WriteAllBytes(outputPath, outputStream.ToArray());
+        }
+
+        // Verify visual fidelity by checking the page dimensions of the saved PDF
+        using (Document doc = new Document(outputPath))
+        {
+            double width = doc.Pages[1].PageInfo.Width;
+            double height = doc.Pages[1].PageInfo.Height;
+
+            Console.WriteLine($"Resized page size: {width} x {height} points");
+
+            if (Math.Abs(width - 1024) < 0.1 && Math.Abs(height - 768) < 0.1)
             {
-                destStream.CopyTo(fileOut);
+                Console.WriteLine("Resize verification passed.");
             }
-
-            // Reset position again because CopyTo leaves the stream at the end
-            destStream.Position = 0;
-
-            // Load the resized PDF to verify visual fidelity
-            using (Document resizedDoc = new Document(destStream))
+            else
             {
-                // Use PdfConverter to rasterize the first page.
-                PdfConverter converter = new PdfConverter(resizedDoc);
-                converter.StartPage = 1;
-                converter.EndPage   = 1;
-                // Set a reasonable resolution; 150 DPI yields a clear preview.
-                converter.Resolution = new Resolution(150); // <-- now resolves correctly
-                converter.DoConvert();
-
-                // Export the first page as a TIFF (cross‑platform safe).
-                converter.SaveAsTIFF(previewImagePath);
-
-                // Clean up the converter
-                converter.Close();
+                Console.WriteLine("Resize verification failed.");
             }
-
-            Console.WriteLine($"Resized PDF saved to '{resizedPdfPath}'.");
-            Console.WriteLine($"Preview image saved to '{previewImagePath}'.");
         }
     }
 }

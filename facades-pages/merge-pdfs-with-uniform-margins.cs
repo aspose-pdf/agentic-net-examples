@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -7,46 +8,64 @@ class Program
     static void Main()
     {
         // Input PDF files
-        const string firstPdf  = "first.pdf";
-        const string secondPdf = "second.pdf";
+        const string pdf1 = "first.pdf";
+        const string pdf2 = "second.pdf";
 
-        // Temporary files that will hold the PDFs after margin alignment
-        const string firstAligned  = "first_aligned.pdf";
-        const string secondAligned = "second_aligned.pdf";
+        // Temporary files after aligning margins and page size
+        const string aligned1 = "first_aligned.pdf";
+        const string aligned2 = "second_aligned.pdf";
 
         // Final merged output
-        const string mergedPdf = "merged.pdf";
+        const string merged = "merged.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
+        // Verify that both source PDFs exist
+        if (!File.Exists(pdf1) || !File.Exists(pdf2))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Define uniform margins (in default PDF units, i.e., points)
-        double leftMargin   = 20.0;
-        double bottomMargin = 20.0;
-        double rightMargin  = 20.0;
-        double topMargin    = 20.0;
+        // Desired uniform page size (A4) and margins (points)
+        double pageWidth  = PageSize.A4.Width;
+        double pageHeight = PageSize.A4.Height;
+        double marginLeft   = 50; // 0.69 inch
+        double marginBottom = 50;
+        double marginRight  = 50;
+        double marginTop    = 50;
 
-        // Create a PdfFileEditor instance (no IDisposable implementation required)
+        // Align each PDF to the same size and margins
+        AlignPdf(pdf1, aligned1, pageWidth, pageHeight, marginLeft, marginBottom, marginRight, marginTop);
+        AlignPdf(pdf2, aligned2, pageWidth, pageHeight, marginLeft, marginBottom, marginRight, marginTop);
+
+        // Merge the two aligned PDFs using the Facades API
         PdfFileEditor editor = new PdfFileEditor();
+        editor.Concatenate(new[] { aligned1, aligned2 }, merged);
 
-        // Align margins for the first PDF
-        // Passing null for the pages array applies the margins to all pages
-        editor.AddMargins(firstPdf, firstAligned, null, leftMargin, bottomMargin, rightMargin, topMargin);
+        Console.WriteLine($"Merged PDF saved to '{merged}'.");
+    }
 
-        // Align margins for the second PDF
-        editor.AddMargins(secondPdf, secondAligned, null, leftMargin, bottomMargin, rightMargin, topMargin);
+    // Adjusts page size and margins for all pages in a PDF
+    static void AlignPdf(string inputPath, string outputPath,
+                         double width, double height,
+                         double left, double bottom, double right, double top)
+    {
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Iterate using 1‑based page indexing (Aspose.Pdf convention)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                // Resize each page to the target dimensions via PageInfo
+                Page page = doc.Pages[i];
+                page.PageInfo.Width = width;
+                page.PageInfo.Height = height;
 
-        // Concatenate the two aligned PDFs into the final document
-        editor.Concatenate(firstAligned, secondAligned, mergedPdf);
+                // Apply uniform margins using MarginInfo
+                page.PageInfo.Margin = new MarginInfo(left, right, top, bottom);
+            }
 
-        // Optional: clean up temporary files
-        try { File.Delete(firstAligned); } catch { /* ignore cleanup errors */ }
-        try { File.Delete(secondAligned); } catch { /* ignore cleanup errors */ }
-
-        Console.WriteLine($"Merged PDF saved to '{mergedPdf}'.");
+            // Save the adjusted PDF; no SaveOptions needed for PDF output
+            doc.Save(outputPath);
+        }
     }
 }

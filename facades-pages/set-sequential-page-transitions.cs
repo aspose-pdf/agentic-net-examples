@@ -7,50 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_transitions.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Initialize the page editor with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
-
-            // Page 1 – vertical blinds transition
-            editor.ProcessPages = new int[] { 1 };
-            editor.TransitionType = PdfPageEditor.BLINDV;
-            editor.TransitionDuration = 2; // seconds
-            editor.ApplyChanges();
-
-            // Page 2 – dissolve transition
-            editor.ProcessPages = new int[] { 2 };
-            editor.TransitionType = PdfPageEditor.DISSOLVE;
-            editor.TransitionDuration = 3;
-            editor.ApplyChanges();
-
-            // Page 3 – left‑right wipe transition
-            editor.ProcessPages = new int[] { 3 };
-            editor.TransitionType = PdfPageEditor.LRWIPE;
-            editor.TransitionDuration = 2;
-            editor.ApplyChanges();
-
-            // Page 4 – bottom‑top wipe transition (if the document has at least 4 pages)
-            if (doc.Pages.Count >= 4)
+            // PdfPageEditor is the Facade class that allows setting page transitions
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                editor.ProcessPages = new int[] { 4 };
-                editor.TransitionType = PdfPageEditor.BTWIPE;
-                editor.TransitionDuration = 2;
-                editor.ApplyChanges();
-            }
+                // Define which pages will receive which transition.
+                // Transition types are specified by their integer values:
+                // 4 = Cover, 6 = Fade, 8 = Fly, 9 = Push (examples)
+                int[] pageNumbers      = { 1, 2, 3, 4 };
+                int[] transitionValues = { 4, 6, 8, 9 };
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                for (int i = 0; i < pageNumbers.Length; i++)
+                {
+                    // Apply the transition to a single page (1‑based indexing)
+                    editor.ProcessPages = new int[] { pageNumbers[i] };
+                    editor.TransitionType = transitionValues[i];
+                    editor.TransitionDuration = 1; // duration in seconds
+                    editor.ApplyChanges();
+                }
+
+                // Persist the changes to a new file
+                editor.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");

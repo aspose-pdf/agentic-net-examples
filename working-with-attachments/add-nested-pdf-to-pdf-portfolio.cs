@@ -6,38 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Paths for the existing portfolio PDF, the PDF to embed, and the output file
         const string portfolioPath = "portfolio.pdf";
-        const string nestedPdfPath = "nested.pdf";
-        const string outputPath    = "portfolio_with_nested.pdf";
+        const string fileToAddPath = "add.pdf";
+        const string outputPath = "portfolio_with_nested.pdf";
 
-        // Ensure source files exist
         if (!File.Exists(portfolioPath))
         {
             Console.Error.WriteLine($"Portfolio file not found: {portfolioPath}");
             return;
         }
-        if (!File.Exists(nestedPdfPath))
+
+        if (!File.Exists(fileToAddPath))
         {
-            Console.Error.WriteLine($"Nested PDF file not found: {nestedPdfPath}");
+            Console.Error.WriteLine($"File to embed not found: {fileToAddPath}");
             return;
         }
 
-        // Open the existing PDF portfolio
-        using (Document doc = new Document(portfolioPath))
+        try
         {
-            // Create a FileSpecification using the constructor (filePath, description)
-            FileSpecification fileSpec = new FileSpecification(nestedPdfPath, "Nested PDF document");
-            // Optionally set a display name for the attachment
-            fileSpec.Name = Path.GetFileName(nestedPdfPath);
+            // Open the existing PDF portfolio
+            using (Document portfolioDoc = new Document(portfolioPath))
+            {
+                // Read the PDF to embed
+                byte[] fileBytes = File.ReadAllBytes(fileToAddPath);
 
-            // Add the file specification to the portfolio's embedded files collection
-            doc.EmbeddedFiles.Add(fileSpec);
+                // Create a FileSpecification with a hierarchical name (folder + file)
+                var fileSpec = new FileSpecification("Attachments/add.pdf", "Embedded PDF");
+                fileSpec.Contents = new MemoryStream(fileBytes);
 
-            // Save the updated portfolio
-            doc.Save(outputPath);
+                // Add the specification to the portfolio's embedded files collection
+                portfolioDoc.EmbeddedFiles.Add(fileSpec);
+
+                // Save the updated portfolio
+                portfolioDoc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Nested PDF added. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Nested PDF added to portfolio. Saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

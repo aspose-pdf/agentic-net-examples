@@ -7,71 +7,53 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF, and the sound file (e.g., a .wav or .mp3)
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_sound.pdf";
-        const string soundFile = "chime.wav";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string soundPath  = "chime.wav";      // sound file to play
+        const int    targetPage = 3;                // page number where sound should play (1‑based)
 
-        // The page number (1‑based) on which the sound should play when the page becomes visible
-        const int targetPageNumber = 3;
-
-        // Verify that the required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(soundFile))
-        {
-            Console.Error.WriteLine($"Sound file not found: {soundFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(soundPath))
         {
-            // Ensure the requested page exists
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
+            Console.Error.WriteLine($"Sound file not found: {soundPath}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Validate page number
+            if (targetPage < 1 || targetPage > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Page {targetPage} is out of range. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
             // Get the target page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[targetPageNumber];
+            Page page = doc.Pages[targetPage];
 
-            // Define the annotation rectangle (coordinates are in points; lower‑left to upper‑right)
-            // Here we place a small icon near the top‑right corner of the page
-            double pageWidth  = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
-            double iconSize   = 20; // size of the sound icon
+            // Define an invisible rectangle where the annotation will be placed.
+            // The rectangle can be zero‑size because we only need the annotation to trigger.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
 
-            // Rectangle: (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                pageWidth - iconSize - 10, // llx (10 points margin from right edge)
-                pageHeight - iconSize - 10, // lly (10 points margin from top edge)
-                pageWidth - 10,             // urx
-                pageHeight - 10);            // ury
+            // Create the SoundAnnotation using the constructor that accepts the audio file path.
+            SoundAnnotation soundAnno = new SoundAnnotation(page, rect, soundPath);
 
-            // Create the SoundAnnotation.
-            // The constructor takes the page, rectangle, and path to the sound file.
-            SoundAnnotation soundAnn = new SoundAnnotation(page, rect, soundFile)
-            {
-                // Use the speaker icon to indicate an audible cue
-                Icon = SoundIcon.Speaker,
+            // Optionally give the annotation a name (useful for debugging)
+            soundAnno.Name = "PageScrollChime";
 
-                // Optional: a tooltip that appears when the user hovers over the icon
-                Contents = "Page‑arrival chime"
-            };
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(soundAnno);
 
-            // Add the annotation to the page's annotation collection.
-            // The overload without the rotation flag is sufficient here.
-            page.Annotations.Add(soundAnn);
-
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Sound annotation added to page {targetPageNumber}. Saved as '{outputPdf}'.");
+        Console.WriteLine($"Sound annotation added. Output saved to '{outputPath}'.");
     }
 }

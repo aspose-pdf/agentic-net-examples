@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -12,30 +11,19 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Generate a new UUID to replace the placeholder text
+        // Generate a new UUID string
         string uuid = Guid.NewGuid().ToString();
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a PdfContentEditor facade and bind the loaded document
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                editor.BindPdf(doc);
+        // Facades API: load PDF, replace text on page 6, and save
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);                     // load source PDF
+        editor.ReplaceText("InvoiceNumber", uuid, 6);  // case‑sensitive replace on page 6
+        editor.Save(outputPath);                       // write modified PDF
 
-                // Replace the exact case‑sensitive string "InvoiceNumber" on page 6
-                // Page numbers are 1‑based in Aspose.Pdf, so page 6 is passed as 6
-                editor.ReplaceText("InvoiceNumber", 6, uuid);
-            }
-
-            // Save the modified document
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Text replaced with UUID and saved to '{outputPath}'.");
+        Console.WriteLine($"Replaced 'InvoiceNumber' with UUID on page 6 and saved to '{outputPath}'.");
     }
 }

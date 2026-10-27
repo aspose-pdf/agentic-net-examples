@@ -1,35 +1,103 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades; // needed for Form facade
+
+// Alias to disambiguate the Form class from Aspose.Pdf.Facades
+using FacadeForm = Aspose.Pdf.Facades.Form;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF form files that may contain duplicate field names
-        string[] inputFiles = { "FormA.pdf", "FormB.pdf", "FormC.pdf" };
-        const string outputFile = "MergedUniqueFields.pdf";
+        // Folder containing PDFs to process
+        const string inputFolder  = @"C:\PdfBatch\Input";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = @"C:\PdfBatch\Output";
 
-        // Verify that all input files exist
-        foreach (string file in inputFiles)
+        if (!Directory.Exists(inputFolder))
         {
-            if (!File.Exists(file))
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the input folder
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName + "_renamed.pdf");
+
+            try
             {
-                Console.Error.WriteLine($"Input file not found: {file}");
-                return;
+                // Load the PDF document using the main Aspose.Pdf API
+                Document pdfDocument = new Document(inputPath);
+
+                // Ensure the document contains a form
+                if (pdfDocument.Form == null || pdfDocument.Form.Fields == null)
+                {
+                    Console.WriteLine($"No form fields found in '{Path.GetFileName(inputPath)}'. Skipping.");
+                    continue;
+                }
+
+                // Retrieve all field names (full names are case‑insensitive in PDF spec)
+                string[] fieldNames = pdfDocument.Form.Fields.Select(f => f.FullName).ToArray();
+
+                // Dictionary to track how many times a name has been seen (case‑insensitive)
+                var nameOccurrences = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                // Use the Form facade – it provides the RenameField method which the
+                // Aspose.Pdf.Forms.Form class does not expose.
+                using (FacadeForm formFacade = new FacadeForm(pdfDocument))
+                {
+                    foreach (string originalName in fieldNames)
+                    {
+                        // Determine current occurrence count
+                        nameOccurrences.TryGetValue(originalName, out int count);
+
+                        if (count == 0)
+                        {
+                            // First occurrence – keep the original name
+                            nameOccurrences[originalName] = 1;
+                        }
+                        else
+                        {
+                            // Duplicate – create a new unique name by appending an index
+                            string newName;
+                            int suffix = count; // start with current count
+                            do
+                            {
+                                newName = $"{originalName}_{suffix}";
+                                suffix++;
+                            }
+                            // Ensure the generated name does not clash with any existing field
+                            while (Array.Exists(fieldNames, n => n.Equals(newName, StringComparison.OrdinalIgnoreCase))
+                                   || nameOccurrences.ContainsKey(newName));
+
+                            // Rename the field using the facade
+                            formFacade.RenameField(originalName, newName);
+
+                            // Update occurrence counters
+                            nameOccurrences[originalName] = count + 1;
+                            nameOccurrences[newName] = 1;
+                        }
+                    }
+                }
+
+                // Save the modified PDF
+                pdfDocument.Save(outputPath);
+                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
 
-        // Initialize PdfFileEditor (does NOT implement IDisposable, so no using block)
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Enable automatic renaming of duplicate fields during concatenation
-        editor.KeepFieldsUnique = true;               // true → add suffix to duplicate names
-        editor.UniqueSuffix = "_%NUM%";                // suffix template; %NUM% will be replaced by 1,2,3...
-
-        // Concatenate the PDFs; duplicate field names will be renamed with the suffix
-        editor.Concatenate(inputFiles, outputFile);
-
-        Console.WriteLine($"Merged PDF saved to '{outputFile}' with unique field names.");
+        Console.WriteLine("Batch processing completed.");
     }
 }

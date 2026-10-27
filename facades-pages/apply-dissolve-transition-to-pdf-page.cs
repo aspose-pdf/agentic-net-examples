@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,26 +16,17 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Use PdfPageEditor to set a Dissolve transition (value 5) with a 3‑second duration on page 5
+        using (PdfPageEditor editor = new PdfPageEditor(doc))
         {
-            // Initialize the PdfPageEditor facade with the loaded document
-            PdfPageEditor editor = new PdfPageEditor(doc);
-
-            // Specify that only page 5 should be edited (pages are 1‑based)
-            editor.ProcessPages = new int[] { 5 };
-
-            // Set the transition type to Dissolve (old page dissolves)
-            editor.TransitionType = PdfPageEditor.DISSOLVE;
-
-            // Set the transition duration to 3 seconds
-            editor.TransitionDuration = 3;
-
-            // Apply the changes to the document
+            editor.ProcessPages = new int[] { 5 }; // 1‑based page index
+            editor.TransitionType = 5;            // 5 corresponds to Dissolve transition
+            editor.TransitionDuration = 3;        // duration in seconds
             editor.ApplyChanges();
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Transition applied and saved to '{outputPath}'.");

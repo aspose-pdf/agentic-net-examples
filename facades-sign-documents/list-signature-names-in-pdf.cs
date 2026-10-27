@@ -3,48 +3,65 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class PdfSignatureHelper
 {
-    // Lists all non‑empty signature names in the specified PDF file.
-    static void ListSignatureNames(string pdfPath)
+    /// <summary>
+    /// Returns a list of all digital signature field names present in the specified PDF.
+    /// </summary>
+    /// <param name="pdfPath">Full path to the PDF file.</param>
+    /// <returns>List of signature names; empty list if none or on error.</returns>
+    public static List<string> ListSignatureNames(string pdfPath)
     {
-        // Verify that the file exists.
+        var signatures = new List<string>();
+
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
+            return signatures;
         }
 
-        // Create the PdfFileSignature facade.
-        PdfFileSignature pdfSign = new PdfFileSignature();
-
-        // Bind the PDF document for processing.
-        pdfSign.BindPdf(pdfPath);
-
-        // Retrieve the names of all non‑empty signatures.
-        // The default parameter (onlyActive = true) returns only active signatures.
-        IList<SignatureName> names = pdfSign.GetSignatureNames();
-
-        // Output each signature name.
-        for (int i = 0; i < names.Count; i++)
+        try
         {
-            Console.WriteLine($"Signature name: {names[i]}");
+            // PdfFileSignature implements IDisposable, so wrap it in a using block.
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
+            {
+                // Bind the PDF document to the signature object.
+                pdfSignature.BindPdf(pdfPath);
+
+                // GetSignatureNames returns IList<SignatureName> (not a string[]).
+                // Convert each SignatureName to its textual representation.
+                IList<SignatureName> nameObjects = pdfSignature.GetSignatureNames();
+
+                if (nameObjects != null)
+                {
+                    foreach (SignatureName sigName in nameObjects)
+                    {
+                        // SignatureName overrides ToString() to return the field name,
+                        // but using the Name property is more explicit when available.
+                        signatures.Add(sigName?.Name ?? sigName?.ToString());
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error reading signatures: {ex.Message}");
         }
 
-        // Release resources held by the facade.
-        pdfSign.Close();
+        return signatures;
     }
 
-    static void Main(string[] args)
+    // Example usage
+    static void Main()
     {
-        // Expect the PDF file path as the first argument.
-        if (args.Length == 0)
-        {
-            Console.Error.WriteLine("Usage: Program <pdf-file-path>");
-            return;
-        }
+        const string inputPdf = "signed_document.pdf";
 
-        string pdfPath = args[0];
-        ListSignatureNames(pdfPath);
+        List<string> sigNames = ListSignatureNames(inputPdf);
+
+        Console.WriteLine($"Found {sigNames.Count} signature(s):");
+        foreach (string name in sigNames)
+        {
+            Console.WriteLine($"- {name}");
+        }
     }
 }

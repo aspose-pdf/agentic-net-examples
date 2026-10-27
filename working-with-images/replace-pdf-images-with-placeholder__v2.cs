@@ -1,54 +1,85 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputPdf  = "output.pdf";         // result PDF
-        const string placeholderImagePath = "placeholder.jpg"; // low‑resolution placeholder
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "output.pdf";
+        const string placeholderImg = "placeholder.png"; // confidential placeholder image
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(placeholderImagePath))
+        if (!File.Exists(placeholderImg))
         {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderImagePath}");
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderImg}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Read the placeholder image once into a byte array
-            byte[] placeholderBytes = File.ReadAllBytes(placeholderImagePath);
+            int firstAppendixPage = -1;
 
-            // Iterate over all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Determine the first page that contains the word "Appendix"
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNum];
-                var images = page.Resources.Images; // XImageCollection
-
-                // Replace each image on the page with the placeholder
-                for (int imgIndex = 1; imgIndex <= images.Count; imgIndex++)
+                TextAbsorber absorber = new TextAbsorber
                 {
-                    // Create a fresh stream for each replacement (Replace consumes the stream)
-                    using (MemoryStream ms = new MemoryStream(placeholderBytes))
-                    {
-                        images.Replace(imgIndex, ms);
-                    }
+                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+                };
+                doc.Pages[i].Accept(absorber);
+                if (absorber.Text != null && absorber.Text.IndexOf("Appendix", StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    firstAppendixPage = i;
+                    break;
                 }
             }
 
-            // Save the modified document
-            doc.Save(outputPdf);
-        }
+            if (firstAppendixPage == -1)
+            {
+                Console.WriteLine("No appendix section detected. No changes applied.");
+                doc.Save(outputPath);
+                return;
+            }
 
-        Console.WriteLine($"Images replaced with placeholder. Saved to '{outputPdf}'.");
+            // Prepare a full‑page placeholder stamp
+            ImageStamp placeholderStamp = new ImageStamp(placeholderImg)
+            {
+                // Place the stamp on top of existing content to hide images
+                Background = false,
+                // Stretch to cover the whole page
+                Width      = doc.Pages[1].PageInfo.Width,
+                Height     = doc.Pages[1].PageInfo.Height,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Apply the placeholder to every page from the appendix start to the end
+            for (int i = firstAppendixPage; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+
+                // Optionally set alternative text for existing images (helps accessibility)
+                foreach (XImage img in page.Resources.Images)
+                {
+                    img.TrySetAlternativeText("Image removed for confidentiality", page);
+                }
+
+                // Add the placeholder stamp (covers the page)
+                page.AddStamp(placeholderStamp);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+            Console.WriteLine($"Appendix images replaced with placeholder. Saved to '{outputPath}'.");
+        }
     }
 }

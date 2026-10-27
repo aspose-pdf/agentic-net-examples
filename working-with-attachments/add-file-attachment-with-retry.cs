@@ -2,113 +2,79 @@ using System;
 using System.IO;
 using System.Threading;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
-namespace PdfAttachmentUtility
+class Program
 {
-    /// <summary>
-    /// Helper for adding a file attachment to a PDF with retry logic for transient I/O errors.
-    /// </summary>
-    public static class PdfAttachmentHelper
+    // Configuration for retry logic
+    private const int MaxRetryAttempts = 5;          // maximum number of attempts
+    private const int RetryDelayMilliseconds = 2000; // wait time between attempts
+
+    static void Main()
     {
-        /// <summary>
-        /// Adds a file attachment to the first page of a PDF located on a network share.
-        /// If a transient I/O error occurs, the operation is retried up to <paramref name="maxRetries"/> times.
-        /// </summary>
-        /// <param name="pdfPath">Full UNC or mapped path to the source PDF.</param>
-        /// <param name="attachmentPath">Full path to the file that will be attached.</param>
-        /// <param name="outputPath">Path where the modified PDF will be saved.</param>
-        /// <param name="maxRetries">Maximum number of retry attempts (default 3).</param>
-        /// <param name="delayMilliseconds">Delay between retries in milliseconds (default 1000).</param>
-        public static void AddAttachmentWithRetry(
-            string pdfPath,
-            string attachmentPath,
-            string outputPath,
-            int maxRetries = 3,
-            int delayMilliseconds = 1000)
+        const string networkPdfPath = @"\\fileserver\share\documents\report.pdf";
+        const string attachmentPath = @"C:\Temp\attachment.txt";
+        const string attachmentName = "Attachment.txt";
+
+        if (!File.Exists(networkPdfPath))
         {
-            if (string.IsNullOrWhiteSpace(pdfPath))
-                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-            if (string.IsNullOrWhiteSpace(attachmentPath))
-                throw new ArgumentException("Attachment path must be provided.", nameof(attachmentPath));
-            if (string.IsNullOrWhiteSpace(outputPath))
-                throw new ArgumentException("Output path must be provided.", nameof(outputPath));
-
-            int attempt = 0;
-            while (true)
-            {
-                try
-                {
-                    // Load the source PDF (using statement ensures deterministic disposal)
-                    using (Document doc = new Document(pdfPath))
-                    {
-                        // Ensure the document has at least one page
-                        if (doc.Pages.Count == 0)
-                            throw new InvalidOperationException("The PDF contains no pages.");
-
-                        // Use the first page for the attachment annotation
-                        Page page = doc.Pages[1];
-
-                        // Create a FileSpecification for the attachment file
-                        FileSpecification fileSpec = new FileSpecification(attachmentPath);
-
-                        // Define a rectangle where the attachment icon will appear
-                        // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-                        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
-
-                        // Create the attachment annotation and add it to the page
-                        FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec);
-                        page.Annotations.Add(attachment);
-
-                        // Save the modified PDF to the desired location
-                        doc.Save(outputPath);
-                    }
-
-                    // If we reach this point the operation succeeded; exit the loop
-                    break;
-                }
-                catch (IOException ex) when (attempt < maxRetries)
-                {
-                    // Transient I/O error – wait and retry
-                    attempt++;
-                    Console.Error.WriteLine($"I/O error on attempt {attempt}: {ex.Message}");
-                    Thread.Sleep(delayMilliseconds);
-                }
-                catch (Exception ex)
-                {
-                    // Non‑retriable exception or max retries exceeded – rethrow
-                    Console.Error.WriteLine($"Failed to add attachment: {ex.Message}");
-                    throw;
-                }
-            }
+            Console.Error.WriteLine($"PDF not found: {networkPdfPath}");
+            return;
         }
-    }
 
-    /// <summary>
-    /// Minimal entry point required for a console application.
-    /// It simply forwards command‑line arguments to <see cref="PdfAttachmentHelper.AddAttachmentWithRetry"/> when the correct number of arguments is supplied.
-    /// </summary>
-    public class Program
-    {
-        public static void Main(string[] args)
+        if (!File.Exists(attachmentPath))
         {
-            // Expected arguments: <pdfPath> <attachmentPath> <outputPath>
-            if (args.Length == 3)
+            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
+            return;
+        }
+
+        int attempt = 0;
+        bool success = false;
+
+        while (attempt < MaxRetryAttempts && !success)
+        {
+            attempt++;
+            try
             {
-                try
+                // Open the PDF from the network share inside a using block (rule: document-disposal-with-using)
+                using (Document pdfDoc = new Document(networkPdfPath))
                 {
-                    PdfAttachmentHelper.AddAttachmentWithRetry(args[0], args[1], args[2]);
-                    Console.WriteLine("Attachment added successfully.");
+                    // Create a FileSpecification for the attachment
+                    var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath));
+                    // Load the file bytes into a MemoryStream and assign to Contents
+                    fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
+                    // Optionally set a description or MIME type
+                    fileSpec.Description = attachmentName;
+
+                    // Add the file specification to the EmbeddedFiles collection
+                    pdfDoc.EmbeddedFiles.Add(fileSpec);
+
+                    // Save back to the same network location
+                    pdfDoc.Save(networkPdfPath);
                 }
-                catch (Exception ex)
+
+                // If we reach this point, the operation succeeded
+                success = true;
+                Console.WriteLine($"Attachment added successfully on attempt {attempt}.");
+            }
+            catch (IOException ioEx)
+            {
+                // Network-related I/O errors are common on UNC paths; retry after a delay
+                Console.Error.WriteLine($"I/O error on attempt {attempt}: {ioEx.Message}");
+                if (attempt < MaxRetryAttempts)
                 {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                    Environment.Exit(1);
+                    Console.WriteLine($"Waiting {RetryDelayMilliseconds} ms before retrying...");
+                    Thread.Sleep(RetryDelayMilliseconds);
+                }
+                else
+                {
+                    Console.Error.WriteLine("Maximum retry attempts reached. Operation failed.");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine("Usage: PdfAttachmentUtility <pdfPath> <attachmentPath> <outputPath>");
+                // Non-recoverable errors – abort immediately
+                Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+                break;
             }
         }
     }

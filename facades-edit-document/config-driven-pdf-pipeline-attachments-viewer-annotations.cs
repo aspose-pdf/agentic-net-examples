@@ -1,181 +1,183 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Drawing; // Needed for System.Drawing.Rectangle used by PdfContentEditor
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
-namespace PdfFacadePipeline
+class AttachmentConfig
 {
-    // Base class for all pipeline actions
-    abstract class ActionConfig
-    {
-        // Marked as non‑nullable but initialized with the null‑forgiving operator to silence warnings.
-        public string ActionType { get; set; } = null!;
-    }
+    public required string FilePath { get; set; }
+    public required string Description { get; set; }
+}
 
-    // Action to add a file attachment to the PDF
-    class AddAttachmentConfig : ActionConfig
-    {
-        public string FilePath { get; set; } = null!;          // Path to the file to attach
-        public string Description { get; set; } = null!;       // Description of the attachment
-    }
+class ViewerPreferencesConfig
+{
+    public bool HideToolbar { get; set; }
+    public bool HideMenubar { get; set; }
+    public bool CenterWindow { get; set; }
+    public bool DisplayDocTitle { get; set; }
+    // Add other preferences as needed
+}
 
-    // Action to change a viewer preference
-    class ViewerPreferenceConfig : ActionConfig
-    {
-        // ViewerPreference enum values are represented as int; default 0 is a safe placeholder.
-        public int Preference { get; set; } = 0;
-    }
+class AnnotationConfig
+{
+    public int PageNumber { get; set; }          // 1‑based page index
+    public double Llx { get; set; }              // lower‑left x
+    public double Lly { get; set; }              // lower‑left y
+    public double Urx { get; set; }              // upper‑right x
+    public double Ury { get; set; }              // upper‑right y
+    public required string Title { get; set; }
+    public required string Contents { get; set; }
+}
 
-    // Action to add an annotation (text or file attachment)
-    class AddAnnotationConfig : ActionConfig
-    {
-        public string AnnotationSubtype { get; set; } = null!; // "Text" or "FileAttachment"
-        public Aspose.Pdf.Rectangle? Rect { get; set; }        // Position on the page (nullable, will be validated at runtime)
-        public string? Content { get; set; }                  // Text content or file path
-        public string? Title { get; set; }                    // Title for the annotation (optional)
-        public string? Description { get; set; }             // Description for file attachment (optional)
-    }
+class PipelineConfig
+{
+    public required string InputPdf { get; set; }
+    public required string OutputPdf { get; set; }
+    public List<AttachmentConfig> Attachments { get; set; } = new List<AttachmentConfig>();
+    public ViewerPreferencesConfig ViewerPrefs { get; set; } = new ViewerPreferencesConfig();
+    public List<AnnotationConfig> Annotations { get; set; } = new List<AnnotationConfig>();
+}
 
-    // Root configuration for the pipeline
-    class PipelineConfig
+class Program
+{
+    static void Main()
     {
-        public string InputPdf { get; set; } = null!;          // Source PDF file
-        public string OutputPdf { get; set; } = null!;         // Destination PDF file
-        public List<ActionConfig> Actions { get; set; } = new List<ActionConfig>();
-    }
+        // -----------------------------------------------------------------
+        // Define a simple configuration (in real scenarios this could be
+        // deserialized from JSON, XML, etc.)
+        // -----------------------------------------------------------------
+        PipelineConfig config = new PipelineConfig {
+            InputPdf = "input.pdf",
+            OutputPdf = "output.pdf",
+            Attachments = new List<AttachmentConfig>
+            {
+                new AttachmentConfig { FilePath = "attachment1.txt", Description = "First attachment" },
+                new AttachmentConfig { FilePath = "attachment2.jpg", Description = "Image attachment" }
+            },
+            ViewerPrefs = new ViewerPreferencesConfig
+            {
+                HideToolbar = true,
+                HideMenubar = true,
+                CenterWindow = true,
+                DisplayDocTitle = true
+            },
+            Annotations = new List<AnnotationConfig>
+            {
+                new AnnotationConfig
+                {
+                    PageNumber = 1,
+                    Llx = 100, Lly = 500, Urx = 300, Ury = 550,
+                    Title = "Note 1",
+                    Contents = "This is a sample text annotation."
+                },
+                new AnnotationConfig
+                {
+                    PageNumber = 2,
+                    Llx = 150, Lly = 400, Urx = 350, Ury = 450,
+                    Title = "Note 2",
+                    Contents = "Another annotation on page 2."
+                }
+            }
+        };
 
-    class Program
-    {
-        static void Main()
+        // Validate input file existence
+        if (!File.Exists(config.InputPdf))
         {
-            // -----------------------------------------------------------------
-            // Sample configuration – in a real scenario this could be read from
-            // JSON, XML, database, etc.
-            // -----------------------------------------------------------------
-            PipelineConfig config = new PipelineConfig
-            {
-                InputPdf = "source.pdf",
-                OutputPdf = "result.pdf",
-                Actions = new List<ActionConfig>
-                {
-                    new AddAttachmentConfig
-                    {
-                        ActionType = "AddAttachment",
-                        FilePath = "attachment.docx",
-                        Description = "Sample attachment"
-                    },
-                    new ViewerPreferenceConfig
-                    {
-                        ActionType = "ViewerPreference",
-                        Preference = ViewerPreference.HideMenubar // hide the menubar
-                    },
-                    new AddAnnotationConfig
-                    {
-                        ActionType = "AddAnnotation",
-                        AnnotationSubtype = "Text",
-                        Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550),
-                        Content = "This is a text annotation",
-                        Title = "Note"
-                    },
-                    new AddAnnotationConfig
-                    {
-                        ActionType = "AddAnnotation",
-                        AnnotationSubtype = "FileAttachment",
-                        Rect = new Aspose.Pdf.Rectangle(50, 700, 150, 800),
-                        Content = "attachment.docx", // file to attach as annotation
-                        Title = "Attached Document",
-                        Description = "File attachment annotation"
-                    }
-                }
-            };
-
-            // Validate input file existence
-            if (!File.Exists(config.InputPdf))
-            {
-                Console.Error.WriteLine($"Input PDF not found: {config.InputPdf}");
-                return;
-            }
-
-            // -----------------------------------------------------------------
-            // Execute the pipeline using PdfContentEditor (Facade API)
-            // -----------------------------------------------------------------
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                // Bind the source PDF
-                editor.BindPdf(config.InputPdf);
-
-                // Process each configured action in order
-                foreach (var action in config.Actions)
-                {
-                    switch (action.ActionType)
-                    {
-                        case "AddAttachment":
-                            var attach = action as AddAttachmentConfig;
-                            if (attach != null && !string.IsNullOrEmpty(attach.FilePath) && File.Exists(attach.FilePath))
-                            {
-                                // Add a document attachment without a visible annotation
-                                editor.AddDocumentAttachment(attach.FilePath, attach.Description ?? string.Empty);
-                            }
-                            break;
-
-                        case "ViewerPreference":
-                            var pref = action as ViewerPreferenceConfig;
-                            if (pref != null)
-                            {
-                                // Change viewer preference using the integer value from ViewerPreference
-                                editor.ChangeViewerPreference(pref.Preference);
-                            }
-                            break;
-
-                        case "AddAnnotation":
-                            var ann = action as AddAnnotationConfig;
-                            if (ann != null && ann.Rect != null)
-                            {
-                                // Convert Aspose.Pdf.Rectangle to System.Drawing.Rectangle because PdfContentEditor expects the latter
-                                System.Drawing.Rectangle sysRect = new System.Drawing.Rectangle(
-                                    (int)ann.Rect.LLX,
-                                    (int)ann.Rect.LLY,
-                                    (int)(ann.Rect.URX - ann.Rect.LLX),
-                                    (int)(ann.Rect.URY - ann.Rect.LLY));
-
-                                if (string.Equals(ann.AnnotationSubtype, "Text", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    // Create a text annotation on the first page (page index is 1‑based)
-                                    editor.CreateText(
-                                        sysRect,
-                                        ann.Content ?? string.Empty,
-                                        ann.Title ?? string.Empty,
-                                        true,                     // set to true to display the annotation initially
-                                        ann.Description ?? string.Empty,
-                                        0);                       // default annotation flags
-                                }
-                                else if (string.Equals(ann.AnnotationSubtype, "FileAttachment", StringComparison.OrdinalIgnoreCase))
-                                {
-                                    // Create a file attachment annotation on the first page
-                                    editor.CreateFileAttachment(
-                                        sysRect,
-                                        ann.Title ?? string.Empty,
-                                        ann.Content ?? string.Empty, // path to the file to embed
-                                        0,                            // annotation flags
-                                        ann.Description ?? string.Empty);
-                                }
-                            }
-                            break;
-
-                        default:
-                            // Unknown action – ignore or log
-                            Console.WriteLine($"Unsupported action type: {action.ActionType}");
-                            break;
-                    }
-                }
-
-                // Save the modified PDF to the output path
-                editor.Save(config.OutputPdf);
-            }
-
-            Console.WriteLine($"Pipeline completed. Output saved to '{config.OutputPdf}'.");
+            Console.Error.WriteLine($"Input PDF not found: {config.InputPdf}");
+            return;
         }
+
+        // -----------------------------------------------------------------
+        // Load the PDF using the core Document API (document‑disposal‑with‑using rule)
+        // -----------------------------------------------------------------
+        using (Document doc = new Document(config.InputPdf))
+        {
+            // -------------------------------------------------------------
+            // Step 1: Add attachments (using EmbeddedFiles collection)
+            // -------------------------------------------------------------
+            foreach (var att in config.Attachments)
+            {
+                if (!File.Exists(att.FilePath))
+                {
+                    Console.Error.WriteLine($"Attachment not found: {att.FilePath}");
+                    continue; // skip missing attachments
+                }
+
+                // Create a FileSpecification with the file name and description.
+                var fileSpec = new FileSpecification(Path.GetFileName(att.FilePath))
+                {
+                    Description = att.Description,
+                    // Embed the actual file bytes.
+                    Contents = new MemoryStream(File.ReadAllBytes(att.FilePath))
+                };
+                doc.EmbeddedFiles.Add(fileSpec);
+            }
+
+            // -------------------------------------------------------------
+            // Step 2: Set viewer preferences – use reflection to stay
+            //         compatible with older Aspose.Pdf versions that may not
+            //         expose the ViewerPreferences type.
+            // -------------------------------------------------------------
+            ApplyViewerPreferences(doc, config.ViewerPrefs);
+
+            // -------------------------------------------------------------
+            // Step 3: Insert annotations using the core Document API.
+            // -------------------------------------------------------------
+            foreach (var ann in config.Annotations)
+            {
+                if (ann.PageNumber < 1 || ann.PageNumber > doc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Invalid page number {ann.PageNumber} for annotation.");
+                    continue;
+                }
+
+                var rect = new Aspose.Pdf.Rectangle(ann.Llx, ann.Lly, ann.Urx, ann.Ury);
+                var txtAnn = new TextAnnotation(doc.Pages[ann.PageNumber], rect)
+                {
+                    Title = ann.Title,
+                    Contents = ann.Contents,
+                    Open = true,
+                    Icon = TextIcon.Note
+                };
+                doc.Pages[ann.PageNumber].Annotations.Add(txtAnn);
+            }
+
+            // Save the final result
+            doc.Save(config.OutputPdf);
+        }
+
+        Console.WriteLine($"Pipeline completed. Output saved to '{config.OutputPdf}'.");
+    }
+
+    /// <summary>
+    /// Applies viewer preferences to a Document using reflection. This avoids a hard
+    /// compile‑time dependency on the ViewerPreferences type, which may be absent in
+    /// older Aspose.Pdf releases.
+    /// </summary>
+    private static void ApplyViewerPreferences(Document doc, ViewerPreferencesConfig cfg)
+    {
+        // Try to get the "ViewerPreferences" property (it may not exist).
+        var vpProp = doc.GetType().GetProperty("ViewerPreferences");
+        if (vpProp == null) return; // Property not available – nothing to set.
+
+        var vpInstance = vpProp.GetValue(doc);
+        if (vpInstance == null) return;
+
+        // Helper to set a boolean property if it exists.
+        void SetBool(string name, bool value)
+        {
+            var prop = vpInstance.GetType().GetProperty(name);
+            if (prop != null && prop.CanWrite)
+            {
+                prop.SetValue(vpInstance, value);
+            }
+        }
+
+        SetBool("HideToolbar", cfg.HideToolbar);
+        SetBool("HideMenubar", cfg.HideMenubar);
+        SetBool("CenterWindow", cfg.CenterWindow);
+        SetBool("DisplayDocTitle", cfg.DisplayDocTitle);
+        // Add more preferences here following the same pattern.
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,57 +8,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "page_word_counts.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "page_word_counts.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Open the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Create a CSV writer
+            using (StreamWriter csvWriter = new StreamWriter(outputCsv))
             {
-                // Prepare CSV writer
-                using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
+                // Write CSV header
+                csvWriter.WriteLine("PageNumber,WordCount");
+
+                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Write CSV header
-                    csvWriter.WriteLine("PageNumber,WordCount");
-
-                    // Iterate pages (1‑based indexing)
-                    for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+                    // Extract text from the current page
+                    TextAbsorber absorber = new TextAbsorber
                     {
-                        Page page = pdfDoc.Pages[pageIndex];
+                        ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+                    };
+                    doc.Pages[i].Accept(absorber);
+                    string pageText = absorber.Text ?? string.Empty;
 
-                        // Extract text from the current page
-                        TextAbsorber absorber = new TextAbsorber();
-                        page.Accept(absorber);
-                        string pageText = absorber.Text ?? string.Empty;
-
-                        // Count words (split on whitespace, ignore empty entries)
-                        int wordCount = 0;
-                        if (!string.IsNullOrWhiteSpace(pageText))
+                    // Count words by splitting on whitespace
+                    int wordCount = 0;
+                    if (!string.IsNullOrWhiteSpace(pageText))
+                    {
+                        string[] words = Regex.Split(pageText, @"\s+");
+                        foreach (string w in words)
                         {
-                            string[] words = pageText.Split(
-                                (char[])null, // split on any whitespace
-                                StringSplitOptions.RemoveEmptyEntries);
-                            wordCount = words.Length;
+                            if (!string.IsNullOrEmpty(w))
+                                wordCount++;
                         }
-
-                        // Write statistics to CSV
-                        csvWriter.WriteLine($"{pageIndex},{wordCount}");
                     }
+
+                    // Write the statistics for this page
+                    csvWriter.WriteLine($"{i},{wordCount}");
                 }
             }
+        }
 
-            Console.WriteLine($"Word count per page saved to '{outputCsvPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Word count per page written to '{outputCsv}'.");
     }
 }

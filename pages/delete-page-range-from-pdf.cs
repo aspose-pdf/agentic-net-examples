@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,19 +15,21 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the page numbers to delete (5 through 10, inclusive)
-            int[] pagesToDelete = { 5, 6, 7, 8, 9, 10 };
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Delete pages 5 through 10 (inclusive) by iterating backwards
+            // to avoid index shifting after each deletion.
+            for (int pageNum = 10; pageNum >= 5; pageNum--)
+            {
+                doc.Pages.Delete(pageNum);
+            }
 
-            // Delete the specified pages in a single operation
-            doc.Pages.Delete(pagesToDelete);
-
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages 5‑10 removed. Result saved to '{outputPath}'.");
+        Console.WriteLine($"Pages 5‑10 removed. Saved to '{outputPath}'.");
     }
 }

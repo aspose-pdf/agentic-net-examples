@@ -6,37 +6,35 @@ class Program
 {
     static void Main()
     {
-        // Path to the image that will be embedded
-        const string imagePath = "sample.png";
-        // Output PDF portfolio file
+        const string imagePath = "picture.jpg";
         const string outputPdf = "portfolio.pdf";
 
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document (will become a portfolio after embedding files)
-        using (Document pdf = new Document())
+        // Create a new PDF document and turn it into a portfolio by using the Collection API
+        using (Document doc = new Document())
         {
-            // Optional: add a blank page so the PDF is not empty
-            pdf.Pages.Add();
+            // Ensure the document has a Collection object (required for portfolios)
+            if (doc.Collection == null)
+                doc.Collection = new Collection();
 
-            // Create a FileSpecification from the image stream.
-            // The second argument defines the name that appears in the portfolio.
-            using (FileStream imgStream = File.OpenRead(imagePath))
+            // Build a FileSpecification for the image file
+            var fileSpec = new FileSpecification(imagePath, "SampleImage.jpg")
             {
-                FileSpecification fileSpec = new FileSpecification(imgStream, Path.GetFileName(imagePath));
-                // Optional: set a description (display name) for the embedded file
-                fileSpec.Description = "Sample Image";
+                Description = "An example image embedded in the PDF portfolio",
+                // Provide the file bytes – this is what will be stored in the portfolio
+                Contents = new MemoryStream(File.ReadAllBytes(imagePath))
+            };
 
-                // Add the file specification to the document's embedded files collection
-                pdf.EmbeddedFiles.Add(fileSpec);
-            }
+            // Add the file specification to the portfolio collection
+            doc.Collection.Add(fileSpec);
 
-            // Save the PDF; the embedded file becomes part of the PDF portfolio
-            pdf.Save(outputPdf);
+            // Save the resulting PDF portfolio
+            doc.Save(outputPdf);
         }
 
         Console.WriteLine($"PDF portfolio created: {outputPdf}");

@@ -1,44 +1,67 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string targetPath = "target.pdf";          // PDF to receive bookmarks
-        const string sourcePath = "source.pdf";          // PDF containing bookmarks
-        const string outputPath = "merged_bookmarks.pdf"; // Resulting PDF
+        // Paths – adjust as needed
+        const string targetPdfPath = "target.pdf";   // PDF that already has bookmarks
+        const string sourcePdfPath = "source.pdf";   // PDF whose bookmarks will be imported
+        const string outputPdfPath = "merged_bookmarks.pdf";
 
-        if (!File.Exists(targetPath) || !File.Exists(sourcePath))
+        // Verify files exist
+        if (!File.Exists(targetPdfPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            return;
+        }
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        // Export bookmarks from the source PDF to an in‑memory XML stream
-        using (MemoryStream bookmarkXml = new MemoryStream())
-        {
-            using (PdfBookmarkEditor sourceEditor = new PdfBookmarkEditor())
-            {
-                sourceEditor.BindPdf(sourcePath);
-                sourceEditor.ExportBookmarksToXML(bookmarkXml);
-                bookmarkXml.Position = 0; // Reset for reading
-            }
+        // Load the PDFs using the Document class (the recommended way for bookmark manipulation)
+        Document targetDoc = new Document(targetPdfPath);
+        Document sourceDoc = new Document(sourcePdfPath);
 
-            // Load the target PDF and import the exported bookmarks
-            using (Document targetDoc = new Document(targetPath))
-            {
-                using (PdfBookmarkEditor targetEditor = new PdfBookmarkEditor())
-                {
-                    targetEditor.BindPdf(targetDoc);
-                    targetEditor.ImportBookmarksWithXML(bookmarkXml);
-                    targetEditor.Save(outputPath); // Save the merged document
-                }
-            }
+        // Merge bookmarks from source into target while preserving order
+        foreach (OutlineItemCollection srcBookmark in sourceDoc.Outlines)
+        {
+            // Clone each bookmark (and its children) into the target document's outline collection
+            OutlineItemCollection cloned = CloneOutlineItem(srcBookmark, targetDoc);
+            targetDoc.Outlines.Add(cloned);
         }
 
-        Console.WriteLine($"Bookmarks merged successfully. Output saved to '{outputPath}'.");
+        // Save the result to a new file (preserves the original target PDF)
+        targetDoc.Save(outputPdfPath);
+
+        Console.WriteLine($"Bookmarks merged successfully. Output saved to '{outputPdfPath}'.");
+    }
+
+    /// <summary>
+    /// Recursively clones an OutlineItemCollection from one document to another.
+    /// </summary>
+    private static OutlineItemCollection CloneOutlineItem(OutlineItemCollection source, Document targetDoc)
+    {
+        // Create a new outline item attached to the target document's outline collection
+        var copy = new OutlineItemCollection(targetDoc.Outlines)
+        {
+            Title = source.Title,
+            Italic = source.Italic,
+            Bold = source.Bold,
+            Color = source.Color,
+            Action = source.Action // For simple GoTo actions this works; complex actions may need adaptation
+        };
+
+        // Recursively clone any child bookmarks
+        foreach (OutlineItemCollection child in source)
+        {
+            copy.Add(CloneOutlineItem(child, targetDoc));
+        }
+
+        return copy;
     }
 }

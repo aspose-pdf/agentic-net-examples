@@ -1,17 +1,15 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source PDF with form fields
-        const string outputPath = "output.pdf"; // PDF after styling
-        const string fieldName = "OptionalField"; // name of the form field to style
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "OptionalField"; // name of the form field to modify
 
         if (!File.Exists(inputPath))
         {
@@ -19,37 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by name using the Fields collection
-            Field field = doc.Form?.Fields?.FirstOrDefault(f => f.FullName == fieldName);
-            if (field != null)
+            // Retrieve the widget annotation that represents the form field
+            WidgetAnnotation? widget = doc.Form[fieldName] as WidgetAnnotation;
+            if (widget == null)
             {
-                // The field derives from Annotation, so we can treat it as such
-                Annotation annotation = field as Annotation;
-                if (annotation != null)
-                {
-                    // Create a Border object associated with the annotation
-                    Border border = new Border(annotation)
-                    {
-                        Style = BorderStyle.Dashed, // dashed border style
-                        Width = 1                    // optional: border width in points
-                    };
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a widget annotation.");
+                return;
+            }
 
-                    // Assign the configured border back to the annotation
-                    annotation.Border = border;
-                }
-            }
-            else
+            // Set a dashed border style (width = 1 point, black colour)
+            widget.Border = new Border(widget)
             {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
-            }
+                Width = 1,
+                Style = BorderStyle.Dashed
+            };
+            // Border colour is defined by the annotation's own Color property
+            widget.Color = Color.Black;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with dashed border to '{outputPath}'.");
+        Console.WriteLine($"Form field border updated and saved to '{outputPath}'.");
     }
 }

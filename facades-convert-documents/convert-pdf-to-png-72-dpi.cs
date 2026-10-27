@@ -1,16 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF
-        const string outputDir = "output_images";    // folder for PNGs
+        const string inputPdf = "input.pdf";
+        const string outputDir = "output_images";
 
-        // Verify source file exists
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -20,36 +20,26 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // PdfConverter implements IDisposable – use using for deterministic cleanup
-            using (PdfConverter converter = new PdfConverter())
+            // Set the desired resolution (72 DPI) for the PNG output
+            var resolution = new Resolution(72);
+
+            // Iterate over all pages (1‑based indexing) and save each as a PNG file
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                // Bind the PDF document to the converter
-                converter.BindPdf(inputPdf);
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
 
-                // Set low resolution (72 DPI) for quick preview images
-                converter.Resolution = new Resolution(72);
-
-                // Prepare internal structures for conversion
-                converter.DoConvert();
-
-                int pageNumber = 1;
-                // Iterate over all pages and save each as PNG
-                while (converter.HasNextImage())
+                // Use PngDevice (cross‑platform) to render the page to a PNG stream
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
                 {
-                    string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                    // Format is inferred from the .png extension – no System.Drawing needed
-                    converter.GetNextImage(outputPath);
-                    pageNumber++;
+                    var pngDevice = new PngDevice(resolution);
+                    pngDevice.Process(doc.Pages[pageNumber], imageStream);
                 }
             }
+        }
 
-            Console.WriteLine("PDF to PNG conversion completed.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+        Console.WriteLine("PDF to PNG conversion completed.");
     }
 }

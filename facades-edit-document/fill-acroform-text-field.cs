@@ -1,35 +1,37 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "filled.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF that contains the AcroForm
-        using (Form form = new Form(inputPath))
-        {
-            // Fill the text field named "CustomerName" with the desired value
-            bool success = form.FillField("CustomerName", "Acme Corporation");
-            if (!success)
-            {
-                Console.Error.WriteLine("Failed to fill the field 'CustomerName'.");
-            }
+        // Load the PDF document.
+        Document pdf = new Document(inputPath);
 
-            // Save the updated PDF
-            form.Save(outputPath);
+        // Fill the AcroForm text field named "CustomerName".
+        if (pdf.Form != null && pdf.Form["CustomerName"] is TextBoxField txtField)
+        {
+            txtField.Value = "Acme Corporation";
+        }
+        else
+        {
+            Console.Error.WriteLine("Form field 'CustomerName' not found or is not a text box.");
         }
 
-        Console.WriteLine($"AcroForm field filled and saved to '{outputPath}'.");
+        // Save the modified PDF.
+        pdf.Save(outputPath);
+
+        Console.WriteLine($"Form field filled and saved to '{outputPath}'.");
     }
 }

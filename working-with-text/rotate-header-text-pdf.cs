@@ -3,63 +3,53 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class RotateHeaders
 {
     static void Main()
     {
         // Folder containing input PDFs
-        const string inputFolder = @"C:\InputPdfs";
+        const string inputFolder = @"C:\PdfInput";
         // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
+        const string outputFolder = @"C:\PdfOutput";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
-
+        // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Define a font size threshold that distinguishes headers.
-        // Adjust this value based on the PDFs you process.
-        const float headerFontSizeThreshold = 14f;
-
         // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            try
-            {
-                // Load the PDF document
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Absorb all text fragments from the whole document
-                    TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-                    doc.Pages.Accept(absorber);
+            // Build output file path (append "_rotated" before extension)
+            string fileName = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_rotated.pdf");
 
-                    // Rotate fragments that are likely headers
-                    foreach (TextFragment fragment in absorber.TextFragments)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Iterate over each page and its paragraphs – avoids the
+                // TextFragmentAbsorber which may trigger an internal helper exe.
+                foreach (Page page in doc.Pages)
+                {
+                    foreach (var paragraph in page.Paragraphs)
                     {
-                        // Simple heuristic: treat larger font size as a header
-                        if (fragment.TextState.FontSize >= headerFontSizeThreshold)
+                        if (paragraph is TextFragment fragment)
                         {
-                            // Rotate the text fragment by 90 degrees
-                            fragment.TextState.Rotation = 90;
+                            // Simple heuristic: treat fragments with a relatively large font size as headers
+                            if (fragment.TextState.FontSize >= 14)
+                            {
+                                // Rotate the fragment by 90 degrees clockwise
+                                fragment.TextState.Rotation = 90;
+                            }
                         }
                     }
-
-                    // Save the modified document to the output folder
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-                    doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                // Save the modified document
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
         }
 
-        Console.WriteLine("All files processed.");
+        Console.WriteLine("All PDFs have been processed.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,56 +8,95 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string videoPath = "sample.mp4";
-        const string posterPath = "poster.jpg";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_richmedia.pdf";
+        const string videoPath = "sample.mp4";          // MP4 video to embed
+        const string posterImagePath = "poster.jpg";   // Image shown before playback
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf) || !File.Exists(videoPath) || !File.Exists(posterPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("One or more required files are missing.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(videoPath))
+        {
+            Console.Error.WriteLine($"Video file not found: {videoPath}");
+            return;
+        }
+        if (!File.Exists(posterImagePath))
+        {
+            Console.Error.WriteLine($"Poster image not found: {posterImagePath}");
             return;
         }
 
-        // Open the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        // Document disposal with using (hard rule)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Select the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
+            // Rectangle: lower‑left (100,500) – upper‑right (400,800)
+            var rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Define the annotation rectangle (lower‑left X/Y, upper‑right X/Y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Create the RichMediaAnnotation (available in all supported versions)
+            var richMedia = new RichMediaAnnotation(page, rect);
 
-            // Create the RichMediaAnnotation
-            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect)
+            // ---------- Embed video (reflection – works when RichMediaContent exists) ----------
+            var richMediaContentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+            if (richMediaContentProp != null)
             {
-                // Optional visual settings
-                Color = Aspose.Pdf.Color.Transparent,
-                // Specify that the embedded content is a video
-                Type = RichMediaAnnotation.ContentType.Video
-            };
-
-            // Embed the MP4 video stream
-            using (FileStream videoStream = File.OpenRead(videoPath))
-            {
-                // The first argument is the name of the stream inside the PDF
-                richMedia.SetContent(Path.GetFileName(videoPath), videoStream);
+                // Try to obtain the RichMediaContent type from the Aspose.Pdf assembly
+                var richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+                if (richMediaContentType != null)
+                {
+                    // Create an instance of RichMediaContent
+                    var richMediaContent = Activator.CreateInstance(richMediaContentType);
+                    // The older API exposes an AddFile(string) method – use it if present
+                    var addFileMethod = richMediaContentType.GetMethod("AddFile", new[] { typeof(string) });
+                    if (addFileMethod != null)
+                    {
+                        addFileMethod.Invoke(richMediaContent, new object[] { videoPath });
+                    }
+                    // Assign the populated RichMediaContent to the annotation
+                    richMediaContentProp.SetValue(richMedia, richMediaContent);
+                }
             }
 
-            // Set the poster image that appears before playback
-            using (FileStream posterStream = File.OpenRead(posterPath))
+            // ---------- Set poster image (reflection – works when the property exists) ----------
+            // First try a direct PosterImage property on the annotation
+            var posterPropDirect = typeof(RichMediaAnnotation).GetProperty("PosterImage");
+            if (posterPropDirect != null)
             {
-                richMedia.SetPoster(posterStream);
+                var posterSpec = new FileSpecification(posterImagePath);
+                posterPropDirect.SetValue(richMedia, posterSpec);
+            }
+            else
+            {
+                // Fallback: navigate through RichMediaSettings if it exists
+                var settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+                if (settingsProp != null)
+                {
+                    var settingsInstance = settingsProp.GetValue(richMedia);
+                    if (settingsInstance != null)
+                    {
+                        var posterProp = settingsInstance.GetType().GetProperty("PosterImage");
+                        if (posterProp != null)
+                        {
+                            var posterSpec = new FileSpecification(posterImagePath);
+                            posterProp.SetValue(settingsInstance, posterSpec);
+                        }
+                    }
+                }
             }
 
-            // Add the annotation to the page
+            // Optional: activation behavior – uncomment if the runtime version supports it
+            // var activationProp = typeof(RichMediaAnnotation).GetProperty("RichMediaActivation");
+            // if (activationProp != null)
+            //     activationProp.SetValue(richMedia, Enum.Parse(activationProp.PropertyType, "OnPageOpen"));
+
+            // Add the annotation to the page and save
             page.Annotations.Add(richMedia);
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Rich media annotation added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Rich media PDF saved to '{outputPdfPath}'.");
     }
 }

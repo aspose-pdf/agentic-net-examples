@@ -1,21 +1,22 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file, pages to delete, and output PDF file
-        const string inputPath  = "input.pdf";
+        // Input PDF file path
+        const string inputPath = "input.pdf";
+        // Output PDF file path after deletion
         const string outputPath = "output.pdf";
-        int[] pagesToDelete = new int[] { 2, 3 }; // page numbers (1‑based)
+        // Pages to delete (example: pages 2 and 3)
+        int[] pagesToDelete = new int[] { 2, 3 };
 
         // Verify that the input file exists before invoking Delete
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file \"{inputPath}\" not found.");
+            Console.Error.WriteLine($"Error: Input file '{inputPath}' not found.");
             return;
         }
 
@@ -24,21 +25,15 @@ class Program
             // PdfFileEditor does not implement IDisposable, so no using block is needed
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Delete the specified pages and save the result to a new file
+            // Delete specified pages using the file‑path overload
             editor.Delete(inputPath, pagesToDelete, outputPath);
 
-            Console.WriteLine($"Pages {string.Join(", ", pagesToDelete)} deleted successfully.");
-            Console.WriteLine($"Result saved to \"{outputPath}\".");
-        }
-        catch (PdfException ex)
-        {
-            // Handles cases where the file exists but is not a valid PDF or other PDF‑related errors
-            Console.Error.WriteLine($"PDF error: {ex.Message}");
+            Console.WriteLine($"Pages deleted successfully. Result saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // General fallback for any other unexpected errors
-            Console.Error.WriteLine($"An error occurred: {ex.Message}");
+            // Catch any runtime errors from the Delete operation
+            Console.Error.WriteLine($"Error during Delete operation: {ex.Message}");
         }
     }
 }

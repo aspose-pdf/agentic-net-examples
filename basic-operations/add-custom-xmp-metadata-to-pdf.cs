@@ -1,50 +1,34 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_xmp.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load PDF, add custom XMP metadata, and save preserving metadata
+        using (Document doc = new Document(inputPath))
         {
-            // Prepare a custom XMP metadata packet (XML format)
-            string xmpPacket = @"<?xpacket begin='﻿' id='W5M0MpCehiHzreSzNTczkc9d'?>
-<x:xmpmeta xmlns:x='adobe:ns:meta/'>
-  <rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
-    <rdf:Description rdf:about='' xmlns:dc='http://purl.org/dc/elements/1.1/'>
-      <dc:title>
-        <rdf:Alt>
-          <rdf:li xml:lang='x-default'>Custom Title</rdf:li>
-        </rdf:Alt>
-      </dc:title>
-    </rdf:Description>
-  </rdf:RDF>
-</x:xmpmeta>
-<?xpacket end='w'?>";
+            // Register the Dublin Core namespace (dc) used in the example XMP block
+            doc.Metadata.RegisterNamespaceUri("dc", "http://purl.org/dc/elements/1.1/");
 
-            // Convert the XML string to a memory stream
-            using (MemoryStream xmpStream = new MemoryStream(Encoding.UTF8.GetBytes(xmpPacket)))
-            {
-                // Set the XMP metadata on the document
-                doc.SetXmpMetadata(xmpStream);
-            }
+            // Add the desired XMP properties – these will be written into the XMP packet automatically.
+            doc.Metadata["dc:creator"] = "John Doe";
+            doc.Metadata["dc:title"]   = "Sample PDF";
 
-            // Save the document, preserving the newly added metadata
-            doc.Save(outputPdf);
+            // Save the document – metadata is preserved automatically.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom XMP metadata to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with custom XMP metadata to '{outputPath}'.");
     }
 }

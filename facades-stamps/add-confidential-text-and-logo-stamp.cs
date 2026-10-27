@@ -1,65 +1,80 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Stamp, FormattedText, EncodingType
-using System.Drawing; // for Color
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string logoPath = "logo.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "stamped_output.pdf";
+        const string logoImagePath = "logo.png";
 
-        // Verify files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(logoPath))
-        {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and bind the source PDF
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf); // loads the document to be stamped
+        if (!File.Exists(logoImagePath))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
+            return;
+        }
 
-        // Create formatted text for the word "Confidential" in bold
-        FormattedText confidentialText = new FormattedText(
-            "Confidential",          // text
-            Color.Red,                // text color (System.Drawing.Color)
-            "Helvetica-Bold",       // bold font name
-            EncodingType.Winansi,    // encoding
-            false,                    // embed font?
-            36);                      // font size
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPdfPath))
+            {
+                // ------------------------------------------------------------
+                // 1. Image stamp – company logo
+                // ------------------------------------------------------------
+                ImageStamp logoStamp = new ImageStamp(logoImagePath)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment   = VerticalAlignment.Top,
+                    XIndent = 20,   // distance from left edge
+                    YIndent = 20,   // distance from top edge
+                    Background = false,
+                    Opacity = 0.8
+                };
 
-        // Create a Stamp and bind both the text and the logo image
-        Stamp stamp = new Stamp();
-        stamp.BindLogo(confidentialText); // bind the formatted text
-        stamp.BindImage(logoPath);        // bind the logo image
+                // ------------------------------------------------------------
+                // 2. Text stamp – the word "Confidential"
+                // ------------------------------------------------------------
+                TextStamp textStamp = new TextStamp("Confidential")
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
+                    Background = false,
+                    Opacity = 0.5
+                };
+                // All visual properties of a TextStamp are set through its TextState object
+                textStamp.TextState.Font = FontRepository.FindFont("Arial");
+                textStamp.TextState.FontSize = 24;
+                textStamp.TextState.FontStyle = FontStyles.Bold;
+                textStamp.TextState.ForegroundColor = Color.Red;
 
-        // Position the stamp (origin is the lower‑left corner of the stamp)
-        stamp.SetOrigin(100f, 500f); // X, Y in points
+                // ------------------------------------------------------------
+                // 3. Apply both stamps to every page in the document
+                // ------------------------------------------------------------
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(logoStamp);
+                    page.AddStamp(textStamp);
+                }
 
-        // Optionally set the size of the image part of the stamp
-        stamp.SetImageSize(80f, 80f); // width, height in points
+                // Save the stamped PDF
+                doc.Save(outputPdfPath);
+            }
 
-        // Make the stamp appear behind the page content (optional)
-        stamp.IsBackground = true;
-
-        // Add the stamp to the PDF
-        fileStamp.AddStamp(stamp);
-
-        // Save the stamped PDF
-        fileStamp.Save(outputPdf);
-
-        // Close the facade (releases resources)
-        fileStamp.Close();
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

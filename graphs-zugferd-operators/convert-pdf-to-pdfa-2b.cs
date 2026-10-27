@@ -8,7 +8,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output_pdfa2b.pdf";
-        const string logPath    = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF, convert to PDF/A‑2b, then save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Convert to PDF/A‑2b; errors are logged to the specified file.
-            doc.Convert(logPath, PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
+            // Load the source PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Convert the document to PDF/A‑2b compliance
+                PdfFormatConversionOptions opts = new PdfFormatConversionOptions(PdfFormat.PDF_A_2B)
+                {
+                    OptimizeFileSize = true
+                };
+                doc.Convert(opts);
 
-            // Save the converted document.
-            doc.Save(outputPath);
+                // Save the compliant PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with PDF/A‑2b compliance to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF/A‑2b compliant file saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

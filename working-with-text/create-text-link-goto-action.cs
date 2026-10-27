@@ -1,70 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";      // existing PDF or create new
-        const string outputPath = "output.pdf";
+        const string outputPath = "linked_output.pdf";
 
-        // Ensure the input file exists; if not, create a simple PDF with two pages
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists (if a directory part is present)
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create and work with the PDF document inside a using block (lifecycle rule)
+        using (Document doc = new Document())
         {
-            using (Document tempDoc = new Document())
+            // Add two pages (page indexing is 1‑based)
+            Page page1 = doc.Pages.Add(); // first page
+            Page page2 = doc.Pages.Add(); // second page
+
+            // -------------------------------------------------
+            // Page 2: add some placeholder content
+            // -------------------------------------------------
+            TextFragment page2Text = new TextFragment("This is page 2.");
+            page2Text.Position = new Position(100, 700);
+            page2.Paragraphs.Add(page2Text);
+
+            // -------------------------------------------------
+            // Page 1: create a visible TextFragment that acts as a link
+            // -------------------------------------------------
+            TextFragment linkFragment = new TextFragment("Go to Page 2");
+            // Position the text on the page
+            linkFragment.Position = new Position(100, 700);
+            // Optional styling (underline and blue color)
+            linkFragment.TextState.Underline = true;
+            // Use predefined Aspose.Pdf.Color to avoid out‑of‑range values
+            linkFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            page1.Paragraphs.Add(linkFragment);
+
+            // -------------------------------------------------
+            // Page 1: create a LinkAnnotation that points to page 2
+            // -------------------------------------------------
+            // Estimate a rectangle that covers the text. The rectangle is defined as
+            // (llx, lly, urx, ury) – lower‑left and upper‑right corners.
+            // Here we use a simple fixed width; for production code you could measure the text.
+            double llx = 100;               // left X (same as text X)
+            double lly = 690;               // lower Y (a bit below the baseline)
+            double urx = 250;               // right X (approximate width of the string)
+            double ury = 710;               // upper Y (a bit above the baseline)
+            LinkAnnotation link = new LinkAnnotation(page1, new Aspose.Pdf.Rectangle(llx, lly, urx, ury))
             {
-                // Page 1
-                Page page1 = tempDoc.Pages.Add();
-                TextFragment tf1 = new TextFragment("Click here to go to Page 2");
-                tf1.Position = new Position(100, 700);
-                page1.Paragraphs.Add(tf1);
+                Action = new GoToAction(page2)
+            };
+            page1.Annotations.Add(link);
 
-                // Page 2
-                Page page2 = tempDoc.Pages.Add();
-                page2.Paragraphs.Add(new TextFragment("You are now on Page 2."));
-
-                tempDoc.Save(inputPath);
-            }
-        }
-
-        // Open the document, add a link that navigates to page 2
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure there are at least two pages
-            if (doc.Pages.Count < 2)
-                doc.Pages.Add();
-
-            // Add a visible text fragment on the first page (optional if already present)
-            Page firstPage = doc.Pages[1];
-            TextFragment linkText = new TextFragment("Go to Page 2");
-            linkText.Position = new Position(100, 750);
-            linkText.TextState.FontSize = 14;
-            linkText.TextState.Font = FontRepository.FindFont("Helvetica");
-            linkText.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-            firstPage.Paragraphs.Add(linkText);
-
-            // Define a rectangle that covers the text fragment (approximate)
-            // Rectangle(left, bottom, right, top) – coordinates are in points
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 730, 250, 760);
-
-            // Create the LinkAnnotation first
-            LinkAnnotation link = new LinkAnnotation(firstPage, linkRect);
-            // Optional visual styling
-            link.Color = Aspose.Pdf.Color.Transparent;
-            link.Border = new Border(link) { Width = 0 };
-            // Assign a GoToAction that jumps to page 2
-            link.Action = new GoToAction(doc.Pages[2]);
-
-            // Add the annotation to the page
-            firstPage.Annotations.Add(link);
-
-            // Save the modified PDF
+            // Save the PDF (still inside the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with text link saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with GoTo link saved to '{outputPath}'.");
     }
 }

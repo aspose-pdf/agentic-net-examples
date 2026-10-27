@@ -1,70 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input JPEG files – adjust the paths as needed
-        string[] imageFiles = new string[]
+        // Paths to the JPEG images to be merged.
+        string[] imagePaths = new string[]
         {
             "image1.jpg",
             "image2.jpg",
             "image3.jpg"
         };
 
-        const string outputPdf = "combined.pdf";
+        // Output PDF file.
+        const string outputPdfPath = "merged_images.pdf";
 
-        // Verify that all image files exist before proceeding
-        foreach (string imgPath in imageFiles)
+        // Verify that all image files exist before processing.
+        foreach (string imgPath in imagePaths)
         {
             if (!File.Exists(imgPath))
             {
-                Console.Error.WriteLine($"Image not found: {imgPath}");
+                Console.Error.WriteLine($"Image file not found: {imgPath}");
                 return;
             }
         }
 
-        // Create a new PDF document
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document.
+        var pdfDocument = new Document();
+
+        // Add each image to a separate page.
+        foreach (string imgPath in imagePaths)
         {
-            // PdfFileMend works on an existing Document instance
-            PdfFileMend pdfMend = new PdfFileMend(pdfDoc);
+            // Add a new page to the document.
+            var page = pdfDocument.Pages.Add();
 
-            // Add each image on a separate page
-            for (int i = 0; i < imageFiles.Length; i++)
-            {
-                // Add a blank page to the document
-                pdfDoc.Pages.Add();
+            // Create an Aspose.Pdf.Image object and bind it to the file.
+            var image = new Aspose.Pdf.Image { File = imgPath };
 
-                // Page numbers in Aspose.Pdf are 1‑based
-                int pageNumber = i + 1;
-                Page page = pdfDoc.Pages[pageNumber];
+            // Optionally, you can set the page size to match the image dimensions.
+            // This requires System.Drawing.Common (or any other way to read image size).
+            // Uncomment the following block if you want the page size to match the image.
+            //
+            // using (var sysImg = System.Drawing.Image.FromFile(imgPath))
+            // {
+            //     page.SetPageSize(sysImg.Width, sysImg.Height);
+            // }
 
-                // Determine page dimensions (width & height in points)
-                // PageInfo properties are double, cast to float for AddImage
-                float pageWidth  = (float)page.PageInfo.Width;
-                float pageHeight = (float)page.PageInfo.Height;
-
-                // Open the image stream and place it to fill the entire page
-                using (FileStream imgStream = File.OpenRead(imageFiles[i]))
-                {
-                    pdfMend.AddImage(
-                        imgStream,          // image stream
-                        pageNumber,         // target page
-                        0f,                 // lower‑left X
-                        0f,                 // lower‑left Y
-                        pageWidth,          // upper‑right X
-                        pageHeight);        // upper‑right Y
-                }
-            }
-
-            // Save the assembled PDF
-            pdfDoc.Save(outputPdf);
+            // Add the image to the page.
+            page.Paragraphs.Add(image);
         }
 
-        Console.WriteLine($"PDF created successfully: {outputPdf}");
+        // Save the combined PDF.
+        pdfDocument.Save(outputPdfPath);
+
+        Console.WriteLine($"PDF successfully created at '{outputPdfPath}'.");
     }
 }

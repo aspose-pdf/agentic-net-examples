@@ -1,47 +1,43 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "dimension_line.pdf";
+
+        // Ensure the output directory exists
+        string outDir = System.IO.Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a blank page to host the drawing
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 400 points, height: 200 points)
-            // Use double parameters as the constructor overload with float is obsolete
-            Graph graph = new Graph(400.0, 200.0);
+            // Create a Graph that spans the whole page – all drawing objects must be placed inside a Graph
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Define a line that starts at (50,150) and ends at (350,150)
-            // PositionArray expects an array of coordinates: { x1, y1, x2, y2, ... }
-            float[] linePos = { 50f, 150f, 350f, 150f };
-            Line line = new Line(linePos);
+            // Define the line coordinates (x1, y1, x2, y2)
+            // Example: a 200‑point long horizontal line starting at (100,500)
+            Line line = new Line(new float[] { 100f, 500f, 300f, 500f });
+            // Set visual properties via GraphInfo
+            line.GraphInfo.Color = Color.Black;
+            line.GraphInfo.LineWidth = 2f;
 
-            // Style the line via GraphInfo (color and thickness)
-            line.GraphInfo = new GraphInfo
-            {
-                Color = Aspose.Pdf.Color.Blue,   // line color
-                LineWidth = 2f                    // line thickness
-            };
-
-            // Add the line to the graph's shape collection
+            // Add the line to the graph and the graph to the page
             graph.Shapes.Add(line);
-
-            // Set a title for the graph – Graph.Title expects a TextFragment, not a string
-            graph.Title = new TextFragment("Dimension Line Example");
-
-            // Add the graph to the page's paragraphs collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF (no SaveOptions needed – will always produce PDF)
-            doc.Save("DimensionLine.pdf");
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with dimension line created: DimensionLine.pdf");
+        Console.WriteLine($"PDF with dimension‑specific line saved to '{outputPath}'.");
     }
 }

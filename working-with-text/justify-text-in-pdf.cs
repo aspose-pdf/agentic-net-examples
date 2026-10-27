@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,34 +7,30 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for proper disposal
+        const string outputPath = "justified.pdf";
+
+        // Ensure deterministic disposal of the Document
         using (Document doc = new Document())
         {
-            // Add a blank page (first page)
+            // Add a new page (Pages collection is 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment with the desired content
-            TextFragment fragment = new TextFragment(
-                "The quick brown fox jumps over the lazy dog. " +
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
+            // Sample paragraph text
+            string sampleText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
+                                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-            // Configure the existing TextState (read‑only property) – do NOT replace the object
+            // Create a TextFragment and set justification
+            TextFragment fragment = new TextFragment(sampleText);
             fragment.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
-            fragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Color.Black;
 
-            // Position the fragment on the page (left margin = 50, bottom margin = 500)
-            fragment.Position = new Position(50, 500);
-
-            // Add the TextFragment to the page's paragraphs collection
+            // Add the fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Save the document as PDF
-            doc.Save("JustifiedText.pdf");
+            // Save as PDF (no SaveOptions needed for PDF format)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with justified text saved as 'JustifiedText.pdf'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -1,22 +1,13 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Define the range of pages to extract (1‑based inclusive)
-        const int rangeStart = 2;
-        const int rangeEnd   = 4;
-
-        // Define the position where the extracted pages will be re‑inserted
-        // (1‑based). Adjust if the position is after the original range.
-        const int insertPosition = 6;
 
         if (!File.Exists(inputPath))
         {
@@ -24,52 +15,69 @@ class Program
             return;
         }
 
-        // Load the source PDF
-        using (Document srcDoc = new Document(inputPath))
+        // Define the page range to extract and the position where it will be reinserted.
+        // Example: extract pages 2‑4 and insert them after page 6.
+        int rangeStart = 2;
+        int rangeEnd   = 4;
+        int insertAfter = 6; // pages will be inserted starting at this index + 1
+
+        // Load the source PDF inside a using block for deterministic disposal.
+        using (Document src = new Document(inputPath))
         {
+            // Validate the requested range.
+            if (rangeStart < 1 || rangeEnd > src.Pages.Count || rangeStart > rangeEnd)
+            {
+                Console.Error.WriteLine("Invalid page range.");
+                return;
+            }
+
             // -----------------------------------------------------------------
-            // 1. Copy the selected pages into a temporary document
+            // 1. Copy the required pages to a temporary document.
             // -----------------------------------------------------------------
-            Document tempDoc = new Document();
+            Document extracted = new Document();
             for (int i = rangeStart; i <= rangeEnd; i++)
             {
-                // Add a reference to the page; this creates a new page in tempDoc
-                tempDoc.Pages.Add(srcDoc.Pages[i]);
+                // Adding a page to another document creates a deep copy.
+                extracted.Pages.Add(src.Pages[i]);
             }
 
             // -----------------------------------------------------------------
-            // 2. Change the size of the copied pages to A4
+            // 2. Resize each extracted page to A4 (595 × 842 points).
             // -----------------------------------------------------------------
-            foreach (Page p in tempDoc.Pages)
+            foreach (Page page in extracted.Pages)
             {
-                // SetPageSize expects width and height in points (1 point = 1/72 inch)
-                p.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                page.PageInfo.Width  = PageSize.A4.Width;
+                page.PageInfo.Height = PageSize.A4.Height;
             }
 
             // -----------------------------------------------------------------
-            // 3. Remove the original pages from the source document
-            //    Deleting from the end prevents index shifting.
+            // 3. Remove the original pages from the source document.
             // -----------------------------------------------------------------
+            // Aspose.Pdf.Pages.Delete only accepts a single page number, so delete
+            // the range backwards to keep the remaining indices valid.
             for (int i = rangeEnd; i >= rangeStart; i--)
             {
-                srcDoc.Pages.Delete(i);
+                src.Pages.Delete(i);
             }
 
             // -----------------------------------------------------------------
-            // 4. Insert the resized pages at the desired position
+            // 4. Compute the insertion index (Aspose.Pdf uses 1‑based indexing).
             // -----------------------------------------------------------------
-            // If the insertion point was after the removed range, adjust it.
-            int adjustedInsertPos = insertPosition;
-            if (insertPosition > rangeEnd)
-                adjustedInsertPos -= (rangeEnd - rangeStart + 1);
-
-            // Insert the array of pages from the temporary document
-            srcDoc.Pages.Insert(adjustedInsertPos, tempDoc.Pages.ToArray());
+            int insertIndex = insertAfter + 1;
+            if (insertIndex > src.Pages.Count + 1)
+                insertIndex = src.Pages.Count + 1;
 
             // -----------------------------------------------------------------
-            // 5. Save the modified PDF
+            // 5. Re‑insert the extracted pages at the new position, preserving order.
             // -----------------------------------------------------------------
-            srcDoc.Save(outputPath);
+            foreach (Page page in extracted.Pages)
+            {
+                src.Pages.Insert(insertIndex, page);
+                insertIndex++; // advance so subsequent pages follow the previous one
+            }
+
+            // Save the modified document.
+            src.Save(outputPath);
         }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");

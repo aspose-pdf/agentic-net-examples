@@ -1,67 +1,81 @@
 using System;
-using System.Data;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Operators;
 
 class Program
 {
     static void Main()
     {
-        // Input and output file paths
-        const string inputPath  = "input.pdf";   // existing PDF or can be a blank PDF
+        const string inputPath = "template.pdf";   // optional existing PDF, can be empty
         const string outputPath = "rotated_table.pdf";
 
-        // Ensure the input file exists; if not, create a blank PDF with one page
+        // Ensure the input file exists; if not, create a blank document
         if (!File.Exists(inputPath))
         {
             using (Document blank = new Document())
             {
-                blank.Pages.Add();
+                blank.Pages.Add(); // add a single empty page
                 blank.Save(inputPath);
             }
         }
 
-        // Load the document (using rule: load with using)
+        // Open the document and work within a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add a new page to host the rotated table
-            Page page = doc.Pages.Add();
+            // Use the first existing page (or the only page we just created)
+            Page page = doc.Pages[1];
 
-            // Create a simple DataTable to populate the Aspose.Pdf.Table
-            DataTable dt = new DataTable();
-            dt.Columns.Add("Product");
-            dt.Columns.Add("Quantity");
-            dt.Columns.Add("Price");
-            dt.Rows.Add("Widget A", "10", "$5.00");
-            dt.Rows.Add("Widget B", "7",  "$8.50");
-            dt.Rows.Add("Widget C", "3",  "$12.00");
+            // ------------------------------------------------------------
+            // Create a simple visual Table (Aspose.Pdf.Table) and populate it
+            // ------------------------------------------------------------
+            Table table = new Table
+            {
+                // Position the table at (0,0) before rotation; size will be adjusted automatically
+                ColumnWidths = "100 100 100", // three columns, each 100 points wide
+                Border = new BorderInfo(BorderSide.All, 1f, Color.Black)
+            };
 
-            // Create the Aspose.Pdf.Table and import the DataTable
-            Table pdfTable = new Table();
-            pdfTable.ColumnWidths = "100 100 100"; // three equal columns
-            pdfTable.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Black);
-            pdfTable.ImportDataTable(dt, true, 0, 0);
+            // Header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
+            header.Cells.Add("Header 3");
+            header.BackgroundColor = Color.LightGray;
 
-            // Position the table on the page (before rotation)
-            pdfTable.Left = 50;   // X coordinate
-            pdfTable.Top  = 50;   // Y coordinate
+            // Data rows
+            for (int i = 1; i <= 5; i++)
+            {
+                Row row = table.Rows.Add();
+                row.Cells.Add($"Item {i}A");
+                row.Cells.Add($"Item {i}B");
+                row.Cells.Add($"Item {i}C");
+            }
 
-            // Apply a 90‑degree rotation matrix to the page's content.
-            // Aspose.Pdf provides a static helper to create the matrix.
-            // The matrix is then assigned to the page's transformation matrix
-            // via the internal Content stream. The simplest way is to set the
-            // page's Rotate property, which internally uses the same matrix.
-            page.Rotate = Rotation.on90; // rotates the whole page (including the table)
+            // ------------------------------------------------------------
+            // Apply a 90-degree rotation transformation before drawing the table
+            // ------------------------------------------------------------
+            // Save the current graphics state (gsave)
+            page.Contents.Add(new GSave());
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(pdfTable);
+            // Create a matrix that rotates 90° clockwise and translates the content
+            // Matrix layout: [a b c d e f] => [0 1 -1 0 pageHeight 0]
+            Matrix rotationMatrix = new Matrix(new double[] { 0, 1, -1, 0, page.PageInfo.Height, 0 });
 
-            // Save the modified document (using rule: save)
+            // Apply the matrix
+            page.Contents.Add(new ConcatenateMatrix(rotationMatrix));
+
+            // Add the table while the rotated coordinate system is active
+            page.Paragraphs.Add(table);
+
+            // Restore the original graphics state (grestore)
+            page.Contents.Add(new GRestore());
+
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document with rotated table saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated table PDF saved to '{outputPath}'.");
     }
 }

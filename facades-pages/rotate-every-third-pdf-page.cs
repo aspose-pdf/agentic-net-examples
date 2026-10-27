@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
@@ -12,34 +11,31 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Rotate every third page (3,6,9,…) by 270° using PdfPageEditor
-        using (PdfPageEditor editor = new PdfPageEditor())
+        try
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
-
-            // Prepare per‑page rotation dictionary (1‑based page numbers)
-            var pageRotations = new Dictionary<int, int>();
-
-            int pageCount = editor.GetPages();
-
-            for (int page = 3; page <= pageCount; page += 3)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                pageRotations[page] = 270; // valid values: 0, 90, 180, 270
+                // Rotate every third page (3, 6, 9, ...) by 270 degrees (landscape)
+                for (int pageNumber = 3; pageNumber <= doc.Pages.Count; pageNumber += 3)
+                {
+                    // Aspose.Pdf uses a 1‑based page index and the Rotation enum
+                    doc.Pages[pageNumber].Rotate = Rotation.on270;
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Assign the rotation dictionary
-            editor.PageRotations = pageRotations;
-
-            // Apply changes and save the result
-            editor.ApplyChanges();
-            editor.Save(outputPath);
+            Console.WriteLine($"Pages rotated and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

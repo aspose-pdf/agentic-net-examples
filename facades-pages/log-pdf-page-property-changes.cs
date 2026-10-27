@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -13,71 +12,57 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Clear previous log
-        File.WriteAllText(logPath, string.Empty);
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Create or overwrite the log file
+        using (StreamWriter log = new StreamWriter(logPath, false))
         {
-            // Enable internal notification logging
-            doc.EnableNotificationLogging = true;
+            // Load the PDF using the Document API (recommended for page‑level changes)
+            Document pdf = new Document(inputPath);
 
-            // Use PdfPageEditor (Facade) to modify page properties
-            using (PdfPageEditor editor = new PdfPageEditor())
+            // ------------------------------------------------------------
+            // Example modification 1: rotate the first page by 90 degrees
+            // ------------------------------------------------------------
+            int pageToRotate = 1;
+            if (pageToRotate <= pdf.Pages.Count)
             {
-                editor.BindPdf(doc);
+                // Log original rotation (default is 0)
+                log.WriteLine($"{DateTime.Now:u} Original rotation of page {pageToRotate}: {pdf.Pages[pageToRotate].Rotate}");
 
-                // Rotate page 1 by 90 degrees
-                editor.Rotation = 90;
-                editor.ProcessPages = new int[] { 1 };
-                editor.ApplyChanges();
-                LogPageChange(doc, 1, logPath, "Rotation set to 90 degrees");
-
-                // Set zoom of page 2 to 1.5
-                editor.Rotation = 0; // reset rotation for next operation
-                editor.Zoom = 1.5f;
-                editor.ProcessPages = new int[] { 2 };
-                editor.ApplyChanges();
-                LogPageChange(doc, 2, logPath, "Zoom set to 1.5");
-            }
-
-            // Directly modify a page property (background color) for page 3
-            if (doc.Pages.Count >= 3)
-            {
-                Page page3 = doc.Pages[3];
-                page3.Background = Aspose.Pdf.Color.LightGray;
-                LogPageChange(doc, 3, logPath, "Background color set to LightGray");
-            }
-
-            // Save the modified document
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Modifications have been logged to '{logPath}'.");
-    }
-
-    // Helper method to write notifications for a specific page
-    static void LogPageChange(Document doc, int pageNumber, string logFile, string actionDescription)
-    {
-        string notifications = doc.Pages[pageNumber].GetNotifications();
-
-        using (StreamWriter writer = new StreamWriter(logFile, true))
-        {
-            writer.WriteLine($"Page {pageNumber}: {actionDescription}");
-            if (!string.IsNullOrEmpty(notifications))
-            {
-                writer.WriteLine("Notifications:");
-                writer.WriteLine(notifications);
+                // Apply rotation using the Rotation enum
+                pdf.Pages[pageToRotate].Rotate = Rotation.on90;
+                log.WriteLine($"{DateTime.Now:u} Rotated page {pageToRotate} by 90 degrees.");
             }
             else
             {
-                writer.WriteLine("No notifications recorded.");
+                log.WriteLine($"{DateTime.Now:u} Page {pageToRotate} does not exist – cannot rotate.");
             }
-            writer.WriteLine(new string('-', 40));
+
+            // ------------------------------------------------------------
+            // Example modification 2: change the size of the second page to A4
+            // ------------------------------------------------------------
+            int pageToResize = 2;
+            if (pageToResize <= pdf.Pages.Count)
+            {
+                Page originalPage = pdf.Pages[pageToResize];
+                log.WriteLine($"{DateTime.Now:u} Original size of page {pageToResize}: Width={originalPage.PageInfo.Width}, Height={originalPage.PageInfo.Height}");
+
+                // Apply new page size (A4) using width and height doubles as required by the API
+                originalPage.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                log.WriteLine($"{DateTime.Now:u} Changed size of page {pageToResize} to A4.");
+            }
+            else
+            {
+                log.WriteLine($"{DateTime.Now:u} Page {pageToResize} does not exist – cannot resize.");
+            }
+
+            // Save the modified PDF
+            pdf.Save(outputPath);
+            log.WriteLine($"{DateTime.Now:u} Saved modified PDF to {outputPath}.");
         }
+
+        Console.WriteLine("PDF modifications completed. Audit log written to modifications.log");
     }
 }

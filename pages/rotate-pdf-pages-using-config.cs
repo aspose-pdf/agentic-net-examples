@@ -3,22 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 
-class RotatePagesExample
+class Program
 {
     static void Main()
     {
         // Input and output PDF paths
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "rotated_output.pdf";
-
-        // Configuration: page number (1‑based) -> rotation angle in degrees (0, 90, 180, 270)
-        var rotationConfig = new Dictionary<int, int>
-        {
-            { 1, 90 },   // rotate page 1 by 90°
-            { 2, 180 },  // rotate page 2 by 180°
-            { 5, 270 }   // rotate page 5 by 270°
-            // add more entries as needed
-        };
 
         if (!File.Exists(inputPath))
         {
@@ -26,19 +17,36 @@ class RotatePagesExample
             return;
         }
 
-        // Load the PDF, apply rotations, and save
+        // Configuration: page number (1‑based) -> rotation angle (degrees, multiples of 90)
+        var pageRotations = new Dictionary<int, int>
+        {
+            { 1, 90 },
+            { 2, 180 },
+            { 3, 270 }   // add more entries as needed
+        };
+
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over the configuration dictionary
+            foreach (var kvp in pageRotations)
             {
-                if (rotationConfig.TryGetValue(i, out int angle))
+                int pageNumber = kvp.Key;   // 1‑based page index
+                int angle      = kvp.Value; // rotation angle (must be 0, 90, 180, 270)
+
+                // Ensure the page exists (pages are 1‑based)
+                if (pageNumber >= 1 && pageNumber <= doc.Pages.Count)
                 {
-                    // Convert integer angle to the Rotation enum
-                    doc.Pages[i].Rotate = Page.IntToRotation(angle);
+                    // Convert the integer angle to the Rotation enum and assign it
+                    doc.Pages[pageNumber].Rotate = (Rotation)angle;
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Page {pageNumber} does not exist in the document.");
                 }
             }
 
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

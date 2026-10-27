@@ -1,75 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";            // PDF to which the attachment will be added
-        const string attachmentPath = "attachment.docx"; // File to attach
-        const string outputPath = "output_with_attachment.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_attachments.pdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(pdfPath))
+        // List of files to attach
+        string[] attachmentFiles = new[]
         {
-            Console.Error.WriteLine($"Error: PDF file not found – '{pdfPath}'.");
-            return;
-        }
+            "attachment1.docx",
+            "attachment2.jpg",
+            "missing_file.txt"   // example of a missing file
+        };
 
-        // Verify that the attachment file exists
-        if (!File.Exists(attachmentPath))
+        // Verify the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: Attachment file not found – '{attachmentPath}'.");
+            Console.Error.WriteLine($"Error: PDF file not found – '{inputPdfPath}'.");
             return;
         }
 
         try
         {
-            // Load the PDF document (lifecycle: load)
-            using (Document doc = new Document(pdfPath))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Create a file specification for the attachment (description is optional)
-                FileSpecification fileSpec = new FileSpecification(attachmentPath, "Attached document");
-
-                // Define the rectangle for the annotation (position on the page)
-                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
-
-                // Create the file attachment annotation on the first page
-                Page page = doc.Pages[1]; // 1‑based indexing
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+                foreach (string filePath in attachmentFiles)
                 {
-                    // Optional visual properties
-                    Icon = FileIcon.Paperclip, // Correct enum for attachment icons
-                    Color = Aspose.Pdf.Color.Blue,
-                    Contents = "Attached document"
-                };
+                    if (!File.Exists(filePath))
+                    {
+                        // Handle missing attachment file – log and skip
+                        Console.Error.WriteLine($"Warning: Attachment file not found – '{filePath}'. Skipping.");
+                        continue;
+                    }
 
-                // Add the annotation to the page
-                page.Annotations.Add(attachment);
+                    // Create a FileSpecification for the attachment.
+                    // The file name shown in the PDF is the simple name, the description is optional.
+                    var fileSpec = new FileSpecification(Path.GetFileName(filePath))
+                    {
+                        // Optional description – you can customize as needed
+                        Description = $"Embedded attachment: {Path.GetFileName(filePath)}",
+                        // Embed the file content via a memory stream
+                        Contents = new MemoryStream(File.ReadAllBytes(filePath))
+                    };
 
-                // Save the modified PDF (lifecycle: save)
-                doc.Save(outputPath);
+                    // Add the specification to the EmbeddedFiles collection (the correct API for attachments).
+                    pdfDoc.EmbeddedFiles.Add(fileSpec);
+                }
+
+                // Save the modified PDF
+                pdfDoc.Save(outputPdfPath);
+                Console.WriteLine($"PDF saved with attachments to '{outputPdfPath}'.");
             }
-
-            Console.WriteLine($"Attachment added successfully. Saved as '{outputPath}'.");
-        }
-        catch (FileNotFoundException fnfEx)
-        {
-            // Handles cases where the PDF or attachment disappears after the existence check
-            Console.Error.WriteLine($"File not found: {fnfEx.Message}");
-        }
-        catch (PdfException pdfEx)
-        {
-            // Handles Aspose.Pdf specific errors (e.g., corrupted PDF)
-            Console.Error.WriteLine($"PDF processing error: {pdfEx.Message}");
         }
         catch (Exception ex)
         {
-            // General fallback for unexpected errors
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            // General error handling
+            Console.Error.WriteLine($"An error occurred: {ex.Message}");
         }
     }
 }

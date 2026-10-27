@@ -1,13 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf; // PageSize enum
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "brochure_landscape.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,23 +15,28 @@ class Program
             return;
         }
 
-        // Rotate all pages to landscape and fit standard A4 brochure size
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF
-            editor.BindPdf(inputPath);
+            // Standard brochure size: A4 landscape (842 x 595 points).
+            const double brochureWidth = 842;  // points (11.69 inches)
+            const double brochureHeight = 595; // points (8.27 inches)
 
-            // Rotate pages 90 degrees (portrait → landscape)
-            editor.Rotation = 90;
+            // Rotate each page 90 degrees clockwise and set the page size.
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                // Rotate the page to landscape orientation.
+                doc.Pages[i].Rotate = Rotation.on90; // 90° clockwise
 
-            // Set the target page size to A4 (landscape orientation)
-            editor.PageSize = PageSize.A4;
+                // Adjust the page dimensions to the brochure size.
+                doc.Pages[i].PageInfo.Width = brochureWidth;
+                doc.Pages[i].PageInfo.Height = brochureHeight;
+                // Optional: mark the page as landscape for clarity.
+                doc.Pages[i].PageInfo.IsLandscape = brochureWidth > brochureHeight;
+            }
 
-            // Apply the modifications
-            editor.ApplyChanges();
-
-            // Save the resulting PDF
-            editor.Save(outputPath);
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Brochure PDF saved to '{outputPath}'.");

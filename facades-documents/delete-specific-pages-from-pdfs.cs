@@ -1,65 +1,70 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the running application
+        // Use the executable's folder as a reliable base directory.
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-
-        // Resolve source and destination folders relative to the base directory
         string sourceFolder = Path.Combine(baseDir, "SourcePdfs");
-        string destFolder   = Path.Combine(baseDir, "OutputPdfs");
+        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
 
-        // Ensure the source folder exists – if it does not, create it and inform the user.
+        // Validate the source folder – if it does not exist, inform the user and stop.
         if (!Directory.Exists(sourceFolder))
         {
-            Directory.CreateDirectory(sourceFolder);
-            Console.WriteLine($"Source folder not found. Created empty folder at: {sourceFolder}");
-            Console.WriteLine("Place PDF files in this folder and re‑run the program.");
-            return; // Nothing to process yet.
-        }
-
-        // Ensure the destination folder exists
-        Directory.CreateDirectory(destFolder);
-
-        // Retrieve all PDF files from the source folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{sourceFolder}'." );
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
+            Console.Error.WriteLine("Create the folder and place PDF files inside, then rerun the program.");
             return;
         }
 
-        foreach (string inputPath in pdfFiles)
+        // Ensure the output folder exists.
+        Directory.CreateDirectory(outputFolder);
+
+        // Process each PDF file in the source folder.
+        foreach (string inputPath in Directory.GetFiles(sourceFolder, "*.pdf"))
         {
             try
             {
-                // Preserve the original file name for the output
-                string fileName   = Path.GetFileName(inputPath);
-                string outputPath = Path.Combine(destFolder, fileName);
+                string fileName = Path.GetFileName(inputPath);
+                string outputPath = Path.Combine(outputFolder, fileName);
 
-                // Use PdfFileEditor (Aspose.Pdf.Facades) to delete pages 3 and 4
-                var editor = new PdfFileEditor();
-
-                // Delete returns true on success; handle failure if needed
-                bool success = editor.Delete(inputPath, new int[] { 3, 4 }, outputPath);
-
-                if (success)
+                // Defensive check – the file should exist because GetFiles returned it, but guard anyway.
+                if (!File.Exists(inputPath))
                 {
-                    Console.WriteLine($"Processed: {fileName} → {outputPath}");
+                    Console.Error.WriteLine($"File not found (skipped): {inputPath}");
+                    continue;
                 }
-                else
+
+                // Load, modify, and save the PDF inside a using block to release resources promptly.
+                using (Document pdfDoc = new Document(inputPath))
                 {
-                    Console.Error.WriteLine($"Failed to process: {fileName}");
+                    // Delete pages 3 and 4 (1‑based indexing). After the first deletion the original
+                    // page 4 becomes page 3, so we delete page 3 a second time.
+                    if (pdfDoc.Pages.Count >= 4)
+                    {
+                        pdfDoc.Pages.Delete(3); // removes original page 3
+                        pdfDoc.Pages.Delete(3); // original page 4 is now at position 3
+                    }
+                    else if (pdfDoc.Pages.Count == 3)
+                    {
+                        pdfDoc.Pages.Delete(3); // only page 3 exists
+                    }
+                    // If the document has fewer than 3 pages, nothing is deleted.
+
+                    pdfDoc.Save(outputPath);
                 }
+
+                Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
+                // Log the error but continue with the next file.
                 Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Page deletion completed.");
     }
 }

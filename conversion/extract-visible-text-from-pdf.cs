@@ -8,33 +8,36 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "extracted.txt";
+        const string outputPath = "output.txt";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TextAbsorber to collect visible text
-            TextAbsorber absorber = new TextAbsorber();
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPath))
+            {
+                // Configure TextAbsorber to extract only visible (non‑hidden) text
+                TextAbsorber absorber = new TextAbsorber();
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Configure extraction to use the Pure formatting mode (visible text only)
-            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                // Apply the absorber to all pages
+                pdfDoc.Pages.Accept(absorber);
+                string extractedText = absorber.Text;
 
-            // Apply the absorber to all pages of the document
-            doc.Pages.Accept(absorber);
+                // Save the extracted text to a plain‑text file
+                File.WriteAllText(outputPath, extractedText);
+            }
 
-            // Retrieve the extracted text
-            string extractedText = absorber.Text;
-
-            // Write the result to a plain text file
-            File.WriteAllText(outputPath, extractedText);
+            Console.WriteLine($"Text extracted to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Visible text extracted to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

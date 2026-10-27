@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,24 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a PdfContentEditor facade to edit the document content
-            using (PdfContentEditor editor = new PdfContentEditor())
-            {
-                // Bind the loaded document to the editor
-                editor.BindPdf(doc);
+            // PdfContentEditor is a Facades class for page-level operations.
+            // It does NOT implement IDisposable, so we do NOT wrap it in a using block.
+            PdfContentEditor editor = new PdfContentEditor();
 
-                // Replace all occurrences of "Draft" with "Final" in the entire document
-                // This overload replaces text on all pages (page index 0 means all pages)
-                editor.ReplaceText("Draft", "Final");
-            }
+            // Bind the source PDF file.
+            editor.BindPdf(inputPath);
 
-            // Save the modified document
-            doc.Save(outputPath);
+            // Replace every occurrence of the word "Draft" with "Final".
+            // This method works on the entire document content.
+            editor.ReplaceText("Draft", "Final");
+
+            // Save the modified PDF to the desired output path.
+            editor.Save(outputPath);
+
+            // Release any internal resources held by the editor.
+            editor.Close();
+
+            Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+        }
     }
 }

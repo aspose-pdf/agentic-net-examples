@@ -17,20 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Set standard author metadata
-            doc.Info.Author = author;
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Set standard author metadata
+                doc.Info.Author = author;
 
-            // Set custom publisher metadata (no dedicated property, use dictionary entry)
-            doc.Info["Publisher"] = publisher;
+                // Add custom publisher metadata using the DocumentInfo indexer
+                doc.Info["Publisher"] = publisher;
 
-            // Save the document as MobiXml using explicit save options
-            MobiXmlSaveOptions saveOptions = new MobiXmlSaveOptions();
-            doc.Save(outputPath, saveOptions);
+                // Prepare MobiXml save options (required for non‑PDF output)
+                MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
+
+                // Save the document as MobiXml using the explicit options
+                doc.Save(outputPath, mobiOptions);
+            }
+
+            Console.WriteLine($"PDF successfully converted to MobiXml: {outputPath}");
         }
-
-        Console.WriteLine($"PDF successfully converted to MobiXml: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

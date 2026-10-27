@@ -17,25 +17,21 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document with deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Use TextAbsorber to extract all text from the document
+            TextAbsorber absorber = new TextAbsorber
             {
-                // Extract text from all pages
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages.Accept(absorber);
-                string extractedText = absorber.Text ?? string.Empty;
+                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+            };
+            pdfDoc.Pages.Accept(absorber);
+            string extractedText = absorber.Text ?? string.Empty;
 
-                // Write the extracted text to a UTF‑8 encoded file
-                File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
-            }
+            // Write the extracted text to a UTF‑8 encoded file
+            File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
+        }
 
-            Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Text extracted to '{outputTxt}'.");
     }
 }

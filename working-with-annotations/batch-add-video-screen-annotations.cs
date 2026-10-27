@@ -7,61 +7,61 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Video files – one per page (ensure the array length matches the PDF page count)
-        string[] videoFiles = { "video1.mp4", "video2.mp4", "video3.mp4" };
-
-        if (!File.Exists(inputPdf))
+        // Video files – one per page (ensure the count matches the number of pages)
+        string[] videoFiles = new[]
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            "video_page1.mp4",
+            "video_page2.mp4",
+            "video_page3.mp4"
+            // add more paths as needed
+        };
+
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Optional: verify video files exist
-        foreach (string vf in videoFiles)
+        // Verify that each video file exists before processing
+        for (int i = 0; i < videoFiles.Length; i++)
         {
-            if (!File.Exists(vf))
+            if (!File.Exists(videoFiles[i]))
             {
-                Console.Error.WriteLine($"Video file not found: {vf}");
+                Console.Error.WriteLine($"Video file not found: {videoFiles[i]}");
                 return;
             }
         }
 
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
+            // Ensure we do not exceed the number of pages
             int pageCount = doc.Pages.Count;
+            int videosToAdd = Math.Min(pageCount, videoFiles.Length);
 
-            if (videoFiles.Length < pageCount)
+            // Iterate using 1‑based page indexing (Aspose.Pdf requirement)
+            for (int pageIndex = 1; pageIndex <= videosToAdd; pageIndex++)
             {
-                Console.Error.WriteLine("Insufficient video files for the number of pages.");
-                return;
-            }
+                Page page = doc.Pages[pageIndex];
 
-            // Iterate pages (1‑based indexing)
-            for (int i = 1; i <= pageCount; i++)
-            {
-                Page page = doc.Pages[i];
+                // Define the rectangle where the screen annotation will appear
+                // Fully qualified type to avoid ambiguity with System.Drawing.Rectangle
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-                // Define annotation rectangle (example coordinates)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+                // Create the screen annotation for the current page, passing the video file path
+                ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoFiles[pageIndex - 1]);
 
-                // Create ScreenAnnotation with the corresponding video file
-                ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoFiles[i - 1]);
-
-                // Optional metadata
-                screen.Title = $"Video {i}";
-                screen.Contents = $"Play {Path.GetFileName(videoFiles[i - 1])}";
-
-                // Add annotation to the page
+                // Add the annotation to the page's annotation collection
                 page.Annotations.Add(screen);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF (no SaveOptions needed for PDF output)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Screen annotations added. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Screen annotations added. Output saved to '{outputPdfPath}'.");
     }
 }

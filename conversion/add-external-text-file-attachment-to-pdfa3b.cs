@@ -1,64 +1,56 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF (should be PDF/A‑3b compatible)
-        const string attachmentFilePath = "note.txt";    // external text file to attach
-        const string outputPdfPath = "output_pdfa3b.pdf";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string attachmentPath = "notes.txt";        // external text file to embed
+        const string outputPdfAPath = "output_pdfa3b.pdf"; // resulting PDF/A‑3b file
+        const string conversionLogPath = "conversion_log.xml"; // optional log for conversion
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath) || !File.Exists(attachmentFilePath))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Input PDF or attachment file not found.");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(attachmentPath))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Load the PDF inside a using block (ensures deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // ------------------------------------------------------------
-            // 1. Create a FileSpecification for the external text file
-            // ------------------------------------------------------------
-            // Use the overload that takes a file path and a description, then assign the file contents via a stream.
-            var fileSpec = new FileSpecification(attachmentFilePath, "Attached Text File");
-            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
-
-            // ------------------------------------------------------------
-            // 2. Add the file to the document's EmbeddedFiles collection.
-            //    This step is required for PDF/A‑3 compliance.
-            // ------------------------------------------------------------
-            doc.EmbeddedFiles.Add(fileSpec);
-
-            // ------------------------------------------------------------
-            // 3. Create a FileAttachment annotation on the first page.
-            //    The annotation provides a visual cue for the attached file.
-            // ------------------------------------------------------------
-            var rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
-            var attachmentAnnot = new FileAttachmentAnnotation(
-                doc.Pages[1],   // target page (1‑based indexing)
-                rect,           // annotation rectangle
-                fileSpec)       // linked file specification
+            // Load the source PDF
+            using (Document doc = new Document(inputPdfPath))
             {
-                Title = "Attached Text File",
-                Contents = "This annotation embeds an external text file."
-            };
+                // Create a FileSpecification for the external file (stream + file name)
+                var fileSpec = new FileSpecification(
+                    new MemoryStream(File.ReadAllBytes(attachmentPath)),
+                    Path.GetFileName(attachmentPath));
 
-            // Add the annotation to the page's annotation collection
-            doc.Pages[1].Annotations.Add(attachmentAnnot);
+                // Set the required PDF/A‑3 relationship (Source is appropriate for an attached document)
+                fileSpec.AFRelationship = Aspose.Pdf.AFRelationship.Source;
 
-            // ------------------------------------------------------------
-            // 4. Convert the document to PDF/A‑3b compliance.
-            //    Use Document.Convert with the appropriate PdfFormat enum.
-            // ------------------------------------------------------------
-            doc.Convert("conversion_log.xml", PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
-            doc.Save(outputPdfPath);
+                // Add the file to the document's EmbeddedFiles collection
+                doc.EmbeddedFiles.Add(fileSpec);
+
+                // Convert the document to PDF/A‑3b compliance
+                doc.Convert(conversionLogPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+
+                // Save the PDF/A‑3b document with the embedded attachment
+                doc.Save(outputPdfAPath);
+            }
+
+            Console.WriteLine($"PDF/A‑3b file created with attachment: {outputPdfAPath}");
         }
-
-        Console.WriteLine($"PDF/A‑3b document with attachment saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

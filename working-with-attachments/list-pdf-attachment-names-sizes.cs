@@ -14,40 +14,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Ensure the Document is disposed properly
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over each embedded file (attachment)
-            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+            // The Attachments collection does not exist; use EmbeddedFiles instead
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                if (fileSpec == null)
-                    continue;
-
-                // Get the attachment name (original file name)
-                string fileName = fileSpec.Name;
-
-                // Determine the size of the attachment (in bytes)
-                long size = 0;
-                Stream contentStream = fileSpec.Contents;
-                if (contentStream != null)
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    if (contentStream.CanSeek)
+                    long sizeInBytes = 0;
+                    if (fileSpec.Contents != null)
                     {
-                        size = contentStream.Length;
-                    }
-                    else
-                    {
-                        // Fallback: copy to a MemoryStream to obtain length
-                        using (var ms = new MemoryStream())
+                        if (fileSpec.Contents.CanSeek)
                         {
-                            contentStream.CopyTo(ms);
-                            size = ms.Length;
+                            sizeInBytes = fileSpec.Contents.Length;
+                        }
+                        else
+                        {
+                            // Fallback: copy to a MemoryStream to determine length
+                            using (var ms = new MemoryStream())
+                            {
+                                fileSpec.Contents.CopyTo(ms);
+                                sizeInBytes = ms.Length;
+                                // Reset the original stream position if possible
+                                if (fileSpec.Contents.CanSeek)
+                                    fileSpec.Contents.Position = 0;
+                            }
                         }
                     }
+                    Console.WriteLine($"{fileSpec.Name} - {sizeInBytes} bytes");
                 }
-
-                // Output the attachment details
-                Console.WriteLine($"Attachment: {fileName}, Size: {size} bytes");
+            }
+            else
+            {
+                Console.WriteLine("No embedded files found in the PDF.");
             }
         }
     }

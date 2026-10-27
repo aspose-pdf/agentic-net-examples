@@ -1,14 +1,16 @@
 using System;
 using System.IO;
-using System.Drawing;               // Required for Rectangle and Color (used by CreateMarkup)
-using Aspose.Pdf.Facades;          // Facade API for annotation creation
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_highlight.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "highlighted.pdf";
+        const string searchText = "SELECTED TEXT"; // replace with the exact text to highlight
 
         if (!File.Exists(inputPath))
         {
@@ -16,38 +18,32 @@ class Program
             return;
         }
 
-        // Initialize the PdfContentEditor facade
-        PdfContentEditor editor = new PdfContentEditor();
-        try
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Search for the text on page 3 only (page index is 1‑based)
+        TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
+        doc.Pages[3].Accept(absorber);
+
+        // If nothing was found, exit gracefully
+        if (absorber.TextFragments.Count == 0)
         {
-            // Load the PDF document
-            editor.BindPdf(inputPath);
-
-            // Define the rectangle that covers the text to be highlighted on page 3
-            // (x, y, width, height) – coordinates are in points.
-            Rectangle highlightRect = new Rectangle(100, 500, 200, 20);
-
-            // Highlight color (yellow)
-            Color highlightColor = Color.Yellow;
-
-            // Markup type: 0 = Highlight
-            int markupType = 0;
-
-            // Page number (1‑based indexing)
-            int pageNumber = 3;
-
-            // Create the highlight annotation
-            editor.CreateMarkup(highlightRect, "Highlighted text", markupType, pageNumber, highlightColor);
-
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
-        finally
-        {
-            // Release resources held by the facade
-            editor.Close();
+            Console.WriteLine("No matching text found on page 3.");
+            return;
         }
 
-        Console.WriteLine($"Highlight annotation added and saved to '{outputPath}'.");
+        // Add a highlight annotation for each found fragment
+        foreach (TextFragment fragment in absorber.TextFragments)
+        {
+            // Create a HighlightAnnotation on the same page using the fragment rectangle
+            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[3], fragment.Rectangle);
+            highlight.Color = Color.Yellow; // set highlight color
+            doc.Pages[3].Annotations.Add(highlight);
+        }
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Highlight annotation applied. Output saved to '{outputPath}'.");
     }
 }

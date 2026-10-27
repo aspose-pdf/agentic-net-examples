@@ -1,53 +1,57 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for System.Drawing.Color used by FormattedText
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace contains FormattedText, EncodingType, Stamp, PdfFileStamp
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "watermarked.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Initialize the PdfFileStamp facade and bind the source PDF
-        PdfFileStamp fileStamp = new PdfFileStamp();
-        fileStamp.BindPdf(inputPdf);
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
 
-        // Create a FormattedText object for the watermark.
-        // Constructor parameters: text, System.Drawing.Color, font name, EncodingType, isEmbedded, font size (float)
-        Aspose.Pdf.Facades.FormattedText watermarkText = new Aspose.Pdf.Facades.FormattedText(
-            "Confidential",                // first line
-            System.Drawing.Color.Gray,      // text color (System.Drawing.Color)
-            "Helvetica",                  // font name
-            Aspose.Pdf.Facades.EncodingType.Winansi, // encoding
-            false,                          // not embedded
-            48f);                           // font size (float)
+        // Create a watermark artifact
+        WatermarkArtifact watermark = new WatermarkArtifact();
 
-        // Add additional lines to the watermark
-        watermarkText.AddNewLineText("Do Not Distribute");
-        watermarkText.AddNewLineText("Company Internal Use Only");
+        // Prepare the text (multi‑line) and its visual style
+        string[] lines = { "Confidential", "Do Not Distribute", "© 2026 Company" };
+        string watermarkText = string.Join("\n", lines); // newline separates the lines
 
-        // Create a Stamp, bind the FormattedText, and configure it as a background watermark
-        Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-        stamp.BindLogo(watermarkText);
-        stamp.IsBackground = true;   // place behind page content
-        stamp.Opacity = 0.3f;        // semi‑transparent
+        TextState textState = new TextState
+        {
+            Font = FontRepository.FindFont("Arial"),
+            FontSize = 36,
+            ForegroundColor = Color.Gray
+        };
 
-        // Add the stamp to all pages of the document
-        fileStamp.AddStamp(stamp);
+        // Apply the text and style to the artifact
+        watermark.SetTextAndState(watermarkText, textState);
 
-        // Save the result
-        fileStamp.Save(outputPdf);
-        fileStamp.Close();
+        // Configure appearance of the watermark
+        watermark.ArtifactHorizontalAlignment = HorizontalAlignment.Center; // center horizontally
+        watermark.ArtifactVerticalAlignment   = VerticalAlignment.Center;   // center vertically
+        watermark.Rotation = 45;               // rotate 45 degrees
+        watermark.Opacity = 0.5f;              // semi‑transparent
+        watermark.IsBackground = true;        // render as background (watermark)
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        // Add the watermark to every page of the document
+        foreach (Page page in pdfDoc.Pages)
+        {
+            page.Artifacts.Add(watermark);
+        }
+
+        // Save the watermarked PDF
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

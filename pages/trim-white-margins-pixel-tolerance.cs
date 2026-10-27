@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 
@@ -7,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "trimmed.pdf";
+        const string outputPath = "trimmed_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,38 +16,54 @@ class Program
             return;
         }
 
-        // Default pixel‑tolerance expressed as a fill‑threshold factor (0..1).
-        // Adjust this value per page if needed.
-        const double defaultTolerance = 0.05;
-
-        using (Document doc = new Document(inputPath))
+        // Define a custom pixel tolerance for each page (optional).
+        // If a page number is not present in the dictionary, a default tolerance will be used.
+        var pageTolerances = new Dictionary<int, double>
         {
-            // Iterate backwards because deleting pages shifts indices.
-            for (int i = doc.Pages.Count; i >= 1; i--)
+            { 1, 15.0 }, // page 1: trim 15 pixels from each side
+            { 2, 20.0 }  // page 2: trim 20 pixels from each side
+            // add more entries as needed
+        };
+        const double defaultTolerance = 10.0; // used when a page has no specific entry
+
+        try
+        {
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Use a custom tolerance; replace with per‑page logic if required.
-                double tolerance = defaultTolerance;
-
-                // Remove page if it is considered blank according to the tolerance.
-                if (page.IsBlank(tolerance))
+                // Iterate using 1‑based page indexing (Aspose.Pdf requirement)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    doc.Pages.Delete(i);
-                    continue;
+                    Page page = doc.Pages[i];
+
+                    // Retrieve the tolerance for the current page
+                    double tolerance = pageTolerances.TryGetValue(i, out double t) ? t : defaultTolerance;
+
+                    // Ensure tolerance does not exceed half of the page dimensions
+                    double halfWidth  = page.PageInfo.Width  / 2.0;
+                    double halfHeight = page.PageInfo.Height / 2.0;
+                    if (tolerance > halfWidth)  tolerance = halfWidth;
+                    if (tolerance > halfHeight) tolerance = halfHeight;
+
+                    // Create a new rectangle that trims the specified amount from each side
+                    Aspose.Pdf.Rectangle trimmedRect = new Aspose.Pdf.Rectangle(
+                        tolerance,                                 // lower‑left X
+                        tolerance,                                 // lower‑left Y
+                        page.PageInfo.Width  - tolerance,          // upper‑right X
+                        page.PageInfo.Height - tolerance);         // upper‑right Y
+
+                    // Apply the rectangle as the page's CropBox (effective visible area)
+                    page.CropBox = trimmedRect;
                 }
 
-                // Trim white margins by setting the TrimBox.
-                // Here we align TrimBox with the existing CropBox, which typically
-                // excludes the outermost white space. For finer control you could
-                // compute a tighter bounding box based on page contents.
-                page.TrimBox = page.CropBox;
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the resulting PDF.
-            doc.Save(outputPath);
+            Console.WriteLine($"Trimmed PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

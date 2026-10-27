@@ -1,53 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF to access its PageLayout property.
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Document's own page layout setting.
-            var docLayout = doc.PageLayout;
-            Console.WriteLine($"Document PageLayout property: {docLayout}");
-
-            // Retrieve viewer preference flags via PdfContentEditor.
-            using (PdfContentEditor viewerEditor = new PdfContentEditor())
+            // ViewerPreferences were introduced in later Aspose.Pdf versions.
+            // To keep the source compatible with older versions we access the member
+            // via dynamic binding and handle the possible RuntimeBinderException.
+            dynamic dynDoc = doc;
+            try
             {
-                viewerEditor.BindPdf(pdfPath);
-                int prefFlags = viewerEditor.GetViewerPreference();
+                var prefs = dynDoc.ViewerPreferences; // runtime access
+                Console.WriteLine($"Page Layout: {prefs.PageLayout}");
+                Console.WriteLine($"Zoom Mode: {prefs.Zoom}");
 
-                Console.WriteLine($"Viewer Preference Flags: 0x{prefFlags:X}");
-
-                // Decode and log specific layout preferences.
-                if ((prefFlags & ViewerPreference.PageLayoutOneColumn) != 0)
-                    Console.WriteLine("Viewer Preference: Page Layout – One Column");
-                if ((prefFlags & ViewerPreference.PageLayoutTwoColumnLeft) != 0)
-                    Console.WriteLine("Viewer Preference: Page Layout – Two Column Left");
-                if ((prefFlags & ViewerPreference.PageLayoutTwoColumnRight) != 0)
-                    Console.WriteLine("Viewer Preference: Page Layout – Two Column Right");
-                if ((prefFlags & ViewerPreference.PageLayoutSinglePage) != 0)
-                    Console.WriteLine("Viewer Preference: Page Layout – Single Page");
+                // When the Zoom mode is Custom, the ZoomFactor property contains the percentage.
+                // We compare the string representation to avoid compile‑time dependency on the ZoomMode enum.
+                if (prefs.Zoom != null && prefs.Zoom.ToString() == "Custom")
+                {
+                    Console.WriteLine($"Custom Zoom Factor: {prefs.ZoomFactor}%");
+                }
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
             }
 
-            // Retrieve the current zoom coefficient via PdfPageEditor.
-            using (PdfPageEditor zoomEditor = new PdfPageEditor())
-            {
-                zoomEditor.BindPdf(pdfPath);
-                float currentZoom = zoomEditor.Zoom; // Default is 1.0 if not set.
-                Console.WriteLine($"Current Zoom Coefficient: {currentZoom}");
-            }
+            // Use the Document.Pages collection to obtain the page count (compatible with all versions).
+            Console.WriteLine($"Number of pages: {doc.Pages.Count}");
         }
     }
 }

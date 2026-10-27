@@ -1,74 +1,66 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
+        // Paths for the source PDF, the output PDF (with attachment) and the file to attach
         const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "output_with_attachment.pdf";
-        const string attachmentFilePath = "attachment.txt";
+        const string attachmentFilePath = "sample.txt";
+        const string attachmentName = "SampleAttachment.txt";
 
-        // ---------------------------------------------------------------
-        // 1. Ensure the required files exist (self‑contained example)
-        // ---------------------------------------------------------------
-        // Create a minimal PDF if it does not exist
+        // Verify that the required files exist
         if (!File.Exists(inputPdfPath))
         {
-            using (var placeholder = new Document())
-            {
-                placeholder.Pages.Add();
-                placeholder.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            return;
         }
-
-        // Create a simple attachment file if it does not exist
         if (!File.Exists(attachmentFilePath))
         {
-            File.WriteAllText(attachmentFilePath, "Sample attachment content");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            return;
         }
 
-        // -----------------------------------------------------------------
-        // 2. Add a document attachment using PdfContentEditor (Facades API)
-        // -----------------------------------------------------------------
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            editor.BindPdf(inputPdfPath);
-            // Add the file as an attachment with a description
-            editor.AddDocumentAttachment(attachmentFilePath, "Sample attachment description");
-            // Save the modified PDF
-            editor.Save(outputPdfPath);
+            // Create a copy of the source PDF to avoid modifying the original file
+            File.Copy(inputPdfPath, outputPdfPath, overwrite: true);
+
+            // Load the copied PDF using Document (PdfFileEditor does not support attachments)
+            Document pdfDoc = new Document(outputPdfPath);
+
+            // Add the attachment using the EmbeddedFiles collection.
+            // The FileSpecification.Name property defines the name that will appear in the PDF.
+            var fileSpec = new FileSpecification(attachmentName)
+            {
+                // Load the file content into a stream; this is required for embedding.
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath))
+            };
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
+
+            // Save the changes back to the output file
+            pdfDoc.Save(outputPdfPath);
+
+            // Retrieve the list of embedded file names from the PDF for verification
+            Document verifyDoc = new Document(outputPdfPath);
+            string[] attachedNames = verifyDoc.EmbeddedFiles
+                                            .Select(fs => fs.Name)
+                                            .ToArray();
+
+            // Verify that the expected attachment name is present
+            bool attachmentFound = attachedNames != null && Array.IndexOf(attachedNames, attachmentName) >= 0;
+
+            Console.WriteLine(attachmentFound
+                ? $"Attachment '{attachmentName}' added and verified successfully."
+                : $"Attachment '{attachmentName}' was not found in the PDF.");
         }
-
-        // ---------------------------------------------------------------
-        // 3. Retrieve attachment information using PdfExtractor (Facades API)
-        // ---------------------------------------------------------------
-        using (PdfExtractor extractor = new PdfExtractor())
+        catch (Exception ex)
         {
-            extractor.BindPdf(outputPdfPath);
-            // Extract attachment metadata (required before calling GetAttachNames or GetAttachmentInfo)
-            extractor.ExtractAttachment();
-
-            // Retrieve and display attachment names
-            IList<string> attachmentNames = extractor.GetAttachNames();
-            Console.WriteLine("Attachment names extracted from the PDF:");
-            foreach (string name in attachmentNames)
-            {
-                Console.WriteLine($"- {name}");
-            }
-
-            // Retrieve full FileSpecification objects (if further details are needed)
-            List<FileSpecification> specs = extractor.GetAttachmentInfo();
-            Console.WriteLine("\nFileSpecification details:");
-            foreach (FileSpecification spec in specs)
-            {
-                // The original file name of the embedded file is available via the Name property
-                Console.WriteLine($"- {spec.Name}");
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

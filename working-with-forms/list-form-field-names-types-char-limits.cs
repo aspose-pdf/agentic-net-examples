@@ -1,67 +1,63 @@
 using System;
 using System.IO;
+using System.Reflection;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Added to resolve WidgetAnnotation
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Directory containing the PDF files to process
-        const string inputFolder = "InputPdfs";
-
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
-
-        // Get all PDF files in the folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // PDF files to process – use command‑line arguments or a default list
+        string[] pdfFiles = args.Length > 0 ? args : new[] { "sample1.pdf", "sample2.pdf" };
 
         foreach (string pdfPath in pdfFiles)
         {
-            // Ensure the file exists before processing
             if (!File.Exists(pdfPath))
             {
                 Console.Error.WriteLine($"File not found: {pdfPath}");
                 continue;
             }
 
-            // Open the PDF document inside a using block (lifecycle rule)
+            // Load each PDF inside a using block for deterministic disposal
             using (Document doc = new Document(pdfPath))
             {
-                Console.WriteLine($"--- {Path.GetFileName(pdfPath)} ---");
+                Console.WriteLine($"--- Form fields in '{Path.GetFileName(pdfPath)}' ---");
 
-                // Iterate over all form fields (the Form collection implements ICollection<WidgetAnnotation>)
-                foreach (WidgetAnnotation widget in doc.Form)
+                // Retrieve the AcroForm (if any) once and work with the local variable.
+                var form = doc.Form;
+                if (form == null || form.Fields == null || !form.Fields.Any())
                 {
-                    // All items in the Form collection are Field instances
-                    if (widget is Field field)
+                    Console.WriteLine("No form fields found.");
+                    continue;
+                }
+
+                // Iterate over all form fields
+                foreach (Field field in form.Fields)
+                {
+                    string name = field.FullName;               // Field name
+                    string type = field.GetType().Name;         // Field type (e.g., TextBoxField, CheckBoxField)
+
+                    // Character limit applies mainly to text fields. Use reflection so the code compiles even if the
+                    // MaxLength property is not present in the referenced Aspose.Pdf version.
+                    string charLimit = "N/A";
+                    if (field is TextBoxField txtField)
                     {
-                        // Field name (fallback to PartialName if Name is null)
-                        string fieldName = field.Name ?? field.PartialName ?? "(unnamed)";
-
-                        // Concrete field type (e.g., TextBoxField, CheckBoxField, etc.)
-                        string fieldType = field.GetType().Name;
-
-                        // Character limit – only applicable to text‑based fields
-                        string charLimit = "N/A";
-
-                        // TextBoxField and its derived types expose the MaxLen property
-                        if (field is TextBoxField txtField)
+                        PropertyInfo maxLenProp = typeof(TextBoxField).GetProperty("MaxLength", BindingFlags.Public | BindingFlags.Instance);
+                        if (maxLenProp != null)
                         {
-                            charLimit = txtField.MaxLen.ToString();
+                            int maxLen = (int)maxLenProp.GetValue(txtField);
+                            charLimit = maxLen > 0 ? maxLen.ToString() : "Unlimited";
                         }
-                        else if (field is FileSelectBoxField fileField)
+                        else
                         {
-                            charLimit = fileField.MaxLen.ToString();
+                            // Property not available – keep "N/A" or attempt a best‑effort default.
+                            charLimit = "N/A";
                         }
-
-                        // Output the information
-                        Console.WriteLine($"Name: {fieldName}, Type: {fieldType}, Max Length: {charLimit}");
                     }
+
+                    Console.WriteLine($"Name: {name}, Type: {type}, CharLimit: {charLimit}");
                 }
             }
         }

@@ -1,59 +1,86 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source and destination PDFs
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_attachment.pdf";
+        // Paths for the source PDF, the output PDF, and the file to embed
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string embedFilePath = "data.bin";
 
-        // Example byte array to be attached (could be any binary data)
-        byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes("Hello, this is the attached file content.");
-        const string attachmentFileName = "hello.txt";
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPath))
+        // ------------------------------------------------------------
+        // 1. Ensure the source PDF exists – create a minimal placeholder
+        //    if it is missing (only on Windows, because Aspose.Pdf may need
+        //    GDI+ for rendering). On non‑Windows platforms we simply abort
+        //    with a clear message.
+        // ------------------------------------------------------------
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPath}");
-            return;
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
+            {
+                var placeholder = new Document();
+                placeholder.Pages.Add();
+                placeholder.Save(inputPdfPath);
+                Console.WriteLine($"Placeholder PDF created at '{inputPdfPath}'.");
+            }
+            else
+            {
+                Console.WriteLine($"Input PDF '{inputPdfPath}' not found and cannot create a placeholder on this OS.");
+                return;
+            }
         }
 
-        // Load the existing PDF document (lifecycle rule: load)
-        using (Document doc = new Document(inputPath))
+        // ------------------------------------------------------------
+        // 2. Load the source PDF.
+        // ------------------------------------------------------------
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Select the page where the attachment annotation will be placed (1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle that bounds the annotation icon
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
-
-            // Create a FileSpecification from the byte array using a MemoryStream
-            using (MemoryStream ms = new MemoryStream(fileBytes))
+            // --------------------------------------------------------
+            // 3. Prepare the byte array to embed.
+            //    If the file does not exist we fall back to a small
+            //    in‑memory dummy payload so the example still runs.
+            // --------------------------------------------------------
+            byte[] fileBytes;
+            if (File.Exists(embedFilePath))
             {
-                FileSpecification fileSpec = new FileSpecification(ms, attachmentFileName);
-
-                // Create the FileAttachmentAnnotation with the page, rectangle, and file spec
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
-                {
-                    // Optional visual and descriptive settings
-                    Icon     = FileIcon.PushPin, // corrected enum
-                    Title    = "File Attachment",
-                    Contents = $"Attached file: {attachmentFileName}"
-                };
-
-                // Add the annotation to the page's annotation collection
-                page.Annotations.Add(attachment);
+                fileBytes = File.ReadAllBytes(embedFilePath);
+            }
+            else
+            {
+                Console.WriteLine($"Embed file '{embedFilePath}' not found – using dummy data.");
+                fileBytes = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
             }
 
-            // Save the modified PDF (lifecycle rule: save)
-            doc.Save(outputPath);
+            // --------------------------------------------------------
+            // 4. Create a FileSpecification from the byte array.
+            //    The Name property defines how the attachment appears
+            //    in PDF viewers. The Contents stream must stay alive
+            //    until the document is saved, therefore we keep the
+            //    MemoryStream instance in a local variable.
+            // --------------------------------------------------------
+            using var contentStream = new MemoryStream(fileBytes);
+            var fileSpec = new FileSpecification
+            {
+                Name = Path.GetFileName(embedFilePath), // display name
+                Description = "Embedded binary data",
+                // Assign the stream that holds the file bytes
+                Contents = contentStream
+            };
+
+            // --------------------------------------------------------
+            // 5. Add the attachment to the document.
+            // --------------------------------------------------------
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
+
+            // --------------------------------------------------------
+            // 6. Save the modified PDF.
+            // --------------------------------------------------------
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with attached file: {outputPath}");
+        Console.WriteLine($"File '{embedFilePath}' embedded into '{outputPdfPath}'.");
     }
 }

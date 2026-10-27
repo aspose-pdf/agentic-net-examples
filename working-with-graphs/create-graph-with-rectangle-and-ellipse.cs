@@ -6,46 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph.pdf";
+        const string outputPath = "graph_output.pdf";
 
-        // Create a new PDF document (wrapped in using for proper disposal)
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Create a graph container (width: 400pt, height: 300pt) – use double literals as required by the constructor
-            Graph graph = new Graph(400.0, 300.0);
+            // Create a Graph container (size 500x500). Use the double overload as the float overload is obsolete.
+            Graph graph = new Graph(500.0, 500.0);
 
-            // ----- Rectangle shape (drawing rectangle, not PDF page rectangle) -----
-            // Parameters: left, bottom, width, height (float values)
-            var rectShape = new Aspose.Pdf.Drawing.Rectangle(50f, 200f, 150f, 100f);
-            rectShape.GraphInfo = new GraphInfo
+            // ----- Rectangle with solid fill (red) -----
+            var rect = new Aspose.Pdf.Drawing.Rectangle(50, 400, 200, 250);
+            rect.GraphInfo = new GraphInfo
             {
-                FillColor = Color.LightGray, // light gray fill
-                Color = Color.Black,         // black border
-                LineWidth = 2f               // border thickness (float)
+                FillColor = Color.FromRgb(1, 0, 0) // solid red
             };
-            graph.Shapes.Add(rectShape);
+            graph.Shapes.Add(rect);
 
-            // ----- Ellipse shape -----
-            // Parameters: left, bottom, width, height (float values)
-            var ellipseShape = new Ellipse(250f, 150f, 120f, 80f);
-            ellipseShape.GraphInfo = new GraphInfo
+            // ----- Ellipse with solid fill (blue) -----
+            var ellipse = new Ellipse(300, 300, 450, 450);
+            ellipse.GraphInfo = new GraphInfo
             {
-                FillColor = Color.Yellow, // yellow fill
-                Color = Color.Red,        // red border
-                LineWidth = 1.5f          // border thickness (float)
+                FillColor = Color.FromRgb(0, 0, 1) // solid blue
             };
-            graph.Shapes.Add(ellipseShape);
+            graph.Shapes.Add(ellipse);
 
-            // Add the graph to the page's paragraph collection
+            // ----- Second rectangle with solid fill (green) -----
+            var rect2 = new Aspose.Pdf.Drawing.Rectangle(250, 50, 450, 150);
+            rect2.GraphInfo = new GraphInfo
+            {
+                FillColor = Color.FromRgb(0, 1, 0) // solid green
+            };
+            graph.Shapes.Add(rect2);
+
+            // Add the completed graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the document
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with graph saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

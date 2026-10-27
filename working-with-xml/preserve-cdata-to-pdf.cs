@@ -3,8 +3,9 @@ using System.IO;
 using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
-class PreserveCDataToPdf
+class Program
 {
     static void Main()
     {
@@ -17,60 +18,95 @@ class PreserveCDataToPdf
             return;
         }
 
-        // Load the XML document (no XSL transformation needed)
+        // Load the XML document
         XmlDocument xmlDoc = new XmlDocument();
         xmlDoc.Load(xmlPath);
 
         // Create a new PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a single page (you can add more pages as needed)
+            // Add a page to the PDF
             Page page = pdfDoc.Pages.Add();
 
-            // Starting coordinates for the first CDATA block
-            double cursorY = page.PageInfo.Height - 50; // top margin
-            const double marginX = 50;
-            const double lineSpacing = 20;
-
-            // Recursively process all CDATA sections in the XML
-            ProcessNode(xmlDoc, ref cursorY, marginX, lineSpacing, page);
+            // Process the XML nodes recursively and add them to the PDF page
+            ProcessXmlNode(xmlDoc.DocumentElement, page, 0);
 
             // Save the PDF
             pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF created: {pdfPath}");
+        Console.WriteLine($"PDF created at '{pdfPath}'.");
     }
 
-    // Walks the XML tree and renders each CDATA section as formatted text
-    private static void ProcessNode(XmlNode node, ref double cursorY, double marginX, double lineSpacing, Page page)
+    /// <summary>
+    /// Recursively processes an XmlNode and adds formatted text fragments to the PDF page.
+    /// </summary>
+    /// <param name="node">Current XML node.</param>
+    /// <param name="page">PDF page to which text fragments are added.</param>
+    /// <param name="indentLevel">Current indentation level (for visual hierarchy).</param>
+    private static void ProcessXmlNode(XmlNode node, Page page, int indentLevel)
     {
-        foreach (XmlNode child in node.ChildNodes)
+        if (node == null) return;
+
+        // Indentation string
+        string indent = new string(' ', indentLevel * 4);
+
+        // Handle element nodes
+        if (node.NodeType == XmlNodeType.Element)
         {
-            if (child.NodeType == XmlNodeType.CDATA)
+            // Write the start tag
+            TextFragment startTag = new TextFragment($"{indent}<{node.Name}>");
+            startTag.TextState.Font = FontRepository.FindFont("Helvetica");
+            startTag.TextState.FontSize = 12;
+            startTag.TextState.FontStyle = FontStyles.Bold;
+            page.Paragraphs.Add(startTag);
+
+            // Process child nodes
+            foreach (XmlNode child in node.ChildNodes)
             {
-                // Create a text fragment for the CDATA content
-                TextFragment tf = new TextFragment(child.Value);
-
-                // Position the fragment on the page
-                tf.Position = new Position(marginX, cursorY);
-
-                // Apply simple formatting (you can customize as needed)
-                tf.TextState.Font = FontRepository.FindFont("Helvetica");
-                tf.TextState.FontSize = 12;
-                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-                // Add the fragment to the page
-                page.Paragraphs.Add(tf);
-
-                // Move the cursor down for the next block
-                cursorY -= lineSpacing;
+                ProcessXmlNode(child, page, indentLevel + 1);
             }
-            else
+
+            // Write the end tag
+            TextFragment endTag = new TextFragment($"{indent}</{node.Name}>");
+            endTag.TextState.Font = FontRepository.FindFont("Helvetica");
+            endTag.TextState.FontSize = 12;
+            endTag.TextState.FontStyle = FontStyles.Bold;
+            page.Paragraphs.Add(endTag);
+        }
+        // Handle CDATA sections
+        else if (node.NodeType == XmlNodeType.CDATA)
+        {
+            // Render CDATA content with a distinct background color
+            TextFragment cdataFragment = new TextFragment($"{indent}<![CDATA[{node.Value}]]>");
+            cdataFragment.TextState.Font = FontRepository.FindFont("Courier New");
+            cdataFragment.TextState.FontSize = 12;
+            cdataFragment.TextState.ForegroundColor = Color.FromRgb(0.2, 0.2, 0.8);
+            cdataFragment.TextState.BackgroundColor = Color.LightGray;
+            page.Paragraphs.Add(cdataFragment);
+        }
+        // Handle text nodes (including whitespace)
+        else if (node.NodeType == XmlNodeType.Text)
+        {
+            // Trim to avoid adding empty fragments
+            string text = node.Value?.Trim();
+            if (!string.IsNullOrEmpty(text))
             {
-                // Recurse into element nodes
-                ProcessNode(child, ref cursorY, marginX, lineSpacing, page);
+                TextFragment textFragment = new TextFragment($"{indent}{text}");
+                textFragment.TextState.Font = FontRepository.FindFont("Helvetica");
+                textFragment.TextState.FontSize = 12;
+                page.Paragraphs.Add(textFragment);
             }
+        }
+        // Handle comments (optional)
+        else if (node.NodeType == XmlNodeType.Comment)
+        {
+            TextFragment commentFragment = new TextFragment($"{indent}<!--{node.Value}-->");
+            commentFragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            commentFragment.TextState.FontSize = 12;
+            commentFragment.TextState.FontStyle = FontStyles.Italic;
+            commentFragment.TextState.ForegroundColor = Color.Gray;
+            page.Paragraphs.Add(commentFragment);
         }
     }
 }

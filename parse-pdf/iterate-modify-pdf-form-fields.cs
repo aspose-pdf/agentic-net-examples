@@ -16,24 +16,29 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate over each form field in the document
-            foreach (Field field in doc.Form.Fields)
+            foreach (Aspose.Pdf.Forms.Field field in doc.Form)
             {
-                // Output the field name (PartialName) and, if applicable, its current value
-                Console.WriteLine($"Field: {field.PartialName}");
+                // Example processing: output field name and its concrete type
+                Console.WriteLine($"Field Name: {field.FullName}, Type: {field.GetType().Name}");
 
-                // If the field is a text box, display and modify its value
-                if (field is TextBoxField textBox)
+                // If the field is a text box, set a sample value
+                if (field is TextBoxField txt)
                 {
-                    Console.WriteLine($"  Current Value: {textBox.Value}");
-                    textBox.Value = "Sample text"; // set a new value
+                    txt.Value = "Sample text";
                 }
+                // If the field is a check box, mark it as checked
+                else if (field is CheckboxField chk)
+                {
+                    chk.Checked = true;
+                }
+                // Additional field-specific logic can be added here
             }
 
-            // Save the modified PDF
+            // Save the modified PDF document
             doc.Save(outputPath);
         }
 

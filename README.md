@@ -11,8 +11,8 @@ This repository provides working code examples demonstrating Aspose.PDF for .NET
 | Total examples | 2636 |
 | Categories | 35 |
 | Target framework | net10.0 |
-| Aspose.PDF version | 26.7.0 |
-| Last updated | 2026-07-21 |
+| Aspose.PDF version | 26.9.0 |
+| Last updated | 2026-10-26 |
 
 ## For AI Coding Agents
 
@@ -29,38 +29,38 @@ This repository is structured for direct use by AI coding agents and LLM-powered
 |----------|----------|-------------|
 | `accessibility-and-tagged-pdfs` | 45 | [AGENTS.md](./accessibility-and-tagged-pdfs/AGENTS.md) |
 | `basic-operations` | 57 | [AGENTS.md](./basic-operations/AGENTS.md) |
-| `compare-pdf` | 29 | [AGENTS.md](./compare-pdf/AGENTS.md) |
-| `conversion` | 102 | [AGENTS.md](./conversion/AGENTS.md) |
-| `document` | 117 | [AGENTS.md](./document/AGENTS.md) |
+| `compare-pdf` | 27 | [AGENTS.md](./compare-pdf/AGENTS.md) |
+| `conversion` | 101 | [AGENTS.md](./conversion/AGENTS.md) |
+| `document` | 119 | [AGENTS.md](./document/AGENTS.md) |
 | `facades-acroforms` | 41 | [AGENTS.md](./facades-acroforms/AGENTS.md) |
-| `facades-annotations` | 106 | [AGENTS.md](./facades-annotations/AGENTS.md) |
-| `facades-bookmarks` | 35 | [AGENTS.md](./facades-bookmarks/AGENTS.md) |
-| `facades-convert-documents` | 36 | [AGENTS.md](./facades-convert-documents/AGENTS.md) |
+| `facades-annotations` | 102 | [AGENTS.md](./facades-annotations/AGENTS.md) |
+| `facades-bookmarks` | 34 | [AGENTS.md](./facades-bookmarks/AGENTS.md) |
+| `facades-convert-documents` | 40 | [AGENTS.md](./facades-convert-documents/AGENTS.md) |
 | `facades-documents` | 101 | [AGENTS.md](./facades-documents/AGENTS.md) |
-| `facades-edit-document` | 213 | [AGENTS.md](./facades-edit-document/AGENTS.md) |
-| `facades-extract-images-and-text` | 83 | [AGENTS.md](./facades-extract-images-and-text/AGENTS.md) |
-| `facades-fill-forms` | 35 | [AGENTS.md](./facades-fill-forms/AGENTS.md) |
-| `facades-forms` | 85 | [AGENTS.md](./facades-forms/AGENTS.md) |
-| `facades-metadata` | 40 | [AGENTS.md](./facades-metadata/AGENTS.md) |
-| `facades-pages` | 117 | [AGENTS.md](./facades-pages/AGENTS.md) |
-| `facades-secure-documents` | 38 | [AGENTS.md](./facades-secure-documents/AGENTS.md) |
-| `facades-sign-documents` | 35 | [AGENTS.md](./facades-sign-documents/AGENTS.md) |
-| `facades-stamps` | 48 | [AGENTS.md](./facades-stamps/AGENTS.md) |
-| `facades-texts-and-images` | 28 | [AGENTS.md](./facades-texts-and-images/AGENTS.md) |
-| `facades-xmp-metadata` | 44 | [AGENTS.md](./facades-xmp-metadata/AGENTS.md) |
-| `graphs-zugferd-operators` | 82 | [AGENTS.md](./graphs-zugferd-operators/AGENTS.md) |
-| `pages` | 100 | [AGENTS.md](./pages/AGENTS.md) |
+| `facades-edit-document` | 206 | [AGENTS.md](./facades-edit-document/AGENTS.md) |
+| `facades-extract-images-and-text` | 82 | [AGENTS.md](./facades-extract-images-and-text/AGENTS.md) |
+| `facades-fill-forms` | 33 | [AGENTS.md](./facades-fill-forms/AGENTS.md) |
+| `facades-forms` | 87 | [AGENTS.md](./facades-forms/AGENTS.md) |
+| `facades-metadata` | 38 | [AGENTS.md](./facades-metadata/AGENTS.md) |
+| `facades-pages` | 114 | [AGENTS.md](./facades-pages/AGENTS.md) |
+| `facades-secure-documents` | 39 | [AGENTS.md](./facades-secure-documents/AGENTS.md) |
+| `facades-sign-documents` | 34 | [AGENTS.md](./facades-sign-documents/AGENTS.md) |
+| `facades-stamps` | 49 | [AGENTS.md](./facades-stamps/AGENTS.md) |
+| `facades-texts-and-images` | 29 | [AGENTS.md](./facades-texts-and-images/AGENTS.md) |
+| `facades-xmp-metadata` | 43 | [AGENTS.md](./facades-xmp-metadata/AGENTS.md) |
+| `graphs-zugferd-operators` | 85 | [AGENTS.md](./graphs-zugferd-operators/AGENTS.md) |
+| `pages` | 95 | [AGENTS.md](./pages/AGENTS.md) |
 | `parse-pdf` | 63 | [AGENTS.md](./parse-pdf/AGENTS.md) |
-| `securing-and-signing-pdf` | 78 | [AGENTS.md](./securing-and-signing-pdf/AGENTS.md) |
+| `securing-and-signing-pdf` | 82 | [AGENTS.md](./securing-and-signing-pdf/AGENTS.md) |
 | `stamping` | 50 | [AGENTS.md](./stamping/AGENTS.md) |
 | `uncategorized` | 1 | [AGENTS.md](./uncategorized/AGENTS.md) |
-| `working-with-annotations` | 156 | [AGENTS.md](./working-with-annotations/AGENTS.md) |
+| `working-with-annotations` | 160 | [AGENTS.md](./working-with-annotations/AGENTS.md) |
 | `working-with-attachments` | 50 | [AGENTS.md](./working-with-attachments/AGENTS.md) |
-| `working-with-forms` | 230 | [AGENTS.md](./working-with-forms/AGENTS.md) |
-| `working-with-graphs` | 77 | [AGENTS.md](./working-with-graphs/AGENTS.md) |
-| `working-with-images` | 72 | [AGENTS.md](./working-with-images/AGENTS.md) |
-| `working-with-tables` | 96 | [AGENTS.md](./working-with-tables/AGENTS.md) |
-| `working-with-text` | 73 | [AGENTS.md](./working-with-text/AGENTS.md) |
+| `working-with-forms` | 228 | [AGENTS.md](./working-with-forms/AGENTS.md) |
+| `working-with-graphs` | 84 | [AGENTS.md](./working-with-graphs/AGENTS.md) |
+| `working-with-images` | 69 | [AGENTS.md](./working-with-images/AGENTS.md) |
+| `working-with-tables` | 99 | [AGENTS.md](./working-with-tables/AGENTS.md) |
+| `working-with-text` | 76 | [AGENTS.md](./working-with-text/AGENTS.md) |
 | `working-with-xml` | 73 | [AGENTS.md](./working-with-xml/AGENTS.md) |
 
 Each category contains standalone `.cs` files that can be compiled and run independently.
@@ -119,7 +119,7 @@ The library runs in evaluation mode without a license (with page-count and colle
 
 ### Prerequisites
 - .NET SDK (net10.0 or compatible version)
-- Aspose.PDF for .NET NuGet package (26.7.0)
+- Aspose.PDF for .NET NuGet package (26.9.0)
 - Valid Aspose license (for production use)
 
 ### Running Examples
@@ -130,7 +130,7 @@ Each example is a self-contained C# file. To run an example:
 cd <CategoryFolder>
 dotnet new console -o ExampleProject
 cd ExampleProject
-dotnet add package Aspose.PDF --version 26.7.0
+dotnet add package Aspose.PDF --version 26.9.0
 # Copy the example .cs file as Program.cs
 dotnet run
 ```
@@ -209,4 +209,4 @@ All examples use [Aspose.PDF for .NET](https://products.aspose.com/pdf/net/) and
 
 ---
 
-*Maintained by an [agentic example generation workflow](https://metrics.aspose.com/agents/sections/examples) | For AI-friendly guidance, see [AGENTS.md](./AGENTS.md) | Last updated: 2026-07-21*
+*Maintained by an [agentic example generation workflow](https://metrics.aspose.com/agents/sections/examples) | For AI-friendly guidance, see [AGENTS.md](./AGENTS.md) | Last updated: 2026-10-26*

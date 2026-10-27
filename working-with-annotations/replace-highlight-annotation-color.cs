@@ -16,35 +16,37 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for proper disposal
+        // Load the PDF inside a using block (document‑disposal‑with‑using rule)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Pages are 1‑based (page-indexing-one-based rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Iterate over all annotations on the current page
-                for (int annotIndex = 1; annotIndex <= page.Annotations.Count; annotIndex++)
+                // Iterate all annotations on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    Annotation annotation = page.Annotations[annotIndex];
-
                     // Process only Highlight annotations
-                    if (annotation is HighlightAnnotation highlight)
+                    if (annot is HighlightAnnotation highlight)
                     {
-                        // Example: retrieve the appearance dictionary (optional)
-                        // var appearanceDict = highlight.Appearance;
+                        // Define a custom shade (e.g., orange) using Aspose.Pdf.Color
+                        Aspose.Pdf.Color customColor = Aspose.Pdf.Color.FromRgb(1.0, 0.5, 0.0);
 
-                        // Replace the highlight color with a custom shade (light orange)
-                        highlight.Color = Aspose.Pdf.Color.FromRgb(1.0, 0.8, 0.6);
+                        // Replace the annotation's color – this updates its appearance stream
+                        highlight.Color = customColor;
+
+                        // No further manipulation of the appearance dictionary is required.
+                        // Setting the Color property forces Aspose.Pdf to regenerate the
+                        // appearance stream automatically.
                     }
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF (Document.Save writes PDF regardless of extension)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

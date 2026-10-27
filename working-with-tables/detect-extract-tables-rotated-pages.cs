@@ -7,8 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,45 +15,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document using the core Document API (no Facades).
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Pages collection is 1‑based.
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageNumber];
+                Rotation rotation = page.Rotate; // Rotation enum: None, on90, on180, on270
 
-                // Check if the page has a rotation applied
-                if (page.Rotate != Rotation.None)
+                if (rotation != Rotation.None)
                 {
-                    Console.WriteLine($"Page {i} is rotated: {page.Rotate}");
+                    // Convert enum to a numeric angle for display purposes.
+                    int angle = rotation == Rotation.on90 ? 90 :
+                                rotation == Rotation.on180 ? 180 :
+                                rotation == Rotation.on270 ? 270 : 0;
 
-                    // Create a TableAbsorber to find tables on this rotated page
+                    Console.WriteLine($"Page {pageNumber} rotated {angle}°. Scanning for tables...");
+
+                    // TableAbsorber works on a single page; we call Visit(page) to limit the scope.
                     TableAbsorber absorber = new TableAbsorber();
-
-                    // Extract tables from the current page
                     absorber.Visit(page);
 
-                    // Process each found table (example: output cell count)
+                    Console.WriteLine($"  Tables found: {absorber.TableList.Count}");
                     for (int t = 0; t < absorber.TableList.Count; t++)
                     {
                         var table = absorber.TableList[t];
-                        int rowCount = table.RowList.Count;
-                        int cellCount = 0;
-                        foreach (var row in table.RowList)
-                        {
-                            cellCount += row.CellList.Count;
-                        }
-
-                        Console.WriteLine($"  Table {t + 1}: {rowCount} rows, {cellCount} cells");
+                        // Rectangle is expressed in the page's coordinate system.
+                        Console.WriteLine($"    Table {t + 1}: Bounds = {table.Rectangle}");
                     }
                 }
+                else
+                {
+                    Console.WriteLine($"Page {pageNumber} has no rotation. Skipping.");
+                }
             }
-
-            // Save the (potentially unchanged) document
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processing completed. Output saved to '{outputPath}'.");
     }
 }

@@ -1,67 +1,83 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
-using System.Drawing; // Used for Image and Bitmap handling
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath1 = "first.pdf";
-        const string pdfPath2 = "second.pdf";
-        const string outputDir = "DiffOutput";
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
 
-        // Verify that both input files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine("Input PDF files not found.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the two PDFs using deterministic disposal
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        if (!File.Exists(secondPdfPath))
         {
-            // Both documents must contain at least one page
-            if (doc1.Pages.Count == 0 || doc2.Pages.Count == 0)
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
+            return;
+        }
+
+        try
+        {
+            // Load both documents using the core Document API
+            using (Document firstDoc = new Document(firstPdfPath))
+            using (Document secondDoc = new Document(secondPdfPath))
             {
-                Console.Error.WriteLine("One of the documents has no pages.");
-                return;
-            }
+                int pageCount = Math.Min(firstDoc.Pages.Count, secondDoc.Pages.Count);
 
-            // Compare pages up to the smaller page count
-            int pageCount = Math.Min(doc1.Pages.Count, doc2.Pages.Count);
-            GraphicalPdfComparer comparer = new GraphicalPdfComparer();
-
-            for (int i = 1; i <= pageCount; i++) // 1‑based indexing
-            {
-                Page page1 = doc1.Pages[i];
-                Page page2 = doc2.Pages[i];
-
-                // Obtain image differences for the current page pair
-                using (ImagesDifference diff = comparer.GetDifference(page1, page2))
+                for (int i = 1; i <= pageCount; i++)
                 {
-                    // Save the source image (first page)
-                    string srcPath = Path.Combine(outputDir, $"Page_{i}_Source.png");
-                    diff.SourceImage.Save(srcPath);
-                    Console.WriteLine($"Saved source image: {srcPath}");
+                    var firstPage  = firstDoc.Pages[i];
+                    var secondPage = secondDoc.Pages[i];
 
-                    // Save the destination image (second page with differences applied)
-                    using (Bitmap destImg = diff.GetDestinationImage())
+                    // Get image collections from each page (core API, no Comparison namespace)
+                    var firstImages  = firstPage.Resources.Images;
+                    var secondImages = secondPage.Resources.Images;
+
+                    int imageCount = Math.Max(firstImages.Count, secondImages.Count);
+
+                    for (int imgIdx = 1; imgIdx <= imageCount; imgIdx++)
                     {
-                        string destPath = Path.Combine(outputDir, $"Page_{i}_Destination.png");
-                        destImg.Save(destPath);
-                        Console.WriteLine($"Saved destination image: {destPath}");
-                    }
+                        // Retrieve images if they exist on the respective pages
+                        var firstImg  = imgIdx <= firstImages.Count  ? firstImages[imgIdx]  : null;
+                        var secondImg = imgIdx <= secondImages.Count ? secondImages[imgIdx] : null;
 
-                    // Output basic metrics about the difference image
-                    Console.WriteLine($"Page {i}: Height={diff.Height}, Stride={diff.Stride}");
+                        // If one of the images is missing, report a difference
+                        if (firstImg == null || secondImg == null)
+                        {
+                            Console.WriteLine($"Image difference on page {i}, image index {imgIdx}: " +
+                                              (firstImg == null ? "missing in first PDF" : "missing in second PDF"));
+                            continue;
+                        }
+
+                        // Compare the raw image bytes
+                        using (var msFirst = new MemoryStream())
+                        using (var msSecond = new MemoryStream())
+                        {
+                            firstImg.Save(msFirst);
+                            secondImg.Save(msSecond);
+
+                            byte[] firstBytes  = msFirst.ToArray();
+                            byte[] secondBytes = msSecond.ToArray();
+
+                            if (!firstBytes.SequenceEqual(secondBytes))
+                            {
+                                Console.WriteLine($"Image difference on page {i}, image index {imgIdx}: content differs.");
+                            }
+                        }
+                    }
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
         }
     }
 }

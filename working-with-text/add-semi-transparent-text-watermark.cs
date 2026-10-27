@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // FontRepository, FontStyles
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
+        const string watermarkText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,37 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the visual style of the watermark text
-            TextState textState = new TextState
-            {
-                Font          = FontRepository.FindFont("Helvetica"),
-                FontSize      = 72,
-                ForegroundColor = Aspose.Pdf.Color.FromRgb(0.5, 0.5, 0.5) // light gray
-            };
+            // Create a TextStamp for the watermark
+            TextStamp stamp = new TextStamp(watermarkText);
 
-            // Apply the watermark to every page
+            // Set semi‑transparent opacity (0.0 = fully transparent, 1.0 = opaque)
+            stamp.Opacity = 0.3;
+
+            // Center the stamp on each page
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+
+            // Modify the existing TextState (do not assign a new TextState object)
+            stamp.TextState.Font = FontRepository.FindFont("Arial");
+            stamp.TextState.FontSize = 72;
+            stamp.TextState.FontStyle = FontStyles.Bold;
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(1, 0, 0); // Red color
+
+            // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
             {
-                // Use the full page rectangle as the annotation bounds
-                Aspose.Pdf.Rectangle pageRect = page.Rect;
-
-                // Create a WatermarkAnnotation covering the whole page
-                WatermarkAnnotation watermark = new WatermarkAnnotation(page, pageRect)
-                {
-                    Opacity = 0.3 // 30% opacity for semi‑transparent effect
-                };
-
-                // Set the watermark text and associate the TextState
-                watermark.SetTextAndState(new[] { "CONFIDENTIAL" }, textState);
-
-                // Add the annotation to the page
-                page.Annotations.Add(watermark);
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
+            // Save the watermarked PDF
             doc.Save(outputPath);
         }
 

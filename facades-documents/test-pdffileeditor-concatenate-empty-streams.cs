@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf.Facades;
 using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation without the NUnit package.
+// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -16,10 +16,6 @@ namespace NUnit.Framework
 
     public static class Assert
     {
-        /// <summary>
-        /// Executes the supplied delegate and returns the caught exception of type T.
-        /// Throws a descriptive exception if no exception or a different exception is thrown.
-        /// </summary>
         public static T Throws<T>(TestDelegate code) where T : Exception
         {
             try
@@ -32,38 +28,37 @@ namespace NUnit.Framework
             }
             catch (Exception ex)
             {
-                throw new Exception($"Assert.Throws failed. Expected exception of type {typeof(T).Name} but caught {ex.GetType().Name}.", ex);
+                throw new Exception($"Assert.Throws failed. Expected {typeof(T)} but got {ex.GetType()}.", ex);
             }
-            throw new Exception($"Assert.Throws failed. No exception was thrown. Expected exception of type {typeof(T).Name}.");
+            throw new Exception($"Assert.Throws failed. No exception thrown. Expected {typeof(T)}.");
         }
     }
 }
 
 [TestFixture]
-public class PdfFileEditorTests
+public class PdfConcatenateTests
 {
     [Test]
-    public void Concatenate_WithEmptyInputStreamArray_ShouldThrowArgumentException()
+    public void Concatenate_EmptyInputStreams_ThrowsArgumentException()
     {
-        // Arrange: create the editor and an empty array of input streams.
+        // Arrange: create the Facade and an empty array of input streams
         PdfFileEditor editor = new PdfFileEditor();
-        Stream[] emptyInputStreams = new Stream[0];
+        Stream[] emptyStreams = new Stream[0];
 
-        // Use a MemoryStream for the output to avoid file I/O.
+        // Use a memory stream for the output to avoid file I/O
         using (MemoryStream outputStream = new MemoryStream())
         {
-            // Act & Assert: the Concatenate method should throw an ArgumentException
-            // when the input stream array is empty.
-            Assert.Throws<ArgumentException>(() => editor.Concatenate(emptyInputStreams, outputStream));
+            // Act & Assert: the method should throw an ArgumentException for empty input
+            Assert.Throws<ArgumentException>(() => editor.Concatenate(emptyStreams, outputStream));
         }
     }
 }
 
-// Dummy entry point to satisfy the compiler when building as an executable.
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
 public static class Program
 {
-    public static void Main(string[] args)
+    public static void Main()
     {
-        // No operation – the project is intended for unit testing only.
+        // No operation – the test runner will discover and execute the tests.
     }
 }

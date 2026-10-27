@@ -1,17 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;               // Required for text-related types (not used here but safe)
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // Image class lives here
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string xmlPath   = "input.xml";
-        const string pdfPath   = "output.pdf";
+        const string xmlPath = "images.xml";
+        const string pdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -19,75 +18,66 @@ class Program
             return;
         }
 
-        // Load the XML document (no special load options required for plain XML)
-        XDocument xDoc = XDocument.Load(xmlPath);
+        // Load the XML document containing base64‑encoded images
+        XDocument xdoc = XDocument.Load(xmlPath);
+        // Assume each image is stored in an <ImageData> element
+        var imageElements = xdoc.Descendants("ImageData");
 
-        // Create a new PDF document and add the first page
+        // Keep the memory streams alive until the PDF is saved
+        List<MemoryStream> streams = new List<MemoryStream>();
+
+        // Create a new PDF document (wrapped in using for deterministic disposal)
         using (Document pdfDoc = new Document())
         {
-            pdfDoc.Pages.Add(); // page index will be 1 (Aspose.Pdf uses 1‑based indexing)
+            int pageIndex = 0; // will be incremented to match 1‑based page indexing
 
-            // Find all attribute values that contain a base64 data URI (e.g. src="data:image/png;base64,....")
-            var base64Attributes = xDoc.Descendants()
-                .SelectMany(e => e.Attributes())
-                .Where(a => a.Value.Contains("base64,"))
-                .Select(a => a.Value);
-
-            // Also check element values that might directly contain the base64 string
-            var base64Elements = xDoc.Descendants()
-                .Where(e => e.Value.Contains("base64,"))
-                .Select(e => e.Value);
-
-            // Combine both sources
-            var allBase64Strings = base64Attributes.Concat(base64Elements).ToList();
-
-            int pageIndex = 1; // current page (starts at 1)
-
-            foreach (string dataUri in allBase64Strings)
+            foreach (var elem in imageElements)
             {
-                // Extract the part after "base64,"
-                int commaPos = dataUri.IndexOf("base64,", StringComparison.Ordinal);
-                if (commaPos < 0) continue; // safety check
+                string base64 = elem.Value.Trim();
+                if (string.IsNullOrEmpty(base64))
+                    continue; // skip empty entries
 
-                string base64Part = dataUri.Substring(commaPos + 7);
-                byte[] imageBytes;
-
+                // Decode the base64 string to a byte array
+                byte[] imgBytes;
                 try
                 {
-                    imageBytes = Convert.FromBase64String(base64Part);
+                    imgBytes = Convert.FromBase64String(base64);
                 }
                 catch (FormatException)
                 {
-                    // Skip malformed base64 strings
+                    Console.Error.WriteLine("Invalid base64 string encountered; skipping this entry.");
                     continue;
                 }
 
-                // If more than one image, create a new page for each subsequent image
-                if (pageIndex > 1)
-                {
-                    pdfDoc.Pages.Add();
-                }
+                // Add a new page for the image
+                pdfDoc.Pages.Add();
+                pageIndex++; // Aspose.Pdf uses 1‑based page indexing
 
-                // Create an Aspose.Pdf.Image and assign the decoded stream
+                // Create a MemoryStream for the image data and keep it in the list
+                MemoryStream ms = new MemoryStream(imgBytes);
+                streams.Add(ms);
+
+                // Instantiate Image using the parameter‑less constructor and assign the stream
                 Image img = new Image
                 {
-                    ImageStream = new MemoryStream(imageBytes)
+                    ImageStream = ms,
+                    // Optional: scale the image to fit the page
+                    // FixWidth = pdfDoc.Pages[pageIndex].PageInfo.Width,
+                    // FixHeight = pdfDoc.Pages[pageIndex].PageInfo.Height
                 };
 
-                // Add the image to the current page. Adjust the rectangle as needed.
-                // Here we place it at (50, 500) with a width/height of 400x400 points.
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 500, 450, 900);
+                // Add the image to the page's paragraph collection
                 pdfDoc.Pages[pageIndex].Paragraphs.Add(img);
-                // Optionally, you could also use Page.AddImage(stream, rect) instead:
-                // pdfDoc.Pages[pageIndex].AddImage(new MemoryStream(imageBytes), rect);
-
-                pageIndex++;
             }
 
-            // Save the resulting PDF
+            // Save the resulting PDF (no SaveOptions needed for PDF output)
             pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF created with embedded images: {pdfPath}");
+        // Dispose all streams after the document has been saved
+        foreach (var s in streams)
+            s.Dispose();
+
+        Console.WriteLine($"PDF successfully created at '{pdfPath}'.");
     }
 }

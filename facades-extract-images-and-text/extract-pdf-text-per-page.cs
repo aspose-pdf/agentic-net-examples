@@ -6,46 +6,56 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
-
-        // Directory where per‑page text files will be saved
         const string outputDir = "ExtractedPages";
-
-        // Optional: file to hold the whole document text
-        const string fullTextFile = "full_text.txt";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor (Facade) to extract text
+        // PdfExtractor implements IDisposable, so wrap it in a using block
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document
+            // Load the PDF document
             extractor.BindPdf(inputPdf);
 
-            // Extract text using Unicode encoding (default)
+            // Extract text from all pages
             extractor.ExtractText();
 
-            // Save the complete text to a single file (optional)
-            extractor.GetText(fullTextFile);
-
-            // Extract each page's text into separate files
-            int pageNumber = 1;
-            while (extractor.HasNextPageText())
+            // Get the concatenated text; pages are separated by a form‑feed character (\f)
+            string allText;
+            using (MemoryStream textStream = new MemoryStream())
             {
-                string pageTextFile = Path.Combine(outputDir, $"Page_{pageNumber}.txt");
-                extractor.GetNextPageText(pageTextFile);
-                pageNumber++;
+                // Write extracted text into the stream
+                extractor.GetText(textStream);
+                textStream.Position = 0;
+                using (StreamReader reader = new StreamReader(textStream))
+                {
+                    allText = reader.ReadToEnd();
+                }
+            }
+
+            // Split the text into individual pages using the delimiter
+            string[] pageTexts = allText.Split('\f');
+
+            // Write each page's text to a separate .txt file
+            for (int i = 0; i < pageTexts.Length; i++)
+            {
+                string pageContent = pageTexts[i].Trim();
+
+                // Skip empty entries that may appear due to leading/trailing delimiters
+                if (string.IsNullOrEmpty(pageContent))
+                    continue;
+
+                string outPath = Path.Combine(outputDir, $"Page_{i + 1}.txt");
+                File.WriteAllText(outPath, pageContent);
+                Console.WriteLine($"Saved page {i + 1} text to '{outPath}'.");
             }
         }
-
-        Console.WriteLine("Text extraction completed.");
     }
 }

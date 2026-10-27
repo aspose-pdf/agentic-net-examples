@@ -4,36 +4,36 @@ using Aspose.Pdf;
 
 class Program
 {
-    // Progress handler that will be called during conversion.
-    // It receives information about the current progress event.
-    static void ShowProgress(Aspose.Pdf.UnifiedSaveOptions.ProgressEventHandlerInfo info)
-    {
-        // Simple console output showing event type and its value.
-        Console.WriteLine($"{info.EventType}: {info.Value}/{info.MaxValue}");
-    }
-
     static void Main()
     {
         const string inputPdfPath  = "input.pdf";
         const string outputPptxPath = "output.pptx";
 
+        // Verify that the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Initialize PPTX save options and assign the custom progress handler.
-            PptxSaveOptions saveOptions = new PptxSaveOptions();
-            saveOptions.CustomProgressHandler = new PptxSaveOptions.ConversionProgressEventHandler(ShowProgress);
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Create PPTX save options – core API does not expose a progress handler,
+                // so conversion will run without explicit progress callbacks.
+                Aspose.Pdf.PptxSaveOptions pptxOptions = new Aspose.Pdf.PptxSaveOptions();
 
-            // Save the document as PPTX using the specified options.
-            pdfDocument.Save(outputPptxPath, saveOptions);
+                // Save the PDF as PPTX
+                pdfDoc.Save(outputPptxPath, pptxOptions);
+            }
+
+            Console.WriteLine($"Conversion completed: '{outputPptxPath}'");
         }
-
-        Console.WriteLine($"Conversion completed. PPTX saved to '{outputPptxPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
+        }
     }
 }

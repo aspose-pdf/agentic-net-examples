@@ -1,13 +1,15 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;          // <-- required for TextBoxField
+using Aspose.Pdf.Annotations;   // <-- required for DefaultAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,19 +18,24 @@ class Program
             return;
         }
 
-        // FormEditor handles loading and saving of the PDF.
-        using (FormEditor editor = new FormEditor(inputPath, outputPath))
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+
+        // Iterate over all form fields in the document
+        foreach (var field in pdfDoc.Form)
         {
-            // Use FormFieldFacade to modify visual attributes of form fields.
-            editor.Facade = new FormFieldFacade();
-
-            // Set the custom font name (must be installed on the system or embedded later).
-            editor.Facade.CustomFont = "Arial Bold";
-
-            // Apply the font to all text fields in the document.
-            editor.DecorateField(FieldType.Text);
+            // Process only text box fields (TextBoxField)
+            if (field is TextBoxField textBox)
+            {
+                // Set the default appearance: Arial Bold, size 12, black color
+                // DefaultAppearance expects System.Drawing.Color, so fully qualify to avoid ambiguity with Aspose.Pdf.Color
+                textBox.DefaultAppearance = new DefaultAppearance("Arial,Bold", 12, System.Drawing.Color.Black);
+            }
         }
 
-        Console.WriteLine($"All text fields have been updated with 'Arial Bold' and saved to '{outputPath}'.");
+        // Save the updated PDF
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"All text fields updated with Arial Bold and saved to '{outputPath}'.");
     }
 }

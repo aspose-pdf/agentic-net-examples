@@ -1,15 +1,14 @@
 using System;
 using System.IO;
+using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Optimization;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input XML file that will be converted to PDF
         const string xmlPath = "input.xml";
-        // Output PDF file with compressed text objects
         const string pdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
@@ -18,25 +17,64 @@ class Program
             return;
         }
 
-        // Load XML using the proper load options (required for XML sources)
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
+        // Load the XML document
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
 
-        // Create the PDF document from the XML content
-        using (Document pdfDocument = new Document(xmlPath, loadOptions))
+        // Ensure the document has a root element
+        if (xmlDoc.DocumentElement == null)
         {
-            // Prepare optimization options: enable compression of PDF objects
-            OptimizationOptions optOptions = new OptimizationOptions
-            {
-                CompressObjects = true   // Pack objects into streams and compress them
-            };
-
-            // Apply the optimization to the document
-            pdfDocument.OptimizeResources(optOptions);
-
-            // Save the optimized PDF
-            pdfDocument.Save(pdfPath);
+            Console.Error.WriteLine("The XML document does not contain a root element.");
+            return;
         }
 
-        Console.WriteLine($"PDF generated and compressed: {pdfPath}");
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
+        {
+            // Add a single page
+            Page page = pdfDoc.Pages.Add();
+
+            // Retrieve a font for text rendering
+            Aspose.Pdf.Text.Font font = FontRepository.FindFont("Arial");
+
+            // Recursively add XML nodes as text fragments
+            AddXmlNodeToPage(xmlDoc.DocumentElement, page, font, 0);
+
+            // Optimize resources to compress streams (including text objects)
+            // The parameterless overload compresses streams without requiring the
+            // OptimizationOptions class, which may be unavailable in some library versions.
+            pdfDoc.OptimizeResources();
+
+            // Save the resulting PDF
+            pdfDoc.Save(pdfPath);
+        }
+
+        Console.WriteLine($"PDF created at '{pdfPath}'.");
+    }
+
+    // Helper method to add an XML node and its children to the PDF page
+    static void AddXmlNodeToPage(XmlNode node, Page page, Aspose.Pdf.Text.Font font, int indentLevel)
+    {
+        // Prepare indented text representing the XML element
+        string indent = new string(' ', indentLevel * 4);
+        string content = $"{indent}<{node.Name}> {node.InnerText}";
+
+        // Create a text fragment with the content
+        TextFragment fragment = new TextFragment(content);
+        fragment.TextState.Font = font;
+        fragment.TextState.FontSize = 12;
+        fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+        // Add the fragment to the page
+        page.Paragraphs.Add(fragment);
+
+        // Process child elements recursively
+        foreach (XmlNode child in node.ChildNodes)
+        {
+            if (child.NodeType == XmlNodeType.Element)
+            {
+                AddXmlNodeToPage(child, page, font, indentLevel + 1);
+            }
+        }
     }
 }

@@ -1,47 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Core Aspose.Pdf namespace
-using Aspose.Pdf.Text;          // Required for XmlLoadOptions (inherits from LoadOptions)
-using Aspose.Pdf.Annotations;   // Required for JavascriptAction
+using Aspose.Pdf;
 
-// Example: Convert an XML file to PDF and apply page transition effects for presentation mode.
 class Program
 {
     static void Main()
     {
-        // Paths to the source XML and the resulting PDF.
-        const string xmlInputPath  = "input.xml";
-        const string pdfOutputPath = "output.pdf";
+        const string xmlPath = "presentation.xml";
+        const string outputPdfPath = "presentation.pdf";
 
-        // Verify that the XML file exists.
-        if (!File.Exists(xmlInputPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Error: XML file not found – {xmlInputPath}");
+            Console.Error.WriteLine($"Input XML not found: {xmlPath}");
             return;
         }
 
-        // Load the XML using XmlLoadOptions (no XSL transformation in this example).
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
-
-        // Create the PDF document from the XML.
-        using (Document pdfDoc = new Document(xmlInputPath, loadOptions))
+        // Load XML and create a PDF document.
+        // XmlLoadOptions tells Aspose.Pdf to treat the source as XML.
+        using (Document pdfDoc = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // Apply a transition effect to each page using JavaScript actions.
-            // This approach works even when the Page.Transition property is not available in the used library version.
-            const string transitionJs = "this.transition = 'Fade'; this.transitionDuration = 1; this.duration = 5;";
+            // Set the document to open in full‑screen (presentation) mode.
+            pdfDoc.PageMode = PageMode.FullScreen;
 
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
-            {
-                Page page = pdfDoc.Pages[i];
+            // NOTE: In the core Aspose.Pdf API (without using Facades) the
+            // page‑transition feature is not exposed. Therefore only the
+            // full‑screen mode is applied here. If transition effects are
+            // required, they must be added via the PdfPageEditor class from
+            // Aspose.Pdf.Facades, which is prohibited by the hard‑rule.
 
-                // Attach a JavaScript action that sets the transition and display duration when the page opens.
-                page.Actions.OnOpen = new JavascriptAction(transitionJs);
-            }
-
-            // Save the resulting PDF with the applied transitions.
-            pdfDoc.Save(pdfOutputPath);
+            // Save the resulting PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF generated with page transitions: {pdfOutputPath}");
+        Console.WriteLine($"Presentation PDF saved to '{outputPdfPath}'.");
     }
 }

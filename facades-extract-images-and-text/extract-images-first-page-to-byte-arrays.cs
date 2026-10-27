@@ -1,76 +1,56 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Create a minimal PDF with an embedded image (self‑contained)
-        // ------------------------------------------------------------
-        // Create a 1×1 pixel BMP in memory (no external files required)
-        byte[] bmpBytes = new byte[] {
-            0x42, 0x4D, 0x3E, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x3E, 0x00, 0x00, 0x00, 0x28, 0x00, 0x00, 0x00, 0x01, 0x00,
-            0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x18, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-            0xFF, 0x00, 0x00, 0x00
-        };
-
-        // Keep the image stream alive until the PDF is saved.
-        MemoryStream imgStream = new MemoryStream(bmpBytes);
-        imgStream.Position = 0; // ensure stream is at the beginning
-
-        // Build the PDF that contains the image
-        using (var doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
-
-            var img = new Aspose.Pdf.Image { ImageStream = imgStream };
-            page.Paragraphs.Add(img);
-
-            doc.Save(pdfPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Dispose the image stream after the document has been saved.
-        imgStream.Dispose();
+        // List to hold extracted image byte arrays
+        List<byte[]> images = new List<byte[]>();
 
-        // ------------------------------------------------------------
-        // 2. Extract images from the first page into byte arrays
-        // ------------------------------------------------------------
-        List<byte[]> extractedImages = new List<byte[]>();
+        // PdfExtractor (Aspose.Pdf.Facades) extracts images from PDFs
+        PdfExtractor extractor = new PdfExtractor();
 
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Bind the PDF file to the extractor
+        extractor.BindPdf(inputPath);
+
+        // Restrict extraction to the first page only
+        extractor.StartPage = 1;
+        extractor.EndPage   = 1;
+
+        // Perform the image extraction
+        extractor.ExtractImage();
+
+        // Retrieve each image as a byte array using a MemoryStream
+        while (extractor.HasNextImage())
         {
-            extractor.BindPdf(pdfPath);
-            extractor.StartPage = 1;
-            extractor.EndPage   = 1;
-            extractor.ExtractImage();
-
-            while (extractor.HasNextImage())
+            using (MemoryStream ms = new MemoryStream())
             {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    bool ok = extractor.GetNextImage(ms);
-                    if (ok)
-                    {
-                        extractedImages.Add(ms.ToArray());
-                    }
-                }
+                // GetNextImage writes the image data into the provided stream
+                extractor.GetNextImage(ms);
+                byte[] imageBytes = ms.ToArray();
+                images.Add(imageBytes);
             }
         }
 
-        Console.WriteLine($"Extracted {extractedImages.Count} image(s) from page 1.");
-        if (extractedImages.Count > 0)
+        Console.WriteLine($"Extracted {images.Count} image(s) from page 1.");
+
+        // Optional: write each image to a file for verification
+        for (int i = 0; i < images.Count; i++)
         {
-            File.WriteAllBytes("firstPageImage1.bmp", extractedImages[0]);
-            Console.WriteLine("First extracted image saved as 'firstPageImage1.bmp'.");
+            string outPath = $"page1_image_{i + 1}.bin";
+            File.WriteAllBytes(outPath, images[i]);
+            Console.WriteLine($"Saved image {i + 1} to {outPath}");
         }
     }
 }

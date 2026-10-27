@@ -1,97 +1,64 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-
-// Simple representation of a diff operation – mimics the Aspose.Pdf.Comparison DiffOperation
-public class DiffOperation
-{
-    public string OperationType { get; set; }
-    public int PageNumber { get; set; }
-    public string Details { get; set; }
-}
+using Aspose.Pdf.Comparison;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdfPath = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string jsonReportPath = "diffReport.json";
+        const string oldPdfPath = "old.pdf";
+        const string newPdfPath = "new.pdf";
+        const string jsonReportPath = "diff_report.json";
 
-        // Verify input files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        if (!File.Exists(oldPdfPath) || !File.Exists(newPdfPath))
         {
-            Console.Error.WriteLine("One or both PDF files were not found.");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Load the two PDFs inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        // Load the PDFs using the core Document class
+        Document doc1 = new Document(oldPdfPath);
+        Document doc2 = new Document(newPdfPath);
+
+        // Use the text‑based comparer that returns DiffOperation objects
+        ComparisonOptions compareOptions = new ComparisonOptions(); // defaults are fine
+
+        // Let the compiler infer the exact return type to avoid IList conversion issues
+        var pageDifferences = TextPdfComparer.CompareDocumentsPageByPage(doc1, doc2, compareOptions);
+
+        // Convert DiffOperation objects into a serializable structure
+        var reportItems = new List<DiffReportItem>();
+        for (int i = 0; i < pageDifferences.Count; i++)
         {
-            // Perform a very basic text‑based comparison page by page.
-            // This replaces the missing Aspose.Pdf.Comparison API while still
-            // producing a collection of DiffOperation objects that can be
-            // serialized to JSON.
-            List<DiffOperation> diffOperations = CompareDocuments(doc1, doc2);
-
-            // Serialize the diff operations to JSON (indented for readability)
-            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string jsonReport = JsonSerializer.Serialize(diffOperations, jsonOptions);
-
-            // Write the JSON report to a file
-            File.WriteAllText(jsonReportPath, jsonReport);
-            Console.WriteLine($"Diff report saved to '{jsonReportPath}'.");
-        }
-    }
-
-    /// <summary>
-    /// Compares two Aspose.Pdf.Document objects page by page using their extracted text.
-    /// Returns a list of DiffOperation objects describing the differences.
-    /// </summary>
-    private static List<DiffOperation> CompareDocuments(Document doc1, Document doc2)
-    {
-        var diffs = new List<DiffOperation>();
-        int maxPages = Math.Max(doc1.Pages.Count, doc2.Pages.Count);
-
-        for (int i = 1; i <= maxPages; i++)
-        {
-            string text1 = i <= doc1.Pages.Count ? ExtractPageText(doc1, i) : string.Empty;
-            string text2 = i <= doc2.Pages.Count ? ExtractPageText(doc2, i) : string.Empty;
-
-            if (text1 != text2)
+            IList<DiffOperation> diffs = pageDifferences[i];
+            if (diffs == null) continue; // no differences on this page
+            foreach (DiffOperation diff in diffs)
             {
-                // Simple heuristic: if one side is empty, treat as Added/Removed, otherwise Modified
-                string operationType;
-                if (string.IsNullOrEmpty(text1) && !string.IsNullOrEmpty(text2))
-                    operationType = "Added";
-                else if (!string.IsNullOrEmpty(text1) && string.IsNullOrEmpty(text2))
-                    operationType = "Removed";
-                else
-                    operationType = "Modified";
-
-                diffs.Add(new DiffOperation
+                reportItems.Add(new DiffReportItem
                 {
-                    OperationType = operationType,
-                    PageNumber = i,
-                    Details = operationType == "Added" ? text2 : text1
+                    PageNumber = i + 1,               // pages are 1‑based for the report
+                    Operation   = diff.Operation.ToString(), // enum → string
+                    Details     = diff.Text         // the text fragment involved in the diff
                 });
             }
         }
 
-        return diffs;
+        // Serialize the report to JSON with indentation for readability
+        string json = JsonSerializer.Serialize(reportItems, new JsonSerializerOptions { WriteIndented = true });
+
+        // Write the JSON report to disk
+        File.WriteAllText(jsonReportPath, json);
+        Console.WriteLine($"Diff report saved to '{jsonReportPath}'.");
     }
 
-    /// <summary>
-    /// Extracts all visible text from a given page using Aspose.Pdf.Text.TextAbsorber.
-    /// </summary>
-    private static string ExtractPageText(Document doc, int pageNumber)
+    // DTO used for JSON serialization – properties are nullable to satisfy non‑nullable warnings
+    private class DiffReportItem
     {
-        var absorber = new TextAbsorber();
-        absorber.Visit(doc.Pages[pageNumber]);
-        return absorber.Text ?? string.Empty;
+        public int    PageNumber { get; set; }
+        public string? Operation   { get; set; }
+        public string? Details     { get; set; }
     }
 }

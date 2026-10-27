@@ -3,87 +3,80 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "signed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string thumbprint = "YOUR_CERT_THUMBPRINT"; // replace with actual thumbprint
+        const string pfxPath = "certificate.pfx"; // path to a PFX that references the smart‑card key (or a placeholder for compilation)
+        const string pfxPassword = ""; // empty if the private key is on a smart‑card and does not require a password
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdf))
-        {
-            // Ensure the document has at least one page.
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
-
-            // Define the rectangle where the visible signature will appear.
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-
-            // Create a signature field on the first page.
-            Aspose.Pdf.Forms.SignatureField sigField = new Aspose.Pdf.Forms.SignatureField(doc, sigRect);
-            doc.Pages[1].Annotations.Add(sigField);
-
-            // Obtain the X509Certificate2 from the smart card (no PIN prompt).
-            // This method should select a certificate whose private key is accessible
-            // without UI interaction (e.g., using a CSP that does not request a PIN).
-            X509Certificate2 cert = GetCertificateFromSmartCard();
-
-            if (cert == null)
-            {
-                Console.Error.WriteLine("Smart card certificate not found.");
-                return;
-            }
-
-            // Create an ExternalSignature that uses the smart‑card certificate.
-            Aspose.Pdf.Forms.ExternalSignature externalSig = new Aspose.Pdf.Forms.ExternalSignature(cert)
-            {
-                Reason      = "Document approved",
-                ContactInfo = "john.doe@example.com",
-                Location    = "Head Office"
-            };
-
-            // Sign the field with the external signature.
-            sigField.Sign(externalSig);
-
-            // Save the signed PDF.
-            doc.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
-    }
-
-    // Retrieves a certificate from the smart card. Adjust the search criteria as needed.
-    private static X509Certificate2 GetCertificateFromSmartCard()
-    {
-        // Look in the CurrentUser's "My" store for a certificate that has a private key
-        // and is marked as a smart‑card certificate (e.g., by checking the ProviderName).
+        // Load the certificate (with private key) from the smart‑card (CurrentUser\My store)
+        X509Certificate2 cert = null;
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
-            store.Open(OpenFlags.ReadOnly | OpenFlags.OpenExistingOnly);
-            foreach (X509Certificate2 cert in store.Certificates)
+            store.Open(OpenFlags.ReadOnly);
+            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
+            if (certs.Count == 0)
             {
-                // Ensure the certificate has a private key.
-                if (!cert.HasPrivateKey)
-                    continue;
-
-                // Example heuristic: the certificate's private key is provided by a CSP
-                // whose name contains "SmartCard". Adjust according to your environment.
-                var keyInfo = cert.PrivateKey?.ToString() ?? string.Empty;
-                if (keyInfo.IndexOf("SmartCard", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
-                    return cert;
-                }
+                Console.Error.WriteLine("Certificate not found on smart card.");
+                return;
             }
+            cert = certs[0];
         }
 
-        return null; // No suitable certificate found.
+        if (!cert.HasPrivateKey)
+        {
+            Console.Error.WriteLine("The selected certificate does not contain a private key.");
+            return;
+        }
+
+        // Create a PKCS#7 object that Aspose.Pdf will use for signing.
+        // Use the overload that accepts a PFX file path and password.
+        PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword);
+
+        // Optional: customise the visual appearance of the signature.
+        pkcs7.CustomAppearance = new SignatureCustomAppearance
+        {
+            BackgroundColor = Color.LightGray,
+            ShowContactInfo = true,
+            ShowLocation = true,
+            ShowReason = true,
+            ContactInfoLabel = "Contact:",
+            LocationLabel = "Location:",
+            ReasonLabel = "Reason:"
+        };
+
+        // Open the PDF document.
+        using (Document doc = new Document(inputPath))
+        {
+            // Define the rectangle where the visible signature will be placed.
+            Aspose.Pdf.Rectangle signatureRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+
+            // Create a signature field and add it to the document's form collection.
+            SignatureField sigField = new SignatureField(doc, signatureRect)
+            {
+                Name = "Signature1"
+            };
+            doc.Form.Add(sigField);
+
+            // Sign the field. The overload without extra parameters signs the field using the PKCS7 object.
+            sigField.Sign(pkcs7);
+
+            // Save the signed PDF.
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF signed and saved to '{outputPath}'.");
     }
 }

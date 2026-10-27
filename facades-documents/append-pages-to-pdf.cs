@@ -1,54 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the destination PDF, the source PDF whose pages will be appended,
-        // and the resulting merged PDF.
-        const string destinationPdf = "destination.pdf";
-        const string sourcePdf      = "source.pdf";
-        const string outputPdf      = "merged.pdf";
+        // Paths to the PDFs
+        const string destinationPath = "destination.pdf"; // existing PDF to which pages will be appended
+        const string sourcePath      = "source.pdf";      // PDF whose pages will be appended
+        const string outputPath      = "merged_output.pdf"; // result PDF
 
-        // Verify that the input files exist.
-        if (!File.Exists(destinationPdf))
+        // Verify that input files exist
+        if (!File.Exists(destinationPath))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
             return;
         }
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
             return;
         }
 
-        // Determine the total number of pages in the source PDF.
-        int sourcePageCount;
-        using (Document srcDoc = new Document(sourcePdf))
-        {
-            sourcePageCount = srcDoc.Pages.Count; // 1‑based page count
-        }
+        // Load PDFs using Aspose.Pdf.Document (PdfFileEditor does not expose GetPageCount or the required Insert overload)
+        Document destDoc = new Document(destinationPath);
+        Document srcDoc  = new Document(sourcePath);
 
-        // Append all pages from the source PDF to the end of the destination PDF.
-        // The Append method handles opening the files and writing the output.
-        PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.Append(
-            inputFile:  destinationPdf,   // original PDF
-            portFile:   sourcePdf,        // PDF to take pages from
-            startPage:  1,                // start from first page of source
-            endPage:    sourcePageCount,  // up to the last page of source
-            outputFile: outputPdf);       // resulting PDF
+        // Append all pages from the source document to the end of the destination document
+        // The correct way is to use Pages.Insert with the source document's Pages collection.
+        destDoc.Pages.Insert(destDoc.Pages.Count + 1, srcDoc.Pages);
 
-        if (success)
-        {
-            Console.WriteLine($"Pages appended successfully. Output saved to '{outputPdf}'.");
-        }
-        else
-        {
-            Console.Error.WriteLine("Failed to append pages.");
-        }
+        // Save the merged document to a new file so the original destination remains unchanged
+        destDoc.Save(outputPath);
+
+        Console.WriteLine($"Pages from '{sourcePath}' have been appended to '{destinationPath}'.");
+        Console.WriteLine($"Result saved as '{outputPath}'.");
     }
 }

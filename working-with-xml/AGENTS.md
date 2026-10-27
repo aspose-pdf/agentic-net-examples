@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-xml
 
-> **Working with XML** in PDF using C# / .NET -- **72** verified, compile-tested examples for **Aspose.PDF for .NET** 26.8.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with XML** in PDF using C# / .NET -- **73** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,39 +23,40 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (70/72 files) ← category-specific
-- `using Aspose.Pdf.Text;` (17/72 files)
-- `using Aspose.Pdf.Annotations;` (7/72 files)
-- `using Aspose.Pdf.Devices;` (4/72 files)
-- `using Aspose.Pdf.Forms;` (4/72 files)
-- `using Aspose.Pdf.Optimization;` (4/72 files)
-- `using Aspose.Pdf.Drawing;` (2/72 files)
-- `using Aspose.Pdf.Comparison;` (1/72 files)
-- `using Aspose.Pdf.Facades;` (1/72 files)
-- `using Aspose.Pdf.LogicalStructure;` (1/72 files)
-- `using Aspose.Pdf.Tagged;` (1/72 files)
-- `using System;` (72/72 files)
-- `using System.IO;` (70/72 files)
-- `using System.Xml.Linq;` (15/72 files)
-- `using System.Xml;` (10/72 files)
-- `using System.Collections.Generic;` (4/72 files)
-- `using System.Data;` (2/72 files)
-- `using System.Linq;` (2/72 files)
-- `using System.Text;` (2/72 files)
-- `using Microsoft.Extensions.DependencyInjection;` (1/72 files)
-- `using System.Diagnostics;` (1/72 files)
-- `using System.Globalization;` (1/72 files)
-- `using System.Text.Json;` (1/72 files)
-- `using System.Threading;` (1/72 files)
-- `using System.Threading.Tasks;` (1/72 files)
+- `using Aspose.Pdf;` (72/73 files) ← category-specific
+- `using Aspose.Pdf.Text;` (21/73 files)
+- `using Aspose.Pdf.Annotations;` (9/73 files)
+- `using Aspose.Pdf.Forms;` (5/73 files)
+- `using Aspose.Pdf.Devices;` (4/73 files)
+- `using Aspose.Pdf.Drawing;` (3/73 files)
+- `using Aspose.Pdf.Optimization;` (3/73 files)
+- `using Aspose.Pdf.Security;` (3/73 files)
+- `using Aspose.Pdf.LogicalStructure;` (1/73 files)
+- `using Aspose.Pdf.Tagged;` (1/73 files)
+- `using System;` (73/73 files)
+- `using System.IO;` (73/73 files)
+- `using System.Xml.Linq;` (26/73 files)
+- `using System.Xml;` (13/73 files)
+- `using System.Collections.Generic;` (9/73 files)
+- `using System.Reflection;` (5/73 files)
+- `using System.Xml.Xsl;` (5/73 files)
+- `using System.Linq;` (4/73 files)
+- `using DocumentFormat.OpenXml;` (1/73 files)
+- `using DocumentFormat.OpenXml.Wordprocessing;` (1/73 files)
+- `using Microsoft.CSharp.RuntimeBinder;` (1/73 files)
+- `using Microsoft.Extensions.DependencyInjection;` (1/73 files)
+- `using NUnit.Framework;` (1/73 files)
+- `using System.Diagnostics;` (1/73 files)
+- `using System.Text;` (1/73 files)
+- `using System.Threading;` (1/73 files)
+- `using System.Threading.Tasks;` (1/73 files)
 
 ## Common Code Pattern
 
-Most files in this category load documents with `XmlLoadOptions`:
+Most files follow this pattern:
 
 ```csharp
-XmlLoadOptions options = new XmlLoadOptions();
-using (Document doc = new Document("input.pdf", options))
+using (Document doc = new Document("input.pdf"))
 {
     // ... operations ...
     doc.Save("output.pdf");
@@ -66,40 +67,40 @@ using (Document doc = new Document("input.pdf", options))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-background-images-to-pdf-pages](./add-background-images-to-pdf-pages.cs) | Add Background Images to PDF Pages from XML | `Document`, `Page`, `BackgroundArtifact` | Demonstrates loading an XML file that maps page numbers to image files and applying those images ... |
-| [add-custom-page-borders-to-pdf](./add-custom-page-borders-to-pdf.cs) | Add Custom Page Borders to PDF Using Graphs | `Document`, `Page`, `Graph` | Shows how to draw a rectangular border on each page of a PDF by creating a Graph container, addin... |
-| [add-header-footer-to-pdf-using-xml-templates](./add-header-footer-to-pdf-using-xml-templates.cs) | Add Header and Footer to PDF Using XML Templates | `Document`, `Page`, `HeaderFooter` | Demonstrates loading header and footer text from XML files, inserting page numbers, and applying ... |
-| [add-javascript-actions-to-pdf-from-xml](./add-javascript-actions-to-pdf-from-xml.cs) | Add JavaScript Actions to PDF from XML | `Document`, `XmlLoadOptions`, `TextBoxField` | Demonstrates loading an XML file into a PDF, adding a document‑level JavaScript alert, creating a... |
-| [add-page-transitions-to-pdf-from-xml](./add-page-transitions-to-pdf-from-xml.cs) | Add Page Transition Effects to PDF Generated from XML | `Document`, `XmlLoadOptions`, `Page` | Loads an XML file into a PDF document using Aspose.Pdf, attaches JavaScript actions to each page ... |
-| [apply-css-from-xml-to-pdf](./apply-css-from-xml-to-pdf.cs) | Apply CSS from XML/XSL to Generate Styled PDF | `Document`, `XmlLoadOptions`, `Save` | Demonstrates how to load an XML document with an XSL stylesheet that references external CSS file... |
-| [apply-custom-font-to-xml-elements](./apply-custom-font-to-xml-elements.cs) | Apply Custom Font to Specific XML Elements in PDF | `Document`, `XmlLoadOptions`, `OpenFont` | Demonstrates loading an XML file into a PDF, extracting text fragments, and applying a custom Tru... |
-| [apply-section-specific-page-margins](./apply-section-specific-page-margins.cs) | Apply Section-Specific Page Margins Using XML | `Document`, `MarginInfo`, `Margin` | Shows how to load margin definitions from an XML file and apply different margins to defined page... |
-| [apply-xml-color-to-pdf-page-background](./apply-xml-color-to-pdf-page-background.cs) | Set PDF Page Background Color from XML Value | `Document`, `Save`, `Parse` | Loads a PDF, parses an XML color string (hex or rgb) into an Aspose.Pdf.Color, and applies that c... |
-| [batch-convert-xml-to-pdf](./batch-convert-xml-to-pdf.cs) | Batch Convert XML Files to PDF | `Document`, `XmlLoadOptions`, `Save` | Shows how to load all XML files in a folder and convert each one to a PDF document using Aspose.P... |
-| [batch-xml-to-pdf-conversion-profiling](./batch-xml-to-pdf-conversion-profiling.cs) | Batch XML to PDF Conversion with Performance Profiling | `Document`, `XmlLoadOptions`, `Save` | Demonstrates how to convert multiple XML files to PDF using Aspose.Pdf while measuring load, save... |
-| [compress-pdf-streams-using-aspose-pdf](./compress-pdf-streams-using-aspose-pdf.cs) | Compress PDF Streams Using Aspose.Pdf Optimization | `Document`, `OptimizationOptions`, `OptimizeResources` | Shows how to load a PDF (e.g., generated from XML), apply resource optimization to compress strea... |
-| [compress-pdf-text-objects-from-xml](./compress-pdf-text-objects-from-xml.cs) | Compress PDF Text Objects from XML | `Document`, `XmlLoadOptions`, `OptimizationOptions` | Demonstrates converting an XML file to a PDF with Aspose.Pdf and applying stream compression to t... |
-| [compress-pdf-text-streams-flate-xml](./compress-pdf-text-streams-flate-xml.cs) | Compress PDF Text Streams with Flate via XML Conversion | `Document`, `XmlSaveOptions`, `XmlLoadOptions` | The example converts a PDF to XML, reloads it, applies Flate compression to all objects (includin... |
-| [concurrent-xml-to-pdf-conversion](./concurrent-xml-to-pdf-conversion.cs) | Concurrent XML to PDF Conversion with Aspose.Pdf | `Document`, `XmlLoadOptions`, `Save` | Demonstrates how to safely convert multiple XML files to PDF in parallel using Aspose.Pdf's XmlLo... |
-| [convert-pdf-pages-to-png-thumbnails](./convert-pdf-pages-to-png-thumbnails.cs) | Convert PDF Pages to High-Resolution PNG Thumbnails | `Document`, `Resolution`, `PngDevice` | Demonstrates how to load a PDF with Aspose.Pdf, set a high DPI resolution, and render each page a... |
-| [convert-styled-html-to-pdf-with-custom-colors](./convert-styled-html-to-pdf-with-custom-colors.cs) | Convert Styled HTML to PDF with Custom Colors | `Document`, `HtmlLoadOptions`, `Save` | Demonstrates how to embed inline CSS in an HTML file and use Aspose.Pdf to convert it into a PDF ... |
-| [convert-xml-to-pdf-with-logging](./convert-xml-to-pdf-with-logging.cs) | Convert XML Files to PDF with Detailed Logging | `Document`, `XmlLoadOptions`, `PdfException` | Reads XML files from a directory, converts each to a PDF using Aspose.Pdf, and records detailed p... |
-| [convert-xml-to-pdf-with-xslt](./convert-xml-to-pdf-with-xslt.cs) | Convert XML to PDF with XSLT Transformation | `XmlLoadOptions`, `ctor`, `Document` | Demonstrates loading an XML file, applying an XSLT stylesheet during loading with Aspose.Pdf, and... |
-| [convert-xml-to-pdf](./convert-xml-to-pdf.cs) | Convert XML to PDF using Aspose.Pdf | `Document`, `XmlLoadOptions`, `Save` | Demonstrates loading an XML file and converting it to a PDF with Aspose.Pdf's default XSLT transf... |
-| [convert-xml-to-pdfa-2b-and-validate](./convert-xml-to-pdfa-2b-and-validate.cs) | Convert XML to PDF/A‑2b and Validate Compliance | `Document`, `XmlLoadOptions`, `PdfFormat` | Shows how to load an XML file, convert it to PDF/A‑2b format, save the PDF, and validate the outp... |
-| [create-barcodes-pdf-from-xml](./create-barcodes-pdf-from-xml.cs) | Create Barcodes in PDF from XML Fields | `Document`, `XmlLoadOptions`, `Page` | Shows how to load an XML file as a PDF, read barcode field definitions, generate Code128 barcodes... |
-| [create-hierarchical-pdf-outline-from-xml](./create-hierarchical-pdf-outline-from-xml.cs) | Create Hierarchical PDF Outline from XML | `Document`, `OutlineItemCollection`, `XYZExplicitDestination` | Shows how to load an XML file and generate a PDF with a nested bookmark outline that mirrors the ... |
-| [create-pdf-from-xsl-fo-memory-stream](./create-pdf-from-xsl-fo-memory-stream.cs) | Create PDF from XSL‑FO Using a MemoryStream | `Document`, `XslFoLoadOptions`, `Save` | Demonstrates loading XSL‑FO XML from a MemoryStream and generating a PDF document with default se... |
-| [create-pdf-outline-from-xml](./create-pdf-outline-from-xml.cs) | Create PDF Outline Hierarchy from XML Nesting | `Document`, `XmlLoadOptions`, `OutlineItemCollection` | Demonstrates loading an XML file with Aspose.Pdf, then generating a PDF outline whose hierarchy m... |
-| [create-pdf-outlines-from-xml-section-titles](./create-pdf-outlines-from-xml-section-titles.cs) | Create PDF Outlines from XML Section Titles | `Document`, `Page`, `TextFragment` | Reads section titles from an XML file, generates a PDF page for each title, and adds outline (boo... |
-| [create-pdf-toc-from-xml](./create-pdf-toc-from-xml.cs) | Create PDF Table of Contents from XML Headings | `Document`, `ITaggedContent`, `TOCElement` | Shows how to build a hierarchical Table of Contents in a PDF by reading heading data from an XML ... |
-| [create-pdf-xfa-form-from-xml](./create-pdf-xfa-form-from-xml.cs) | Create PDF XFA Form Fields from XML and Set Default Values | `Document`, `Form`, `AssignXfa` | Shows how to load or create a PDF, assign an XFA form definition from an XML file, set default fi... |
-| [create-png-thumbnail-from-xml](./create-png-thumbnail-from-xml.cs) | Create PNG Thumbnail of First PDF Page from XML | `Document`, `XmlLoadOptions`, `Page` | The example loads an XML file, converts it to a PDF using Aspose.Pdf, and generates a PNG thumbna... |
-| [downsample-images-from-xml](./downsample-images-from-xml.cs) | Downsample Images from XML to PDF using Aspose.Pdf | `Document`, `BindXml`, `OptimizationOptions` | Shows how to load an XML file, convert it to a PDF, and down‑sample high‑resolution images by con... |
-| ... | | | *and 42 more files* |
+| [add-background-images-to-pdf-pages](./add-background-images-to-pdf-pages.cs) | Apply Background Images to PDF Pages from XML | `Document`, `ImageStamp`, `AddStamp` | Shows how to read an XML mapping of page numbers to image files and apply those images as backgro... |
+| [add-header-footer-to-pdf-using-xml-templates](./add-header-footer-to-pdf-using-xml-templates.cs) | Add Header and Footer to PDF Using XML Template | `Document`, `Page`, `TextStamp` | Reads header and footer text from an XML file and adds them to every page of a PDF using Aspose.P... |
+| [add-javascript-actions-to-pdf-from-xml](./add-javascript-actions-to-pdf-from-xml.cs) | Embed JavaScript Validation in PDF Generated from XML | `Document`, `XmlLoadOptions`, `TextBoxField` | Demonstrates loading an XML file into a PDF with Aspose.Pdf, adding a text box form field, and at... |
+| [add-page-transitions-to-pdf-from-xml](./add-page-transitions-to-pdf-from-xml.cs) | Create Presentation Mode PDF from XML | `Document`, `XmlLoadOptions`, `PageMode` | Loads an XML file as a PDF, sets the document to open in full‑screen presentation mode, and saves... |
+| [apply-css-from-xml-to-pdf](./apply-css-from-xml-to-pdf.cs) | Apply External CSS Stylesheets to PDF | `Document`, `HtmlLoadOptions`, `Save` | Demonstrates loading an XML/HTML file that references external CSS files and converting it to a s... |
+| [apply-custom-font-to-xml-elements](./apply-custom-font-to-xml-elements.cs) | Apply Custom Font to Specific XML Elements in PDF | `Document`, `Page`, `TextFragment` | Shows how to load an XML file, register a custom TrueType font with Aspose.Pdf, and apply that fo... |
+| [apply-section-specific-page-margins](./apply-section-specific-page-margins.cs) | Apply Section-Specific Page Margins from XML | `Document`, `PageInfo`, `MarginInfo` | Demonstrates loading margin definitions from an XML file and applying different margins to PDF pa... |
+| [apply-xml-color-to-pdf-page-background](./apply-xml-color-to-pdf-page-background.cs) | Apply XML-defined Background Color to PDF Pages | `Document`, `Page`, `Color` | Shows how to read a hex color from an XML file and set it as the background color for each page o... |
+| [batch-convert-xml-to-pdf](./batch-convert-xml-to-pdf.cs) | Batch Convert XML Files to PDF | `Document`, `XmlLoadOptions`, `Save` | Shows how to iterate over a folder of XML files, load each with Aspose.Pdf's XmlLoadOptions, and ... |
+| [batch-xml-to-pdf-conversion-profiling](./batch-xml-to-pdf-conversion-profiling.cs) | Profile Batch XML to PDF Conversion with Aspose.Pdf | `Document`, `XmlLoadOptions`, `Save` | Demonstrates measuring load and save times while converting multiple XML files to PDF using Aspos... |
+| [compress-pdf-streams-using-aspose-pdf](./compress-pdf-streams-using-aspose-pdf.cs) | Compress PDF Streams Using Aspose.Pdf Optimization | `Document`, `OptimizationOptions`, `OptimizeResources` | Demonstrates loading a PDF generated from XML and applying Aspose.Pdf optimization to compress st... |
+| [compress-pdf-text-objects-from-xml](./compress-pdf-text-objects-from-xml.cs) | Compress PDF Streams Generated from XML | `Document`, `Page`, `FontRepository` | Loads an XML file, renders its elements as text fragments in a PDF, and then compresses the PDF s... |
+| [compress-pdf-text-streams-flate-xml](./compress-pdf-text-streams-flate-xml.cs) | Compress PDF Text Streams Using Flate via XML Conversion | `Document`, `XmlSaveOptions`, `OptimizationOptions` | Shows how to convert a PDF to XML, reload it, apply Flate compression to text streams through res... |
+| [concurrent-xml-to-pdf-conversion](./concurrent-xml-to-pdf-conversion.cs) | Thread‑Safe PDF Generation from XML Using Parallel Processin... | `Document`, `XmlLoadOptions`, `Save` | Demonstrates how to convert multiple XML‑based PDF definitions to PDF files concurrently using As... |
+| [convert-pdf-pages-to-png-thumbnails](./convert-pdf-pages-to-png-thumbnails.cs) | Convert PDF Pages to PNG Thumbnails | `Document`, `PngDevice`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, iterate through each page, and render the pages to high‑... |
+| [convert-styled-html-to-pdf-with-custom-colors](./convert-styled-html-to-pdf-with-custom-colors.cs) | Apply Custom Color Scheme to PDF Text via XML | `Document`, `Page`, `TextFragmentAbsorber` | The example reads a text color defined in an XML style file and applies that color to all text fr... |
+| [convert-xml-to-pdf-with-logging](./convert-xml-to-pdf-with-logging.cs) | Convert XML Files to PDF with Aspose.Pdf | `Document`, `XmlLoadOptions`, `Save` | Shows how to load XML files as PDF documents using Aspose.Pdf, process multiple files, log progre... |
+| [convert-xml-to-pdf-with-xslt](./convert-xml-to-pdf-with-xslt.cs) | Convert XML to PDF using XSL‑FO with Aspose.Pdf | `Document`, `XslFoLoadOptions`, `Save` | Demonstrates applying an XSLT stylesheet to XML to generate XSL‑FO and then converting that FO to... |
+| [convert-xml-to-pdf](./convert-xml-to-pdf.cs) | Convert XML to PDF with Default XSLT Transformation | `XmlLoadOptions`, `Document`, `Save` | Demonstrates loading an XML file using Aspose.Pdf.XmlLoadOptions and saving it as a PDF, applying... |
+| [convert-xml-to-pdfa-2b-and-validate](./convert-xml-to-pdfa-2b-and-validate.cs) | Validate PDF/A-2b Compliance After XML Conversion | `Document`, `XmlSaveOptions`, `XmlLoadOptions` | The example shows how to export a PDF to XML, reload it, convert it to PDF/A‑2b, and then validat... |
+| [create-hierarchical-pdf-outline-from-xml](./create-hierarchical-pdf-outline-from-xml.cs) | Create Hierarchical PDF Outline from XML | `Document`, `Page`, `OutlineItemCollection` | Loads an XML file and generates a PDF whose outline hierarchy mirrors the XML element structure, ... |
+| [create-pdf-from-xsl-fo-memory-stream](./create-pdf-from-xsl-fo-memory-stream.cs) | Create PDF from XML Using MemoryStream | `Document`, `BindXml`, `Save` | Demonstrates loading XML from a MemoryStream, binding it to an Aspose.Pdf Document, and saving th... |
+| [create-pdf-outline-from-xml](./create-pdf-outline-from-xml.cs) | Create PDF Outline Hierarchy from XML Structure | `Document`, `OutlineItemCollection`, `XYZExplicitDestination` | Loads an XML file that defines a nested structure and generates matching PDF outlines (bookmarks)... |
+| [create-pdf-outlines-from-xml-section-titles](./create-pdf-outlines-from-xml-section-titles.cs) | Create PDF Outline from XML Section Titles | `Document`, `Page`, `TextFragment` | Shows how to read section titles from an XML file, add a page for each title, and generate corres... |
+| [create-pdf-toc-from-xml](./create-pdf-toc-from-xml.cs) | Create PDF Table of Contents from XML Headings | `Document`, `Page`, `TextFragment` | Shows how to generate a Table of Contents page in a PDF by reading a heading hierarchy from an XM... |
+| [create-pdf-xfa-form-from-xml](./create-pdf-xfa-form-from-xml.cs) | Create PDF Form Fields from XML Definition | `Document`, `Page`, `Rectangle` | Shows how to load an XML file that describes form fields and programmatically add matching Aspose... |
+| [create-png-thumbnail-from-xml](./create-png-thumbnail-from-xml.cs) | Generate PDF Thumbnail from First Page | `Document`, `Resolution`, `PngDevice` | Shows how to create a PNG thumbnail image of the first page of a PDF document using Aspose.Pdf. |
+| [downsample-images-from-xml](./downsample-images-from-xml.cs) | Downsample Images from XML and Optimize PDF | `Document`, `Page`, `Image` | The example reads image file paths from an XML document, adds each image to a separate PDF page, ... |
+| [embed-3d-models-from-xml](./embed-3d-models-from-xml.cs) | Embed 3D Model as Rich Media Annotation in PDF | `Document`, `Page`, `Rectangle` | Demonstrates loading an XML file with 3D model references, creating RichMediaAnnotations on speci... |
+| [embed-audio-annotations-from-xml](./embed-audio-annotations-from-xml.cs) | Embed Audio Annotations from XML into PDF | `Document`, `Page`, `Rectangle` | Shows how to read an XML file that defines audio files and their positions, then embed those audi... |
+| ... | | | *and 43 more files* |
 
 ## Category Statistics
-- Total examples: 72
+- Total examples: 73
 
 ## Category-Specific Tips
 
@@ -135,5 +136,5 @@ using (Document doc = new Document("input.pdf", options))
 - Review code examples in this folder for working-with-xml patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-08-20 | Run: `20260820_001147_12d7b3`
+Updated: 2026-10-25 | Run: `20261025_232257_0da171`
 <!-- AUTOGENERATED:END -->

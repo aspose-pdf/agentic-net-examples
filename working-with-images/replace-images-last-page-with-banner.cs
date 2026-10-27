@@ -1,14 +1,15 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string bannerImgPath = "banner.jpg";
+        const string inputPdfPath  = "input.pdf";      // source PDF
+        const string bannerImgPath = "banner.jpg";    // banner image file
+        const string outputPdfPath = "output.pdf";    // result PDF
 
         // Verify required files exist
         if (!File.Exists(inputPdfPath))
@@ -22,50 +23,49 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Get the last page (Aspose.Pdf uses 1‑based indexing)
-            Page lastPage = doc.Pages[doc.Pages.Count];
+            // Aspose.Pdf uses 1‑based page indexing
+            int lastPageNumber = pdfDoc.Pages.Count;
+            Page lastPage = pdfDoc.Pages[lastPageNumber];
 
-            // -----------------------------------------------------------------
-            // Step 1: Hide all existing images on the last page
-            // -----------------------------------------------------------------
-            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-            lastPage.Accept(absorber);
-            foreach (ImagePlacement placement in absorber.ImagePlacements)
+            // ------------------------------------------------------------
+            // Remove all existing images from the last page
+            // ------------------------------------------------------------
+            // Collect images first to avoid modifying the collection while iterating
+            List<XImage> imagesToRemove = new List<XImage>();
+            foreach (XImage img in lastPage.Resources.Images)
+                imagesToRemove.Add(img);
+
+            foreach (XImage img in imagesToRemove)
+                lastPage.Resources.Images.Remove(img);
+
+            // ------------------------------------------------------------
+            // Add a banner that spans the full page width
+            // ------------------------------------------------------------
+            ImageStamp bannerStamp = new ImageStamp(bannerImgPath)
             {
-                placement.Hide(); // removes the image from the page content
-            }
+                // Set the banner width to match the page width
+                Width = lastPage.Rect.Width,
 
-            // -----------------------------------------------------------------
-            // Step 2: Add the banner image spanning the full page width
-            // -----------------------------------------------------------------
-            // Load the banner once; the stream will be reused for AddImage
-            using (FileStream bannerStream = File.OpenRead(bannerImgPath))
-            {
-                // Determine the page rectangle (full media box)
-                Aspose.Pdf.Rectangle pageRect = lastPage.Rect;
+                // Keep the original aspect ratio; height will be scaled automatically
+                // If you prefer a fixed height, set Height and set FixHeight = true
+                // Height = 100; // example fixed height
+                // FixHeight = true;
 
-                // Define a rectangle that spans the full width.
-                // Height is set to 20 % of the page height – adjust as needed.
-                double bannerHeight = (pageRect.URY - pageRect.LLY) * 0.20;
-                Aspose.Pdf.Rectangle bannerRect = new Aspose.Pdf.Rectangle(
-                    pageRect.LLX,                     // left
-                    pageRect.LLY,                     // bottom
-                    pageRect.URX,                     // right
-                    pageRect.LLY + bannerHeight);     // top
+                // Align the banner at the top of the page (you can change as needed)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Top
+            };
 
-                // Add the banner image; Aspose.Pdf will preserve aspect ratio.
-                lastPage.AddImage(bannerStream, bannerRect);
-            }
+            // Apply the stamp to the page
+            lastPage.AddStamp(bannerStamp);
 
-            // -----------------------------------------------------------------
-            // Step 3: Save the modified document (lifecycle rule: save inside using)
-            // -----------------------------------------------------------------
-            doc.Save(outputPdfPath);
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Banner applied to the last page and saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Banner applied and saved to '{outputPdfPath}'.");
     }
 }

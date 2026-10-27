@@ -6,42 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string stampImage = "stamp.png";
+        const string outputPdf = "output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImage))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
             return;
         }
 
-        // Load the PDF document (wrapped in using for deterministic disposal)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Wrap Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an image stamp from the specified image file
-            ImageStamp imgStamp = new ImageStamp(stampImagePath);
+            // Create an image stamp from the PNG/JPG file
+            ImageStamp imgStamp = new ImageStamp(stampImage);
 
-            // Rotate the stamp by an arbitrary angle (45 degrees)
+            // Rotate the stamp 45 degrees clockwise
             imgStamp.RotateAngle = 45;
 
-            // Optional: set the position of the stamp on the page
-            imgStamp.XIndent = 100; // distance from the left edge
-            imgStamp.YIndent = 100; // distance from the bottom edge
+            // Optional: set alignment or position on the page
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Left;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
 
-            // Add the rotated stamp to the first page of the PDF
-            pdfDoc.Pages[1].AddStamp(imgStamp);
+            // Pages are 1‑based; add the stamp to the first page
+            doc.Pages[1].AddStamp(imgStamp);
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF (default Save writes PDF)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with rotated image stamp at '{outputPdfPath}'.");
+        Console.WriteLine($"Stamp added and rotated 45°; saved to '{outputPdf}'.");
     }
 }

@@ -2,62 +2,109 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Linq; // needed for Count()
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // for Field types
+using Aspose.Pdf.Annotations; // for WidgetAnnotation
 
 class Program
 {
+    // Simple DTO for JSON serialization
+    public class FormFieldInfo
+    {
+        public string Name { get; set; } = null!;          // non‑nullable, initialized to suppress CS8618
+        public string FieldType { get; set; } = null!;    // non‑nullable, initialized to suppress CS8618
+        public int PageNumber { get; set; }
+        public RectangleCoordinates Rect { get; set; } = null!; // non‑nullable, initialized to suppress CS8618
+    }
+
+    public class RectangleCoordinates
+    {
+        public double LowerLeftX { get; set; }
+        public double LowerLeftY { get; set; }
+        public double UpperRightX { get; set; }
+        public double UpperRightY { get; set; }
+    }
+
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "fields_layout.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "form_fields.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the Facade for the PDF form
-        Form form = new Form(inputPdf);
-
-        // Collect layout information for each field
-        var fieldInfos = new List<FieldInfo>();
-        foreach (string fieldName in form.FieldNames)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Obtain the facade for the specific field
-            FormFieldFacade fieldFacade = form.GetFieldFacade(fieldName);
-
-            // Position returns an array: { llx, lly, urx, ury }
-            float[] pos = fieldFacade.Position;
-            if (pos != null && pos.Length == 4)
+            // Ensure the document actually contains a form with fields
+            if (pdfDoc.Form == null || pdfDoc.Form.Fields == null || pdfDoc.Form.Fields.Count() == 0)
             {
-                fieldInfos.Add(new FieldInfo
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
+            }
+
+            // Build a map of field name -> page number by scanning widget annotations on each page
+            var fieldPageMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            for (int pageIdx = 1; pageIdx <= pdfDoc.Pages.Count; pageIdx++)
+            {
+                Page page = pdfDoc.Pages[pageIdx];
+                foreach (Annotation ann in page.Annotations)
                 {
-                    Name   = fieldName,
-                    Left   = pos[0],
-                    Bottom = pos[1],
-                    Right  = pos[2],
-                    Top    = pos[3]
+                    if (ann is WidgetAnnotation widget && !string.IsNullOrEmpty(widget.Name))
+                    {
+                        // The same field name can appear only once; later occurrences will overwrite which is fine for our purpose
+                        fieldPageMap[widget.Name] = pageIdx;
+                    }
+                }
+            }
+
+            var fieldsInfo = new List<FormFieldInfo>();
+
+            // Enumerate each field directly from the Form collection
+            foreach (Field field in pdfDoc.Form.Fields)
+            {
+                // Field name
+                string name = field.Name;
+
+                // Determine the field type via runtime type name (e.g., TextBoxField, CheckBoxField)
+                string fieldType = field.GetType().Name;
+
+                // Page number where the field resides – derived from the widget‑annotation map
+                int pageNum = fieldPageMap.TryGetValue(name, out int pn) ? pn : 0; // 0 if not found (should not happen)
+
+                // Rectangle coordinates of the field (field.Rect is never null for a valid form field)
+                // Use a fallback rectangle with explicit constructor arguments because Aspose.Pdf.Rectangle has no parameterless ctor.
+                Aspose.Pdf.Rectangle rect = field.Rect ?? new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+
+                RectangleCoordinates rectInfo = new RectangleCoordinates
+                {
+                    LowerLeftX = rect.LLX,
+                    LowerLeftY = rect.LLY,
+                    UpperRightX = rect.URX,
+                    UpperRightY = rect.URY
+                };
+
+                fieldsInfo.Add(new FormFieldInfo
+                {
+                    Name = name,
+                    FieldType = fieldType,
+                    PageNumber = pageNum,
+                    Rect = rectInfo
                 });
             }
+
+            // Serialize the list to JSON with indentation for readability
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(fieldsInfo, jsonOptions);
+
+            // Write JSON to the output file
+            File.WriteAllText(outputJsonPath, json);
+            Console.WriteLine($"Form field layout exported to '{outputJsonPath}'.");
         }
-
-        // Serialize the layout data to indented JSON
-        var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(fieldInfos, jsonOptions);
-
-        // Write JSON to the output file
-        File.WriteAllText(outputJson, json);
-        Console.WriteLine($"Exported field layout to '{outputJson}'.");
-    }
-
-    // Simple DTO for JSON output
-    private class FieldInfo
-    {
-        public string Name   { get; set; }
-        public float  Left   { get; set; }
-        public float  Bottom { get; set; }
-        public float  Right  { get; set; }
-        public float  Top    { get; set; }
     }
 }

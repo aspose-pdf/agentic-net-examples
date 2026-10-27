@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,29 +16,35 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Define the rectangle where the checkbox will appear (llx, lly, urx, ury)
-            // Fully qualify to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
-
-            // Create a new checkbox field on the document
-            CheckboxField checkbox = new CheckboxField(doc, rect)
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
             {
-                Name = "AgreeTerms",          // Field name
-                PartialName = "AgreeTerms",   // Partial name (optional, often same as Name)
-                ExportValue = "Yes",          // Value exported when checked
-                Checked = false               // Initial state (unchecked)
-            };
+                // Define the rectangle for the checkbox (lower‑left X,Y and upper‑right X,Y)
+                var rect = new Rectangle(100, 700, 120, 720);
 
-            // Add the checkbox to the form
-            doc.Form.Add(checkbox);
+                // Create a new checkbox field on the first page
+                var checkBox = new CheckboxField(doc.Pages[1], rect)
+                {
+                    // Optional: set the initial state
+                    Checked = true
+                };
+                // Set the field name (PartialName) separately – the constructor does not accept a name argument in recent versions
+                checkBox.PartialName = "AgreeTerms";
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Add the field to the document's form collection
+                doc.Form.Add(checkBox);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Checkbox field added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Checkbox field added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,39 +1,34 @@
 using System;
-using Aspose.Pdf;
+using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // source PDF containing the form field
-        const string outputPdf = "output.pdf"; // PDF that will receive the renamed field
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string oldFieldName = "OldName";
+        const string newFieldName = "NewName";
 
-        // ------------------------------------------------------------
-        // Create a minimal PDF with a form field named "OldName".
-        // This makes the example self‑contained and avoids FileNotFoundException.
-        // ------------------------------------------------------------
-        Document seedDoc = new Document();
-        Page seedPage = seedDoc.Pages.Add();
-        // Define a rectangle for the text box field (left, bottom, right, top).
-        var fieldRect = new Rectangle(100, 700, 200, 750);
-        TextBoxField oldField = new TextBoxField(seedPage, fieldRect)
+        if (!File.Exists(inputPath))
         {
-            PartialName = "OldName",
-            Value = "Sample value"
-        };
-        // Add the field to the document's form collection (not directly to page annotations).
-        seedDoc.Form.Add(oldField);
-        seedDoc.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-        // ------------------------------------------------------------
-        // Rename the field from "OldName" to "NewName" using FormEditor.
-        // Use the non‑obsolete constructor and the Save(string) overload.
-        // ------------------------------------------------------------
-        FormEditor formEditor = new FormEditor();
-        formEditor.BindPdf(inputPdf);
-        formEditor.RenameField("OldName", "NewName");
-        formEditor.Save(outputPdf);
+        // FormEditor does not implement IDisposable, so no using block is needed.
+        FormEditor editor = new FormEditor();
+
+        // Load the PDF document.
+        editor.BindPdf(inputPath);
+
+        // Rename the form field throughout the document.
+        editor.RenameField(oldFieldName, newFieldName);
+
+        // Save the updated PDF.
+        editor.Save(outputPath);
+
+        Console.WriteLine($"Field renamed from '{oldFieldName}' to '{newFieldName}' and saved to '{outputPath}'.");
     }
 }

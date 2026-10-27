@@ -2,9 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using NUnit.Framework; // Added to bring NUnit stub types into scope
+using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced.
+// -----------------------------------------------------------------------------
+// Minimal NUnit stubs – added because the project does not reference the real
+// NUnit package. Only the members used by the tests are provided.
+// -----------------------------------------------------------------------------
 namespace NUnit.Framework
 {
     [AttributeUsage(AttributeTargets.Class)]
@@ -14,10 +17,11 @@ namespace NUnit.Framework
     public sealed class TestAttribute : Attribute { }
 
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetUpAttribute : Attribute { }
+    public sealed class OneTimeSetUpAttribute : Attribute { }
 
+    // Added stub for OneTimeTearDown to fix build errors
     [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TearDownAttribute : Attribute { }
+    public sealed class OneTimeTearDownAttribute : Attribute { }
 
     public delegate void TestDelegate();
 
@@ -25,7 +29,8 @@ namespace NUnit.Framework
     {
         /// <summary>
         /// Executes the supplied delegate and returns the caught exception of type T.
-        /// Throws a generic Exception if no exception or a different exception type is thrown.
+        /// If no exception or a different exception is thrown, an AssertionException
+        /// (represented here by a generic Exception) is raised.
         /// </summary>
         public static T Throws<T>(TestDelegate code) where T : Exception
         {
@@ -46,62 +51,93 @@ namespace NUnit.Framework
     }
 }
 
-namespace AsposePdfTests
+namespace AsposePdfFacadeTests
 {
     [TestFixture]
-    public class PdfFileEditorDeleteTests
+    public class DeletePageTests
     {
-        private string? _tempDir;
-        private string? _inputPdf;
-        private string? _outputPdf;
+        private const string TempFolder = "TempTestFiles";
 
-        // Set up a temporary folder and a simple 2‑page PDF before each test
-        [SetUp]
-        public void SetUp()
+        [OneTimeSetUp]
+        public void GlobalSetup()
         {
-            _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(_tempDir!);
+            // Ensure a clean temporary folder for test files
+            if (Directory.Exists(TempFolder))
+                Directory.Delete(TempFolder, true);
+            Directory.CreateDirectory(TempFolder);
+        }
 
-            _inputPdf = Path.Combine(_tempDir, "input.pdf");
-            _outputPdf = Path.Combine(_tempDir, "output.pdf");
+        [OneTimeTearDown]
+        public void GlobalTeardown()
+        {
+            // Remove temporary files after all tests have run
+            if (Directory.Exists(TempFolder))
+                Directory.Delete(TempFolder, true);
+        }
 
-            // Create a PDF with two blank pages
+        /// <summary>
+        /// Creates a simple PDF with the specified number of pages.
+        /// </summary>
+        private string CreatePdfWithPages(int pageCount)
+        {
+            string filePath = Path.Combine(TempFolder, $"sample_{pageCount}_pages.pdf");
+
+            // Document implements IDisposable, so wrap it in a using block
             using (Document doc = new Document())
             {
-                doc.Pages.Add(); // page 1
-                doc.Pages.Add(); // page 2
-                doc.Save(_inputPdf);
+                // Add the requested number of blank pages
+                for (int i = 0; i < pageCount; i++)
+                {
+                    doc.Pages.Add();
+                }
+
+                // Save the PDF to disk
+                doc.Save(filePath);
             }
+
+            return filePath;
         }
 
-        // Clean up temporary files after each test
-        [TearDown]
-        public void TearDown()
-        {
-            try { if (File.Exists(_inputPdf)) File.Delete(_inputPdf); } catch { }
-            try { if (File.Exists(_outputPdf)) File.Delete(_outputPdf); } catch { }
-            try { if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true); } catch { }
-        }
-
-        // Verify that Delete throws when a page number larger than the document length is supplied
         [Test]
         public void Delete_PageNumberExceedsDocumentLength_ThrowsException()
         {
-            // The input PDF has only 2 pages; attempt to delete page 5
-            int[] pagesToDelete = new[] { 5 };
+            // Arrange: create a PDF with 2 pages
+            string sourcePdf = CreatePdfWithPages(2);
+            string outputPdf = Path.Combine(TempFolder, "output.pdf");
 
-            // PdfFileEditor does NOT implement IDisposable, so do NOT use a using statement.
+            // The page number 5 does not exist (valid range is 1‑2)
+            int[] pagesToDelete = new int[] { 5 };
+
             PdfFileEditor editor = new PdfFileEditor();
-            Assert.Throws<Exception>(() => editor.Delete(_inputPdf!, pagesToDelete, _outputPdf!));
+
+            // Act & Assert: Delete should throw an exception for out‑of‑range page numbers
+            // We assert any exception because the exact type may vary across Aspose versions.
+            Assert.Throws<Exception>(() =>
+            {
+                // NOTE: In the Aspose.Pdf version used by this project the Delete overload
+                // expects the page array as the second argument and the output file as the third.
+                // Swapping the arguments fixes the CS1503 conversion errors.
+                editor.Delete(sourcePdf, pagesToDelete, outputPdf);
+            });
+
+            // Cleanup generated files if they exist
+            if (File.Exists(sourcePdf))
+                File.Delete(sourcePdf);
+            if (File.Exists(outputPdf))
+                File.Delete(outputPdf);
         }
     }
 }
 
-// Dummy entry point to satisfy the compiler when building as a console application.
-public static class Program
+// -----------------------------------------------------------------------------
+// Dummy entry point to satisfy the compiler when the project is built as an
+// executable. The test runner (NUnit) will discover and execute the tests.
+// -----------------------------------------------------------------------------
+public class Program
 {
     public static void Main(string[] args)
     {
-        // No runtime logic required – tests are executed by the test runner.
+        // No runtime logic required – the presence of Main satisfies the
+        // compiler's requirement for an entry point.
     }
 }

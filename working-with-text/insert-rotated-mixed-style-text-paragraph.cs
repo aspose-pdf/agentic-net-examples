@@ -7,60 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Ensure the document has at least three pages
-            if (doc.Pages.Count < 3)
+            while (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document must contain at least three pages.");
-                return;
+                doc.Pages.Add();
             }
 
             // Get the third page (1‑based indexing)
             Page page = doc.Pages[3];
 
-            // Create a TextParagraph
-            TextParagraph paragraph = new TextParagraph();
+            // Create a TextFragment that will hold mixed‑style segments
+            TextFragment mixedFragment = new TextFragment();
+            mixedFragment.TextState.Font = FontRepository.FindFont("Arial");
+            mixedFragment.TextState.FontSize = 12;
+            // Rotate the whole fragment 45 degrees
+            mixedFragment.TextState.Rotation = 45;
 
-            // Define the rectangle where the paragraph will be placed
-            paragraph.Rectangle = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
+            // First segment – bold
+            TextSegment segBold = new TextSegment("Bold Text ");
+            segBold.TextState.FontStyle = FontStyles.Bold;
 
-            // Rotate the paragraph by 45 degrees
-            paragraph.Rotation = 45;
+            // Second segment – italic
+            TextSegment segItalic = new TextSegment("Italic Text ");
+            segItalic.TextState.FontStyle = FontStyles.Italic;
 
-            // Create TextState objects for different styles
-            TextState boldState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica-Bold"),
-                FontSize = 14,
-                ForegroundColor = Aspose.Pdf.Color.Blue
-            };
+            // Third segment – regular
+            TextSegment segRegular = new TextSegment("Regular Text");
+            segRegular.TextState.FontStyle = FontStyles.Regular;
 
-            TextState italicState = new TextState
-            {
-                Font = FontRepository.FindFont("Helvetica-Oblique"),
-                FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.Green
-            };
+            // Add segments to the fragment
+            mixedFragment.Segments.Add(segBold);
+            mixedFragment.Segments.Add(segItalic);
+            mixedFragment.Segments.Add(segRegular);
 
-            // Append lines with mixed styles
-            paragraph.AppendLine("This line is bold and blue.", boldState);
-            paragraph.AppendLine("This line is italic and green.", italicState);
-            paragraph.AppendLine("Normal line with default style.");
-
-            // Append the paragraph to the page using TextBuilder
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendParagraph(paragraph);
+            // Insert the fragment into the third page
+            page.Paragraphs.Add(mixedFragment);
 
             // Save the modified PDF
             doc.Save(outputPath);

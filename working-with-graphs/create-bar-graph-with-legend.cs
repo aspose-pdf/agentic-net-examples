@@ -1,114 +1,102 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 
-class ReportGenerator
+class Program
 {
     static void Main()
     {
+        const string outputPath = "Report.pdf";
+
         // Create a new PDF document
         using (Document doc = new Document())
         {
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Define graph dimensions
-            double graphWidth = 400;
-            double graphHeight = 200;
-            double graphLeft = 100;   // X position of the graph
-            double graphBottom = 400; // Y position of the graph (used for legend calculations)
+            // Graph layout parameters
+            double graphX = 50;          // left margin of the graph
+            double graphY = 500;         // baseline of the bars
+            double barWidth = 40;        // width of each bar
+            double barSpacing = 20;      // space between bars
 
-            // Create a Graph container (use double constructor as the float one is obsolete)
-            Graph graph = new Graph(graphWidth, graphHeight)
+            // Sample data categories
+            var categories = new[]
             {
-                Left = graphLeft
-                // Bottom property is not required; positioning is handled via Left and the stored graphBottom variable
+                new { Label = "Category A", Value = 120, Color = Aspose.Pdf.Color.FromRgb(0.2, 0.6, 0.8) },
+                new { Label = "Category B", Value = 80,  Color = Aspose.Pdf.Color.FromRgb(0.8, 0.3, 0.3) },
+                new { Label = "Category C", Value = 150, Color = Aspose.Pdf.Color.FromRgb(0.4, 0.8, 0.4) },
+                new { Label = "Category D", Value = 60,  Color = Aspose.Pdf.Color.FromRgb(0.9, 0.7, 0.2) }
             };
 
-            // Category data (example values)
-            double[] values = { 120, 80, 150 };
-            string[] categories = { "Category A", "Category B", "Category C" };
-            Aspose.Pdf.Color[] colors = {
-                Aspose.Pdf.Color.FromArgb(255, 99, 149, 237),   // Blue
-                Aspose.Pdf.Color.FromArgb(255, 255, 192, 0),    // Orange
-                Aspose.Pdf.Color.FromArgb(255, 112, 173, 71)    // Green
-            };
+            // Determine the maximum value for scaling the bars
+            double maxValue = 0;
+            foreach (var c in categories)
+                if (c.Value > maxValue) maxValue = c.Value;
 
-            // Calculate rectangle width based on values (simple proportional scaling)
-            double maxVal = 150; // maximum value for scaling
-            float rectHeight = 30f;
-            float startX = 0f;
-            float startY = 0f;
+            // Create a Graph that will hold all rectangle shapes (bars + legend boxes)
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            for (int i = 0; i < values.Length; i++)
-            {
-                float rectWidth = (float)((values[i] / maxVal) * graphWidth);
-
-                // Create a rectangle shape (drawing.Rectangle) – constructor expects float arguments
-                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                    startX,
-                    startY,
-                    rectWidth,
-                    rectHeight);
-
-                // Set visual properties via GraphInfo
-                rect.GraphInfo = new GraphInfo
-                {
-                    FillColor = colors[i],
-                    Color = Aspose.Pdf.Color.Black,
-                    LineWidth = 1f
-                };
-
-                // Add rectangle to the graph
-                graph.Shapes.Add(rect);
-
-                // Move Y position for next bar
-                startY += rectHeight + 10f;
-            }
-
-            // ---- Legend ----
-            // Position for legend items (calculated using stored graphBottom)
-            double legendX = graphLeft + graphWidth + 20;
-            double legendY = graphBottom + graphHeight - 20;
-            float legendBoxSize = 12f;
-            float legendSpacing = 20f;
-
+            // Draw each bar as a colored rectangle
             for (int i = 0; i < categories.Length; i++)
             {
-                // Small colored box – added to the same graph so it shares the coordinate system
-                Aspose.Pdf.Drawing.Rectangle legendBox = new Aspose.Pdf.Drawing.Rectangle(
-                    (float)legendX,
-                    (float)(legendY - i * legendSpacing),
-                    legendBoxSize,
-                    legendBoxSize);
+                double barHeight = (categories[i].Value / maxValue) * 300; // scale to 300 units height
+                double llx = graphX + i * (barWidth + barSpacing);
+                double lly = graphY - barHeight;
+                double urx = llx + barWidth;
+                double ury = graphY;
 
-                legendBox.GraphInfo = new GraphInfo
-                {
-                    FillColor = colors[i],
-                    Color = Aspose.Pdf.Color.Black,
-                    LineWidth = 0.5f
-                };
-                graph.Shapes.Add(legendBox);
+                // Rectangle shape representing the bar
+                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle((float)llx, (float)lly, (float)urx, (float)ury);
+                rect.GraphInfo.FillColor = categories[i].Color;          // fill with category colour
+                rect.GraphInfo.Color = Aspose.Pdf.Color.Black;          // optional border colour
+                graph.Shapes.Add(rect);
 
-                // Text label next to the box
-                TextFragment label = new TextFragment(categories[i])
+                // Label under the bar
+                TextFragment label = new TextFragment(categories[i].Label)
                 {
-                    // Position the text fragment
-                    Position = new Position((float)legendX + legendBoxSize + 5, (float)(legendY - i * legendSpacing) + 2),
-                    // Set text color for readability
-                    TextState = { ForegroundColor = Aspose.Pdf.Color.Black, FontSize = 12 }
+                    Position = new Position((float)llx, (float)(graphY - 20)),
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
                 page.Paragraphs.Add(label);
             }
 
-            // Add the graph (with bars and legend boxes) to the page
+            // Draw legend on the right side of the graph
+            double legendX = graphX + categories.Length * (barWidth + barSpacing) + 30;
+            double legendY = graphY;
+            double legendItemHeight = 20;
+            double legendItemSpacing = 10;
+
+            for (int i = 0; i < categories.Length; i++)
+            {
+                double boxSize = 12;
+                double boxX = legendX;
+                double boxY = legendY - i * (legendItemHeight + legendItemSpacing) - boxSize;
+
+                // Colored box for the legend entry
+                Aspose.Pdf.Drawing.Rectangle colorBox = new Aspose.Pdf.Drawing.Rectangle((float)boxX, (float)boxY, (float)(boxX + boxSize), (float)(boxY + boxSize));
+                colorBox.GraphInfo.FillColor = categories[i].Color;
+                colorBox.GraphInfo.Color = Aspose.Pdf.Color.Black;
+                graph.Shapes.Add(colorBox);
+
+                // Text label next to the colored box
+                TextFragment legendText = new TextFragment(categories[i].Label)
+                {
+                    Position = new Position((float)(boxX + boxSize + 5), (float)(boxY + 2)),
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                page.Paragraphs.Add(legendText);
+            }
+
+            // Add the graph (containing all rectangles) to the page
             page.Paragraphs.Add(graph);
 
             // Save the PDF report
-            doc.Save("ReportWithGraph.pdf");
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF report generated: ReportWithGraph.pdf");
+        Console.WriteLine($"PDF report generated: {System.IO.Path.GetFullPath(outputPath)}");
     }
 }

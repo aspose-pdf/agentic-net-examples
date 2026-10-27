@@ -7,64 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF (portrait)
-        const string tempPdf   = "temp_landscape.pdf"; // intermediate PDF after resizing
-        const string outputPdf = "booklet_output.pdf"; // final booklet PDF
+        const string inputPath = "input.pdf";
+        const string tempPath = "temp_landscape.pdf";
+        const string outputPath = "booklet.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Load the original PDF and change its page size to landscape.
-        // -----------------------------------------------------------------
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF, rotate portrait pages to landscape, and save to a temporary file
+        Document doc = new Document(inputPath);
+        for (int i = 1; i <= doc.Pages.Count; i++)
         {
-            // PdfPageEditor works on a Document instance.
-            PdfPageEditor pageEditor = new PdfPageEditor();
-            pageEditor.BindPdf(doc);
-
-            // Set the desired page size (A4). Rotation will turn the content to landscape.
-            pageEditor.PageSize = PageSize.A4; // A4Landscape does not exist; use A4 + rotation.
-            pageEditor.Rotation = 90;          // Rotate content 90° to achieve landscape layout.
-
-            // Apply the changes to the document.
-            pageEditor.ApplyChanges();
-
-            // Save the modified PDF to a temporary file.
-            doc.Save(tempPdf);
+            Page page = doc.Pages[i];
+            // Rotate only if the page is portrait (height > width)
+            if (page.PageInfo.Height > page.PageInfo.Width)
+            {
+                page.Rotate = Rotation.on90; // use the Rotation enum
+            }
         }
+        doc.Save(tempPath); // Save the resized PDF
 
-        // -----------------------------------------------------------------
-        // Step 2: Create a booklet from the resized (landscape) PDF.
-        // -----------------------------------------------------------------
-        // PdfFileEditor does NOT implement IDisposable, so no using block is needed.
-        PdfFileEditor fileEditor = new PdfFileEditor();
-
-        // MakeBooklet reads the input file and writes the booklet to the output file.
-        bool success = fileEditor.MakeBooklet(tempPdf, outputPdf);
-
-        if (success)
-        {
-            Console.WriteLine($"Booklet created successfully: {outputPdf}");
-        }
-        else
+        // Generate a booklet from the landscape PDF using the Facades API
+        PdfFileEditor editor = new PdfFileEditor();
+        bool success = editor.MakeBooklet(tempPath, outputPath); // correct method name
+        if (!success)
         {
             Console.Error.WriteLine("Failed to create booklet.");
         }
 
-        // Optional: clean up the intermediate file.
-        try
-        {
-            if (File.Exists(tempPdf))
-                File.Delete(tempPdf);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Could not delete temporary file: {ex.Message}");
-        }
+        // Clean up the temporary file
+        try { File.Delete(tempPath); } catch { }
+
+        Console.WriteLine($"Booklet created at: {outputPath}");
     }
 }

@@ -1,37 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Flatten pdf form fields
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/working-with-forms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document inside a using block for proper disposal.
-            using (Document doc = new Document(inputPath))
-            {
-                // Remove all interactive form fields and place their current values directly on the page.
-                doc.Flatten();
-
-                // Save the resulting static PDF.
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

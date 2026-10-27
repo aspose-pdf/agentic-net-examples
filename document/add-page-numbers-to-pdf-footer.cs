@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // for TextState if needed
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_page_numbers.pdf";
+        const string outputPath = "output_numbered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            int pageCount = doc.Pages.Count; // 1‑based page count
+
+            // Iterate using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= pageCount; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a PageNumberStamp – default format is "#"
-                PageNumberStamp pageNumberStamp = new PageNumberStamp();
-
-                // Position the stamp in the footer (centered, bottom of the page)
+                // Create a dynamic footer stamp showing the current page number
+                TextStamp pageNumberStamp = new TextStamp($"Page {i} of {pageCount}");
+                // Position the stamp at the bottom center of the page
                 pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
                 pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                pageNumberStamp.BottomMargin        = 20;   // distance from the bottom edge
+                pageNumberStamp.BottomMargin        = 20; // distance from the bottom edge (points)
 
-                // Optional: adjust appearance
-                pageNumberStamp.TextState.FontSize = 12;
-                pageNumberStamp.TextState.Font      = FontRepository.FindFont("Helvetica");
-                pageNumberStamp.TextState.ForegroundColor = Color.Black;
+                // Styling – modify the existing TextState instance (read‑only property)
+                pageNumberStamp.TextState.FontSize        = 12;
+                pageNumberStamp.TextState.Font            = FontRepository.FindFont("Arial");
+                pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
                 // Add the stamp to the current page
                 page.AddStamp(pageNumberStamp);
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

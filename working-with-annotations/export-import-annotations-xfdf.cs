@@ -4,77 +4,60 @@ using Aspose.Pdf;
 
 class Program
 {
-    // Helper to count all annotations in a document
-    static int GetAnnotationCount(Document doc)
-    {
-        int count = 0;
-        foreach (Page page in doc.Pages)
-        {
-            count += page.Annotations.Count;
-        }
-        return count;
-    }
-
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF with annotations
-        const string xfdfFile   = "annotations.xfdf";   // temporary XFDF file
-        const string outputPdf  = "roundtrip_output.pdf";
+        // Paths for the source PDF, the intermediate XFDF file and the final PDF
+        const string inputPdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // -----------------------------------------------------------------
+        // 1. Export existing annotations from the source PDF to an XFDF file
+        // -----------------------------------------------------------------
+        using (Document sourceDoc = new Document(inputPdfPath))
+        using (FileStream xfdfWriteStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
         {
-            // Load the original document and count its annotations
-            using (Document originalDoc = new Document(inputPdf))
-            {
-                int originalCount = GetAnnotationCount(originalDoc);
-                Console.WriteLine($"Original annotation count: {originalCount}");
-
-                // Export all annotations to XFDF
-                originalDoc.ExportAnnotationsToXfdf(xfdfFile);
-                Console.WriteLine($"Annotations exported to XFDF: {xfdfFile}");
-
-                // Load the same PDF again for import test
-                using (Document importDoc = new Document(inputPdf))
-                {
-                    // Import annotations from the XFDF file
-                    importDoc.ImportAnnotationsFromXfdf(xfdfFile);
-                    Console.WriteLine("Annotations imported from XFDF.");
-
-                    // Verify round‑trip integrity by comparing counts
-                    int afterImportCount = GetAnnotationCount(importDoc);
-                    Console.WriteLine($"Annotation count after import: {afterImportCount}");
-
-                    // Expected: original annotations duplicated (original * 2)
-                    if (afterImportCount == originalCount * 2)
-                    {
-                        Console.WriteLine("Round‑trip verification succeeded.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Round‑trip verification failed.");
-                    }
-
-                    // Save the document with re‑imported annotations
-                    importDoc.Save(outputPdf);
-                    Console.WriteLine($"Result saved to: {outputPdf}");
-                }
-            }
-
-            // Clean up temporary XFDF file
-            if (File.Exists(xfdfFile))
-            {
-                File.Delete(xfdfFile);
-            }
+            // ExportAnnotationsToXfdf writes the annotation data to the provided stream.
+            sourceDoc.ExportAnnotationsToXfdf(xfdfWriteStream);
         }
-        catch (Exception ex)
+
+        // ---------------------------------------------------------------
+        // 2. Load the source PDF again and import the previously exported
+        //    XFDF data back into the document
+        // ---------------------------------------------------------------
+        using (Document importDoc = new Document(inputPdfPath))
+        using (FileStream xfdfReadStream = new FileStream(xfdfPath, FileMode.Open, FileAccess.Read))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // ImportAnnotationsFromXfdf reads the XFDF stream and adds the annotations.
+            importDoc.ImportAnnotationsFromXfdf(xfdfReadStream);
+
+            // Save the document that now contains the re‑imported annotations.
+            importDoc.Save(outputPdfPath);
+        }
+
+        // ---------------------------------------------------------------
+        // 3. Verify round‑trip integrity by comparing annotation counts
+        // ---------------------------------------------------------------
+        using (Document originalDoc = new Document(inputPdfPath))
+        using (Document roundTripDoc = new Document(outputPdfPath))
+        {
+            int originalAnnotationCount = 0;
+            foreach (Page page in originalDoc.Pages)
+                originalAnnotationCount += page.Annotations.Count;
+
+            int roundTripAnnotationCount = 0;
+            foreach (Page page in roundTripDoc.Pages)
+                roundTripAnnotationCount += page.Annotations.Count;
+
+            Console.WriteLine($"Original annotation count: {originalAnnotationCount}");
+            Console.WriteLine($"After round‑trip annotation count: {roundTripAnnotationCount}");
         }
     }
 }

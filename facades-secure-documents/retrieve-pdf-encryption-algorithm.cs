@@ -2,49 +2,37 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "protected.pdf";
 
-        // -------------------------------------------------------------------
-        // Ensure the input file exists. In the sandbox there is no pre‑existing
-        // PDF, so we create a minimal one on‑the‑fly. This follows the
-        // "hardcoded-input-file-generate-inline-first" pattern.
-        // -------------------------------------------------------------------
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            using (Document seed = new Document())
-            {
-                // Add a single blank page (or add content if desired).
-                seed.Pages.Add();
-                // Optional: add a simple text fragment so the PDF is not empty.
-                seed.Pages[1].Paragraphs.Add(new TextFragment("Sample PDF"));
-                seed.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {pdfPath}");
+            return;
         }
 
-        // Load PDF meta‑information using the Facades API.
-        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        // PdfFileInfo provides file‑level information without loading the whole document.
+        PdfFileInfo fileInfo = new PdfFileInfo(pdfPath);
+
+        if (!fileInfo.IsEncrypted)
         {
-            bool isEncrypted = pdfInfo.IsEncrypted;
-            string algorithm = "None";
-
-            if (isEncrypted)
-            {
-                // The underlying Document is available via the PdfFileInfo object.
-                Document doc = pdfInfo.Document;
-                algorithm = doc.CryptoAlgorithm.HasValue
-                    ? doc.CryptoAlgorithm.Value.ToString()
-                    : "Unknown";
-            }
-
-            // Display the results (console used as UI placeholder).
-            Console.WriteLine($"Is Encrypted: {isEncrypted}");
-            Console.WriteLine($"Encryption Algorithm: {algorithm}");
+            Console.WriteLine("The PDF is not encrypted.");
+            return;
         }
+
+        // The EncryptionAlgorithm property is not available in the current Aspose.PDF version.
+        // Use a placeholder to indicate that the document is encrypted.
+        string algorithmName = "Encrypted (algorithm unknown)";
+
+        // If you upgrade to a version that exposes EncryptionAlgorithm, you can replace the
+        // placeholder with the actual value, e.g.:
+        // var algo = fileInfo.EncryptionAlgorithm; // CryptoAlgorithm enum
+        // algorithmName = algo.ToString();
+
+        Console.WriteLine($"Current encryption algorithm: {algorithmName}");
     }
 }

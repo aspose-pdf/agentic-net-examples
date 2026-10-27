@@ -1,65 +1,69 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Network locations – adjust as needed
-        const string inputFolder  = @"\\Server\Share\PDFs";
-        const string outputFolder = @"\\Server\Share\StampedPDFs";
-        const string stampPdfPath = @"\\Server\Share\Stamp\stamp.pdf";
+        // Network share containing the PDFs
+        const string networkFolder = @"\\server\share\pdfs";
 
-        // Stamp configuration
-        const int    stampPageNumber = 1;      // page in the stamp PDF to use
-        const float  rotationDegrees = 45f;   // desired rotation angle
-
-        // Validate folders
-        if (!Directory.Exists(inputFolder))
+        // Verify the folder exists
+        if (!Directory.Exists(networkFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {networkFolder}");
             return;
         }
-        Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF in the network share
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        foreach (string sourcePath in pdfFiles)
+        // Get all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(networkFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            string fileName   = Path.GetFileName(sourcePath);
-            string targetPath = Path.Combine(outputFolder, fileName);
+            Console.WriteLine("No PDF files found.");
+            return;
+        }
 
+        foreach (string inputPath in pdfFiles)
+        {
             try
             {
-                // Initialise the facade for stamping
-                Aspose.Pdf.Facades.PdfFileStamp fileStamp = new Aspose.Pdf.Facades.PdfFileStamp();
+                // Load the source PDF
+                using (Document doc = new Document(inputPath))
+                {
+                    // Create a text stamp that will be reused for every page
+                    TextStamp stamp = new TextStamp("CONFIDENTIAL");
+                    stamp.TextState.Font = FontRepository.FindFont("Helvetica");
+                    stamp.TextState.FontSize = 24;
+                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
 
-                // Bind the source PDF document
-                fileStamp.BindPdf(sourcePath);
+                    // Rotate the stamp 45 degrees
+                    stamp.RotateAngle = 45; // degrees
 
-                // Create a stamp from a page of another PDF
-                Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
-                stamp.BindPdf(stampPdfPath, stampPageNumber);
-                stamp.Rotation = rotationDegrees;   // rotate the stamp (degrees)
+                    // Center the stamp on each page
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Center;
 
-                // Apply the stamp to all pages (null means every page)
-                stamp.Pages = null;
+                    // Apply the stamp to every page in the document
+                    foreach (Page page in doc.Pages)
+                    {
+                        page.AddStamp(stamp);
+                    }
 
-                // Add the configured stamp to the document
-                fileStamp.AddStamp(stamp);
+                    // Build output file name (original name + "_stamped")
+                    string directory = Path.GetDirectoryName(inputPath);
+                    string fileName  = Path.GetFileNameWithoutExtension(inputPath);
+                    string outputPath = Path.Combine(directory, $"{fileName}_stamped.pdf");
 
-                // Save the stamped PDF to the output location
-                fileStamp.Save(targetPath);
-
-                // Release resources held by the facade
-                fileStamp.Close();
-
-                Console.WriteLine($"Stamped PDF saved: {targetPath}");
+                    // Save the modified PDF
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Stamped PDF saved: {outputPath}");
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{sourcePath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
     }

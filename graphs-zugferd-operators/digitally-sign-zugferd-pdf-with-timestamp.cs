@@ -7,58 +7,62 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "invoice.pdf";
-        const string outputPdf = "invoice_signed.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath = "zugferd_input.pdf";
+        const string outputPdfPath = "zugferd_signed.pdf";
         const string pfxPath = "certificate.pfx";
-        const string pfxPassword = "password";
-        const string timestampUrl = "http://timestamp.digicert.com";
+        const string pfxPassword = "pfxPassword";
+        const string timestampUrl = "http://timestamp.server/url";
 
-        if (!File.Exists(inputPdf))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"PFX file not found: {pfxPath}");
+            Console.Error.WriteLine($"PFX certificate not found: {pfxPath}");
             return;
         }
 
-        // Load the ZUGFeRD PDF
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Define the signature appearance rectangle on page 1
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a signature field and add it to the document's form
-            SignatureField sigField = new SignatureField(doc.Pages[1], rect)
+            // Load the ZUGFeRD PDF
+            using (Document doc = new Document(inputPdfPath))
             {
-                PartialName = "Signature1"
-            };
-            doc.Form.Add(sigField);
+                // Define the signature field rectangle (coordinates in points)
+                // Adjust the values to position the signature as required
+                Rectangle sigRect = new Rectangle(100, 100, 250, 150);
 
-            // Load the PFX certificate and configure PKCS#7 signature
-            using (FileStream pfxStream = File.OpenRead(pfxPath))
-            {
-                PKCS7 pkcs7 = new PKCS7(pfxStream, pfxPassword)
-                {
-                    Reason = "Approved",
-                    Location = "Company HQ",
-                    ContactInfo = "contact@example.com",
-                    // TimestampSettings constructor requires three arguments:
-                    // server URL, basic auth credentials (empty if not needed), and digest algorithm.
-                    TimestampSettings = new TimestampSettings(timestampUrl, string.Empty, DigestHashAlgorithm.Sha256)
-                };
+                // Create the signature field on the first page
+                SignatureField signatureField = new SignatureField(doc.Pages[1], sigRect);
+                signatureField.PartialName = "Signature1";
+                signatureField.Name = "Signature1";
 
-                // Sign the PDF using the signature field
-                sigField.Sign(pkcs7);
+                // Add the signature field to the form (page number is 1‑based)
+                doc.Form.Add(signatureField, 1);
+
+                // Prepare PKCS#7 signature credentials
+                PKCS7 pkcs = new PKCS7(pfxPath, pfxPassword);
+                pkcs.Reason = "Document approval";
+                pkcs.Location = "Company Headquarters";
+                pkcs.ContactInfo = "support@example.com";
+                // Configure timestamping (no basic auth in this example)
+                pkcs.TimestampSettings = new Aspose.Pdf.TimestampSettings(timestampUrl, null);
+
+                // Sign the field – Signature property is read‑only, so we call Sign()
+                signatureField.Sign(pkcs);
+
+                // Save the signed PDF
+                doc.Save(outputPdfPath);
             }
 
-            // Save the signed PDF
-            doc.Save(outputPdf);
+            Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during signing: {ex.Message}");
+        }
     }
 }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,37 +16,42 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF (wrapped in a using block for deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to work with
-            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+            // Access the first page (Aspose.Pdf uses 1‑based page indexing)
+            Page page = doc.Pages[1];
 
-            // Create a table with three columns
+            // Create a table and limit each column to a maximum width of 150 points
             Table table = new Table
             {
-                // Set a default column width (in points). This acts as a maximum width
-                // for any column that does not have an explicit width defined.
-                DefaultColumnWidth = "120"
+                // ColumnWidths is a space‑separated list of widths in points.
+                // Here we define three columns, each capped at 150 points.
+                ColumnWidths = "150 150 150"
             };
 
-            // Define explicit widths for each column to enforce a maximum width.
-            // Values are in points; here each column is limited to 150 points.
-            table.ColumnWidths = "150 150 150";
+            // Optional: add a thin border to make column limits visible
+            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f);
 
-            // Add a row with sample data
-            Row row = table.Rows.Add();
-            row.Cells.Add("First column long text that should be limited by the column width.");
-            row.Cells.Add("Second column text.");
-            row.Cells.Add("Third column text.");
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Column 1");
+            header.Cells.Add("Column 2");
+            header.Cells.Add("Column 3");
 
-            // Insert the table into the page's content
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Data A");
+            data.Cells.Add("Data B");
+            data.Cells.Add("Data C");
+
+            // Insert the table into the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
+            // Save the modified PDF (still inside the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with limited column widths saved to '{outputPath}'.");
     }
 }

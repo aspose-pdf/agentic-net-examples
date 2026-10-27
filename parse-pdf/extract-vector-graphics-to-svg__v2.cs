@@ -1,67 +1,63 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Vector;
 
-class Program
+class ExtractVectorGraphics
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdf = "input.pdf";
-        // Page number to extract vector graphics from (1‑based indexing)
-        const int pageNumber = 1;
-        // Directory where extracted SVG files will be saved
-        const string outputDir = "ExtractedSvgs";
+        // Input PDF and the page number to extract (1‑based indexing)
+        const string inputPdfPath = "input.pdf";
+        const int pageNumber = 2;                     // change as needed
 
-        if (!File.Exists(inputPdf))
+        // Folder where the SVG files will be written
+        const string outputFolder = "ExtractedSvgs";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Document srcDoc = new Document(inputPdfPath))
             {
                 // Validate the requested page number
-                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                if (pageNumber < 1 || pageNumber > srcDoc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {doc.Pages.Count} pages.");
+                    Console.Error.WriteLine($"Page number {pageNumber} is out of range. Document has {srcDoc.Pages.Count} pages.");
                     return;
                 }
 
-                // Retrieve the specific page (Aspose.Pdf uses 1‑based indexing)
-                Page page = doc.Pages[pageNumber];
-
-                // Check if the page actually contains vector graphics
-                if (!page.HasVectorGraphics())
+                // Create a temporary document that contains only the desired page.
+                using (Document singlePageDoc = new Document())
                 {
-                    Console.WriteLine($"Page {pageNumber} does not contain vector graphics.");
-                    return;
+                    // Add the selected page to the new document.
+                    singlePageDoc.Pages.Add(srcDoc.Pages[pageNumber]);
+
+                    // Configure SVG save options.
+                    SvgSaveOptions svgOptions = new SvgSaveOptions();
+                    // Enable CSS style embedding (recommended for clean SVG output)
+                    svgOptions.ScaleToPixels = true;
+
+                    // Build the output file name – only one SVG will be produced because the document has a single page.
+                    string svgPath = Path.Combine(outputFolder, $"Page_{pageNumber}.svg");
+
+                    // Save the document as SVG.
+                    singlePageDoc.Save(svgPath, svgOptions);
                 }
-
-                // Create an SvgExtractor instance (default options)
-                SvgExtractor extractor = new SvgExtractor();
-
-                // Extract each vector graphic on the page to a separate SVG file
-                // The method creates one SVG file per graphic inside the target directory
-                extractor.Extract(page, outputDir);
-
-                Console.WriteLine($"Vector graphics from page {pageNumber} have been extracted to '{outputDir}'.");
             }
-        }
-        catch (PdfException ex)
-        {
-            Console.Error.WriteLine($"Aspose.Pdf error: {ex.Message}");
+
+            Console.WriteLine($"Vector graphics from page {pageNumber} have been saved as an SVG file in '{outputFolder}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

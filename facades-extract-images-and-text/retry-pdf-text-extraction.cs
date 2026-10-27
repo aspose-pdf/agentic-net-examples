@@ -6,59 +6,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTxtPath = "extracted.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        const int maxAttempts = 3;
+        const int maxRetries = 3;
         int attempt = 0;
-        bool success = false;
+        bool extracted = false;
 
-        while (attempt < maxAttempts && !success)
+        while (attempt < maxRetries && !extracted)
         {
             attempt++;
             try
             {
-                // Create a new PdfExtractor for each attempt
+                // PdfExtractor implements IDisposable, so wrap it in a using block
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    // Bind the source PDF file
-                    extractor.BindPdf(inputPdf);
+                    // Bind the source PDF
+                    extractor.BindPdf(inputPdfPath);
 
-                    // Extract all text from the document
+                    // Perform text extraction
                     extractor.ExtractText();
 
-                    // Save the extracted text to a file
-                    extractor.GetText(outputTxt);
+                    // Write extracted text to a file
+                    using (FileStream outStream = new FileStream(outputTxtPath, FileMode.Create, FileAccess.Write))
+                    {
+                        extractor.GetText(outStream);
+                    }
                 }
 
-                // If we reach this point, extraction succeeded
-                success = true;
-                Console.WriteLine($"Text extraction succeeded on attempt {attempt}.");
+                // If we reach here, extraction succeeded
+                extracted = true;
+                Console.WriteLine($"Extraction succeeded on attempt {attempt}.");
             }
             catch (IOException ioEx)
             {
-                // Log the I/O error and retry if attempts remain
-                Console.Error.WriteLine($"I/O error on attempt {attempt}: {ioEx.Message}");
-                if (attempt >= maxAttempts)
+                // Log the IOException and retry if attempts remain
+                Console.Error.WriteLine($"Attempt {attempt} failed with IOException: {ioEx.Message}");
+                if (attempt >= maxRetries)
                 {
-                    Console.Error.WriteLine("Maximum retry attempts reached. Extraction failed.");
+                    Console.Error.WriteLine("Maximum retry attempts reached. Extraction aborted.");
+                    // Re‑throw or handle as needed; here we exit the loop
+                    break;
                 }
-                else
-                {
-                    Console.WriteLine("Retrying extraction...");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Non‑IO exceptions are not retried; report and exit
-                Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-                break;
+                // Optionally, introduce a short delay before retrying
+                // System.Threading.Thread.Sleep(500);
             }
         }
     }

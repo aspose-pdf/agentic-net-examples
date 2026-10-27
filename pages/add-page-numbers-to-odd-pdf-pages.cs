@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "odd_page_numbers.pdf";
+        const string outputPath = "output_numbered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,32 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Iterate using 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply numbering only to odd pages
+                // Process only odd pages
                 if (i % 2 == 1)
                 {
-                    // Create a page number stamp; default format "#" will be replaced by the page number
-                    PageNumberStamp stamp = new PageNumberStamp();
+                    Page page = doc.Pages[i];
 
-                    // Optional visual settings
-                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                    stamp.BottomMargin        = 20; // distance from the bottom edge
+                    // Create a text fragment with the page number
+                    TextFragment tf = new TextFragment(i.ToString())
+                    {
+                        // Position near the bottom center of the page
+                        // X = half of page width, Y = 20 points from bottom
+                        Position = new Position(page.PageInfo.Width / 2, 20),
+                        // Center align the text
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        // Use a cross‑platform color
+                        TextState = { ForegroundColor = Aspose.Pdf.Color.Black }
+                    };
 
-                    // Add the stamp to the current page
-                    stamp.Put(doc.Pages[i]);
+                    // Add the fragment to the page's paragraphs collection
+                    page.Paragraphs.Add(tf);
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF (save inside the using block as per lifecycle rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with page numbers on odd pages: '{outputPath}'.");
+        Console.WriteLine($"Page numbers added to odd pages. Output saved to '{outputPath}'.");
     }
 }

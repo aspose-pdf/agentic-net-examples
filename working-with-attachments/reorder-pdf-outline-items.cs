@@ -1,76 +1,58 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf; // Core PDF API
+using System.Collections.Generic;
+using Aspose.Pdf;
 
-class ReorderPortfolioOutlines
+class Program
 {
     static void Main()
     {
         const string inputPath = "portfolio.pdf";
-        const string outputPath = "portfolio_reordered.pdf";
+        const string outputPath = "reordered_portfolio.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (using the standard load constructor)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // ---------------------------------------------------------------
-            // 1. Extract current top‑level outline items into a list for manipulation
-            // ---------------------------------------------------------------
-            List<OutlineItemCollection> originalItems = new List<OutlineItemCollection>();
-            foreach (OutlineItemCollection item in doc.Outlines)
+            // Verify that the document actually contains a portfolio (collection of embedded files)
+            if (doc.Collection == null || doc.Collection.Count == 0)
             {
-                originalItems.Add(item);
+                Console.WriteLine("No portfolio items found. Saving original document.");
+                doc.Save(outputPath);
+                return;
             }
 
-            // ---------------------------------------------------------------
-            // 2. Define the desired order.
-            //    Example: reverse the sequence – replace with any custom logic.
-            // ---------------------------------------------------------------
-            originalItems.Reverse();
+            // Capture current portfolio items in a list
+            List<FileSpecification> currentItems = new List<FileSpecification>();
+            foreach (FileSpecification spec in doc.Collection)
+                currentItems.Add(spec);
 
-            // ---------------------------------------------------------------
-            // 3. Remove all existing outline items from the document.
-            // ---------------------------------------------------------------
-            doc.Outlines.Clear();
+            // Define the desired order. Example: reverse the existing order.
+            currentItems.Reverse();
 
-            // ---------------------------------------------------------------
-            // 4. Re‑add the items in the new sequence.
-            //    We create a fresh OutlineItemCollection for each entry and copy the
-            //    relevant properties (Title, Action, Destination, visual style, etc.).
-            // ---------------------------------------------------------------
-            foreach (OutlineItemCollection original in originalItems)
+            // Remove all existing items from the portfolio collection using Delete (Clear is not available)
+            for (int i = doc.Collection.Count; i >= 1; i--)
             {
-                // Create a new outline entry based on the original one.
-                OutlineItemCollection newItem = new OutlineItemCollection(doc.Outlines)
+                var spec = doc.Collection[i];
+                if (spec != null && !string.IsNullOrEmpty(spec.Name))
                 {
-                    Title = original.Title,
-                    Action = original.Action,
-                    Destination = original.Destination,
-                    Color = original.Color,
-                    Open = original.Open,
-                    Bold = original.Bold,
-                    Italic = original.Italic
-                };
-
-                // Add the newly created outline to the document's root outline collection.
-                doc.Outlines.Add(newItem);
-
-                // NOTE: If the original outline had child items, they would need to be
-                // copied recursively. This example focuses on top‑level items only.
+                    doc.Collection.Delete(spec.Name);
+                }
             }
 
-            // ---------------------------------------------------------------
-            // 5. Save the modified PDF.
-            // ---------------------------------------------------------------
+            // Re‑add items in the new sequence
+            foreach (FileSpecification spec in currentItems)
+                doc.Collection.Add(spec);
+
+            // Save the reordered PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Portfolio reordered and saved to '{outputPath}'.");
     }
 }

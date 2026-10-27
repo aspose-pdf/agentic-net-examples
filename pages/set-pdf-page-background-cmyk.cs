@@ -9,33 +9,30 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // CMYK components (range 0.0 – 1.0) for the desired background color
-        double cyan = 0.0;
-        double magenta = 0.5;
-        double yellow = 0.5;
-        double black = 0.0;
-
-        // If the source PDF does not exist, create a simple one with a single page
         if (!File.Exists(inputPath))
         {
-            using (Document tempDoc = new Document())
-            {
-                tempDoc.Pages.Add();
-                tempDoc.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF, set the background color on each page, and save the result
-        using (Document doc = new Document(inputPath))
+        // Open the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            foreach (Page page in doc.Pages)
+            // Define a CMYK color (values are in the range 0.0 – 1.0)
+            // Example: 0% cyan, 100% magenta, 0% yellow, 0% black
+            Aspose.Pdf.Color cmykColor = Aspose.Pdf.Color.FromCmyk(0.0, 1.0, 0.0, 0.0);
+
+            // Apply the background color to each page (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.Background = Aspose.Pdf.Color.FromCmyk(cyan, magenta, yellow, black);
+                Aspose.Pdf.Page page = doc.Pages[i];
+                page.Background = cmykColor;
             }
 
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with CMYK background to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with background color to '{outputPath}'.");
     }
 }

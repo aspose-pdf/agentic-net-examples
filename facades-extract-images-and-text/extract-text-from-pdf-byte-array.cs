@@ -1,53 +1,57 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfDemo
+class Program
 {
-    public static class PdfTextExtractor
+    static void Main()
     {
-        /// <summary>
-        /// Extracts all text from a PDF supplied as a byte array.
-        /// The PDF is processed entirely in memory; no files are written to disk.
-        /// </summary>
-        /// <param name="pdfBytes">Byte array containing the PDF data.</param>
-        /// <returns>The extracted text as a string.</returns>
-        public static string ExtractTextFromBytes(byte[] pdfBytes)
+        // Obtain the PDF content as a byte array. Replace the implementation of GetPdfBytes
+        // with the actual source of your PDF data (e.g., a database, a web service, an embedded resource, etc.).
+        byte[] pdfBytes = GetPdfBytes();
+
+        if (pdfBytes == null || pdfBytes.Length == 0)
         {
-            if (pdfBytes == null) throw new ArgumentNullException(nameof(pdfBytes));
+            Console.Error.WriteLine("Error: PDF byte array is empty. Provide a valid PDF document.");
+            return;
+        }
 
-            // Wrap the byte array in a MemoryStream for Aspose.Pdf.Facades binding.
-            using (MemoryStream pdfStream = new MemoryStream(pdfBytes))
-            // Create the PdfExtractor facade.
-            using (PdfExtractor extractor = new PdfExtractor())
+        // Use a MemoryStream to avoid any file system I/O when extracting text.
+        using (MemoryStream pdfStream = new MemoryStream(pdfBytes))
+        using (PdfExtractor extractor = new PdfExtractor())
+        {
+            // Load the PDF from the memory stream.
+            extractor.BindPdf(pdfStream);
+
+            // Configure the extractor to retrieve text.
+            extractor.ExtractText();
+
+            // Write the extracted text to a stream, then read it as a string.
+            using (MemoryStream textStream = new MemoryStream())
             {
-                // Bind the PDF document from the stream.
-                extractor.BindPdf(pdfStream);
-
-                // Perform text extraction using the default Unicode encoding.
-                extractor.ExtractText();
-
-                // Capture the extracted text into another MemoryStream.
-                using (MemoryStream textStream = new MemoryStream())
+                extractor.GetText(textStream); // Write text to the stream.
+                textStream.Position = 0;        // Reset position for reading.
+                using (StreamReader reader = new StreamReader(textStream))
                 {
-                    extractor.GetText(textStream);
-
-                    // Convert the resulting bytes (Unicode) to a .NET string.
-                    return Encoding.Unicode.GetString(textStream.ToArray());
+                    string extractedText = reader.ReadToEnd();
+                    // Process the extracted text as needed.
+                    Console.WriteLine(extractedText);
                 }
             }
         }
     }
 
-    internal class Program
+    // Example implementation – replace with your real source.
+    // This version reads a PDF file from disk only to obtain the byte array.
+    // The extraction itself still works entirely in memory.
+    static byte[] GetPdfBytes()
     {
-        private static void Main(string[] args)
+        const string samplePath = "sample.pdf"; // Path to a sample PDF for demonstration.
+        if (!File.Exists(samplePath))
         {
-            // Example usage – can be removed or replaced in production code.
-            // byte[] pdfBytes = File.ReadAllBytes("sample.pdf");
-            // string extracted = PdfTextExtractor.ExtractTextFromBytes(pdfBytes);
-            // Console.WriteLine(extracted);
+            Console.Error.WriteLine($"Sample PDF not found at '{samplePath}'.");
+            return new byte[0];
         }
+        return File.ReadAllBytes(samplePath);
     }
 }

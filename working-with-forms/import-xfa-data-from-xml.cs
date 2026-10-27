@@ -2,47 +2,65 @@ using System;
 using System.IO;
 using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmlPath = "data.xml";
-        const string outputPath = "output.pdf";
+        const string pdfPath = "form.pdf";
+        const string xmlDataPath = "data.xml";
+        const string outputPath = "filled_form.pdf";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
             return;
         }
 
-        // Load the XFA XML data
-        XmlDocument xfaData = new XmlDocument();
-        xfaData.Load(xmlPath);
-
-        // Load the PDF document (XFA form must be present)
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            if (!doc.Form.HasXfa)
+            // Load the PDF that contains an XFA form
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                Console.Error.WriteLine("The PDF does not contain an XFA form.");
-                return;
+                // Verify that the document actually has an XFA form
+                if (pdfDoc.Form != null && pdfDoc.Form.HasXfa)
+                {
+                    // Load the XML data
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load(xmlDataPath);
+
+                    // Access the XFA object (note the upper‑case XFA)
+                    XFA xfa = pdfDoc.Form.XFA;
+
+                    // Replace the datasets node with the data from the XML file
+                    // This effectively imports the XML data into the XFA form
+                    if (xfa.Datasets != null && xmlDoc.DocumentElement != null)
+                    {
+                        // Preserve the original <datasets> wrapper and inject the child nodes
+                        xfa.Datasets.InnerXml = xmlDoc.DocumentElement.InnerXml;
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine("The PDF does not contain an XFA form.");
+                }
+
+                // Save the PDF with the imported data
+                pdfDoc.Save(outputPath);
             }
 
-            // Assign the XFA data to the form
-            doc.Form.AssignXfa(xfaData);
-
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"XFA data imported and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"XFA data imported and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

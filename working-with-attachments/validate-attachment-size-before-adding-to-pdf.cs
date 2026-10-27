@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
-    // Maximum allowed attachment size (in bytes). Example: 5 MB.
-    const long MaxAttachmentSizeBytes = 5L * 1024 * 1024;
-
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output_with_attachments.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Paths of files to be attached.
-        string[] attachmentFiles = { "doc1.pdf", "image.png", "large_file.zip" };
+        // Define maximum allowed attachment size (e.g., 5 MB)
+        const long maxAttachmentSizeBytes = 5L * 1024 * 1024;
+
+        // List of files to attach
+        string[] filesToAttach = { "doc1.pdf", "image.png", "largefile.zip" };
 
         if (!File.Exists(inputPdfPath))
         {
@@ -22,54 +21,41 @@ class Program
             return;
         }
 
-        // Load the PDF document.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Use the first page for demonstration; adjust as needed.
-            Page page = pdfDoc.Pages[1];
-
-            foreach (string filePath in attachmentFiles)
+            foreach (string filePath in filesToAttach)
             {
                 if (!File.Exists(filePath))
                 {
-                    Console.WriteLine($"Attachment not found, skipping: {filePath}");
+                    Console.Error.WriteLine($"Attachment not found: {filePath}");
                     continue;
                 }
 
-                // Check file size against the limit.
+                // Validate file size before adding
                 long fileSize = new FileInfo(filePath).Length;
-                if (fileSize > MaxAttachmentSizeBytes)
+                if (fileSize > maxAttachmentSizeBytes)
                 {
-                    Console.WriteLine($"Attachment exceeds size limit ({MaxAttachmentSizeBytes} bytes), skipping: {filePath}");
+                    Console.Error.WriteLine($"Skipping '{filePath}' (size {fileSize} bytes exceeds limit of {maxAttachmentSizeBytes} bytes).");
                     continue;
                 }
 
-                // Create a FileSpecification describing the attachment.
-                FileSpecification fileSpec = new FileSpecification(filePath);
-
-                // Define the rectangle where the annotation will appear.
-                // Fully qualified to avoid ambiguity with System.Drawing.Rectangle.
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
-
-                // Create the FileAttachment annotation.
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
+                // Add the attachment to the PDF using the EmbeddedFiles collection
+                var fileSpec = new FileSpecification(Path.GetFileName(filePath))
                 {
-                    // Optional visual styling.
-                    Color = Aspose.Pdf.Color.LightGray,
-                    Title = Path.GetFileName(filePath),
-                    Contents = $"Attached file: {Path.GetFileName(filePath)}"
+                    // Store the file data in a memory stream
+                    Contents = new MemoryStream(File.ReadAllBytes(filePath)),
+                    // Optional: a description shown in PDF viewers
+                    Description = $"Embedded file: {Path.GetFileName(filePath)}"
                 };
 
-                // Add the annotation to the page.
-                page.Annotations.Add(attachment);
-
-                Console.WriteLine($"Attached file: {filePath} ({fileSize} bytes)");
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                Console.WriteLine($"Attached '{filePath}' ({fileSize} bytes).");
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF
             pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"PDF saved with attachments to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with attachments: {outputPdfPath}");
     }
 }

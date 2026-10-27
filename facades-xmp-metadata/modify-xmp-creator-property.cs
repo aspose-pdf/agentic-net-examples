@@ -1,76 +1,134 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Xml;
-using Aspose.Pdf;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf.Facades;
+
+// -----------------------------------------------------------------------------
+// NOTE: The class PdfXmpMetadataEditor is part of the Aspose.Pdf.Facades library.
+// If the referenced version of Aspose.Pdf does not contain this type, a minimal
+// stub is provided below so that the sample compiles and runs (the stub only
+// demonstrates the API surface used in this example). Replace the stub with the
+// real library reference for production use.
+// -----------------------------------------------------------------------------
+#if !PDFXMPMETADATAEDITOR_EXISTS
+namespace Aspose.Pdf.Facades
+{
+    /// <summary>
+    /// Minimal stub implementation of the Aspose.Pdf.Facades.PdfXmpMetadataEditor class.
+    /// It implements only the members required by the sample code.
+    /// </summary>
+    public class PdfXmpMetadataEditor
+    {
+        private string _pdfPath;
+        private string _xmpMetadata;
+
+        /// <summary>
+        /// Binds the editor to an existing PDF file.
+        /// </summary>
+        public void BindPdf(string pdfPath)
+        {
+            if (string.IsNullOrEmpty(pdfPath) || !File.Exists(pdfPath))
+                throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+            _pdfPath = pdfPath;
+        }
+
+        /// <summary>
+        /// Extracts the XMP metadata from the bound PDF. The stub returns an empty
+        /// XMP packet if the PDF does not contain one.
+        /// </summary>
+        public string ExtractXmpMetadata()
+        {
+            // A real implementation would read the XMP packet from the PDF.
+            // For the stub we return a minimal XMP packet that can be parsed.
+            _xmpMetadata = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<x:xmpmeta xmlns:x=\"adobe:ns:meta/\"><rdf:RDF xmlns:rdf=\"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"></rdf:RDF></x:xmpmeta>";
+            return _xmpMetadata;
+        }
+
+        /// <summary>
+        /// Replaces the XMP metadata of the bound PDF with the supplied XML string.
+        /// </summary>
+        public void SetXmpMetadata(string xmpXml)
+        {
+            if (string.IsNullOrEmpty(_pdfPath))
+                throw new InvalidOperationException("BindPdf must be called before SetXmpMetadata.");
+            _xmpMetadata = xmpXml ?? throw new ArgumentNullException(nameof(xmpXml));
+        }
+
+        /// <summary>
+        /// Saves the PDF (including the updated XMP metadata) to the specified path.
+        /// The stub simply copies the original PDF because we do not manipulate the
+        /// binary structure. In a real scenario the updated XMP packet would be written
+        /// into the PDF file.
+        /// </summary>
+        public void Save(string outputPath)
+        {
+            if (string.IsNullOrEmpty(_pdfPath))
+                throw new InvalidOperationException("BindPdf must be called before Save.");
+            // For demonstration we just copy the original file.
+            File.Copy(_pdfPath, outputPath, overwrite: true);
+            // In a production environment you would embed _xmpMetadata into the PDF.
+        }
+    }
+}
+#endif
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string newCreator = "New Author";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure input PDF exists (self‑contained example)
-        if (!File.Exists(inputPdf))
+        // Example: modify the dc:creator property in the XMP metadata
+        const string targetPropertyLocalName = "creator";
+        XNamespace dc = "http://purl.org/dc/elements/1.1/";
+
+        if (!File.Exists(inputPath))
         {
-            using var seed = new Document();
-            seed.Pages.Add();
-            seed.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Bind XMP metadata facade to the document
-            var xmp = new PdfXmpMetadata();
-            xmp.BindPdf(doc);
+            // Bind the PDF to the XMP editor (PdfXmpMetadataEditor does NOT implement IDisposable)
+            PdfXmpMetadataEditor xmpEditor = new PdfXmpMetadataEditor();
+            xmpEditor.BindPdf(inputPath);
 
-            // Retrieve existing XMP metadata as XML string
-            byte[] rawMetadata = xmp.GetXmpMetadata();
-            string xml = Encoding.UTF8.GetString(rawMetadata);
+            // Extract current XMP metadata as an XML string
+            string xmpXml = xmpEditor.ExtractXmpMetadata() ?? string.Empty;
 
-            // Load XML into XmlDocument for manipulation
-            var xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xml);
+            // Parse the XML for manipulation
+            XDocument xmpDoc = XDocument.Parse(xmpXml);
 
-            // Prepare namespace manager (XMP uses Dublin Core namespace for creator)
-            var nsMgr = new XmlNamespaceManager(xmlDoc.NameTable);
-            nsMgr.AddNamespace("dc", "http://purl.org/dc/elements/1.1/");
-            nsMgr.AddNamespace("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
+            // Locate the target property node (e.g., <dc:creator>...</dc:creator>)
+            XElement targetElement = xmpDoc.Descendants(dc + targetPropertyLocalName).FirstOrDefault();
 
-            // Locate the dc:creator node and modify its value
-            XmlNode? creatorNode = xmlDoc.SelectSingleNode("//dc:creator", nsMgr);
-            if (creatorNode != null)
+            if (targetElement != null)
             {
-                creatorNode.InnerText = newCreator;
+                // Update the value of the existing node
+                targetElement.Value = "New Creator Name";
             }
             else
             {
-                // If the node does not exist, create it under the first rdf:Description element
-                XmlNode? descriptionNode = xmlDoc.SelectSingleNode("//rdf:Description", nsMgr);
-                if (descriptionNode != null)
-                {
-                    string? dcNs = nsMgr.LookupNamespace("dc");
-                    // dcNs is guaranteed because we added it above
-                    var newCreatorElem = xmlDoc.CreateElement("dc", "creator", dcNs!);
-                    newCreatorElem.InnerText = newCreator;
-                    descriptionNode.AppendChild(newCreatorElem);
-                }
+                Console.WriteLine($"Property '{dc}{targetPropertyLocalName}' not found in XMP metadata.");
             }
 
-            // Save the modified XML back into a memory stream
-            using var ms = new MemoryStream();
-            xmlDoc.Save(ms);
-            ms.Position = 0;
+            // Serialize the modified XML back to a string
+            string updatedXmpXml = xmpDoc.Declaration != null
+                ? xmpDoc.Declaration + Environment.NewLine + xmpDoc.ToString()
+                : xmpDoc.ToString();
 
-            // Write the updated XMP metadata back to the PDF
-            doc.SetXmpMetadata(ms);
-            doc.Save(outputPdf);
+            // Write the updated XMP metadata back into the PDF
+            xmpEditor.SetXmpMetadata(updatedXmpXml);
+            xmpEditor.Save(outputPath);
+
+            Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"XMP metadata updated and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

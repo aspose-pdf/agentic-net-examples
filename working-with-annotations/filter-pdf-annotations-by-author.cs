@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -10,7 +10,9 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "filtered.pdf";
-        const string currentUser = "John Doe";
+
+        // The name of the user whose annotations should be kept
+        string currentUser = Environment.UserName; // or any other source
 
         if (!File.Exists(inputPath))
         {
@@ -18,44 +20,40 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
-                AnnotationCollection annotations = page.Annotations;
-
-                // Collect annotations whose author (Title) does NOT match the current user
+                Page page = doc.Pages[i];
+                // Collect annotations that do NOT belong to the current user
                 List<Annotation> toRemove = new List<Annotation>();
-                foreach (Annotation annot in annotations)
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Title is defined only on markup annotations (e.g., TextAnnotation, HighlightAnnotation, etc.)
-                    if (annot is MarkupAnnotation markup)
+                    bool keep = false;
+                    // Author information is stored in the Subject property of MarkupAnnotation
+                    if (annot is MarkupAnnotation markup && !string.IsNullOrEmpty(markup.Subject))
                     {
-                        if (!string.Equals(markup.Title, currentUser, StringComparison.OrdinalIgnoreCase))
-                        {
-                            toRemove.Add(annot);
-                        }
+                        if (string.Equals(markup.Subject, currentUser, StringComparison.OrdinalIgnoreCase))
+                            keep = true;
                     }
-                    else
-                    {
-                        // Non‑markup annotations do not have an author; keep them unchanged.
-                    }
+                    // If the annotation is not a MarkupAnnotation or its Subject does not match, remove it
+                    if (!keep)
+                        toRemove.Add(annot);
                 }
 
                 // Remove the collected annotations
                 foreach (Annotation annot in toRemove)
                 {
-                    annotations.Delete(annot);
+                    page.Annotations.Remove(annot);
                 }
             }
 
-            // Save the filtered PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Filtered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations filtered. Output saved to '{outputPath}'.");
     }
 }

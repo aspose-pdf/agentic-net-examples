@@ -1,19 +1,15 @@
 using System;
 using System.IO;
-using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // for SimpleFontSubstitution
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDF file and where BMP images will be saved
-        const string dataDir = @"C:\PdfData";
-        const string pdfFileName = "input.pdf";
-
-        // Full path to the source PDF
-        string pdfPath = Path.Combine(dataDir, pdfFileName);
+        const string pdfPath = "input.pdf";
+        const string outputDir = "BmpPages";
 
         if (!File.Exists(pdfPath))
         {
@@ -21,35 +17,30 @@ class Program
             return;
         }
 
-        // Load the PDF document (required for binding to the converter)
-        using (Document pdfDocument = new Document(pdfPath))
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document
+        Document pdfDocument = new Document(pdfPath);
+
+        // Enable font substitution for missing fonts using FontRepository
+        // Substitute common missing fonts with Arial (adjust as needed)
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Arial"));
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+        // Add more substitutions if required
+
+        // Define the resolution for the bitmap images (150 DPI – adjust as required)
+        Resolution resolution = new Resolution(150);
+
+        // Convert each page to a BMP image
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Initialize the PDF converter facade
-            PdfConverter converter = new PdfConverter();
+            string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
 
-            // Bind the loaded document to the converter
-            converter.BindPdf(pdfDocument);
-
-            // NOTE: In recent Aspose.Pdf versions font substitution is enabled by default.
-            // If a specific property is required, it can be set via RenderingOptions when available.
-
-            // Prepare the converter for image extraction
-            converter.DoConvert();
-
-            int pageIndex = 1;
-            // Extract each page as a BMP image
-            while (converter.HasNextImage())
-            {
-                string bmpOutputPath = Path.Combine(dataDir, $"image{pageIndex}_out.bmp");
-                // Use System.Drawing.Imaging.ImageFormat for BMP output
-                converter.GetNextImage(bmpOutputPath, ImageFormat.Bmp);
-                pageIndex++;
-            }
-
-            // Release resources held by the converter
-            converter.Close();
+            // BmpDevice does not implement IDisposable, so do not use a using block
+            BmpDevice bmpDevice = new BmpDevice(resolution);
+            bmpDevice.Process(pdfDocument.Pages[pageNumber], outPath);
         }
 
-        Console.WriteLine("PDF pages have been successfully converted to BMP images.");
+        Console.WriteLine($"PDF successfully converted to BMP images in '{outputDir}'.");
     }
 }

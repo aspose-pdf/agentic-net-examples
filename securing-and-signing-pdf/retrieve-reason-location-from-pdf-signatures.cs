@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Signatures;
 
 class Program
 {
@@ -10,31 +10,34 @@ class Program
     {
         const string inputPath = "signed.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields and filter for signature fields
-            foreach (Field field in doc.Form.Fields)
+            // Retrieve all form fields and filter for signature fields
+            var signatureFields = doc?.Form?.Fields?.OfType<SignatureField>();
+            if (signatureFields == null || !signatureFields.Any())
             {
-                if (field is SignatureField sigField)
-                {
-                    // The underlying PKCS#7 signature (if present)
-                    PKCS7 pkcs7 = sigField.Signature as PKCS7;
+                Console.WriteLine("No digital signatures found in the PDF.");
+                return;
+            }
 
-                    string reason   = pkcs7?.Reason   ?? "(no reason)";
-                    string location = pkcs7?.Location ?? "(no location)";
+            int sigIndex = 1;
+            foreach (SignatureField sigField in signatureFields)
+            {
+                // The PKCS7 object attached to the signature field holds Reason and Location
+                var pkcs7 = sigField.Signature;
+                string reason   = pkcs7?.Reason   ?? "(none)";
+                string location = pkcs7?.Location ?? "(none)";
 
-                    Console.WriteLine($"Signature Field: {sigField.PartialName}");
-                    Console.WriteLine($"  Reason:   {reason}");
-                    Console.WriteLine($"  Location: {location}");
-                    Console.WriteLine();
-                }
+                Console.WriteLine($"Signature {sigIndex}: Reason = \"{reason}\", Location = \"{location}\"");
+                sigIndex++;
             }
         }
     }

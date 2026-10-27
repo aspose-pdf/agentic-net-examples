@@ -4,61 +4,76 @@ using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class InsertFootnotes
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string footnotesXmlPath = "footnotes.xml";
-        const string outputPdfPath  = "output_with_footnotes.pdf";
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "footnotes.xml";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        if (!File.Exists(footnotesXmlPath))
+        // Load footnote definitions from XML.
+        // Expected format:
+        // <footnotes>
+        //   <footnote page="1" number="1">First footnote text.</footnote>
+        //   <footnote page="2" number="2">Second footnote text.</footnote>
+        // </footnotes>
+        XDocument xDoc = XDocument.Load(xmlPath);
+        var footnoteElements = xDoc.Root?.Elements("footnote");
+
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            Console.Error.WriteLine($"XML not found: {footnotesXmlPath}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Load footnote definitions from XML
-            XDocument xmlDoc = XDocument.Load(footnotesXmlPath);
-            // Expected XML format:
-            // <footnotes>
-            //   <footnote id="1">First footnote text.</footnote>
-            //   <footnote id="2">Second footnote text.</footnote>
-            // </footnotes>
-
-            // Simple example: add each footnote as a separate paragraph on the first page
-            Page firstPage = pdfDoc.Pages[1]; // page indexing is 1‑based (rule: page-indexing-one-based)
-
-            foreach (XElement fnElement in xmlDoc.Root.Elements("footnote"))
+            if (footnoteElements != null)
             {
-                string footnoteText = fnElement.Value.Trim();
+                foreach (var fn in footnoteElements)
+                {
+                    // Parse the target page number (Aspose.Pdf uses 1‑based indexing).
+                    int pageNum = (int?)fn.Attribute("page") ?? 0;
+                    if (pageNum < 1 || pageNum > pdfDoc.Pages.Count)
+                        continue; // Skip invalid page references.
 
-                // Create a TextFragment for the main content (could be empty if only footnote is needed)
-                TextFragment mainFragment = new TextFragment(string.Empty);
-                // Assign the footnote to the TextFragment (property FootNote expects a Note object)
-                mainFragment.FootNote = new Note(footnoteText);
+                    // Optional footnote number (e.g., "1", "2").
+                    string number = (string?)fn.Attribute("number") ?? string.Empty;
+                    // The actual footnote text.
+                    string text = fn.Value?.Trim() ?? string.Empty;
 
-                // Position the fragment near the bottom of the page (adjust as needed)
-                // Using Aspose.Pdf.Text.Position; avoid System.Drawing types.
-                mainFragment.Position = new Position(50, 50); // 50 points from left, 50 points from bottom
+                    // Build the displayed footnote string.
+                    string footnoteContent = string.IsNullOrEmpty(number)
+                        ? text
+                        : $"{number}. {text}";
 
-                // Add the fragment to the page's paragraph collection
-                firstPage.Paragraphs.Add(mainFragment);
+                    // Create a TextFragment for the footnote.
+                    TextFragment tf = new TextFragment(footnoteContent);
+                    tf.TextState.FontSize = 8; // Smaller font for footnotes.
+                    tf.TextState.Font = FontRepository.FindFont("Arial"); // Use a common font.
+
+                    // Position the footnote near the bottom left of the page.
+                    // Adjust Y coordinate as needed for your layout.
+                    tf.Position = new Position(40, 20);
+
+                    // Retrieve the target page (1‑based index) and add the fragment.
+                    Page page = pdfDoc.Pages[pageNum];
+                    page.Paragraphs.Add(tf);
+                }
             }
 
-            // Save the modified PDF (lifecycle rule: use Save inside using)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF. No SaveOptions needed for PDF output.
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Footnotes inserted and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Footnotes inserted and saved to '{outputPath}'.");
     }
 }

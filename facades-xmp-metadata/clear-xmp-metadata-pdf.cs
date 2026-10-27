@@ -1,64 +1,52 @@
 using System;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
 
-namespace XmpMetadataDemo
+class XmpCleaner
 {
-    /// <summary>
-    /// Helper class that clears all XMP metadata from a PDF while preserving the mandatory PDF schema header.
-    /// </summary>
-    public static class XmpMetadataHelper
+    // Clears all XMP metadata fields, leaving only the required PDF schema header.
+    public static void ClearXmpMetadata(string inputPdfPath, string outputPdfPath)
     {
-        /// <summary>
-        /// Clears all XMP metadata from the specified PDF, preserving only the mandatory PDF schema header.
-        /// </summary>
-        /// <param name="inputPdfPath">Path to the source PDF file.</param>
-        /// <param name="outputPdfPath">Path where the cleaned PDF will be saved.</param>
-        public static void ClearAllXmpMetadata(string inputPdfPath, string outputPdfPath)
-        {
-            // Ensure the input file exists before proceeding.
-            if (!System.IO.File.Exists(inputPdfPath))
-                throw new System.IO.FileNotFoundException($"Input PDF not found: {inputPdfPath}");
+        // Minimal XMP packet containing only the PDF schema header.
+        const string minimalXmp = @"<?xpacket begin='' id='W5M0MpCehiHzreSzNTczkc9d'?>
+<x:xmpmeta xmlns:x='adobe:ns:meta/'>
+<rdf:RDF xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'>
+<rdf:Description rdf:about='' xmlns:pdf='http://ns.adobe.com/pdf/1.3/'>
+</rdf:Description>
+</rdf:RDF>
+</x:xmpmeta>
+<?xpacket end='w'?>";
 
-            // PdfXmpMetadata implements SaveableFacade and is IDisposable.
-            // Use a using block for deterministic disposal (document-disposal-with-using rule).
-            using (PdfXmpMetadata xmp = new PdfXmpMetadata())
-            {
-                // Bind the PDF file to the facade.
-                xmp.BindPdf(inputPdfPath);
+        // Load the PDF.
+        Document pdfDocument = new Document(inputPdfPath);
 
-                // Remove all XMP entries. The required PDF schema header is retained automatically.
-                xmp.Clear();
+        // ---------------------------------------------------------------------
+        // NOTE: In recent Aspose.PDF versions the Document class no longer exposes
+        // a "XmpMetadata" property.  XMP data is accessed through the
+        // Document.Metadata dictionary (key/value pairs representing individual XMP
+        // fields).  To remove all existing XMP entries we clear the dictionary and
+        // then store the minimal packet as a custom entry.  This approach follows
+        // the "use-document-metadata-indexer-instead-of-xmpmetadata" fix pattern.
+        // ---------------------------------------------------------------------
+        pdfDocument.Metadata.Clear();                 // remove every existing XMP field
+        pdfDocument.Metadata["xmp"] = minimalXmp;    // store the minimal packet (key can be any identifier)
 
-                // Save the modified PDF to the output location.
-                xmp.Save(outputPdfPath);
-            }
-        }
+        // Save the cleaned PDF.
+        pdfDocument.Save(outputPdfPath);
     }
 
-    /// <summary>
-    /// Minimal console entry point required for a buildable executable.
-    /// </summary>
-    internal class Program
+    static void Main()
     {
-        private static void Main(string[] args)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_cleaned.pdf";
+
+        if (!File.Exists(inputPath))
         {
-            // Expect exactly two arguments: input PDF path and output PDF path.
-            if (args.Length == 2)
-            {
-                try
-                {
-                    XmpMetadataHelper.ClearAllXmpMetadata(args[0], args[1]);
-                    Console.WriteLine("XMP metadata cleared successfully.");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error: {ex.Message}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Usage: XmpMetadataDemo <inputPdfPath> <outputPdfPath>");
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
+
+        ClearXmpMetadata(inputPath, outputPath);
+        Console.WriteLine($"XMP metadata cleared. Saved to '{outputPath}'.");
     }
 }

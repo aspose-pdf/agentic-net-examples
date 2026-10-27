@@ -1,34 +1,56 @@
 using System;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string annotName = "Comment1";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string annotationName = "Comment1";
 
-        // Ensure the source file exists
-        if (!System.IO.File.Exists(inputPdf))
+        // Verify the source PDF exists.
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Use PdfAnnotationEditor to delete the annotation by name
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+        // Load the PDF using the Document class (PdfFileEditor does not provide DeleteAnnotation).
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Load the PDF document
-            editor.BindPdf(inputPdf);
+            bool annotationDeleted = false;
 
-            // Delete the annotation with the specified name
-            editor.DeleteAnnotation(annotName);
+            // Iterate through all pages and their annotations to find the one with the specified name.
+            foreach (Page page in pdfDoc.Pages)
+            {
+                // Iterate backwards so we can safely remove items while iterating.
+                for (int i = page.Annotations.Count; i >= 1; i--)
+                {
+                    var annotation = page.Annotations[i];
+                    if (annotation.Name == annotationName)
+                    {
+                        page.Annotations.Delete(i);
+                        annotationDeleted = true;
+                        break; // Assuming only one annotation with this name.
+                    }
+                }
 
-            // Save the modified PDF
-            editor.Save(outputPdf);
+                if (annotationDeleted)
+                    break;
+            }
+
+            if (!annotationDeleted)
+            {
+                Console.WriteLine($"Annotation '{annotationName}' not found.");
+            }
+            else
+            {
+                // Save the modified PDF.
+                pdfDoc.Save(outputPath);
+                Console.WriteLine($"Annotation '{annotationName}' deleted. Saved to '{outputPath}'.");
+            }
         }
-
-        Console.WriteLine($"Annotation \"{annotName}\" deleted. Result saved to '{outputPdf}'.");
     }
 }

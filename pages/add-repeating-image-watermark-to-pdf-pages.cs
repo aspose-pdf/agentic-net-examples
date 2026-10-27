@@ -1,75 +1,83 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string outputPdf = "watermarked.pdf";    // result PDF
-        const string watermarkImage = "logo.png";      // image to repeat
+        const string inputPath = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string watermarkImagePath = "watermark.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(watermarkImage))
+        if (!File.Exists(watermarkImagePath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkImage}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use Document constructor)
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Load the watermark image using System.Drawing to obtain its dimensions.
+            double imgWidth;
+            double imgHeight;
+            using (var bitmap = new Bitmap(watermarkImagePath))
             {
-                // Page dimensions (points)
-                double pageWidth  = page.PageInfo.Width;
+                // Aspose.Pdf works with points (1 point = 1/72 inch). Assuming the image DPI is 72,
+                // the pixel dimensions can be used directly as points.
+                imgWidth = bitmap.Width;
+                imgHeight = bitmap.Height;
+            }
+
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement).
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                Page page = doc.Pages[pageIndex];
+
+                // Page dimensions (points).
+                double pageWidth = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Desired size of each watermark image (adjust as needed)
-                const double stampWidth  = 100;   // points
-                const double stampHeight = 50;    // points
+                // Grid step – you can add spacing if desired.
+                double stepX = imgWidth;
+                double stepY = imgHeight;
 
-                // Spacing between repeated images (adjust as needed)
-                const double stepX = 150; // horizontal step
-                const double stepY = 120; // vertical step
-
-                // Loop to place stamps in a grid
+                // Place the watermark image repeatedly across the page.
                 for (double y = 0; y < pageHeight; y += stepY)
                 {
                     for (double x = 0; x < pageWidth; x += stepX)
                     {
-                        // Create a new ImageStamp for each position
-                        ImageStamp stamp = new ImageStamp(watermarkImage);
+                        // Create a new ImageStamp for each grid cell.
+                        ImageStamp stamp = new ImageStamp(watermarkImagePath)
+                        {
+                            // Make the stamp semi‑transparent.
+                            Opacity = 0.2,
+                            // Ensure the stamp is drawn over existing content.
+                            Background = false,
+                            // Position using margins from the page origin (bottom‑left).
+                            LeftMargin = x,
+                            TopMargin = y
+                        };
 
-                        // Set size of the stamp
-                        stamp.Width  = stampWidth;
-                        stamp.Height = stampHeight;
-
-                        // Position of the stamp (origin is bottom‑left)
-                        stamp.XIndent = x;
-                        stamp.YIndent = y;
-
-                        // Make the watermark semi‑transparent and place it on top
-                        stamp.Opacity   = 0.2f;   // 0 = fully transparent, 1 = opaque
-                        stamp.Background = false;
-
-                        // Add the stamp to the current page
+                        // Add the stamp to the current page.
                         page.AddStamp(stamp);
                     }
                 }
             }
 
-            // Save the modified PDF (lifecycle rule: use Document.Save)
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

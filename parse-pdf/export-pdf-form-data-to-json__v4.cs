@@ -1,72 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class ExportFormData
+class Program
 {
+    // Supported export format – the core API provides JSON export for form data.
+    enum ExportFormat
+    {
+        JSON
+    }
+
     static void Main(string[] args)
     {
-        // Expect at least two arguments: input PDF path and output format flag.
-        if (args.Length < 2)
+        // Expect: <pdfPath>
+        if (args.Length != 1)
         {
-            Console.Error.WriteLine("Usage: ExportFormData <input.pdf> <format> [output]");
-            Console.Error.WriteLine("Supported formats: json");
+            Console.Error.WriteLine("Usage: ExportFormData <pdfPath>");
             return;
         }
 
-        string inputPath = args[0];
-        string format    = args[1].ToLowerInvariant();
-        string outputPath;
+        string pdfPath = args[0];
 
-        // Determine output file name if not supplied.
-        if (args.Length >= 3)
+        if (!File.Exists(pdfPath))
         {
-            outputPath = args[2];
-        }
-        else
-        {
-            string baseName = Path.GetFileNameWithoutExtension(inputPath);
-            switch (format)
-            {
-                case "json":
-                    outputPath = $"{baseName}_form.json";
-                    break;
-                default:
-                    Console.Error.WriteLine($"Unsupported format '{format}'.");
-                    return;
-            }
-        }
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Error: PDF file not found: {pdfPath}");
             return;
         }
+
+        // The only supported export format with the core API is JSON.
+        ExportFormat exportFormat = ExportFormat.JSON;
+        string outputPath = Path.ChangeExtension(pdfPath, "json");
 
         try
         {
-            // Load the PDF document using the standard Aspose.Pdf constructor.
-            using (Document doc = new Document(inputPath))
+            // Load PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Export form fields according to the requested format.
-                switch (format)
+                // Ensure the document actually contains a form
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    case "json":
-                        // Export all form fields to a JSON file.
-                        // The ExportToJson overload writes directly to the specified file.
-                        doc.Form.ExportToJson(outputPath);
-                        Console.WriteLine($"Form data exported to JSON: {outputPath}");
-                        break;
+                    Console.WriteLine("No form fields found in the PDF.");
+                    return;
+                }
 
-                    default:
-                        Console.Error.WriteLine($"Format '{format}' is not implemented.");
-                        break;
+                // Export form data to JSON – this is the supported core‑API method.
+                using (FileStream jsonStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    doc.Form.ExportToJson(jsonStream);
                 }
             }
+
+            Console.WriteLine($"Form data exported to: {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
         }
     }
 }

@@ -1,106 +1,96 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
-public static class PdfImageHelper
+namespace PdfUtilities
 {
     /// <summary>
-    /// Adds an image to a specific page of a PDF file at the given rectangle coordinates.
+    /// Provides helper methods for PDF manipulation.
     /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
-    /// <param name="imagePath">Path to the image file to insert.</param>
-    /// <param name="pageNumber">1‑based page number where the image will be placed.</param>
-    /// <param name="lowerLeftX">X coordinate of the lower‑left corner of the image rectangle.</param>
-    /// <param name="lowerLeftY">Y coordinate of the lower‑left corner of the image rectangle.</param>
-    /// <param name="upperRightX">X coordinate of the upper‑right corner of the image rectangle.</param>
-    /// <param name="upperRightY">Y coordinate of the upper‑right corner of the image rectangle.</param>
-    public static void AddImageToPdf(
-        string inputPdfPath,
-        string outputPdfPath,
-        string imagePath,
-        int pageNumber,
-        float lowerLeftX,
-        float lowerLeftY,
-        float upperRightX,
-        float upperRightY)
+    public static class PdfHelper
     {
-        // Validate arguments (optional but helpful)
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
-
-        if (!File.Exists(imagePath))
-            throw new FileNotFoundException($"Image file not found: {imagePath}");
-
-        // PdfFileMend is a facade for adding images/text to existing PDFs.
-        // It implements IDisposable, so we wrap it in a using block.
-        using (PdfFileMend mender = new PdfFileMend())
+        /// <summary>
+        /// Adds an image to a specific page of a PDF at the given coordinates.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF.</param>
+        /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
+        /// <param name="pageNumber">1‑based page number where the image will be placed.</param>
+        /// <param name="imagePath">Path to the image file to insert.</param>
+        /// <param name="llx">Lower‑left X coordinate of the image rectangle (points).</param>
+        /// <param name="lly">Lower‑left Y coordinate of the image rectangle (points).</param>
+        /// <param name="urx">Upper‑right X coordinate of the image rectangle (points).</param>
+        /// <param name="ury">Upper‑right Y coordinate of the image rectangle (points).</param>
+        public static void AddImageToPage(
+            string inputPdfPath,
+            string outputPdfPath,
+            int pageNumber,
+            string imagePath,
+            double llx,
+            double lly,
+            double urx,
+            double ury)
         {
-            // Bind the source PDF file.
-            mender.BindPdf(inputPdfPath);
+            // ---------------------------------------------------------------------
+            // 1. Validate input files
+            // ---------------------------------------------------------------------
+            if (!File.Exists(inputPdfPath))
+                throw new FileNotFoundException($"PDF not found: {inputPdfPath}");
 
-            // Add the image to the specified page and rectangle.
-            // This uses the AddImage(string, int, float, float, float, float) overload.
-            bool success = mender.AddImage(imagePath, pageNumber, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
-            if (!success)
-                throw new InvalidOperationException("Failed to add image to the PDF.");
+            if (!File.Exists(imagePath))
+                throw new FileNotFoundException($"Image not found: {imagePath}");
 
-            // Save the modified PDF to the output path.
-            mender.Save(outputPdfPath);
+            // ---------------------------------------------------------------------
+            // 2. Load the PDF and verify the requested page exists
+            // ---------------------------------------------------------------------
+            using (Document doc = new Document(inputPdfPath))
+            {
+                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                    throw new ArgumentOutOfRangeException(nameof(pageNumber),
+                        $"Page number must be between 1 and {doc.Pages.Count}.");
 
-            // Close the facade (optional; using will also call Dispose).
-            mender.Close();
+                // -----------------------------------------------------------------
+                // 3. Create the ImageStamp and configure its size / position
+                // -----------------------------------------------------------------
+                ImageStamp imgStamp = new ImageStamp(imagePath)
+                {
+                    // The image should appear on top of existing page content
+                    Background = false
+                };
+
+                // Width / Height of the rectangle defined by the caller
+                float width = (float)(urx - llx);
+                float height = (float)(ury - lly);
+                imgStamp.Width = width;
+                imgStamp.Height = height;
+
+                // Offsets are measured from the lower‑left corner of the page.
+                imgStamp.XIndent = (float)llx;
+                imgStamp.YIndent = (float)lly;
+
+                // -----------------------------------------------------------------
+                // 4. Add the stamp to the requested page and save the document
+                // -----------------------------------------------------------------
+                Page page = doc.Pages[pageNumber];
+                // Use AddStamp instead of Paragraphs.Add – ImageStamp is not a BaseParagraph.
+                page.AddStamp(imgStamp);
+
+                doc.Save(outputPdfPath);
+            }
         }
     }
-}
 
-public class Program
-{
-    /// <summary>
-    /// Entry point required for a console‑application build. Demonstrates the helper usage.
-    /// </summary>
-    public static void Main(string[] args)
+    // -------------------------------------------------------------------------
+    // A minimal entry point is required for a console‑type project.  The
+    // helper class can be used from any other project without invoking Main.
+    // -------------------------------------------------------------------------
+    internal class Program
     {
-        // Expected arguments:
-        //   0: input PDF path
-        //   1: output PDF path
-        //   2: image file path
-        //   3: page number (1‑based)
-        //   4: lower‑left X
-        //   5: lower‑left Y
-        //   6: upper‑right X
-        //   7: upper‑right Y
-        if (args.Length < 8)
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: <inputPdf> <outputPdf> <imagePath> <pageNumber> <llx> <lly> <urx> <ury>");
-            return;
-        }
-
-        string inputPdf = args[0];
-        string outputPdf = args[1];
-        string imagePath = args[2];
-        if (!int.TryParse(args[3], out int pageNumber))
-        {
-            Console.WriteLine("Invalid page number.");
-            return;
-        }
-        if (!float.TryParse(args[4], out float llx) ||
-            !float.TryParse(args[5], out float lly) ||
-            !float.TryParse(args[6], out float urx) ||
-            !float.TryParse(args[7], out float ury))
-        {
-            Console.WriteLine("Invalid coordinate values.");
-            return;
-        }
-
-        try
-        {
-            PdfImageHelper.AddImageToPdf(inputPdf, outputPdf, imagePath, pageNumber, llx, lly, urx, ury);
-            Console.WriteLine("Image added successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
+            // No default action – the library is intended to be called from
+            // user code or unit tests.  Keeping Main empty satisfies the C#
+            // compiler when the project type expects an entry point.
         }
     }
 }

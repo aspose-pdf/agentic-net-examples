@@ -2,13 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ReplaceBackgroundImage
 {
     static void Main()
     {
         const string inputPdfPath   = "input.pdf";
+        const string highResImgPath = "highres_background.png";
         const string outputPdfPath  = "output.pdf";
-        const string highResImgPath = "highres.png";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -22,34 +22,37 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the standard load constructor)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                // Iterate through artifacts on the page (also 1‑based)
-                for (int i = 1; i <= page.Artifacts.Count; i++)
-                {
-                    Artifact artifact = page.Artifacts[i];
+                Page page = pdfDoc.Pages[pageNum];
 
-                    // Identify BackgroundArtifact instances
-                    if (artifact is BackgroundArtifact bgArtifact)
-                    {
-                        // Replace the background image with the higher‑resolution version.
-                        // SetImage copies the image data, so the source stream can be closed safely.
-                        using (FileStream imgStream = File.OpenRead(highResImgPath))
-                        {
-                            bgArtifact.SetImage(imgStream);
-                        }
-                    }
-                }
+                // Create an ImageStamp that will act as the page background.
+                // Setting Background = true places the stamp behind existing page content.
+                ImageStamp bgStamp = new ImageStamp(highResImgPath)
+                {
+                    Background = true,
+                    // Stretch the image to cover the whole page without altering layout.
+                    Width  = page.PageInfo.Width,
+                    Height = page.PageInfo.Height,
+                    // Position at the lower‑left corner of the page.
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    XIndent = 0,
+                    YIndent = 0
+                };
+
+                // Add the new stamp; it will appear behind existing content and effectively replace any previous background.
+                page.AddStamp(bgStamp);
             }
 
-            // Save the modified PDF (standard Save overload)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF (Document.Save writes PDF regardless of extension)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with updated background image: {outputPdfPath}");
+        Console.WriteLine($"Background images replaced. Output saved to '{outputPdfPath}'.");
     }
 }

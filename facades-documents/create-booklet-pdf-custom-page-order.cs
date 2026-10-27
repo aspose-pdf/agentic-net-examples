@@ -6,27 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";   // source PDF containing at least 20 pages
-        const string outputPath = "booklet.pdf"; // resulting booklet PDF
+        const string sourcePdf = "source.pdf";
+        const string outputPdf = "booklet.pdf";
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // Define the left‑hand and right‑hand page order for the booklet
-        int[] leftPages  = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-        int[] rightPages = new int[] {11,12,13,14,15,16,17,18,19,20};
-
-        // Use PdfFileEditor to create a customized booklet
+        // PdfFileEditor does not implement IDisposable; no using block needed.
         PdfFileEditor editor = new PdfFileEditor();
-        bool result = editor.MakeBooklet(inputPath, outputPath, leftPages, rightPages);
 
-        if (result)
-            Console.WriteLine($"Booklet created successfully: {outputPath}");
-        else
+        // Use the correct MakeBooklet overload (no PageSize argument).
+        // This creates a booklet from pages 1‑20 where left pages appear first.
+        bool success = editor.MakeBooklet(sourcePdf, outputPdf);
+        if (!success)
+        {
             Console.Error.WriteLine("Failed to create booklet.");
+            return;
+        }
+
+        Console.WriteLine($"Booklet created successfully: {outputPdf}");
     }
 }

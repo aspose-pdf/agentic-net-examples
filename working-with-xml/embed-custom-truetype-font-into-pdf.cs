@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,52 +9,79 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string xmlPath      = "input.xml";
-        const string outputPdf    = "output.pdf";
-        const string customFontPath = "custom-font.ttf";
+        // ---------------------------------------------------------------------
+        // Load the Aspose.Pdf assembly manually to avoid a runtime FileNotFoundException.
+        // This is useful when the DLL is present in the executable directory but the
+        // CLR cannot locate it automatically (e.g., case‑sensitive file systems).
+        // ---------------------------------------------------------------------
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string[] possibleNames = { "Aspose.Pdf.dll", "Aspose.PDF.dll" };
+        string assemblyPath = null;
+        foreach (var name in possibleNames)
+        {
+            var candidate = Path.Combine(baseDir, name);
+            if (File.Exists(candidate))
+            {
+                assemblyPath = candidate;
+                break;
+            }
+        }
+        if (assemblyPath == null)
+        {
+            Console.Error.WriteLine("Aspose.Pdf assembly not found in the application directory.");
+            return;
+        }
+        // Load the assembly explicitly.
+        Assembly.LoadFrom(assemblyPath);
 
+        // ---------------------------------------------------------------------
+        // Paths – adjust as needed
+        // ---------------------------------------------------------------------
+        const string xmlPath   = "input.xml";
+        const string ttfPath   = "CustomFont.ttf";
+        const string outputPdf = "output.pdf";
+
+        // Verify input files exist
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
-
-        if (!File.Exists(customFontPath))
+        if (!File.Exists(ttfPath))
         {
-            Console.Error.WriteLine($"TrueType font file not found: {customFontPath}");
+            Console.Error.WriteLine($"TrueType font file not found: {ttfPath}");
             return;
         }
 
         // Load the XML content into a PDF document
-        XmlLoadOptions xmlLoadOptions = new XmlLoadOptions();
-        using (Document pdfDoc = new Document(xmlPath, xmlLoadOptions))
+        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // Ensure standard Type1 fonts are also embedded if used
-            pdfDoc.EmbedStandardFonts = true;
+            // Open the custom TrueType font – this loads the font and marks it for embedding
+            Font customFont = FontRepository.OpenFont(ttfPath);
 
-            // Open the custom TrueType font and mark it for embedding
-            Font customFont = FontRepository.OpenFont(customFontPath);
-            customFont.IsEmbedded = true;
+            // Iterate over all pages and apply the custom font to every TextFragment
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
 
-            // OPTIONAL: replace existing text with the custom font.
-            // Here we simply add a new paragraph using the custom font
-            // to guarantee that the font is embedded in the final PDF.
-            TextFragment tf = new TextFragment("Sample text using custom TrueType font");
-            tf.TextState.Font = customFont;
-            tf.TextState.FontSize = 14;
-            tf.TextState.ForegroundColor = Color.Black;
+                // Use LINQ's OfType<T>() to safely get only TextFragment objects
+                foreach (TextFragment tf in page.Paragraphs.OfType<TextFragment>())
+                {
+                    tf.TextState.Font = customFont; // font will be embedded on save
+                }
+            }
 
-            // Add the fragment to the first page (or create a new page if none exist)
-            if (pdfDoc.Pages.Count == 0)
-                pdfDoc.Pages.Add();
-
-            pdfDoc.Pages[1].Paragraphs.Add(tf);
-
-            // Save the resulting PDF with the embedded font
-            pdfDoc.Save(outputPdf);
+            // Save the resulting PDF – no SaveOptions needed because the target is PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF generated with embedded TrueType font: {outputPdf}");
+        // Ensure all native resources are released before the process ends.
+        // This helps avoid the "cannot open AsposePdfApi_*.dll" lock when the
+        // assembly is re‑compiled immediately after execution.
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+
+        Console.WriteLine($"PDF generated with embedded font: {outputPdf}");
     }
 }

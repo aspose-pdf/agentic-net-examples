@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_datefield.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +17,36 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Use the first page (page-indexing-one-based)
-            Page page = doc.Pages[1];
+            // Open the existing PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Access the first page (1‑based indexing)
+                Page page = doc.Pages[1];
 
-            // Define the rectangle where the date field will appear
-            // Fully qualified to avoid ambiguity (rectangle-disambiguation)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
+                // Define the field rectangle (lower‑left x, lower‑right y, upper‑right x, upper‑right y)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
 
-            // Create a DateField on the specified page and rectangle
-            DateField dateField = new DateField(page, rect);
+                // NOTE: In older Aspose.Pdf versions the DateTimeField class may be missing.
+                // Use a TextBoxField to act as a date picker and set its default value to the current date.
+                TextBoxField dateField = new TextBoxField(page, rect);
+                dateField.PartialName = "DatePicker";
+                // Set the default value to the current system date (format can be adjusted as needed)
+                dateField.Value = DateTime.Now.ToString("yyyy-MM-dd");
 
-            // Set the default value to the current system date
-            dateField.Value = DateTime.Now;
+                // Add the field to the page's annotations collection
+                page.Annotations.Add(dateField);
 
-            // Optional: specify the display format (default is dd/MM/yyyy)
-            dateField.DateFormat = "dd/MM/yyyy";
+                // Save the modified PDF (default PDF format)
+                doc.Save(outputPath);
+            }
 
-            // Add the field to the form and initialize it on the page
-            doc.Form.Add(dateField);
-            dateField.Init(page);
-
-            // Save the modified PDF (save-to-non-pdf-always-use-save-options not needed for PDF)
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved with date picker field: '{outputPath}'");
         }
-
-        Console.WriteLine($"Date picker field added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

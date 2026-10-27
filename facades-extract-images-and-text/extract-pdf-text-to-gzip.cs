@@ -1,3 +1,6 @@
+// ------------------------------------------------------------
+// File: Program.cs
+// ------------------------------------------------------------
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -7,25 +10,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputGzipPath = "extracted_text.gz";
+        const string pdfPath = "input.pdf";
+        const string gzipPath = "output.txt.gz";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Extract text and write it directly to a GZip compressed stream
-        using (PdfExtractor extractor = new PdfExtractor())
-        using (FileStream gzipFileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
-        using (GZipStream gzipStream = new GZipStream(gzipFileStream, CompressionLevel.Optimal))
+        // Load PDF and extract all text using the Facade API
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(pdfPath);
+        extractor.ExtractText();
+
+        // Retrieve the extracted text via a MemoryStream (PdfExtractor.GetText requires a stream)
+        string extractedText;
+        using (MemoryStream textStream = new MemoryStream())
         {
-            extractor.BindPdf(inputPdfPath);
-            extractor.ExtractText();               // Extract all text from the PDF
-            extractor.GetText(gzipStream);         // Write extracted text to the GZip stream
+            extractor.GetText(textStream); // write text to the stream
+            textStream.Position = 0;        // rewind for reading
+            using (StreamReader reader = new StreamReader(textStream))
+            {
+                extractedText = reader.ReadToEnd();
+            }
         }
 
-        Console.WriteLine($"Text extracted and compressed to '{outputGzipPath}'.");
+        // Write the text to a GZip compressed file
+        using (FileStream fileStream = new FileStream(gzipPath, FileMode.Create, FileAccess.Write))
+        using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+        using (StreamWriter writer = new StreamWriter(gzipStream))
+        {
+            writer.Write(extractedText);
+        }
+
+        Console.WriteLine($"Extracted text saved to compressed file: {gzipPath}");
     }
+}
+
+// ------------------------------------------------------------
+// File: AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig
+// ------------------------------------------------------------
+// This file was originally referenced in the project as a source file
+// but the actual .editorconfig content is not required for compilation.
+// Providing a minimal, valid C# source file satisfies the compiler
+// and eliminates the CS2001 error.
+namespace AsposePdfApi.GeneratedMSBuildEditorConfig
+{
+    // Empty placeholder class – no runtime behavior needed.
+    internal static class Placeholder { }
 }

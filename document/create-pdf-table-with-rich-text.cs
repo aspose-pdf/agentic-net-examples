@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,112 +7,64 @@ class Program
 {
     static void Main()
     {
-        // Output PDF path
-        const string outputPath = "RichTextTable.pdf";
+        const string outputPath = "rich_text_table.pdf";
 
-        // Create a new PDF document inside a using block for proper disposal
+        // Create a new PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a page (Pages[1] is the first page – 1‑based indexing).
             Page page = doc.Pages.Add();
 
-            // Create a table and set its position on the page
+            // Create a table and set its column widths (percent of page width).
             Table table = new Table
             {
-                // Position the table (optional)
-                Left = 50,
-                Top = 700,
-                // Define column widths (in points)
-                ColumnWidths = "150 150"
+                ColumnWidths = "200 200 200", // three equal columns
+                Border = new BorderInfo(BorderSide.All, 0.5f) // thin border for visibility
             };
 
-            // -------------------------
-            // First Row – Header cells
-            // -------------------------
-            // Create first header cell with bold, blue text
-            TextFragment header1 = new TextFragment("Product");
-            header1.TextState.Font = FontRepository.FindFont("Helvetica");
-            header1.TextState.FontSize = 12;
-            header1.TextState.FontStyle = FontStyles.Bold;
-            header1.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-
-            // Create second header cell with bold, blue text
-            TextFragment header2 = new TextFragment("Price");
-            header2.TextState.Font = FontRepository.FindFont("Helvetica");
-            header2.TextState.FontSize = 12;
-            header2.TextState.FontStyle = FontStyles.Bold;
-            header2.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-
-            // Add the header row
+            // Row 1 – Header cells with bold text.
             Row headerRow = table.Rows.Add();
-            headerRow.Cells.Add(header1);
-            headerRow.Cells.Add(header2);
+            AddCellWithRichText(headerRow, "Product", true, false, Aspose.Pdf.Color.LightGray);
+            AddCellWithRichText(headerRow, "Quantity", true, false, Aspose.Pdf.Color.LightGray);
+            AddCellWithRichText(headerRow, "Price", true, false, Aspose.Pdf.Color.LightGray);
 
-            // -------------------------
-            // Data Row 1
-            // -------------------------
-            // Cell with normal text and red color
-            TextFragment cell11 = new TextFragment("Widget A");
-            cell11.TextState.Font = FontRepository.FindFont("Helvetica");
-            cell11.TextState.FontSize = 10;
-            cell11.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
-
-            // Cell with italic, green text
-            TextFragment cell12 = new TextFragment("$25.00");
-            cell12.TextState.Font = FontRepository.FindFont("Helvetica");
-            cell12.TextState.FontSize = 10;
-            cell12.TextState.FontStyle = FontStyles.Italic;
-            cell12.TextState.ForegroundColor = Aspose.Pdf.Color.Green;
-
+            // Row 2 – Data cells with mixed formatting.
             Row dataRow1 = table.Rows.Add();
-            dataRow1.Cells.Add(cell11);
-            dataRow1.Cells.Add(cell12);
+            AddCellWithRichText(dataRow1, "Widget A", false, false, Aspose.Pdf.Color.Black);
+            AddCellWithRichText(dataRow1, "10", false, true, Aspose.Pdf.Color.Blue);
+            AddCellWithRichText(dataRow1, "$15.00", false, false, Aspose.Pdf.Color.DarkGreen);
 
-            // -------------------------
-            // Data Row 2 – demonstrates multiple segments in a single cell
-            // -------------------------
-            // Create a fragment with three segments: normal, bold, normal
-            TextFragment cell21 = new TextFragment();
-            // First segment – normal text
-            TextSegment seg1 = new TextSegment("Widget B (");
-            seg1.TextState.Font = FontRepository.FindFont("Helvetica");
-            seg1.TextState.FontSize = 10;
-            seg1.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-            // Second segment – bold text
-            TextSegment seg2 = new TextSegment("Special");
-            seg2.TextState.Font = FontRepository.FindFont("Helvetica");
-            seg2.TextState.FontSize = 10;
-            seg2.TextState.FontStyle = FontStyles.Bold;
-            seg2.TextState.ForegroundColor = Aspose.Pdf.Color.Purple;
-            // Third segment – closing parenthesis
-            TextSegment seg3 = new TextSegment(")");
-            seg3.TextState.Font = FontRepository.FindFont("Helvetica");
-            seg3.TextState.FontSize = 10;
-            seg3.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Add segments to the fragment
-            cell21.Segments.Add(seg1);
-            cell21.Segments.Add(seg2);
-            cell21.Segments.Add(seg3);
-
-            // Second cell with underlined text
-            TextFragment cell22 = new TextFragment("$40.00");
-            cell22.TextState.Font = FontRepository.FindFont("Helvetica");
-            cell22.TextState.FontSize = 10;
-            cell22.TextState.Underline = true; // Underline is a boolean property, not a FontStyle
-            cell22.TextState.ForegroundColor = Aspose.Pdf.Color.Orange;
-
+            // Row 3 – Data cells with italic and colored text.
             Row dataRow2 = table.Rows.Add();
-            dataRow2.Cells.Add(cell21);
-            dataRow2.Cells.Add(cell22);
+            AddCellWithRichText(dataRow2, "Gadget B", false, true, Aspose.Pdf.Color.DarkRed);
+            AddCellWithRichText(dataRow2, "5", false, false, Aspose.Pdf.Color.Black);
+            AddCellWithRichText(dataRow2, "$42.50", true, false, Aspose.Pdf.Color.Purple);
 
-            // Add the table to the page's paragraphs collection
+            // Add the table to the page's paragraphs collection.
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF
+            // Save the PDF. No SaveOptions needed because the target format is PDF.
             doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDF with rich‑text table saved to '{outputPath}'.");
+    }
+
+    // Helper method to create a cell containing a TextFragment with rich formatting.
+    static void AddCellWithRichText(Row row, string text, bool bold, bool italic, Aspose.Pdf.Color foreColor)
+    {
+        // Create a TextFragment for the cell content.
+        TextFragment tf = new TextFragment(text);
+
+        // Apply rich text formatting via TextState.
+        tf.TextState.FontSize = 12;
+        // FontStyle does not have a 'None' member; use a cast of 0 for "no style".
+        tf.TextState.FontStyle = (bold ? FontStyles.Bold : (FontStyles)0) |
+                                 (italic ? FontStyles.Italic : (FontStyles)0);
+        tf.TextState.ForegroundColor = foreColor;
+
+        // Add the TextFragment to a new cell and then to the row.
+        Cell cell = row.Cells.Add();
+        cell.Paragraphs.Add(tf);
     }
 }

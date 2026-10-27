@@ -1,74 +1,48 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_collapsed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_collapsed.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Titles of bookmarks that should be collapsed (closed) when the PDF is opened
-        var titlesToCollapse = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-        {
-            "Chapter 1",
-            "Section 2"
-        };
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Use PdfBookmarkEditor to work with bookmarks
-        var editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPdf);
+        // Collapse (close) specific bookmarks by title.
+        CollapseBookmark(doc.Outlines, "Chapter 1");
+        CollapseBookmark(doc.Outlines, "Appendix");
 
-        // Extract all existing bookmarks
-        Bookmarks allBookmarks = editor.ExtractBookmarks();
+        // Save the updated PDF with the modified bookmark states
+        doc.Save(outputPath);
 
-        // Recursively set Open = false for the specified titles
-        foreach (Bookmark bm in allBookmarks)
-        {
-            SetBookmarkOpenState(bm, titlesToCollapse);
-        }
-
-        // Remove existing bookmarks from the document
-        editor.DeleteBookmarks();
-
-        // Re‑create the (modified) bookmark hierarchy
-        foreach (Bookmark bm in allBookmarks)
-        {
-            editor.CreateBookmarks(bm);
-        }
-
-        // Save the updated PDF
-        editor.Save(outputPdf);
-        editor.Close();
-
-        Console.WriteLine($"Bookmarks updated and saved to '{outputPdf}'.");
+        Console.WriteLine($"Bookmarks collapsed and saved to '{outputPath}'.");
     }
 
-    // Recursively set the Open property based on the title list
-    private static void SetBookmarkOpenState(Bookmark bookmark, HashSet<string> titlesToCollapse)
+    // Recursively searches outline items and sets their open state to false when the title matches.
+    private static void CollapseBookmark(IEnumerable<OutlineItemCollection> outlines, string title)
     {
-        if (bookmark == null) return;
-
-        if (titlesToCollapse.Contains(bookmark.Title))
+        foreach (var item in outlines)
         {
-            // Collapse this bookmark
-            bookmark.Open = false;
-        }
-
-        // Process child bookmarks, if any
-        if (bookmark.ChildItems != null)
-        {
-            foreach (Bookmark child in bookmark.ChildItems)
+            if (item.Title.Equals(title, StringComparison.OrdinalIgnoreCase))
             {
-                SetBookmarkOpenState(child, titlesToCollapse);
+                // "Open" property controls the expanded/collapsed state. false = collapsed.
+                item.Open = false;
+            }
+
+            // Recurse into child outlines, if any
+            if (item.Count > 0)
+            {
+                CollapseBookmark(item, title);
             }
         }
     }

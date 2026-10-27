@@ -6,56 +6,34 @@ class Program
 {
     static void Main()
     {
-        // Paths for source PDF, target PDF and the resulting PDF
-        const string sourcePath = "source.pdf";
-        const string targetPath = "target.pdf";
-        const string outputPath = "merged.pdf";
+        const string targetPath = "target.pdf";   // PDF that will receive the new page
+        const string sourcePath = "source.pdf";   // PDF that provides the page to insert
+        const string outputPath = "result.pdf";   // Path for the merged document
+        const int insertPosition = 3;             // 1‑based index where the page will be placed
 
-        // 1‑based page numbers (Aspose.Pdf uses 1‑based indexing)
-        const int sourcePageNumber = 2;   // page to copy from source PDF
-        const int insertPosition   = 3;   // position in target PDF where the page will be inserted
-
-        // Verify that both files exist
-        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
+        if (!File.Exists(targetPath) || !File.Exists(sourcePath))
         {
-            Console.Error.WriteLine("Source or target file not found.");
+            Console.Error.WriteLine("One or both input files were not found.");
             return;
         }
 
-        try
+        // Load both documents inside using blocks (ensures deterministic disposal)
+        using (Document target = new Document(targetPath))
+        using (Document source = new Document(sourcePath))
         {
-            // Load both documents inside using blocks for deterministic disposal
-            using (Document sourceDoc = new Document(sourcePath))
-            using (Document targetDoc = new Document(targetPath))
-            {
-                // Validate requested page numbers against the actual page counts
-                if (sourcePageNumber < 1 || sourcePageNumber > sourceDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine("Invalid source page number.");
-                    return;
-                }
+            // Validate the insertion index (must be between 1 and Pages.Count+1)
+            int position = Math.Max(1, Math.Min(insertPosition, target.Pages.Count + 1));
 
-                if (insertPosition < 1 || insertPosition > targetDoc.Pages.Count + 1)
-                {
-                    Console.Error.WriteLine("Invalid insert position.");
-                    return;
-                }
+            // Retrieve the page to insert from the source document (Aspose.Pdf uses 1‑based indexing)
+            Page pageToInsert = source.Pages[1];
 
-                // Retrieve the page from the source document
-                Page pageToInsert = sourceDoc.Pages[sourcePageNumber];
+            // Insert the page into the target document at the desired position
+            target.Pages.Insert(position, pageToInsert);
 
-                // Insert the page into the target document at the desired position
-                targetDoc.Pages.Insert(insertPosition, pageToInsert);
-
-                // Save the modified target document (PDF format)
-                targetDoc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Inserted page {sourcePageNumber} from '{sourcePath}' into '{targetPath}' at position {insertPosition}. Saved as '{outputPath}'.");
+            // Save the updated document
+            target.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Page inserted successfully. Output saved to '{outputPath}'.");
     }
 }

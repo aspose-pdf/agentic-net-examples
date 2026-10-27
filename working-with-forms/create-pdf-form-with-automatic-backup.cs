@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
@@ -7,29 +8,39 @@ class Program
 {
     static void Main()
     {
-        const string outputPdf = "form_with_backup.pdf";
+        const string outputPath = "form_with_backup.pdf";
 
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
+            // Add a blank page to host the form field
             Page page = doc.Pages.Add();
 
-            Form pdfForm = doc.Form;
+            // Define the field rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            TextBoxField txtField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 600, 300, 630))
+            // Create a text box form field
+            TextBoxField txtField = new TextBoxField(page, fieldRect)
             {
-                PartialName = "SampleText",
-                Value = "Enter text here"
+                PartialName = "SampleField",
+                Value = ""
             };
 
-            pdfForm.Add(txtField, 1);
+            // JavaScript that saves a backup copy each time the field loses focus after a change
+            string js = "var dt = new Date(); " +
+                        "var name = 'backup_' + util.printd('yyyyMMddHHmmss', dt) + '.pdf'; " +
+                        "this.saveAs(name);";
 
-            // Correct property for a blur (loss of focus) event
-            txtField.Actions.OnLostFocus = new JavascriptAction("this.saveAs('backup.pdf');");
+            // Use the correct action property for "blur" (loss of focus)
+            txtField.Actions.OnLostFocus = new JavascriptAction(js);
 
-            doc.Save(outputPdf);
+            // Add the field to the document's form (page index is 1‑based)
+            doc.Form.Add(txtField, 1);
+
+            // Save the PDF form
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form created: {outputPdf}");
-        Console.WriteLine("When the text field loses focus, the viewer will attempt to save a backup copy named 'backup.pdf'.");
+        Console.WriteLine($"PDF form created: {outputPath}");
     }
 }

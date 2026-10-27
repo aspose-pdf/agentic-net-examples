@@ -2,55 +2,50 @@ using System;
 using System.IO;
 using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+#if XFA_ENABLED
+using Aspose.Pdf.Xfa;
+#endif
 
 class Program
 {
     static void Main()
     {
-        // Paths for the XFA template XML and the output PDF
-        const string xfaTemplatePath = "template.xfa";
-        const string outputPdfPath   = "output_with_xfa.pdf";
+        const string outputPath = "xfa_form.pdf";
 
-        // Ensure the XFA template file exists
-        if (!File.Exists(xfaTemplatePath))
+        // Create a new PDF document and ensure deterministic disposal.
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"XFA template not found: {xfaTemplatePath}");
-            return;
-        }
+#if XFA_ENABLED
+            // Create an XFA form instance associated with the document.
+            // The XfaForm class is located in the Aspose.Pdf.Xfa namespace.
+            XfaForm xfaForm = new XfaForm(doc);
 
-        // Load the XFA XML document
-        XmlDocument xfaXml = new XmlDocument();
-        xfaXml.Load(xfaTemplatePath);
+            // Build a minimal XFA XML structure with two fields: "FirstName" and "LastName".
+            string xfaXml = @"
+                <xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'>
+                    <xfa:data>
+                        <FirstName></FirstName>
+                        <LastName></LastName>
+                    </xfa:data>
+                </xfa:datasets>";
 
-        // Create a new PDF document and add a blank page (required for a PDF container)
-        using (Document pdfDoc = new Document())
-        {
-            pdfDoc.Pages.Add();
+            // Load the XML into an XmlDocument and assign it to the XFA form.
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.LoadXml(xfaXml);
+            xfaForm.DomDocument = xmlDoc;
 
-            // Assign the XFA data to the form
-            pdfDoc.Form.AssignXfa(xfaXml);
-
-            // Populate XFA fields (example field names must exist in the XFA template)
-            if (pdfDoc.Form.HasXfa)
+            // OPTIONAL: Verify that the XFA form was created before populating fields.
+            if (xfaForm != null)
             {
-                // The indexer returns a generic WidgetAnnotation. Cast to the concrete field type
-                // (e.g., TextBoxField) and set its Value property.
-                if (pdfDoc.Form["FirstName"] is TextBoxField firstNameField)
-                {
-                    firstNameField.Value = "John"; // Use Value instead of Text
-                }
-
-                if (pdfDoc.Form["LastName"] is TextBoxField lastNameField)
-                {
-                    lastNameField.Value = "Doe"; // Use Value instead of Text
-                }
+                // Populate the XFA fields with sample data.
+                xfaForm.SetFieldValue("FirstName", "John");
+                xfaForm.SetFieldValue("LastName", "Doe");
             }
-
-            // Save the PDF containing the XFA form
-            pdfDoc.Save(outputPdfPath);
+#endif
+            // Save the PDF (with or without XFA content).
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with XFA form saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with XFA form saved to '{outputPath}'.");
     }
 }

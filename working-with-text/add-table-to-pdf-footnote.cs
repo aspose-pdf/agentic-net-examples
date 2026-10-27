@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_footnote.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,42 +17,76 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Load the PDF and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page to work with
-            Page page = doc.Pages[1];
+            // Access the tagged content interface
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Create a text fragment that will carry the footnote
-            TextFragment textFragment = new TextFragment("Sample text with footnote.");
+            // Optional: set language and title for the document
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Create the footnote (Note) object
-            Note footnote = new Note();
+            // Root element of the structure tree
+            StructureElement root = taggedContent.RootElement;
 
-            // Build a simple table to place inside the footnote
-            Table footTable = new Table();
-            footTable.ColumnWidths = "100 100"; // two equal columns
+            // ------------------------------------------------------------
+            // Create a footnote (NoteElement) and add it to the root
+            // ------------------------------------------------------------
+            NoteElement footnote = taggedContent.CreateNoteElement();
+            footnote.SetText("Footnote:");
+            root.AppendChild(footnote);
 
-            // First row (header)
-            footTable.Rows.Add(new Row());
-            footTable.Rows[1].Cells.Add("Header 1");
-            footTable.Rows[1].Cells.Add("Header 2");
+            // ------------------------------------------------------------
+            // Create a table and add it to the footnote
+            // ------------------------------------------------------------
+            TableElement table = taggedContent.CreateTableElement();
+            table.AlternativeText = "Sample data table in footnote";
+            footnote.AppendChild(table);
 
-            // Second row (data)
-            footTable.Rows.Add(new Row());
-            footTable.Rows[2].Cells.Add("Value 1");
-            footTable.Rows[2].Cells.Add("Value 2");
+            // Header row
+            TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = taggedContent.CreateTableTRElement();
+            thead.AppendChild(headerRow);
 
-            // Add the table to the footnote's paragraph collection
-            footnote.Paragraphs.Add(footTable);
+            TableTHElement th1 = taggedContent.CreateTableTHElement();
+            th1.SetText("Item");
+            headerRow.AppendChild(th1);
 
-            // Attach the footnote to the text fragment
-            textFragment.FootNote = footnote;
+            TableTHElement th2 = taggedContent.CreateTableTHElement();
+            th2.SetText("Quantity");
+            headerRow.AppendChild(th2);
 
-            // Insert the text fragment (with footnote) into the page
-            page.Paragraphs.Add(textFragment);
+            // Body rows
+            TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+            table.AppendChild(tbody);
 
-            // Save the modified PDF
+            // First data row
+            TableTRElement dataRow1 = taggedContent.CreateTableTRElement();
+            tbody.AppendChild(dataRow1);
+
+            TableTDElement td1a = taggedContent.CreateTableTDElement();
+            td1a.SetText("Apples");
+            dataRow1.AppendChild(td1a);
+
+            TableTDElement td1b = taggedContent.CreateTableTDElement();
+            td1b.SetText("10");
+            dataRow1.AppendChild(td1b);
+
+            // Second data row
+            TableTRElement dataRow2 = taggedContent.CreateTableTRElement();
+            tbody.AppendChild(dataRow2);
+
+            TableTDElement td2a = taggedContent.CreateTableTDElement();
+            td2a.SetText("Oranges");
+            dataRow2.AppendChild(td2a);
+
+            TableTDElement td2b = taggedContent.CreateTableTDElement();
+            td2b.SetText("5");
+            dataRow2.AppendChild(td2b);
+
+            // Save the modified PDF (no PreSave call needed)
             doc.Save(outputPath);
         }
 

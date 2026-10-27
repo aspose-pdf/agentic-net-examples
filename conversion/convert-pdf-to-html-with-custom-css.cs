@@ -6,55 +6,63 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string pdfPath      = "input.pdf";
-        const string htmlPath     = "output.html";
-        const string customCssPath = "custom.css";
+        const string pdfPath = "input.pdf";
+        const string htmlPath = "output.html";
+        const string cssPath = "custom.css";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(customCssPath))
+        if (!File.Exists(cssPath))
         {
-            Console.Error.WriteLine($"Custom CSS not found: {customCssPath}");
-            return;
+            Console.Error.WriteLine($"CSS file not found: {cssPath}");
+            // Continue without CSS – we will simply not inject a <link> tag.
         }
 
         try
         {
-            // Load the source PDF
-            using (Document pdfDocument = new Document(pdfPath))
+            using (Document doc = new Document(pdfPath))
             {
-                // Prepare HTML save options
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions();
-
-                // Assign a custom CSS saving strategy that injects the user‑provided CSS file
-                htmlOptions.CustomCssSavingStrategy = new HtmlSaveOptions.CssSavingStrategy(info =>
+                var htmlOpts = new HtmlSaveOptions
                 {
-                    // The converter supplies a writable stream (info.ContentStream)
-                    // Copy the contents of the custom CSS file into that stream
-                    using (FileStream cssSource = File.OpenRead(customCssPath))
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    SplitIntoPages = false
+                };
+
+                doc.Save(htmlPath, htmlOpts);
+                Console.WriteLine($"PDF converted to HTML: {htmlPath}");
+
+                // If a CSS file exists, inject a <link> element that references it.
+                if (File.Exists(cssPath))
+                {
+                    string htmlContent = File.ReadAllText(htmlPath);
+                    string linkTag = $"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(cssPath)}\" />";
+
+                    int headIdx = htmlContent.IndexOf("<head>", StringComparison.OrdinalIgnoreCase);
+                    if (headIdx >= 0)
                     {
-                        cssSource.CopyTo(info.ContentStream);
+                        int insertPos = headIdx + "<head>".Length;
+                        htmlContent = htmlContent.Insert(insertPos, Environment.NewLine + "    " + linkTag);
+                        File.WriteAllText(htmlPath, htmlContent);
+                        Console.WriteLine($"Custom CSS linked in HTML: {cssPath}");
                     }
-                });
-
-                // Optional: set a title for the generated HTML page
-                htmlOptions.Title = "Converted Document";
-
-                // Save as HTML using the options (required to pass SaveOptions explicitly)
-                pdfDocument.Save(htmlPath, htmlOptions);
+                    else
+                    {
+                        // Fallback – prepend the link if <head> is missing.
+                        File.WriteAllText(htmlPath, linkTag + Environment.NewLine + htmlContent);
+                        Console.WriteLine("<head> tag not found; CSS link prepended at file start.");
+                    }
+                }
             }
-
-            Console.WriteLine($"PDF successfully converted to HTML: {htmlPath}");
         }
         catch (TypeInitializationException)
         {
-            // HTML conversion relies on GDI+ and is Windows‑only
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+            // HTML conversion relies on GDI+ and is Windows‑only.
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {

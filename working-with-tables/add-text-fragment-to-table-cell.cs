@@ -7,49 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string outputPath = "table_with_text.pdf";
 
-        // Ensure the input file exists
-        if (!File.Exists(inputPdf))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document (wrapped in using for proper disposal)
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create a table with one row and one cell
+            // Create a table and add it to the page's paragraphs collection
             Table table = new Table
             {
-                ColumnWidths = "200" // set column width as needed
+                // Optional: set table borders for visibility
+                Border = new BorderInfo(BorderSide.All, 0.5f)
             };
+            page.Paragraphs.Add(table);
+
+            // Add a single row to the table
             Row row = table.Rows.Add();
+
+            // Add a single cell to the row
             Cell cell = row.Cells.Add();
 
             // Create a TextFragment with the desired text
-            TextFragment tf = new TextFragment("Sample Text");
+            TextFragment textFragment = new TextFragment("Hello, Aspose.Pdf!");
 
-            // Set font and size via the TextState of the fragment
-            tf.TextState.Font = FontRepository.FindFont("TimesNewRoman");
-            tf.TextState.FontSize = 14; // specific font size
-
-            // Ensure the cell uses the TextFragment's TextState
-            cell.IsOverrideByFragment = true;
+            // Set the font and size using the TextState property
+            // FontRepository.FindFont searches for a system font; fallback to Helvetica if not found
+            textFragment.TextState.Font = FontRepository.FindFont("Arial") ?? FontRepository.FindFont("Helvetica");
+            textFragment.TextState.FontSize = 14; // Desired font size
 
             // Add the TextFragment to the cell's paragraphs collection
-            cell.Paragraphs.Add(tf);
+            cell.Paragraphs.Add(textFragment);
 
-            // Add the table to the first page (or any desired page)
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(table);
-
-            // Save the modified PDF (wrapped in using ensures the document stays alive until Save completes)
-            doc.Save(outputPdf);
+            // Save the PDF document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

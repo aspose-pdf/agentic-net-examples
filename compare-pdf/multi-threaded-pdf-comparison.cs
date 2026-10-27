@@ -3,82 +3,120 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Text;
+
+class PdfComparisonResult
+{
+    public string FileA { get; set; }
+    public string FileB { get; set; }
+    public bool AreEqual { get; set; }
+    public string Differences { get; set; }
+
+    // Initialise non‑nullable properties to avoid CS8618 warnings.
+    public PdfComparisonResult()
+    {
+        FileA = string.Empty;
+        FileB = string.Empty;
+        Differences = string.Empty;
+        AreEqual = true;
+    }
+}
 
 class Program
 {
-    // Represents a pair of PDF files to be compared.
-    private class PdfPair
+    // Extracts the full text of a single page.
+    static string ExtractPageText(Document doc, int pageNumber)
     {
-        public string File1 { get; }
-        public string File2 { get; }
-        public string ResultPath { get; }
-
-        public PdfPair(string file1, string file2, string resultPath)
-        {
-            File1 = file1;
-            File2 = file2;
-            ResultPath = resultPath;
-        }
+        // Pages are 1‑based (see GLOBAL RULE: page-indexing-one-based)
+        // TextAbsorber does not implement IDisposable in the current SDK version, so avoid using.
+        TextAbsorber absorber = new TextAbsorber();
+        doc.Pages[pageNumber].Accept(absorber);
+        string text = absorber.Text ?? string.Empty;
+        // No need to dispose explicitly.
+        return text;
     }
 
-    static void Main()
+    // Compares two PDFs and returns a result object.
+    static PdfComparisonResult ComparePdfs(string pathA, string pathB)
     {
-        // Example input: list of PDF file pairs.
-        var pairs = new List<PdfPair>
+        var result = new PdfComparisonResult
         {
-            new PdfPair("docA1.pdf", "docA2.pdf", "resultA.pdf"),
-            new PdfPair("docB1.pdf", "docB2.pdf", "resultB.pdf"),
-            new PdfPair("docC1.pdf", "docC2.pdf", "resultC.pdf")
+            FileA = pathA,
+            FileB = pathB,
+            AreEqual = true,
+            Differences = string.Empty
         };
 
-        // Validate that all source files exist before starting.
-        foreach (var p in pairs)
+        // Ensure both files exist before proceeding.
+        if (!File.Exists(pathA) || !File.Exists(pathB))
         {
-            if (!File.Exists(p.File1))
-                Console.Error.WriteLine($"Source file not found: {p.File1}");
-            if (!File.Exists(p.File2))
-                Console.Error.WriteLine($"Source file not found: {p.File2}");
+            result.AreEqual = false;
+            result.Differences = "One or both files do not exist.";
+            return result;
         }
 
-        // Create a list of tasks, each performing a comparison in its own thread.
-        var tasks = new List<Task>();
-
-        foreach (var pair in pairs)
+        // Load both documents inside using blocks (see GLOBAL RULE: document-disposal-with-using)
+        using (Document docA = new Document(pathA))
+        using (Document docB = new Document(pathB))
         {
-            // Capture the current pair for the lambda.
-            var currentPair = pair;
-
-            var task = Task.Run(() =>
+            // Compare page counts.
+            if (docA.Pages.Count != docB.Pages.Count)
             {
-                try
+                result.AreEqual = false;
+                result.Differences = $"Page count mismatch: {docA.Pages.Count} vs {docB.Pages.Count}.";
+                return result;
+            }
+
+            // Compare text content page by page.
+            for (int i = 1; i <= docA.Pages.Count; i++) // 1‑based loop
+            {
+                string textA = ExtractPageText(docA, i);
+                string textB = ExtractPageText(docB, i);
+
+                if (!string.Equals(textA, textB, StringComparison.Ordinal))
                 {
-                    // Load the first document.
-                    using (Document doc1 = new Document(currentPair.File1))
-                    // Load the second document.
-                    using (Document doc2 = new Document(currentPair.File2))
-                    {
-                        // Configure side‑by‑side comparison options (default settings are fine).
-                        SideBySideComparisonOptions options = new SideBySideComparisonOptions();
-
-                        // Perform the comparison; the result is written directly to the target PDF file.
-                        SideBySidePdfComparer.Compare(doc1, doc2, currentPair.ResultPath, options);
-                    }
-
-                    Console.WriteLine($"Comparison completed: {currentPair.ResultPath}");
+                    result.AreEqual = false;
+                    result.Differences = $"Text differs on page {i}.";
+                    // Early exit on first difference; remove break to collect all differences.
+                    break;
                 }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error comparing '{currentPair.File1}' and '{currentPair.File2}': {ex.Message}");
-                }
-            });
-
-            tasks.Add(task);
+            }
         }
 
-        // Wait for all comparison tasks to finish.
-        Task.WaitAll(tasks.ToArray());
+        return result;
+    }
 
-        Console.WriteLine("All comparisons finished.");
+    static async Task Main(string[] args)
+    {
+        // Define pairs of PDFs to compare.
+        var pdfPairs = new List<(string FileA, string FileB)>
+        {
+            ("doc1_v1.pdf", "doc1_v2.pdf"),
+            ("report_Jan.pdf", "report_Feb.pdf"),
+            ("manual_en.pdf", "manual_fr.pdf")
+        };
+
+        // Create a task for each comparison.
+        var comparisonTasks = new List<Task<PdfComparisonResult>>();
+        foreach (var (fileA, fileB) in pdfPairs)
+        {
+            // Capture variables correctly for the lambda.
+            string a = fileA;
+            string b = fileB;
+            comparisonTasks.Add(Task.Run(() => ComparePdfs(a, b)));
+        }
+
+        // Wait for all tasks to finish.
+        PdfComparisonResult[] results = await Task.WhenAll(comparisonTasks);
+
+        // Output the aggregated results.
+        foreach (var res in results)
+        {
+            Console.WriteLine($"Comparison: {Path.GetFileName(res.FileA)} ↔ {Path.GetFileName(res.FileB)}");
+            Console.WriteLine($"  Are Equal : {res.AreEqual}");
+            if (!res.AreEqual)
+                Console.WriteLine($"  Differences: {res.Differences}");
+            Console.WriteLine();
+        }
     }
 }

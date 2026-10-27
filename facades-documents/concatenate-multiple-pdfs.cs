@@ -6,18 +6,19 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expected arguments: outputPath inputFile1 inputFile2 [additional input files...]
-        if (args.Length < 3)
+        // Expect at least two arguments: one or more input PDFs and one output PDF path
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: ConcatenatePdf <output.pdf> <input1.pdf> <input2.pdf> [more...]");
+            Console.Error.WriteLine("Usage: <input1.pdf> [<input2.pdf> ...] <output.pdf>");
             return;
         }
 
-        string outputPath = args[0];
+        // The last argument is the output file; all preceding arguments are input files
+        string outputPath = args[args.Length - 1];
         string[] inputFiles = new string[args.Length - 1];
-        Array.Copy(args, 1, inputFiles, 0, inputFiles.Length);
+        Array.Copy(args, inputFiles, args.Length - 1);
 
-        // Verify that all input files exist
+        // Verify that each input file exists
         foreach (string file in inputFiles)
         {
             if (!File.Exists(file))
@@ -27,25 +28,34 @@ class Program
             }
         }
 
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+        {
+            try
+            {
+                Directory.CreateDirectory(outputDir);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to create output directory: {ex.Message}");
+                return;
+            }
+        }
+
         try
         {
-            // Create the PdfFileEditor facade
+            // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Ensure streams are closed after concatenation (optional but safe)
-            editor.CloseConcatenatedStreams = true;
+            // Concatenate the input PDFs into the specified output PDF
+            editor.Concatenate(inputFiles, outputPath);
 
-            // Perform concatenation
-            bool success = editor.Concatenate(inputFiles, outputPath);
-
-            if (success)
-                Console.WriteLine($"Successfully concatenated {inputFiles.Length} files to '{outputPath}'.");
-            else
-                Console.Error.WriteLine("Concatenation failed.");
+            Console.WriteLine($"Successfully concatenated {inputFiles.Length} PDFs into '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during concatenation: {ex.Message}");
         }
     }
 }

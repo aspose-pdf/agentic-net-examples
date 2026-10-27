@@ -1,34 +1,33 @@
 using System;
-using Aspose.Pdf;
+using System.IO;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf; // PageSize type
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!System.IO.File.Exists(pdfPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor implements IDisposable, so use a using block.
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the PDF file.
-            editor.BindPdf(pdfPath);
+        // PdfPageEditor does not implement IDisposable, so no using block is needed
+        PdfPageEditor pageEditor = new PdfPageEditor();
 
-            // Pages are 1‑based; retrieve size of page 2.
-            PageSize size = editor.GetPageSize(2);
+        // Load the PDF document into the editor
+        pageEditor.BindPdf(inputPath);
 
-            // Store dimensions.
-            float width = size.Width;
-            float height = size.Height;
+        // Page numbers are 1‑based; retrieve size of page 2 using Aspose.Pdf.PageSize
+        PageSize pageSize = pageEditor.GetPageSize(2);
 
-            // Log the dimensions.
-            Console.WriteLine($"Page 2 size: {width} x {height}");
-        }
+        // Log the dimensions (width and height in points)
+        Console.WriteLine($"Page 2 size: Width = {pageSize.Width} pt, Height = {pageSize.Height} pt");
+
+        // No need to save changes because we only read the size
     }
 }

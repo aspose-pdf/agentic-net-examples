@@ -6,62 +6,53 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document inside a using block for proper disposal.
+        const string outputPath = "output.pdf";
+
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document.
+            // Add a blank page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define a graph (container for vector shapes) with desired size.
-            // Width and height are in points (1/72 inch).
-            Graph graph = new Graph(400, 300);
-
-            // Parameters for a regular hexagon.
-            double centerX = 200;   // X coordinate of the center.
-            double centerY = 150;   // Y coordinate of the center.
-            double radius  = 100;   // Distance from center to any vertex.
-            int sides = 6;          // Number of sides for a regular polygon.
-
-            // Pre‑compute the vertices of the hexagon.
-            var vertices = new System.Drawing.PointF[sides];
-            for (int i = 0; i < sides; i++)
+            // Define a Graph that will contain the polygon.
+            // Width and height are derived from the original rectangle (200 x 200).
+            // Use the double‑based constructor as the float overload is obsolete.
+            Graph graph = new Graph(200.0, 200.0)
             {
-                double angle = Math.PI / 3 * i; // 60° increments.
-                float x = (float)(centerX + radius * Math.Cos(angle));
-                float y = (float)(centerY + radius * Math.Sin(angle));
-                vertices[i] = new System.Drawing.PointF(x, y);
-            }
+                Left = 100.0,   // X‑position on the page (llx)
+                Top = 500.0     // Y‑position on the page (lly)
+            };
 
-            // Create line shapes for each edge of the polygon.
-            for (int i = 0; i < sides; i++)
+            // Create a regular hexagon using a closed Line shape.
+            // The first point is repeated at the end to close the shape.
+            Line hexagon = new Line(new float[]
             {
-                // Current vertex.
-                var p1 = vertices[i];
-                // Next vertex (wrap around to the first vertex).
-                var p2 = vertices[(i + 1) % sides];
-
-                // Line constructor expects a float array: { x1, y1, x2, y2 }.
-                float[] linePos = { p1.X, p1.Y, p2.X, p2.Y };
-                Line line = new Line(linePos);
-
-                // Set border (stroke) color and thickness via GraphInfo.
-                line.GraphInfo = new GraphInfo
+                180f, 100f,      // point 1
+                140f, 169.28f,   // point 2
+                60f,  169.28f,   // point 3
+                20f,  100f,      // point 4
+                60f,  30.72f,    // point 5
+                140f, 30.72f,    // point 6
+                180f, 100f       // close back to point 1
+            })
+            {
+                GraphInfo = new GraphInfo
                 {
-                    Color = Aspose.Pdf.Color.Blue,   // Border color.
-                    LineWidth = 2                     // Border thickness.
-                };
+                    Color = Aspose.Pdf.Color.Blue,   // Border color
+                    LineWidth = 2f                  // Border thickness
+                }
+            };
 
-                // Add the line to the graph.
-                graph.Shapes.Add(line);
-            }
+            // Add the hexagon to the graph's shape collection
+            graph.Shapes.Add(hexagon);
 
-            // Add the completed graph to the page's paragraph collection.
+            // Place the graph onto the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document.
-            doc.Save("RegularHexagon.pdf");
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with a regular hexagon saved as 'RegularHexagon.pdf'.");
+        Console.WriteLine($"PDF with hexagon saved to '{outputPath}'.");
     }
 }

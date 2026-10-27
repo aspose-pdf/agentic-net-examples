@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Text;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,67 +8,68 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "TablesCsv";
+        const string inputPath = "input.pdf";
+        const string outputDir = "TablesCsv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Find all tables in the document
-            TableAbsorber absorber = new TableAbsorber();
-            absorber.Visit(doc); // extracts tables from all pages
+            // TableAbsorber extracts tables from the document pages
+            TableAbsorber tableAbsorber = new TableAbsorber();
 
-            // Iterate over each detected table
-            for (int tableIndex = 0; tableIndex < absorber.TableList.Count; tableIndex++)
+            // Visit each page – the newer API uses Visit(page) instead of Page.Accept(...)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                var absorbedTable = absorber.TableList[tableIndex];
-                StringBuilder csvBuilder = new StringBuilder();
+                tableAbsorber.Visit(doc.Pages[pageIndex]);
+            }
 
-                // Process rows
-                foreach (var row in absorbedTable.RowList)
+            int tableIndex = 1;
+
+            // Iterate over each extracted table
+            foreach (var table in tableAbsorber.TableList)
+            {
+                string csvPath = Path.Combine(outputDir, $"Table_{tableIndex}.csv");
+
+                using (StreamWriter writer = new StreamWriter(csvPath))
                 {
-                    var cellTexts = new List<string>();
-
-                    // Process cells in the current row
-                    foreach (var cell in row.CellList)
+                    // RowList and CellList are the correct collections
+                    foreach (var row in table.RowList)
                     {
-                        StringBuilder cellBuilder = new StringBuilder();
+                        List<string> csvCells = new List<string>();
 
-                        // Concatenate all text fragments inside the cell
-                        foreach (var fragment in cell.TextFragments)
+                        foreach (var cell in row.CellList)
                         {
-                            cellBuilder.Append(fragment.Text);
+                            // Concatenate all text fragments inside the cell
+                            string cellText = string.Empty;
+                            foreach (var fragment in cell.TextFragments)
+                            {
+                                cellText += fragment.Text;
+                            }
+                            // Escape double quotes and wrap the cell text in quotes
+                            cellText = cellText?.Replace("\"", "\"\"") ?? string.Empty;
+                            csvCells.Add($"\"{cellText}\"");
                         }
 
-                        // Escape CSV special characters
-                        string cellText = cellBuilder.ToString()
-                            .Replace("\"", "\"\""); // escape double quotes
-
-                        if (cellText.Contains(",") || cellText.Contains("\"") || cellText.Contains("\n"))
-                        {
-                            cellText = $"\"{cellText}\"";
-                        }
-
-                        cellTexts.Add(cellText);
+                        writer.WriteLine(string.Join(",", csvCells));
                     }
-
-                    // Join cells with commas to form a CSV line
-                    csvBuilder.AppendLine(string.Join(",", cellTexts));
                 }
 
-                // Write the CSV file for the current table
-                string csvPath = Path.Combine(outputFolder, $"table_{tableIndex + 1}.csv");
-                File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
-                Console.WriteLine($"Exported table {tableIndex + 1} to '{csvPath}'.");
+                Console.WriteLine($"Table {tableIndex} saved to '{csvPath}'.");
+                tableIndex++;
+            }
+
+            if (tableIndex == 1)
+            {
+                Console.WriteLine("No tables were found in the PDF.");
             }
         }
     }

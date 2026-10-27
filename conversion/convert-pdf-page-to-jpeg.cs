@@ -7,41 +7,55 @@ class Program
 {
     static void Main()
     {
-        // Input PDF file path
-        const string inputPdfPath = "input.pdf";
-        // Page number to convert (1‑based indexing)
-        const int pageNumber = 2;
-        // Output JPEG file path
-        const string outputJpegPath = "page2.jpg";
+        const string inputPdf = "input.pdf";
+        const string outputJpeg = "page1.jpg";
+        const int pageNumber = 1; // 1‑based page index
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Validate the requested page number
-            if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                Console.Error.WriteLine("Invalid page number.");
-                return;
+                // Validate the requested page number (Aspose.Pdf uses 1‑based indexing)
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                    return;
+                }
+
+                // Retrieve the specific page
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Create a file stream for the JPEG output
+                using (FileStream imgStream = new FileStream(outputJpeg, FileMode.Create, FileAccess.Write))
+                {
+                    // JpegDevice uses the default DPI when constructed without a Resolution argument.
+                    JpegDevice jpegDevice = new JpegDevice();
+                    // Process overload that accepts a Page and an output stream (2 arguments).
+                    jpegDevice.Process(page, imgStream);
+                }
             }
 
-            // Create a JpegDevice with default resolution (150 DPI) and maximum quality
-            JpegDevice jpegDevice = new JpegDevice();
-
-            // Open a file stream for the JPEG output
-            using (FileStream jpegStream = new FileStream(outputJpegPath, FileMode.Create))
-            {
-                // Convert the specified page to JPEG and write to the stream
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegStream);
-            }
+            Console.WriteLine($"Page {pageNumber} saved as JPEG to '{outputJpeg}'.");
         }
-
-        Console.WriteLine($"Page {pageNumber} saved as JPEG to '{outputJpegPath}'.");
+        // HTML/image conversions may require GDI+ (Windows only)
+        catch (TypeInitializationException)
+        {
+            Console.WriteLine("Image conversion requires Windows (GDI+). Skipped on this platform.");
+        }
+        catch (DllNotFoundException)
+        {
+            Console.WriteLine("GDI+ library not found. Image conversion is Windows‑only.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

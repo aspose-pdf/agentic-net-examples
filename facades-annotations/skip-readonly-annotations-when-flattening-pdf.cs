@@ -1,61 +1,121 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
-class BatchAnnotationFlattener
+class Program
 {
-    // Configuration option – set to true to skip flattening of read‑only annotations.
-    private const bool SkipReadOnlyAnnotations = true;
+    // Configuration: when true, read‑only annotations are preserved and NOT flattened.
+    private const bool SkipFlattenReadOnly = true;
 
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputFolder = "InputPdfs";
+        const string outputFolder = "OutputPdfs";
 
-        if (!File.Exists(inputPath))
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Initialize the annotation editor facade and bind the source PDF.
-        PdfAnnotationEditor editor = new PdfAnnotationEditor();
-        editor.BindPdf(inputPath);
+        Directory.CreateDirectory(outputFolder);
 
-        // Access the underlying Document to work with pages and annotations.
-        Document doc = editor.Document;
-
-        // Iterate over all pages and their annotations.
-        foreach (Page page in doc.Pages)
+        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Collect annotations to avoid modifying the collection while iterating.
-            var annotations = new Annotation[page.Annotations.Count];
-            for (int i = 1; i <= page.Annotations.Count; i++)
-                annotations[i - 1] = page.Annotations[i];
+            string fileName = Path.GetFileName(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-            foreach (Annotation ann in annotations)
+            // Load the PDF document
+            Document doc = new Document(inputPath);
+
+            // -----------------------------------------------------------------
+            // 1. Collect read‑only annotations so they can be re‑added later.
+            // -----------------------------------------------------------------
+            var readOnlyAnnotations = new List<(int pageNumber, Annotation annotation)>();
+
+            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
             {
-                // If the configuration says to skip read‑only annotations, check the flag.
-                if (SkipReadOnlyAnnotations && ann.Flags.HasFlag(AnnotationFlags.ReadOnly))
+                Page page = doc.Pages[pageIdx];
+                // Iterate backwards because we may delete annotations while iterating.
+                for (int i = page.Annotations.Count; i >= 1; i--)
                 {
-                    // Skip this annotation – it is marked as read‑only.
-                    continue;
-                }
+                    Annotation annot = page.Annotations[i];
+                    bool isReadOnly = IsAnnotationReadOnly(annot);
 
-                // Flatten the annotation: its appearance becomes part of the page content
-                // and the annotation object is removed.
-                ann.Flatten();
+                    if (isReadOnly)
+                    {
+                        // Store a clone so we can re‑add it after flattening.
+                        readOnlyAnnotations.Add((pageIdx, (Annotation)annot.Clone()));
+                        // Remove it now – we do NOT want it to be flattened.
+                        page.Annotations.Delete(i);
+                    }
+                }
+            }
+
+            // -----------------------------------------------------------------
+            // 2. Flatten the remaining (non‑read‑only) annotations.
+            // -----------------------------------------------------------------
+            // Use PdfAnnotationEditor.FlatteningAnnotations() – the Document class does not expose a flatten method.
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                editor.BindPdf(doc);
+                editor.FlatteningAnnotations();
+            }
+
+            // -----------------------------------------------------------------
+            // 3. Re‑add the read‑only annotations if the configuration says to keep them.
+            // -----------------------------------------------------------------
+            if (SkipFlattenReadOnly)
+            {
+                foreach (var (pageNumber, annotation) in readOnlyAnnotations)
+                {
+                    doc.Pages[pageNumber].Annotations.Add(annotation);
+                }
+            }
+
+            // -----------------------------------------------------------------
+            // 4. Save the processed PDF.
+            // -----------------------------------------------------------------
+            doc.Save(outputPath);
+
+            Console.WriteLine($"Processed (read‑only {(SkipFlattenReadOnly ? "preserved" : "flattened")}): {fileName}");
+        }
+    }
+
+    /// <summary>
+    /// Determines whether an annotation is marked as read‑only.
+    /// Handles both the explicit "ReadOnly" property (newer versions) and the Flags enum.
+    /// </summary>
+    private static bool IsAnnotationReadOnly(Annotation annot)
+    {
+        // 1. Try the explicit ReadOnly property if it exists.
+        var readOnlyProp = annot.GetType().GetProperty("ReadOnly");
+        if (readOnlyProp != null && readOnlyProp.PropertyType == typeof(bool))
+        {
+            return (bool?)readOnlyProp.GetValue(annot) == true;
+        }
+
+        // 2. Fallback – inspect the Flags enum for the ReadOnly flag.
+        var flagsProp = annot.GetType().GetProperty("Flags");
+        if (flagsProp != null)
+        {
+            object flagsValue = flagsProp.GetValue(annot);
+            if (flagsValue != null)
+            {
+                Type enumType = flagsProp.PropertyType;
+                // Try to parse the enum member named "ReadOnly" safely.
+                if (Enum.TryParse(enumType, "ReadOnly", out object readOnlyEnum))
+                {
+                    int flagsInt = Convert.ToInt32(flagsValue);
+                    int readOnlyInt = Convert.ToInt32(readOnlyEnum);
+                    return (flagsInt & readOnlyInt) != 0;
+                }
             }
         }
 
-        // Save the modified PDF. The Save method belongs to PdfAnnotationEditor.
-        editor.Save(outputPath);
-
-        // Release resources held by the facade.
-        editor.Close();
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        return false;
     }
 }

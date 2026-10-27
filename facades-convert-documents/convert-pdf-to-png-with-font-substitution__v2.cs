@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text; // for FontRepository and SimpleFontSubstitution
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string outputDir = "PngPages";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,45 +16,41 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // ------------------------------------------------------------
-        // Enable font substitution for any missing fonts.
-        // Using FontRepository.Substitutions we can map a missing font
-        // name to a fallback font (e.g., Arial). This substitution is
-        // applied automatically during rendering, so it must be set
-        // before any conversion or rendering operation.
-        // ------------------------------------------------------------
-        // Substitute any font that cannot be resolved with Arial.
-        // The "*" wildcard is not supported; instead we add a generic
-        // substitution that covers the most common missing fonts. You can
-        // add additional entries as needed.
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Arial"));
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "Arial"));
-        // If you need a catch‑all fallback, you can also add a substitution
-        // for a font name that is unlikely to exist in the document.
-        // FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", "Arial"));
-
-        // Define the resolution (DPI) for the PNG images
-        const int resolution = 150; // 150 DPI – you can change this as needed
-
-        // Iterate through each page and save it as a PNG image
-        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        try
         {
-            string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-            using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
+            // Load PDF
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // PngDevice renders a page to a PNG image with the specified resolution
-                PngDevice pngDevice = new PngDevice(resolution, resolution);
-                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
-            }
-        }
+                // Enable font substitution if the property exists (some older versions lack it)
+                var fontSubProp = pdfDoc.GetType().GetProperty("FontSubstitutionEnabled");
+                if (fontSubProp != null && fontSubProp.CanWrite)
+                {
+                    fontSubProp.SetValue(pdfDoc, true);
+                }
 
-        Console.WriteLine("PDF has been converted to PNG images successfully.");
+                // Set the desired resolution (DPI) for the PNG images
+                var resolution = new Resolution(300);
+                var pngDevice = new PngDevice(resolution);
+
+                // Convert each page to a separate PNG file (1‑based indexing)
+                for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+                {
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                    {
+                        pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                    }
+                    Console.WriteLine($"Saved page {pageNumber} as PNG → {outPath}");
+                }
+            }
+
+            Console.WriteLine("PDF to PNG conversion completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

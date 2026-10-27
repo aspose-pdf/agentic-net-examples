@@ -1,118 +1,101 @@
 using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;          // only for creating sample images
 using System.IO;
-using Aspose.Pdf;                     // core PDF API
-using Aspose.Pdf.Facades;             // for PdfExtractor
+using System.Collections.Generic;
+using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class ContactSheetGenerator
+// NOTE: Add the Aspose.Pdf NuGet package to the project (e.g., <PackageReference Include="Aspose.Pdf" Version="23.12" />)
+// This resolves the missing "AsposePdfApi.csproj.nuget.g.targets" import error.
+
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";          // source PDF containing images
-        const string outputPdfPath  = "contact_sheet.pdf"; // resulting contact sheet
-        const int   thumbWidth      = 150;                 // thumbnail width (points)
-        const int   thumbHeight     = 150;                 // thumbnail height (points)
-        const int   columns         = 4;                   // thumbnails per row
-        const int   margin          = 20;                  // page margin (points)
-        const int   hSpacing        = 10;                  // horizontal spacing between thumbnails
-        const int   vSpacing        = 10;                  // vertical spacing between thumbnails
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "contact_sheet.pdf";
 
-        // -----------------------------------------------------------------
-        // Ensure a source PDF exists – create a minimal one with a few images
-        // -----------------------------------------------------------------
         if (!File.Exists(inputPdfPath))
         {
-            // Create a simple 2‑page PDF, each page contains a generated PNG image
-            using (var sampleDoc = new Document())
-            {
-                for (int p = 0; p < 2; p++)
-                {
-                    var page = sampleDoc.Pages.Add();
-
-                    // Generate a 100x100 solid‑color bitmap in memory
-                    using (var bmp = new Bitmap(100, 100))
-                    {
-                        using (var g = Graphics.FromImage(bmp))
-                        {
-                            g.Clear(p % 2 == 0 ? System.Drawing.Color.Red : System.Drawing.Color.Green);
-                        }
-                        using (var imgStream = new MemoryStream())
-                        {
-                            bmp.Save(imgStream, ImageFormat.Png);
-                            imgStream.Position = 0;
-
-                            // Add the image to the PDF page
-                            var rect = new Aspose.Pdf.Rectangle(50, 500, 150, 600);
-                            page.AddImage(imgStream, rect);
-                        }
-                    }
-                }
-                sampleDoc.Save(inputPdfPath);
-            }
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Extract all images from the source PDF into memory streams
-        // -----------------------------------------------------------------
+        // ---------------------------------------------------------------------
+        // 1. Extract all images from the source PDF using ImagePlacementAbsorber
+        // ---------------------------------------------------------------------
         List<MemoryStream> imageStreams = new List<MemoryStream>();
-
-        using (PdfExtractor extractor = new PdfExtractor())
+        Document srcDoc = new Document(inputPdfPath);
+        ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+        srcDoc.Pages.Accept(absorber);
+        foreach (var placement in absorber.ImagePlacements)
         {
-            extractor.BindPdf(inputPdfPath);   // bind the source PDF
-            extractor.ExtractImage();          // start image extraction
-
-            while (extractor.HasNextImage())
-            {
-                // Store each extracted image in its original format
-                MemoryStream ms = new MemoryStream();
-                extractor.GetNextImage(ms);    // overload without ImageFormat avoids platform warning
-                ms.Position = 0;               // reset for later reading
-                imageStreams.Add(ms);
-            }
+            // The ImagePlacement provides an Image object. Save it to a memory stream.
+            var img = placement.Image;
+            MemoryStream ms = new MemoryStream();
+            img.Save(ms, ImageFormat.Png); // PNG preserves quality and works for all image types
+            ms.Position = 0;
+            imageStreams.Add(ms);
         }
 
-        // -----------------------------------------------------------------
-        // Step 2: Create a new PDF document that will hold the contact sheet
-        // -----------------------------------------------------------------
+        if (imageStreams.Count == 0)
+        {
+            Console.WriteLine("No images found in the PDF.");
+            return;
+        }
+
+        // ---------------------------------------------------------------
+        // 2. Create a new PDF that will hold the contact‑sheet thumbnails
+        // ---------------------------------------------------------------
         using (Document contactDoc = new Document())
         {
-            // Add a single page (size A4)
+            // Add a single page (default size A4)
             Page page = contactDoc.Pages.Add();
 
-            // Determine page dimensions (A4 default)
-            double pageWidth  = page.PageInfo.Width;
+            // Layout parameters
+            const int columns = 3;                     // thumbnails per row
+            const double thumbWidth = 150;             // width of each thumbnail
+            const double thumbHeight = 150;            // height of each thumbnail
+            const double spacing = 10;                 // space between thumbnails
+            double pageWidth = page.PageInfo.Width;
             double pageHeight = page.PageInfo.Height;
 
-            // Compute layout positions
-            int imageCount = imageStreams.Count;
-            int rows = (int)Math.Ceiling(imageCount / (double)columns);
+            // Calculate starting offsets to centre the grid horizontally
+            double totalRowWidth = columns * thumbWidth + (columns - 1) * spacing;
+            double startX = (pageWidth - totalRowWidth) / 2;
+            double startY = pageHeight - spacing - thumbHeight; // start from top
 
-            for (int i = 0; i < imageCount; i++)
+            int currentColumn = 0;
+            int currentRow = 0;
+
+            foreach (MemoryStream imgStream in imageStreams)
             {
-                int col = i % columns;
-                int row = i / columns; // 0‑based from top
+                // Use ImageStamp for absolute positioning on the page
+                ImageStamp stamp = new ImageStamp(imgStream)
+                {
+                    Width = thumbWidth,
+                    Height = thumbHeight,
+                    XIndent = startX + currentColumn * (thumbWidth + spacing),
+                    YIndent = startY - currentRow * (thumbHeight + spacing)
+                };
 
-                // X coordinate (left)
-                double x = margin + col * (thumbWidth + hSpacing);
-                // Y coordinate (bottom). PDF origin is bottom‑left, so we count from top.
-                double y = pageHeight - margin - ((row + 1) * thumbHeight) - row * vSpacing;
+                // Add the stamp to the page
+                page.AddStamp(stamp);
 
-                // Define the rectangle where the thumbnail will be placed
-                var rect = new Aspose.Pdf.Rectangle(x, y, x + thumbWidth, y + thumbHeight);
-
-                // Add the image to the page using the memory stream
-                page.AddImage(imageStreams[i], rect);
+                // Move to next cell in the grid
+                currentColumn++;
+                if (currentColumn >= columns)
+                {
+                    currentColumn = 0;
+                    currentRow++;
+                }
             }
 
             // Save the contact sheet PDF
             contactDoc.Save(outputPdfPath);
         }
 
-        // -----------------------------------------------------------------
-        // Step 3: Clean up the in‑memory image streams
-        // -----------------------------------------------------------------
+        // Dispose all extracted image streams
         foreach (var ms in imageStreams)
         {
             ms.Dispose();

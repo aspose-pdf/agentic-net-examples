@@ -1,81 +1,65 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input_with_attachments.pdf";
-        const string outputDir = "ExtractedAttachments";
+        const string pdfPath = "input.pdf";
+        const string outputFolder = "Attachments";
 
-        // ------------------------------------------------------------
-        // 1️⃣ Create a self‑contained PDF that already contains an
-        //    attachment. This guarantees the file exists in the sandbox.
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            // a) Create a temporary file that will be embedded.
-            const string tempAttachmentName = "sample.txt";
-            File.WriteAllText(tempAttachmentName, "This is a sample attachment.");
-
-            // b) Build a minimal PDF document.
-            using (Document doc = new Document())
-            {
-                // Add a single blank page – the document must have at least one page.
-                doc.Pages.Add();
-
-                // c) Embed the temporary file.
-                using (FileStream fs = File.OpenRead(tempAttachmentName))
-                {
-                    var fileSpec = new FileSpecification(fs, tempAttachmentName, "Sample attachment")
-                    {
-                        MIMEType = "text/plain",
-                        AFRelationship = AFRelationship.Data
-                    };
-                    doc.EmbeddedFiles.Add(fileSpec);
-                }
-
-                // d) Save the PDF that will be used as input for extraction.
-                doc.Save(inputPdfPath);
-            }
-
-            // Clean up the temporary attachment file – it is now stored inside the PDF.
-            File.Delete(tempAttachmentName);
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2️⃣ Ensure the output folder exists.
-        // ------------------------------------------------------------
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // ------------------------------------------------------------
-        // 3️⃣ Extract all attachments and compute a SHA‑256 hash for each.
-        // ------------------------------------------------------------
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the PDF document
+        Document pdfDoc = new Document(pdfPath);
+
+        // Extract all embedded attachments
+        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
         {
-            extractor.BindPdf(inputPdfPath);
-            extractor.ExtractAttachment();
-            extractor.GetAttachment(outputDir);
-
-            IList<string> attachmentNames = extractor.GetAttachNames();
-
-            foreach (string name in attachmentNames)
+            foreach (FileSpecification spec in pdfDoc.EmbeddedFiles)
             {
-                if (string.IsNullOrEmpty(name))
-                    continue;
+                // Determine a safe file name for the attachment
+                string attachmentName = string.IsNullOrEmpty(spec.Name)
+                    ? Path.GetFileNameWithoutExtension(pdfPath) + "_attachment"
+                    : spec.Name;
 
-                string filePath = Path.Combine(outputDir, name);
-                using (FileStream fs = File.OpenRead(filePath))
-                using (SHA256 sha256 = SHA256.Create())
+                // Replace any invalid file‑name characters
+                foreach (char c in Path.GetInvalidFileNameChars())
+                    attachmentName = attachmentName.Replace(c, '_');
+
+                string destPath = Path.Combine(outputFolder, attachmentName);
+
+                // Ensure the stream is at the beginning before copying
+                spec.Contents.Position = 0;
+                using (FileStream fileStream = new FileStream(destPath, FileMode.Create, FileAccess.Write))
                 {
-                    byte[] hashBytes = sha256.ComputeHash(fs);
-                    string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-                    Console.WriteLine($"{name}: {hashString}");
+                    spec.Contents.CopyTo(fileStream);
                 }
+            }
+        }
+        else
+        {
+            Console.WriteLine("No embedded attachments found in the PDF.");
+        }
+
+        // Compute SHA‑256 hash for each extracted attachment
+        foreach (string filePath in Directory.GetFiles(outputFolder))
+        {
+            using (FileStream stream = File.OpenRead(filePath))
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                byte[] hashBytes = sha256.ComputeHash(stream);
+                string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+                Console.WriteLine($"{Path.GetFileName(filePath)}: {hashHex}");
             }
         }
     }

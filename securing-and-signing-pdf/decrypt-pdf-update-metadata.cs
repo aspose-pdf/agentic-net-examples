@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";
-        const string outputPath = "decrypted_updated.pdf";
+        const string inputPath  = "encrypted.pdf";
+        const string outputPath = "decrypted_modified.pdf";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -16,29 +16,23 @@ class Program
             return;
         }
 
-        try
+        // Load the encrypted PDF using the owner password.
+        // The password is supplied via the Document constructor.
+        using (Document doc = new Document(inputPath, ownerPassword))
         {
-            // Open the encrypted PDF using the owner password
-            using (Document doc = new Document(inputPath, ownerPassword))
-            {
-                // Remove encryption from the document
-                doc.Decrypt();
+            // Remove encryption. Decrypt() takes no parameters.
+            doc.Decrypt();
 
-                // Modify document metadata
-                doc.Info.Title = "Updated Document Title";
-                doc.Info.Author = "John Doe";
-                doc.Info.Subject = "Decrypted and updated metadata";
-                doc.Info.Keywords = "Aspose.Pdf, Decrypt, Metadata";
+            // Modify document metadata.
+            doc.Info.Title  = "Updated Title";
+            doc.Info.Author = "Updated Author";
+            doc.Info.Subject = "Updated Subject";
+            doc.Info.Keywords = "Aspose, PDF, Metadata";
 
-                // Save the decrypted PDF with the new metadata
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
+            // Save the decrypted and updated PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
     }
 }
