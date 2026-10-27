@@ -17,32 +17,39 @@ class Program
             return;
         }
 
-        // Use a using block for deterministic disposal of the Document.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdfPath))
         {
+            // StringBuilder to accumulate note texts
             StringBuilder notesBuilder = new StringBuilder();
 
-            // Aspose.Pdf uses 1‑based page indexing.
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Iterate over all annotations on the page.
+                // Annotations collection may be null; guard against it
+                if (page.Annotations == null) continue;
+
+                // Loop through all annotations on the page
                 foreach (Annotation annotation in page.Annotations)
                 {
-                    // TextAnnotation represents a "note" (sticky‑note) annotation.
+                    // We are interested only in TextAnnotation (the "Note" type)
                     if (annotation is TextAnnotation note)
                     {
-                        // Append the note's contents. Trim to remove extra whitespace.
-                        notesBuilder.AppendLine(note.Contents?.Trim());
+                        // Append the note's contents (if any) followed by a line break
+                        if (!string.IsNullOrEmpty(note.Contents))
+                        {
+                            notesBuilder.AppendLine(note.Contents);
+                        }
                     }
                 }
             }
 
-            // Write the concatenated notes to a plain text file.
+            // Write concatenated notes to a plain text file
             File.WriteAllText(outputTxtPath, notesBuilder.ToString());
-        }
 
-        Console.WriteLine($"All note texts have been saved to '{outputTxtPath}'.");
+            Console.WriteLine($"Extracted notes saved to '{outputTxtPath}'.");
+        }
     }
 }

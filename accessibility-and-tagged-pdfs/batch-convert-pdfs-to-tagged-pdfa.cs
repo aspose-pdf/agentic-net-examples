@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the source PDFs
+        // Input folder containing untagged PDFs
         const string inputFolder = "InputPdfs";
-        // Folder where the tagged PDFs will be written
+        // Output folder for tagged PDFs
         const string outputFolder = "TaggedPdfs";
 
         if (!Directory.Exists(inputFolder))
@@ -21,45 +22,36 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Enable global auto‑tagging – this setting is consulted during Document.Save()
+        // Enable global auto‑tagging – applied when the document is saved
         AutoTaggingSettings.Default.EnableAutoTagging = true;
-        // Optional: configure heading detection strategy
-        // AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
 
         // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileNameWithoutExt + "_tagged.pdf");
-
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // Determine whether the document is already tagged by checking TaggedContent
-                bool alreadyTagged = doc.TaggedContent != null;
-
-                if (alreadyTagged)
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Already tagged – just copy to the output location
-                    doc.Save(outputPath);
-                    Console.WriteLine($"Copied already tagged PDF: {fileNameWithoutExt}");
-                }
-                else
-                {
-                    // Document is not tagged – auto‑tagging will be applied on Save()
-                    // Optional: set accessibility metadata after the document becomes tagged
-                    // (metadata can be set before Save when auto‑tagging is enabled)
-                    ITaggedContent tagged = doc.TaggedContent; // will be created by auto‑tagging on Save
-                    if (tagged != null)
-                    {
-                        tagged.SetLanguage("en-US");
-                        tagged.SetTitle(fileNameWithoutExt);
-                    }
+                    // Access the tagged‑content interface
+                    ITaggedContent tagged = doc.TaggedContent;
 
+                    // Set language and title for accessibility
+                    tagged.SetLanguage("en-US");
+                    tagged.SetTitle(Path.GetFileNameWithoutExtension(pdfPath));
+
+                    // Save the auto‑tagged PDF to the output folder
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
                     doc.Save(outputPath);
-                    Console.WriteLine($"Auto‑tagged PDF saved: {outputPath}");
+
+                    Console.WriteLine($"Tagged PDF saved: {outputPath}");
                 }
             }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

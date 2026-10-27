@@ -8,54 +8,65 @@ class ExtractLinksToCsv
 {
     static void Main()
     {
+        // Input PDF file path
         const string inputPdfPath = "input.pdf";
+        // Output CSV file path
         const string outputCsvPath = "links.csv";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // List to hold extracted URLs
+        List<string> linkUrls = new List<string>();
+
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Collect all URLs from LinkAnnotations across all pages
-            List<string> urls = new List<string>();
-
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            // Iterate over all pages (1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                Page page = pdfDoc.Pages[i];
+                Page page = pdfDoc.Pages[pageIndex];
+
+                // Iterate over all annotations on the page
                 foreach (Annotation annotation in page.Annotations)
                 {
-                    // We are interested only in link annotations
-                    if (annotation is LinkAnnotation linkAnno && linkAnno.Action != null)
+                    // We are interested only in LinkAnnotation objects
+                    if (annotation is LinkAnnotation linkAnnotation)
                     {
-                        // Go‑to URI actions contain the target URL
-                        if (linkAnno.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                        // The Action of a LinkAnnotation can be a GoToURIAction containing the URL
+                        if (linkAnnotation.Action is GoToURIAction uriAction)
                         {
-                            urls.Add(uriAction.URI);
+                            string uri = uriAction.URI;
+                            if (!string.IsNullOrEmpty(uri))
+                            {
+                                linkUrls.Add(uri);
+                            }
                         }
                     }
                 }
             }
+        }
 
-            // Write the collected URLs to a CSV file
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false, System.Text.Encoding.UTF8))
+        // Write the collected URLs to a CSV file (one URL per line)
+        try
+        {
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
-                // CSV header
-                writer.WriteLine("URL");
-
-                foreach (string url in urls)
+                foreach (string url in linkUrls)
                 {
-                    // Escape double quotes by doubling them, then wrap the field in quotes
-                    string escaped = $"\"{url.Replace("\"", "\"\"")}\"";
-                    writer.WriteLine(escaped);
+                    // Simple CSV line – URLs are written as‑is; commas are unlikely in URLs
+                    writer.WriteLine(url);
                 }
             }
 
-            Console.WriteLine($"Extracted {urls.Count} link(s) to '{outputCsvPath}'.");
+            Console.WriteLine($"Extracted {linkUrls.Count} link(s) to '{outputCsvPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error writing CSV: {ex.Message}");
         }
     }
 }

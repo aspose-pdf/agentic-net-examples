@@ -17,35 +17,43 @@ class Program
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Access tagged content; if the document is not tagged, TaggedContent will be null
+            // Access the tagged content interface
             ITaggedContent taggedContent = doc.TaggedContent;
             if (taggedContent == null)
             {
-                Console.WriteLine("The document is not a tagged PDF.");
+                Console.WriteLine("The document does not contain tagged content.");
                 return;
             }
 
             // Root of the structure tree
             StructureElement root = taggedContent.RootElement;
 
-            // Recursively find all structure elements
-            var allElements = root.FindElements<StructureElement>(true);
+            // Recursively walk the structure tree and log information
+            WalkStructureElement(root, 0);
+        }
+    }
 
-            Console.WriteLine("Structure Elements:");
-            foreach (StructureElement element in allElements)
+    // Recursive helper to process each structure element
+    static void WalkStructureElement(StructureElement element, int depth)
+    {
+        // Indentation for readability
+        string indent = new string(' ', depth * 2);
+
+        // Tag name (type name), language, and title (using ActualText as the title)
+        string tagName   = element.GetType().Name;
+        string language  = element.Language ?? string.Empty;
+        string title     = element.ActualText ?? string.Empty;
+
+        Console.WriteLine($"{indent}Tag: {tagName}, Language: {language}, Title: {title}");
+
+        // Iterate over child elements
+        foreach (Element child in element.ChildElements)
+        {
+            if (child is StructureElement childStructure)
             {
-                // Tag name (type of the element)
-                string tagName = element.GetType().Name;
-
-                // Language property (if set)
-                string language = element.Language ?? "(none)";
-
-                // Title / actual text (if any)
-                string title = element.ActualText ?? "(none)";
-
-                Console.WriteLine($"Tag: {tagName}, Language: {language}, Title: {title}");
+                WalkStructureElement(childStructure, depth + 1);
             }
         }
     }

@@ -3,7 +3,6 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
-using Aspose.Pdf.Text; // for TextAbsorber fallback
 
 class Program
 {
@@ -20,46 +19,46 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Determine if the PDF is tagged by checking the TaggedContent property
+            // Determine if the PDF is tagged by checking TaggedContent (IsTagged does not exist in this version)
             if (doc.TaggedContent == null)
             {
-                Console.WriteLine("Document is not tagged. Extracting raw text via TextAbsorber.");
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages.Accept(absorber);
-                Console.WriteLine(absorber.Text);
+                Console.WriteLine("The PDF is not tagged; no structure tree to traverse.");
                 return;
             }
 
-            // Access the tagged content structure
+            // Access the tagged content interface
             ITaggedContent taggedContent = doc.TaggedContent;
-            StructureElement root = taggedContent.RootElement; // no cast required
 
-            // Recursively traverse the structure tree and output textual content
+            // Root element of the structure tree (no cast required)
+            StructureElement root = taggedContent.RootElement;
+
+            Console.WriteLine("Extracted textual content from the structure tree:");
             TraverseStructure(root, 0);
         }
     }
 
-    // Recursive helper to walk the structure tree
+    // Recursively walk the structure tree and output text/alt text
     static void TraverseStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
 
-        // ActualText holds the visible text for the element
-        string visibleText = element.ActualText ?? string.Empty;
-        // AlternativeText may hold alt text for images or figures
+        // ActualText holds the visible text of the element
+        string actualText = element.ActualText ?? string.Empty;
+
+        // AlternativeText holds alt text for images or other non‑text elements
         string altText = element.AlternativeText ?? string.Empty;
 
-        if (!string.IsNullOrEmpty(visibleText) || !string.IsNullOrEmpty(altText))
+        if (!string.IsNullOrWhiteSpace(actualText) || !string.IsNullOrWhiteSpace(altText))
         {
-            Console.WriteLine($"{indent}[{element.GetType().Name}] Text: '{visibleText}' Alt: '{altText}'");
+            Console.WriteLine($"{indent}[{element.GetType().Name}] Text: '{actualText}' Alt: '{altText}'");
         }
 
-        // Iterate over child elements using the correct ChildElements property
+        // Recurse into child elements
         foreach (Element child in element.ChildElements)
         {
-            if (child is StructureElement childStructure)
+            if (child is StructureElement childStruct)
             {
-                TraverseStructure(childStructure, depth + 1);
+                TraverseStructure(childStruct, depth + 1);
             }
         }
     }

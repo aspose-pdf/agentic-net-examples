@@ -18,19 +18,29 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and access its tagged content
         using (Document doc = new Document(inputPath))
         {
-            // Obtain the tagged content interface
-            ITaggedContent tagged = doc.TaggedContent;
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Set the primary language for the entire structure tree
-            tagged.SetLanguage(language);
+            // Ensure the document has a structure tree; if not, enable tagging
+            if (taggedContent == null || taggedContent.RootElement == null)
+            {
+                Console.Error.WriteLine("Document does not contain a structure tree.");
+                return;
+            }
 
-            // Save the updated PDF
+            // Set the language attribute on the root element of the structure tree
+            StructureElement root = taggedContent.RootElement;
+            root.Language = language; // applies to the entire structure tree
+
+            // Optionally also set the document-level language entry
+            taggedContent.SetLanguage(language);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Language '{language}' applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Language '{language}' added to structure tree. Saved as '{outputPath}'.");
     }
 }

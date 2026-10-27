@@ -3,48 +3,36 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "heading.pdf";
+        const string outputPath = "heading_language.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a visual page so the PDF is not empty
-            Page page = doc.Pages.Add();
-
-            // Create a text fragment that will be displayed on the page
-            TextFragment tf = new TextFragment("Chapter 1: Introduction");
-            page.Paragraphs.Add(tf);
-
-            // Access the tagging API
+            // Enable tagged PDF and set document language
             ITaggedContent tagged = doc.TaggedContent;
-
-            // Optional: set document-level language and title
             tagged.SetLanguage("en-US");
             tagged.SetTitle("Document with Heading");
 
-            // Get the root of the logical structure tree
+            // Get the root structure element (no cast needed)
             StructureElement root = tagged.RootElement;
 
-            // Create a heading element (level 1) and set its displayed text
+            // Create a heading (H1) element, set its text and language attribute
             HeaderElement heading = tagged.CreateHeaderElement(1);
-            heading.SetText("Chapter 1: Introduction");
+            heading.SetText("Sample Heading");
+            heading.Language = "en-US"; // language attribute on the heading element
 
-            // Assign a language attribute to the heading element
-            heading.Language = "en-US";
-
-            // Attach the heading to the root element
+            // Attach the heading to the structure tree
             root.AppendChild(heading);
 
             // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF created: {outputPath}");
     }
 }

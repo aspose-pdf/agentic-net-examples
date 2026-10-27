@@ -1,68 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Forms; // required for form field classes
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_form.pdf";
+        const string outputPath = "output_form_tagged.pdf";
 
-        // Create a simple PDF if the input does not exist
         if (!File.Exists(inputPath))
         {
-            using (Document tmpDoc = new Document())
-            {
-                tmpDoc.Pages.Add();
-                tmpDoc.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
         using (Document doc = new Document(inputPath))
         {
-            // Ensure at least one page exists
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
-
-            // -------------------------------------------------------------
-            // 1. Create a text box form field and add it to the AcroForm
-            // -------------------------------------------------------------
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
-            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect)
-            {
-                PartialName = "SampleTextField",
-                Value = "Enter text here"
-            };
-            // The AcroForm collection is exposed via Document.Form
-            doc.Form.Add(textField);
-
-            // -------------------------------------------------------------
-            // 2. Create a /Form structure element in the tagged content tree
-            // -------------------------------------------------------------
+            // Set basic tagging information
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
-            tagged.SetTitle("PDF with Form Field");
+            tagged.SetTitle("Form with structure element");
 
-            var root = tagged.RootElement; // root of the structure tree
+            // Create a text box form field on the first page
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect);
+            textField.PartialName = "SampleText";
+            textField.Value = "Enter text here";
 
-            FormElement formStruct = tagged.CreateFormElement();
-            formStruct.AlternativeText = "User input form field";
-            root.AppendChild(formStruct);
+            // Register the field in the AcroForm
+            doc.Form.Add(textField);
 
-            // -------------------------------------------------------------
-            // 3. Associate the form field with the /Form structure element
-            // -------------------------------------------------------------
-            // Use the Tag method of FormElement to link the field
-            formStruct.Tag(textField);
+            // Create a /Form structure element and link it directly to the field
+            var root = tagged.RootElement; // use var (or dynamic) to avoid compile‑time dependency on StructureElement
+            var formStruct = tagged.CreateFormElement(); // /Form element
+            formStruct.Tag(textField); // associate the field (widget) with the structure element
+            root.AppendChild(formStruct); // attach to the root of the structure tree
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with form field saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF with form saved to '{outputPath}'.");
     }
 }

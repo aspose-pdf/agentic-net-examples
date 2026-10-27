@@ -9,8 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string newTitle   = "Accessible Document Title";
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -24,16 +23,24 @@ class Program
             // Access the tagged content interface
             ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Set the document title metadata (applies to the root structure element)
-            taggedContent.SetTitle(newTitle);
+            // Set the document title metadata (write‑only setter)
+            taggedContent.SetTitle("My Accessible PDF Document");
 
-            // Optionally, you can also set the language if needed
-            // taggedContent.SetLanguage("en-US");
+            // Optionally set language for completeness
+            taggedContent.SetLanguage("en-US");
 
-            // No need to call PreSave(); just save the document
+            // Obtain the root structure element (no cast required)
+            StructureElement root = taggedContent.RootElement;
+
+            // Example: add a paragraph describing the title change
+            ParagraphElement para = taggedContent.CreateParagraphElement();
+            para.SetText("Document title has been set via the root structure element.");
+            root.AppendChild(para);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with title set to \"{newTitle}\" at '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }
