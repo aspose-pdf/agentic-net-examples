@@ -1,16 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // JavascriptAction resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "form.pdf";
+        const string outputPath = "form_updated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,37 +17,51 @@ class Program
             return;
         }
 
-        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Ensure automatic recalculation is enabled (default is true)
-            doc.Form.AutoRecalculate = true;
+            Form form = doc.Form;
 
-            // Retrieve the fields that participate in the calculation.
-            // Replace "Item1", "Item2", "Total" with actual field names in your PDF.
-            Field item1Field = (Field)doc.Form["Item1"];
-            Field item2Field = (Field)doc.Form["Item2"];
-            Field totalField = (Field)doc.Form["Total"];
-
-            // Define the calculation order: first calculate Item1 and Item2,
-            // then calculate Total which depends on the previous fields.
-            doc.Form.CalculatedFields = new List<Field>
+            // Item1 field
+            TextBoxField item1 = form["Item1"] as TextBoxField;
+            if (item1 == null)
             {
-                item1Field,
-                item2Field,
-                totalField
-            };
+                item1 = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 700, 200, 720))
+                { PartialName = "Item1" };
+                form.Add(item1);
+            }
 
-            // Optionally, assign JavaScript to the Total field to sum the values.
-            // This step is not required for order definition but demonstrates a typical use case.
-            totalField.Actions.OnCalculate = new JavascriptAction(
-                "event.value = this.getField('Item1').value + this.getField('Item2').value;"
+            // Item2 field
+            TextBoxField item2 = form["Item2"] as TextBoxField;
+            if (item2 == null)
+            {
+                item2 = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 660, 200, 680))
+                { PartialName = "Item2" };
+                form.Add(item2);
+            }
+
+            // Total field
+            TextBoxField total = form["Total"] as TextBoxField;
+            if (total == null)
+            {
+                total = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 620, 200, 640))
+                { PartialName = "Total" };
+                form.Add(total);
+            }
+
+            // NOTE: The CalcOrder property is not available in the referenced Aspose.Pdf version.
+            // Calculation order is handled automatically when AutoRecalculate is enabled.
+
+            // JavaScript that calculates the total (correct class name is JavascriptAction)
+            total.Actions.OnCalculate = new JavascriptAction(
+                "event.value = Number(this.getField('Item1').value) + Number(this.getField('Item2').value);"
             );
 
-            // Save the modified PDF
+            // Enable automatic recalculation of fields
+            form.AutoRecalculate = true;
+
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved with calculation order: {outputPath}");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

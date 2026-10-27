@@ -1,97 +1,79 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq; // Added for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class FormDataComparer
+class Program
 {
     static void Main()
     {
         const string pdfPath1 = "form1.pdf";
         const string pdfPath2 = "form2.pdf";
-        const string reportPath = "form_diff_report.txt";
+        const string reportPath = "diffReport.txt";
 
         if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine("One or both PDF files not found.");
             return;
         }
 
-        // Load the two PDF documents inside using blocks (ensures proper disposal)
-        using (Document doc1 = new Document(pdfPath1))
-        using (Document doc2 = new Document(pdfPath2))
+        try
         {
-            // Dictionaries to hold field name -> value for each document
-            var fields1 = ExtractFormFields(doc1);
-            var fields2 = ExtractFormFields(doc2);
-
-            // Build a diff report
-            StringBuilder reportBuilder = new StringBuilder();
-            reportBuilder.AppendLine("Form Data Comparison Report");
-            reportBuilder.AppendLine($"File 1: {Path.GetFileName(pdfPath1)}");
-            reportBuilder.AppendLine($"File 2: {Path.GetFileName(pdfPath2)}");
-            reportBuilder.AppendLine(new string('=', 50));
-            reportBuilder.AppendLine();
-
-            // Compare fields present in the first document
-            foreach (var kvp in fields1)
+            // Load both PDFs inside using blocks for deterministic disposal
+            using (Document doc1 = new Document(pdfPath1))
+            using (Document doc2 = new Document(pdfPath2))
+            using (StreamWriter report = new StreamWriter(reportPath, false))
             {
-                string fieldName = kvp.Key;
-                string value1 = kvp.Value;
-                string value2 = fields2.ContainsKey(fieldName) ? fields2[fieldName] : "(missing)";
+                // Write header for the report
+                report.WriteLine("Form Data Comparison Report");
+                report.WriteLine($"File 1: {pdfPath1}");
+                report.WriteLine($"File 2: {pdfPath2}");
+                report.WriteLine(new string('=', 50));
+                report.WriteLine();
 
-                if (value1 != value2)
+                // Compare fields that exist in the first document
+                foreach (Field field1 in doc1.Form.Fields)
                 {
-                    reportBuilder.AppendLine($"Field: {fieldName}");
-                    reportBuilder.AppendLine($"  Value in {Path.GetFileName(pdfPath1)}: {value1}");
-                    reportBuilder.AppendLine($"  Value in {Path.GetFileName(pdfPath2)}: {value2}");
-                    reportBuilder.AppendLine();
-                }
-            }
+                    string fieldName = field1.FullName ?? field1.Name ?? string.Empty;
 
-            // Detect fields that exist only in the second document
-            foreach (var kvp in fields2)
-            {
-                if (!fields1.ContainsKey(kvp.Key))
+                    // Try to find the same field in the second document (cast required)
+                    Field field2 = doc2.Form[fieldName] as Field;
+
+                    if (field2 == null)
+                    {
+                        report.WriteLine($"Field \"{fieldName}\" exists only in the first PDF.");
+                        continue;
+                    }
+
+                    // Retrieve the string representation of each field's value
+                    string value1 = field1.Value?.ToString() ?? string.Empty;
+                    string value2 = field2.Value?.ToString() ?? string.Empty;
+
+                    if (!value1.Equals(value2, StringComparison.Ordinal))
+                    {
+                        report.WriteLine($"Mismatch in field \"{fieldName}\":");
+                        report.WriteLine($"    PDF 1 value: \"{value1}\"");
+                        report.WriteLine($"    PDF 2 value: \"{value2}\"");
+                        report.WriteLine();
+                    }
+                }
+
+                // Find fields that exist only in the second document
+                foreach (Field field2 in doc2.Form.Fields)
                 {
-                    reportBuilder.AppendLine($"Field: {kvp.Key}");
-                    reportBuilder.AppendLine($"  Value in {Path.GetFileName(pdfPath1)}: (missing)");
-                    reportBuilder.AppendLine($"  Value in {Path.GetFileName(pdfPath2)}: {kvp.Value}");
-                    reportBuilder.AppendLine();
+                    string fieldName = field2.FullName ?? field2.Name ?? string.Empty;
+                    if (doc1.Form[fieldName] as Field == null)
+                    {
+                        report.WriteLine($"Field \"{fieldName}\" exists only in the second PDF.");
+                    }
                 }
-            }
 
-            // Write the report to a text file
-            File.WriteAllText(reportPath, reportBuilder.ToString());
-            Console.WriteLine($"Form data diff report saved to '{reportPath}'.");
-        }
-    }
-
-    // Helper method to extract form field values into a dictionary
-    private static Dictionary<string, string> ExtractFormFields(Document doc)
-    {
-        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-        // Ensure the document actually contains a form and fields collection
-        if (doc.Form != null && doc.Form.Fields != null && doc.Form.Fields.Count() > 0) // Fixed Count usage
-        {
-            // The Fields collection is an IEnumerable of Field objects, not a dictionary.
-            foreach (Field field in doc.Form.Fields)
-            {
-                // Guard against a null field reference (unlikely but defensive)
-                if (field == null) continue;
-
-                string fieldName = field.Name ?? string.Empty;
-                // Some field types (e.g., CheckBoxField) expose the value via the "Value" property.
-                // For safety, we convert the value to string, falling back to empty string if null.
-                string fieldValue = field?.Value?.ToString() ?? string.Empty;
-                result[fieldName] = fieldValue;
+                Console.WriteLine($"Diff report generated at \"{reportPath}\".");
             }
         }
-
-        return result;
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
+        }
     }
 }

@@ -1,59 +1,92 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace (contains Document, XmlSaveOptions)
+using System.Linq;
+using System.Xml.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class BatchFormExport
+class Program
 {
     static void Main()
     {
-        // Determine base directory (the folder where the executable runs)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing the source PDF files
+        const string inputFolder = "InputPdfs";
+        // Folder where the XML files will be written
+        const string outputFolder = "FormXml";
 
-        // Build input and output folders relative to the base directory
-        string inputFolder = Path.Combine(baseDir, "PdfInputs");
-        string outputFolder = Path.Combine(baseDir, "PdfXmlOutputs");
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Validate the input directory – if it does not exist, fall back to the current working directory
+        // Verify input folder exists
         if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input folder '{inputFolder}' not found. Using current directory as fallback.");
-            inputFolder = Directory.GetCurrentDirectory();
-        }
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'. Batch export aborted.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
+
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Build the corresponding XML file name
-                string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-                string xmlPath = Path.Combine(outputFolder, xmlFileName);
-
-                // Load the PDF and export its form data (and full structure) to XML
+                // Load each PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Save as XML using explicit XmlSaveOptions (required for non‑PDF formats)
-                    doc.Save(xmlPath, new XmlSaveOptions());
-                }
+                    // Skip files that do not contain any form fields
+                    if (doc.Form == null || doc.Form.Count == 0)
+                    {
+                        Console.WriteLine($"No form fields in '{Path.GetFileName(pdfPath)}'. Skipping.");
+                        continue;
+                    }
 
-                Console.WriteLine($"Exported '{pdfPath}' → '{xmlPath}'");
+                    // Build the output XML file name (same base name as PDF)
+                    string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
+                    string xmlPath = Path.Combine(outputFolder, xmlFileName);
+
+                    // Export the form data to XML (custom implementation – ExportToXml does not exist in core API)
+                    ExportFormToXml(doc, xmlPath);
+
+                    Console.WriteLine($"Exported form data to '{xmlPath}'.");
+                }
             }
             catch (Exception ex)
             {
+                // Log any errors but continue processing remaining files
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+    }
 
-        Console.WriteLine("Batch export completed.");
+    /// <summary>
+    /// Serialises the AcroForm fields of a PDF document to a simple XML representation.
+    /// The XML structure is:
+    ///   <FormData>
+    ///       <Field name="fieldName">fieldValue</Field>
+    ///       ...
+    ///   </FormData>
+    /// </summary>
+    /// <param name="doc">The loaded PDF document.</param>
+    /// <param name="outputPath">Full path where the XML file will be saved.</param>
+    private static void ExportFormToXml(Document doc, string outputPath)
+    {
+        // Guard against a missing Form object – though callers already check Count > 0.
+        if (doc?.Form?.Fields == null)
+        {
+            // Create an empty XML file to keep the contract consistent.
+            new XDocument(new XElement("FormData")).Save(outputPath);
+            return;
+        }
+
+        var fieldElements = doc.Form.Fields
+            .Select(field => new XElement(
+                "Field",
+                new XAttribute("name", field.Name ?? field.FullName ?? string.Empty),
+                field.Value?.ToString() ?? string.Empty));
+
+        var root = new XElement("FormData", fieldElements);
+        var xDoc = new XDocument(root);
+        xDoc.Save(outputPath);
     }
 }

@@ -1,43 +1,54 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms;   // Form field types
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";   // existing PDF with a form page
-        const string outputPdf = "output_with_tooltip.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName  = "CustomerID";          // name of the form field to modify
+        const string tooltip    = "Enter a 10‑digit numeric ID (e.g., 1234567890)";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the text box will appear (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+            // Ensure the document contains AcroForm fields
+            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
+            {
+                Console.Error.WriteLine("No form fields found in the document.");
+                return;
+            }
 
-            // Create a text box field on the document
-            TextBoxField txtField = new TextBoxField(doc, rect);
+            // Find the field by its name
+            TextBoxField field = doc.Form[fieldName] as TextBoxField;
+            if (field == null)
+            {
+                Console.Error.WriteLine($"TextBoxField named '{fieldName}' not found.");
+                return;
+            }
 
-            // Set the tooltip (alternate name) that shows in Adobe Acrobat
-            txtField.AlternateName = "Enter date as MM/DD/YYYY";
+            // Set the tooltip that appears when the user hovers over the field.
+            // In Aspose.Pdf the tooltip is stored in the 'Contents' property of the widget annotation.
+            field.Contents = tooltip;
 
-            // Optionally set a visible name for the field (used in the form hierarchy)
-            txtField.Name = "DateField";
+            // Optionally, you can also set a default value or appearance here
+            // field.Value = "";
+            // field.Border = new Border(field) { Width = 1, Color = Aspose.Pdf.Color.Black };
 
-            // Add the field to the form
-            doc.Form.Add(txtField);
-
-            // Save the modified PDF (output format is PDF because no SaveOptions are supplied)
-            doc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip: '{outputPdf}'");
+        Console.WriteLine($"Tooltip added and saved to '{outputPath}'.");
     }
 }

@@ -1,82 +1,72 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "FormWithAnalytics.pdf";
+        const string outputPath = "form_with_logging.pdf";
 
-        // Create a new PDF document
+        // Document lifecycle must be wrapped in a using block
         using (Document doc = new Document())
         {
-            // Add a blank page (page index is 1‑based)
+            // Add a single page to host the form fields
             Page page = doc.Pages.Add();
 
             // -------------------------------------------------
-            // 1. Create a hidden log field (will store interaction logs)
+            // Hidden log field (stores interaction logs)
             // -------------------------------------------------
-            // Use a zero‑size rectangle; set it read‑only and hidden
             TextBoxField logField = new TextBoxField(page, new Aspose.Pdf.Rectangle(0, 0, 0, 0));
-            logField.PartialName = "Log";
-            logField.ReadOnly = true;
-            // Hide the field using the annotation flag (Hidden = 2)
-            logField.Flags = AnnotationFlags.Hidden;
-            // Add the log field to the form on page 1
-            doc.Form.Add(logField, "Log", 1);
+            logField.PartialName = "log";
+            logField.Flags = AnnotationFlags.Hidden; // make the field invisible
+            logField.Multiline = true; // allow multiple lines of text
+            doc.Form.Add(logField);
 
             // -------------------------------------------------
-            // 2. Helper to attach JavaScript logging to a field
+            // Helper to create a visible text field with logging
             // -------------------------------------------------
-            void AttachLogAction(Field field, string fieldName)
+            void AddLoggingTextField(string fieldName, string label, double llx, double lly, double urx, double ury)
             {
-                // JavaScript appends a line to the hidden log field each time the field value changes
-                string js = $"var log = this.getField('Log'); " +
-                            $"log.value += '{fieldName} changed at ' + new Date().toISOString() + '\n';";
-                // Use a valid action property – OnCalculate fires when the field value is recalculated/changed
-                field.Actions.OnCalculate = new JavascriptAction(js);
+                // Visible text box field
+                TextBoxField txtField = new TextBoxField(page, new Aspose.Pdf.Rectangle(llx, lly, urx, ury));
+                txtField.PartialName = fieldName;
+                txtField.Value = "";
+                doc.Form.Add(txtField);
+
+                // Optional label placed above the field
+                TextFragment lbl = new TextFragment(label);
+                lbl.Position = new Position(llx, ury + 5);
+                page.Paragraphs.Add(lbl);
+
+                // JavaScript that appends an entry to the hidden log field
+                string js = $@"var log = this.getField('log');
+if (log) {{
+    log.value += '{fieldName} interacted at ' + new Date().toISOString() + '\r\n';
+}}";
+
+                // Attach the script to common interaction events
+                JavascriptAction jsAction = new JavascriptAction(js);
+                txtField.Actions.OnEnter = jsAction;          // focus
+                txtField.Actions.OnExit = jsAction;           // blur
+                // OnModifyCharacter fires for each keystroke (valid property)
+                txtField.Actions.OnModifyCharacter = jsAction; // keystroke‑like logging
             }
 
             // -------------------------------------------------
-            // 3. Add a sample text box field
+            // Create sample form fields
             // -------------------------------------------------
-            TextBoxField txtField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 700, 300, 730));
-            txtField.PartialName = "UserName";
-            txtField.Contents = "Enter name";
-            doc.Form.Add(txtField, "UserName", 1);
-            AttachLogAction(txtField, "UserName");
+            AddLoggingTextField("firstName", "First Name:", 100, 600, 300, 620);
+            AddLoggingTextField("lastName",  "Last Name:",  100, 560, 300, 580);
+            AddLoggingTextField("email",     "Email:",      100, 520, 300, 540);
 
-            // -------------------------------------------------
-            // 4. Add a sample check box field
-            // -------------------------------------------------
-            CheckboxField chkField = new CheckboxField(page, new Aspose.Pdf.Rectangle(100, 650, 120, 670));
-            chkField.PartialName = "Subscribe";
-            chkField.Contents = "Subscribe to newsletter";
-            doc.Form.Add(chkField, "Subscribe", 1);
-            AttachLogAction(chkField, "Subscribe");
-
-            // -------------------------------------------------
-            // 5. Add a sample combo box field
-            // -------------------------------------------------
-            ComboBoxField comboField = new ComboBoxField(page, new Aspose.Pdf.Rectangle(100, 600, 300, 630));
-            comboField.PartialName = "Country";
-            comboField.Contents = "Select country";
-            // Add options using the AddOption method (Option class has no single‑argument constructor)
-            comboField.AddOption("USA");
-            comboField.AddOption("Canada");
-            comboField.AddOption("UK");
-            doc.Form.Add(comboField, "Country", 1);
-            AttachLogAction(comboField, "Country");
-
-            // -------------------------------------------------
-            // 6. Save the PDF
-            // -------------------------------------------------
+            // Save the PDF (no PreSave required for tagged content)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form with analytics saved to '{outputPath}'.");
+        Console.WriteLine($"PDF form with interaction logging saved to '{outputPath}'.");
     }
 }

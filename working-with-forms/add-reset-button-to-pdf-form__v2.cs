@@ -17,28 +17,23 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the reset button will be placed
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
+            // Define the button rectangle (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 530);
 
-            // Create a push button field on the document
-            ButtonField resetButton = new ButtonField(doc, btnRect)
+            // Create a button field that will act as the reset button
+            ButtonField resetButton = new ButtonField(doc.Pages[1], btnRect)
             {
-                // Set the button caption (text shown on the button)
-                AlternateCaption = "Reset",
-                // Optional: set a tooltip for the button
-                AlternateName = "ResetFormButton"
+                PartialName      = "resetBtn",
+                AlternateCaption = "Reset"
             };
 
-            // Attach a JavaScript action that clears all form fields when the button is clicked
-            // Use a valid action property from AnnotationActionCollection (OnPressMouseBtn or OnReleaseMouseBtn)
+            // Assign a JavaScript action that clears all form fields when the button is clicked
             resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
 
-            // Add the button to the PDF form
-            doc.Form.Add(resetButton);
+            // Add the button to the form on page 1
+            doc.Form.Add(resetButton, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);

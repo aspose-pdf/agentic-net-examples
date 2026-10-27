@@ -7,14 +7,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "signed_locked.pdf"; // result PDF
-        const string certPath   = "certificate.pfx";   // signing certificate
-        const string certPass   = "password";          // certificate password
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
         if (!File.Exists(certPath))
@@ -23,47 +23,51 @@ class Program
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // ------------------------------------------------------------
-            // 1. Add a signature field and mark it as required
-            // ------------------------------------------------------------
-            // Fully qualified Rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            SignatureField sigField = new SignatureField(doc, sigRect)
+            // Load the existing PDF document
+            using (Document doc = new Document(inputPath))
             {
-                PartialName = "Signature1", // field name
-                Required    = true          // make the field required
-            };
-            doc.Form.Add(sigField);
+                // Ensure the document has a form (AcroForm)
+                Form form = doc.Form;
 
-            // ------------------------------------------------------------
-            // 2. Create a PKCS#7 signature object using the certificate
-            // ------------------------------------------------------------
-            Signature signature = new PKCS7(certPath, certPass);
+                // Define the rectangle where the signature field will appear (llx, lly, urx, ury)
+                Rectangle rect = new Rectangle(100, 500, 300, 550);
 
-            // ------------------------------------------------------------
-            // 3. Sign the field with the signature object
-            // ------------------------------------------------------------
-            sigField.Sign(signature);
+                // Create a signature field on page 1
+                SignatureField sigField = new SignatureField(doc.Pages[1], rect)
+                {
+                    PartialName = "Signature1",
+                    Required = true // make the field required
+                };
 
-            // ------------------------------------------------------------
-            // 4. Lock the document after signing (MDP signature with NoChanges)
-            // ------------------------------------------------------------
-            // This creates a modification‑detection‑and‑prevention signature
-            // that disallows any further changes to the PDF.
-            DocMDPSignature mdpSignature = new DocMDPSignature(signature, DocMDPAccessPermissions.NoChanges);
+                // Add the signature field to the form on page 1
+                form.Add(sigField, 1);
 
-            // Optional: enforce exception if the document is altered after signing
-            doc.HandleSignatureChange = true;
+                // Create a PKCS#7 signature using the certificate file
+                PKCS7 pkcs = new PKCS7(certPath, certPassword)
+                {
+                    Reason = "Document approved",
+                    Location = "Office",
+                    ContactInfo = "signer@example.com"
+                };
 
-            // ------------------------------------------------------------
-            // 5. Save the signed and locked PDF (lifecycle rule: save inside using)
-            // ------------------------------------------------------------
-            doc.Save(outputPath);
+                // Sign the field (Signature property is read‑only, so we use Sign())
+                sigField.Sign(pkcs);
+
+                // After a signature is applied, lock the document for further changes
+                // This is achieved by enabling the Append‑Only mode for signatures.
+                form.SignaturesAppendOnly = true;
+
+                // Save the signed PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Document signed, required field set, and locked: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

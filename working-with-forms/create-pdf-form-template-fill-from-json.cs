@@ -1,72 +1,132 @@
 using System;
 using System.IO;
-using System.Drawing; // for System.Drawing.Color
-using System.Text.Json; // for JSON serialization
+using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text; // needed for DefaultAppearance
+using Aspose.Pdf.Annotations; // for form field annotations
+using Aspose.Pdf.Forms;      // for AcroForm field types
+using Aspose.Pdf.Text;       // for TextFragment and Position
 
 class Program
 {
+    // Simple POCO matching the expected JSON structure
+    private class FormData
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public bool Subscribe { get; set; }
+    }
+
     static void Main()
     {
         const string templatePath = "form_template.pdf";
-        const string jsonPath     = "data.json";
         const string outputPath   = "filled_form.pdf";
+        const string jsonPath     = "data.json";
 
-        // ---------- Create a PDF form template ----------
-        using (Document doc = new Document())
+        // -------------------------------------------------
+        // Step 1: Create a PDF form template with placeholder fields
+        // -------------------------------------------------
+        if (!File.Exists(templatePath))
         {
-            // Add a single page (1‑based indexing)
-            Page page = doc.Pages.Add();
-
-            // ----- Text box field (placeholder) -----
-            Aspose.Pdf.Rectangle txtRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
-            TextBoxField txtField = new TextBoxField(page, txtRect)
+            using (Document doc = new Document())
             {
-                PartialName = "NameField",          // field identifier
-                Value       = "Enter name"          // placeholder text
-            };
-            // Set default appearance using the constructor (font name, size, color)
-            txtField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
-            // Add the field to the document's form (not the page)
-            doc.Form.Add(txtField);
+                // Add a single page
+                Page page = doc.Pages.Add();
 
-            // ----- Checkbox field (placeholder) -----
-            Aspose.Pdf.Rectangle chkRect = new Aspose.Pdf.Rectangle(100, 560, 115, 575);
-            CheckboxField chkField = new CheckboxField(page, chkRect)
-            {
-                PartialName = "SubscribeField",
-                Value       = "Off"                 // default unchecked
-            };
-            // Add the checkbox to the document's form
-            doc.Form.Add(chkField);
+                // ---- TextBox for Name ----
+                // Rectangle(left, bottom, right, top) – coordinates are in points
+                Aspose.Pdf.Rectangle nameRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
+                TextBoxField nameField = new TextBoxField(page, nameRect)
+                {
+                    PartialName = "Name",
+                    Value       = "Enter your name"
+                };
+                doc.Form.Add(nameField);
 
-            // Save the blank form template
-            doc.Save(templatePath);
+                // ---- TextBox for Email ----
+                Aspose.Pdf.Rectangle emailRect = new Aspose.Pdf.Rectangle(100, 650, 300, 670);
+                TextBoxField emailField = new TextBoxField(page, emailRect)
+                {
+                    PartialName = "Email",
+                    Value       = "Enter your email"
+                };
+                doc.Form.Add(emailField);
+
+                // ---- CheckBox for Subscription ----
+                Aspose.Pdf.Rectangle subscribeRect = new Aspose.Pdf.Rectangle(100, 600, 115, 615);
+                CheckboxField subscribeField = new CheckboxField(page, subscribeRect)
+                {
+                    PartialName = "Subscribe",
+                    // Default unchecked; will set Checked = true/false later
+                };
+                doc.Form.Add(subscribeField);
+
+                // Optional: add visual labels (simple text fragments)
+                TextFragment nameLabel = new TextFragment("Name:")
+                {
+                    Position = new Position(20, 710),
+                    TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.Black }
+                };
+                page.Paragraphs.Add(nameLabel);
+
+                TextFragment emailLabel = new TextFragment("Email:")
+                {
+                    Position = new Position(20, 660),
+                    TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.Black }
+                };
+                page.Paragraphs.Add(emailLabel);
+
+                TextFragment subscribeLabel = new TextFragment("Subscribe to newsletter:")
+                {
+                    Position = new Position(120, 610),
+                    TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.Black }
+                };
+                page.Paragraphs.Add(subscribeLabel);
+
+                // Save the template
+                doc.Save(templatePath);
+                Console.WriteLine($"Template created at '{templatePath}'.");
+            }
         }
 
-        // ---------- Create a JSON data source matching the field names ----------
-        var formData = new
+        // -------------------------------------------------
+        // Step 2: Load JSON data and populate the form fields
+        // -------------------------------------------------
+        if (!File.Exists(jsonPath))
         {
-            NameField = "John Doe",
-            SubscribeField = "On" // "On" checks the box, "Off" leaves it unchecked
-        };
-        string jsonString = JsonSerializer.Serialize(formData, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(jsonPath, jsonString);
+            Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
+            return;
+        }
 
-        // ---------- Populate the form from the JSON data source ----------
+        // Deserialize JSON into the FormData object
+        FormData data;
+        try
+        {
+            string jsonContent = File.ReadAllText(jsonPath);
+            data = JsonSerializer.Deserialize<FormData>(jsonContent);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+            return;
+        }
+
+        // Open the template, fill fields, and save the result
         using (Document doc = new Document(templatePath))
         {
-            // Import field values from the JSON file (matches field names)
-            doc.Form.ImportFromJson(jsonPath);
+            // Set text box values
+            if (doc.Form["Name"] is TextBoxField nameField)
+                nameField.Value = data.Name ?? string.Empty;
 
-            // Optional: flatten the form if you want a non‑editable result
-            // doc.Form.Flatten();
+            if (doc.Form["Email"] is TextBoxField emailField)
+                emailField.Value = data.Email ?? string.Empty;
+
+            // Set checkbox state – use the Checked property (bool)
+            if (doc.Form["Subscribe"] is CheckboxField subscribeField)
+                subscribeField.Checked = data.Subscribe;
 
             // Save the filled PDF
             doc.Save(outputPath);
+            Console.WriteLine($"Filled form saved at '{outputPath}'.");
         }
     }
 }

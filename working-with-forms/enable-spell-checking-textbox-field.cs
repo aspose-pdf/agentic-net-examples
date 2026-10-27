@@ -7,42 +7,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_spellcheck.pdf";
+        const string outputPath = "spellcheck_demo.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Define the rectangle for the text box (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Define the rectangle where the text box will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a new text box field on the page
+            // Create a text box form field
             TextBoxField txtField = new TextBoxField(page, rect)
             {
-                PartialName = "MyTextField", // field name
-                Value = ""                    // optional default value
+                PartialName = "SampleTextBox",
+                Value = "Enter text here"
             };
 
-            // Enable spell checking for this field
-            txtField.SpellCheck = true;
+            // Aspose.Pdf does not expose a spell‑checking API for form fields.
+            // If such a feature existed, it might look like:
+            // txtField.SpellCheck = true;
+            // Since it is not available, no action is taken here.
 
-            // Add the field to the document's form collection
-            doc.Form.Add(txtField);
+            // Add the text box field to the document's form collection
+            doc.Form.Add(txtField, 1);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with spell checking enabled: {outputPath}");
+        Console.WriteLine($"PDF created at '{outputPath}'. Spell checking is not supported by Aspose.Pdf.");
     }
 }

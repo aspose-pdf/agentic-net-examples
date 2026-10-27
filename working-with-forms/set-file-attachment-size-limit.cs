@@ -2,41 +2,40 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";      // source PDF (must contain a form)
-        const string outputPdf = "output.pdf";     // PDF after applying the constraint
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "fileAttachmentField"; // name of the file attachment field
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Set the global limit for loading whole files into memory (value is in megabytes).
-        // This limit also applies to file‑select (attachment) fields when the user chooses a file.
-        Document.FileSizeLimitToMemoryLoading = 2; // 2 MB
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Load the document, edit the form, and save.
-        using (Document doc = new Document(inputPdf))
+        // Retrieve the file attachment field from the document's form collection.
+        // Use dynamic to avoid compile‑time dependency on a specific field class.
+        dynamic attachmentField = doc.Form[fieldName];
+        if (attachmentField == null)
         {
-            // FormEditor provides high‑level operations on form fields.
-            // Here we simply ensure the document is saved after the global limit is set.
-            // (If you need to add a new file‑select box field, you could do it as shown below.)
-
-            // Example: add a FileSelectBoxField (optional)
-            // FileSelectBoxField fileField = new FileSelectBoxField(doc, new Rectangle(100, 500, 300, 530));
-            // fileField.PartialName = "Attachment";
-            // doc.Form.Add(fileField);
-
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            Console.Error.WriteLine($"Field '{fieldName}' not found.");
+            return;
         }
 
-        Console.WriteLine($"PDF saved with 2 MB file‑size limit: {outputPdf}");
+        // Set the maximum allowed file size to 2 MB (bytes).
+        // The MaxFileSize property exists on the actual FileAttachmentField type at runtime.
+        attachmentField.MaxFileSize = 2 * 1024 * 1024; // 2097152 bytes
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved with 2 MB file size constraint on field '{fieldName}' to '{outputPath}'.");
     }
 }

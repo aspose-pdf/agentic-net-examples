@@ -1,50 +1,43 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using System.Text.RegularExpressions;
 
 class Program
 {
+    // Regular expression for MM/DD/YYYY format:
+    // - Month: 01 to 12
+    // - Day:   01 to 31 (basic validation, not accounting for month length or leap years)
+    // - Year:  four digits
+    private static readonly Regex DateRegex = new Regex(
+        @"^(0[1-9]|1[0-2])/(0[1-9]|[12][0-9]|3[01])/(\d{4})$",
+        RegexOptions.Compiled);
+
+    // Returns true if the input matches the MM/DD/YYYY pattern
+    static bool ValidateDate(string date)
+    {
+        if (string.IsNullOrWhiteSpace(date))
+            return false;
+
+        return DateRegex.IsMatch(date);
+    }
+
     static void Main()
     {
-        // Create a new PDF document and add a blank page
-        using (Document doc = new Document())
+        // Example inputs
+        string[] testDates = {
+            "02/28/2023", // valid
+            "12/31/1999", // valid
+            "00/10/2020", // invalid month
+            "13/01/2020", // invalid month
+            "04/31/2021", // invalid day (basic pattern still accepts, deeper validation needed)
+            "5/5/2022",   // invalid format (single-digit month/day)
+            "05/05/22",   // invalid year length
+            ""            // invalid (empty)
+        };
+
+        foreach (var date in testDates)
         {
-            Page page = doc.Pages.Add();
-
-            // Define the rectangle where the date field will be placed
-            // (left, bottom, right, top) coordinates are in points
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
-
-            // Create the date field on the page
-            DateField dateField = new DateField(page, rect)
-            {
-                Name = "DateField1",
-                // Set the expected date format (displayed in the field)
-                DateFormat = "MM/dd/yyyy"
-            };
-
-            // JavaScript to validate the entered value against MM/DD/YYYY pattern
-            string js = @"
-                var re = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$/;
-                if (!re.test(this.value)) {
-                    app.alert('Invalid date format. Please use MM/DD/YYYY.');
-                    this.value = '';
-                }
-            ";
-
-            // Attach the JavaScript validation to the field
-            JavascriptAction jsAction = new JavascriptAction(js);
-            dateField.ExecuteFieldJavaScript(jsAction);
-
-            // Add the field to the document's form collection
-            doc.Form.Add(dateField);
-
-            // Save the PDF
-            doc.Save("DateFieldValidated.pdf");
+            bool isValid = ValidateDate(date);
+            Console.WriteLine($"{date,-12} => {(isValid ? "Valid" : "Invalid")}");
         }
-
-        Console.WriteLine("PDF with validated date field created successfully.");
     }
 }

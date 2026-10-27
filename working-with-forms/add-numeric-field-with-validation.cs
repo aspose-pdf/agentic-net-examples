@@ -1,56 +1,48 @@
 using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
-class Program
+public static class NumericValidator
 {
-    static void Main()
+    /// <summary>
+    /// Validates that a numeric value lies within the specified inclusive range.
+    /// </summary>
+    /// <param name="value">The value to validate.</param>
+    /// <param name="min">Minimum acceptable value (inclusive).</param>
+    /// <param name="max">Maximum acceptable value (inclusive).</param>
+    /// <returns>True if the value is within range; otherwise false.</returns>
+    /// <exception cref="ArgumentException">Thrown when min is greater than max.</exception>
+    public static bool IsWithinRange(double value, double min, double max)
     {
-        const string inputPdf  = "input.pdf";          // existing PDF to modify
-        const string outputPdf = "output_validated.pdf"; // result PDF
+        if (min > max)
+            throw new ArgumentException("Minimum value cannot be greater than maximum value.");
 
-        if (!File.Exists(inputPdf))
+        return value >= min && value <= max;
+    }
+
+    /// <summary>
+    /// Example usage of the validator.
+    /// </summary>
+    public static void Example()
+    {
+        double input = 42.5;
+        double minAllowed = 0.0;
+        double maxAllowed = 100.0;
+
+        if (IsWithinRange(input, minAllowed, maxAllowed))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
+            Console.WriteLine($"{input} is within the acceptable range [{minAllowed}, {maxAllowed}].");
         }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        else
         {
-            // Define the rectangle where the numeric field will appear
-            // (llx, lly, urx, ury) – coordinates are in points
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
-
-            // Create a NumberField on the first page of the document
-            NumberField numberField = new NumberField(doc, fieldRect)
-            {
-                // Internal name of the field
-                PartialName = "AmountField",
-
-                // Allow digits, decimal point and minus sign
-                AllowedChars = "0123456789.-"
-            };
-
-            // JavaScript that validates the entered value.
-            // It checks that the value is between 0 and 1000.
-            // If the check fails, an alert is shown and the entry is rejected.
-            JavascriptAction validateAction = new JavascriptAction(
-                "if (event.value < 0 || event.value > 1000) {" +
-                "   app.alert('Please enter a value between 0 and 1000');" +
-                "   event.rc = false;" +
-                "}"
-            );
-
-            // Attach the validation script to the field's OnValidate action
-            numberField.Actions.OnValidate = validateAction;
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            Console.WriteLine($"{input} is outside the acceptable range [{minAllowed}, {maxAllowed}].");
         }
+    }
+}
 
-        Console.WriteLine($"PDF with validated numeric field saved to '{outputPdf}'.");
+public class Program
+{
+    public static void Main()
+    {
+        // Entry point for the console application.
+        NumericValidator.Example();
     }
 }

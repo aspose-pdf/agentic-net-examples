@@ -1,15 +1,18 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // PDF containing the form
-        const string outputPath = "output_centered.pdf"; // Resulting PDF
-        const string fieldName = "myTextField";        // Name of the text field to modify
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_centered.pdf";
+        const string fieldName = "MyTextField"; // name of the text field to modify
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +20,43 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field (or a derived type).
-            Field? field = doc.Form[fieldName] as Field;
-            if (field is TextBoxField textBox)
+            // Retrieve the form field by name
+            if (doc.Form != null && doc.Form[fieldName] != null)
             {
-                // Set horizontal alignment to center
-                textBox.TextHorizontalAlignment = HorizontalAlignment.Center;
+                // Cast to TextBoxField (the type that supports text entry)
+                if (doc.Form[fieldName] is TextBoxField textBox)
+                {
+                    // Set the horizontal text alignment to center
+                    textBox.TextHorizontalAlignment = HorizontalAlignment.Center;
 
-                // Optionally, also center vertically if desired
-                // textBox.TextVerticalAlignment = VerticalAlignment.Center;
+                    // Define a default appearance for the field (font, size, colour)
+                    // Use System.Drawing.Color for the colour argument
+                    DefaultAppearance appearance = new DefaultAppearance(
+                        FontRepository.FindFont("Arial"), // Aspose.Pdf.Text.Font instance
+                        12,                               // font size
+                        System.Drawing.Color.Black       // text colour
+                    );
+                    textBox.DefaultAppearance = appearance;
+
+                    // Optionally, set a default value to see the effect
+                    // textBox.Value = "Centered Text";
+
+                    // Save the modified PDF
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Field '{fieldName}' processed. Saved to '{outputPath}'.");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField.");
+                }
             }
             else
             {
-                Console.Error.WriteLine($"Text box field '{fieldName}' not found.");
+                Console.Error.WriteLine($"Field '{fieldName}' not found in the document.");
             }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Saved centered text field PDF to '{outputPath}'.");
     }
 }

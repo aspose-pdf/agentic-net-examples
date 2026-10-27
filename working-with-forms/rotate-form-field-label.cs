@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
-class RotateFormFieldLabel
+class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
         const string outputPath = "rotated_label.pdf";
-        const string fieldName = "MyLabel"; // name of the form field to rotate
 
         if (!File.Exists(inputPath))
         {
@@ -17,28 +17,49 @@ class RotateFormFieldLabel
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field – the Form indexer returns a WidgetAnnotation,
-            // so we must cast it to Aspose.Pdf.Forms.Field before accessing field members.
-            Field? field = doc.Form[fieldName] as Field;
-            if (field == null)
+            // Ensure the document contains at least one form field
+            if (doc.Form.Count == 0)
             {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a standard field.");
+                Console.Error.WriteLine("No form fields found in the document.");
                 return;
             }
 
-            // Rotate the field's rectangle by 45 degrees. The rotation affects the visual
-            // representation of the field, including its label.
-            Aspose.Pdf.Rectangle rect = field.Rect;
-            rect.Rotate(45); // 45‑degree rotation
-            field.Rect = rect; // apply the rotated rectangle back to the field
+            // Get the first form field and cast the returned WidgetAnnotation to Field
+            Field? field = doc.Form[1] as Field;
+            if (field == null)
+            {
+                Console.Error.WriteLine("The first annotation is not a form field.");
+                return;
+            }
+
+            // Create a text stamp that will act as the label. Use RotateAngle for rotation.
+            TextStamp labelStamp = new TextStamp("Customer Name")
+            {
+                // Position the stamp just above the form field using the field's rectangle
+                XIndent = field.Rect.LLX,
+                YIndent = field.Rect.URY + 10,
+                // No automatic alignment – we control the exact coordinates
+                HorizontalAlignment = HorizontalAlignment.None,
+                VerticalAlignment = VerticalAlignment.None,
+                // Visual tweaks
+                Background = false,
+                Opacity = 1.0,
+                // Rotate 45 degrees clockwise
+                RotateAngle = 45f
+            };
+            // Set font size via the TextState object (FontSize on TextStamp is read‑only)
+            labelStamp.TextState.FontSize = 12;
+
+            // Add the stamp (label) to the first page
+            doc.Pages[1].AddStamp(labelStamp);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Form field '{fieldName}' rotated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with rotated label: {outputPath}");
     }
 }

@@ -3,66 +3,68 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "template.pdf";
-        const string outputPath = "filled.pdf";
+        const string inputPath = "input.pdf";   // existing PDF to add fields to
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load existing PDF (create rule)
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            Form form = doc.Form;
+            // Work with the first page (1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Define appearance for the form fields using the constructor (Font, FontSize, TextColor)
+            var defaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
             // Quantity field
-            Aspose.Pdf.Rectangle qtyRect = new Aspose.Pdf.Rectangle(100, 700, 150, 720);
-            NumberField qtyField = new NumberField(doc, qtyRect)
+            TextBoxField qtyField = new TextBoxField(doc)
             {
                 PartialName = "Quantity",
-                Value = "0"
+                Rect = new Aspose.Pdf.Rectangle(100, 700, 200, 720),
+                Value = "0",
+                DefaultAppearance = defaultAppearance
             };
-            form.Add(qtyField);
+            doc.Form.Add(qtyField, 1); // page number, not Page object
 
             // Unit Price field
-            Aspose.Pdf.Rectangle priceRect = new Aspose.Pdf.Rectangle(200, 700, 250, 720);
-            NumberField priceField = new NumberField(doc, priceRect)
+            TextBoxField priceField = new TextBoxField(doc)
             {
                 PartialName = "UnitPrice",
-                Value = "0"
+                Rect = new Aspose.Pdf.Rectangle(100, 660, 200, 680),
+                Value = "0.00",
+                DefaultAppearance = defaultAppearance
             };
-            form.Add(priceField);
+            doc.Form.Add(priceField, 1);
 
-            // Total Price field (calculated, read‑only)
-            Aspose.Pdf.Rectangle totalRect = new Aspose.Pdf.Rectangle(300, 700, 380, 720);
-            NumberField totalField = new NumberField(doc, totalRect)
+            // Total Price field (read‑only, calculated)
+            TextBoxField totalField = new TextBoxField(doc)
             {
                 PartialName = "TotalPrice",
-                ReadOnly = true
+                Rect = new Aspose.Pdf.Rectangle(100, 620, 200, 640),
+                ReadOnly = true,
+                Value = "0.00",
+                DefaultAppearance = defaultAppearance
             };
-            // JavaScript to compute total = quantity * unit price
+            // JavaScript calculation: Total = Quantity * UnitPrice
             totalField.Actions.OnCalculate = new JavascriptAction(
                 "event.value = this.getField('Quantity').value * this.getField('UnitPrice').value;");
-            form.Add(totalField);
+            doc.Form.Add(totalField, 1);
 
-            // Example values (could be set from elsewhere)
-            qtyField.Value = "5";
-            priceField.Value = "12.34";
-
-            // Recalculate calculated fields
-            totalField.Recalculate();
-
-            // Save the updated PDF (save rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with calculated total saved to '{outputPath}'.");
     }
 }

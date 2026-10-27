@@ -7,47 +7,42 @@ class Program
 {
     static void Main()
     {
-        // Input PDF (template) and output PDF paths
-        const string inputPath  = "template.pdf";
-        const string outputPath = "barcode_filled.pdf";
+        const string templatePath = "template.pdf";   // PDF containing a BarcodeField named "barcode"
+        const string outputPath   = "output.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
 
-        // Generate a unique barcode value (e.g., GUID without hyphens)
-        string uniqueCode = Guid.NewGuid().ToString("N");
+        // Generate a unique value for the barcode (e.g., 12‑character alphanumeric string)
+        string uniqueBarcodeValue = Guid.NewGuid().ToString("N").Substring(0, 12);
 
-        // Load the PDF, add a barcode field, populate it, and save
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(templatePath))
         {
-            // Choose the page where the barcode will be placed (first page in this example)
-            Page page = doc.Pages[1]; // 1‑based indexing
+            // Retrieve the barcode form field by its name
+            if (doc.Form["barcode"] is BarcodeField barcodeField)
+            {
+                // The barcode type (e.g., Code128) is usually defined in the template.
+                // If you need to change it programmatically, ensure you are using a version of Aspose.Pdf that exposes the BarcodeType property.
+                // For compatibility with older versions we only set the value here.
+                barcodeField.Value = uniqueBarcodeValue;
 
-            // Define the rectangle for the barcode field (left, bottom, width, height)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+                // Visual appearance (color, background) is controlled by the field's appearance settings in the template.
+                // The older Aspose.Pdf versions do not expose TextColor or BackgroundColor on BarcodeField, so we omit them.
+            }
+            else
+            {
+                Console.Error.WriteLine("Barcode field named 'barcode' not found in the PDF.");
+                return;
+            }
 
-            // Create the barcode field on the selected page
-            BarcodeField barcodeField = new BarcodeField(page, rect);
-
-            // Add a Code128 barcode using the generated unique code
-            // This method also makes the field read‑only automatically
-            barcodeField.AddBarcode(uniqueCode);
-
-            // Optionally set a visible border color for the field
-            barcodeField.Color = Aspose.Pdf.Color.Black;
-
-            // Add the field to the page's annotations collection
-            page.Annotations.Add(barcodeField);
-
-            // Save the modified document (PDF format)
+            // Save the modified PDF (saving as PDF does not require SaveOptions)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Barcode PDF created: {outputPath}");
+        Console.WriteLine($"Generated barcode '{uniqueBarcodeValue}' and saved to '{outputPath}'.");
     }
 }

@@ -1,107 +1,94 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.Json.Nodes;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "sourceForm.pdf";   // PDF containing the original form data
-        const string targetPdfPath = "targetForm.pdf";   // PDF that will receive the transformed data
-        const string resultPdfPath = "resultForm.pdf";   // Final PDF after import
+        const string sourcePdf = "source_form.pdf";
+        const string targetPdf = "target_template.pdf";
+        const string outputPdf = "merged_filled.pdf";
 
-        // ------------------------------------------------------------
-        // 1. Create sample PDFs so the example is self‑contained.
-        // ------------------------------------------------------------
-        CreateSourcePdf(sourcePdfPath);
-        CreateTargetPdf(targetPdfPath);
-
-        // ------------------------------------------------------------
-        // 2. Load the source PDF and export its form fields to JSON (in memory)
-        // ------------------------------------------------------------
-        using (Document sourceDoc = new Document(sourcePdfPath))
-        using (MemoryStream exportStream = new MemoryStream())
+        if (!File.Exists(sourcePdf) || !File.Exists(targetPdf))
         {
-            // Export form fields to JSON – the correct Aspose.Pdf API method
-            sourceDoc.Form.ExportToJson(exportStream);
-            exportStream.Position = 0; // rewind for reading
+            Console.Error.WriteLine("Source or target PDF not found.");
+            return;
+        }
 
-            // 3. Read the exported JSON as a string
-            string originalJson = new StreamReader(exportStream, Encoding.UTF8).ReadToEnd();
-
-            // 4. Transform the JSON to a different schema (example: prefix each field name with "new_")
-            string transformedJson = TransformJsonSchema(originalJson);
-
-            // 5. Load the target PDF where the transformed data will be imported
-            using (Document targetDoc = new Document(targetPdfPath))
-            // 6. Import the transformed JSON back into the target PDF's form
-            using (MemoryStream importStream = new MemoryStream(Encoding.UTF8.GetBytes(transformedJson)))
+        // ---------------------------------------------------------------------
+        // 1. Extract form data from the source PDF
+        // ---------------------------------------------------------------------
+        var extractedData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        using (Document srcDoc = new Document(sourcePdf))
+        {
+            var form = srcDoc.Form;
+            // FormFieldCollection exposes a Count() extension – use it via LINQ.
+            if (form != null && form.Fields.Count() > 0)
             {
-                targetDoc.Form.ImportFromJson(importStream);
-                // 7. Save the resulting PDF
-                targetDoc.Save(resultPdfPath);
+                foreach (var field in form.Fields)
+                {
+                    // Use the FormField API (PartialName / Value)
+                    string name = field.PartialName;
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    extractedData[name] = value;
+                }
             }
         }
 
-        Console.WriteLine("Form data extracted, transformed, and re‑imported successfully.");
-    }
-
-    // ------------------------------------------------------------
-    // Helper: create a source PDF with a simple form field.
-    // ------------------------------------------------------------
-    private static void CreateSourcePdf(string path)
-    {
-        using (Document doc = new Document())
+        // ---------------------------------------------------------------------
+        // 2. Transform data to a new schema (example: rename keys and uppercase values)
+        // ---------------------------------------------------------------------
+        var transformedData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kvp in extractedData)
         {
-            Page page = doc.Pages.Add();
-            // Add a text box field named "Name" with a default value.
-            TextBoxField nameField = new TextBoxField(page, new Rectangle(100, 600, 300, 620))
-            {
-                PartialName = "Name",
-                Value = "John Doe"
-            };
-            doc.Form.Add(nameField, 1);
-            doc.Save(path);
+            string newName = "new_" + kvp.Key;
+            string newValue = kvp.Value.ToUpperInvariant();
+            transformedData[newName] = newValue;
         }
-    }
 
-    // ------------------------------------------------------------
-    // Helper: create a target PDF that expects the transformed field names.
-    // ------------------------------------------------------------
-    private static void CreateTargetPdf(string path)
-    {
-        using (Document doc = new Document())
+        // ---------------------------------------------------------------------
+        // 3. Load the target PDF and import transformed data as new form fields
+        // ---------------------------------------------------------------------
+        using (Document tgtDoc = new Document(targetPdf))
         {
-            Page page = doc.Pages.Add();
-            // The transformed field will be "new_Name".
-            TextBoxField newNameField = new TextBoxField(page, new Rectangle(100, 600, 300, 620))
-            {
-                PartialName = "new_Name"
-            };
-            doc.Form.Add(newNameField, 1);
-            doc.Save(path);
-        }
-    }
+            // Use the first page as the container for new fields (adjust as needed)
+            Page page = tgtDoc.Pages[1]; // 1‑based indexing
 
-    // Simple example transformation: rename each field by adding a "new_" prefix.
-    // Adjust this method to implement any required schema conversion.
-    static string TransformJsonSchema(string json)
-    {
-        JsonNode? rootNode = JsonNode.Parse(json);
-        if (rootNode is JsonObject obj)
-        {
-            JsonObject transformed = new JsonObject();
-            foreach (var kvp in obj)
+            double startY = 750; // initial vertical position
+            foreach (var kvp in transformedData)
             {
-                string newKey = "new_" + kvp.Key;          // rename the field
-                transformed[newKey] = kvp.Value;           // keep the original value
+                // Define a rectangle for the field (position/size can be adjusted)
+                double llx = 50;
+                double lly = startY;
+                double urx = 300;
+                double ury = lly + 15;
+
+                // Create a TextBoxField and set its properties
+                TextBoxField txtField = new TextBoxField(tgtDoc, new Rectangle(llx, lly, urx, ury))
+                {
+                    PartialName = kvp.Key,
+                    Value = kvp.Value
+                };
+
+                // Set the font size via the DefaultAppearance property (FontSize is not a direct member)
+                txtField.DefaultAppearance.FontSize = 12;
+
+                // Add the field to the document's form collection
+                tgtDoc.Form.Add(txtField);
+
+                // Move the next field down
+                startY -= 20;
             }
-            return transformed.ToJsonString();
+
+            // Save the resulting PDF
+            tgtDoc.Save(outputPdf);
         }
-        // If the JSON structure is not an object (or parsing failed), return the original JSON.
-        return json;
+
+        Console.WriteLine($"Form data transferred and saved to '{outputPdf}'.");
     }
 }

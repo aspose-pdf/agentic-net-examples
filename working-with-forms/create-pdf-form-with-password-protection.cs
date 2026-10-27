@@ -2,54 +2,46 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
-using System.Drawing; // System.Drawing.Color is required for DefaultAppearance
+using Aspose.Pdf.Security; // Required for Permissions enum
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "PasswordProtectedForm.pdf";
-        const string userPassword = "user123";   // password for opening (read‑only)
-        const string ownerPassword = "owner123"; // password for full access (editing)
+        const string outputPath = "protected_form.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to host the form field
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the password field will appear
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
+            // Define the rectangle for the form field (left, bottom, right, top)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
 
-            // Create a text box field and configure it as a password field
-            TextBoxField pwdField = new TextBoxField(page, fieldRect)
+            // Create a text box form field
+            TextBoxField txtField = new TextBoxField(page, fieldRect)
             {
-                Name = "UserPassword",               // internal field name
-                PartialName = "UserPassword",        // partial name
-                AlternateName = "Enter password",    // tooltip shown to the user
-                // Set default appearance: font, size, and text color
-                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black)
-                // Note: The IsPassword property is not available in the current Aspose.PDF version.
-                // The field will behave as a normal text box. Password‑style masking can be
-                // achieved via PDF viewers when the document is opened with appropriate permissions.
+                PartialName = "SecureField",
+                Value = "Enter text here"
             };
 
             // Add the field to the document's form collection
-            doc.Form.Add(pwdField);
+            doc.Form.Add(txtField);
 
-            // Encrypt the document:
-            // - userPassword allows opening but does NOT grant FillForm permission
-            // - ownerPassword grants full permissions (including form editing)
-            // - Permissions exclude FillForm so the field cannot be edited with the user password
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            // Set document encryption:
+            // - userPassword allows opening the document and filling forms
+            // - ownerPassword restricts other operations
+            // - Permissions include FillForm so the user can edit the field after authentication
+            Permissions perms = Permissions.PrintDocument | Permissions.FillForm;
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the PDF
+            // Save the PDF (no SaveOptions needed for PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with password‑protected field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with password‑protected form saved to '{outputPath}'.");
     }
 }

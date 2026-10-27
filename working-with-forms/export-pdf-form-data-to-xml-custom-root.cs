@@ -1,21 +1,17 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
+using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class ExportFormDataToCustomXml
+class Program
 {
     static void Main()
     {
-        // Input PDF containing a form.
-        const string inputPdfPath = "input_form.pdf";
-
-        // Desired output XML file path.
-        const string outputXmlPath = "form_data_custom.xml";
-
-        // Custom root element name required by the external system.
-        const string customRootName = "CustomFormData";
+        const string inputPdfPath = "input.pdf";          // source PDF containing form fields
+        const string outputXmlPath = "formData.xml";       // destination XML file
+        const string customRoot = "ExternalSystemRoot";   // required root element name
 
         if (!File.Exists(inputPdfPath))
         {
@@ -23,36 +19,31 @@ class ExportFormDataToCustomXml
             return;
         }
 
-        // Load the PDF document.
+        // Load the PDF inside a using block to ensure deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Access the XFA form (if present). XFA holds the form data as XML.
-            XFA xfa = pdfDoc.Form.XFA;
-
-            // XFA.Datasets contains the data part of the XFA form.
-            // Load it into an XmlDocument for manipulation.
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xfa.Datasets.OuterXml);
-
-            // Rename the root element to the custom name.
-            XmlElement oldRoot = xmlDoc.DocumentElement;
-            XmlElement newRoot = xmlDoc.CreateElement(customRootName);
-
-            // Transfer all child nodes from the old root to the new root.
-            while (oldRoot.HasChildNodes)
+            var form = pdfDoc.Form;
+            // Use Count() (extension method) because FormFieldCollection exposes Count as a method, not a property
+            if (form == null || form.Fields == null || form.Fields.Count() == 0)
             {
-                XmlNode child = oldRoot.FirstChild;
-                oldRoot.RemoveChild(child);
-                newRoot.AppendChild(child);
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
             }
 
-            // Replace the old root with the new one.
-            xmlDoc.ReplaceChild(newRoot, oldRoot);
+            // Build XML manually using the Fields collection
+            var root = new XElement(customRoot);
+            foreach (var field in form.Fields)
+            {
+                // Guard against possible nulls on Name / FullName
+                string fieldName = field?.Name ?? field?.FullName ?? "UnnamedField";
+                string fieldValue = field?.Value?.ToString() ?? string.Empty;
+                root.Add(new XElement(fieldName, fieldValue));
+            }
 
-            // Save the modified XML to the desired file.
+            var xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
             xmlDoc.Save(outputXmlPath);
         }
 
-        Console.WriteLine($"Form data exported to XML with custom root '{customRootName}': {outputXmlPath}");
+        Console.WriteLine($"Form data exported to XML with root '{customRoot}' at '{outputXmlPath}'.");
     }
 }

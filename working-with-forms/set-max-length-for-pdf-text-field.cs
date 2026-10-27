@@ -1,40 +1,35 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_limited.pdf";
+        const string fieldName  = "CustomerName";
+        const int    maxLength  = 50;
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Retrieve the field named "CustomerName" as a TextBoxField
-            TextBoxField? textBox = doc.Form["CustomerName"] as TextBoxField;
-            if (textBox == null)
-            {
-                Console.Error.WriteLine("Field 'CustomerName' not found or is not a text box.");
-            }
-            else
-            {
-                // Set the maximum character limit to 50
-                textBox.MaxLen = 50;
-            }
+        // FormEditor does not implement IDisposable, so no using block is needed.
+        FormEditor formEditor = new FormEditor();
 
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+        // Load the PDF document into the editor.
+        formEditor.BindPdf(inputPath);
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        // Set a character limit of 50 on the specified form field.
+        formEditor.SetFieldLimit(fieldName, maxLength);
+
+        // Save the modified PDF.
+        formEditor.Save(outputPath);
+
+        Console.WriteLine($"Field '{fieldName}' limited to {maxLength} characters. Saved to '{outputPath}'.");
     }
 }

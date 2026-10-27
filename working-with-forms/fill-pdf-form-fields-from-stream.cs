@@ -7,69 +7,70 @@ using Aspose.Pdf.Forms;
 public static class PdfFieldFiller
 {
     /// <summary>
-    /// Loads a PDF from the provided input stream, fills the specified form fields,
-    /// and returns the resulting PDF as a byte array.
+    /// Loads a PDF from a byte array, fills the specified form fields, and returns the modified PDF as a byte array.
     /// </summary>
-    /// <param name="pdfInput">Stream containing the source PDF.</param>
-    /// <param name="fieldValues">Dictionary of field names and the values to set.</param>
-    /// <returns>Byte array of the filled PDF.</returns>
-    public static byte[] FillFields(Stream pdfInput, Dictionary<string, string> fieldValues)
+    /// <param name="pdfBytes">Original PDF content.</param>
+    /// <param name="fieldValues">Dictionary where key = field name, value = field value.</param>
+    /// <returns>Byte array of the PDF with filled fields.</returns>
+    public static byte[] FillFields(byte[] pdfBytes, Dictionary<string, string> fieldValues)
     {
-        // Ensure the input stream is at the beginning
-        if (pdfInput.CanSeek)
-            pdfInput.Position = 0;
-
-        // Load the PDF document from the input stream
-        using (Document doc = new Document(pdfInput))
+        // Load the source PDF into a memory stream.
+        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
         {
-            // Iterate over the supplied field values and assign them to the form fields
-            foreach (KeyValuePair<string, string> kvp in fieldValues)
-            {
-                // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
-                Field? field = doc.Form[kvp.Key] as Field;
-                if (field == null)
-                    continue; // field not found or not a form field – skip
+            // Ensure the stream position is at the beginning before loading.
+            inputStream.Position = 0;
 
-                // Different field types expose the value via different properties
-                switch (field)
+            // Load the PDF document from the stream.
+            using (Document doc = new Document(inputStream))
+            {
+                // Iterate over the provided field values and set them in the PDF form.
+                foreach (KeyValuePair<string, string> kvp in fieldValues)
                 {
-                    case TextBoxField txt:
-                        // TextBoxField uses the Value property (Text does not exist)
-                        txt.Value = kvp.Value;
-                        break;
-                    case ComboBoxField combo:
-                        combo.Value = kvp.Value;
-                        break;
-                    case ListBoxField list:
-                        list.Value = kvp.Value;
-                        break;
-                    case CheckboxField chk:
-                        // For check boxes, "On" means checked, any other value means unchecked
-                        chk.Checked = string.Equals(kvp.Value, "On", StringComparison.OrdinalIgnoreCase);
-                        break;
-                    case RadioButtonField radio:
-                        radio.Value = kvp.Value;
-                        break;
-                    default:
-                        // Fallback – many field types inherit from the base Field which has a Value property
-                        field.Value = kvp.Value;
-                        break;
-                }
-            }
+                    // The Form indexer returns a WidgetAnnotation; cast it to Field.
+                    Field field = doc.Form[kvp.Key] as Field;
+                    if (field == null)
+                        continue; // No such field or not a form field.
 
-            // Save the modified document into a memory stream
-            using (MemoryStream output = new MemoryStream())
-            {
-                doc.Save(output);
-                return output.ToArray();
+                    // Strong‑typed handling for TextBoxField (stable across versions).
+                    if (field is TextBoxField txtField)
+                    {
+                        txtField.Value = kvp.Value;
+                    }
+                    else
+                    {
+                        // For other field types use runtime type inspection to avoid version‑specific compile‑time dependencies.
+                        string typeName = field.GetType().Name;
+
+                        if (typeName == "CheckBoxField")
+                        {
+                            // Checkbox – treat "true" (case‑insensitive) as checked.
+                            dynamic checkBox = field;
+                            checkBox.Checked = kvp.Value.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        }
+                        else if (typeName == "RadioButtonOptionField")
+                        {
+                            // Radio button – set the selected option value.
+                            dynamic radio = field;
+                            radio.Value = kvp.Value;
+                        }
+                        // Additional field types (e.g., ListBox) can be added here using a similar pattern.
+                    }
+                }
+
+                // Save the modified PDF into a new memory stream.
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    doc.Save(outputStream);
+                    return outputStream.ToArray();
+                }
             }
         }
     }
 
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    // The method does nothing and can be removed if the project type is changed to a class library.
+    // Dummy entry point to satisfy the compiler when the project expects a Main method.
     public static void Main(string[] args)
     {
-        // No operation – placeholder only.
+        // This method is intentionally left empty. The class is designed to be used
+        // programmatically via the FillFields method.
     }
 }

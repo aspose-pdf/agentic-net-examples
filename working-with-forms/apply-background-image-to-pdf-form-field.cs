@@ -2,84 +2,89 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing; // for Rectangle
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "form.pdf";
-        const string outputPdfPath = "form_with_background.pdf";
-        const string fieldName = "logoField"; // name of the form field to decorate
-        const string imagePath = "logo.png";
+        const string inputPdfPath = "input.pdf";          // source PDF with a form field
+        const string outputPdfPath = "output.pdf";        // PDF after applying background image
+        const string fieldName = "myButtonField";        // name of the target form field
+        const string backgroundImg = "brand_logo.png";   // image to use as background
 
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
-        if (!File.Exists(imagePath))
+        if (!File.Exists(backgroundImg))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Background image not found: {backgroundImg}");
             return;
         }
 
-        // Open the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Access the AcroForm object
-            Form form = doc.Form;
-
-            // ------------------------------------------------------------
-            // 1. If the document contains an XFA form, use XFA.SetFieldImage
-            // ------------------------------------------------------------
-            if (form.HasXfa)
+            // Retrieve the form field by name and ensure it is a button field
+            if (pdfDoc.Form[fieldName] is ButtonField buttonField)
             {
-                // Set the background image for the specified XFA field
-                using (FileStream imgStream = File.OpenRead(imagePath))
+                // Determine the page that contains the button. ButtonField does not expose a PageNumber
+                // property, so we locate the page by checking which page rectangle fully contains the field's rectangle.
+                int pageNumber = FindPageContainingRect(pdfDoc, buttonField.Rect);
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Use the button's rectangle to position the background image
+                Aspose.Pdf.Rectangle btnRect = buttonField.Rect;
+                double btnWidth = btnRect.URX - btnRect.LLX;
+                double btnHeight = btnRect.URY - btnRect.LLY;
+
+                // Create an ImageStamp for the background image
+                ImageStamp imgStamp = new ImageStamp(backgroundImg)
                 {
-                    form.XFA.SetFieldImage(fieldName, imgStream);
-                }
+                    Width = btnWidth,
+                    Height = btnHeight,
+                    XIndent = btnRect.LLX,
+                    YIndent = btnRect.LLY
+                };
+
+                // Add the stamp to the page (adding before the button keeps the image underneath)
+                page.AddStamp(imgStamp);
+
+                // Optionally clear the button's caption so only the image is visible
+                // buttonField.NormalCaption = string.Empty;
             }
             else
             {
-                // ------------------------------------------------------------
-                // 2. For a standard AcroForm field, add a background artifact
-                // ------------------------------------------------------------
-                // Retrieve the field (example assumes a TextBoxField)
-                var field = form[fieldName] as TextBoxField;
-                if (field != null)
-                {
-                    // Create a background artifact and assign the image
-                    BackgroundArtifact bgArtifact = new BackgroundArtifact();
-                    using (FileStream imgStream = File.OpenRead(imagePath))
-                    {
-                        bgArtifact.SetImage(imgStream);
-                    }
-
-                    // Obtain the rectangle that defines the field's location
-                    Aspose.Pdf.Rectangle fieldRect = field.Rect;
-
-                    // Add the artifact to the page that contains the field.
-                    // For simplicity we use the first page; adjust as needed.
-                    Page page = doc.Pages[1];
-                    page.Artifacts.Add(bgArtifact);
-
-                    // Ensure the field itself is rendered on top of the background.
-                    // This adds an additional appearance of the field at the same rectangle.
-                    form.AddFieldAppearance(field, 1, fieldRect);
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
-                }
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or not a ButtonField.");
+                return;
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with background image applied to field: {outputPdfPath}");
+        Console.WriteLine($"Background image applied to field '{fieldName}'. Saved as '{outputPdfPath}'.");
+    }
+
+    /// <summary>
+    /// Finds the page index (1‑based) that fully contains the specified rectangle.
+    /// If no page fully contains the rectangle, the method returns 1 as a fallback.
+    /// </summary>
+    private static int FindPageContainingRect(Document doc, Aspose.Pdf.Rectangle rect)
+    {
+        for (int i = 1; i <= doc.Pages.Count; i++)
+        {
+            Page pg = doc.Pages[i];
+            // Compare the field rectangle with the page's media box (pg.Rect)
+            if (rect.LLX >= pg.Rect.LLX && rect.LLY >= pg.Rect.LLY &&
+                rect.URX <= pg.Rect.URX && rect.URY <= pg.Rect.URY)
+            {
+                return i;
+            }
+        }
+        // Fallback – assume first page
+        return 1;
     }
 }

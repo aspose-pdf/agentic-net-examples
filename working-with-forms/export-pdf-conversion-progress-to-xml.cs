@@ -1,59 +1,37 @@
 using System;
 using System.IO;
-using System.Xml;
-using Aspose.Pdf;
+using System.Xml.Linq;
 
 class Program
 {
-    // XML document that will collect progress events
-    private static readonly XmlDocument progressXml = new XmlDocument();
-
-    static void Main()
+    // Entry point of the application
+    static void Main(string[] args)
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.html";
-        const string progressXmlPath = "progress.xml";
-
-        if (!File.Exists(inputPdfPath))
+        // Example: obtain progress value (could be from a UI control, argument, etc.)
+        // Here we simply parse the first command‑line argument or default to 0.
+        int progressValue = 0;
+        if (args.Length > 0 && int.TryParse(args[0], out int parsed))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
+            progressValue = Math.Clamp(parsed, 0, 100); // ensure 0‑100 range
         }
 
-        // Initialise the XML document with a root element
-        XmlElement root = progressXml.CreateElement("ProgressEvents");
-        progressXml.AppendChild(root);
+        // Build the XML structure
+        XDocument xmlDoc = new XDocument(
+            new XElement("Progress",
+                new XElement("Value", progressValue),
+                new XElement("Timestamp", DateTime.UtcNow.ToString("o")) // ISO 8601 format
+            )
+        );
 
-        // Load the PDF document (using block ensures proper disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Define the output path (can be customized)
+        string outputPath = "progress_status.xml";
+
+        // Write the XML to file using a FileStream inside a using block for deterministic disposal
+        using (FileStream stream = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
         {
-            // Configure HTML save options with a custom progress handler
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-            {
-                // Assign the handler that records progress into the XML document
-                CustomProgressHandler = new HtmlSaveOptions.ConversionProgressEventHandler(RecordProgress)
-            };
-
-            // Save the document; the progress handler will be invoked during the conversion
-            doc.Save(outputPdfPath, htmlOpts);
+            xmlDoc.Save(stream);
         }
 
-        // After conversion, write the collected progress information to an XML file
-        progressXml.Save(progressXmlPath);
-        Console.WriteLine($"Conversion completed. Progress data saved to '{progressXmlPath}'.");
-    }
-
-    // Handler that receives progress events and appends them to the XML document
-    private static void RecordProgress(HtmlSaveOptions.ProgressEventHandlerInfo eventInfo)
-    {
-        // Create an <Event> element with relevant attributes
-        XmlElement eventElem = progressXml.CreateElement("Event");
-        eventElem.SetAttribute("Timestamp", DateTime.Now.ToString("o"));
-        eventElem.SetAttribute("EventType", eventInfo.EventType.ToString());
-        eventElem.SetAttribute("Value", eventInfo.Value.ToString());
-        eventElem.SetAttribute("MaxValue", eventInfo.MaxValue.ToString());
-
-        // Append the event to the root <ProgressEvents> element
-        progressXml.DocumentElement?.AppendChild(eventElem);
+        Console.WriteLine($"Progress value {progressValue} saved to '{outputPath}'.");
     }
 }

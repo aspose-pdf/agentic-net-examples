@@ -1,80 +1,83 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";                 // PDF with interactive form (created inline)
-        const string encryptedXmlPath = "data.xml.enc";    // Encrypted XFDF file (created inline)
-        const string outputPdfPath = "form_filled.pdf";    // Resulting PDF
+        const string pdfPath = "template.pdf";
+        const string encryptedXmlPath = "data.xml.enc";
+        const string outputPdfPath = "filled.pdf";
 
-        // Example key/IV – deterministic values for the demo
-        byte[] key = new byte[32]; // 256‑bit key
-        byte[] iv  = new byte[16]; // 128‑bit IV
-        for (int i = 0; i < key.Length; i++) key[i] = (byte)(i + 1);
-        for (int i = 0; i < iv.Length; i++)  iv[i]  = (byte)(i + 1);
+        // Replace with your actual key (32 bytes for AES‑256) and IV (16 bytes)
+        // For demo purposes we pad/truncate the strings to required lengths.
+        byte[] key = GetFixedLengthBytes("YOUR_32_BYTE_KEY_GOES_HERE_____", 32);
+        byte[] iv  = GetFixedLengthBytes("YOUR_16_BYTE_IV__", 16);
 
-        // ------------------------------------------------------------
-        // 1. Create a simple PDF containing a single text box field.
-        // ------------------------------------------------------------
-        CreatePdfTemplate(pdfPath);
+        // Verify that the source files exist before proceeding.
+        if (!File.Exists(pdfPath))
+        {
+            Console.WriteLine($"PDF template not found: {Path.GetFullPath(pdfPath)}");
+            return;
+        }
+        if (!File.Exists(encryptedXmlPath))
+        {
+            Console.WriteLine($"Encrypted XML file not found: {Path.GetFullPath(encryptedXmlPath)}");
+            return;
+        }
 
-        // ------------------------------------------------------------
-        // 2. Build an XFDF string that fills the field and encrypt it.
-        // ------------------------------------------------------------
-        string xfdf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                      "<xfdf xmlns=\"http://ns.adobe.com/xfdf/\">\n" +
-                      "  <fields>\n" +
-                      "    <field name=\"FullName\">\n" +
-                      "      <value>John Doe</value>\n" +
-                      "    </field>\n" +
-                      "  </fields>\n" +
-                      "</xfdf>";
-        EncryptAndSave(xfdf, encryptedXmlPath, key, iv);
+        // Decrypt the XML file
+        string xmlContent = DecryptXmlFile(encryptedXmlPath, key, iv);
+        if (string.IsNullOrWhiteSpace(xmlContent))
+        {
+            Console.WriteLine("Decrypted XML content is empty.");
+            return;
+        }
 
-        // ------------------------------------------------------------
-        // 3. Decrypt the XFDF and import the values into the PDF.
-        // ------------------------------------------------------------
-        using (FileStream encStream = File.OpenRead(encryptedXmlPath))
-        using (MemoryStream decryptedStream = DecryptStream(encStream, key, iv))
+        // Load XML into an XDocument
+        XDocument xDoc = XDocument.Parse(xmlContent);
+
+        // Open the PDF template inside a using block (ensures disposal)
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // Import field values from the decrypted XFDF stream
-            XfdfReader.ReadFields(decryptedStream, pdfDoc);
+            // Expect XML like: <FormData><Field name="FieldName">Value</Field>...</FormData>
+            foreach (XElement fieldElem in xDoc.Descendants("Field"))
+            {
+                XAttribute nameAttr = fieldElem.Attribute("name");
+                if (nameAttr == null) continue;
 
-            // Save the updated PDF
+                string fieldName = nameAttr.Value;
+                string fieldValue = fieldElem.Value;
+
+                // Retrieve the form field; the indexer returns a Field object or null.
+                // Use a nullable variable to avoid CS8600 warning.
+                Field? pdfField = pdfDoc.Form[fieldName] as Field;
+                if (pdfField != null)
+                {
+                    pdfField.Value = fieldValue;
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: No form field named '{fieldName}' found in the PDF template.");
+                }
+            }
+
+            // Save the filled PDF (PDF format, no SaveOptions needed)
             pdfDoc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 
-    // Creates a PDF with a single TextBoxField named "FullName".
-    private static void CreatePdfTemplate(string path)
+    // Decrypts an AES‑CBC encrypted file and returns the plaintext as a string
+    static string DecryptXmlFile(string encryptedPath, byte[] key, byte[] iv)
     {
-        using (Document doc = new Document())
-        {
-            Page page = doc.Pages.Add();
-            // Define a rectangle for the field (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-            var rect = new Rectangle(100, 700, 300, 720);
-            TextBoxField txt = new TextBoxField(page, rect)
-            {
-                PartialName = "FullName",
-                Value = string.Empty
-            };
-            doc.Form.Add(txt);
-            doc.Save(path);
-        }
-    }
-
-    // Encrypts a plain‑text string using AES‑CBC and writes the ciphertext to a file.
-    private static void EncryptAndSave(string plainText, string outputPath, byte[] key, byte[] iv)
-    {
+        using (FileStream fs = new FileStream(encryptedPath, FileMode.Open, FileAccess.Read))
         using (Aes aes = Aes.Create())
         {
             aes.Key = key;
@@ -82,34 +85,22 @@ class Program
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
 
-            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            using (CryptoStream cryptoStream = new CryptoStream(outStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
-            using (StreamWriter writer = new StreamWriter(cryptoStream))
+            using (CryptoStream cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read))
+            using (MemoryStream ms = new MemoryStream())
             {
-                writer.Write(plainText);
+                cs.CopyTo(ms);
+                return Encoding.UTF8.GetString(ms.ToArray());
             }
         }
     }
 
-    // Decrypts an input stream using AES‑CBC and returns a MemoryStream with plaintext.
-    private static MemoryStream DecryptStream(Stream encryptedStream, byte[] key, byte[] iv)
+    // Helper: ensures a byte array of the exact required length (pads with zeros or truncates).
+    static byte[] GetFixedLengthBytes(string input, int length)
     {
-        encryptedStream.Position = 0; // Ensure start position
-
-        using (Aes aes = Aes.Create())
-        {
-            aes.Key = key;
-            aes.IV = iv;
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.PKCS7;
-
-            using (CryptoStream cryptoStream = new CryptoStream(encryptedStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
-            {
-                MemoryStream plainStream = new MemoryStream();
-                cryptoStream.CopyTo(plainStream);
-                plainStream.Position = 0; // Reset for reading
-                return plainStream;
-            }
-        }
+        byte[] bytes = Encoding.UTF8.GetBytes(input);
+        if (bytes.Length == length) return bytes;
+        byte[] fixedBytes = new byte[length];
+        Array.Copy(bytes, 0, fixedBytes, 0, Math.Min(bytes.Length, length));
+        return fixedBytes;
     }
 }

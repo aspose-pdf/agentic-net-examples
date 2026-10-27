@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using System.Xml;
 
 class Program
@@ -18,22 +19,30 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for proper disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Verify that the document contains an XFA form
-                if (!doc.Form.HasXfa)
+                // Verify that the PDF contains an XFA form
+                if (doc.Form != null && doc.Form.HasXfa)
                 {
-                    Console.WriteLine("The PDF does not contain an XFA form.");
-                    return;
+                    // Access the XFA packet via the core API (uppercase XFA)
+                    XFA xfa = doc.Form.XFA;
+                    XmlNode datasets = xfa.Datasets;
+
+                    if (datasets != null)
+                    {
+                        // Save the XFA datasets (XML) to a file
+                        File.WriteAllText(outputXml, datasets.OuterXml);
+                        Console.WriteLine($"XFA data saved to '{outputXml}'.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("XFA packet does not contain datasets.");
+                    }
                 }
-
-                // Retrieve the XFA data package (XDP) as an XmlDocument
-                XmlDocument xfaXml = doc.Form.XFA.XDP;
-
-                // Save the extracted XML to the specified file
-                xfaXml.Save(outputXml);
-                Console.WriteLine($"XFA data extracted and saved to '{outputXml}'.");
+                else
+                {
+                    Console.WriteLine("No XFA form found in the PDF.");
+                }
             }
         }
         catch (Exception ex)

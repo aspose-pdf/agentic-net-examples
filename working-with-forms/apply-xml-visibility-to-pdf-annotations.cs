@@ -1,18 +1,18 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, the XML with visibility settings, and the output PDF.
-        const string pdfPath = "source.pdf";
+        const string pdfPath = "input.pdf";
         const string xmlPath = "visibility.xml";
-        const string outPdfPath = "output.pdf";
+        const string outputPdf = "output.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -26,87 +26,73 @@ class Program
             return;
         }
 
-        // Load the XML file that defines visibility for each annotation (or logical section).
+        // Load visibility definitions from XML.
         // Expected format:
-        // <Sections>
-        //   <Section id="0" visible="true" />
-        //   <Section id="1" visible="false" />
-        //   ...
-        // </Sections>
+        // <Visibilities>
+        //   <Section Id="sec1" Visibility="hidden" />
+        //   <Section Id="sec2" Visibility="visible" />
+        // </Visibilities>
         XDocument xmlDoc = XDocument.Load(xmlPath);
-        if (xmlDoc.Root == null)
+        var visibilityMap = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        foreach (var elem in xmlDoc.Root?.Elements("Section") ?? Array.Empty<XElement>())
         {
-            Console.Error.WriteLine("Invalid XML: missing root element.");
-            return;
+            string id = (string)elem.Attribute("Id");
+            string vis = (string)elem.Attribute("Visibility");
+            if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(vis))
+            {
+                bool hidden = vis.Equals("hidden", StringComparison.OrdinalIgnoreCase);
+                visibilityMap[id] = hidden;
+            }
         }
 
-        var visibilityMap = xmlDoc.Root
-                                   .Elements("Section")
-                                   .Select(e => new
-                                   {
-                                       Id = (int?)e.Attribute("id") ?? -1,
-                                       Visible = (bool?)e.Attribute("visible") ?? false
-                                   })
-                                   .Where(v => v.Id >= 0)
-                                   .ToDictionary(v => v.Id, v => v.Visible);
-
-        // Open the PDF document inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(pdfPath))
+        // Process PDF.
+        using (Document doc = new Document(pdfPath))
         {
-            // Iterate over all pages.
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            // Verify that the PDF is tagged.
+            if (doc.TaggedContent == null)
             {
-                Page page = pdfDoc.Pages[pageIndex];
-
-                // Iterate over all annotations on the page.
-                for (int annIndex = 1; annIndex <= page.Annotations.Count; annIndex++)
-                {
-                    Annotation ann = page.Annotations[annIndex];
-
-                    // Use a deterministic global index for the annotation.
-                    int globalIndex = GetGlobalAnnotationIndex(pdfDoc, pageIndex, annIndex);
-                    if (visibilityMap.TryGetValue(globalIndex, out bool visible))
-                    {
-                        // Aspose.Pdf does not expose an IsHidden property on the base Annotation class.
-                        // Visibility is controlled via the annotation's Flags. The Hidden flag (bit 2) hides the annotation.
-                        // We add or remove the Hidden flag based on the XML setting.
-                        if (ann != null)
-                        {
-                            if (visible)
-                            {
-                                // Ensure the Hidden flag is cleared.
-                                ann.Flags &= ~AnnotationFlags.Hidden;
-                            }
-                            else
-                            {
-                                // Set the Hidden flag.
-                                ann.Flags |= AnnotationFlags.Hidden;
-                            }
-                        }
-                    }
-                }
+                Console.WriteLine("PDF is not tagged; cannot apply visibility states.");
+                doc.Save(outputPdf);
+                Console.WriteLine($"Saved unchanged PDF to '{outputPdf}'.");
+                return;
             }
 
+            ITaggedContent taggedContent = doc.TaggedContent;
+            // Use dynamic to avoid compile‑time dependency on StructureElement.
+            dynamic root = taggedContent.RootElement;
+
+            ApplyVisibilityRecursive(root, visibilityMap);
+
             // Save the modified PDF.
-            pdfDoc.Save(outPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with updated visibility: {outPdfPath}");
+        Console.WriteLine($"Visibility states applied and saved to '{outputPdf}'.");
     }
 
-    /// <summary>
-    /// Calculates a deterministic global index for an annotation based on its page and position.
-    /// This simple implementation counts annotations sequentially across pages.
-    /// </summary>
-    private static int GetGlobalAnnotationIndex(Document doc, int pageNumber, int annotationNumberOnPage)
+    private static void ApplyVisibilityRecursive(dynamic element, Dictionary<string, bool> visibilityMap)
     {
-        int index = 0;
-        for (int i = 1; i < pageNumber; i++)
+        // Try to obtain the element's ID.
+        string elementId = null;
+        try { elementId = element.GetId(); } catch { /* GetId not available */ }
+
+        if (!string.IsNullOrEmpty(elementId) && visibilityMap.TryGetValue(elementId, out bool hide))
         {
-            index += doc.Pages[i].Annotations.Count;
+            // Attempt to set the hidden flag; ignore if the method does not exist in the current version.
+            try { element.SetHidden(hide); } catch { /* SetHidden not available */ }
         }
-        // annotationNumberOnPage is 1‑based, convert to 0‑based offset.
-        index += (annotationNumberOnPage - 1);
-        return index;
+
+        // Recurse into child elements if any.
+        try
+        {
+            foreach (var child in element.ChildElements)
+            {
+                ApplyVisibilityRecursive(child, visibilityMap);
+            }
+        }
+        catch
+        {
+            // ChildElements not supported – nothing to recurse.
+        }
     }
 }

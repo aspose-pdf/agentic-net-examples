@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "MyField"; // name of the form field to modify
+        const string fieldName = "myField";
 
         if (!File.Exists(inputPath))
         {
@@ -18,27 +18,35 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the widget annotation that represents the form field
-            WidgetAnnotation widget = doc.Form[fieldName] as WidgetAnnotation;
-            if (widget == null)
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Field \"{fieldName}\" not found or is not a widget annotation.");
-                return;
+                // Retrieve the form field by its name. The Form indexer returns a WidgetAnnotation,
+                // so we need to cast it to Field (or a derived field type) before using field members.
+                Field? field = doc.Form[fieldName] as Field;
+                if (field == null)
+                {
+                    Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a form field.");
+                }
+                else
+                {
+                    // Make the field visible on screen but exclude it from printing.
+                    // Clear Hidden, Invisible and Print flags.
+                    field.Flags &= ~AnnotationFlags.Hidden;      // ensure not hidden
+                    field.Flags &= ~AnnotationFlags.Invisible;   // ensure not invisible
+                    field.Flags &= ~AnnotationFlags.Print;       // prevent printing
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Clear the Print flag so the field is visible on screen but omitted from printing
-            widget.Flags = widget.Flags & ~AnnotationFlags.Print;
-
-            // Ensure the field is not hidden (no Invisible or Hidden flags set)
-            widget.Flags = widget.Flags & ~AnnotationFlags.Invisible & ~AnnotationFlags.Hidden;
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Field \"{fieldName}\" set to visible‑only (non‑printable). Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

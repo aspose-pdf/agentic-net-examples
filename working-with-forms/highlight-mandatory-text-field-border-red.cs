@@ -1,14 +1,17 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // Required for Border and BorderStyle
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName = "MandatoryField"; // name of the text field to highlight
 
         if (!File.Exists(inputPath))
         {
@@ -16,20 +19,26 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields in the document
-            foreach (Field field in doc.Form)
+            // Retrieve the text box field from the form collection safely
+            TextBoxField txtField = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName) as TextBoxField;
+            if (txtField != null)
             {
-                // Process only text box fields (including derived types like NumberField, PasswordBoxField, etc.)
-                if (field is TextBoxField txtField)
+                // Define a solid border with a width of 2 points
+                txtField.Border = new Border(txtField)
                 {
-                    // Set the border color to red to highlight the field as mandatory.
-                    // In Aspose.Pdf the border color is controlled by the annotation's Color property,
-                    // not by a Color property on the Border object.
-                    txtField.Color = Aspose.Pdf.Color.Red;
-                }
+                    Style = BorderStyle.Solid,
+                    Width = 2
+                };
+
+                // Set the border colour – the Color property of the field controls the border colour
+                txtField.Color = Aspose.Pdf.Color.Red;
+            }
+            else
+            {
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a text box.");
             }
 
             // Save the modified PDF

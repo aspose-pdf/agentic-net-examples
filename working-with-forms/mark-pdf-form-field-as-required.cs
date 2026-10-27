@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_required.pdf";
         const string fieldName = "myTextField";
 
         if (!File.Exists(inputPath))
@@ -17,35 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field to access field‑specific members
-            Field field = doc.Form[fieldName] as Field;
-            if (field != null)
+            // Wrap Document in a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Mark the existing field as required; validation will fail if left empty
-                field.Required = true;
-            }
-            else
-            {
-                // Field not found – create a new TextBoxField as an example
-                // Rectangle coordinates: lower‑left x, lower‑left y, upper‑right x, upper‑right y
-                var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
-                var txt = new TextBoxField(doc, rect)
+                // Access the form fields collection
+                var form = doc.Form;
+
+                // Retrieve the specific field (assumed to be a TextBoxField)
+                var field = form[fieldName] as TextBoxField;
+                if (field == null)
                 {
-                    PartialName = fieldName,
-                    Required = true
-                };
-                // Add the new field to the form (and to the first page annotations)
-                doc.Form.Add(txt);
-                doc.Pages[1].Annotations.Add(txt);
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
+                }
+                else
+                {
+                    // Mark the field as required; PDF viewers will block submission if left empty
+                    field.Required = true;
+                }
+
+                // Save the updated PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
-            doc.Save(outputPath);
+            Console.WriteLine($"Saved PDF with required field to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with required field saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

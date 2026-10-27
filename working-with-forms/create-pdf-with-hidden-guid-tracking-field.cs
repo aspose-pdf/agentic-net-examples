@@ -1,36 +1,43 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Generate a GUID at runtime for tracking
-        string trackingId = Guid.NewGuid().ToString();
+        const string outputPath = "tracking.pdf";
 
-        // Create a new PDF document (wrapped in using as per lifecycle rule)
+        // Generate a GUID at runtime for tracking
+        string guid = Guid.NewGuid().ToString();
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page (required for placing form fields)
+            // Add a blank page to host the form field
             Page page = doc.Pages.Add();
 
-            // Define a zero‑size rectangle for the hidden field (position is irrelevant)
-            Rectangle fieldRect = new Rectangle(0, 0, 0, 0);
+            // Define the field rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            Rectangle rect = new Rectangle(100, 500, 300, 550);
 
-            // Create a textbox field on the page, assign a partial name and store the GUID as its value
-            TextBoxField hiddenField = new TextBoxField(page, fieldRect)
+            // Create a hidden text box field and assign the GUID as its value
+            TextBoxField hiddenField = new TextBoxField(page, rect)
             {
                 PartialName = "TrackingId",
-                Value = trackingId
-                // No need to set a flag; the zero‑size rectangle keeps the field invisible
+                Value = guid
             };
 
-            // Add the field to the document's form
+            // Hide the field by setting the widget annotation flag to Hidden
+            hiddenField.Flags = AnnotationFlags.Hidden;
+
+            // Add the field to the document's form collection
             doc.Form.Add(hiddenField);
 
             // Save the PDF
-            doc.Save("HiddenGuid.pdf");
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with hidden GUID field saved to '{outputPath}'.");
     }
 }

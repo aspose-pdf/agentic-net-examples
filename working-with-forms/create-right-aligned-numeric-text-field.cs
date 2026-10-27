@@ -2,47 +2,44 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the text field will be placed (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
-
-            // Create a numeric text field (NumberField) on the first page
-            NumberField numField = new NumberField(doc.Pages[1], fieldRect)
+            // Retrieve the text box form field by its name (adjust the name as needed)
+            TextBoxField txtField = doc.Form["NumericField"] as TextBoxField;
+            if (txtField == null)
             {
-                // Set the field name (optional, useful for form data extraction)
-                Name = "AmountField",
+                Console.Error.WriteLine("Text field 'NumericField' not found.");
+            }
+            else
+            {
+                // NOTE: The Justification property is not available in the current Aspose.Pdf version.
+                // If right‑alignment is required, consider using a newer library version where
+                // TextBoxField.Justification exists, or apply a custom appearance stream.
+                // txtField.Justification = Justification.Right; // <-- removed for compatibility
 
-                // Align the entered text to the right for numeric values
-                TextHorizontalAlignment = HorizontalAlignment.Right,
-
-                // Optional: limit allowed characters to digits and decimal separator
-                AllowedChars = "0123456789.,"
-            };
-
-            // Add the field to the page's annotations collection
-            doc.Pages[1].Annotations.Add(numField);
+                // Optional: set an example numeric value
+                txtField.Value = "12345";
+            }
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with right-aligned numeric field: {outputPdf}");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

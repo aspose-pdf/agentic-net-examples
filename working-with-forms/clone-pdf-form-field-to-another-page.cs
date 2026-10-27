@@ -9,9 +9,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string originalFieldName = "myField";   // name of the field to clone
-        const string clonedFieldName = "myField_clone";
-        const int targetPageNumber = 2;               // page where the clone will be placed (1‑based)
+        const string sourceFieldName = "TextField1"; // name of the field to clone
+        const int targetPageNumber = 2; // page where the clone will be placed
 
         if (!File.Exists(inputPath))
         {
@@ -19,43 +18,50 @@ class Program
             return;
         }
 
-        // Load the source PDF (using the lifecycle rule for disposal)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Access the form object
-            Form form = doc.Form;
-
-            // Retrieve the field that will be cloned (cast from WidgetAnnotation to Field)
-            Field originalField = doc.Form[originalFieldName] as Field;
-            if (originalField == null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Field '{originalFieldName}' not found or is not a form field.");
-                return;
+                // Retrieve the original form field and cast it to Field
+                Field sourceField = doc.Form[sourceFieldName] as Field;
+                if (sourceField == null)
+                {
+                    Console.Error.WriteLine($"Form field '{sourceFieldName}' not found or is not a form field.");
+                    return;
+                }
+
+                // Clone the field (deep copy). The Clone method returns a WidgetAnnotation, so cast it back to Field.
+                Field clonedField = sourceField.Clone() as Field;
+                if (clonedField == null)
+                {
+                    Console.Error.WriteLine("Failed to clone the form field.");
+                    return;
+                }
+
+                // Modify properties of the cloned field
+                clonedField.PartialName = "Cloned_" + sourceFieldName; // give it a unique name
+                clonedField.Value = "Cloned value"; // set a new default value
+
+                // Define the rectangle where the cloned field will appear
+                Rectangle rect = new Rectangle(100, 500, 200, 550);
+                clonedField.Rect = rect;
+
+                // Add the cloned field to the form collection
+                doc.Form.Add(clonedField);
+
+                // Place the cloned field on the target page using AddFieldAppearance
+                doc.Form.AddFieldAppearance(clonedField, targetPageNumber, rect);
+
+                // Save the updated PDF
+                doc.Save(outputPath);
             }
 
-            // Clone the field onto the target page with a new partial name.
-            // The Add method returns a WidgetAnnotation; cast it to Field to work with field members.
-            Field clonedField = doc.Form.Add(originalField, clonedFieldName, targetPageNumber) as Field;
-            if (clonedField == null)
-            {
-                Console.Error.WriteLine("Failed to clone the field.");
-                return;
-            }
-
-            // Modify properties of the cloned field
-            // Example: change its position and size (fully qualified Rectangle to avoid ambiguity)
-            clonedField.Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Example: set a new default value
-            clonedField.Value = "Cloned Value";
-
-            // Example: make the cloned field read‑only
-            clonedField.ReadOnly = true;
-
-            // Save the modified document (using the lifecycle rule)
-            doc.Save(outputPath);
+            Console.WriteLine($"Cloned field saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Cloned field saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

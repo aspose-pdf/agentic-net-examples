@@ -16,23 +16,16 @@ class Program
             return;
         }
 
-        try
+        // Ensure the Document is disposed properly
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Delete the form field by its name
-                doc.Form.Delete(fieldName);
+            // Delete the specified form field
+            doc.Form.Delete(fieldName);
 
-                // Save the modified document
-                doc.Save(outputPath);
-            }
+            // Save the updated PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Field '{fieldName}' deleted. Saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form field '{fieldName}' deleted. Saved to '{outputPath}'.");
     }
 }

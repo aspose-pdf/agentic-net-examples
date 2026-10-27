@@ -1,50 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // Form field types and actions
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "secured.pdf";
+        const string outputPath = "secured_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Iterate over all form fields and remove any JavaScript actions attached to them
-        foreach (Field field in doc.Form.Fields)
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdf = new Document(inputPath))
         {
-            var actions = field.Actions;
-            if (actions == null) continue;
+            // Iterate over all form fields in the document
+            foreach (Field field in pdf.Form)
+            {
+                // If the field has any JavaScript actions, clear them using the valid properties of AnnotationActionCollection
+                if (field.Actions != null)
+                {
+                    field.Actions.OnEnter = null;
+                    field.Actions.OnExit = null;
+                    field.Actions.OnPressMouseBtn = null;
+                    field.Actions.OnReleaseMouseBtn = null;
+                    field.Actions.OnReceiveFocus = null;
+                    field.Actions.OnLostFocus = null;
+                    field.Actions.OnOpenPage = null;
+                    field.Actions.OnClosePage = null;
+                    field.Actions.OnShowPage = null;
+                    field.Actions.OnHidePage = null;
+                    field.Actions.OnModifyCharacter = null;
+                    field.Actions.OnValidate = null;
+                    field.Actions.OnFormat = null;
+                    field.Actions.OnCalculate = null;
+                }
+            }
 
-            // Set every possible action property to null – this effectively removes the JavaScript.
-            actions.OnEnter = null;
-            actions.OnExit = null;
-            actions.OnPressMouseBtn = null;
-            actions.OnReleaseMouseBtn = null;
-            actions.OnReceiveFocus = null;
-            actions.OnLostFocus = null;
-            actions.OnOpenPage = null;
-            actions.OnClosePage = null;
-            actions.OnShowPage = null;
-            actions.OnHidePage = null;
-            actions.OnModifyCharacter = null;
-            actions.OnValidate = null;
-            actions.OnFormat = null;
-            actions.OnCalculate = null;
+            // Save the cleaned PDF; no SaveOptions needed because the output is PDF
+            pdf.Save(outputPath);
         }
 
-        // Save the cleaned PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"All JavaScript actions removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"JavaScript actions removed. Saved to '{outputPath}'.");
     }
 }

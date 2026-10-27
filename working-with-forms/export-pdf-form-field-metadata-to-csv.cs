@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,59 +8,64 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdfPath = "input.pdf";
-        // Output CSV file for auditing
-        const string outputCsvPath = "form_audit.csv";
+        const string inputPdf = "input.pdf";
+        const string outputCsv = "form_fields.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Open a StreamWriter for the CSV output
-            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
+            // Verify that the document contains a form with fields
+            var form = doc.Form;
+            if (form == null || form.Fields == null || !form.Fields.Any())
+            {
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            // Create the CSV file inside a using block to ensure proper disposal
+            using (StreamWriter writer = new StreamWriter(outputCsv))
             {
                 // Write CSV header
                 writer.WriteLine("FieldName,FieldType,DefaultValue");
 
-                // Iterate over all form fields
-                foreach (Field field in pdfDocument.Form.Fields)
+                // Iterate over each form field via the Fields collection
+                foreach (Field field in form.Fields)
                 {
-                    // The field name (full name)
-                    string fieldName = field.FullName ?? string.Empty;
+                    // Full field name
+                    string name = field.Name ?? string.Empty;
 
-                    // Determine the concrete field type (e.g., TextBoxField, CheckboxField, etc.)
-                    string fieldType = field.GetType().Name;
+                    // Determine field type via runtime type name (e.g., TextBoxField, CheckBoxField)
+                    string type = field.GetType().Name;
 
-                    // Retrieve the default/value of the field
-                    string fieldValue = string.Empty;
-                    try
-                    {
-                        // Most field types expose a Value property that holds the current/default value
-                        fieldValue = field.Value?.ToString() ?? string.Empty;
-                    }
-                    catch
-                    {
-                        // If accessing Value throws, leave it empty
-                        fieldValue = string.Empty;
-                    }
+                    // Retrieve the field's current/value which serves as the default for auditing purposes
+                    string defaultValue = field.Value?.ToString() ?? string.Empty;
 
-                    // Escape commas and double quotes in CSV values by surrounding with double quotes
-                    string escapedName = $"\"{fieldName.Replace("\"", "\"\"")}\"";
-                    string escapedType = $"\"{fieldType.Replace("\"", "\"\"")}\"";
-                    string escapedValue = $"\"{fieldValue.Replace("\"", "\"\"")}\"";
+                    // Escape CSV values that may contain commas or quotes
+                    name = EscapeCsv(name);
+                    type = EscapeCsv(type);
+                    defaultValue = EscapeCsv(defaultValue);
 
-                    // Write the CSV line
-                    writer.WriteLine($"{escapedName},{escapedType},{escapedValue}");
+                    writer.WriteLine($"{name},{type},{defaultValue}");
                 }
             }
-        }
 
-        Console.WriteLine($"Form field metadata exported to '{outputCsvPath}'.");
+            Console.WriteLine($"Form field metadata exported to '{outputCsv}'.");
+        }
+    }
+
+    // Helper method to escape CSV fields containing commas, quotes, or line breaks
+    static string EscapeCsv(string value)
+    {
+        if (value.Contains('"'))
+            value = value.Replace("\"", "\"\"");
+        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
+            value = $"\"{value}\"";
+        return value;
     }
 }

@@ -1,68 +1,109 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using System.Linq;
+using System.Xml.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-class Program
+class BatchXmlFormImporter
 {
     static void Main()
     {
-        // Base directory of the application (works for both Windows and Linux)
+        // Base directory of the running application – works on any OS
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Resolve input / output folders relative to the base directory
-        string pdfFolder = Path.Combine(baseDir, "pdfs");
-        string xmlFolder = Path.Combine(baseDir, "xmls");
-        string outputFolder = Path.Combine(baseDir, "output");
-
-        // Validate / create folders so the sample can run out‑of‑the‑box
-        if (!Directory.Exists(pdfFolder))
-        {
-            Console.WriteLine($"PDF source folder not found: '{pdfFolder}'. Creating it now.");
-            Directory.CreateDirectory(pdfFolder);
-            Console.WriteLine("Place PDF files in this folder and re‑run the program.");
-            return; // No PDFs to process yet
-        }
-
-        if (!Directory.Exists(xmlFolder))
-        {
-            Console.WriteLine($"XML source folder not found: '{xmlFolder}'. Creating it now.");
-            Directory.CreateDirectory(xmlFolder);
-            Console.WriteLine("Place matching XML files in this folder and re‑run the program.");
-            // Continue – XML files may be added later; we will simply skip PDFs without XML.
-        }
-
-        // Ensure the output directory exists
+        // Resolve input / output folders (fallback to the base directory if the configured one does not exist)
+        string pdfFolder = GetValidDirectory(Path.Combine(baseDir, "Input", "PDFs"), "PDF input");
+        string xmlFolder = GetValidDirectory(Path.Combine(baseDir, "Input", "XML"), "XML input");
+        string outputFolder = Path.Combine(baseDir, "Output", "FilledPDFs");
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file found in the source folder
-        foreach (string pdfPath in Directory.GetFiles(pdfFolder, "*.pdf"))
+        // Get all PDF files in the source folder
+        string[] pdfFiles = Directory.GetFiles(pdfFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
         {
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string xmlPath = Path.Combine(xmlFolder, baseName + ".xml");
-            string outputPath = Path.Combine(outputFolder, baseName + "_filled.pdf");
+            Console.WriteLine($"No PDF files found in '{pdfFolder}'. Nothing to process.");
+            return;
+        }
 
-            if (!File.Exists(xmlPath))
-            {
-                Console.WriteLine($"[Warning] XML file not found for '{baseName}'. Skipping this PDF.");
-                continue;
-            }
-
+        foreach (string pdfPath in pdfFiles)
+        {
             try
             {
-                using (Document pdfDoc = new Document(pdfPath))
-                {
-                    // Bind the XML data to the PDF form fields
-                    pdfDoc.BindXml(xmlPath);
+                // Determine corresponding XML file (same file name, .xml extension)
+                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
+                string xmlPath = Path.Combine(xmlFolder, baseName + ".xml");
 
-                    // Save the filled PDF
-                    pdfDoc.Save(outputPath);
+                if (!File.Exists(xmlPath))
+                {
+                    Console.WriteLine($"XML data not found for '{baseName}'. Skipping.");
+                    continue;
                 }
 
-                Console.WriteLine($"[Success] Processed '{baseName}'. Output saved to '{outputPath}'.");
+                // Load PDF, import XML form data, and save the result
+                using (Document doc = new Document(pdfPath))
+                {
+                    ImportFormDataFromXml(doc, xmlPath);
+
+                    string outputPdfPath = Path.Combine(outputFolder, baseName + "_filled.pdf");
+                    doc.Save(outputPdfPath);
+                    Console.WriteLine($"Processed '{baseName}': saved filled PDF to '{outputPdfPath}'.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[Error] Failed to process '{baseName}': {ex.Message}");
+                Console.Error.WriteLine($"[Error] Failed to process '{pdfPath}': {ex.Message}");
+            }
+        }
+
+        Console.WriteLine("Batch import completed.");
+    }
+
+    /// <summary>
+    /// Returns a valid directory path. If the supplied path does not exist, the method falls back to the
+    /// application base directory and logs the situation.
+    /// </summary>
+    private static string GetValidDirectory(string path, string description)
+    {
+        if (Directory.Exists(path))
+            return path;
+
+        string fallback = AppDomain.CurrentDomain.BaseDirectory;
+        Console.WriteLine($"{description} folder not found at '{path}'. Using fallback folder '{fallback}'.");
+        return fallback;
+    }
+
+    /// <summary>
+    /// Reads a simple XML file and maps its field values to the PDF form fields.
+    /// Expected XML structure (example):
+    /// <form>
+    ///   <field name="FirstName">John</field>
+    ///   <field name="LastName">Doe</field>
+    /// </form>
+    /// </summary>
+    private static void ImportFormDataFromXml(Document doc, string xmlPath)
+    {
+        if (doc?.Form?.Fields == null)
+            return;
+
+        XDocument xDoc = XDocument.Load(xmlPath);
+        // Iterate over each <field> element (case‑insensitive name handling)
+        foreach (var fieldElem in xDoc.Descendants("field"))
+        {
+            var nameAttr = fieldElem.Attribute("name") ?? fieldElem.Attribute("Name");
+            if (nameAttr == null)
+                continue; // No field name – cannot map
+
+            string fieldName = nameAttr.Value;
+            string fieldValue = fieldElem.Value ?? string.Empty;
+
+            // Find the matching PDF form field (case‑insensitive match)
+            var pdfField = doc.Form.Fields.FirstOrDefault(f =>
+                string.Equals(f.Name, fieldName, StringComparison.OrdinalIgnoreCase));
+
+            if (pdfField != null)
+            {
+                pdfField.Value = fieldValue;
             }
         }
     }

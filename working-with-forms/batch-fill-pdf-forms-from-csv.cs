@@ -3,119 +3,94 @@ using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
-class BatchPdfFiller
+class Program
 {
     static void Main()
     {
         // Paths – adjust as needed
-        const string csvPath      = "data.csv";          // CSV file with data rows
-        const string templatePath = "template.pdf";      // PDF template with form fields
-        const string outputFolder = "FilledOutputs";    // Folder to store filled PDFs
+        const string templatesFolder = "Templates";          // folder containing PDF templates
+        const string csvPath        = "data.csv";           // CSV file with data rows
+        const string outputFolder   = "Output";            // folder for generated PDFs
 
-        // Verify input files and create output directory
+        if (!Directory.Exists(templatesFolder))
+        {
+            Console.Error.WriteLine($"Templates folder not found: {templatesFolder}");
+            return;
+        }
+
         if (!File.Exists(csvPath))
         {
             Console.Error.WriteLine($"CSV file not found: {csvPath}");
             return;
         }
-        if (!File.Exists(templatePath))
-        {
-            Console.Error.WriteLine($"PDF template not found: {templatePath}");
-            return;
-        }
+
         Directory.CreateDirectory(outputFolder);
 
-        // Read CSV – first line contains column headers
-        string[] allLines = File.ReadAllLines(csvPath);
-        if (allLines.Length < 2)
+        // Read CSV – first line is header
+        string[] csvLines = File.ReadAllLines(csvPath);
+        if (csvLines.Length < 2)
         {
-            Console.Error.WriteLine("CSV file must contain at least a header line and one data row.");
+            Console.Error.WriteLine("CSV file does not contain data rows.");
             return;
         }
 
-        // Parse header
-        string[] headers = SplitCsvLine(allLines[0]);
+        string[] headers = csvLines[0].Split(',');
 
-        // Process each data row
-        for (int rowIndex = 1; rowIndex < allLines.Length; rowIndex++)
+        // Process each template file
+        foreach (string templatePath in Directory.GetFiles(templatesFolder, "*.pdf"))
         {
-            string[] values = SplitCsvLine(allLines[rowIndex]);
-            if (values.Length != headers.Length)
-            {
-                Console.Error.WriteLine($"Row {rowIndex} column count mismatch – skipping.");
-                continue;
-            }
+            string templateFileName = Path.GetFileNameWithoutExtension(templatePath);
 
-            // Build a dictionary of column name → value for easy lookup
-            var rowData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            for (int i = 0; i < headers.Length; i++)
-                rowData[headers[i]] = values[i];
-
-            // Load a fresh copy of the template for each row
-            using (Document pdfDoc = new Document(templatePath))
+            // Process each data row
+            for (int rowIndex = 1; rowIndex < csvLines.Length; rowIndex++)
             {
-                // Fill form fields – field names are expected to match CSV column names
-                foreach (var kvp in rowData)
+                string[] values = csvLines[rowIndex].Split(',');
+
+                // Build a dictionary of column name → value for quick lookup
+                var rowData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < headers.Length; i++)
                 {
-                    // Retrieve the field; the Form indexer returns a WidgetAnnotation, so cast to Field
-                    Field? field = pdfDoc.Form[kvp.Key] as Field;
-                    if (field != null)
+                    string value = i < values.Length ? values[i] : string.Empty;
+                    rowData[headers[i].Trim()] = value.Trim();
+                }
+
+                // Load the template PDF
+                using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(templatePath))
+                {
+                    // Iterate over all form fields in the document
+                    foreach (Aspose.Pdf.Forms.Field field in doc.Form.Fields)
                     {
-                        // Most field types expose a Value property (object). Setting it works for TextBox, ComboBox, etc.
-                        field.Value = kvp.Value;
+                        // Try to find a matching column in the CSV row
+                        if (rowData.TryGetValue(field.Name, out string? fieldValue) && fieldValue != null)
+                        {
+                            // Handle TextBox fields directly
+                            if (field is TextBoxField txtField)
+                            {
+                                txtField.Value = fieldValue;
+                            }
+                            // For other field types (including CheckBox), set the generic Value property.
+                            // Aspose.Pdf will interpret "true", "1", "On" etc. appropriately for check boxes.
+                            else
+                            {
+                                field.Value = fieldValue;
+                            }
+                        }
                     }
-                }
 
-                // Determine output file name – use a column named "FileName" if present, otherwise use row index
-                string outputFileName;
-                if (rowData.TryGetValue("FileName", out string? customName) && !string.IsNullOrWhiteSpace(customName))
-                {
-                    // Ensure the name is a valid file name
-                    foreach (char c in Path.GetInvalidFileNameChars())
-                        customName = customName.Replace(c, '_');
-                    outputFileName = $"{customName}.pdf";
-                }
-                else
-                {
-                    outputFileName = $"filled_{rowIndex}.pdf";
-                }
+                    // Build output file name: TemplateName_RowNumber.pdf
+                    string outputPath = Path.Combine(
+                        outputFolder,
+                        $"{templateFileName}_Row{rowIndex}.pdf");
 
-                string outputPath = Path.Combine(outputFolder, outputFileName);
-
-                // Save the filled PDF – Document.Save(string) writes a PDF regardless of extension
-                pdfDoc.Save(outputPath);
-                Console.WriteLine($"Saved filled PDF: {outputPath}");
+                    // Save the filled PDF
+                    doc.Save(outputPath);
+                    Console.WriteLine($"Saved: {outputPath}");
+                }
             }
         }
-    }
 
-    // Simple CSV line splitter handling commas inside quoted fields
-    private static string[] SplitCsvLine(string line)
-    {
-        var fields = new List<string>();
-        bool inQuotes = false;
-        System.Text.StringBuilder current = new System.Text.StringBuilder();
-
-        foreach (char c in line)
-        {
-            if (c == '"')
-            {
-                inQuotes = !inQuotes;
-                continue;
-            }
-
-            if (c == ',' && !inQuotes)
-            {
-                fields.Add(current.ToString());
-                current.Clear();
-            }
-            else
-            {
-                current.Append(c);
-            }
-        }
-        fields.Add(current.ToString());
-        return fields.ToArray();
+        Console.WriteLine("Batch processing completed.");
     }
 }

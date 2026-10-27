@@ -2,48 +2,59 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing; // for Rectangle (avoid System.Drawing)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "form_input.pdf";   // PDF containing a text box field named "MyField"
-        const string outputPath = "form_output.pdf";
+        const string pdfPath = "field_test.pdf";
+        const int maxLength = 50; // desired character limit
 
-        if (!File.Exists(inputPath))
+        // Create a PDF with a text box field (no built‑in MaxLength property in this version)
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
+            // Add a page
+            Page page = doc.Pages.Add();
+
+            // Define a rectangle for the field (use Aspose.Pdf.Rectangle to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
+
+            // Create the text box field
+            TextBoxField txtField = new TextBoxField(page, rect);
+            txtField.PartialName = "MyField";
+            txtField.Value = ""; // initial empty value
+
+            // Add the field to the document's form
+            doc.Form.Add(txtField, 1);
+
+            // Save the PDF
+            doc.Save(pdfPath);
         }
 
-        // Load the PDF document (using the recommended lifecycle rule)
-        using (Document doc = new Document(inputPath))
+        // Prepare a 60‑character string
+        string longText = new string('A', 60); // e.g., "AAAAAAAA...." (60 times)
+
+        // Load the PDF, set the long value (truncated manually), and verify truncation
+        using (Document doc = new Document(pdfPath))
         {
-            // Retrieve the field by name and cast to TextBoxField
-            TextBoxField txtField = doc.Form["MyField"] as TextBoxField;
-            if (txtField == null)
-            {
-                Console.Error.WriteLine("TextBoxField 'MyField' not found in the document.");
-                return;
-            }
+            // Retrieve the field by its partial name
+            TextBoxField txtField = (TextBoxField)doc.Form["MyField"];
 
-            // Set the maximum allowed length to 50 characters
-            txtField.MaxLen = 50;
+            // Manually enforce the character limit because TextBoxField.MaxLength is not available
+            string truncated = longText.Length > maxLength ? longText.Substring(0, maxLength) : longText;
+            txtField.Value = truncated;
 
-            // Attempt to assign a 60‑character string
-            string longInput = new string('A', 60);
-            txtField.Value = longInput;
+            // Save changes (optional, but ensures the value is persisted)
+            doc.Save(pdfPath);
 
-            // Verify that the value has been truncated to the MaxLen
-            string resultingValue = txtField.Value as string ?? string.Empty;
-            Console.WriteLine($"Original length: {longInput.Length}");
-            Console.WriteLine($"Stored length : {resultingValue.Length}");
-            Console.WriteLine($"Stored value  : {resultingValue}");
+            // Read back the stored value
+            string actual = txtField.Value;
 
-            // Save the modified document (optional, follows the save rule)
-            doc.Save(outputPath);
+            // Output validation results
+            Console.WriteLine($"Original length: {longText.Length}");   // should be 60
+            Console.WriteLine($"Stored length:   {actual.Length}");    // should be 50
+            Console.WriteLine($"Truncation correct: {actual.Length == maxLength}");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -7,43 +7,35 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName = "DateField"; // name of the form field containing the placeholder
 
-        // Name of the form field that contains the placeholder text
-        const string fieldName = "DatePlaceholder";
-
-        // Ensure the source file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Retrieve the field by name. The indexer returns null if the field does not exist.
-            var field = doc.Form[fieldName] as TextBoxField;
-            if (field != null)
+            // Retrieve the form field by name; cast to TextBoxField to set its value
+            TextBoxField dateField = pdfDoc.Form[fieldName] as TextBoxField;
+            if (dateField != null)
             {
-                // Create a PageDate instance to obtain the formatted current date (default format dd/MM/yyyy)
-                PageDate pageDate = new PageDate();
-                string formattedDate = pageDate.GetFormattedDate(); // e.g., "27/08/2026"
-
-                // Set the field value
-                field.Value = formattedDate;
+                // Replace the placeholder with the current system date formatted as "MMMM dd, yyyy"
+                dateField.Value = DateTime.Now.ToString("MMMM dd, yyyy");
             }
             else
             {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a text-based field.");
+                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a TextBoxField.");
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the updated PDF
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Placeholder replaced with date. Saved to '{outputPdf}'.");
+        Console.WriteLine($"Placeholder replaced and saved to '{outputPath}'.");
     }
 }

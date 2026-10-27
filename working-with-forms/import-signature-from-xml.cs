@@ -1,108 +1,106 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // for PKCS7 and SignatureField classes
+using Aspose.Pdf.Forms;
 
-class ApplySignatureFromXml
+class Program
 {
     static void Main()
     {
-        // Input PDF, XML (XFDF‑like) containing signature data, and certificate (PFX)
-        const string pdfPath = "input.pdf";
-        const string xmlPath = "signature_data.xml"; // renamed for clarity
-        const string pfxPath = "certificate.pfx";
-        const string pfxPassword = "password";
-        const string outputPath = "signed_output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string signatureXmlPath = "signature.xml";
+        const string outputPdfPath = "signed_output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(pdfPath) || !File.Exists(xmlPath) || !File.Exists(pfxPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Missing input PDF, XML, or PFX file.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document (lifecycle: create/load)
-        using (Document doc = new Document(pdfPath))
+        if (!File.Exists(signatureXmlPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Parse the XML that contains the signature field data.
-            //    The original example used Aspose.Pdf.Xfdf which lives in a separate
-            //    assembly. To keep the project self‑contained we read the XML with
-            //    System.Xml and extract the values we need (field name, reason,
-            //    location, contact info, etc.).
-            // -----------------------------------------------------------------
-            string targetFieldName = "Signature1"; // default field name
-            string reason = "Document approved";
-            string location = "Office";
-            string contactInfo = "contact@example.com";
+            Console.Error.WriteLine($"Signature XML not found: {signatureXmlPath}");
+            return;
+        }
 
-            try
+        try
+        {
+            // -------------------------------------------------------------------
+            // Load signature parameters from the XML file.
+            // Expected XML format (all elements are optional except CertificatePath):
+            //   <Signature>
+            //       <FieldName>Signature1</FieldName>
+            //       <CertificatePath>cert.pfx</CertificatePath>
+            //       <Password>pwd</Password>
+            //       <Reason>Approved</Reason>
+            //       <Location>Office</Location>
+            //   </Signature>
+            // -------------------------------------------------------------------
+            XDocument xml = XDocument.Load(signatureXmlPath);
+            XElement root = xml.Root ?? new XElement("Signature");
+            string fieldName = (string)root.Element("FieldName") ?? string.Empty;
+            string certPath = (string)root.Element("CertificatePath") ?? string.Empty;
+            string certPassword = (string)root.Element("Password") ?? string.Empty;
+            string reason = (string)root.Element("Reason") ?? string.Empty;
+            string location = (string)root.Element("Location") ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(certPath) || !File.Exists(certPath))
             {
-                XmlDocument xmlDoc = new XmlDocument();
-                xmlDoc.Load(xmlPath);
-
-                // Expected simple structure:
-                // <xfdf>
-                //   <fields>
-                //     <field name="Signature1">
-                //       <reason>...</reason>
-                //       <location>...</location>
-                //       <contactInfo>...</contactInfo>
-                //     </field>
-                //   </fields>
-                // </xfdf>
-                XmlNode fieldNode = xmlDoc.SelectSingleNode($"//field[@name='{targetFieldName}']");
-                if (fieldNode != null)
-                {
-                    XmlNode reasonNode = fieldNode.SelectSingleNode("reason");
-                    XmlNode locationNode = fieldNode.SelectSingleNode("location");
-                    XmlNode contactNode = fieldNode.SelectSingleNode("contactInfo");
-
-                    if (reasonNode != null) reason = reasonNode.InnerText;
-                    if (locationNode != null) location = locationNode.InnerText;
-                    if (contactNode != null) contactInfo = contactNode.InnerText;
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Signature field '{targetFieldName}' not found in XML. Using defaults.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error reading XML signature data: {ex.Message}. Using defaults.");
-            }
-
-            // -----------------------------------------------------------------
-            // 2. Locate the signature field inside the PDF.
-            // -----------------------------------------------------------------
-            SignatureField sigField = doc.Form[targetFieldName] as SignatureField;
-            if (sigField == null)
-            {
-                Console.Error.WriteLine($"Signature field '{targetFieldName}' not found in PDF.");
+                Console.Error.WriteLine($"Certificate file not found: {certPath}");
                 return;
             }
 
-            // -----------------------------------------------------------------
-            // 3. Create a PKCS7 signature object using the certificate.
-            // -----------------------------------------------------------------
-            using (FileStream pfxStream = File.OpenRead(pfxPath))
+            // -------------------------------------------------------------------
+            // Load the PDF document.
+            // -------------------------------------------------------------------
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                PKCS7 pkcs7 = new PKCS7(pfxStream, pfxPassword)
+                // Find the signature field. If a field name is supplied we look for that name;
+                // otherwise we take the first SignatureField we encounter.
+                SignatureField signatureField = null;
+                foreach (Field f in pdfDoc.Form.Fields)
                 {
-                    Reason = reason,
-                    Location = location,
-                    ContactInfo = contactInfo
-                };
+                    if (f is SignatureField sf)
+                    {
+                        if (string.IsNullOrEmpty(fieldName) ||
+                            sf.PartialName.Equals(fieldName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            signatureField = sf;
+                            break;
+                        }
+                    }
+                }
 
-                // Apply the digital signature to the field.
-                sigField.Sign(pkcs7);
+                if (signatureField == null)
+                {
+                    Console.Error.WriteLine(string.IsNullOrEmpty(fieldName)
+                        ? "No signature field found in the PDF."
+                        : $"Signature field '{fieldName}' not found in the PDF.");
+                    return;
+                }
+
+                // -------------------------------------------------------------------
+                // Create a PKCS7 signature object using the certificate.
+                // -------------------------------------------------------------------
+                PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+                if (!string.IsNullOrEmpty(reason)) pkcs7.Reason = reason;
+                if (!string.IsNullOrEmpty(location)) pkcs7.Location = location;
+
+                // -------------------------------------------------------------------
+                // Apply the signature to the field. The Signature property is read‑only;
+                // the correct way is to call the Sign method on the field.
+                // -------------------------------------------------------------------
+                signatureField.Sign(pkcs7);
+
+                // Save the signed PDF.
+                pdfDoc.Save(outputPdfPath);
+                Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
             }
-
-            // Save the signed PDF (lifecycle: save)
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

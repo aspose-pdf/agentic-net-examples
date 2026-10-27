@@ -7,33 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // PDF with a form field
-        const string outputPdf = "readonly_output.pdf"; // Resulting PDF
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF and ensure deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Access the form collection; replace "MyField" with the actual field name
-            if (doc.Form != null && doc.Form["MyField"] is TextBoxField textField)
+            // Populate a text box form field and mark it read‑only
+            if (doc.Form != null && doc.Form["Name"] is TextBoxField nameField)
             {
-                // Mark the field as read‑only to prevent further editing
-                textField.ReadOnly = true;
-            }
-            else
-            {
-                Console.WriteLine("Form field 'MyField' not found or is not a TextBoxField.");
+                nameField.Value = "John Doe";   // initial population
+                nameField.ReadOnly = true;      // prevent further editing
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with read‑only field: {outputPdf}");
+        Console.WriteLine($"Read‑only form PDF saved to '{outputPath}'.");
     }
 }

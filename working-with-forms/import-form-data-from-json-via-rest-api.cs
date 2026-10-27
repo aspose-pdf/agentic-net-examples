@@ -1,6 +1,9 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Text;
+using System.Text.Json;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,45 +11,86 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
-        const string inputPdfPath = "input_form.pdf";
-        const string outputPdfPath = "filled_form.pdf";
+        const string pdfTemplatePath = "template.pdf";
+        const string outputPath = "filled.pdf";
+        const string apiUrl = "https://example.com/api/formdata";
 
-        // URL of the REST API that returns JSON data for the form fields
-        const string jsonApiUrl = "https://example.com/api/formdata";
-
-        // Download the JSON payload from the REST API
-        Stream jsonStream = null;
-        try
+        if (!File.Exists(pdfTemplatePath))
         {
-            using (HttpClient client = new HttpClient())
+            Console.Error.WriteLine($"Template not found: {pdfTemplatePath}");
+            return;
+        }
+
+        // Retrieve JSON data from the REST API
+        string jsonData;
+        using (HttpClient client = new HttpClient())
+        {
+            try
             {
-                HttpResponseMessage response = client.GetAsync(jsonApiUrl).Result;
-                response.EnsureSuccessStatusCode();
-                jsonStream = response.Content.ReadAsStreamAsync().Result;
+                jsonData = client.GetStringAsync(apiUrl).Result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error fetching JSON: {ex.Message}");
+                return;
+            }
+        }
+
+        // Load the PDF, populate the form fields from JSON, and save the result
+        using (Document doc = new Document(pdfTemplatePath))
+        {
+            // Verify that the PDF contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
+            {
+                Console.Error.WriteLine("No form fields found in the PDF.");
+                return;
             }
 
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
-            {
-                // Import form field values from the JSON stream
-                // Core API method: ImportFromJson(Stream)
-                doc.Form.ImportFromJson(jsonStream);
+            // Enable automatic recalculation (if the form contains JavaScript calculations)
+            doc.Form.AutoRecalculate = true;
 
-                // Save the updated PDF
-                doc.Save(outputPdfPath);
+            // Parse the JSON and assign values to matching form fields
+            try
+            {
+                using (JsonDocument jsonDoc = JsonDocument.Parse(jsonData))
+                {
+                    if (jsonDoc.RootElement.ValueKind == JsonValueKind.Object)
+                    {
+                        foreach (JsonProperty prop in jsonDoc.RootElement.EnumerateObject())
+                        {
+                            // Find a field whose Name or FullName matches the JSON property name
+                            var field = doc.Form.Fields?.FirstOrDefault(f =>
+                                string.Equals(f.Name, prop.Name, StringComparison.OrdinalIgnoreCase) ||
+                                string.Equals(f.FullName, prop.Name, StringComparison.OrdinalIgnoreCase));
+
+                            if (field != null)
+                            {
+                                // Convert the JSON value to a string representation suitable for the field
+                                string value = prop.Value.ValueKind switch
+                                {
+                                    JsonValueKind.String => prop.Value.GetString(),
+                                    JsonValueKind.Number => prop.Value.GetRawText(),
+                                    JsonValueKind.True => "True",
+                                    JsonValueKind.False => "False",
+                                    _ => prop.Value.GetRawText()
+                                };
+
+                                field.Value = value;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (JsonException je)
+            {
+                Console.Error.WriteLine($"Failed to parse JSON data: {je.Message}");
+                return;
             }
 
-            Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+            // Save the populated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            // Ensure the JSON stream is properly disposed
-            jsonStream?.Dispose();
-        }
+
+        Console.WriteLine($"Form populated and saved to '{outputPath}'.");
     }
 }

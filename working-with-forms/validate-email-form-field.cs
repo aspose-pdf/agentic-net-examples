@@ -1,45 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // source PDF with a form field named "email"
-        const string outputPath = "validated_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string email      = "user@example.com";
 
+        // Ensure the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Validate the email address contains an '@' character
+        if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
         {
-            // Retrieve the form field named "email" and cast it to a Field
-            Field emailField = doc.Form["email"] as Field;
-            if (emailField == null)
+            Console.Error.WriteLine("Invalid email address. PDF will not be saved.");
+            return;
+        }
+
+        try
+        {
+            // Document lifecycle must be wrapped in a using block (rule: document-disposal-with-using)
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Email field not found or is not a form field.");
-                return;
+                // Example usage of the validated email (e.g., store it in metadata)
+                doc.Info.Author = email;
+
+                // Save the PDF after successful validation
+                doc.Save(outputPath);
             }
 
-            // Get the current value of the field (may be null)
-            string emailValue = emailField.Value?.ToString() ?? string.Empty;
-
-            // Validate that the value contains an '@' character
-            if (!emailValue.Contains("@"))
-            {
-                Console.Error.WriteLine("Validation failed: email address must contain '@'.");
-                return;
-            }
-
-            // Validation passed – save the document
-            doc.Save(outputPath);
-            Console.WriteLine($"Document saved successfully to '{outputPath}'.");
+            Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

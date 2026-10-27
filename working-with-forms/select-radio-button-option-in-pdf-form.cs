@@ -5,61 +5,61 @@ using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Selects a radio button option in an existing PDF form.
-    // Parameters:
-    //   inputPdf   - path to the source PDF containing the radio button field.
-    //   outputPdf  - path where the modified PDF will be saved.
-    //   fieldName  - the fully qualified name of the radio button field.
-    //   optionIndex- 1‑based index of the option to select (as defined in the PDF).
     static void Main(string[] args)
     {
-        if (args.Length != 4)
+        // Expected arguments:
+        // args[0] - input PDF path
+        // args[1] - output PDF path
+        // args[2] - name of the radio button field
+        // args[3] - value of the option to select
+        if (args.Length < 4)
         {
-            Console.Error.WriteLine("Usage: <inputPdf> <outputPdf> <fieldName> <optionIndex>");
+            Console.Error.WriteLine("Usage: <inputPdf> <outputPdf> <radioFieldName> <optionValue>");
             return;
         }
 
-        string inputPdf   = args[0];
-        string outputPdf  = args[1];
-        string fieldName  = args[2];
-        if (!int.TryParse(args[3], out int optionIndex) || optionIndex < 1)
+        string inputPath = args[0];
+        string outputPath = args[1];
+        string fieldName = args[2];
+        string optionValue = args[3];
+
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("Option index must be a positive integer (1‑based).");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(inputPdf))
+        try
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document (lifecycle: load)
-        using (Document doc = new Document(inputPdf))
-        {
-            // Retrieve the radio button field from the form collection
-            RadioButtonField radioField = doc.Form[fieldName] as RadioButtonField;
-
-            if (radioField == null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Radio button field '{fieldName}' not found.");
-                return;
+                // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
+                Field? field = doc.Form[fieldName] as Field;
+                if (field == null)
+                {
+                    Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a form field.");
+                    return;
+                }
+
+                // Ensure the field is a radio button
+                if (field is not RadioButtonField radio)
+                {
+                    Console.Error.WriteLine($"Form field '{fieldName}' is not a radio button.");
+                    return;
+                }
+
+                // Set the desired option. Aspose.Pdf will ignore an invalid value, so we set it directly.
+                radio.Value = optionValue;
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+                Console.WriteLine($"Radio button '{fieldName}' set to '{optionValue}'. Saved to '{outputPath}'.");
             }
-
-            // Ensure the requested option index is within the available range
-            if (optionIndex > radioField.Count)
-            {
-                Console.Error.WriteLine($"Option index {optionIndex} exceeds the number of options ({radioField.Count}).");
-                return;
-            }
-
-            // Select the desired option (property is 1‑based)
-            radioField.Selected = optionIndex;
-
-            // Save the modified PDF (lifecycle: save)
-            doc.Save(outputPdf);
         }
-
-        Console.WriteLine($"Radio button '{fieldName}' set to option {optionIndex} and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

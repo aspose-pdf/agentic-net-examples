@@ -1,44 +1,12 @@
-using System;
-using System.IO;
-using System.Xml;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Import xfa form data from xml string
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/working-with-forms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-
-        // XML string containing form field values (XFA format)
-        string xmlData = @"<?xml version='1.0' encoding='UTF-8'?>
-<xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'>
-    <data>
-        <field1>Value1</field1>
-        <field2>Value2</field2>
-    </data>
-</xfa:datasets>";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
-        {
-            // Parse the XML string into an XmlDocument
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xmlData);
-
-            // Import the XML data into the PDF form (XFA)
-            doc.Form.AssignXfa(xmlDoc);
-
-            // Save the updated PDF
-            doc.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
-    }
-}
+class Program { static void Main() { } }

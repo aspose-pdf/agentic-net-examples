@@ -3,7 +3,6 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -18,31 +17,24 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the reset button will be placed (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
-
-            // Create a push‑button field (ButtonField) on the first page
-            ButtonField resetButton = new ButtonField(doc.Pages[1], btnRect)
+            // Create a reset button field on the first page
+            var resetButton = new ButtonField(
+                doc.Pages[1],
+                new Aspose.Pdf.Rectangle(100, 700, 200, 750))
             {
-                // The name used to reference the field programmatically
-                Name = "ResetButton",
+                // Field name (PartialName is the correct property for AcroForm fields)
+                PartialName = "ResetButton",
                 // The label shown on the button
-                NormalCaption = "Reset Form",
-                // Optional: set a background color
-                Color = Color.LightGray
+                NormalCaption = "Reset Form"
             };
 
-            // Set a thin border – this must be done after the object is constructed
-            resetButton.Border = new Border(resetButton) { Width = 1 };
+            // Use a JavaScript action to reset the form when the button is pressed
+            resetButton.OnActivated = new JavascriptAction("this.resetForm();");
 
-            // Attach a JavaScript action that resets the form when the button is pressed
-            // Aspose.PDF does not have a dedicated ResetFormAction; use JavaScript instead.
-            resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
-
-            // Add the button to the form (it will appear on the first page)
+            // Add the button to the document's form collection
             doc.Form.Add(resetButton);
 
             // Save the modified PDF
