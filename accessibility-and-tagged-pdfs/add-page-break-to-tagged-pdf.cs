@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "tagged_with_pagebreak.pdf";
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +17,27 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
             // Access the tagged content interface
-            ITaggedContent tagged = doc.TaggedContent;
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Optional: set language and title for the tagged PDF
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Get the root element of the logical structure tree
+            var root = taggedContent.RootElement;
 
-            // Get the root of the logical structure tree
-            StructureElement root = tagged.RootElement;
-
-            // Insert a page‑break element by creating a DivElement with the "PageBreak" tag
-            DivElement pageBreak = tagged.CreateDivElement();
+            // Create a page‑break element. In the current Aspose.Pdf API a page break is
+            // represented by a <Div> element whose tag is set to "PageBreak".
+            DivElement pageBreak = taggedContent.CreateDivElement();
             pageBreak.SetTag("PageBreak");
             root.AppendChild(pageBreak);
 
-            // Example: add a paragraph after the page break
-            ParagraphElement para = tagged.CreateParagraphElement();
-            para.SetText("Content that follows the page break.");
+            // Optionally add a paragraph after the page break to illustrate the new section.
+            ParagraphElement para = taggedContent.CreateParagraphElement();
+            para.SetText("Content after the page break.");
             root.AppendChild(para);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

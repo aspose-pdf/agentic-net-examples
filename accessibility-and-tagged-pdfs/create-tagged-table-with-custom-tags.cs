@@ -8,9 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "tagged_output.pdf";
-        const string validationLogPath = "validation_log.txt";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "tagged_table.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -23,8 +22,10 @@ class Program
             // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Access tagged content (creates structure if not present)
+                // Access the tagged content interface
                 ITaggedContent taggedContent = doc.TaggedContent;
+
+                // Set language and title for the tagged PDF
                 taggedContent.SetLanguage("en-US");
                 taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
@@ -36,79 +37,65 @@ class Program
                 table.AlternativeText = "Sample data table with custom data‑type tags";
                 root.AppendChild(table);
 
-                // Create table header
+                // ----- Table Header -----
                 TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
                 table.AppendChild(thead);
+
                 TableTRElement headerRow = taggedContent.CreateTableTRElement();
                 thead.AppendChild(headerRow);
 
-                // Header cells
                 TableTHElement thName = taggedContent.CreateTableTHElement();
                 thName.SetText("Name");
-                thName.AlternativeText = "String"; // custom tag indicating data type
+                // Use AlternativeText to store a custom tag for the column
+                thName.AlternativeText = "type:string";
                 headerRow.AppendChild(thName);
 
-                TableTHElement thAmount = taggedContent.CreateTableTHElement();
-                thAmount.SetText("Amount");
-                thAmount.AlternativeText = "Currency";
-                headerRow.AppendChild(thAmount);
+                TableTHElement thValue = taggedContent.CreateTableTHElement();
+                thValue.SetText("Value");
+                thValue.AlternativeText = "type:currency";
+                headerRow.AppendChild(thValue);
 
-                TableTHElement thDate = taggedContent.CreateTableTHElement();
-                thDate.SetText("Date");
-                thDate.AlternativeText = "Date";
-                headerRow.AppendChild(thDate);
-
-                // Create table body
+                // ----- Table Body -----
                 TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
                 table.AppendChild(tbody);
 
-                // Example data rows
-                AddDataRow(taggedContent, tbody, "Widget A", "123.45", "2023-01-15");
-                AddDataRow(taggedContent, tbody, "Widget B", "678.90", "2023-02-20");
+                // First data row
+                TableTRElement row1 = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(row1);
 
-                // Save the modified PDF
+                TableTDElement tdName1 = taggedContent.CreateTableTDElement();
+                tdName1.SetText("Product A");
+                tdName1.AlternativeText = "type:string";
+                row1.AppendChild(tdName1);
+
+                TableTDElement tdValue1 = taggedContent.CreateTableTDElement();
+                tdValue1.SetText("$12,345");
+                tdValue1.AlternativeText = "type:currency";
+                row1.AppendChild(tdValue1);
+
+                // Second data row
+                TableTRElement row2 = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(row2);
+
+                TableTDElement tdName2 = taggedContent.CreateTableTDElement();
+                tdName2.SetText("Product B");
+                tdName2.AlternativeText = "type:string";
+                row2.AppendChild(tdName2);
+
+                TableTDElement tdValue2 = taggedContent.CreateTableTDElement();
+                tdValue2.SetText("$67,890");
+                tdValue2.AlternativeText = "type:currency";
+                row2.AppendChild(tdValue2);
+
+                // Save the modified PDF (no PreSave required)
                 doc.Save(outputPath);
-
-                // Validate the resulting PDF for PDF/UA compliance
-                // The Validate method returns a bool indicating compliance and writes a log file.
-                bool isValid = doc.Validate(validationLogPath, PdfFormat.PDF_UA_1);
-                Console.WriteLine($"Validation result: {(isValid ? "Valid" : "Invalid")}");
-                if (!isValid)
-                {
-                    Console.WriteLine($"See validation log for details: {validationLogPath}");
-                }
-                else
-                {
-                    Console.WriteLine("PDF complies with PDF/UA 1.0 profile.");
-                }
             }
+
+            Console.WriteLine($"Tagged PDF with custom cell tags saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
-    }
-
-    // Helper to add a data row with custom data‑type tags on each cell
-    static void AddDataRow(ITaggedContent tagged, TableTBodyElement tbody,
-                           string name, string amount, string date)
-    {
-        TableTRElement row = tagged.CreateTableTRElement();
-        tbody.AppendChild(row);
-
-        TableTDElement tdName = tagged.CreateTableTDElement();
-        tdName.SetText(name);
-        tdName.AlternativeText = "String";
-        row.AppendChild(tdName);
-
-        TableTDElement tdAmount = tagged.CreateTableTDElement();
-        tdAmount.SetText(amount);
-        tdAmount.AlternativeText = "Currency";
-        row.AppendChild(tdAmount);
-
-        TableTDElement tdDate = tagged.CreateTableTDElement();
-        tdDate.SetText(date);
-        tdDate.AlternativeText = "Date";
-        row.AppendChild(tdDate);
     }
 }

@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,32 +17,32 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content API (creates a structure tree if missing)
+            // Access tagged content and set basic properties
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root of the logical structure tree
+            // Root element of the structure tree (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Create a figure element (e.g., for an image) and set its alt text
+            // Create a figure element (e.g., representing an image)
             FigureElement figure = tagged.CreateFigureElement();
-            figure.AlternativeText = "Alt text describing the figure content.";
+            figure.AlternativeText = "Diagram showing process flow.";
             root.AppendChild(figure); // Attach figure to the root
 
-            // Create a note element to serve as a caption under the figure
+            // Create a note element to serve as a caption for the figure
             NoteElement note = tagged.CreateNoteElement();
-            note.SetText("Figure 1: This is a custom caption providing a descriptive explanation of the figure.");
-            // Append the note as a child of the figure element
+            note.SetText("Figure 1: Process flow diagram illustrating the main steps.");
+            // Append the note under the figure element
             figure.AppendChild(note);
 
-            // Persist the changes
+            // Save the modified PDF (no PreSave call required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with caption saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF with figure and note saved to '{outputPath}'.");
     }
 }

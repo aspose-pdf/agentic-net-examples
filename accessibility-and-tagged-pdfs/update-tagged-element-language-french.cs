@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_french.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,60 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged‑content interface
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access tagged content (document must be tagged)
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Verify that the document is tagged. If not, we cannot modify structure elements.
-            if (tagged == null)
+            // Find the first paragraph element (as an example of a specific element)
+            // FindElements<T>(true) performs a recursive search
+            var paragraphs = taggedContent.RootElement.FindElements<ParagraphElement>(true);
+            if (paragraphs.Count == 0)
             {
-                Console.WriteLine("Document is not a tagged PDF. No structure tree to modify.");
+                Console.WriteLine("No paragraph elements found.");
                 return;
             }
 
-            // Root of the logical structure tree – use dynamic to avoid compile‑time dependency on StructureElement type
-            dynamic root = tagged.RootElement;
+            // Update the language property of the selected element to French
+            ParagraphElement targetElement = paragraphs[0];
+            targetElement.Language = "fr-FR";   // Set language to French (ISO code)
 
-            // Find the first paragraph element (tag "P") in the tree
-            dynamic firstParagraph = null;
-            foreach (var child in root.ChildElements)
-            {
-                // Each child is also a structure element; use dynamic for safe access
-                dynamic elem = child;
-                // The Tag property holds the PDF structure tag (e.g., "P" for paragraph)
-                if (elem.Tag != null && elem.Tag.Equals("P", StringComparison.OrdinalIgnoreCase))
-                {
-                    firstParagraph = elem;
-                    break;
-                }
-            }
-
-            if (firstParagraph != null)
-            {
-                // Update the language property to French (fr-FR)
-                firstParagraph.Language = "fr-FR";
-                Console.WriteLine("Updated language of the first paragraph element to French.");
-            }
-            else
-            {
-                Console.WriteLine("No paragraph elements found in the structure tree.");
-            }
-
-            // NOTE: PDF/UA validation requires the Aspose.Pdf.Validation assembly, which may not be referenced.
-            // If the validation library is available, the following code can be used:
-            // var validationOptions = new Aspose.Pdf.Validation.ValidationOptions();
-            // validationOptions.Compliance = Aspose.Pdf.Validation.ValidationCompliance.PDF_UA;
-            // var validationResult = doc.Validate(validationOptions);
-            // Console.WriteLine($"Validation passed: {validationResult.IsValid}");
-            // For the purpose of this example we simply acknowledge the step.
-            Console.WriteLine("PDF/UA validation step skipped (validation library not referenced).");
-
-            // Save the modified PDF
+            // Save the modified PDF (revalidation is implicit on save)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed file saved as '{outputPath}'.");
+        Console.WriteLine($"Document saved with updated language at '{outputPath}'.");
     }
 }

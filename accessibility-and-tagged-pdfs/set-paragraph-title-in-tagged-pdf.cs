@@ -8,33 +8,44 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "paragraph_title.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_tagged.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Access the tagged content interface to enable accessibility features
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");                     // Set document language
-            tagged.SetTitle("Document with Paragraph Title"); // Set document title
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // The root of the structure tree (no cast needed)
-            StructureElement root = tagged.RootElement;
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        {
+            // Access the tagged content interface
+            Aspose.Pdf.Tagged.ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Create a paragraph structure element via the ITaggedContent factory
-            ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This paragraph has a title attribute for accessibility."); // Set visible text
+            // Set document language and title (optional)
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Set the Title property on the paragraph to provide a concise summary
-            paragraph.Title = "Summary of paragraph content";
+            // Get the root structure element (no cast needed)
+            Aspose.Pdf.LogicalStructure.StructureElement root = taggedContent.RootElement;
 
-            // Attach the paragraph to the root element
+            // Create a new paragraph element
+            Aspose.Pdf.LogicalStructure.ParagraphElement paragraph = taggedContent.CreateParagraphElement();
+
+            // Set the visible text of the paragraph
+            paragraph.SetText("This paragraph provides a concise summary of the document.");
+
+            // Set the Title attribute of the paragraph (used for accessibility)
+            paragraph.Title = "Summary Paragraph";
+
+            // Append the paragraph to the root of the structure tree
             root.AppendChild(paragraph);
 
-            // Save the PDF; no PreSave() call is required
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
     }
 }

@@ -1,72 +1,80 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Xml.Linq;
 using Aspose.Pdf;
 
-class PdfBatchValidator
+class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input directory containing PDFs; use first argument or current directory if none provided
-        string inputDirectory = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
+        // Input directory containing PDFs to validate
+        const string inputDirectory = @"C:\PdfBatch";
+        // Directory where XML logs will be stored
+        const string logDirectory = @"C:\PdfBatch\Logs";
+        // Path of the summary CSV file
+        const string summaryCsvPath = @"C:\PdfBatch\validation_summary.csv";
 
-        if (!Directory.Exists(inputDirectory))
+        // Ensure the log directory exists
+        Directory.CreateDirectory(logDirectory);
+
+        // Prepare CSV header
+        StringBuilder csvBuilder = new StringBuilder();
+        csvBuilder.AppendLine("FileName,IsValid,ErrorMessage");
+
+        // Enumerate all PDF files in the input directory (non‑recursive)
+        foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
         {
-            Console.Error.WriteLine($"Directory not found: {inputDirectory}");
-            return;
-        }
+            string fileName = Path.GetFileName(pdfPath);
+            bool isValid = true;
+            string errorMessage = string.Empty;
 
-        // Prepare summary CSV file
-        string summaryCsvPath = Path.Combine(inputDirectory, "validation_summary.csv");
-        using (StreamWriter csvWriter = new StreamWriter(summaryCsvPath, false))
-        {
-            // CSV header
-            csvWriter.WriteLine("FileName,IsValid,LogPath");
-
-            // Process each PDF file in the directory
-            foreach (string pdfPath in Directory.GetFiles(inputDirectory, "*.pdf"))
+            try
             {
-                bool isValid = false;
-                string logPath = Path.Combine(
-                    inputDirectory,
-                    Path.GetFileNameWithoutExtension(pdfPath) + ".xml");
-
-                // Attempt to load the PDF; successful load indicates basic structural validity
-                try
+                // Load the PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    using (Document doc = new Document(pdfPath))
-                    {
-                        // If we reach this point, the PDF was opened without exception
-                        isValid = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Loading failed – treat as invalid and capture the exception message
-                    isValid = false;
-                    // Include exception details in the XML log
-                    XDocument errorLog = new XDocument(
-                        new XElement("Validation",
-                            new XElement("File", Path.GetFileName(pdfPath)),
-                            new XElement("Status", "Invalid"),
-                            new XElement("Error", ex.Message)));
-                    errorLog.Save(logPath);
-                    csvWriter.WriteLine($"{Path.GetFileName(pdfPath)},{isValid},{logPath}");
-                    continue; // Move to next file
-                }
+                    // Attempt basic validation by accessing the document structure.
+                    // If the document is corrupted, an exception will be thrown.
+                    int pageCount = doc.Pages.Count; // forces parsing of the page tree
 
-                // Create a simple XML log indicating validation result
-                XDocument xmlLog = new XDocument(
-                    new XElement("Validation",
-                        new XElement("File", Path.GetFileName(pdfPath)),
-                        new XElement("Status", isValid ? "Valid" : "Invalid")));
-                xmlLog.Save(logPath);
-
-                // Write entry to the summary CSV
-                csvWriter.WriteLine($"{Path.GetFileName(pdfPath)},{isValid},{logPath}");
+                    // Optional: call the built‑in Validate method if available.
+                    // Uncomment the following lines if your Aspose.Pdf version supports it.
+                    // var validationResult = doc.Validate();
+                    // isValid = validationResult.IsValid;
+                }
             }
+            catch (Exception ex)
+            {
+                // Any exception means the PDF is not valid
+                isValid = false;
+                errorMessage = ex.Message;
+            }
+
+            // Create an XML log for this file
+            XDocument logDoc = new XDocument(
+                new XElement("Validation",
+                    new XElement("FileName", fileName),
+                    new XElement("IsValid", isValid),
+                    new XElement("ErrorMessage", errorMessage)
+                )
+            );
+
+            // Save the XML log (extension .xml) in the log directory
+            string logPath = Path.Combine(logDirectory, Path.ChangeExtension(fileName, ".xml"));
+            logDoc.Save(logPath);
+
+            // Append result to CSV summary
+            // Escape double quotes in the error message
+            string escapedError = errorMessage.Replace("\"", "\"\"");
+            csvBuilder.AppendLine($"{fileName},{isValid},\"{escapedError}\"");
         }
 
-        Console.WriteLine($"Validation complete. Summary CSV saved to: {summaryCsvPath}");
+        // Write the CSV summary file
+        File.WriteAllText(summaryCsvPath, csvBuilder.ToString(), Encoding.UTF8);
+
+        Console.WriteLine("Validation complete.");
+        Console.WriteLine($"XML logs saved to: {logDirectory}");
+        Console.WriteLine($"Summary CSV saved to: {summaryCsvPath}");
     }
 }
