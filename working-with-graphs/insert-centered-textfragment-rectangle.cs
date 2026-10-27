@@ -1,71 +1,56 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Create a new PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define rectangle dimensions (left, bottom, width, height)
-            double llx = 100;   // left X
-            double lly = 500;   // lower Y
-            double rectWidth = 200;
-            double rectHeight = 100;
+        // Define the rectangle where the text will be centered
+        double llx = 100; // lower‑left X
+        double lly = 500; // lower‑left Y
+        double urx = 300; // upper‑right X
+        double ury = 600; // upper‑right Y
 
-            // Create a Graph that covers the whole page (or large enough area)
-            // Using page size ensures the graph can be placed anywhere on the page.
-            float pageWidth = (float)page.PageInfo.Width;
-            float pageHeight = (float)page.PageInfo.Height;
-            Graph graph = new Graph(pageWidth, pageHeight);
+        // Optional: create a Rectangle object for clarity (not strictly required)
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Create the rectangle shape with absolute page coordinates
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(
-                (float)llx,
-                (float)lly,
-                (float)rectWidth,
-                (float)rectHeight);
-            rect.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightGray,   // background fill
-                Color = Color.Black,           // border color
-                LineWidth = 1f
-            };
-            graph.Shapes.Add(rect);
+        // Compute the centre point of the rectangle
+        double centerX = (rect.LLX + rect.URX) / 2;
+        double centerY = (rect.LLY + rect.URY) / 2;
 
-            // Add the graph (with the rectangle) to the page
-            page.Paragraphs.Add(graph);
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure there is at least one page
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
             // Create a TextFragment with the desired text
             TextFragment tf = new TextFragment("Hello World");
 
-            // Center the text horizontally within the rectangle
-            tf.HorizontalAlignment = HorizontalAlignment.Center;
+            // Align the text horizontally (vertical alignment is not supported directly on TextFragmentState)
+            tf.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Position the text at the rectangle's center (baseline Y is approximated)
-            tf.Position = new Position(llx + rectWidth / 2, lly + rectHeight / 2);
+            // Position the fragment at the centre of the rectangle (baseline will be at centreY)
+            tf.Position = new Position(centerX, centerY);
 
-            // Optional styling
-            tf.TextState.FontSize = 14;
-            tf.TextState.Font = FontRepository.FindFont("Helvetica");
-            tf.TextState.ForegroundColor = Color.Blue;
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(tf);
 
-            // Append the text fragment to the page
-            TextBuilder builder = new TextBuilder(page);
-            builder.AppendText(tf);
-
-            // Save the document as PDF (lifecycle rule: save inside using block)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with centered text to '{outputPath}'.");
     }
 }

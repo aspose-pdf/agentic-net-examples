@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,41 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "ellipse_semi_transparent.pdf";
+        const string outputPath = "ellipse.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page
+            Page page = doc.Pages.Add();
 
-        // Open the source PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a Graph container (required for vector shapes)
-            Graph graph = new Graph(500, 400);
+            // Create a Graph container that spans the whole page (or any size you need)
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Define a semi‑transparent red color (alpha = 128 out of 255 ≈ 0.5)
-            // Aspose.Pdf.Color provides a FromArgb method similar to System.Drawing.Color
-            Color semiTransparentRed = Color.FromArgb(128, 255, 0, 0);
+            // Create an ellipse: left, bottom, width, height (all as floats)
+            // Example: left = 100, bottom = 300, width = 200, height = 200
+            Ellipse ellipse = new Ellipse(100f, 300f, 200f, 200f);
 
-            // Create the ellipse shape
-            Ellipse ellipse = new Ellipse(100, 200, 300, 150);
-            ellipse.GraphInfo = new GraphInfo
-            {
-                FillColor = semiTransparentRed   // semi‑transparent fill
-                // Stroke color can be set here if needed, e.g. Color = Color.Black
-            };
+            // Set a semi‑transparent fill (alpha = 128 out of 255) – blue color
+            ellipse.GraphInfo.FillColor = Color.FromArgb(128, 0, 0, 255);
 
-            // Add the ellipse to the graph and the graph to the first page
+            // Optional: set a visible border
+            ellipse.GraphInfo.Color = Color.Black;
+            ellipse.GraphInfo.LineWidth = 1;
+
+            // Add the ellipse to the graph and the graph to the page
             graph.Shapes.Add(ellipse);
-            doc.Pages[1].Paragraphs.Add(graph);
+            page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Ellipse with semi‑transparent fill saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with ellipse saved to '{outputPath}'.");
     }
 }

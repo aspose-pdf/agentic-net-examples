@@ -6,41 +6,45 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "graph_with_circle.pdf";
+
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Define a Graph container (size can be larger than the circle)
-            Graph graph = new Graph(500, 500);
+            // Circle parameters (coordinates are in points)
+            double centerX = 200;   // X coordinate of the circle center
+            double centerY = 400;   // Y coordinate of the circle center
+            double radius  = 50;    // Radius of the circle
 
-            // Specify circle center (X, Y) and radius
-            float centerX = 250f;   // X-coordinate of center
-            float centerY = 250f;   // Y-coordinate of center
-            float radius  = 100f;   // Radius of the circle
+            // Create a Graph container that covers the whole page
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Create the circle shape
-            Circle circle = new Circle(centerX, centerY, radius);
+            // Create a filled ellipse (circle) shape.
+            // Ellipse constructor: left, bottom, width, height
+            Ellipse circle = new Ellipse(
+                (float)(centerX - radius),   // left (lower‑left X)
+                (float)(centerY - radius),   // bottom (lower‑left Y)
+                (float)(radius * 2),         // width
+                (float)(radius * 2)          // height
+            );
 
-            // Set visual properties via GraphInfo (filled with light blue, black border)
-            circle.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightBlue,
-                Color     = Color.Black,
-                LineWidth = 2
-            };
+            // Style the circle via its GraphInfo
+            // Use normalized RGB values (0..1) or predefined colors to avoid range errors
+            circle.GraphInfo.FillColor = Aspose.Pdf.Color.Blue; // solid blue fill
+            circle.GraphInfo.Color = Aspose.Pdf.Color.Black;   // outline color
+            circle.GraphInfo.LineWidth = 1;                     // outline width
 
-            // Add the circle to the graph
+            // Add the circle to the graph, then add the graph to the page
             graph.Shapes.Add(circle);
-
-            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
-            doc.Save("output.pdf");
+            // Save the PDF document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with filled circle saved as 'output.pdf'.");
+        Console.WriteLine($"PDF with filled circle saved to '{outputPath}'.");
     }
 }

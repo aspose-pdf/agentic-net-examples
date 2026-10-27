@@ -1,63 +1,55 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Create a new PDF document
+        const string outputPath = "graph_output.pdf";
+
         using (Document doc = new Document())
         {
-            // Ensure there is at least one page
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
+            Page page = doc.Pages.Add();
 
-            // Get the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Create a Graph container (width, height)
+            Graph graph = new Graph(500, 400);
 
-            // Create a Graph container (width: 400 pt, height: 300 pt) – use double values as required by the API
-            Graph graph = new Graph(400.0, 300.0);
-
-            // ----- Filled rectangle (stroke + fill) -----
-            // Drawing.Rectangle constructor: (left, bottom, width, height) – all float values
-            var filledRect = new Aspose.Pdf.Drawing.Rectangle(50f, 150f, 200f, 100f);
-            filledRect.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightGray,   // Fill the rectangle
-                Color = Color.Black,           // Stroke color
-                LineWidth = 2f                 // Stroke thickness (float)
-            };
+            // -------------------------------------------------
+            // Filled rectangle (stroke + fill)
+            // -------------------------------------------------
+            // left, bottom, width, height
+            Aspose.Pdf.Drawing.Rectangle filledRect = new Aspose.Pdf.Drawing.Rectangle(50, 150, 150, 150);
+            filledRect.GraphInfo.FillColor = Aspose.Pdf.Color.LightBlue;   // Fill color
+            filledRect.GraphInfo.Color = Aspose.Pdf.Color.Black;          // Border color
+            filledRect.GraphInfo.LineWidth = 2;                           // Border thickness
             graph.Shapes.Add(filledRect);
 
-            // ----- Unfilled circle (stroke only) -----
-            var outlineEllipse = new Ellipse(300f, 150f, 100f, 100f);
-            outlineEllipse.GraphInfo = new GraphInfo
-            {
-                // No FillColor => only outline is drawn
-                Color = Color.Blue,            // Stroke color
-                LineWidth = 3f                 // Stroke thickness
-            };
+            // -------------------------------------------------
+            // Unfilled ellipse (stroke only)
+            // -------------------------------------------------
+            // left, bottom, width, height
+            Aspose.Pdf.Drawing.Ellipse outlineEllipse = new Aspose.Pdf.Drawing.Ellipse(250, 150, 200, 150);
+            outlineEllipse.GraphInfo.Color = Aspose.Pdf.Color.Red;       // Border color
+            outlineEllipse.GraphInfo.LineWidth = 2;                       // Border thickness
+            // No fill color – left as transparent
             graph.Shapes.Add(outlineEllipse);
 
-            // ----- Line (stroke only) -----
-            // Line constructor takes a float array: { x1, y1, x2, y2 }
-            float[] linePoints = { 100f, 50f, 350f, 50f };
-            var line = new Line(linePoints);
-            line.GraphInfo = new GraphInfo
-            {
-                Color = Color.Red,             // Stroke color
-                LineWidth = 1.5f               // Stroke thickness
-            };
-            graph.Shapes.Add(line);
-
-            // Add the Graph to the page's paragraph collection
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF to a file
-            doc.Save("Graph_StrokeAndFill.pdf");
+            // Optional title
+            TextFragment title = new TextFragment("Filled and Unfilled Shapes Example");
+            title.Position = new Position(0, 420);
+            title.TextState.FontSize = 16;
+            title.TextState.FontStyle = FontStyles.Bold;
+            title.TextState.Font = FontRepository.FindFont("Helvetica");
+            page.Paragraphs.Add(title);
+
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with mixed filled and outline shapes created successfully.");
+        Console.WriteLine($"PDF with graph saved to '{outputPath}'.");
     }
 }

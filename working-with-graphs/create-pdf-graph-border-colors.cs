@@ -7,79 +7,61 @@ class Program
 {
     static void Main()
     {
-        // Output PDF file path
-        const string outputPath = "graph_output.pdf";
+        // Lookup table: shape index -> border color
+        var borderColors = new Dictionary<int, Aspose.Pdf.Color>
+        {
+            { 0, Aspose.Pdf.Color.FromRgb(1, 0, 0) }, // Red
+            { 1, Aspose.Pdf.Color.FromRgb(0, 1, 0) }, // Green
+            { 2, Aspose.Pdf.Color.FromRgb(0, 0, 1) }, // Blue
+            { 3, Aspose.Pdf.Color.FromRgb(1, 1, 0) }  // Yellow
+        };
 
-        // Create a new PDF document
+        // Create a new PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (width: 500pt, height: 400pt)
-            Graph graph = new Graph(500, 400)
-            {
-                // Position the graph on the page (optional)
-                Left = 50,
-                Top = 500
-            };
+            // Parameters for drawing circles
+            double startX = 100;      // X coordinate of first circle center
+            double centerY = 700;     // Y coordinate (same for all circles)
+            double radius = 40;       // Circle radius
+            double spacing = 120;     // Horizontal distance between circles
 
-            // Lookup table: shape index -> border color
-            Dictionary<int, Color> borderColors = new Dictionary<int, Color>
-            {
-                { 0, Color.FromRgb(1, 0, 0) },       // Red
-                { 1, Color.FromRgb(0, 1, 0) },       // Green
-                { 2, Color.FromRgb(0, 0, 1) },       // Blue
-                { 3, Color.FromRgb(1, 0.5, 0) }      // Orange
-            };
+            // Create a Graph container that will hold the drawing shapes
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Rectangle shape (index 0)
-            Aspose.Pdf.Drawing.Rectangle rect1 = new Aspose.Pdf.Drawing.Rectangle(0, 0, 150, 100);
-            rect1.GraphInfo = new GraphInfo
+            // Draw four circles, each with a border color from the lookup table
+            for (int i = 0; i < 4; i++)
             {
-                Color = borderColors[0],                     // Border color from lookup
-                LineWidth = 2,
-                FillColor = Color.FromRgb(0.9, 0.9, 0.9)     // Light gray fill
-            };
-            graph.Shapes.Add(rect1);
+                double cx = startX + i * spacing; // Current circle center X
 
-            // Ellipse shape (index 1)
-            Ellipse ellipse = new Ellipse(200, 0, 150, 100);
-            ellipse.GraphInfo = new GraphInfo
-            {
-                Color = borderColors[1],
-                LineWidth = 2,
-                FillColor = Color.FromRgb(0.9, 0.9, 0.9)
-            };
-            graph.Shapes.Add(ellipse);
+                // Create an ellipse (circle) shape
+                Ellipse circle = new Ellipse(cx - radius, centerY - radius, cx + radius, centerY + radius);
 
-            // Line shape (index 2)
-            float[] linePoints = { 0, 150, 300, 150 };
-            Line line = new Line(linePoints);
-            line.GraphInfo = new GraphInfo
-            {
-                Color = borderColors[2],
-                LineWidth = 3
-            };
-            graph.Shapes.Add(line);
+                // Determine border color; default to black if not found
+                if (!borderColors.TryGetValue(i, out Aspose.Pdf.Color border))
+                {
+                    border = Aspose.Pdf.Color.Black;
+                }
 
-            // Second rectangle shape (index 3)
-            Aspose.Pdf.Drawing.Rectangle rect2 = new Aspose.Pdf.Drawing.Rectangle(0, 200, 150, 100);
-            rect2.GraphInfo = new GraphInfo
-            {
-                Color = borderColors[3],
-                LineWidth = 2,
-                FillColor = Color.FromRgb(0.9, 0.9, 0.9)
-            };
-            graph.Shapes.Add(rect2);
+                // Set stroke (border) and fill properties via GraphInfo
+                circle.GraphInfo = new GraphInfo
+                {
+                    LineWidth = 2,
+                    Color = border,                     // Border color
+                    FillColor = Aspose.Pdf.Color.Transparent // Transparent fill
+                };
 
-            // Add the graph to the page
+                // Add the shape to the graph container
+                graph.Shapes.Add(circle);
+            }
+
+            // Add the graph (with all circles) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
-            doc.Save(outputPath);
+            // Save the PDF to disk
+            doc.Save("graph.pdf");
         }
-
-        Console.WriteLine($"PDF with graph saved to '{outputPath}'.");
     }
 }

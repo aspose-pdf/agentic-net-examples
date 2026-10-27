@@ -2,70 +2,102 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text; // Required for TextFragment, TextState, FontStyles, etc.
+
+// Alias ambiguous Rectangle types for clarity
+using PdfRect = Aspose.Pdf.Rectangle;          // page/annotation coordinates
+using ShapeRect = Aspose.Pdf.Drawing.Rectangle; // shape rectangle
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_graph.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF (lifecycle: load)
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add a new blank page (lifecycle: create)
-            Page newPage = doc.Pages.Add();
+            // Add a new blank page at the end of the document
+            Page graphPage = doc.Pages.Add();
 
-            // Create a Graph container (width: 400 points, height: 200 points)
-            // Use double parameters as the constructor with float is obsolete.
-            Graph graph = new Graph(400.0, 200.0);
+            // Create a Graph container that will hold all drawing primitives
+            Graph graph = new Graph(graphPage.PageInfo.Width, graphPage.PageInfo.Height);
 
-            // ----- Draw a rectangle -----
-            // Use Aspose.Pdf.Drawing.Rectangle (not Aspose.Pdf.Rectangle)
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 100f, 50f);
-            rect.GraphInfo = new GraphInfo
+            // -------------------------------------------------
+            // Draw X and Y axes
+            // -------------------------------------------------
+            // X‑axis
+            Line xAxis = new Line(new float[] { 50, 500, 550, 500 });
+            xAxis.GraphInfo.Color = Color.Black;
+            xAxis.GraphInfo.LineWidth = 2;
+            graph.Shapes.Add(xAxis);
+
+            // Y‑axis
+            Line yAxis = new Line(new float[] { 50, 100, 50, 500 });
+            yAxis.GraphInfo.Color = Color.Black;
+            yAxis.GraphInfo.LineWidth = 2;
+            graph.Shapes.Add(yAxis);
+
+            // -------------------------------------------------
+            // Plot sample data points and connect them with lines
+            // -------------------------------------------------
+            // Sample data (X, Y) in page coordinates
+            var points = new (float X, float Y)[]
             {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 2f
+                (100, 150),
+                (200, 250),
+                (300, 200),
+                (400, 350),
+                (500, 300)
             };
-            graph.Shapes.Add(rect);
 
-            // ----- Draw an ellipse -----
-            // Ellipse constructor: (left, bottom, width, height)
-            Ellipse ellipse = new Ellipse(150f, 0f, 100f, 80f);
-            ellipse.GraphInfo = new GraphInfo
+            // Draw circles for each data point
+            foreach (var (x, y) in points)
             {
-                FillColor = Color.Yellow,
-                Color = Color.Red,
-                LineWidth = 1.5f
-            };
-            graph.Shapes.Add(ellipse);
+                // Circle is an Ellipse with equal width/height
+                Ellipse circle = new Ellipse(x - 5, y - 5, x + 5, y + 5);
+                circle.GraphInfo.Color = Color.Blue;          // stroke color
+                circle.GraphInfo.FillColor = Color.LightBlue; // fill color
+                circle.GraphInfo.LineWidth = 1;
+                graph.Shapes.Add(circle);
+            }
 
-            // ----- Draw a line -----
-            // Line constructor takes a float array: { x1, y1, x2, y2 }
-            float[] linePoints = { 0f, 100f, 300f, 150f };
-            Line line = new Line(linePoints);
-            line.GraphInfo = new GraphInfo
+            // Connect points with lines
+            for (int i = 0; i < points.Length - 1; i++)
             {
-                Color = Color.Blue,
-                LineWidth = 2f
-            };
-            graph.Shapes.Add(line);
+                var (x1, y1) = points[i];
+                var (x2, y2) = points[i + 1];
+                Line segment = new Line(new float[] { x1, y1, x2, y2 });
+                segment.GraphInfo.Color = Color.Red;
+                segment.GraphInfo.LineWidth = 1.5f;
+                graph.Shapes.Add(segment);
+            }
 
-            // Add the Graph (which contains the shapes) to the page's paragraphs
-            newPage.Paragraphs.Add(graph);
+            // Add the completed graph to the page
+            graphPage.Paragraphs.Add(graph);
 
-            // Save the modified PDF (lifecycle: save)
+            // -------------------------------------------------
+            // Add a title using a TextFragment
+            // -------------------------------------------------
+            TextFragment title = new TextFragment("Sample Graph");
+            title.Position = new Position(200, 550);
+            // Modify the existing TextState instance instead of assigning a new one
+            title.TextState.FontSize = 18;
+            title.TextState.FontStyle = FontStyles.Bold;
+            title.TextState.ForegroundColor = Color.DarkGreen;
+            graphPage.Paragraphs.Add(title);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Graph added and saved to '{outputPath}'.");
     }
 }

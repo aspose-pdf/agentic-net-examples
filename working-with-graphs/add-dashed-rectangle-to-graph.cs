@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,48 +7,48 @@ class Program
 {
     static void Main()
     {
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Document lifecycle must be managed with a using block
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a new page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a Graph container (width, height) – this holds vector shapes
-            // Use the double‑based constructor (the float overload is obsolete)
-            Graph graph = new Graph(400.0, 200.0)
+        // Open the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Pages are 1‑based
+            Page page = doc.Pages[1];
+
+            // Create a Graph that covers the whole page (or any size you need)
+            // Here we use the page dimensions so we can place shapes using absolute coordinates.
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+
+            // Define a rectangle shape (left, bottom, width, height).
+            // The desired rectangle spans from (100, 400) to (300, 500).
+            Aspose.Pdf.Drawing.Rectangle shapeRect = new Aspose.Pdf.Drawing.Rectangle(100, 400, 200, 100);
+
+            // Configure visual appearance: 2‑point black border, dashed line.
+            shapeRect.GraphInfo = new GraphInfo
             {
-                // Position the graph on the page (optional)
-                Left = 100,
-                Top  = 500
+                Color = Aspose.Pdf.Color.Black,   // border color
+                LineWidth = 2,                    // 2‑point thickness
+                DashArray = new int[] { 6, 3 },   // dash pattern: 6 points on, 3 points off
+                DashPhase = 0                     // start at beginning of pattern
             };
 
-            // Create a rectangle shape for the graph.
-            // Parameters: left, bottom, width, height (all in points)
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
+            // Add the rectangle to the graph
+            graph.Shapes.Add(shapeRect);
 
-            // Configure the rectangle's border:
-            // - 2‑point thickness
-            // - dashed line style (dash length 5, gap length 5)
-            // - black border color
-            rect.GraphInfo = new GraphInfo
-            {
-                Color     = Aspose.Pdf.Color.Black,
-                LineWidth = 2f,
-                DashArray = new int[] { 5, 5 }
-            };
-
-            // Add the rectangle to the graph's shape collection
-            graph.Shapes.Add(rect);
-
-            // Add the graph to the page's paragraph collection
+            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle added and saved to '{outputPath}'.");
     }
 }

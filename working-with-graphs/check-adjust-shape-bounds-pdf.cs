@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Drawing; // for Graph and shape types
 
 class Program
 {
@@ -16,56 +16,79 @@ class Program
             return;
         }
 
-        // Load the PDF (lifecycle rule: use using for deterministic disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            Page page = doc.Pages[1];
-
-            // Create a Graph container sized to the page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-            // Define a rectangle shape that may exceed page bounds
-            float rectWidth = 100f;
-            float rectHeight = 100f;
-            float rectLeft = (float)(page.PageInfo.Width - 50);   // positioned near the right edge
-            float rectBottom = (float)(page.PageInfo.Height - 50); // positioned near the top edge
-
-            // Shape instance (Aspose.Pdf.Drawing.Rectangle)
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(
-                rectLeft,
-                rectBottom,
-                rectWidth,
-                rectHeight);
-            rectShape.GraphInfo = new GraphInfo
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                FillColor = Aspose.Pdf.Color.LightGray,
-                Color = Aspose.Pdf.Color.Black,
-                LineWidth = 1f
-            };
+                Page page = doc.Pages[pageIndex];
 
-            // Check if the shape fits within the page dimensions
-            bool fits = rectShape.CheckBounds((float)page.PageInfo.Width, (float)page.PageInfo.Height);
-            if (!fits)
-            {
-                // Adjust position so the shape fits (move to origin)
-                rectShape = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, rectWidth, rectHeight);
-                rectShape.GraphInfo = new GraphInfo
+                // Page dimensions
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
+
+                // Shapes are stored inside Graph objects that are added to the page's Paragraphs collection.
+                foreach (var paragraph in page.Paragraphs)
                 {
-                    FillColor = Aspose.Pdf.Color.LightGray,
-                    Color = Aspose.Pdf.Color.Black,
-                    LineWidth = 1f
-                };
+                    if (paragraph is Graph graph)
+                    {
+                        // Iterate over each shape in the graph
+                        foreach (var shape in graph.Shapes)
+                        {
+                            // We only know how to adjust rectangle‑type shapes because they expose
+                            // Left, Bottom, Width and Height. Other shape types would need their own
+                            // handling logic.
+                            if (shape is Aspose.Pdf.Drawing.Rectangle rectShape)
+                            {
+                                // Current bounds of the rectangle shape
+                                double left   = rectShape.Left;
+                                double bottom = rectShape.Bottom;
+                                double right  = left + rectShape.Width;
+                                double top    = bottom + rectShape.Height;
+
+                                // Horizontal correction
+                                if (left < 0)
+                                {
+                                    double shift = -left;
+                                    left  += shift;
+                                    right += shift;
+                                }
+                                else if (right > pageWidth)
+                                {
+                                    double shift = right - pageWidth;
+                                    left  -= shift;
+                                    right -= shift;
+                                }
+
+                                // Vertical correction
+                                if (bottom < 0)
+                                {
+                                    double shift = -bottom;
+                                    bottom += shift;
+                                    top    += shift;
+                                }
+                                else if (top > pageHeight)
+                                {
+                                    double shift = top - pageHeight;
+                                    bottom -= shift;
+                                    top    -= shift;
+                                }
+
+                                // Apply the corrected position back to the rectangle shape.
+                                // Width and Height stay the same; only Left and Bottom are updated.
+                                rectShape.Left   = (float)left;
+                                rectShape.Bottom = (float)bottom;
+                            }
+                        }
+                    }
+                }
             }
 
-            // Add the shape to the graph and the graph to the page
-            graph.Shapes.Add(rectShape);
-            page.Paragraphs.Add(graph);
-
-            // Save the modified PDF (lifecycle rule: save inside using)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

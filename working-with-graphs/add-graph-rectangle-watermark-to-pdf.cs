@@ -1,74 +1,69 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Use the executable's folder as a reliable base directory
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-        string inputDir = System.IO.Path.Combine(baseDir, "input_pdfs");
-        string outputDir = System.IO.Path.Combine(baseDir, "output_pdfs");
+        // Folder containing source PDF files
+        string inputFolder = @"C:\PdfInput";
+        // Folder where modified PDFs will be saved
+        string outputFolder = @"C:\PdfOutput";
+        // Path to the graph image that will be inserted into each page
+        string graphImagePath = @"C:\Resources\graph.png";
 
-        // Ensure the folders exist so the program never throws DirectoryNotFoundException
-        Directory.CreateDirectory(inputDir);
-        Directory.CreateDirectory(outputDir);
-
-        // Get all PDF files – if none are found we simply exit with a friendly message
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
-        if (pdfFiles.Length == 0)
+        // Ensure output directory exists
+        if (!Directory.Exists(outputFolder))
         {
-            Console.WriteLine($"No PDF files found in '{inputDir}'. Place PDFs there and rerun the program.");
-            return;
+            Directory.CreateDirectory(outputFolder);
         }
 
-        foreach (string inputPath in pdfFiles)
+        // Iterate over all PDF files in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = System.IO.Path.GetFileName(inputPath);
-            string outputPath = System.IO.Path.Combine(outputDir, fileName);
-
-            try
+            // Open the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document (lifecycle rule: use using)
-                using (Document doc = new Document(inputPath))
+                // Process each page in the document
+                foreach (Page page in doc.Pages)
                 {
-                    // Process each page in the document
-                    foreach (Page page in doc.Pages)
-                    {
-                        // Create a Graph container sized to the current page
-                        double pageWidth = page.PageInfo.Width;
-                        double pageHeight = page.PageInfo.Height;
-                        Graph graph = new Graph(pageWidth, pageHeight);
+                    // ------------------------------------------------------------
+                    // Insert the graph image as a stamp
+                    // ------------------------------------------------------------
+                    ImageStamp imgStamp = new ImageStamp(graphImagePath);
+                    // Set desired size and alignment (adjust as needed)
+                    imgStamp.Width = 200;
+                    imgStamp.Height = 150;
+                    imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    imgStamp.VerticalAlignment = VerticalAlignment.Center;
+                    // Add the image stamp to the current page
+                    page.AddStamp(imgStamp);
 
-                        // Define a rectangle shape that will act as a watermark
-                        // Position: lower‑left corner (50,50), size: 200x100 points
-                        Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(50, 50, 200, 100);
-                        rectShape.GraphInfo = new GraphInfo
-                        {
-                            FillColor = Color.LightGray, // Background of the rectangle
-                            Color = Color.Black,         // Border color
-                            LineWidth = 2                // Border thickness
-                        };
-
-                        // Add the rectangle to the graph
-                        graph.Shapes.Add(rectShape);
-
-                        // Add the graph (containing the rectangle) to the page
-                        page.Paragraphs.Add(graph);
-                    }
-
-                    // Save the modified document (lifecycle rule: use Save)
-                    doc.Save(outputPath);
+                    // ------------------------------------------------------------
+                    // Insert a semi‑transparent text watermark (acts as a rectangle)
+                    // ------------------------------------------------------------
+                    TextStamp txtStamp = new TextStamp("CONFIDENTIAL");
+                    txtStamp.Background = true;                     // draw background rectangle
+                    txtStamp.Opacity = 0.3;                         // make it semi‑transparent
+                    txtStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    txtStamp.VerticalAlignment = VerticalAlignment.Center;
+                    txtStamp.TextState.FontSize = 72;
+                    txtStamp.TextState.FontStyle = FontStyles.Bold;
+                    txtStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                    // Add the text stamp to the current page
+                    page.AddStamp(txtStamp);
                 }
 
-                Console.WriteLine($"Processed '{fileName}' → '{outputPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                // Build the output file path (preserve original file name)
+                string outputPath = System.IO.Path.Combine(outputFolder, System.IO.Path.GetFileName(pdfPath));
+                // Save the modified document
+                doc.Save(outputPath);
+                Console.WriteLine($"Processed and saved: {outputPath}");
             }
         }
+
+        Console.WriteLine("All PDFs have been processed.");
     }
 }

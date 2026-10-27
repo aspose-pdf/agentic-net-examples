@@ -1,93 +1,126 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
-class Program
+namespace GraphBuilder
 {
-    // Helper to convert a color name (e.g., "LightGray") to Aspose.Pdf.Color
-    static Color GetColor(string name)
+    // Represents the configuration for default fill colors per shape type.
+    public class FillColorConfig
     {
-        // Try to get a static property with the given name from Aspose.Pdf.Color
-        var prop = typeof(Color).GetProperty(name);
-        if (prop != null && prop.PropertyType == typeof(Color))
-        {
-            var value = prop.GetValue(null);
-            return value != null ? (Color)value : Color.Black;
-        }
-        // Fallback to Black if the name is not found
-        return Color.Black;
+        // Key: shape name (e.g., "Bar", "Line", "Pie")
+        // Value: color in hex format "#RRGGBB"
+        public Dictionary<string, string> ShapeColors { get; set; } = new Dictionary<string, string>();
     }
 
-    static void Main()
+    class Program
     {
-        const string configPath = "config.json";
-        const string outputPath = "output.pdf";
-
-        // Load configuration: shape type -> color name
-        Dictionary<string, string> fillColors = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        if (File.Exists(configPath))
+        // Parses a hex color string (e.g., "#FFAA33") into an Aspose.Pdf.Color.
+        static Aspose.Pdf.Color ParseHexColor(string hex)
         {
-            string json = File.ReadAllText(configPath);
-            fillColors = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        }
-        else
-        {
-            // Default colors if config file is missing
-            fillColors["Aspose.Pdf.Rectangle"] = "LightGray";
-            fillColors["Ellipse"] = "Yellow";
-            fillColors["Line"] = "Red";
-        }
+            if (string.IsNullOrWhiteSpace(hex))
+                return Aspose.Pdf.Color.Transparent; // fallback
 
-        // Create a new PDF document
-        using (Document doc = new Document())
-        {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            // Remove leading '#', if present.
+            hex = hex.TrimStart('#');
 
-            // Create a Graph container (width: 400, height: 200) – use double as recommended
-            Graph graph = new Graph(400.0, 200.0);
+            // Ensure we have exactly 6 characters.
+            if (hex.Length != 6)
+                throw new ArgumentException($"Invalid hex color: {hex}");
 
-            // ---------- Rectangle shape (Aspose.Pdf.Drawing.Rectangle) ----------
-            // Constructor: left, bottom, width, height (float values)
-            var rectShape = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 100f, 50f);
-            rectShape.GraphInfo = new GraphInfo
-            {
-                FillColor = GetColor(fillColors.GetValueOrDefault("Aspose.Pdf.Rectangle", "LightGray")),
-                Color = Color.Black,          // stroke color
-                LineWidth = 1f
-            };
-            graph.Shapes.Add(rectShape);
+            int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+            int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+            int b = Convert.ToInt32(hex.Substring(4, 2), 16);
 
-            // ---------- Ellipse ----------
-            var ellipseShape = new Ellipse(150f, 0f, 250f, 100f);
-            ellipseShape.GraphInfo = new GraphInfo
-            {
-                FillColor = GetColor(fillColors.GetValueOrDefault("Ellipse", "Yellow")),
-                Color = Color.Black,
-                LineWidth = 1f
-            };
-            graph.Shapes.Add(ellipseShape);
-
-            // ---------- Line ----------
-            float[] linePoints = { 0f, 150f, 300f, 150f };
-            var lineShape = new Line(linePoints);
-            lineShape.GraphInfo = new GraphInfo
-            {
-                Color = GetColor(fillColors.GetValueOrDefault("Line", "Red")),
-                LineWidth = 2f
-            };
-            graph.Shapes.Add(lineShape);
-
-            // Add the Graph to the page
-            page.Paragraphs.Add(graph);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            return Aspose.Pdf.Color.FromRgb(r, g, b);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        static void Main()
+        {
+            const string configPath = "config.json";
+            const string outputPath = "output.pdf";
+
+            // Load configuration file.
+            FillColorConfig config;
+            try
+            {
+                string json = File.ReadAllText(configPath);
+                config = JsonSerializer.Deserialize<FillColorConfig>(json) ?? new FillColorConfig();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to load config: {ex.Message}");
+                // Use empty config as fallback.
+                config = new FillColorConfig();
+            }
+
+            // Determine default fill color for bars; fallback to light gray if not defined.
+            Aspose.Pdf.Color barFillColor = config.ShapeColors.TryGetValue("Bar", out string barHex)
+                ? ParseHexColor(barHex)
+                : Aspose.Pdf.Color.LightGray;
+
+            // Create a new PDF document.
+            using (Document doc = new Document())
+            {
+                // Add a page.
+                Page page = doc.Pages.Add();
+
+                // Simple bar chart data.
+                double[] values = { 120, 80, 150, 60, 200 };
+                double maxVal = 0;
+                foreach (double v in values) if (v > maxVal) maxVal = v;
+
+                // Layout parameters.
+                double chartWidth = 400;
+                double chartHeight = 300;
+                double chartX = 50;               // left side of chart
+                double chartY = 500;              // top side of chart (Y grows upwards in PDF coordinates)
+
+                double barWidth = chartWidth / values.Length * 0.7;
+                double gap = (chartWidth - (barWidth * values.Length)) / (values.Length + 1);
+
+                // Create a Graph container that will hold all drawing shapes.
+                Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+
+                // ----- Draw axes -----
+                // X‑axis line
+                Line xAxis = new Line(new float[] { (float)chartX, (float)chartY, (float)(chartX + chartWidth), (float)chartY });
+                xAxis.GraphInfo.Color = Aspose.Pdf.Color.Black;
+                xAxis.GraphInfo.LineWidth = 0.5f;
+                graph.Shapes.Add(xAxis);
+
+                // Y‑axis line
+                Line yAxis = new Line(new float[] { (float)chartX, (float)chartY, (float)chartX, (float)(chartY - chartHeight) });
+                yAxis.GraphInfo.Color = Aspose.Pdf.Color.Black;
+                yAxis.GraphInfo.LineWidth = 0.5f;
+                graph.Shapes.Add(yAxis);
+
+                // ----- Draw each bar using the configured fill color -----
+                for (int i = 0; i < values.Length; i++)
+                {
+                    double barHeight = (values[i] / maxVal) * chartHeight;
+                    double left = chartX + gap + i * (barWidth + gap);
+                    double bottom = chartY - barHeight;
+
+                    // Rectangle constructor: left, bottom, width, height
+                    Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle((float)left, (float)bottom, (float)barWidth, (float)barHeight);
+                    bar.GraphInfo.FillColor = barFillColor;
+                    bar.GraphInfo.Color = Aspose.Pdf.Color.Black; // border color
+                    bar.GraphInfo.LineWidth = 0.5f;
+
+                    graph.Shapes.Add(bar);
+                }
+
+                // Add the graph (containing axes and bars) to the page.
+                page.Paragraphs.Add(graph);
+
+                // Save the PDF.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with graph saved to '{outputPath}'.");
+        }
     }
 }
