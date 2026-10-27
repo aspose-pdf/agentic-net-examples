@@ -1,7 +1,7 @@
 {
   "name": "Aspose.PDF for .NET Examples Agent",
-  "description": "AI agent that generates, compiles, and validates C# code examples for Aspose.PDF for .NET 26.7.0. 2,636 build-verified examples across 35 categories.",
-  "version": "26.7.0",
+  "description": "AI agent that generates, compiles, and validates C# code examples for Aspose.PDF for .NET 26.9.0. 2,636 build-verified examples across 35 categories.",
+  "version": "26.9.0",
   "url": "https://github.com/aspose-pdf/agentic-net-examples.git",
   "api_base_url": "http://172.20.1.175:7050",
   "mcp_endpoint": "http://172.20.1.175:7050/mcp/generate",
@@ -42,15 +42,15 @@
     },
     {
       "name": "Compare PDF",
-      "examples": 29
+      "examples": 27
     },
     {
       "name": "Conversion",
-      "examples": 102
+      "examples": 101
     },
     {
       "name": "Document",
-      "examples": 117
+      "examples": 119
     },
     {
       "name": "Facades AcroForms",
@@ -58,15 +58,15 @@
     },
     {
       "name": "Facades annotations",
-      "examples": 106
+      "examples": 102
     },
     {
       "name": "Facades bookmarks",
-      "examples": 35
+      "examples": 34
     },
     {
       "name": "Facades convert documents",
-      "examples": 36
+      "examples": 40
     },
     {
       "name": "Facades documents",
@@ -74,55 +74,55 @@
     },
     {
       "name": "Facades edit document",
-      "examples": 213
+      "examples": 206
     },
     {
       "name": "Facades extract images and text",
-      "examples": 83
-    },
-    {
-      "name": "Facades fill forms",
-      "examples": 35
-    },
-    {
-      "name": "Facades forms",
-      "examples": 85
-    },
-    {
-      "name": "Facades metadata",
-      "examples": 40
-    },
-    {
-      "name": "Facades pages",
-      "examples": 117
-    },
-    {
-      "name": "Facades secure documents",
-      "examples": 38
-    },
-    {
-      "name": "Facades sign documents",
-      "examples": 35
-    },
-    {
-      "name": "Facades stamps",
-      "examples": 48
-    },
-    {
-      "name": "Facades texts and images",
-      "examples": 28
-    },
-    {
-      "name": "Facades XMP metadata",
-      "examples": 44
-    },
-    {
-      "name": "Graphs ZUGFeRD operators",
       "examples": 82
     },
     {
+      "name": "Facades fill forms",
+      "examples": 33
+    },
+    {
+      "name": "Facades forms",
+      "examples": 87
+    },
+    {
+      "name": "Facades metadata",
+      "examples": 38
+    },
+    {
+      "name": "Facades pages",
+      "examples": 114
+    },
+    {
+      "name": "Facades secure documents",
+      "examples": 39
+    },
+    {
+      "name": "Facades sign documents",
+      "examples": 34
+    },
+    {
+      "name": "Facades stamps",
+      "examples": 49
+    },
+    {
+      "name": "Facades texts and images",
+      "examples": 29
+    },
+    {
+      "name": "Facades XMP metadata",
+      "examples": 43
+    },
+    {
+      "name": "Graphs ZUGFeRD operators",
+      "examples": 85
+    },
+    {
       "name": "Pages",
-      "examples": 100
+      "examples": 95
     },
     {
       "name": "Parse PDF",
@@ -130,7 +130,7 @@
     },
     {
       "name": "Securing and signing PDF",
-      "examples": 78
+      "examples": 82
     },
     {
       "name": "Stamping",
@@ -142,7 +142,7 @@
     },
     {
       "name": "Working with annotations",
-      "examples": 156
+      "examples": 160
     },
     {
       "name": "Working with attachments",
@@ -150,23 +150,23 @@
     },
     {
       "name": "Working with forms",
-      "examples": 230
+      "examples": 228
     },
     {
       "name": "Working with graphs",
-      "examples": 77
+      "examples": 84
     },
     {
       "name": "Working with images",
-      "examples": 72
+      "examples": 69
     },
     {
       "name": "Working with tables",
-      "examples": 96
+      "examples": 99
     },
     {
       "name": "Working with text",
-      "examples": 73
+      "examples": 76
     },
     {
       "name": "Working with XML",
@@ -176,7 +176,7 @@
   "product": {
     "name": "Aspose.PDF for .NET",
     "nuget_package": "Aspose.PDF",
-    "nuget_version": "26.7.0",
+    "nuget_version": "26.9.0",
     "target_framework": "net10.0"
   },
   "links": {
