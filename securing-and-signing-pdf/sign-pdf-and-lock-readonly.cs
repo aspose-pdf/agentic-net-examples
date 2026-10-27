@@ -2,21 +2,21 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Signatures; // for PKCS1 signature class
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "signed_locked.pdf";
-        const string certPath   = "certificate.pfx";
-        const string certPass   = "password";
+        const string inputPdfPath = "input.pdf";
+        const string signedPdfPath = "signed.pdf";
+        const string lockedPdfPath = "locked.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "certPassword";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(certPath))
@@ -25,40 +25,46 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // ------------------------------------------------------------
+        // Step 1: Add a signature field (placeholder – no actual signing)
+        // ------------------------------------------------------------
+        using (Document doc = new Document(inputPdfPath))
         {
+            // Define the signature rectangle (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+            var sigRect = new Rectangle(100, 100, 200, 150);
+
             // Create a signature field on the first page
-            Page page = doc.Pages[1];
-            // Define the rectangle where the signature will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
-            SignatureField sigField = new SignatureField(page, rect)
+            var signatureField = new SignatureField(doc.Pages[1], sigRect)
             {
-                PartialName = "Signature1" // field name
-            };
-            // Add the signature field to the page annotations
-            page.Annotations.Add(sigField);
-
-            // Prepare the digital signature (PKCS#1)
-            PKCS1 pkcs1Signature = new PKCS1(certPath, certPass)
-            {
-                Reason      = "Document approved",
-                ContactInfo = "john.doe@example.com",
-                Location    = "New York"
+                PartialName = "Signature1"
             };
 
-            // Sign the field
-            sigField.Sign(pkcs1Signature);
+            // Add the signature field to the document's form
+            doc.Form.Add(signatureField);
 
-            // Enforce read‑only mode after signing
-            // This makes the document contain append‑only signatures,
-            // preventing further modifications without invalidating the signature.
-            doc.Form.SignaturesAppendOnly = true;
-
-            // Save the signed and locked PDF
-            doc.Save(outputPdf);
+            // Save the PDF that now contains the (empty) signature field
+            doc.Save(signedPdfPath);
         }
 
-        Console.WriteLine($"Signed and locked PDF saved to '{outputPdf}'.");
+        // ------------------------------------------------------------
+        // Step 2: Lock the signed PDF (read‑only) by encrypting with no permissions
+        // ------------------------------------------------------------
+        using (Document signedDoc = new Document(signedPdfPath))
+        {
+            // (Permissions)0 means "no permissions" – the document becomes read‑only
+            Permissions noPermissions = (Permissions)0;
+
+            signedDoc.Encrypt(
+                userPassword: "",
+                ownerPassword: "ownerPassword",
+                permissions: noPermissions,
+                cryptoAlgorithm: CryptoAlgorithm.AESx256);
+
+            // Save the locked PDF
+            signedDoc.Save(lockedPdfPath);
+        }
+
+        Console.WriteLine($"Signed PDF saved to: {signedPdfPath}");
+        Console.WriteLine($"Locked (read‑only) PDF saved to: {lockedPdfPath}");
     }
 }

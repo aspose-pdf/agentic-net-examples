@@ -6,37 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "protected.pdf";
-        const string outputPath = "decrypted.pdf";
-        const string ownerPassword = "owner123";
+        const string encryptedPath = "protected.pdf";
+        const string ownerPassword  = "owner123";
+        const string outputPath     = "decrypted.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(encryptedPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPath}");
             return;
         }
 
-        try
+        // Open the encrypted PDF using the owner password.
+        // The password argument accepts either user or owner password.
+        using (Document doc = new Document(encryptedPath, ownerPassword))
         {
-            // Open the encrypted PDF using the owner password
-            using (Document doc = new Document(inputPath, ownerPassword))
-            {
-                // Decrypt the document (no parameters required)
-                doc.Decrypt();
+            // Remove encryption. Decrypt() takes no parameters.
+            doc.Decrypt();
 
-                // Save the decrypted PDF to a new file
-                doc.Save(outputPath);
-            }
+            // Save the now‑unencrypted PDF.
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
-        }
-        catch (InvalidPasswordException ex)
-        {
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
     }
 }

@@ -1,59 +1,83 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using System.Security.Cryptography.X509Certificates;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed.pdf";               // source PDF with digital signature
-        const string outputDir = "certificates";            // folder to store DER files
+        const string inputPdf = "signed.pdf";
+        const string outputDir = "certificates";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Iterate over all form fields; look for signature fields
-            foreach (var field in doc.Form)
+            using (Document doc = new Document(inputPdf))
             {
-                if (field is SignatureField sigField)
+                // Iterate over all form fields and pick the signature fields
+                var signatureFields = doc?.Form?.Fields?.OfType<SignatureField>();
+                if (signatureFields == null || !signatureFields.Any())
                 {
-                    // Try to get the X509Certificate2 object from the signature
-                    X509Certificate2 cert = sigField.ExtractCertificateObject();
-                    if (cert == null)
+                    Console.WriteLine("No signature fields found.");
+                    return;
+                }
+
+                int sigIndex = 1;
+                foreach (SignatureField sigField in signatureFields)
+                {
+                    // Extract the signing (leaf) certificate from the signature field
+                    X509Certificate2 signingCert = sigField.ExtractCertificateObject();
+                    if (signingCert != null)
                     {
-                        Console.WriteLine("No certificate found in this signature field.");
-                        continue;
+                        SaveCertificate(signingCert, outputDir, $"sig{sigIndex}_signer.der");
+
+                        // Build the full certificate chain using X509Chain
+                        var chainBuilder = new X509Chain();
+                        // Optional: you can adjust chain policy here if needed
+                        chainBuilder.Build(signingCert);
+
+                        for (int i = 0; i < chainBuilder.ChainElements.Count; i++)
+                        {
+                            // Skip the leaf certificate – it has already been saved
+                            if (chainBuilder.ChainElements[i].Certificate.Thumbprint == signingCert.Thumbprint)
+                                continue;
+
+                            string fileName = $"sig{sigIndex}_chain_{i + 1}.der";
+                            SaveCertificate(chainBuilder.ChainElements[i].Certificate, outputDir, fileName);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Signature field {sigIndex} does not contain a certificate.");
                     }
 
-                    // Build the certificate chain using .NET X509Chain
-                    X509Chain chain = new X509Chain();
-                    chain.Build(cert);
-
-                    // Save each certificate in the chain as a DER file
-                    int index = 0;
-                    foreach (X509ChainElement element in chain.ChainElements)
-                    {
-                        byte[] rawData = element.Certificate.RawData; // DER-encoded bytes
-                        string outPath = Path.Combine(outputDir, $"cert_{index}.der");
-                        File.WriteAllBytes(outPath, rawData);
-                        Console.WriteLine($"Saved certificate {index} to {outPath}");
-                        index++;
-                    }
+                    sigIndex++;
                 }
             }
-        }
 
-        Console.WriteLine("Certificate extraction completed.");
+            Console.WriteLine($"Certificates have been saved to '{outputDir}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    static void SaveCertificate(X509Certificate2 cert, string directory, string fileName)
+    {
+        // Export the certificate in DER (binary) format
+        byte[] derBytes = cert.Export(X509ContentType.Cert);
+        string path = Path.Combine(directory, fileName);
+        File.WriteAllBytes(path, derBytes);
     }
 }

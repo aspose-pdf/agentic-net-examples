@@ -1,68 +1,54 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Forms; // for SignatureField
-using Aspose.Pdf;      // core API
-using Aspose.Pdf.Forms; // signature related types
-using Aspose.Pdf;      // ensure core namespace is included
-using Aspose.Pdf;      // redundant but harmless
-using Aspose.Pdf;      // keep core namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // source PDF (must contain a blank signature field)
-        const string outputPdf = "signed_output.pdf"; // destination PDF
-        const string pfxPath = "certificate.pfx";    // PKCS#12 certificate file
-        const string pfxPassword = "password";       // certificate password
-        const string signatureFieldName = "Signature1"; // name of the blank signature field
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_sha384.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        if (!File.Exists(pfxPath))
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Create an invisible signature field on the first page
+            var rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+            var sigField = new SignatureField(doc.Pages[1], rect)
             {
-                // Load the certificate (private key required for signing)
-                X509Certificate2 cert = new X509Certificate2(pfxPath, pfxPassword);
+                PartialName = "Signature1"
+            };
+            doc.Form.Add(sigField);
 
-                // Create an ExternalSignature that uses SHA‑384 as the digest algorithm
-                ExternalSignature externalSig = new ExternalSignature(cert, DigestHashAlgorithm.Sha384);
+            // Prepare PKCS7 signature
+            var pkcs = new PKCS7(certPath, certPassword);
 
-                // Retrieve the blank signature field by name
-                SignatureField sigField = doc.Form[signatureFieldName] as SignatureField;
-                if (sigField == null)
-                {
-                    Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found.");
-                    return;
-                }
+            // Set SHA‑384 as the digest algorithm via TimestampSettings
+            pkcs.TimestampSettings = new TimestampSettings(
+                "http://example.com",          // TSA server URL (dummy)
+                null,                         // no authentication
+                DigestHashAlgorithm.Sha384);  // digest algorithm
 
-                // Sign the field using the prepared ExternalSignature
-                sigField.Sign(externalSig);
+            // Sign the field
+            sigField.Sign(pkcs);
 
-                // Save the signed PDF
-                doc.Save(outputPdf);
-            }
-
-            Console.WriteLine($"PDF signed successfully. Output saved to '{outputPdf}'.");
+            // Save the signed PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during signing: {ex.Message}");
-        }
+
+        Console.WriteLine($"Document signed with SHA‑384 saved to '{outputPath}'.");
     }
 }

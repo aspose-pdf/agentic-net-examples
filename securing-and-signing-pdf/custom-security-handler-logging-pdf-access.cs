@@ -1,89 +1,28 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security; // Added for ICustomSecurityHandler and EncryptionParameters
+using Aspose.Pdf.Security;
 
-// Custom security handler that logs every password check and encryption step.
-public class CustomSecurityHandler : ICustomSecurityHandler
+// Helper class that logs encryption and decryption actions
+static class PdfSecurityLogger
 {
-    // Store passwords for simple validation.
-    private string _userPassword;
-    private string _ownerPassword;
-
-    // ICustomSecurityHandler required properties.
-    public string Filter => "CustomHandler";
-    public int KeyLength => 128;          // Example key length.
-    public int Revision => 4;             // Example revision.
-    public string SubFilter => null;      // Not used.
-    public int Version => 2;              // Example version.
-
-    // Called when the handler is initialized for encryption/decryption.
-    public void Initialize(EncryptionParameters parameters)
+    public static void EncryptWithLogging(Document doc, string userPassword, string ownerPassword,
+                                          Permissions permissions, CryptoAlgorithm algorithm)
     {
-        Console.WriteLine("CustomSecurityHandler: Initialize called.");
-        // No special initialization needed for this example.
+        Console.WriteLine("[LOG] Encrypting document:");
+        Console.WriteLine($"      User password:   {userPassword}");
+        Console.WriteLine($"      Owner password:  {ownerPassword}");
+        Console.WriteLine($"      Permissions:     {permissions}");
+        Console.WriteLine($"      Algorithm:       {algorithm}");
+        // Perform the actual encryption
+        doc.Encrypt(userPassword, ownerPassword, permissions, algorithm);
     }
 
-    // Create a user key from the supplied password.
-    public byte[] GetUserKey(string userPassword)
+    public static void DecryptWithLogging(Document doc, string userPassword)
     {
-        Console.WriteLine($"CustomSecurityHandler: GetUserKey called (password = '{userPassword}').");
-        _userPassword = userPassword;
-        return System.Text.Encoding.UTF8.GetBytes(userPassword);
-    }
-
-    // Create an owner key from the supplied passwords.
-    public byte[] GetOwnerKey(string userPassword, string ownerPassword)
-    {
-        Console.WriteLine($"CustomSecurityHandler: GetOwnerKey called (user = '{userPassword}', owner = '{ownerPassword}').");
-        _ownerPassword = ownerPassword;
-        return System.Text.Encoding.UTF8.GetBytes(ownerPassword);
-    }
-
-    // Verify whether a password is the user password.
-    public bool IsUserPassword(string password)
-    {
-        Console.WriteLine($"CustomSecurityHandler: IsUserPassword check for '{password}'.");
-        return password == _userPassword;
-    }
-
-    // Verify whether a password is the owner password.
-    public bool IsOwnerPassword(string password)
-    {
-        Console.WriteLine($"CustomSecurityHandler: IsOwnerPassword check for '{password}'.");
-        return password == _ownerPassword;
-    }
-
-    // Calculate the encryption key (simple pass‑through in this demo).
-    public byte[] CalculateEncryptionKey(string userPassword)
-    {
-        Console.WriteLine($"CustomSecurityHandler: CalculateEncryptionKey for '{userPassword}'.");
-        return System.Text.Encoding.UTF8.GetBytes(userPassword);
-    }
-
-    // Encrypt a data block (no real encryption – just logs and returns the data unchanged).
-    public byte[] Encrypt(byte[] data, int offset, int count, byte[] key)
-    {
-        Console.WriteLine("CustomSecurityHandler: Encrypt called.");
-        byte[] result = new byte[count];
-        Array.Copy(data, offset, result, 0, count);
-        return result;
-    }
-
-    // Decrypt a data block (no real decryption – just logs and returns the data unchanged).
-    public byte[] Decrypt(byte[] data, int offset, int count, byte[] key)
-    {
-        Console.WriteLine("CustomSecurityHandler: Decrypt called.");
-        byte[] result = new byte[count];
-        Array.Copy(data, offset, result, 0, count);
-        return result;
-    }
-
-    // Encrypt the permissions integer (simple conversion to bytes for demonstration).
-    public byte[] EncryptPermissions(int permissions)
-    {
-        Console.WriteLine($"CustomSecurityHandler: EncryptPermissions called (permissions = {permissions}).");
-        return BitConverter.GetBytes(permissions);
+        Console.WriteLine($"[LOG] Decrypt attempt with password: {userPassword}");
+        // Perform the actual decryption (no parameters required after opening with password)
+        doc.Decrypt();
     }
 }
 
@@ -91,36 +30,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";
-        const string encryptedPath  = "encrypted.pdf";
-        const string userPassword   = "user123";
-        const string ownerPassword  = "owner123";
+        const string inputPdf      = "input.pdf";
+        const string encryptedPdf  = "encrypted.pdf";
+        const string decryptedPdf  = "decrypted.pdf";
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
 
-        // Ensure the source PDF exists.
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Instantiate the custom handler.
-        CustomSecurityHandler customHandler = new CustomSecurityHandler();
-
-        // ---------- Encrypt the PDF using the custom handler ----------
-        using (Document doc = new Document(inputPath))
+        // ---------- Encrypt the PDF with logging ----------
+        try
         {
-            // Encrypt with desired permissions and the custom handler.
-            doc.Encrypt(userPassword, ownerPassword, Permissions.PrintDocument, customHandler);
-            doc.Save(encryptedPath); // Save the encrypted document.
+            using (Document doc = new Document(inputPdf))
+            {
+                // Define permissions (example: allow printing and content extraction)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Encrypt using AES-256 while logging the operation
+                PdfSecurityLogger.EncryptWithLogging(doc, userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
+                doc.Save(encryptedPdf);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Encryption error: {ex.Message}");
+            return;
         }
 
-        Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
-
-        // ---------- Open the encrypted PDF – each access attempt will be logged ----------
-        using (Document encryptedDoc = new Document(encryptedPath, userPassword, customHandler))
+        // ---------- Decrypt (open) the encrypted PDF with logging ----------
+        try
         {
-            // Accessing the document (e.g., reading page count) triggers password checks.
-            Console.WriteLine($"Encrypted PDF has {encryptedDoc.Pages.Count} page(s).");
+            // Open the encrypted PDF providing the user password
+            using (Document encDoc = new Document(encryptedPdf, userPassword))
+            {
+                // Log the decrypt attempt and perform decryption
+                PdfSecurityLogger.DecryptWithLogging(encDoc, userPassword);
+
+                // Save the decrypted version
+                encDoc.Save(decryptedPdf);
+            }
+
+            Console.WriteLine($"Decrypted PDF saved to '{decryptedPdf}'.");
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Decryption error: {ex.Message}");
         }
     }
 }

@@ -7,51 +7,62 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed.pdf";
-        const string pfxPath = "certificate.pfx";
-        const string pfxPassword = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string certPath = "mycert.pfx";
+        const string certPassword = "password";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(pfxPath))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Enable incremental updates so that further signatures can be added later
-            doc.Form.SignaturesAppendOnly = true;
+            using (Document doc = new Document(inputPath))
+            {
+                // Create a signature field on the first page
+                var sigField = new SignatureField(doc, new Rectangle(100, 100, 250, 150));
+                doc.Form.Add(sigField);
 
-            // Define the rectangle (llx, lly, urx, ury) where the signature field will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+                // Prepare PKCS#7 signature object – this is where Reason, Location, etc. are set
+                var pkcs = new PKCS7(certPath, certPassword)
+                {
+                    Reason = "Approved",
+                    Location = "New York, USA",
+                    ContactInfo = "john.doe@example.com"
+                };
 
-            // Create a signature field on the first page (using the Document constructor overload)
-            SignatureField sigField = new SignatureField(doc, rect);
-            sigField.PartialName = "Signature1"; // optional field name
+                // Optional visual appearance – only if the current Aspose.Pdf version provides the class
+                // Uncomment the block below when SignatureAppearance is available in the library.
+                /*
+                pkcs.SignatureAppearance = new SignatureAppearance
+                {
+                    Text = "Signed by John Doe",
+                    BackgroundColor = Color.LightGray,
+                    BorderColor = Color.DarkGray,
+                    BorderWidth = 1
+                };
+                */
 
-            // Add the signature field to the document's form collection
-            doc.Form.Add(sigField);
+                // Sign the field with the prepared PKCS#7 object
+                sigField.Sign(pkcs);
 
-            // Create a PKCS#7 signature object using the certificate (PFX) file
-            PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword);
-            pkcs7.Reason = "Approved";
-            pkcs7.Location = "Office";
-            pkcs7.ContactInfo = "contact@example.com";
+                // Save the signed PDF. The document remains open for further signatures.
+                doc.Save(outputPath);
+            }
 
-            // Sign the document using the created signature field
-            sigField.Sign(pkcs7);
-
-            // Save the document. No SaveOptions are provided, so an incremental update is used.
-            doc.Save(outputPdf);
+            Console.WriteLine($"PDF signed and saved to '{outputPath}'. Additional signatures can be added later.");
         }
-
-        Console.WriteLine($"Document signed and saved to '{outputPdf}'. Additional signatures can be added later.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

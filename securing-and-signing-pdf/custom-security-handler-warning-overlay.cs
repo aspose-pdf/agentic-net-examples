@@ -2,40 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Security; // Only core Aspose.Pdf namespaces are used.
-
-class MyCustomSecurityHandler : ICustomSecurityHandler
-{
-    // Required read‑only properties – simple placeholder values.
-    public string Filter => "Standard";
-    public int KeyLength => 128;
-    public int Revision => 4;
-    public string SubFilter => "adbe.pkcs7.s5";
-    public int Version => 2;
-
-    // Called during encryption to initialise the handler.
-    public void Initialize(EncryptionParameters parameters) { /* No custom initialisation needed */ }
-
-    // Calculate the encryption key – not used in this simple handler.
-    public byte[] CalculateEncryptionKey(string userPassword) => new byte[0];
-
-    // Encrypt data – pass through unchanged (no actual encryption performed here).
-    public byte[] Encrypt(byte[] data, int offset, int count, byte[] key) => data;
-
-    // Decrypt data – pass through unchanged (must return a byte[] to satisfy the interface).
-    public byte[] Decrypt(byte[] data, int offset, int count, byte[] key) => data;
-
-    // Encrypt the permissions field – simple pass‑through of the integer value.
-    public byte[] EncryptPermissions(int permissions) => BitConverter.GetBytes(permissions);
-
-    // Owner/User key generation – return empty arrays (no password‑based keys).
-    public byte[] GetOwnerKey(string userPassword, string ownerPassword) => new byte[0];
-    public byte[] GetUserKey(string userPassword) => new byte[0];
-
-    // Password checks – always return false (no owner/user password validation).
-    public bool IsOwnerPassword(string password) => false;
-    public bool IsUserPassword(string password) => false;
-}
 
 class Program
 {
@@ -43,6 +9,9 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "secured_output.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
+        const string warningText = "Confidential – Do not copy or distribute";
 
         if (!File.Exists(inputPath))
         {
@@ -50,43 +19,47 @@ class Program
             return;
         }
 
-        // Load the PDF, apply a custom security handler, add a visible warning, and save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Disable copy‑paste by omitting the ExtractContent permission.
-            Permissions perms = Permissions.PrintDocument | Permissions.ModifyContent | Permissions.ModifyTextAnnotations;
-
-            // Apply encryption with a custom handler (no actual encryption, but handler is attached).
-            doc.Encrypt(
-                userPassword:   "user123",
-                ownerPassword:  "owner123",
-                permissions:    perms,
-                customHandler:  new MyCustomSecurityHandler()
-            );
-
-            // Add a visible warning overlay to each page.
-            foreach (Page page in doc.Pages)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Full‑page rectangle (coordinates are in points; 0,0 is bottom‑left).
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, page.PageInfo.Width, page.PageInfo.Height);
-
-                TextAnnotation warning = new TextAnnotation(page, rect)
+                // Add a visible warning overlay on each page
+                foreach (Page page in doc.Pages)
                 {
-                    Title    = "Security Notice",
-                    Contents = "Copying and extracting content is disabled for this document.",
-                    Color    = Aspose.Pdf.Color.Red, // Border color
-                    Open     = true
-                };
+                    // Rectangle covering the top part of the page (full width, 50 points height)
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, page.PageInfo.Height, page.PageInfo.Width, page.PageInfo.Height - 50);
 
-                // Ensure the annotation prints with the page.
-                warning.Flags = AnnotationFlags.Print;
-                page.Annotations.Add(warning);
+                    // Create a text annotation as the warning overlay
+                    TextAnnotation warning = new TextAnnotation(page, rect)
+                    {
+                        Title = "Security Warning",
+                        Contents = warningText,
+                        Open = true,
+                        Icon = TextIcon.Note,
+                        // Optional: set a background color for visibility
+                        Color = Aspose.Pdf.Color.Yellow
+                    };
+
+                    // Attach the annotation to the page
+                    page.Annotations.Add(warning);
+                }
+
+                // Define permissions: allow printing only, thereby disabling content extraction (copy‑paste)
+                Permissions perms = Permissions.PrintDocument;
+
+                // Encrypt the document using AES‑256
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the secured PDF
+                doc.Save(outputPath);
             }
 
-            // Save the protected PDF.
-            doc.Save(outputPath);
+            Console.WriteLine($"Secured PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Document saved with custom security handler to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

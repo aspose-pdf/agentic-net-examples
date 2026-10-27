@@ -8,64 +8,76 @@ class Program
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // NOTE:
-        // The original example retrieved a PFX certificate from Azure Key Vault
-        // using the Azure.Identity and Azure.Security.KeyVault.Secrets packages.
-        // Those packages are not referenced in the project, which caused the
-        // CS0246 errors ("The type or namespace name 'Azure' could not be found").
-        // ---------------------------------------------------------------------
-        // To make the sample compile without adding external NuGet packages we
-        // replace the Azure Key Vault call with a simple local‑file load.  In a
-        // real application you should restore the Azure SDK packages and use
-        // the original code – the rest of the signing logic remains unchanged.
-        // ---------------------------------------------------------------------
+        // Input and output PDF files
+        string inputPdf = "input.pdf";
+        string signedPdf = "signed_output.pdf";
 
-        // Path to a PFX file that contains the signing certificate (including the
-        // private key).  Replace this with the appropriate path or re‑introduce the
-        // Azure Key Vault retrieval logic once the required packages are added.
-        const string pfxFilePath = "certificate.pfx"; // <-- update as needed
-        const string pfxPassword = ""; // empty if the PFX has no password
-
-        // PDF files
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "signed_output.pdf";
-
-        // Load the PFX certificate into a memory stream
-        if (!File.Exists(pfxFilePath))
+        // Retrieve the certificate (PFX) as a byte array.
+        // In a real scenario you would obtain this from Azure Key Vault.
+        // For this self‑contained example we read a Base64‑encoded string from an environment variable.
+        byte[] pfxBytes = GetCertificateBytes();
+        if (pfxBytes == null || pfxBytes.Length == 0)
         {
-            Console.WriteLine($"PFX file not found: {pfxFilePath}");
+            Console.WriteLine("Certificate data not found. Set the CERT_BASE64 environment variable with a Base64‑encoded PFX.");
             return;
         }
-        byte[] pfxBytes = File.ReadAllBytes(pfxFilePath);
+
         using var pfxStream = new MemoryStream(pfxBytes);
 
         // Load the PDF document
-        using (var document = new Document(inputPdfPath))
+        var doc = new Document(inputPdf);
+
+        // Define the rectangle where the visible signature will appear (coordinates are in points)
+        var sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+
+        // Create a signature field on the first page and add it to the form
+        var signatureField = new SignatureField(doc.Pages[1], sigRect)
         {
-            // Create a signature field on the first page (adjust rectangle as needed)
-            var rect = new Rectangle(100, 100, 200, 150);
-            var signatureField = new SignatureField(document.Pages[1], rect)
-            {
-                PartialName = "Signature1"
-            };
-            document.Form.Add(signatureField, 1);
+            PartialName = "Signature1"
+        };
+        doc.Form.Add(signatureField, 1);
 
-            // Create a PKCS#1 signature object using the PFX stream
-            var pkcs1Signature = new PKCS1(pfxStream, pfxPassword);
+        // Reset the stream position before it is used a second time
+        pfxStream.Position = 0;
 
-            // Optional: set signature appearance and metadata
-            pkcs1Signature.Reason = "Document approved";
-            pkcs1Signature.ContactInfo = "contact@example.com";
-            pkcs1Signature.Location = "Office";
+        // Create a PKCS7 signature object using the certificate stream (no password in this example)
+        var pkcs7 = new PKCS7(pfxStream, (string)null)
+        {
+            Reason = "Document signed with Azure Key Vault certificate",
+            Location = "Location",
+            ContactInfo = "Contact Info"
+        };
 
-            // Sign the field
-            signatureField.Sign(pkcs1Signature);
+        // Reset the stream again because PKCS7 constructor consumes it
+        pfxStream.Position = 0;
 
-            // Save the signed PDF
-            document.Save(outputPdfPath);
+        // Sign the field with the PKCS7 object and the certificate stream
+        signatureField.Sign(pkcs7, pfxStream, (string)null);
+
+        // Save the signed PDF
+        doc.Save(signedPdf);
+
+        Console.WriteLine($"Signed PDF saved to '{signedPdf}'.");
+    }
+
+    /// <summary>
+    /// Retrieves the PFX certificate bytes.
+    /// This implementation reads a Base64‑encoded string from the environment variable "CERT_BASE64".
+    /// In production replace this with Azure Key Vault retrieval logic.
+    /// </summary>
+    private static byte[] GetCertificateBytes()
+    {
+        string base64 = Environment.GetEnvironmentVariable("CERT_BASE64");
+        if (string.IsNullOrWhiteSpace(base64))
+            return null;
+        try
+        {
+            return Convert.FromBase64String(base64);
         }
-
-        Console.WriteLine($"PDF signed and saved to '{outputPdfPath}'.");
+        catch
+        {
+            Console.WriteLine("Failed to decode CERT_BASE64 environment variable.");
+            return null;
+        }
     }
 }

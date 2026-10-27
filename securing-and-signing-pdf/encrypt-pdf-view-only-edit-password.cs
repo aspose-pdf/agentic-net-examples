@@ -6,8 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "encrypted_view_only.pdf";
+        const string inputPath      = "input.pdf";
+        const string outputPath     = "encrypted_view_only.pdf";
+        const string ownerPassword  = "ownerSecret";
 
         if (!File.Exists(inputPath))
         {
@@ -15,24 +16,27 @@ class Program
             return;
         }
 
-        // Permissions that allow viewing/printing but prevent editing
-        Permissions perms = Permissions.PrintDocument; // allow printing, no modify permissions
-
-        // Empty user password => no password required to open/view
-        // Owner password protects editing operations
-        const string userPassword  = "";          // view without password
-        const string ownerPassword = "EditOnly123";
-
         try
         {
+            // Open the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Encrypt the document: viewable without password, editing requires owner password
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Permissions that allow viewing/printing but prevent editing
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Empty user password => no password required to open/view the PDF
+                // Owner password protects the permissions and is required for editing
+                doc.Encrypt(
+                    userPassword: "",          // no password for opening
+                    ownerPassword: ownerPassword,
+                    permissions: perms,
+                    cryptoAlgorithm: CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted successfully. Viewable without password, editing requires the owner password.\nSaved to: {outputPath}");
         }
         catch (Exception ex)
         {

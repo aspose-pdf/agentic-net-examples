@@ -7,56 +7,59 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_flattened.pdf";
-        const string certPath = "certificate.pfx";
-        const string certPassword = "password";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_flattened.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        if (!File.Exists(certPath))
+        try
         {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
-            return;
-        }
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Define the rectangle for the visible signature (left, bottom, right, top)
+                var sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+                // Create a signature field. Providing a rectangle makes the field visible by default.
+                var sigField = new SignatureField(doc, sigRect);
+
+                // Add the signature field to the document's AcroForm collection
+                doc.Form.Add(sigField);
+
+                // Prepare a PKCS#7 signature (Aspose uses PKCS7 for PDF signatures)
+                var pkcs7 = new PKCS7(certificatePath, certificatePassword)
+                {
+                    Reason = "Document approval",
+                    Location = "Office",
+                    ContactInfo = "John Doe"
+                };
+
+                // Sign the field using the PKCS#7 signature
+                sigField.Sign(pkcs7);
+
+                // Flatten all form fields so they become static content after signing
+                doc.Form.Flatten();
+
+                // Save the signed and flattened PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Signed and flattened PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
         {
-            // Define the rectangle where the signature field will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-
-            // Create a signature field on the first page
-            SignatureField signatureField = new SignatureField(doc, rect)
-            {
-                PartialName = "Signature1"
-            };
-
-            // Add the signature field to the page annotations collection
-            doc.Pages[1].Annotations.Add(signatureField);
-
-            // Create a PKCS7 signature using a certificate file and password
-            Signature signature = new PKCS7(certPath, certPassword)
-            {
-                Reason = "Document approved",
-                Location = "Office",
-                ContactInfo = "contact@example.com"
-            };
-
-            // Sign the document using the signature field
-            signatureField.Sign(signature);
-
-            // Flatten all form fields so their values become part of the page content
-            doc.Flatten();
-
-            // Save the signed and flattened PDF
-            doc.Save(outputPdf);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        Console.WriteLine($"Signed and flattened PDF saved to '{outputPdf}'.");
     }
 }

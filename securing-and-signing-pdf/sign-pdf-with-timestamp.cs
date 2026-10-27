@@ -3,61 +3,66 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class SignPdfWithTimestamp
+class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF, and signing certificate (PFX) details
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_with_timestamp.pdf";
-        const string pfxPath        = "certificate.pfx";
-        const string pfxPassword    = "pfxPassword";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_timestamped.pdf";
+        const string certificate = "certificate.pfx";
+        const string certPassword = "certPassword";
+        const string tsaUrl = "http://timestamp.digicert.com";
 
-        // Timestamp Authority (TSA) server URL and optional basic authentication credentials
-        const string tsaServerUrl          = "https://tsa.example.com";
-        const string tsaBasicAuthCreds     = ""; // format "username:password" or empty if not required
-
-        // Ensure the input files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(pfxPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(certificate))
         {
-            // Create a signature field on the first page (coordinates are in points)
-            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-            SignatureField signatureField = new SignatureField(doc.Pages[1], sigRect);
-            doc.Form.Add(signatureField);
-
-            // Initialize a PKCS#7 signature object using the PFX certificate
-            PKCS7 pkcs7Signature = new PKCS7(pfxPath, pfxPassword);
-
-            // Configure timestamp settings (server URL, optional basic auth, hash algorithm)
-            pkcs7Signature.TimestampSettings = new TimestampSettings(
-                tsaServerUrl,
-                tsaBasicAuthCreds,
-                DigestHashAlgorithm.Sha256);
-
-            // Optional: set additional signature properties (reason, location, etc.)
-            pkcs7Signature.Reason   = "Document approved";
-            pkcs7Signature.Location = "Company HQ";
-
-            // Sign the document using the signature field
-            signatureField.Sign(pkcs7Signature);
-
-            // Save the signed PDF (lifecycle rule: save inside using block)
-            doc.Save(outputPdfPath);
+            Console.Error.WriteLine($"Certificate file not found: {certificate}");
+            return;
         }
 
-        Console.WriteLine($"PDF signed and timestamped successfully: {outputPdfPath}");
+        try
+        {
+            // Load the PDF document
+            Document doc = new Document(inputPdf);
+
+            // Define the rectangle where the signature will appear (coordinates are in points)
+            // Here we place it on the first page at (100,100) with width 200 and height 100
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+
+            // Create a signature field and add it to the document's form collection
+            SignatureField sigField = new SignatureField(doc, sigRect)
+            {
+                Name = "Signature1"
+            };
+            doc.Form.Add(sigField);
+
+            // Prepare the PKCS#7 signature using the provided certificate
+            PKCS7 pkcs7 = new PKCS7(certificate, certPassword)
+            {
+                Reason = "Document signed",
+                Location = "MyCompany"
+                // SigningTime is automatically set; no explicit property exists.
+            };
+
+            // Apply a timestamp from a trusted TSA server using TimestampSettings
+            pkcs7.TimestampSettings = new TimestampSettings(tsaUrl, string.Empty);
+
+            // Sign the field with the prepared PKCS#7 object
+            sigField.Sign(pkcs7);
+
+            // Save the signed and timestamped PDF
+            doc.Save(outputPdf);
+
+            Console.WriteLine($"Signed PDF with timestamp saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

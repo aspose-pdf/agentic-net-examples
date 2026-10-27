@@ -7,11 +7,11 @@ class Program
     static void Main()
     {
         const string inputPath = "encrypted_input.pdf";
-        const string outputPath = "re_encrypted_output.pdf";
-        const string extractedImagesDir = "ExtractedImages";
-        const string existingPassword = "oldPassword"; // password of the source PDF
-        const string newOwnerPassword = "newOwner123"; // new owner password
-        const string userPassword = ""; // no user password after re‑encryption
+        const string outputPdfPath = "reencrypted_output.pdf";
+        const string imagesOutputDir = "ExtractedImages";
+
+        const string userPassword = "user123";
+        const string newOwnerPassword = "newOwner456";
 
         if (!File.Exists(inputPath))
         {
@@ -19,46 +19,64 @@ class Program
             return;
         }
 
-        Directory.CreateDirectory(extractedImagesDir);
+        Directory.CreateDirectory(imagesOutputDir);
 
         try
         {
-            // Open the encrypted PDF using the known password
-            using (Document doc = new Document(inputPath, existingPassword))
+            // Open the encrypted PDF using the user password.
+            using (Document doc = new Document(inputPath, userPassword))
             {
-                // Decrypt the document (no parameters)
+                // Decrypt the document.
                 doc.Decrypt();
 
-                // Extract all images from each page
-                int imageIndex = 1;
-                foreach (Page page in doc.Pages)
+                // Extract all images from each page.
+                int imgCounter = 1;
+                for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
                 {
+                    Page page = doc.Pages[i];
                     foreach (XImage img in page.Resources.Images)
                     {
-                        string imgPath = Path.Combine(extractedImagesDir, $"image_{imageIndex}.png");
+                        // Determine a safe file extension (default to png).
+                        string ext = GetImageExtension(img);
+                        string imgPath = Path.Combine(imagesOutputDir, $"image_{imgCounter}.{ext}");
+
+                        // Save the image to a file via a FileStream (XImage.Save expects a Stream).
                         using (FileStream fs = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
                         {
-                            img.Save(fs); // Save image to file
+                            img.Save(fs);
                         }
-                        imageIndex++;
+
+                        Console.WriteLine($"Saved image {imgCounter} to {imgPath}");
+                        imgCounter++;
                     }
                 }
 
-                // Re‑encrypt the document with a new owner password (no user password)
+                // Re‑encrypt with the same user password and a new owner password.
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
                 doc.Encrypt(userPassword, newOwnerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the re‑encrypted PDF
-                doc.Save(outputPath);
+                // Save the re‑encrypted PDF.
+                doc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Decryption, image extraction, and re‑encryption completed.");
-            Console.WriteLine($"Images saved to: {extractedImagesDir}");
-            Console.WriteLine($"Re‑encrypted PDF saved to: {outputPath}");
+            Console.WriteLine($"Re‑encrypted PDF saved to '{outputPdfPath}'.");
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
+
+    // Helper that returns a default image file extension.
+    // Aspose.Pdf's XImage does not expose format information in older versions,
+    // so we default to PNG which works for the majority of raster images.
+    private static string GetImageExtension(XImage img)
+    {
+        // If future versions expose format info, this method can be extended.
+        return "png";
     }
 }
