@@ -1,49 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path
+        // Paths for input and output PDFs
         const string inputPath = "input.pdf";
-        // Output encrypted PDF path
-        const string outputPath = "encrypted_aes256.pdf";
+        const string encryptedPath = "encrypted_aes256.pdf";
 
-        // User password (required to open the document)
-        const string userPassword = "user123";
-        // Owner password (required to change permissions)
-        const string ownerPassword = "owner123";
+        // Passwords for user and owner
+        const string userPassword = "UserPass123";
+        const string ownerPassword = "OwnerPass456";
 
         // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions you want to allow.
-                // Here we allow printing and content extraction.
+                // Define permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt using AES‑256 algorithm.
+                // Encrypt using AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF.
-                doc.Save(outputPath);
+                // Save the encrypted PDF
+                doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"PDF encrypted with AES‑256 and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted successfully and saved to '{encryptedPath}'.");
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

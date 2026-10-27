@@ -6,30 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, encrypt it, and save the result.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Disable all content extraction by not granting any permissions.
-            Permissions perms = (Permissions)0; // no permission bits set
+            // Load the original PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Define permissions: allow printing only, do NOT include ExtractContent
+                Permissions perms = Permissions.PrintDocument;
 
-            // Encrypt using AES-256 algorithm.
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Encrypt the document with a strong algorithm (AES‑256)
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF.
-            doc.Save(outputPath);
+                // Save the encrypted PDF
+                doc.Save(encryptedPath);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
-
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

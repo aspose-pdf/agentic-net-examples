@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
@@ -8,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed_document.pdf";
+        const string inputPath = "signed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,50 +17,68 @@ class Program
             return;
         }
 
-        // Load the PDF document (using the recommended lifecycle pattern)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all fields and process only signature fields
-            foreach (Field field in doc.Form.Fields)
+            // Ensure the document contains a form with fields
+            if (doc?.Form?.Fields == null)
             {
-                if (field is SignatureField sigField)
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
+
+            // Collect only the signature fields from the form
+            var signatureFields = new List<SignatureField>();
+            foreach (var field in doc.Form.Fields)
+            {
+                if (field is SignatureField sig)
+                    signatureFields.Add(sig);
+            }
+
+            if (signatureFields.Count == 0)
+            {
+                Console.WriteLine("No signature fields found in the document.");
+                return;
+            }
+
+            // Iterate over each signature field
+            foreach (SignatureField sigField in signatureFields)
+            {
+                Console.WriteLine($"Signature field name: {sigField.PartialName}");
+
+                // Extract the signer's certificate from the signature field
+                X509Certificate2 signerCert = sigField.ExtractCertificateObject();
+                if (signerCert != null)
                 {
-                    // Extract the X509 certificate object from the signature field
-                    X509Certificate2 cert = sigField.ExtractCertificateObject();
+                    Console.WriteLine($"  Signer: {signerCert.Subject}");
+                    Console.WriteLine($"  Certificate expires on: {signerCert.NotAfter:u}");
 
-                    if (cert == null)
+                    // Build the certificate chain using X509Chain
+                    var chain = new X509Chain();
+                    // Optional: configure chain policy if needed (e.g., revocation checking)
+                    chain.Build(signerCert);
+
+                    if (chain.ChainElements != null && chain.ChainElements.Count > 0)
                     {
-                        Console.WriteLine($"Signature field '{sigField.PartialName}' does not contain a certificate.");
-                        continue;
-                    }
-
-                    Console.WriteLine($"Signature field: {sigField.PartialName}");
-                    Console.WriteLine($"  Subject: {cert.Subject}");
-                    Console.WriteLine($"  Issuer : {cert.Issuer}");
-                    Console.WriteLine($"  Valid From: {cert.NotBefore}");
-                    Console.WriteLine($"  Valid To  : {cert.NotAfter}");
-                    Console.WriteLine($"  Expired?  : {(DateTime.UtcNow > cert.NotAfter ? "Yes" : "No")}");
-
-                    // Build the certificate chain for this certificate
-                    using (X509Chain chain = new X509Chain())
-                    {
-                        // Use default chain policy; you can customize if needed
-                        chain.Build(cert);
-
-                        Console.WriteLine($"  Chain elements count: {chain.ChainElements.Count}");
-
-                        for (int i = 0; i < chain.ChainElements.Count; i++)
+                        Console.WriteLine("  Certificate chain:");
+                        foreach (X509ChainElement element in chain.ChainElements)
                         {
-                            X509Certificate2 chainCert = chain.ChainElements[i].Certificate;
-                            Console.WriteLine($"    Chain [{i}] Subject: {chainCert.Subject}");
-                            Console.WriteLine($"    Chain [{i}] Issuer : {chainCert.Issuer}");
-                            Console.WriteLine($"    Chain [{i}] Valid To: {chainCert.NotAfter}");
-                            Console.WriteLine($"    Chain [{i}] Expired? : {(DateTime.UtcNow > chainCert.NotAfter ? "Yes" : "No")}");
+                            X509Certificate2 chainCert = element.Certificate;
+                            Console.WriteLine($"    Subject: {chainCert.Subject}");
+                            Console.WriteLine($"    Expires : {chainCert.NotAfter:u}");
                         }
                     }
-
-                    Console.WriteLine(); // blank line between signatures
+                    else
+                    {
+                        Console.WriteLine("  No certificate chain could be built.");
+                    }
                 }
+                else
+                {
+                    Console.WriteLine("  No certificate could be extracted from the signature.");
+                }
+
+                Console.WriteLine(); // Blank line between signatures
             }
         }
     }

@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Security;
 
 class Program
 {
@@ -16,35 +16,69 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Prepare validation options to use CRL distribution points
-            ValidationOptions options = new ValidationOptions
-            {
-                ValidationMethod = ValidationMethod.Crl,      // Use CRL for revocation checking
-                ValidationMode   = ValidationMode.Strict,    // Fail the signature if validation fails
-                CheckCertificateChain = false               // Only check revocation status
-            };
+            // Retrieve all signature fields from the AcroForm.
+            var signatureFields = doc.Form?.Fields?.OfType<SignatureField>() ?? Enumerable.Empty<SignatureField>();
 
-            // Iterate over all signature fields in the document
-            foreach (Field field in doc.Form.Fields)
+            foreach (SignatureField sigField in signatureFields)
             {
-                if (field is SignatureField sigField)
+                object validationResult = null;
+
+                try
                 {
-                    // The actual signature object (PKCS7, PKCS7Detached, etc.)
-                    Signature signature = sigField.Signature;
+                    // Try to find an overload that accepts ValidationOptions (may not exist in older versions).
+                    var methodWithOptions = sigField.GetType().GetMethod("ValidateSignature", new[] { typeof(object) });
+                    if (methodWithOptions != null)
+                    {
+                        // Attempt to create ValidationOptions via reflection.
+                        var optionsType = Type.GetType("Aspose.Pdf.Signatures.ValidationOptions, Aspose.Pdf");
+                        object optionsInstance = null;
+                        if (optionsType != null)
+                        {
+                            optionsInstance = Activator.CreateInstance(optionsType);
+                            var checkRevocationProp = optionsType.GetProperty("CheckRevocation");
+                            checkRevocationProp?.SetValue(optionsInstance, true);
+                        }
+                        validationResult = methodWithOptions.Invoke(sigField, new[] { optionsInstance });
+                    }
+                    else
+                    {
+                        // Fallback to parameter‑less overload (available in all supported versions).
+                        var methodNoOptions = sigField.GetType().GetMethod("ValidateSignature", Type.EmptyTypes);
+                        validationResult = methodNoOptions?.Invoke(sigField, null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error validating signature '{sigField.PartialName}': {ex.Message}");
+                    continue;
+                }
 
-                    // Verify the signature using the prepared options
-                    bool isValid = signature.Verify(options, out ValidationResult result);
+                if (validationResult != null)
+                {
+                    // Use dynamic to access members without compile‑time type dependencies.
+                    dynamic result = validationResult;
+                    Console.WriteLine($"Signature '{sigField.PartialName}': Valid = {result.IsValid}");
 
-                    // Output verification details
-                    Console.WriteLine($"Signature field: {sigField.PartialName}");
-                    Console.WriteLine($"  Valid: {isValid}");
-                    Console.WriteLine($"  Validation result: {result?.Status}");
-                    // RevocationInfo property is not available in the current Aspose.PDF version;
-                    // if needed, additional revocation details can be obtained from the Status enum.
+                    if (result.RevocationInfo != null)
+                    {
+                        Console.WriteLine($"  Revocation status: {result.RevocationInfo.Status}");
+                        Console.WriteLine($"  Revocation source: {result.RevocationInfo.Source}");
+                    }
+                    else
+                    {
+                        Console.WriteLine("  No revocation information available.");
+                    }
+
+                    Console.WriteLine($"  Signer: {result.SignerInfo?.Subject}");
+                    Console.WriteLine($"  Signing time: {result.SigningTime}");
                     Console.WriteLine();
+                }
+                else
+                {
+                    Console.WriteLine($"Signature '{sigField.PartialName}' could not be validated (method not found).\n");
                 }
             }
         }

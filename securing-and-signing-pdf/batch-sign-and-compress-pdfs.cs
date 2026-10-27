@@ -2,66 +2,73 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Optimization;
 
-class BatchSignAndCompress
+class Program
 {
+    // Adjust these paths as needed
+    const string InputFolder   = @"C:\Pdf\Input";
+    const string OutputFolder  = @"C:\Pdf\SignedCompressed";
+    const string CertPath      = @"C:\Certificates\mycert.pfx";
+    const string CertPassword  = "certPassword";
+
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputFolder   = @"C:\PdfInput";
-        const string outputFolder  = @"C:\PdfSigned";
-        const string certificatePath = @"C:\cert\mycert.pfx";
-        const string certPassword    = "pfxPassword";
-
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(OutputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string inputFile in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfFile in Directory.GetFiles(InputFolder, "*.pdf"))
         {
-            string fileName   = Path.GetFileNameWithoutExtension(inputFile);
-            string outputFile = Path.Combine(outputFolder, fileName + "_signed.pdf");
-
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputFile))
+            try
             {
-                // -------------------------------------------------
-                // 1. Add a digital signature field to the first page
-                // -------------------------------------------------
-                // Define the signature appearance rectangle (left, bottom, right, top)
-                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+                // Load the PDF document
+                using (Document doc = new Document(pdfFile))
+                {
+                    // -------------------------------------------------
+                    // Add a digital signature field on the first page
+                    // -------------------------------------------------
+                    // Define the rectangle where the signature will appear
+                    Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
 
-                // Create the signature field and add it to the document form
-                SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
-                doc.Form.Add(sigField);
+                    // Create the signature field and add it to the form
+                    SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
+                    doc.Form.Add(sigField, 1);
 
-                // -------------------------------------------------
-                // 2. Sign the field using the provided certificate
-                // -------------------------------------------------
-                // Use a concrete implementation of the abstract Signature class
-                PKCS7 pkcs7 = new PKCS7(certificatePath, certPassword);
-                pkcs7.Reason   = "Document approved";
-                pkcs7.Location = "Company HQ";
-                // Optional: pkcs7.ContactInfo = "contact@example.com";
+                    // Configure the signature properties
+                    Signature signature = sigField.Signature; // read‑only property, but its members are writable
+                    signature.ContactInfo = "contact@example.com";
+                    signature.Location    = "Office";
+                    signature.Reason      = "Document approval";
+                    // Attach the certificate (PKCS#7) using the Forms API
+                    PKCS1 pkcs = new PKCS1(CertPath, CertPassword);
+                    sigField.Sign(pkcs);
 
-                // Apply the signature to the field
-                sigField.Sign(pkcs7);
+                    // -------------------------------------------------
+                    // Optimize (compress) the signed document
+                    // -------------------------------------------------
+                    OptimizationOptions optOptions = new OptimizationOptions
+                    {
+                        // Example: enable object stream compression
+                        CompressObjects = true
+                    };
+                    doc.OptimizeResources(optOptions);
 
-                // -------------------------------------------------
-                // 3. Compress the signed document
-                // -------------------------------------------------
-                // OptimizeResources removes unused objects and merges duplicates
-                doc.OptimizeResources();
+                    // -------------------------------------------------
+                    // Save the processed PDF
+                    // -------------------------------------------------
+                    string outputPath = Path.Combine(OutputFolder, Path.GetFileName(pdfFile));
+                    doc.Save(outputPath);
+                }
 
-                // -------------------------------------------------
-                // 4. Save the signed and compressed PDF
-                // -------------------------------------------------
-                doc.Save(outputFile);
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
             }
-
-            Console.WriteLine($"Processed: {Path.GetFileName(inputFile)} → {Path.GetFileName(outputFile)}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
+            }
         }
 
-        Console.WriteLine("Batch signing and compression completed.");
+        Console.WriteLine("Batch processing completed.");
     }
 }

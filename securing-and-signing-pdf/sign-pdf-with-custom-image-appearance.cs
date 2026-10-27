@@ -7,54 +7,75 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, certificate (PFX) and image for the visible signature
-        const string pdfPath      = "input.pdf";
-        const string pfxPath      = "certificate.pfx";
-        const string pfxPassword  = "yourPfxPassword";
-        const string imagePath    = "signature.png";
-        const string outputPath   = "signed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
+        const string signatureImagePath = "signature.png";
 
-        // Verify required files exist
-        if (!File.Exists(pdfPath) || !File.Exists(pfxPath) || !File.Exists(imagePath))
+        // Validate required files
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine("One or more required files are missing.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            return;
+        }
+        if (!File.Exists(signatureImagePath))
+        {
+            Console.Error.WriteLine($"Signature image not found: {signatureImagePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for disposal)
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF
+        using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle where the signature field will be placed (coordinates in points)
-            // Adjust values as needed for your layout
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+            // Define the rectangle where the visible signature will appear
+            // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+            Rectangle signatureRect = new Rectangle(100, 100, 250, 150);
 
             // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(doc, rect);
-            doc.Pages[1].Annotations.Add(sigField);
-
-            // Load the image that will be used as the visible appearance
-            using (FileStream imgStream = File.OpenRead(imagePath))
+            SignatureField sigField = new SignatureField(doc, signatureRect)
             {
-                // PKCS1 constructor with image stream defines the custom appearance
-                PKCS1 pkcs1Signature = new PKCS1(imgStream);
+                PartialName = "Signature1"
+            };
+            doc.Form.Add(sigField, 1);
 
-                // Optional: set additional signature properties
-                pkcs1Signature.Reason   = "I agree to the terms.";
-                pkcs1Signature.Location = "New York, USA";
-                pkcs1Signature.ContactInfo = "contact@example.com";
+            // Prepare PKCS#7 signature object
+            PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+            {
+                Reason = "Document approval",
+                ContactInfo = "John Doe",
+                Location = "New York"
+            };
 
-                // Load the certificate (PFX) as a stream
-                using (FileStream pfxStream = File.OpenRead(pfxPath))
-                {
-                    // Sign the field using the PKCS1 signature (appearance) and the certificate stream
-                    sigField.Sign(pkcs1Signature, pfxStream, pfxPassword);
-                }
-            }
+            // Configure custom visual appearance (foreground image)
+            pkcs7.CustomAppearance = new SignatureCustomAppearance
+            {
+                IsForegroundImage = true
+                // Additional appearance settings can be added here if needed
+            };
 
-            // Save the signed PDF (lifecycle rule: save inside using block)
+            // Sign the field
+            sigField.Sign(pkcs7);
+
+            // Add the image stamp so the signature appears visually
+            ImageStamp imgStamp = new ImageStamp(signatureImagePath)
+            {
+                BottomMargin = signatureRect.LLY,
+                LeftMargin   = signatureRect.LLX,
+                Width        = signatureRect.URX - signatureRect.LLX,
+                Height       = signatureRect.URY - signatureRect.LLY
+            };
+            doc.Pages[1].AddStamp(imgStamp);
+
+            // Save the signed PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF signed successfully. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

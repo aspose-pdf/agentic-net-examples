@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_new_sig.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +17,52 @@ class Program
             return;
         }
 
-        // Load the PDF document (wrapped in using for proper disposal)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // List existing signature fields
+            // -----------------------------------------------------------------
+            // Extract existing signature fields
+            // -----------------------------------------------------------------
             Console.WriteLine("Existing signature fields:");
-            foreach (var field in doc.Form.Fields)
+            foreach (Field field in doc.Form?.Fields ?? Enumerable.Empty<Field>())
             {
                 if (field is SignatureField sigField)
                 {
-                    Console.WriteLine($"- Name: {sigField.Name}, Page: {sigField.PageIndex}, Rect: {sigField.Rect}");
+                    // PartialName is the field name; Rect gives the location on the page
+                    Console.WriteLine($"  Name: {sigField.PartialName}, Rect: {sigField.Rect}");
                 }
             }
 
-            // Define rectangle for the new signature field (coordinates: llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+            // -----------------------------------------------------------------
+            // Add a new empty signature field for future signing
+            // -----------------------------------------------------------------
+            const string baseFieldName = "SignatureField_New";
+            string fieldName = baseFieldName;
+            int suffix = 1;
 
-            // Create a new empty signature field on the first page
-            SignatureField newSignature = new SignatureField(doc.Pages[1], rect);
-            newSignature.Name = "NewSignature"; // optional field name
+            // Ensure the field name is unique within the form
+            while (doc.Form?.Fields?.Any(f => f.PartialName == fieldName) == true)
+            {
+                fieldName = $"{baseFieldName}_{suffix++}";
+            }
 
-            // Add the new signature field to the form (page number is 1‑based)
-            doc.Form.Add(newSignature, 1);
+            // Choose the page (1‑based) and rectangle where the field will appear
+            int targetPage = 1; // first page (Aspose.Pdf pages are 1‑based)
+            // Rectangle(llx, lly, urx, ury) – coordinates are in points
+            Rectangle rect = new Rectangle(100, 100, 250, 150);
 
-            // Save the updated PDF
+            // Create the signature field and add it to the form
+            SignatureField newSig = new SignatureField(doc.Pages[targetPage], rect)
+            {
+                PartialName = fieldName
+            };
+            // The Form.Add method expects only the field instance; the name is already set via PartialName.
+            doc.Form.Add(newSig);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with new signature field: {outputPath}");
     }
 }

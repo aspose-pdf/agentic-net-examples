@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,13 +9,12 @@ class Program
     static void Main()
     {
         const string inputPath = "encrypted.pdf";
-        const string outputPath = "signed.pdf";
-        const string userPassword = "userpass";
+        const string outputPath = "re_signed.pdf";
+        const string userPassword = "user123";
 
-        // Paths to the certificates and their passwords.
-        // Add as many as needed; the code will cycle through them.
-        string[] certFiles = { "cert1.pfx", "cert2.pfx", "cert3.pfx" };
-        string[] certPasswords = { "pass1", "pass2", "pass3" };
+        // Certificate files and passwords – one per signature field (cycle if needed)
+        string[] certPaths = { "cert1.pfx", "cert2.pfx" };
+        string[] certPasswords = { "pass1", "pass2" };
 
         if (!File.Exists(inputPath))
         {
@@ -22,22 +22,22 @@ class Program
             return;
         }
 
-        // Open the encrypted PDF with the user password.
+        // Open the encrypted PDF with the user password
         using (Document doc = new Document(inputPath, userPassword))
         {
-            // Decrypt the document so that modifications can be made.
+            // Decrypt the document (no parameters required)
             doc.Decrypt();
 
-            // Ensure the document contains a form.
-            if (doc.Form == null)
+            // Ensure the document contains form fields
+            if (doc.Form == null || doc.Form.Fields == null)
             {
-                Console.WriteLine("Document does not contain any form fields.");
+                Console.WriteLine("No form fields found.");
                 doc.Save(outputPath);
                 return;
             }
 
-            // Gather all signature fields.
-            var signatureFields = new System.Collections.Generic.List<SignatureField>();
+            // Gather all signature fields in the document
+            List<SignatureField> signatureFields = new List<SignatureField>();
             foreach (Field field in doc.Form.Fields)
             {
                 if (field is SignatureField sigField)
@@ -46,45 +46,49 @@ class Program
                 }
             }
 
-            if (signatureFields.Count == 0)
+            // Re‑sign each signature field with a different certificate
+            for (int i = 0; i < signatureFields.Count; i++)
             {
-                Console.WriteLine("No signature fields found in the document.");
-                doc.Save(outputPath);
-                return;
-            }
+                SignatureField sigField = signatureFields[i];
 
-            // Sign each field with a different certificate (cycle if needed).
-            int certIndex = 0;
-            foreach (SignatureField sigField in signatureFields)
-            {
-                string certPath = certFiles[certIndex % certFiles.Length];
-                string certPass = certPasswords[certIndex % certPasswords.Length];
+                // Select certificate (cycle if fewer certificates than fields)
+                string certPath = certPaths[i % certPaths.Length];
+                string certPassword = certPasswords[i % certPasswords.Length];
 
                 if (!File.Exists(certPath))
                 {
-                    Console.Error.WriteLine($"Certificate file not found: {certPath}");
-                    certIndex++;
-                    continue; // Skip this field.
+                    Console.Error.WriteLine($"Certificate not found: {certPath}");
+                    continue;
                 }
 
-                // Create a PKCS7 signature object from the certificate.
-                var pkcs7 = new PKCS7(certPath, certPass)
+                // Create a PKCS#7 digital signature
+                PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+
+                // Optional visual appearance – set via PKCS7.CustomAppearance
+                SignatureCustomAppearance appearance = new SignatureCustomAppearance
                 {
-                    Reason = $"Signed with certificate #{certIndex + 1}",
-                    ContactInfo = "contact@example.com",
-                    Location = "Location"
+                    ShowContactInfo = true,
+                    ShowLocation = true,
+                    ShowReason = true,
+                    ContactInfoLabel = "Contact:",
+                    LocationLabel = "Location:",
+                    ReasonLabel = "Reason:"
                 };
+                pkcs7.CustomAppearance = appearance;
 
-                // Apply the signature to the current field.
+                // Optional metadata (reason, location, contact info)
+                pkcs7.Reason = "Document re‑signed";
+                pkcs7.Location = "Office";
+                pkcs7.ContactInfo = "signer@example.com";
+
+                // Apply the signature to the field
                 sigField.Sign(pkcs7);
-
-                certIndex++;
             }
 
-            // Save the newly signed PDF.
+            // Save the re‑signed PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Re‑signed PDF saved to '{outputPath}'.");
     }
 }

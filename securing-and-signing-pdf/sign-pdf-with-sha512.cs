@@ -1,55 +1,72 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-// Input PDF, output PDF, and certificate (PFX) paths
-const string inputPdfPath   = "input.pdf";
-const string outputPdfPath  = "signed_sha512.pdf";
-const string certificatePath = "cert.pfx";
-const string certificatePassword = "password";
-
-if (!File.Exists(inputPdfPath))
+class Program
 {
-    Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-    return;
-}
-if (!File.Exists(certificatePath))
-{
-    Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
-    return;
-}
-
-// Load the PDF document inside a using block for deterministic disposal
-using (Document pdfDoc = new Document(inputPdfPath))
-{
-    // Create a signature field on the first page.
-    // Fully qualify Rectangle to avoid ambiguity with System.Drawing.Rectangle.
-    Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 200, 150);
-    SignatureField sigField = new SignatureField(pdfDoc.Pages[1], sigRect)
+    static void Main()
     {
-        PartialName = "Signature1"
-    };
-    pdfDoc.Form.Add(sigField);
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
+        const string certificate = "certificate.pfx";
+        const string certPassword = "certPass";
 
-    // Load the signing certificate (PFX) with its password.
-    X509Certificate2 cert = new X509Certificate2(certificatePath, certificatePassword);
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certificate))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificate}");
+            return;
+        }
 
-    // Create an ExternalSignature specifying SHA‑512 as the digest algorithm.
-    // DigestHashAlgorithm is in the Aspose.Pdf namespace.
-    ExternalSignature signature = new ExternalSignature(cert, Aspose.Pdf.DigestHashAlgorithm.Sha512)
-    {
-        Reason      = "Document approved",
-        Location    = "Head Office",
-        ContactInfo = "security@example.com"
-    };
+        try
+        {
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
+            {
+                // Define the rectangle where the signature will appear (lower‑left x/y, upper‑right x/y)
+                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
 
-    // Sign the PDF using the signature field and the configured signature object.
-    sigField.Sign(signature);
+                // Create a signature field and add it to the form on the last page
+                SignatureField sigField = new SignatureField(doc, sigRect)
+                {
+                    PartialName = "Signature1"
+                };
+                // The page number is 1‑based; add the field to the last page
+                doc.Form.Add(sigField, doc.Pages.Count);
 
-    // Save the signed PDF. The using block ensures the document is properly closed.
-    pdfDoc.Save(outputPdfPath);
+                // Prepare the PKCS7 signature provider
+                PKCS7 pkcs = new PKCS7(certificate, certPassword)
+                {
+                    Reason = "Document approval",
+                    Location = "Head Office",
+                    ContactInfo = "security@example.com"
+                };
+
+                // Set the digest algorithm to SHA‑512 via TimestampSettings (PKCS7 does not expose a direct DigestAlgorithm property)
+                // A dummy timestamp server URL is supplied; replace with a real TSA URL if needed.
+                pkcs.TimestampSettings = new TimestampSettings(
+                    "https://timestamp.example.com", // TSA server URL (can be empty if not used)
+                    null,
+                    DigestHashAlgorithm.Sha512);
+
+                // Sign the field
+                sigField.Sign(pkcs);
+
+                // Save the signed PDF
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"PDF signed successfully: {outputPdf}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during signing: {ex.Message}");
+        }
+    }
 }
-
-Console.WriteLine($"PDF signed with SHA‑512 and saved to '{outputPdfPath}'.");

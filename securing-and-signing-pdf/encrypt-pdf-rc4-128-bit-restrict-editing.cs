@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -19,20 +19,17 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Open the source PDF and apply RC4‑128 encryption.
+            // Permissions are set to allow printing and content extraction only,
+            // thereby restricting any editing (no ModifyDocument permission).
             using (Document doc = new Document(inputPath))
             {
-                // Allow only printing (restrict editing)
-                Permissions perms = Permissions.PrintDocument;
-
-                // Apply RC4 128‑bit encryption
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.RC4x128);
-
-                // Save the encrypted PDF
-                doc.Save(outputPath);
+                doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted successfully and saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {

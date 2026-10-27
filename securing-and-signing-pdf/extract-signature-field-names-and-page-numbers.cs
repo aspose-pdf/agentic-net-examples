@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -15,27 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document (using rule: document disposal with using)
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form (may be null if no AcroForm present)
-            Form form = doc.Form;
-            if (form == null || form.Count == 0)
+            // Iterate over pages to obtain the page number for each signature field
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Console.WriteLine("No form fields found in the document.");
-                return;
-            }
-
-            // Iterate over all fields and pick out signature fields
-            foreach (Field field in form)
-            {
-                if (field is SignatureField sigField)
+                Page page = doc.Pages[pageIndex];
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // FullName provides the field's name
-                    string fieldName = sigField.FullName;
-                    // PageIndex returns the 1‑based page number containing the field
-                    int pageNumber = sigField.PageIndex;
-                    Console.WriteLine($"Signature field \"{fieldName}\" is on page {pageNumber}.");
+                    // SignatureField derives from WidgetAnnotation, so we can cast directly
+                    if (annotation is SignatureField signature)
+                    {
+                        // SignatureField.Name gives the field name; pageIndex is the 1‑based page number
+                        Console.WriteLine($"Signature field: '{signature.Name}' on page {pageIndex}");
+                    }
                 }
             }
         }

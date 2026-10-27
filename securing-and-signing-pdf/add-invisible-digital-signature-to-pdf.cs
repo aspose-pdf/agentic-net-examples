@@ -7,64 +7,53 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, output PDF and signing certificate (PFX) paths
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_invisible.pdf";
-        const string pfxPath        = "certificate.pfx";
-        const string pfxPassword    = "pfxPassword";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "password";
 
-        // Ensure the input files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(pfxPath))
+        if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // Load the PDF document (lifecycle rule: use using for deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Choose a page to place the (invisible) signature field.
-            // Page indexing in Aspose.Pdf is 1‑based.
-            Page page = doc.Pages[1];
+            // Create an invisible signature field (zero‑size rectangle).
+            // A zero‑size rectangle makes the field invisible and does not affect layout.
+            var invisibleRect = new Rectangle(0, 0, 0, 0);
+            SignatureField sigField = new SignatureField(doc, invisibleRect)
+            {
+                PartialName = "Signature1" // required identifier for the field
+            };
 
-            // Define a zero‑size rectangle – the field will not be visible
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-
-            // Create the signature field and add it to the document's form.
-            SignatureField sigField = new SignatureField(page, rect);
+            // Add the signature field to the document's form collection
             doc.Form.Add(sigField);
 
-            // Create a PKCS#7 signature object using the PFX file.
-            // The constructor (string pfx, string password) matches the API.
-            PKCS7 pkcs7Signature = new PKCS7(pfxPath, pfxPassword);
+            // Create a PKCS#7 signature using the certificate file
+            PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+            {
+                Reason = "Document approved",
+                Location = "Head Office",
+                ContactInfo = "security@example.com"
+                // Signing time is recorded automatically when Sign() is called
+            };
 
-            // Record the signing time.
-            pkcs7Signature.Date = DateTime.Now;
+            // Apply the digital signature to the field
+            sigField.Sign(pkcs7);
 
-            // Hide the signature appearance (invisible signature).
-            pkcs7Signature.ShowProperties = false;
-
-            // Optional: set additional metadata (reason, location, etc.).
-            // pkcs7Signature.Reason = "Document approved";
-            // pkcs7Signature.Location = "Office";
-
-            // Sign the document using the signature field.
-            sigField.Sign(pkcs7Signature);
-
-            // Ensure the signature is preserved via incremental update.
-            // This prevents layout changes when the document is saved later.
-            doc.Form.SignaturesAppendOnly = true;
-
-            // Save the signed PDF (lifecycle rule: use Document.Save(string)).
-            doc.Save(outputPdfPath);
+            // Save the signed PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Invisible digital signature applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Invisible digital signature applied. Output saved to '{outputPath}'.");
     }
 }

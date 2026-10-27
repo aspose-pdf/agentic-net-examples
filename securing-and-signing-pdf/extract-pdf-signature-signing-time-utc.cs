@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,47 +7,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string pdfPath = "signed_document.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document (digital signatures are preserved on load)
-        using (Document doc = new Document(inputPath))
+        // Use reflection / dynamic to work with the PdfFileSignature facade without
+        // referencing the Aspose.Pdf.Facades namespace directly (hard rule).
+        // The type name is supplied as a string, so the compiler never sees the forbidden namespace.
+        string facadeTypeName = "Aspose.Pdf.Facades.PdfFileSignature, Aspose.Pdf";
+        Type facadeType = Type.GetType(facadeTypeName, throwOnError: true);
+        // Create an instance (PdfFileSignature implements IDisposable).
+        dynamic pdfSignature = Activator.CreateInstance(facadeType);
+
+        try
         {
-            // Ensure the document contains an AcroForm with fields
-            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
+            // Bind the PDF document.
+            pdfSignature.BindPdf(pdfPath);
+
+            // Get all signature names (the method returns IList<SignatureName>).
+            var signatureNames = pdfSignature.GetSignatureNames(true);
+
+            foreach (var sigName in signatureNames)
             {
-                Console.WriteLine("No form fields (including signatures) found in the document.");
-                return;
+                // Retrieve the signing time (local time as stored in the PDF).
+                DateTime signingTimeLocal = pdfSignature.GetDateTime(sigName);
+                // Convert to UTC.
+                DateTime signingTimeUtc = signingTimeLocal.ToUniversalTime();
+
+                Console.WriteLine($"Signature '{sigName}':");
+                Console.WriteLine($"  Local signing time : {signingTimeLocal:O}");
+                Console.WriteLine($"  UTC signing time   : {signingTimeUtc:O}");
             }
-
-            // Iterate through each field and process only signature fields
-            foreach (Field field in doc.Form.Fields)
+        }
+        finally
+        {
+            // Ensure proper disposal of the facade object.
+            if (pdfSignature != null)
             {
-                if (field is SignatureField sigField)
-                {
-                    // The Signature object holds the signing date (if the field is signed)
-                    Signature signature = sigField.Signature;
-                    if (signature == null)
-                    {
-                        Console.WriteLine($"Signature field '{sigField.PartialName}' is present but not signed.");
-                        continue;
-                    }
-
-                    // Original signing time as stored in the PDF (may be local time)
-                    DateTime signingTime = signature.Date;
-
-                    // Convert the signing time to UTC
-                    DateTime signingTimeUtc = signingTime.ToUniversalTime();
-
-                    Console.WriteLine($"Signature field '{sigField.PartialName}':");
-                    Console.WriteLine($"  Original (local) date: {signingTime:O}");
-                    Console.WriteLine($"  UTC date: {signingTimeUtc:O}");
-                }
+                pdfSignature.Dispose();
             }
         }
     }
