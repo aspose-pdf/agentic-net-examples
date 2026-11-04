@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_blank_page.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,9 +19,10 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Add a new blank page at the end of the document
+            // Pages collection is 1‑based; Add() appends a new page
             doc.Pages.Add();
 
-            // Save the updated PDF
+            // Save the updated PDF; Document.Save without options writes PDF format
             doc.Save(outputPath);
         }
 

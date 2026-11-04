@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,13 +15,13 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Replace the Author metadata with the current user name
+            // Set the Author metadata to the current user name
             doc.Info.Author = Environment.UserName;
 
-            // Save the updated document (PDF format)
+            // Save the updated document
             doc.Save(outputPath);
         }
 

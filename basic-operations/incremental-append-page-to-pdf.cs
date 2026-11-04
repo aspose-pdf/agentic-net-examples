@@ -6,29 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_incremental.pdf";
+        const string originalPdf = "original.pdf";
+        const string pagesToAdd = "newpages.pdf";
+        const string outputPdf = "updated.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(originalPdf) || !File.Exists(pagesToAdd))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine("Required PDF files not found.");
             return;
         }
 
-        // Copy the original PDF to the output location.
-        File.Copy(inputPath, outputPath, true);
+        // Create the output file as a copy of the original so that we can perform an incremental update.
+        File.Copy(originalPdf, outputPdf, true);
 
-        // Open the copied PDF with a read/write stream.
-        using (var fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite))
-        using (var doc = new Document(fs))
+        // Open the output PDF with a read/write FileStream. Loading the document from this stream
+        // allows Aspose.Pdf to perform an incremental update when Save() is called without options.
+        using (FileStream outStream = new FileStream(outputPdf, FileMode.Open, FileAccess.ReadWrite))
+        using (Document doc = new Document(outStream))
+        using (Document src = new Document(pagesToAdd))
         {
-            // Append a new blank page.
-            doc.Pages.Add();
+            // Append all pages from the source document.
+            doc.Pages.Add(src.Pages);
 
-            // Parameterless Save performs an incremental update.
+            // Parameterless Save performs an incremental update on the opened stream.
             doc.Save();
         }
 
-        Console.WriteLine($"PDF saved with incremental update to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with incremental update to '{outputPdf}'.");
     }
 }

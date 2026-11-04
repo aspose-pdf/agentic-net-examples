@@ -6,33 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string protectedPdfPath = "protected.pdf";
+        const string pdfPath = "protected.pdf";
 
-        if (!File.Exists(protectedPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {protectedPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         try
         {
-            // Attempt to open the password‑protected PDF without supplying a password.
-            // This will throw InvalidPasswordException if the document is encrypted.
-            using (Document doc = new Document(protectedPdfPath))
+            // Attempt to open the PDF without providing a password.
+            // The Document constructor will throw InvalidPasswordException
+            // if the file is password‑protected.
+            using (Document doc = new Document(pdfPath))
             {
-                // If the document opens successfully (unlikely), you can work with it here.
+                // If the file opens successfully (unlikely in this scenario),
+                // you can access its properties here.
                 Console.WriteLine($"Pages: {doc.Pages.Count}");
             }
         }
         catch (InvalidPasswordException ex)
         {
-            // Handle the specific case where a password is required.
-            Console.WriteLine($"Cannot open PDF: password required. Details: {ex.Message}");
+            // Handle the specific exception for missing or wrong password.
+            Console.Error.WriteLine("Failed to open PDF: password required.");
+            Console.Error.WriteLine($"Error details: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // Handle any other unexpected errors.
-            Console.Error.WriteLine($"Error opening PDF: {ex.Message}");
+            // Fallback for any other unexpected errors.
+            Console.Error.WriteLine($"An unexpected error occurred: {ex.Message}");
         }
     }
 }

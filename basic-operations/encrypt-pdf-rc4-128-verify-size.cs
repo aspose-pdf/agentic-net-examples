@@ -18,34 +18,31 @@ class Program
         // Record original file size
         long originalSize = new FileInfo(inputPath).Length;
 
-        try
+        // Encrypt using 128‑bit RC4
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF and apply 128‑bit RC4 encryption
-            using (Document doc = new Document(inputPath))
-            {
-                // Example permissions: allow printing and content extraction
-                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                // Encrypt with user password, owner password, permissions, and RC4x128 algorithm
-                doc.Encrypt(userPassword: "user123", ownerPassword: "owner123", perms, CryptoAlgorithm.RC4x128);
-                doc.Save(encryptedPath);
-            }
-
-            // Record encrypted file size
-            long encryptedSize = new FileInfo(encryptedPath).Length;
-
-            Console.WriteLine($"Original size:   {originalSize} bytes");
-            Console.WriteLine($"Encrypted size:  {encryptedSize} bytes");
-
-            // Verify that the encrypted file is slightly larger
-            if (encryptedSize > originalSize)
-                Console.WriteLine("File size increased after encryption (as expected).");
-            else
-                Console.WriteLine("File size did not increase; encryption may not have been applied correctly.");
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            doc.Encrypt(
+                userPassword: "",               // no user password
+                ownerPassword: "owner123",     // owner password
+                permissions: perms,
+                cryptoAlgorithm: CryptoAlgorithm.RC4x128);
+            doc.Save(encryptedPath);
         }
-        catch (Exception ex)
+
+        // Record encrypted file size
+        long encryptedSize = new FileInfo(encryptedPath).Length;
+
+        Console.WriteLine($"Original size:   {originalSize} bytes");
+        Console.WriteLine($"Encrypted size: {encryptedSize} bytes");
+
+        if (encryptedSize > originalSize)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"File size increased by {encryptedSize - originalSize} bytes.");
+        }
+        else
+        {
+            Console.WriteLine("Encrypted file is not larger than the original (unexpected).");
         }
     }
 }

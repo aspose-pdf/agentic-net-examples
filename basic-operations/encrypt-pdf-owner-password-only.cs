@@ -1,42 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
+using Aspose.Pdf.Security; // Added for Permissions enum
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string ownerPassword = "ownerSecret";
+        const string encryptedPath = "encrypted_owner_only.pdf";
+        const string ownerPassword = "OwnerSecret123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Empty user password – users can open the file but will be limited by permissions
-        string userPassword = "";
-
-        // No permissions for the user (equivalent to "none")
-        Permissions userPermissions = (Permissions)0;
-
         try
         {
+            // Load the source PDF and encrypt it.
+            // User password is empty (no password required to open), but permissions are restricted.
+            // Owner password grants full rights.
             using (Document doc = new Document(inputPath))
             {
-                // Encrypt with owner password, empty user password, restrictive permissions, AES‑256
-                doc.Encrypt(userPassword, ownerPassword, userPermissions, CryptoAlgorithm.AESx256);
-                doc.Save(outputPath);
+                // Define the permissions you want to allow for regular users.
+                // Here we deny all permissions (full restriction) by using a zero value.
+                Permissions userPermissions = (Permissions)0; // No permissions for users
+
+                // Encrypt with owner password only.
+                doc.Encrypt(
+                    userPassword: "",               // No user password required to open
+                    ownerPassword: ownerPassword,   // Owner password with full rights
+                    permissions: userPermissions,   // Restricted permissions for users
+                    cryptoAlgorithm: CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF.
+                doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"PDF encrypted with owner password only. Saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted successfully. Output: {encryptedPath}");
+        }
+        catch (InvalidPasswordException ex)
+        {
+            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

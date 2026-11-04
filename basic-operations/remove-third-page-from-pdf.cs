@@ -26,11 +26,10 @@ class Program
             }
             else
             {
-                Console.WriteLine("The document has fewer than three pages; no page removed.");
+                Console.WriteLine("The document has fewer than three pages; nothing to delete.");
             }
 
-            // Save the modified document. Save() is called inside the using block
-            // so the Document remains alive until the operation completes.
+            // Save the modified document
             doc.Save(outputPath);
         }
 

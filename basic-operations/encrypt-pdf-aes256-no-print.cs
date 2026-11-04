@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";
-        const string encryptedPath  = "encrypted.pdf";
-        const string userPassword   = "user123";
-        const string ownerPassword  = "owner123";
+        const string inputPath = "input.pdf";
+        const string encryptedPath = "encrypted.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -18,36 +18,29 @@ class Program
             return;
         }
 
-        try
+        // ---------- Encrypt the PDF ----------
+        // No permissions granted (including printing)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the original PDF and apply AES‑256 encryption with no permissions (no printing)
-            using (Document doc = new Document(inputPath))
-            {
-                // No permissions – use a zero‑valued Permissions flag
-                Permissions perms = (Permissions)0;
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-                doc.Save(encryptedPath);
-            }
-
-            // Open the encrypted PDF using the user password and verify security settings
-            using (Document encDoc = new Document(encryptedPath, userPassword))
-            {
-                // Verify that the document is indeed encrypted
-                bool isEncrypted = encDoc.IsEncrypted;
-
-                // Retrieve the permissions that were set during encryption (cast from int)
-                Permissions currentPerms = (Permissions)encDoc.Permissions;
-
-                // Determine whether printing is allowed (should be false)
-                bool canPrint = (currentPerms & Permissions.PrintDocument) == Permissions.PrintDocument;
-
-                Console.WriteLine($"Encrypted: {isEncrypted}");
-                Console.WriteLine($"Printing allowed: {canPrint}");
-            }
+            Permissions perms = (Permissions)0; // no permissions
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            doc.Save(encryptedPath);
         }
-        catch (Exception ex)
+
+        // ---------- Verify security settings ----------
+        // Open the encrypted file with the user password.
+        using (Document encDoc = new Document(encryptedPath, userPassword))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Check that the document is indeed encrypted.
+            Console.WriteLine($"IsEncrypted: {encDoc.IsEncrypted}");
+
+            // Cast the integer Permissions value to the enum before using HasFlag.
+            Permissions currentPerms = (Permissions)encDoc.Permissions;
+            bool canPrint = currentPerms.HasFlag(Permissions.PrintDocument);
+            Console.WriteLine($"Printing permission granted: {canPrint}");
+
+            // List all granted permissions (should be none).
+            Console.WriteLine($"Granted permissions: {currentPerms}");
         }
     }
 }
