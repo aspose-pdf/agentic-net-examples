@@ -1,94 +1,113 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
-class Program
+class FormDataTransformer
 {
     static void Main()
     {
-        const string sourcePdf = "source_form.pdf";
-        const string targetPdf = "target_template.pdf";
-        const string outputPdf = "merged_filled.pdf";
+        const string sourcePdfPath   = "source_form.pdf";
+        const string targetPdfPath   = "target_form.pdf";
+        const string outputPdfPath   = "merged_output.pdf";
 
-        if (!File.Exists(sourcePdf) || !File.Exists(targetPdf))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine("Source or target PDF not found.");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        // ---------------------------------------------------------------------
-        // 1. Extract form data from the source PDF
-        // ---------------------------------------------------------------------
-        var extractedData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        using (Document srcDoc = new Document(sourcePdf))
+        if (!File.Exists(targetPdfPath))
         {
-            var form = srcDoc.Form;
-            // FormFieldCollection exposes a Count() extension – use it via LINQ.
-            if (form != null && form.Fields.Count() > 0)
+            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            return;
+        }
+
+        // 1. Extract form data from the source PDF
+        var sourceData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        using (Document srcDoc = new Document(sourcePdfPath))
+        {
+            // Iterate over all form fields in the source document
+            foreach (Field field in srcDoc.Form.Fields)
             {
-                foreach (var field in form.Fields)
+                string fieldName = field.PartialName;
+                string fieldValue = string.Empty;
+
+                // Retrieve the value based on the concrete field type
+                switch (field)
                 {
-                    // Use the FormField API (PartialName / Value)
-                    string name = field.PartialName;
-                    string value = field.Value?.ToString() ?? string.Empty;
-                    extractedData[name] = value;
+                    case TextBoxField txt:
+                        fieldValue = txt.Value?.ToString() ?? string.Empty;
+                        break;
+                    case CheckboxField chk:
+                        fieldValue = chk.Checked ? "True" : "False";
+                        break;
+                    case RadioButtonField rad:
+                        // Selected is 1‑based; we store the index as string
+                        fieldValue = rad.Selected > 0 ? rad.Selected.ToString() : string.Empty;
+                        break;
+                    // Add other field types as needed
                 }
+
+                sourceData[fieldName] = fieldValue;
             }
         }
 
-        // ---------------------------------------------------------------------
-        // 2. Transform data to a new schema (example: rename keys and uppercase values)
-        // ---------------------------------------------------------------------
-        var transformedData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var kvp in extractedData)
+        // 2. Transform the extracted data to a new schema
+        var nameMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            string newName = "new_" + kvp.Key;
-            string newValue = kvp.Value.ToUpperInvariant();
+            { "FirstName", "GivenName" },
+            { "LastName",  "FamilyName" },
+            { "Email",     "ContactEmail" }
+            // add more mappings as required
+        };
+
+        var transformedData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var kvp in sourceData)
+        {
+            string newName = nameMapping.ContainsKey(kvp.Key) ? nameMapping[kvp.Key] : kvp.Key;
+            string newValue = kvp.Value.Trim().ToUpperInvariant();
             transformedData[newName] = newValue;
         }
 
-        // ---------------------------------------------------------------------
-        // 3. Load the target PDF and import transformed data as new form fields
-        // ---------------------------------------------------------------------
-        using (Document tgtDoc = new Document(targetPdf))
+        // 3. Import the transformed data into the target PDF
+        using (Document tgtDoc = new Document(targetPdfPath))
         {
-            // Use the first page as the container for new fields (adjust as needed)
-            Page page = tgtDoc.Pages[1]; // 1‑based indexing
-
-            double startY = 750; // initial vertical position
             foreach (var kvp in transformedData)
             {
-                // Define a rectangle for the field (position/size can be adjusted)
-                double llx = 50;
-                double lly = startY;
-                double urx = 300;
-                double ury = lly + 15;
+                // Locate a field with the transformed name in the target PDF
+                Field targetField = tgtDoc.Form[kvp.Key] as Field;
 
-                // Create a TextBoxField and set its properties
-                TextBoxField txtField = new TextBoxField(tgtDoc, new Rectangle(llx, lly, urx, ury))
+                if (targetField != null)
                 {
-                    PartialName = kvp.Key,
-                    Value = kvp.Value
-                };
-
-                // Set the font size via the DefaultAppearance property (FontSize is not a direct member)
-                txtField.DefaultAppearance.FontSize = 12;
-
-                // Add the field to the document's form collection
-                tgtDoc.Form.Add(txtField);
-
-                // Move the next field down
-                startY -= 20;
+                    // Set the field's value according to its concrete type
+                    switch (targetField)
+                    {
+                        case TextBoxField txt:
+                            txt.Value = kvp.Value;
+                            break;
+                        case CheckboxField chk:
+                            chk.Checked = kvp.Value.Equals("TRUE", StringComparison.OrdinalIgnoreCase);
+                            break;
+                        case RadioButtonField rad:
+                            // Attempt to match the stored value with an option index
+                            if (int.TryParse(kvp.Value, out int sel) && sel > 0 && sel <= rad.Options.Count)
+                                rad.Selected = sel;
+                            break;
+                        // Extend with other field types as required
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: Target PDF does not contain field '{kvp.Key}'.");
+                }
             }
 
-            // Save the resulting PDF
-            tgtDoc.Save(outputPdf);
+            // 4. Save the updated target PDF
+            tgtDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form data transferred and saved to '{outputPdf}'.");
+        Console.WriteLine($"Form data transferred and saved to '{outputPdfPath}'.");
     }
 }

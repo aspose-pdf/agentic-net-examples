@@ -2,47 +2,27 @@ using System;
 
 public static class NumericValidator
 {
-    /// <summary>
-    /// Validates that a numeric value lies within the specified inclusive range.
-    /// </summary>
-    /// <param name="value">The value to validate.</param>
-    /// <param name="min">Minimum acceptable value (inclusive).</param>
-    /// <param name="max">Maximum acceptable value (inclusive).</param>
-    /// <returns>True if the value is within range; otherwise false.</returns>
-    /// <exception cref="ArgumentException">Thrown when min is greater than max.</exception>
-    public static bool IsWithinRange(double value, double min, double max)
+    // Validates that the given numeric value falls within the inclusive range [min, max].
+    // Throws ArgumentException if the range definition is invalid (min > max).
+    // Returns true if the value is within range; otherwise false.
+    public static bool IsValid(int value, int min, int max)
     {
         if (min > max)
-            throw new ArgumentException("Minimum value cannot be greater than maximum value.");
+            throw new ArgumentException("The minimum value cannot be greater than the maximum value.");
 
         return value >= min && value <= max;
     }
 
-    /// <summary>
-    /// Example usage of the validator.
-    /// </summary>
-    public static void Example()
-    {
-        double input = 42.5;
-        double minAllowed = 0.0;
-        double maxAllowed = 100.0;
-
-        if (IsWithinRange(input, minAllowed, maxAllowed))
-        {
-            Console.WriteLine($"{input} is within the acceptable range [{minAllowed}, {maxAllowed}].");
-        }
-        else
-        {
-            Console.WriteLine($"{input} is outside the acceptable range [{minAllowed}, {maxAllowed}].");
-        }
-    }
-}
-
-public class Program
-{
+    // Example usage of the validation logic.
     public static void Main()
     {
-        // Entry point for the console application.
-        NumericValidator.Example();
+        int value = 42;
+        int min = 10;
+        int max = 100;
+
+        if (IsValid(value, min, max))
+            Console.WriteLine($"{value} is within the range [{min}, {max}].");
+        else
+            Console.WriteLine($"{value} is outside the range [{min}, {max}].");
     }
 }

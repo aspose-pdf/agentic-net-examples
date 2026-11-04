@@ -1,9 +1,11 @@
 using System;
 using System.IO;
-using System.Drawing;
+using System.Linq;
+using System.Drawing; // for System.Drawing.Color (will be fully qualified where needed)
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // <-- added for DefaultAppearance
+using Aspose.Pdf.Text; // <-- added for FontRepository (if needed in future)
 
 class Program
 {
@@ -11,7 +13,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "MyTextField"; // name of the form field to modify
+        const string fieldName = "myTextField";
 
         if (!File.Exists(inputPath))
         {
@@ -22,33 +24,36 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has an AcroForm (Form) object
-            if (doc.Form == null || doc.Form.Count == 0)
+            // Verify that the form contains the specified field using the Fields collection
+            bool fieldExists = doc.Form?.Fields?.Any(f => f.Name == fieldName) ?? false;
+            if (!fieldExists)
             {
-                Console.Error.WriteLine("No form fields found in the document.");
+                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
                 return;
             }
 
-            // Retrieve the target field; cast to TextBoxField (or appropriate field type)
-            TextBoxField field = doc.Form[fieldName] as TextBoxField;
-            if (field == null)
+            // Retrieve the field via the Form indexer and cast to the appropriate type.
+            // The indexer returns a WidgetAnnotation, so an explicit cast is required.
+            if (doc.Form[fieldName] is TextBoxField textBox)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a TextBoxField.");
+                // Set the default appearance (font, size, colour) for the text box field.
+                // DefaultAppearance lives in Aspose.Pdf.Annotations and its constructor expects
+                // a font name, size and a System.Drawing.Color.
+                textBox.DefaultAppearance = new DefaultAppearance(
+                    "Helvetica",
+                    12,
+                    System.Drawing.Color.Blue);
+            }
+            else
+            {
+                Console.Error.WriteLine($"Field '{fieldName}' is not a text box and does not support DefaultAppearance.");
                 return;
             }
 
-            // Set the Default Appearance (DA) for the field.
-            // Fully qualify the System.Drawing.Color to avoid ambiguity with Aspose.Pdf.Color.
-            DefaultAppearance da = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Blue);
-            field.DefaultAppearance = da;
-
-            // Optionally, set the field's default value to see the appearance in action.
-            field.Value = "Sample text";
-
-            // Save the modified PDF.
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Default appearance set for field '{fieldName}' and saved to '{outputPath}'.");
     }
 }

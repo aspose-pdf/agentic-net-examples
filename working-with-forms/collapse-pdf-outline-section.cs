@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -16,29 +17,28 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Assume the collapsible section is controlled by a button field named "SectionToggle".
-            // Retrieve the field from the document's form collection.
-            ButtonField toggleField = doc.Form["SectionToggle"] as ButtonField;
+            // Assume the collapsible section is controlled by a button field named "CollapsibleSection"
+            // Retrieve the field from the form collection
+            var collapsibleField = doc.Form["CollapsibleSection"] as ButtonField;
 
-            if (toggleField != null)
+            if (collapsibleField != null)
             {
-                // Set the initial state of the collapsible section to collapsed.
-                // In the current Aspose.Pdf version the FieldFlag enum and SetFlag method are not available.
-                // The typical way to collapse a section controlled by a button is to set its value to "Off".
-                toggleField.Value = "Off";
+                // Set the field's hidden flag so the associated content starts collapsed
+                // Use AnnotationFlags.Hidden (from Aspose.Pdf.Annotations) for the flag value
+                collapsibleField.Flags |= AnnotationFlags.Hidden;
             }
             else
             {
-                Console.WriteLine("Toggle field 'SectionToggle' not found.");
+                Console.Error.WriteLine("CollapsibleSection field not found or not a ButtonField.");
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with collapsible section initially collapsed: {outputPath}");
+        Console.WriteLine($"PDF saved with initial collapsed state to '{outputPath}'.");
     }
 }

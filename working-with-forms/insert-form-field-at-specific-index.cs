@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -10,7 +11,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int insertIndex = 2; // zero‑based position in the Fields collection
+        const int insertIndex = 2; // zero‑based index where the new field will be placed
 
         if (!File.Exists(inputPath))
         {
@@ -18,38 +19,63 @@ class Program
             return;
         }
 
-        try
+        // Wrap the Document in a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Create a new text box form field on the first page
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
+            TextBoxField newField = new TextBoxField(doc.Pages[1], rect)
             {
-                // The Form object is obtained from the document; it is never null for a valid PDF.
-                Form form = doc.Form;
+                PartialName = "NewField",
+                Value = "Default text"
+            };
 
-                // Create a new text box form field on the first page
-                TextBoxField txtField = new TextBoxField(
-                    doc.Pages[1],
-                    new Aspose.Pdf.Rectangle(100, 600, 300, 620))
+            // -----------------------------------------------------------------
+            // Insert the new field at a specific index within the form's field list.
+            // Aspose.Pdf's Form.Fields property is read‑only, so we cannot assign a
+            // reordered array back. Instead we:
+            //   1. Capture the current fields.
+            //   2. Remove all existing fields from the form.
+            //   3. Re‑add them in the desired order, inserting the new field at
+            //      the requested position.
+            // -----------------------------------------------------------------
+            List<Field> existingFields = doc.Form?.Fields?.ToList() ?? new List<Field>();
+
+            // Remove all current fields from the document form.
+            foreach (var f in existingFields)
+            {
+                // The Delete method expects the field's name.
+                // Use Name if available, otherwise FullName.
+                string fieldName = f.Name ?? f.FullName;
+                if (!string.IsNullOrEmpty(fieldName))
                 {
-                    PartialName = "NewField",
-                    Value = "Default"
-                };
-
-                // Insert the new field at the desired index using the mutable collection returned by Form.Fields
-                // Form.Fields implements IList<Field>, so we can use Insert.
-                IList<Field> fields = form.Fields;
-                int index = Math.Max(0, Math.Min(insertIndex, fields.Count));
-                fields.Insert(index, txtField);
-
-                // Save the modified document
-                doc.Save(outputPath);
+                    doc.Form.Delete(fieldName);
+                }
             }
 
-            Console.WriteLine($"Form field inserted and saved to '{outputPath}'.");
+            // Re‑add fields in the new order.
+            int currentIndex = 0;
+            foreach (var f in existingFields)
+            {
+                if (currentIndex == insertIndex)
+                {
+                    // Insert the new field before the field that would occupy this index.
+                    doc.Form.Add(newField);
+                }
+                doc.Form.Add(f);
+                currentIndex++;
+            }
+
+            // If the insert index is greater than the original count, append the new field.
+            if (insertIndex >= existingFields.Count)
+            {
+                doc.Form.Add(newField);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form field inserted and saved to '{outputPath}'.");
     }
 }

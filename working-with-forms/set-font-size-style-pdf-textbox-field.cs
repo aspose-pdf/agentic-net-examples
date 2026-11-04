@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // for DefaultAppearance
 
 class Program
 {
@@ -11,7 +11,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myTextField";
+        const string fieldName = "myTextBox"; // name of the text field to modify
 
         if (!File.Exists(inputPath))
         {
@@ -19,46 +19,40 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Ensure the document contains a form and the specified field exists
+            var field = doc.Form[fieldName];
+            if (field == null)
             {
-                // Locate the field in the form's Fields collection and cast to TextBoxField
-                var textField = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName) as TextBoxField;
-                if (textField != null)
-                {
-                    // Set font size
-                    textField.DefaultAppearance.FontSize = 14;
-
-                    // Set font (Bold) – retrieve the font and assign its name
-                    var boldFont = FontRepository.FindFont("Arial", FontStyles.Bold);
-                    if (boldFont != null)
-                    {
-                        textField.DefaultAppearance.FontName = boldFont.FontName;
-                    }
-                    else
-                    {
-                        // Fallback to regular Arial if bold variant is not found
-                        textField.DefaultAppearance.FontName = "Arial";
-                    }
-
-                    // Set font color for better readability (System.Drawing.Color is required)
-                    textField.DefaultAppearance.TextColor = System.Drawing.Color.Black;
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a text box.");
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
+                return;
             }
 
-            Console.WriteLine($"PDF saved with updated font settings to '{outputPath}'.");
+            // Retrieve the text box field (cast from the generic FormField)
+            TextBoxField textBox = field as TextBoxField;
+            if (textBox == null)
+            {
+                Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField.");
+                return;
+            }
+
+            // Choose a readable font, style, and size
+            string fontName = "Arial"; // Aspose.Pdf uses font name strings for DefaultAppearance
+            double fontSize = 14; // increase size for better readability
+
+            // Apply the font, size, and color (black) to the field's default appearance
+            // NOTE: DefaultAppearance expects System.Drawing.Color, so we fully qualify it to avoid ambiguity with Aspose.Pdf.Color.
+            textBox.DefaultAppearance = new DefaultAppearance(fontName, fontSize, System.Drawing.Color.Black);
+
+            // Optionally set the current value to demonstrate the new appearance
+            textBox.Value = "Sample text with larger bold font";
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

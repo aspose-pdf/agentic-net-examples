@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations; // JavascriptAction lives here
@@ -8,51 +9,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "form_with_datepicker.pdf";
-        const string outputPdf = "form_with_datepicker_validated.pdf";
-        const string fieldName = "DatePicker"; // name of the date picker field in the PDF
+        const string inputPath = "input.pdf";          // PDF containing the date picker field
+        const string outputPath = "validated_output.pdf";
+        const string fieldName = "DatePicker";         // Exact name of the date picker field in the PDF
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Locate the form field by name
-            var field = doc.Form[fieldName];
+            // Access the form object via the Document
+            var pdfForm = doc.Form;
+
+            // Verify the field exists in the form's Fields collection
+            var field = pdfForm?.Fields?.FirstOrDefault(f =>
+                string.Equals(f.FullName, fieldName, StringComparison.Ordinal) ||
+                string.Equals(f.Name, fieldName, StringComparison.Ordinal));
+
             if (field == null)
             {
-                Console.Error.WriteLine($"Field \"{fieldName}\" not found in the document.");
+                Console.Error.WriteLine($"Form does not contain a field named '{fieldName}'.");
                 return;
             }
 
-            // JavaScript validation script that rejects dates earlier than 2000-01-01.
-            string jsValidate = @"
-                // Convert the entered value to a Date object.
-                var entered = util.scand('yyyy-mm-dd', event.value);
-                var minDate = new Date(2000, 0, 1); // January is month 0
-                if (entered < minDate) {
-                    app.alert('Date must be on or after January 1, 2000.');
-                    event.rc = false; // reject the value
-                }";
-
-            // Assign the JavaScript to the OnValidate action.
-            field.Actions.OnValidate = new JavascriptAction(jsValidate);
-
-            // Set a default value that complies with the rule.
-            // Use TextBoxField (or any field that supports a string value) because DateTimeField may not be available in all SDK versions.
-            if (field is TextBoxField txtField)
+            // Aspose.Pdf does not expose a dedicated DateTimeField class in all versions.
+            // A date picker is typically a TextBoxField with a JavaScript validation action.
+            // Cast to TextBoxField (the base type for text‑based form fields).
+            TextBoxField dateField = field as TextBoxField;
+            if (dateField == null)
             {
-                txtField.Value = "2000-01-01";
+                Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField (date picker).);");
+                return;
             }
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // JavaScript that validates the entered date is on/after 2000‑01‑01
+            string validationJs = @"
+                var minDate = new Date('2000-01-01');
+                var entered = util.scand('yyyy-mm-dd', event.value);
+                if (entered < minDate) {
+                    app.alert('Date must be on or after January 1, 2000.');
+                    event.rc = false; // Reject the value
+                }
+            ";
+
+            // Attach the JavaScript to the field's OnValidate action
+            dateField.Actions.OnValidate = new JavascriptAction(validationJs);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Validated PDF saved to \"{outputPdf}\".");
+        Console.WriteLine($"PDF saved with validation to '{outputPath}'.");
     }
 }

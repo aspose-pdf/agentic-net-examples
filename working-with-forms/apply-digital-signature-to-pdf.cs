@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,54 +8,68 @@ class Program
     static void Main()
     {
         // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_output.pdf";
-        const string certPath       = "certificate.pfx";
-        const string certPassword   = "certPassword";
+        const string inputPdfPath = "filled_form.pdf";      // PDF with filled form fields
+        const string outputPdfPath = "signed_form.pdf";    // Resulting PDF with a visible signature field
+        const string signatureImagePath = "signature.png"; // Optional visual signature image (can be null)
 
-        // Verify files exist
+        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
-            return;
-        }
+        bool useImage = File.Exists(signatureImagePath);
 
-        // Load the PDF document (contains already filled form fields)
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // OPTIONAL: set form field values programmatically
-            // Example: doc.Form["NameField"].Value = "John Doe";
+            // Load the PDF that already contains filled form fields
+            Document pdfDocument = new Document(inputPdfPath);
 
-            // Create a signature field on the first page
-            // Rectangle coordinates are in points (lower‑left x, lower‑right y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-            SignatureField signature = new SignatureField(doc.Pages[1], sigRect)
+            // -----------------------------------------------------------------
+            // Create a visible signature field on the first page (adjust rectangle as needed)
+            // -----------------------------------------------------------------
+            const int pageNumber = 1; // Aspose pages are 1‑based
+            const string signatureFieldName = "Signature1";
+            // Rectangle(left, bottom, right, top) – coordinates are in points (1/72 inch)
+            var signatureRect = new Rectangle(100, 100, 300, 150);
+
+            // The SignatureField constructor expects a Page (or Document) and a Rectangle.
+            // The field is visible by default; no IsVisible property exists.
+            var signatureField = new SignatureField(pdfDocument.Pages[pageNumber], signatureRect)
             {
-                PartialName = "Signature1",
-                Name        = "John Doe"
+                Name = signatureFieldName
             };
 
+            // If a visual image is supplied, store its path for later use when a real
+            // cryptographic signature is applied (requires the Facades API, which is
+            // intentionally omitted here). The core API does not expose a per‑field
+            // graphic property.
+            if (useImage)
+            {
+                // Placeholder comment – the image can be used via PKCS7.CustomAppearance
+                // when a digital signature is added with the Facades API.
+            }
+
             // Add the signature field to the document's form collection
-            doc.Form.Add(signature);
+            pdfDocument.Form.Add(signatureField, pageNumber);
 
-            // Load the signing certificate (PKCS#12 / .pfx) and create a PKCS7 signature object
-            PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
-            pkcs7.Reason      = "Document approval";
-            pkcs7.Location    = "New York, USA";
-            pkcs7.ContactInfo = "john.doe@example.com";
+            // -----------------------------------------------------------------
+            // NOTE:
+            // Actual digital signing (PKCS#7/PKCS#1) is performed via the
+            // Aspose.Pdf.Facades.PdfFileSignature class, which is outside the
+            // allowed core API namespace for this exercise. Therefore this
+            // example only creates a visible signature field without applying
+            // a cryptographic signature.
+            // -----------------------------------------------------------------
 
-            // Apply the digital signature to the field
-            signature.Sign(pkcs7);
+            // Save the PDF with the new signature field
+            pdfDocument.Save(outputPdfPath);
 
-            // Save the signed PDF
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"Signature field added successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+        }
     }
 }

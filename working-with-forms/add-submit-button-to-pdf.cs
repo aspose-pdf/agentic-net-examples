@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Required for SubmitFormAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,7 +10,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string submitUrl = "https://example.com/submit";
+        const string buttonName = "SubmitBtn";               // name of the button field in the PDF
+        const string submitUrl = "https://example.com/submit"; // URL to which the form will be submitted
 
         if (!File.Exists(inputPath))
         {
@@ -18,29 +19,24 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            Page page = doc.Pages[1];
-
-            // Define the button rectangle (lower‑left x, lower‑right y, upper‑right x, upper‑right y)
-            var rect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
-
-            // Create a button field and give it a name
-            var submitButton = new ButtonField(page, rect)
+            // Retrieve the button field from the form collection
+            // The field must exist; otherwise, handle the null case.
+            ButtonField button = doc.Form[buttonName] as ButtonField;
+            if (button == null)
             {
-                PartialName = "SubmitBtn",
-                NormalCaption = "Submit" // Button label
-            };
+                Console.Error.WriteLine($"Button field '{buttonName}' not found.");
+                return;
+            }
 
-            // Assign the SubmitForm action (URL) to the button's activation event
-            var submitAction = new SubmitFormAction();
+            // Create a SubmitFormAction and set its target URL via a FileSpecification
+            SubmitFormAction submitAction = new SubmitFormAction();
             submitAction.Url = new FileSpecification(submitUrl);
-            submitButton.OnActivated = submitAction;
 
-            // Add the button to the document's form collection
-            doc.Form.Add(submitButton);
+            // Assign the action to the button's activation event
+            button.OnActivated = submitAction;
 
             // Save the modified PDF
             doc.Save(outputPath);

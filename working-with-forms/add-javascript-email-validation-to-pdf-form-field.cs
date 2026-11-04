@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_validation.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +17,36 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Retrieve the form field named "Email"
-            // The Form collection can be accessed via doc.Form["fieldName"]
-            if (doc.Form["Email"] is TextBoxField emailField)
+            // The Form indexer returns a WidgetAnnotation, so cast it to Field first
+            Field field = doc.Form["Email"] as Field;
+            if (field == null)
             {
-                // JavaScript that validates the presence of '@' in the field value
-                // The script runs when the field is validated (e.g., on blur)
-                JavascriptAction validateJs = new JavascriptAction(
-                    "if (event.value.indexOf('@') == -1) { " +
-                    "app.alert('Please enter a valid email address.'); " +
-                    "event.rc = false; " + // reject the value
-                    "}"
-                );
-
-                // Assign the JavaScript to the field's OnValidate action
-                emailField.Actions.OnValidate = validateJs;
-            }
-            else
-            {
-                Console.Error.WriteLine("The PDF does not contain a TextBoxField named 'Email'.");
+                Console.Error.WriteLine("Form field 'Email' not found or is not a form field.");
                 return;
             }
+
+            // Cast to a TextBoxField to access Actions
+            TextBoxField emailField = field as TextBoxField;
+            if (emailField == null)
+            {
+                Console.Error.WriteLine("'Email' field is not a text box.");
+                return;
+            }
+
+            // JavaScript validation: ensure the value contains an '@' character
+            string js = @"
+if (event.value.indexOf('@') == -1) {
+    app.alert('Invalid email address. It must contain an ''@'' character.');
+    event.rc = false; // reject the input
+}
+";
+
+            // Assign the JavaScript action to the field's OnValidate event
+            emailField.Actions.OnValidate = new JavascriptAction(js);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
@@ -18,35 +18,25 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Retrieve the form field by its name and cast to Field
+            Field? field = doc.Form[fieldName] as Field;
+            if (field == null)
             {
-                // Retrieve the form field by its name. The Form indexer returns a WidgetAnnotation,
-                // so we need to cast it to Field (or a derived field type) before using field members.
-                Field? field = doc.Form[fieldName] as Field;
-                if (field == null)
-                {
-                    Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a form field.");
-                }
-                else
-                {
-                    // Make the field visible on screen but exclude it from printing.
-                    // Clear Hidden, Invisible and Print flags.
-                    field.Flags &= ~AnnotationFlags.Hidden;      // ensure not hidden
-                    field.Flags &= ~AnnotationFlags.Invisible;   // ensure not invisible
-                    field.Flags &= ~AnnotationFlags.Print;       // prevent printing
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a form field.");
+                return;
             }
 
-            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+            // Ensure the field is visible on screen (do not set Invisible/NoView flags)
+            // Remove the Print flag so the field is not printed.
+            field.Flags = field.Flags & ~AnnotationFlags.Print;
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form field visibility updated and saved to '{outputPath}'.");
     }
 }

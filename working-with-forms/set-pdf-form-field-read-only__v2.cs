@@ -7,8 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "template.pdf";
-        const string outputPath = "filled_readonly.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName  = "EmployeeID";
 
         if (!File.Exists(inputPath))
         {
@@ -16,24 +17,35 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form field named 'EmployeeID'
-            var employeeField = doc.Form["EmployeeID"] as TextBoxField;
-            if (employeeField != null)
+            // Ensure the document contains a form and the specified field exists
+            if (doc.Form != null && doc.Form[fieldName] != null)
             {
-                // Set the field value (optional, based on generation logic)
-                employeeField.Value = "12345";
-
-                // Mark the field as read‑only to prevent user edits
-                employeeField.ReadOnly = true;
+                // Try to cast to a specific field type (e.g., TextBoxField)
+                var textBox = doc.Form[fieldName] as TextBoxField;
+                if (textBox != null)
+                {
+                    // Set the field to read‑only to prevent user edits
+                    textBox.ReadOnly = true;
+                }
+                else
+                {
+                    // For other field types (CheckBoxField, RadioButtonOptionField, etc.)
+                    var genericField = doc.Form[fieldName];
+                    genericField.ReadOnly = true;
+                }
+            }
+            else
+            {
+                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
             }
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with read‑only '{fieldName}' field to '{outputPath}'.");
     }
 }

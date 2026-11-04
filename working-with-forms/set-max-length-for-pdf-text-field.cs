@@ -8,28 +8,33 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_limited.pdf";
+        const string outputPath = "output.pdf";
         const string fieldName  = "CustomerName";
         const int    maxLength  = 50;
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // FormEditor does not implement IDisposable, so no using block is needed.
-        FormEditor formEditor = new FormEditor();
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // FormEditor is a Facades class that also implements IDisposable
+            using (FormEditor editor = new FormEditor())
+            {
+                // Bind the editor to the loaded document
+                editor.BindPdf(doc);
 
-        // Load the PDF document into the editor.
-        formEditor.BindPdf(inputPath);
+                // Set a 50‑character limit on the 'CustomerName' text field
+                editor.SetFieldLimit(fieldName, maxLength);
 
-        // Set a character limit of 50 on the specified form field.
-        formEditor.SetFieldLimit(fieldName, maxLength);
+                // Save the modified document to a new file
+                editor.Save(outputPath);
+            }
+        }
 
-        // Save the modified PDF.
-        formEditor.Save(outputPath);
-
-        Console.WriteLine($"Field '{fieldName}' limited to {maxLength} characters. Saved to '{outputPath}'.");
+        Console.WriteLine($"Field limit applied and saved to '{outputPath}'.");
     }
 }

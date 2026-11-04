@@ -10,8 +10,8 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Example input data: determine whether the checkbox should be checked
-        bool shouldCheck = true; // replace with actual logic or data source
+        // Input data indicating whether the checkbox should be checked
+        bool shouldCheck = true; // replace with actual logic as needed
 
         if (!File.Exists(inputPath))
         {
@@ -25,26 +25,25 @@ class Program
             using (Document doc = new Document(inputPath))
             {
                 // Name of the checkbox field in the PDF form
-                const string fieldName = "myCheckBox"; // replace with the actual field name
+                const string fieldName = "myCheckBox"; // adjust to your field name
 
-                // The Form indexer returns a WidgetAnnotation; cast it to Field safely
-                Field? field = doc.Form[fieldName] as Field;
-
-                if (field is CheckboxField checkBox)
+                // Retrieve the field and cast to CheckboxField
+                CheckboxField checkBox = doc.Form[fieldName] as CheckboxField;
+                if (checkBox != null)
                 {
-                    // Set the checkbox state based on input data
+                    // Set the checked state based on input data
                     checkBox.Checked = shouldCheck;
                 }
                 else
                 {
-                    Console.Error.WriteLine($"Checkbox field '{fieldName}' not found or is not a CheckboxField.");
+                    Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
                 }
 
                 // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Checkbox updated and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

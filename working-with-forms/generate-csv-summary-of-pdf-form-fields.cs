@@ -1,86 +1,99 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq; // Added for Any()
+using System.Text;
+using System.Linq; // Added for Count() extension method
 using Aspose.Pdf;
+
+#pragma warning disable NU1902 // Suppress known vulnerability warning for System.Security.Cryptography.Pkcs 9.0.0
+#pragma warning disable NU1903 // Suppress high severity vulnerability warning for System.Security.Cryptography.Pkcs 9.0.0
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
-        const string inputFolder = @"C:\PdfBatch";
+        // Directory containing the PDFs to process
+        const string inputDirectory = "pdfs";
+
         // Path for the generated summary report (CSV format)
-        const string reportPath = @"C:\PdfBatch\FieldSummaryReport.csv";
+        const string reportPath = "field_report.csv";
 
-        // Verify the input folder exists
-        if (!Directory.Exists(inputFolder))
+        // Validate input directory – fall back to current directory if missing
+        string pdfFolder = Directory.Exists(inputDirectory) ? inputDirectory : Directory.GetCurrentDirectory();
+        if (!Directory.Exists(pdfFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
             return;
         }
 
-        // Collect all PDF files in the folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
+        // StringBuilder to accumulate CSV lines
+        StringBuilder csvBuilder = new StringBuilder();
 
-        // Prepare a list of CSV lines; first line is the header
-        List<string> reportLines = new List<string>
-        {
-            "FileName,FieldName,FieldValue"
-        };
+        // CSV header
+        csvBuilder.AppendLine("FileName,FieldName,FieldValue");
 
-        // Process each PDF file
-        foreach (string pdfPath in pdfFiles)
+        // Iterate over all PDF files in the input directory
+        foreach (string pdfPath in Directory.GetFiles(pdfFolder, "*.pdf"))
         {
-            // Ensure the file exists (defensive check)
-            if (!File.Exists(pdfPath))
+            // Ensure each Document is disposed promptly
+            try
             {
-                Console.Error.WriteLine($"File not found (skipped): {pdfPath}");
-                continue;
-            }
-
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
-            {
-                // If the document has no form fields, note it and continue
-                if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
+                using (Document doc = new Document(pdfPath))
                 {
-                    reportLines.Add($"{Path.GetFileName(pdfPath)},(NoFields),");
-                    continue;
-                }
+                    // Access the form (if any) in the PDF
+                    var form = doc.Form;
 
-                // Iterate over all form fields and record their names and values
-                foreach (var field in doc.Form.Fields)
-                {
-                    // Guard against unexpected nulls (field itself is never null in the collection)
-                    string fieldName = field?.FullName ?? string.Empty;
-                    string fieldValue = field?.Value?.ToString() ?? string.Empty;
-
-                    // Escape commas and double quotes in values to keep CSV integrity
-                    if (fieldValue.Contains(",") || fieldValue.Contains('"'))
+                    // If the PDF contains form fields, enumerate them
+                    if (form != null && form.Fields != null && form.Fields.Count() > 0)
                     {
-                        fieldValue = $"\"{fieldValue.Replace("\"", "\"\"")}\"";
-                    }
+                        foreach (var field in form.Fields)
+                        {
+                            // FullName provides the field's identifier
+                            string fieldName = field.FullName ?? string.Empty;
 
-                    reportLines.Add($"{Path.GetFileName(pdfPath)},{fieldName},{fieldValue}");
+                            // Value may be null; convert to string safely
+                            string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                            // Escape values for CSV compliance
+                            string escapedName = EscapeCsv(fieldName);
+                            string escapedValue = EscapeCsv(fieldValue);
+
+                            // Append a line: FileName,FieldName,FieldValue
+                            csvBuilder.AppendLine($"{Path.GetFileName(pdfPath)},{escapedName},{escapedValue}");
+                        }
+                    }
+                    else
+                    {
+                        // PDF has no form fields; still record the file with empty entries
+                        csvBuilder.AppendLine($"{Path.GetFileName(pdfPath)},,");
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                // Record the file with an error indicator
+                csvBuilder.AppendLine($"{Path.GetFileName(pdfPath)},Error,\"{EscapeCsv(ex.Message)}\"");
             }
         }
 
-        // Write the report to disk
-        try
+        // Write the accumulated CSV content to the report file
+        File.WriteAllText(reportPath, csvBuilder.ToString(), Encoding.UTF8);
+
+        Console.WriteLine($"Summary report generated: {reportPath}");
+    }
+
+    // Helper to escape commas, quotes, and newlines in CSV fields
+    static string EscapeCsv(string input)
+    {
+        if (input.Contains(",") || input.Contains("\"") || input.Contains("\n") || input.Contains("\r"))
         {
-            File.WriteAllLines(reportPath, reportLines);
-            Console.WriteLine($"Field summary report generated at: {reportPath}");
+            // Double up any existing quotes
+            string escaped = input.Replace("\"", "\"\"");
+            // Enclose the field in quotes
+            return $"\"{escaped}\"";
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to write report: {ex.Message}");
-        }
+        return input;
     }
 }
+#pragma warning restore NU1902
+#pragma warning restore NU1903

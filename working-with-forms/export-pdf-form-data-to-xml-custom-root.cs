@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,41 +8,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF containing form fields
-        const string outputXmlPath = "formData.xml";       // destination XML file
-        const string customRoot = "ExternalSystemRoot";   // required root element name
+        const string inputPath = "input.pdf";
+        const string outputPath = "formdata.xml";
+        const string customRoot = "MyCustomRoot";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block to ensure deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            var form = pdfDoc.Form;
-            // Use Count() (extension method) because FormFieldCollection exposes Count as a method, not a property
-            if (form == null || form.Fields == null || form.Fields.Count() == 0)
+            using (Document doc = new Document(inputPath))
             {
-                Console.WriteLine("No form fields found in the PDF.");
-                return;
+                // Build the XML manually because Aspose.Pdf.Form does not expose ExportToXml with a custom root.
+                XDocument xDoc = new XDocument(new XElement(customRoot));
+
+                if (doc.Form != null && doc.Form.Fields != null)
+                {
+                    foreach (Field field in doc.Form.Fields)
+                    {
+                        string fieldName = field.Name ?? field.FullName ?? "UnnamedField";
+                        string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                        // Each field is represented as a <Field Name="..." Value="..."/> element.
+                        XElement fieldElement = new XElement("Field",
+                            new XAttribute("Name", fieldName),
+                            new XAttribute("Value", fieldValue));
+
+                        xDoc.Root.Add(fieldElement);
+                    }
+                }
+
+                xDoc.Save(outputPath);
             }
 
-            // Build XML manually using the Fields collection
-            var root = new XElement(customRoot);
-            foreach (var field in form.Fields)
-            {
-                // Guard against possible nulls on Name / FullName
-                string fieldName = field?.Name ?? field?.FullName ?? "UnnamedField";
-                string fieldValue = field?.Value?.ToString() ?? string.Empty;
-                root.Add(new XElement(fieldName, fieldValue));
-            }
-
-            var xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
-            xmlDoc.Save(outputXmlPath);
+            Console.WriteLine($"Form data exported to '{outputPath}' with root element '{customRoot}'.");
         }
-
-        Console.WriteLine($"Form data exported to XML with root '{customRoot}' at '{outputXmlPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

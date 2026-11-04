@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,7 +10,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_required.pdf";
-        const string fieldName = "myTextField";
 
         if (!File.Exists(inputPath))
         {
@@ -19,29 +19,30 @@ class Program
 
         try
         {
-            // Wrap Document in a using block for deterministic disposal
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Access the form fields collection
-                var form = doc.Form;
+                // Name of the form field to mark as required
+                const string fieldName = "myTextBox";
 
-                // Retrieve the specific field (assumed to be a TextBoxField)
-                var field = form[fieldName] as TextBoxField;
-                if (field == null)
+                // Ensure the document contains a form and the field exists
+                if (doc.Form != null && doc.Form.Fields != null &&
+                    doc.Form.Fields.Any(f => f.Name == fieldName))
                 {
-                    Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
-                }
-                else
-                {
-                    // Mark the field as required; PDF viewers will block submission if left empty
-                    field.Required = true;
+                    // Retrieve the field; cast to the appropriate type (e.g., TextBoxField)
+                    var field = doc.Form[fieldName] as TextBoxField;
+                    if (field != null)
+                    {
+                        // Mark the field as required – validation will fail if left empty
+                        field.Required = true;
+                    }
                 }
 
-                // Save the updated PDF
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Saved PDF with required field to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with required field: '{outputPath}'.");
         }
         catch (Exception ex)
         {

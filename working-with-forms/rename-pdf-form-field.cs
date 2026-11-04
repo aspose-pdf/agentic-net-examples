@@ -7,10 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // source PDF containing the form
-        const string outputPath = "renamed_form.pdf";   // destination PDF
-        const string oldFieldName = "CustomerID";       // existing field name
-        const string newFieldName = "ClientID";         // new name per naming convention
+        const string inputPath  = "input.pdf";
+        const string outputPath = "renamed_fields.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,26 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field to access field members
+            // Example: rename a specific form field from old naming to new naming.
+            const string oldFieldName = "CustomerName";   // existing field name
+            const string newFieldName = "cust_name";      // new naming convention
+
+            // Retrieve the field by its current name. The Form indexer returns a WidgetAnnotation,
+            // so we need to cast it to Field (or use the 'as' operator) before accessing Field members.
             Field? field = doc.Form[oldFieldName] as Field;
-            if (field == null)
+
+            if (field != null)
             {
-                Console.Error.WriteLine($"Form field \"{oldFieldName}\" not found or is not a form field.");
+                // Rename the field by setting its Name property.
+                field.Name = newFieldName;
+                Console.WriteLine($"Field '{oldFieldName}' renamed to '{newFieldName}'.");
             }
             else
             {
-                // Rename the field – PartialName is the mutable name property
-                field.PartialName = newFieldName;
-                Console.WriteLine($"Field \"{oldFieldName}\" renamed to \"{newFieldName}\".");
+                Console.WriteLine($"Field '{oldFieldName}' not found.");
             }
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved updated PDF to \"{outputPath}\".");
+        Console.WriteLine($"Document saved to '{outputPath}'.");
     }
 }

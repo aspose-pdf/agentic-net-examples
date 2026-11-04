@@ -6,19 +6,18 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string email      = "user@example.com";
+        const string email = "user@example.com";
 
-        // Ensure the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Validate the email address contains an '@' character
-        if (string.IsNullOrWhiteSpace(email) || !email.Contains("@"))
+        // Validate email contains '@' before proceeding
+        if (string.IsNullOrEmpty(email) || !email.Contains("@"))
         {
             Console.Error.WriteLine("Invalid email address. PDF will not be saved.");
             return;
@@ -26,17 +25,26 @@ class Program
 
         try
         {
-            // Document lifecycle must be wrapped in a using block (rule: document-disposal-with-using)
+            // Document lifecycle must be wrapped in a using block
             using (Document doc = new Document(inputPath))
             {
-                // Example usage of the validated email (e.g., store it in metadata)
-                doc.Info.Author = email;
+                // Example modification: add a text annotation with the email
+                Page page = doc.Pages[1]; // 1‑based indexing
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                Aspose.Pdf.Annotations.TextAnnotation annotation = new Aspose.Pdf.Annotations.TextAnnotation(page, rect)
+                {
+                    Title = "Contact",
+                    Contents = $"Email: {email}",
+                    Open = true,
+                    Icon = Aspose.Pdf.Annotations.TextIcon.Note
+                };
+                page.Annotations.Add(annotation);
 
-                // Save the PDF after successful validation
+                // Save only after email validation succeeded
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

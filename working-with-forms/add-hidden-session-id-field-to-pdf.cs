@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -10,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string sessionId = "ABC123DEF456"; // session identifier to store
+        const string sessionId = "SESSION-1234567890";
 
         if (!File.Exists(inputPath))
         {
@@ -18,31 +17,29 @@ class Program
             return;
         }
 
-        // Open the existing PDF inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form; Aspose creates it lazily if it does not exist
-            Form form = doc.Form;
+            // Ensure the document has a form; accessing doc.Form will create one if absent
+            var form = doc.Form;
 
-            // Create a hidden text box field on the first page
-            TextBoxField hiddenField = new TextBoxField(
-                doc.Pages[1],                     // first page (1‑based indexing)
-                new Rectangle(0, 0, 0, 0))        // zero‑size rectangle (invisible)
+            // Zero‑size rectangle for the hidden field (position does not matter)
+            Rectangle rect = new Rectangle(0, 0, 0, 0);
+
+            // Create a text box field on the first page (any page works for hidden fields)
+            TextBoxField hiddenField = new TextBoxField(doc.Pages[1], rect)
             {
-                PartialName = "SessionId",      // field name
-                Value = sessionId                 // store the session identifier
+                PartialName = "SessionIdentifier", // field name used by backend
+                Value = sessionId
             };
 
-            // Hide the field from viewers using the AnnotationFlags.Hidden flag
-            hiddenField.Flags = AnnotationFlags.Hidden;
-
-            // Add the hidden field to the document's form
+            // No need to set a hidden flag; a zero‑size rectangle makes the field invisible
             form.Add(hiddenField);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with hidden session field to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden session field: {outputPath}");
     }
 }

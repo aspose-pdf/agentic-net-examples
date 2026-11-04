@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
@@ -9,12 +10,11 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";               // source PDF
-        const string outputPdf = "output_custom_font.pdf";   // destination PDF
-        const string fontPath  = "customfont.ttf";           // external TrueType/OpenType font
-        const string fieldName = "myTextField";              // name of the form field to modify
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string fontPath = "customfont.ttf";
+        const string fieldName = "myTextField";
 
-        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -26,32 +26,30 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal (document-disposal-with-using rule)
         using (Document doc = new Document(inputPdf))
         {
-            // Retrieve the form field by its name; cast to TextBoxField (other field types have similar APIs)
+            // Retrieve the form field; it must be a TextBoxField
             var field = doc.Form[fieldName] as TextBoxField;
             if (field == null)
             {
                 Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
-            }
-            else
-            {
-                // Load the custom font from the external file
-                var customFont = FontRepository.OpenFont(fontPath);
-
-                // Apply the custom font to the field's default appearance.
-                // DefaultAppearance is read‑only, but its properties (FontName, FontSize, TextColor) are writable.
-                field.DefaultAppearance.FontName   = customFont.FontName; // set the font name
-                field.DefaultAppearance.FontSize   = 12;                 // set desired size
-                // Use System.Drawing.Color for TextColor (DefaultAppearance expects System.Drawing.Color)
-                field.DefaultAppearance.TextColor  = System.Drawing.Color.Black;
+                return;
             }
 
-            // Save the modified PDF (default PDF format, no SaveOptions needed)
+            // Load external TrueType/OpenType font (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Text.Font customFont = FontRepository.OpenFont(fontPath);
+
+            // Create a DefaultAppearance that uses the custom font
+            var appearance = new DefaultAppearance(customFont.FontName, 12, System.Drawing.Color.Black);
+            field.DefaultAppearance = appearance;
+
+            // Optional: set a sample value to see the font applied
+            field.Value = "Sample text";
+
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with custom font to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with custom font applied to field '{fieldName}'.");
     }
 }

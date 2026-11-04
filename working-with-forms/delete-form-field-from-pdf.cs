@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -14,38 +13,31 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF, delete the specified form field, and save
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            Form form = doc.Form;
+            // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
+            Field? field = form[fieldName] as Field;
+            if (field != null)
             {
-                // Check if the form field exists using the Fields collection
-                bool fieldExists = doc.Form?.Fields?.Any(f => f.Name == fieldName) ?? false;
-
-                if (fieldExists)
-                {
-                    // Delete the form field
-                    doc.Form.Delete(fieldName);
-                    Console.WriteLine($"Form field '{fieldName}' deleted.");
-                }
-                else
-                {
-                    Console.WriteLine($"Form field '{fieldName}' not found.");
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Remove the field from the form
+                form.Delete(fieldName);
+                Console.WriteLine($"Form field '{fieldName}' deleted.");
+            }
+            else
+            {
+                Console.WriteLine($"Form field '{fieldName}' not found.");
             }
 
-            Console.WriteLine($"Saved to '{outputPath}'.");
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

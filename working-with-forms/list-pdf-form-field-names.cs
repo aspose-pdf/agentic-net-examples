@@ -1,7 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
+using Aspose.Pdf.Forms; // Provides the Field class
 
 class Program
 {
@@ -15,21 +16,21 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Document must be wrapped in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            var form = doc.Form;
-            // Use LINQ Any() (or Count()) to safely check for the presence of fields
-            if (form == null || form.Fields == null || !form.Fields.Any())
+            // Check whether the PDF contains any form fields
+            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
             {
-                Console.WriteLine("No form fields found in the PDF.");
+                Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
             Console.WriteLine("Form field names:");
-            // Enumerate each field and output its name (FullyQualifiedName is not available)
-            foreach (var field in form.Fields)
+            // Enumerate all fields and output their names
+            foreach (Field field in doc.Form.Fields)
             {
+                // Field.Name holds the name of the form field
                 Console.WriteLine($"- {field.Name}");
             }
         }

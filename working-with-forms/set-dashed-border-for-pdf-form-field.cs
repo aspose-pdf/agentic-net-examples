@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // Required for Border and BorderStyle
 
 class Program
 {
@@ -9,7 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "OptionalField"; // name of the form field to modify
+        const string fieldName = "OptionalField";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +18,39 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the widget annotation that represents the form field
-            WidgetAnnotation? widget = doc.Form[fieldName] as WidgetAnnotation;
-            if (widget == null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a widget annotation.");
-                return;
+                // Retrieve the form field by its name; cast to the appropriate type
+                var field = doc.Form[fieldName] as TextBoxField;
+                if (field == null)
+                {
+                    Console.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
+                }
+                else
+                {
+                    // Set the border color via the annotation's Color property
+                    field.Color = Aspose.Pdf.Color.Gray;
+
+                    // Configure the border: width and dashed style
+                    field.Border = new Border(field)
+                    {
+                        Width = 1,
+                        Style = BorderStyle.Dashed
+                    };
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Set a dashed border style (width = 1 point, black colour)
-            widget.Border = new Border(widget)
-            {
-                Width = 1,
-                Style = BorderStyle.Dashed
-            };
-            // Border colour is defined by the annotation's own Color property
-            widget.Color = Color.Black;
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Form field border updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -9,9 +9,9 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myField";   // name of the field to copy
-        const int sourcePage = 1;               // page where the original field resides (kept for reference)
-        const int targetPage = 2;               // page where the copy will be placed
+        const string fieldName = "myField";   // name of the form field to copy
+        const int sourcePage = 1;               // original page (1‑based) – kept for logging only
+        const int targetPage = 2;               // page to copy the field to
 
         if (!File.Exists(inputPath))
         {
@@ -19,41 +19,43 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the original field (assumed to be a TextBoxField; adjust type if needed)
-            TextBoxField originalField = doc.Form[fieldName] as TextBoxField;
-            if (originalField == null)
+            // Retrieve the existing field (by name) – the Form indexer returns a WidgetAnnotation,
+            // so we must cast it to Field explicitly.
+            Field sourceField = doc.Form[fieldName] as Field;
+            if (sourceField == null)
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a standard field.");
                 return;
             }
 
-            // Clone the field to create an independent copy
-            TextBoxField copiedField = (TextBoxField)originalField.Clone();
+            // Clone the field to create an independent copy.
+            Field copiedField = (Field)sourceField.Clone();
 
-            // Assign a new unique name to avoid name collisions
-            copiedField.PartialName = $"Copy_of_{originalField.PartialName}";
+            // Give the copied field a unique name (optional but recommended).
+            copiedField.Name = $"{sourceField.Name}_copy_page{targetPage}";
 
-            // Preserve the original rectangle (position and size)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                originalField.Rect.LLX,
-                originalField.Rect.LLY,
-                originalField.Rect.URX,
-                originalField.Rect.URY);
+            // Preserve the original rectangle (position and size).
+            var rect = new Aspose.Pdf.Rectangle(
+                sourceField.Rect.LLX,
+                sourceField.Rect.LLY,
+                sourceField.Rect.URX,
+                sourceField.Rect.URY);
             copiedField.Rect = rect;
 
-            // Add the new field to the document's form collection
+            // Add the cloned field to the document's form collection.
             doc.Form.Add(copiedField);
 
-            // Place the copied field on the target page using AddFieldAppearance
+            // Place the field on the target page. AddFieldAppearance creates the visual
+            // representation of the field on the specified page.
             doc.Form.AddFieldAppearance(copiedField, targetPage, rect);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' copied to page {targetPage} and saved as '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' copied from page {sourcePage} to page {targetPage}.");
     }
 }

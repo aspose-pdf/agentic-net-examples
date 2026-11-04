@@ -1,15 +1,15 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath1 = "form1.pdf";
-        const string pdfPath2 = "form2.pdf";
-        const string reportPath = "diffReport.txt";
+        const string pdfPath1 = "first.pdf";
+        const string pdfPath2 = "second.pdf";
+        const string reportPath = "form_diff_report.txt";
 
         if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
@@ -17,63 +17,64 @@ class Program
             return;
         }
 
-        try
+        var diffs = new List<string>();
+
+        // Wrap both Document objects in using blocks for deterministic disposal
+        using (Document doc1 = new Document(pdfPath1))
+        using (Document doc2 = new Document(pdfPath2))
         {
-            // Load both PDFs inside using blocks for deterministic disposal
-            using (Document doc1 = new Document(pdfPath1))
-            using (Document doc2 = new Document(pdfPath2))
-            using (StreamWriter report = new StreamWriter(reportPath, false))
+            // Extract form fields from each PDF into dictionaries (field name -> value)
+            var fields1 = GetFormFields(doc1);
+            var fields2 = GetFormFields(doc2);
+
+            // Create a set containing all unique field names from both PDFs
+            var allNames = new HashSet<string>(fields1.Keys, StringComparer.OrdinalIgnoreCase);
+            allNames.UnionWith(fields2.Keys);
+
+            // Compare values for each field name
+            foreach (var name in allNames)
             {
-                // Write header for the report
-                report.WriteLine("Form Data Comparison Report");
-                report.WriteLine($"File 1: {pdfPath1}");
-                report.WriteLine($"File 2: {pdfPath2}");
-                report.WriteLine(new string('=', 50));
-                report.WriteLine();
+                fields1.TryGetValue(name, out string val1);
+                fields2.TryGetValue(name, out string val2);
 
-                // Compare fields that exist in the first document
-                foreach (Field field1 in doc1.Form.Fields)
+                if (val1 != val2)
                 {
-                    string fieldName = field1.FullName ?? field1.Name ?? string.Empty;
-
-                    // Try to find the same field in the second document (cast required)
-                    Field field2 = doc2.Form[fieldName] as Field;
-
-                    if (field2 == null)
-                    {
-                        report.WriteLine($"Field \"{fieldName}\" exists only in the first PDF.");
-                        continue;
-                    }
-
-                    // Retrieve the string representation of each field's value
-                    string value1 = field1.Value?.ToString() ?? string.Empty;
-                    string value2 = field2.Value?.ToString() ?? string.Empty;
-
-                    if (!value1.Equals(value2, StringComparison.Ordinal))
-                    {
-                        report.WriteLine($"Mismatch in field \"{fieldName}\":");
-                        report.WriteLine($"    PDF 1 value: \"{value1}\"");
-                        report.WriteLine($"    PDF 2 value: \"{value2}\"");
-                        report.WriteLine();
-                    }
+                    diffs.Add($"Field '{name}':");
+                    diffs.Add($"  First PDF : {(val1 ?? "<null>")}");
+                    diffs.Add($"  Second PDF: {(val2 ?? "<null>")}");
                 }
-
-                // Find fields that exist only in the second document
-                foreach (Field field2 in doc2.Form.Fields)
-                {
-                    string fieldName = field2.FullName ?? field2.Name ?? string.Empty;
-                    if (doc1.Form[fieldName] as Field == null)
-                    {
-                        report.WriteLine($"Field \"{fieldName}\" exists only in the second PDF.");
-                    }
-                }
-
-                Console.WriteLine($"Diff report generated at \"{reportPath}\".");
             }
         }
-        catch (Exception ex)
+
+        // Write the diff report to a text file
+        if (diffs.Count == 0)
         {
-            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
+            File.WriteAllText(reportPath, "No differences found in form fields.");
         }
+        else
+        {
+            File.WriteAllLines(reportPath, diffs);
+        }
+
+        Console.WriteLine($"Form diff report written to '{reportPath}'.");
+    }
+
+    // Helper method to collect form fields from a Document into a dictionary
+    static Dictionary<string, string> GetFormFields(Document doc)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Ensure the document actually contains a form
+        if (doc.Form != null && doc.Form.Fields != null)
+        {
+            foreach (var field in doc.Form.Fields)
+            {
+                // Use FullName as the field identifier and convert the value to string
+                string value = field.Value?.ToString();
+                dict[field.FullName] = value;
+            }
+        }
+
+        return dict;
     }
 }

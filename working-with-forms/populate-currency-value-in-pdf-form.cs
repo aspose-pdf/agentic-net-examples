@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "filled.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +17,27 @@ class Program
             return;
         }
 
-        // Example currency amount to insert
-        decimal amount = 1234567.89m;
-        // Format with currency symbol and thousand separators (e.g., $1,234,567.89)
-        string formattedAmount = amount.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+        // Currency amount to insert
+        decimal amount = 12345.67m;
+        // Format with currency symbol and thousand separators (e.g., $12,345.67)
+        string formattedValue = amount.ToString("C", CultureInfo.GetCultureInfo("en-US"));
 
-        // Load the PDF, modify the form field, and save
+        // Load PDF, modify form field, and save
         using (Document doc = new Document(inputPath))
         {
             // Replace "AmountField" with the actual name of the target form field
-            TextBoxField field = doc.Form["AmountField"] as TextBoxField;
-            if (field != null)
+            if (doc.Form["AmountField"] is TextBoxField amountField)
             {
-                field.Value = formattedAmount;
+                amountField.Value = formattedValue;
             }
             else
             {
                 Console.Error.WriteLine("Form field 'AmountField' not found.");
             }
 
-            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Currency value saved to '{outputPath}'.");
+        Console.WriteLine($"Currency value populated and saved to '{outputPath}'.");
     }
 }

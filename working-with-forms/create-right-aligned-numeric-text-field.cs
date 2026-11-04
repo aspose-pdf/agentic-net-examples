@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,6 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName = "NumericField"; // name of the text field to modify
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the text box form field by its name (adjust the name as needed)
-            TextBoxField txtField = doc.Form["NumericField"] as TextBoxField;
-            if (txtField == null)
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Text field 'NumericField' not found.");
-            }
-            else
-            {
-                // NOTE: The Justification property is not available in the current Aspose.Pdf version.
-                // If right‑alignment is required, consider using a newer library version where
-                // TextBoxField.Justification exists, or apply a custom appearance stream.
-                // txtField.Justification = Justification.Right; // <-- removed for compatibility
+                // Retrieve the form field by name
+                var field = doc.Form[fieldName];
 
-                // Optional: set an example numeric value
-                txtField.Value = "12345";
+                // Ensure the field exists and is a TextBoxField (text input)
+                if (field is TextBoxField txtField)
+                {
+                    // Set right alignment for numeric entry formats using the non‑obsolete property
+                    txtField.TextHorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Right;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

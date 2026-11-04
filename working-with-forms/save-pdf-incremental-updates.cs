@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "incremental_updated.pdf";
+        const string outputPath = "output_incremental.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,23 +16,23 @@ class Program
             return;
         }
 
-        // Create a copy that will be updated incrementally.
+        // Copy the original PDF to the output location – the incremental update
+        // will be written to this copy while preserving the original revisions.
         File.Copy(inputPath, outputPath, true);
 
-        // Open the PDF with a read/write stream – this enables incremental updates.
-        using (var fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite))
-        using (var doc = new Document(fs))
+        // Open the copy with read/write access so that Aspose.Pdf can append
+        // an incremental update to the existing file. A parameterless Save()
+        // performs the incremental update automatically.
+        using (FileStream fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite))
+        using (Document doc = new Document(fs))
         {
-            // Retrieve the form field safely – the Form indexer returns a WidgetAnnotation,
-            // so we cast it to Aspose.Pdf.Forms.Field before accessing field members.
-            Field? nameField = doc.Form["Name"] as Field;
-            if (nameField != null)
+            // Retrieve the form field "CustomerName" and set its value.
+            if (doc.Form["CustomerName"] is Field field)
             {
-                nameField.Value = "John Doe";
+                field.Value = "John Doe";
             }
 
-            // Parameterless Save performs an incremental update when the document
-            // was opened from a read/write stream.
+            // Save the document – without options this triggers an incremental update.
             doc.Save();
         }
 

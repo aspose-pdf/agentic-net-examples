@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Text;
@@ -7,44 +8,41 @@ class Program
 {
     static void Main()
     {
-        // Create a new PDF document and ensure proper disposal
+        const string outputPath = "gender_form.pdf";
+
+        // Create a new PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a blank page where the form fields will be placed.
             Page page = doc.Pages.Add();
 
-            // Add a label prompting the user to select gender
-            TextFragment label = new TextFragment("Select Gender:");
-            label.Position = new Position(100, 700); // Position near top of page
-            page.Paragraphs.Add(label);
-
-            // Create a radio button field (AcroForm) for gender selection
-            // The constructor takes only a Page instance; the field name is set via PartialName
+            // Create a radio button field named "Gender" and associate it with the page.
             RadioButtonField genderField = new RadioButtonField(page);
             genderField.PartialName = "Gender";
 
-            // Define the "Male" option with its widget rectangle
-            genderField.AddOption(
-                "Male",
-                new Rectangle(100, 650, 120, 670) // llx, lly, urx, ury
-            );
+            // Define the options for the radio button group with their widget rectangles.
+            genderField.AddOption("Male", new Rectangle(100, 700, 115, 715));
+            genderField.AddOption("Female", new Rectangle(100, 670, 115, 685));
 
-            // Define the "Female" option with its widget rectangle
-            genderField.AddOption(
-                "Female",
-                new Rectangle(200, 650, 220, 670)
-            );
+            // Set the default selected value (1‑based index, 1 = first option).
+            genderField.Selected = 1;
 
-            // Set the default selected value (optional)
-            genderField.Value = "Male";
+            // Add labels next to the radio button widgets.
+            TextFragment maleLabel = new TextFragment("Male") { TextState = { FontSize = 12 } };
+            maleLabel.Position = new Position(120, 700);
+            page.Paragraphs.Add(maleLabel);
 
-            // Add the radio button field to the document's AcroForm on the first page
-            doc.Form.Add(genderField, page.Number);
+            TextFragment femaleLabel = new TextFragment("Female") { TextState = { FontSize = 12 } };
+            femaleLabel.Position = new Position(120, 670);
+            page.Paragraphs.Add(femaleLabel);
 
-            // Save the PDF with the AcroForm to disk
-            doc.Save("gender_form.pdf");
+            // Add the radio button field to the document's AcroForm.
+            doc.Form.Add(genderField);
+
+            // Save the PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with gender radio button group created: gender_form.pdf");
+        Console.WriteLine($"PDF with gender radio button group saved to '{outputPath}'.");
     }
 }

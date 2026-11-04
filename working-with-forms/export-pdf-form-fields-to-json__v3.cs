@@ -1,68 +1,101 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using System.Text.Json;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "form_schema.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "form_schema.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Verify that the PDF contains form fields
-            if (doc.Form == null || doc.Form.Count == 0)
-            {
-                Console.WriteLine("No form fields found in the PDF.");
-                return;
-            }
+            // Prepare a list that will hold the JSON‑serializable field definitions
+            var fieldDefinitions = new List<object>();
 
-            // Collect field definitions into a list
-            var fields = new List<FormFieldDefinition>();
-
-            foreach (Field field in doc.Form)
+            // Iterate over all form fields present in the document
+            foreach (Field field in pdfDoc.Form.Fields)
             {
-                FormFieldDefinition definition = new FormFieldDefinition {
-                    // PartialName is the programmatic name of the field
-                    Name = field.PartialName,
-                    // Use the concrete class name (e.g., TextBoxField, CheckBoxField) as the type identifier
+                // Basic information common to all field types
+                var baseInfo = new
+                {
+                    Name = field.FullName,
                     Type = field.GetType().Name,
-                    // Convert the field value to a string; handle nulls safely
-                    Value = field.Value?.ToString(),
-                    // Aspose.Pdf does not expose a Required flag directly; default to false
-                    Required = false
+                    Value = field.Value?.ToString()
                 };
 
-                fields.Add(definition);
+                // Extend the information for specific field types when needed
+                object detailedInfo = baseInfo;
+
+                switch (field)
+                {
+                    case ListBoxField listBox:
+                        detailedInfo = new
+                        {
+                            baseInfo.Name,
+                            baseInfo.Type,
+                            baseInfo.Value,
+                            Options = listBox.Options
+                        };
+                        break;
+
+                    case ComboBoxField comboBox:
+                        detailedInfo = new
+                        {
+                            baseInfo.Name,
+                            baseInfo.Type,
+                            baseInfo.Value,
+                            Options = comboBox.Options
+                        };
+                        break;
+
+                    case CheckboxField checkBox:
+                        detailedInfo = new
+                        {
+                            baseInfo.Name,
+                            baseInfo.Type,
+                            IsChecked = checkBox.Checked,
+                            baseInfo.Value
+                        };
+                        break;
+
+                    case RadioButtonOptionField radioOption:
+                        // RadioButtonOptionField does not expose a 'Checked' property.
+                        // Use OptionName and the checked‑state name instead.
+                        detailedInfo = new
+                        {
+                            baseInfo.Name,
+                            baseInfo.Type,
+                            OptionName = radioOption.OptionName,
+                            CheckedState = radioOption.GetCheckedStateName(),
+                            baseInfo.Value
+                        };
+                        break;
+
+                    // Add more cases here for other field types if required
+                }
+
+                fieldDefinitions.Add(detailedInfo);
             }
 
-            // Serialize the list to JSON with indentation for readability
+            // Serialize the collected definitions to a pretty‑printed JSON string
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(fields, jsonOptions);
+            string json = JsonSerializer.Serialize(fieldDefinitions, jsonOptions);
 
             // Write the JSON schema to the output file
-            File.WriteAllText(outputJson, json);
-            Console.WriteLine($"Form schema exported to '{outputJson}'.");
+            File.WriteAllText(outputJsonPath, json);
+            Console.WriteLine($"Form field schema exported to '{outputJsonPath}'.");
         }
-    }
-
-    // DTO representing a form field in the JSON schema
-    private class FormFieldDefinition
-    {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public string Value { get; set; }
-        public bool Required { get; set; }
     }
 }

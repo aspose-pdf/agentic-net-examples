@@ -10,50 +10,46 @@ class Program
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string xmlDataPath = "data.xml";
+        const string xmlPath = "data.xml";
         const string outputPath = "output.pdf";
 
-        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(xmlDataPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(pdfPath))
             {
-                // -----------------------------------------------------------------
-                // Import form data from the XML file.
-                // The Aspose.Pdf.Forms.Form class does not expose an ImportXml method
-                // in the core API (it exists only in the Facades wrapper, which we are
-                // prohibited from using). Therefore we manually parse the XML and set
-                // matching field values.
-                // -----------------------------------------------------------------
-                XDocument xmlDoc = XDocument.Load(xmlDataPath);
-                var root = xmlDoc.Root;
-                if (root != null && doc.Form != null && doc.Form.Fields != null)
+                // Load XML data
+                XDocument xmlDoc = XDocument.Load(xmlPath);
+
+                // Iterate over each element in the root and map to form fields
+                foreach (XElement element in xmlDoc.Root.Elements())
                 {
-                    foreach (Field field in doc.Form.Fields)
+                    string fieldName = element.Name.LocalName;
+                    string fieldValue = element.Value ?? string.Empty;
+
+                    // Find the matching field in the PDF form
+                    var field = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName);
+                    if (field != null)
                     {
-                        // Try to find an element whose name matches the field name.
-                        // XML element names are case‑sensitive; adjust as needed.
-                        var element = root.Element(field.Name);
-                        if (element != null)
-                        {
-                            field.Value = element.Value;
-                        }
+                        // Set the field value. Most field types accept a string representation.
+                        field.Value = fieldValue;
                     }
                 }
 
-                // Save the updated PDF. No SaveOptions needed for PDF output.
+                // Enable automatic recalculation of calculated fields (optional but recommended).
+                doc.Form.AutoRecalculate = true;
+
+                // Save the updated PDF.
                 doc.Save(outputPath);
             }
 

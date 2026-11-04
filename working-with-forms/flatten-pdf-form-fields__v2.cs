@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,17 +17,22 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Load the PDF. If the file is encrypted, a PdfException will be thrown.
+            using (var doc = new Document(inputPath))
             {
-                // Flatten all interactive form fields, making them static content
-                doc.Form.Flatten();
+                // Flatten all interactive form fields into static content.
+                // The Form property may be null for PDFs without an AcroForm, so we guard against it.
+                doc.Form?.Flatten();
 
-                // Save the result as a regular PDF
+                // Save the flattened PDF.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Form fields flattened and saved to '{outputPath}'.");
+        }
+        catch (PdfException)
+        {
+            Console.Error.WriteLine("The PDF is encrypted and cannot be processed without a password.");
         }
         catch (Exception ex)
         {

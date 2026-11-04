@@ -8,57 +8,77 @@ using Aspose.Pdf.Forms;
 
 class Program
 {
-    static async Task Main()
+    // Asynchronous entry point (C# 7.1+)
+    static async Task Main(string[] args)
     {
-        const string pdfPath = "template.pdf";
-        const string xmlDataPath = "formdata.xml";
-        const string outputPath = "filled.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath  = "template.pdf";
+        const string xmlDataPath   = "formData.xml";
+        const string outputPdfPath = "filled.pdf";
 
-        if (!File.Exists(pdfPath))
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(xmlDataPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlDataPath}");
+            Console.Error.WriteLine($"XML data not found: {xmlDataPath}");
             return;
         }
 
-        await ImportXmlFormDataAsync(pdfPath, xmlDataPath, outputPath);
-        Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
+        try
+        {
+            // Perform the import and save without blocking the main thread
+            await ImportXmlFormDataAsync(inputPdfPath, xmlDataPath, outputPdfPath);
+            Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 
-    // Asynchronously loads the XML, maps its elements to form fields and saves the PDF.
-    static async Task ImportXmlFormDataAsync(string pdfFile, string xmlFile, string outputFile)
+    // Asynchronously loads a PDF, imports XML form data, and saves the result.
+    private static async Task ImportXmlFormDataAsync(string pdfPath, string xmlPath, string outputPath)
     {
-        // Load the PDF document.
-        using var doc = new Document(pdfFile);
-
-        // Load the XML document asynchronously.
-        await using var xmlStream = File.OpenRead(xmlFile);
-        // Disambiguate LoadOptions – we need the one from System.Xml.Linq.
-        var xDoc = await XDocument.LoadAsync(xmlStream, System.Xml.Linq.LoadOptions.None, default);
-
-        // Simple convention: each direct child element of the root represents a form field.
-        // Element name = field name, element value = field value.
-        if (doc.Form?.Fields != null && xDoc.Root != null)
+        // Load the XML once – this is CPU‑bound, so run it on a background thread.
+        var xmlFields = await Task.Run(() =>
         {
-            foreach (var element in xDoc.Root.Elements())
+            XDocument doc = XDocument.Load(xmlPath);
+            // Expect XML like <fields><field name="FieldName">Value</field>...</fields>
+            return doc.Descendants("field")
+                      .Select(f => new
+                      {
+                          Name  = (string)f.Attribute("name"),
+                          Value = (string)f.Value
+                      })
+                      .Where(f => !string.IsNullOrEmpty(f.Name))
+                      .ToList();
+        });
+
+        // Work with the PDF document.
+        using (Document pdfDoc = new Document(pdfPath))
+        {
+            // Enable automatic recalculation for JavaScript‑based fields (optional but common).
+            pdfDoc.Form.AutoRecalculate = true;
+
+            // Assign values to matching form fields – also CPU‑bound, so offload.
+            await Task.Run(() =>
             {
-                string fieldName = element.Name.LocalName;
-                string fieldValue = element.Value ?? string.Empty;
-
-                var field = doc.Form.Fields.FirstOrDefault(f => f.Name == fieldName);
-                if (field != null)
+                foreach (var xmlField in xmlFields)
                 {
-                    field.Value = fieldValue;
+                    var pdfField = pdfDoc.Form?.Fields?.FirstOrDefault(f => f.Name == xmlField.Name);
+                    if (pdfField != null)
+                    {
+                        pdfField.Value = xmlField.Value;
+                    }
                 }
-            }
-        }
+            });
 
-        // Save the updated PDF.
-        doc.Save(outputFile);
+            // Save the modified PDF on a background thread to avoid blocking.
+            await Task.Run(() => pdfDoc.Save(outputPath));
+        }
     }
 }

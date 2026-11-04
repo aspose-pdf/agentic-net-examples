@@ -1,54 +1,53 @@
 using System;
 using System.IO;
-using System.Text;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputCsv = "form_fields.csv";
+        const string outputCsv = "fields.csv";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Verify that the document actually contains an AcroForm with fields
-                // Fixed: Count is a method, so we need to invoke it.
-                if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
+                // Verify that the document contains a form with fields
+                if (doc.Form == null || !doc.Form.Fields.Any())
                 {
-                    Console.WriteLine("No form fields found in the document.");
+                    Console.WriteLine("No form fields found in the PDF.");
                     return;
                 }
 
-                // Create the CSV file (UTF‑8) inside a using block
-                using (StreamWriter writer = new StreamWriter(outputCsv, false, Encoding.UTF8))
+                // Create (or overwrite) the CSV file
+                using (StreamWriter writer = new StreamWriter(outputCsv, false))
                 {
-                    // Write CSV header
-                    writer.WriteLine("FieldName,FieldValue");
+                    // CSV header
+                    writer.WriteLine("FieldName,Value");
 
-                    // Iterate over each form field and write its name/value
-                    foreach (Field field in doc.Form.Fields)
+                    // Iterate over each form field
+                    foreach (var field in doc.Form.Fields)
                     {
-                        // Field name – PartialName is the field's identifier
-                        string name = field.PartialName ?? string.Empty;
+                        // Retrieve the field name (FullName is preferred, fallback to Name)
+                        string name = field.FullName ?? field.Name ?? string.Empty;
 
-                        // Resolve the field value based on its concrete type
-                        string value = GetFieldValue(field);
+                        // Retrieve the current value; convert nulls to empty string
+                        string value = field.Value?.ToString() ?? string.Empty;
 
                         // Escape commas, quotes, and newlines for CSV compliance
-                        string escapedName = EscapeCsv(name);
-                        string escapedValue = EscapeCsv(value);
+                        name = EscapeCsv(name);
+                        value = EscapeCsv(value);
 
-                        writer.WriteLine($"{escapedName},{escapedValue}");
+                        writer.WriteLine($"{name},{value}");
                     }
                 }
 
@@ -61,54 +60,14 @@ class Program
         }
     }
 
-    // Centralised logic for extracting a field's current value
-    private static string GetFieldValue(Field field)
+    // Helper method to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string text)
     {
-        switch (field)
+        if (text.Contains("\"") || text.Contains(",") || text.Contains("\n") || text.Contains("\r"))
         {
-            case CheckboxField cb:
-                return cb.Checked ? "True" : "False";
-
-            case TextBoxField tb:
-                return tb.Value ?? string.Empty;
-
-            case ComboBoxField combo:
-                return combo.Value ?? string.Empty;
-
-            case ListBoxField listBox:
-                // SelectedItems returns an array of integer indices.
-                // Join them as a semicolon‑separated string.
-                if (listBox.SelectedItems != null && listBox.SelectedItems.Length > 0)
-                    return string.Join(";", listBox.SelectedItems);
-                return string.Empty;
-
-            case RadioButtonOptionField radio:
-                return radio.Value ?? string.Empty;
-
-            default:
-                try
-                {
-                    return field.Value?.ToString() ?? string.Empty;
-                }
-                catch
-                {
-                    // If the field does not expose a Value property, return empty.
-                    return string.Empty;
-                }
+            text = text.Replace("\"", "\"\"");
+            return $"\"{text}\"";
         }
-    }
-
-    // Helper to escape a CSV field according to RFC 4180
-    private static string EscapeCsv(string input)
-    {
-        if (input == null) return string.Empty;
-
-        if (input.Contains('"'))
-            input = input.Replace("\"", "\"\"");
-
-        if (input.Contains(',') || input.Contains('\n') || input.Contains('\r'))
-            return $"\"{input}\"";
-
-        return input;
+        return text;
     }
 }

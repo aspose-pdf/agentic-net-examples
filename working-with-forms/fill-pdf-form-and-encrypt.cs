@@ -7,10 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "template.pdf";
-        const string outputPath = "encrypted_filled.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        const string inputPath  = "form_template.pdf";
+        const string outputPath = "filled_encrypted.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,38 +18,51 @@ class Program
 
         try
         {
-            // Load the PDF that contains form fields
             using (Document doc = new Document(inputPath))
             {
-                // Example: fill a text box field named "Name"
-                if (doc.Form["Name"] != null && doc.Form["Name"] is TextBoxField nameField)
+                // Fill form fields (example field names)
+                if (doc.Form != null && doc.Form.Count > 0)
                 {
-                    nameField.Value = "John Doe";
+                    // Text box field
+                    var nameField = doc.Form["Name"];
+                    if (nameField is TextBoxField txtBox)
+                    {
+                        txtBox.Value = "John Doe";
+                    }
+
+                    // Checkbox field – use runtime type inspection to avoid compile‑time binding issues
+                    var agreeField = doc.Form["Agree"];
+                    if (agreeField != null && agreeField.GetType().Name == "CheckboxField")
+                    {
+                        dynamic chk = agreeField; // CheckboxField has a bool Checked property
+                        chk.Checked = true;
+                    }
+
+                    // Radio button group – also handled via reflection/dynamic
+                    var genderField = doc.Form["Gender"];
+                    if (genderField != null && genderField.GetType().Name == "RadioButtonOptionField")
+                    {
+                        dynamic radio = genderField; // RadioButtonOptionField exposes Selected property
+                        radio.Selected = "Male";
+                    }
+
+                    // Combo box field
+                    var countryField = doc.Form["Country"];
+                    if (countryField is ComboBoxField combo)
+                    {
+                        combo.Value = "USA";
+                    }
                 }
 
-                // Example: check a checkbox field named "Subscribe"
-                if (doc.Form["Subscribe"] != null && doc.Form["Subscribe"] is CheckboxField checkField)
-                {
-                    checkField.Checked = true;
-                }
-
-                // Example: select an item in a combo box field named "Country"
-                if (doc.Form["Country"] != null && doc.Form["Country"] is ComboBoxField comboField)
-                {
-                    // Set the selected value directly via the Value property.
-                    // The value must match one of the existing options in the combo box.
-                    comboField.Value = "USA";
-                }
-
-                // Apply encryption after the form is filled
+                // Apply encryption with AES‑256 and basic permissions
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                doc.Encrypt("user123", "owner123", perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved and encrypted to '{outputPath}'.");
+            Console.WriteLine($"Form filled and encrypted PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
