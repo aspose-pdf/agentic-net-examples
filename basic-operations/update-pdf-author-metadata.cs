@@ -6,22 +6,21 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF file (can be any existing PDF)
-        FileInfo pdfFile = new FileInfo("sample.pdf");
-
+        // Locate the PDF file via FileInfo
+        FileInfo pdfFile = new FileInfo("input.pdf");
         if (!pdfFile.Exists)
         {
             Console.Error.WriteLine($"File not found: {pdfFile.FullName}");
             return;
         }
 
-        // Open the PDF, modify metadata, and save back to the same location
+        // Load, modify metadata, and save back using a using block for deterministic disposal
         using (Document doc = new Document(pdfFile.FullName))
         {
             // Update the Author metadata
             doc.Info.Author = "New Author Name";
 
-            // Save changes overwriting the original file
+            // Save changes to the original file path
             doc.Save(pdfFile.FullName);
         }
 

@@ -6,43 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Ensure the input PDF exists. If it does not, create a placeholder with at least three pages.
-        if (!File.Exists(inputPath))
+        // Create a sample PDF in memory with at least three pages.
+        byte[] pdfBytes;
+        using (var seedDoc = new Document())
         {
-            using var placeholder = new Document();
             // Add three blank pages so page index 3 is valid.
-            placeholder.Pages.Add();
-            placeholder.Pages.Add();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPath);
+            seedDoc.Pages.Add();
+            seedDoc.Pages.Add();
+            seedDoc.Pages.Add();
+
+            using (var ms = new MemoryStream())
+            {
+                seedDoc.Save(ms);
+                pdfBytes = ms.ToArray();
+            }
         }
 
-        // Load PDF bytes from the file.
-        byte[] pdfBytes = File.ReadAllBytes(inputPath);
-
-        // Load PDF from the byte array using a MemoryStream.
+        // Load the PDF from the byte array via a MemoryStream.
         using (var ms = new MemoryStream(pdfBytes))
         using (var doc = new Document(ms))
         {
-            // Aspose.Pdf uses 1‑based page indexing.
+            // Ensure the document has at least three pages.
             if (doc.Pages.Count >= 3)
             {
-                // Rotate page 3 by 180 degrees.
+                // Rotate page 3 by 180 degrees (pages are 1‑based).
                 doc.Pages[3].Rotate = Rotation.on180;
             }
             else
             {
-                Console.Error.WriteLine("The document has fewer than 3 pages.");
+                Console.Error.WriteLine("The document does not contain a third page.");
                 return;
             }
 
             // Save the modified PDF.
-            doc.Save(outputPath);
+            doc.Save("output.pdf");
         }
 
-        Console.WriteLine($"Page 3 rotated and saved to '{outputPath}'.");
+        Console.WriteLine("Page 3 rotated and saved to 'output.pdf'.");
     }
 }

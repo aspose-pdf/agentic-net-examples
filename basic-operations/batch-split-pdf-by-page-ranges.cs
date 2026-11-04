@@ -1,86 +1,89 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
-class BatchPdfSplitter
+class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath = "input.pdf";
-        const string configPath   = "ranges.txt"; // each line: start-end (e.g., 1-3)
+        const string inputPdf = "input.pdf";
+        const string configPath = "ranges.txt";
+        const string outputDir = "Sections";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Config file not found: {configPath}");
             return;
         }
 
-        // Read and parse page ranges from the configuration file
-        var ranges = File.ReadAllLines(configPath);
-        int sectionIndex = 1;
-
-        using (Document sourceDoc = new Document(inputPdfPath))
+        // Parse page ranges from configuration file.
+        // Expected format per line: start-end (both inclusive), e.g., "1-5"
+        List<(int start, int end)> ranges = new List<(int, int)>();
+        foreach (string line in File.ReadAllLines(configPath))
         {
-            // Validate that the source document has pages
-            if (sourceDoc.Pages.Count == 0)
+            string trimmed = line.Trim();
+            if (string.IsNullOrEmpty(trimmed)) continue;
+
+            string[] parts = trimmed.Split('-');
+            if (parts.Length != 2 ||
+                !int.TryParse(parts[0], out int start) ||
+                !int.TryParse(parts[1], out int end) ||
+                start < 1 || end < start)
             {
-                Console.Error.WriteLine("Source PDF contains no pages.");
-                return;
+                Console.Error.WriteLine($"Invalid range line: '{line}'");
+                continue;
             }
 
-            foreach (string rawLine in ranges)
-            {
-                string line = rawLine.Trim();
-
-                // Skip empty lines or comments
-                if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
-                    continue;
-
-                // Expected format: start-end (both inclusive)
-                string[] parts = line.Split('-');
-                if (parts.Length != 2 ||
-                    !int.TryParse(parts[0], out int startPage) ||
-                    !int.TryParse(parts[1], out int endPage))
-                {
-                    Console.Error.WriteLine($"Invalid range format: '{line}'. Expected 'start-end'.");
-                    continue;
-                }
-
-                // Ensure 1‑based indexing and valid bounds
-                if (startPage < 1 || endPage < startPage || endPage > sourceDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Range out of bounds: '{line}'. PDF has {sourceDoc.Pages.Count} pages.");
-                    continue;
-                }
-
-                // Create a new document for this section
-                using (Document sectionDoc = new Document())
-                {
-                    // Copy pages from source to the new document
-                    for (int i = startPage; i <= endPage; i++) // 1‑based page indexing
-                    {
-                        sectionDoc.Pages.Add(sourceDoc.Pages[i]);
-                    }
-
-                    // Build output file name
-                    string outputPath = $"section_{sectionIndex}_{startPage}-{endPage}.pdf";
-
-                    // Save the split section
-                    sectionDoc.Save(outputPath);
-                    Console.WriteLine($"Saved pages {startPage}-{endPage} to '{outputPath}'.");
-                }
-
-                sectionIndex++;
-            }
+            ranges.Add((start, end));
         }
 
-        Console.WriteLine("Batch splitting completed.");
+        if (ranges.Count == 0)
+        {
+            Console.Error.WriteLine("No valid page ranges found.");
+            return;
+        }
+
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Open source PDF once using a using block (document-disposal-with-using rule)
+        using (Document srcDoc = new Document(inputPdf))
+        {
+            int totalPages = srcDoc.Pages.Count; // page-indexing-one-based rule
+
+            foreach (var (start, end) in ranges)
+            {
+                // Skip ranges that exceed the source document page count
+                if (end > totalPages)
+                {
+                    Console.Error.WriteLine($"Range {start}-{end} exceeds total pages ({totalPages}). Skipping.");
+                    continue;
+                }
+
+                // Create a new document for the current section
+                using (Document sectionDoc = new Document())
+                {
+                    // Add pages from source to the new document (1‑based indexing)
+                    for (int i = start; i <= end; i++)
+                    {
+                        sectionDoc.Pages.Add(srcDoc.Pages[i]);
+                    }
+
+                    // Build output file name, e.g., "section_1-5.pdf"
+                    string outPath = Path.Combine(outputDir, $"section_{start}-{end}.pdf");
+
+                    // Save the section (PDF format by default)
+                    sectionDoc.Save(outPath);
+                    Console.WriteLine($"Saved pages {start}-{end} to '{outPath}'.");
+                }
+            }
+        }
     }
 }

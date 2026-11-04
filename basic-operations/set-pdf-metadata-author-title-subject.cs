@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "updated.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,32 +15,22 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF, set document information, and save
+        using (Document doc = new Document(inputPath))
         {
-            // Open the PDF, set document information, and save
-            using (Document doc = new Document(inputPath))
-            {
-                // Set metadata
-                doc.Info.Author  = "John Doe";
-                doc.Info.Title   = "Sample Document";
-                doc.Info.Subject = "Demonstration of setting PDF info";
+            doc.Info.Author = "John Doe";
+            doc.Info.Title = "Sample Document";
+            doc.Info.Subject = "Demonstration of setting metadata";
 
-                // Save the updated PDF
-                doc.Save(outputPath);
-            }
-
-            // Re-open the saved PDF to verify the metadata
-            using (Document verifyDoc = new Document(outputPath))
-            {
-                Console.WriteLine("Verification after saving:");
-                Console.WriteLine($"Author : {verifyDoc.Info.Author}");
-                Console.WriteLine($"Title  : {verifyDoc.Info.Title}");
-                Console.WriteLine($"Subject: {verifyDoc.Info.Subject}");
-            }
+            doc.Save(outputPath); // Save as PDF (no SaveOptions needed)
         }
-        catch (Exception ex)
+
+        // Re-open the saved PDF to verify the metadata
+        using (Document verifyDoc = new Document(outputPath))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Author : {verifyDoc.Info.Author}");
+            Console.WriteLine($"Title  : {verifyDoc.Info.Title}");
+            Console.WriteLine($"Subject: {verifyDoc.Info.Subject}");
         }
     }
 }

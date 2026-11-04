@@ -7,11 +7,11 @@ class Program
     static void Main()
     {
         // Folder containing encrypted PDFs
-        const string inputFolder  = @"C:\EncryptedPdfs";
-        // Folder where decrypted copies will be saved
-        const string outputFolder = @"C:\DecryptedPdfs";
-        // Shared owner password for all PDFs in the batch
-        const string ownerPassword = "ownerSecret";
+        const string inputFolder = "EncryptedPdfs";
+        // Folder where decrypted PDFs will be saved
+        const string outputFolder = "DecryptedPdfs";
+        // Shared owner password for all PDFs
+        const string ownerPassword = "owner123";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -19,38 +19,37 @@ class Program
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string encryptedPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] encryptedFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string encryptedPath in encryptedFiles)
         {
-            string fileName = Path.GetFileNameWithoutExtension(encryptedPath);
-            string decryptedPath = Path.Combine(outputFolder, $"{fileName}_decrypted.pdf");
+            // Build output file name (optional suffix to avoid overwriting)
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(encryptedPath);
+            string decryptedPath = Path.Combine(outputFolder, $"{fileNameWithoutExt}_decrypted.pdf");
 
             try
             {
                 // Open the encrypted PDF using the owner password
                 using (Document doc = new Document(encryptedPath, ownerPassword))
                 {
-                    // Remove encryption – Decrypt() takes no parameters
+                    // Remove encryption; Decrypt() takes no parameters
                     doc.Decrypt();
 
-                    // Save the unprotected copy
+                    // Save the unprotected copy as a regular PDF
                     doc.Save(decryptedPath);
                 }
 
-                Console.WriteLine($"Decrypted: {encryptedPath} → {decryptedPath}");
-            }
-            catch (InvalidPasswordException)
-            {
-                Console.Error.WriteLine($"Invalid password for file: {encryptedPath}");
+                Console.WriteLine($"Decrypted: {Path.GetFileName(encryptedPath)} → {decryptedPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{encryptedPath}': {ex.Message}");
+                // Log any errors (e.g., wrong password, corrupted file)
+                Console.Error.WriteLine($"Failed to decrypt '{encryptedPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch decryption completed.");
     }
 }

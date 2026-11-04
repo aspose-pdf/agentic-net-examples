@@ -7,8 +7,8 @@ class Program
     static void Main()
     {
         const string encryptedPath = "encrypted.pdf";
-        const string decryptedPath = "decrypted.pdf";
-        const string userPassword  = "user123";
+        const string userPassword   = "user123";
+        const string outputPath     = "decrypted.pdf";
 
         if (!File.Exists(encryptedPath))
         {
@@ -18,17 +18,17 @@ class Program
 
         try
         {
-            // Load the encrypted PDF, supplying the user password
+            // Open the encrypted PDF, supplying the user password
             using (Document doc = new Document(encryptedPath, userPassword))
             {
-                // Remove encryption; Decrypt takes no arguments
+                // Remove encryption; Decrypt() takes no parameters
                 doc.Decrypt();
 
                 // Save the unprotected PDF
-                doc.Save(decryptedPath);
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
+            Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
         }
         catch (InvalidPasswordException ex)
         {

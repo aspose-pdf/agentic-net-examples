@@ -6,24 +6,22 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_copy.pdf";
 
+        // Ensure the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF as a FileStream.
-        using (FileStream stream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
+        // Open the PDF via a FileStream and load it into a Document
+        using (FileStream inputStream = File.OpenRead(inputPath))
+        using (Document doc = new Document(inputStream))
         {
-            // Load the PDF document from the stream.
-            using (Document doc = new Document(stream))
-            {
-                // Save the document to a new file using default settings.
-                doc.Save(outputPath);
-            }
+            // Save the document to a new file using default PDF settings
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDF saved to '{outputPath}'.");
