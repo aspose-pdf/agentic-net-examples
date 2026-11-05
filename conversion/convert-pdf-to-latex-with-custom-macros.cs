@@ -1,79 +1,76 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class PdfToLatexConverter
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTex = "output.tex";
+        const string inputPdfPath = "input.pdf";
+        const string outputTexPath = "output.tex";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load PDF and extract its text using TextAbsorber (correct API)
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            TextAbsorber absorber = new TextAbsorber
-            {
-                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-            };
+            // Extract all textual content from the PDF
+            TextAbsorber absorber = new TextAbsorber();
+            // Optional: preserve formatting (e.g., line breaks)
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
             pdfDoc.Pages.Accept(absorber);
-            string rawText = absorber.Text;
+            string rawText = absorber.Text ?? string.Empty;
 
-            // Convert extracted text to LaTeX with custom macro definitions
-            string latexContent = GenerateLatex(rawText);
+            // Define custom LaTeX macros for special symbols
+            // Key = symbol as it appears in the PDF text, Value = LaTeX macro
+            var symbolMacros = new Dictionary<string, string>
+            {
+                { "α", @"\alpha" },
+                { "β", @"\beta" },
+                { "γ", @"\gamma" },
+                { "Δ", @"\Delta" },
+                { "π", @"\pi" },
+                { "Ω", @"\Omega" },
+                // Add more mappings as needed
+            };
 
-            // Write the LaTeX source to a .tex file
-            File.WriteAllText(outputTex, latexContent);
+            // Replace each special symbol with its corresponding macro
+            string latexBody = rawText;
+            foreach (var kvp in symbolMacros)
+            {
+                latexBody = latexBody.Replace(kvp.Key, kvp.Value);
+            }
+
+            // Build the final LaTeX document content
+            var latexLines = new List<string>
+            {
+                @"\documentclass{article}",
+                @"\usepackage[utf8]{inputenc}",
+                @"\usepackage{amsmath,amssymb}",
+                // Define macros (if you want shorter names you can add them here)
+                // Example: \newcommand{\myalpha}{\alpha}
+                // In this case we directly use the standard macros, so no extra definitions needed
+                @"\begin{document}",
+                latexBody,
+                @"\end{document}"
+            };
+
+            // Write the LaTeX content to the .tex file
+            try
+            {
+                File.WriteAllLines(outputTexPath, latexLines);
+                Console.WriteLine($"LaTeX file generated successfully: {outputTexPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to write LaTeX file: {ex.Message}");
+            }
         }
-
-        Console.WriteLine($"LaTeX file saved to '{outputTex}'.");
-    }
-
-    // Builds a LaTeX document string, defines macros, and escapes special characters
-    static string GenerateLatex(string plainText)
-    {
-        // Custom macro definitions for special symbols
-        string macros = @"\newcommand{\myAlpha}{\ensuremath{\alpha}}
-\newcommand{\myBeta}{\ensuremath{\beta}}
-% Add additional macro definitions here
-";
-
-        // Escape LaTeX‑sensitive characters
-        string escaped = EscapeLatex(plainText);
-
-        // Replace literal Unicode symbols with the defined macros
-        escaped = escaped.Replace("α", @"\myAlpha");
-        escaped = escaped.Replace("β", @"\myBeta");
-
-        // Assemble the complete LaTeX document
-        return @"\documentclass{article}
-\usepackage{amsmath}
-" + macros + @"
-\begin{document}
-" + escaped + @"
-\end{document}";
-    }
-
-    // Escapes characters that have special meaning in LaTeX
-    static string EscapeLatex(string text)
-    {
-        return text
-            .Replace(@"\", @"\textbackslash{}")
-            .Replace("{", @"\{")
-            .Replace("}", @"\}")
-            .Replace("#", @"\#")
-            .Replace("$", @"\$")
-            .Replace("%", @"\%")
-            .Replace("^", @"\^{}")
-            .Replace("_", @"\_")
-            .Replace("~", @"\~{}")
-            .Replace("&", @"\&");
     }
 }

@@ -5,19 +5,19 @@ using Aspose.Pdf.Devices;
 
 class BatchPdfToPng
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input and output root folders (adjust as needed)
-        string inputRoot  = args.Length > 0 ? args[0] : @"C:\InputPdfs";
-        string outputRoot = args.Length > 1 ? args[1] : @"C:\OutputPngs";
+        // Root folders – adjust as needed
+        const string inputRoot  = @"InputPdfs";
+        const string outputRoot = @"OutputImages";
 
         if (!Directory.Exists(inputRoot))
         {
-            Console.Error.WriteLine($"Input folder does not exist: {inputRoot}");
+            Console.Error.WriteLine($"Input folder not found: {inputRoot}");
             return;
         }
 
-        // Gather all PDF files recursively
+        // Find all PDF files recursively
         string[] pdfFiles = Directory.GetFiles(inputRoot, "*.pdf", SearchOption.AllDirectories);
 
         foreach (string pdfPath in pdfFiles)
@@ -26,31 +26,26 @@ class BatchPdfToPng
             string relativePath = Path.GetRelativePath(inputRoot, pdfPath);
             string relativeDir  = Path.GetDirectoryName(relativePath) ?? string.Empty;
 
-            // Create corresponding output directory
-            string outputDir = Path.Combine(outputRoot, relativeDir);
-            Directory.CreateDirectory(outputDir);
+            // Destination directory for this PDF's images
+            string destDir = Path.Combine(outputRoot, relativeDir);
+            Directory.CreateDirectory(destDir);
 
-            // Load PDF document inside a using block for deterministic disposal
+            // Open PDF inside a using block for deterministic disposal
             using (Document doc = new Document(pdfPath))
             {
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Define a resolution for the PNG output (you can adjust DPI as needed)
+                var resolution = new Resolution(300);
+                var pngDevice = new PngDevice(resolution);
+
+                // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
                 {
-                    Page page = doc.Pages[i];
+                    // Build PNG file name: originalname_page_1.png, etc.
+                    string pngFileName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_page_{pageNum}.png";
+                    string pngPath      = Path.Combine(destDir, pngFileName);
 
-                    // Build output PNG file name: originalname_page{index}.png
-                    string pngFileName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_page{i}.png";
-                    string pngPath      = Path.Combine(outputDir, pngFileName);
-
-                    // Render page to PNG using PngDevice. Use Process() instead of the non‑existent Save().
-                    var pngDevice = new PngDevice(new Resolution(300)); // adjust resolution as needed
-                    // Optional: make background transparent
-                    // pngDevice.TransparentBackground = true;
-
-                    using (FileStream outStream = new FileStream(pngPath, FileMode.Create, FileAccess.Write))
-                    {
-                        pngDevice.Process(page, outStream);
-                    }
+                    // Render the selected page to PNG using PngDevice
+                    pngDevice.Process(doc.Pages[pageNum], pngPath);
                 }
             }
 

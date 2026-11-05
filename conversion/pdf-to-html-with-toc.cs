@@ -1,73 +1,86 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
-    // Input PDF file (must exist in the working directory)
-    private const string inputPdf = "input.pdf";
-
-    // Directory where HTML pages will be written
-    private const string outputDir = "HtmlOutput";
-
-    // Table of contents file – built at runtime, therefore static readonly
-    private static readonly string tocPath = Path.Combine(outputDir, "toc.html");
-
     static void Main()
     {
-        if (!File.Exists(inputPdf))
+        const string inputPdfPath   = "input.pdf";
+        const string outputHtmlBase = "output.html";   // base name for HTML files
+        const string tocHtmlPath    = "toc.html";      // table of contents file
+        const string outputFolder   = "HtmlOutput";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output folder exists
+        Directory.CreateDirectory(outputFolder);
 
         try
         {
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Configure HTML conversion options
+                // Configure HTML conversion options.
+                // SplitIntoPages = true creates one HTML file per PDF page.
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    SplitIntoPages = true,
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                    SplitIntoPages        = true,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    PartsEmbeddingMode    = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
                 };
 
-                // Convert PDF to a set of HTML pages (one per PDF page)
+                // HTML conversion requires GDI+ on Windows. Wrap in try‑catch to handle non‑Windows platforms.
                 try
                 {
-                    pdfDoc.Save(outputDir, htmlOpts);
+                    // Save the PDF as HTML files inside the output folder.
+                    // The first page will be saved as "output.html",
+                    // subsequent pages as "output_page2.html", "output_page3.html", etc.
+                    string htmlOutputPath = Path.Combine(outputFolder, outputHtmlBase);
+                    pdfDoc.Save(htmlOutputPath, htmlOpts);
                 }
                 catch (TypeInitializationException)
                 {
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping conversion.");
+                    Console.WriteLine("HTML conversion requires GDI+ (Windows only). Skipping HTML generation.");
                     return;
                 }
 
-                // Build a simple Table of Contents linking to each generated HTML page
-                string[] pageFiles = Directory.GetFiles(outputDir, "page_*.html");
-                Array.Sort(pageFiles); // ensure correct order
-
-                using (StreamWriter writer = new StreamWriter(tocPath, false))
+                // After conversion, generate a simple Table of Contents (TOC) linking to each page file.
+                // The number of pages is known from the original PDF.
+                using (StreamWriter tocWriter = new StreamWriter(Path.Combine(outputFolder, tocHtmlPath)))
                 {
-                    writer.WriteLine("<!DOCTYPE html>");
-                    writer.WriteLine("<html><head><meta charset=\"utf-8\"><title>Table of Contents</title></head><body>");
-                    writer.WriteLine("<h1>Table of Contents</h1>");
-                    writer.WriteLine("<ul>");
+                    tocWriter.WriteLine("<!DOCTYPE html>");
+                    tocWriter.WriteLine("<html lang=\"en\">");
+                    tocWriter.WriteLine("<head><meta charset=\"UTF-8\"><title>Table of Contents</title></head>");
+                    tocWriter.WriteLine("<body>");
+                    tocWriter.WriteLine("<h1>Table of Contents</h1>");
+                    tocWriter.WriteLine("<ul>");
 
-                    for (int i = 0; i < pageFiles.Length; i++)
+                    // Page indexing in Aspose.Pdf is 1‑based.
+                    for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                     {
-                        string fileName = Path.GetFileName(pageFiles[i]);
-                        writer.WriteLine($"  <li><a href=\"{fileName}\">Page {i + 1}</a></li>");
+                        // Determine the file name for the current page.
+                        // Page 1 uses the base name; later pages get the "_pageN.html" suffix.
+                        string pageFileName = pageNum == 1
+                            ? outputHtmlBase
+                            : $"output_page{pageNum}.html";
+
+                        // Create a link to the page HTML file.
+                        tocWriter.WriteLine($"  <li><a href=\"{pageFileName}\">Page {pageNum}</a></li>");
                     }
 
-                    writer.WriteLine("</ul>");
-                    writer.WriteLine("</body></html>");
+                    tocWriter.WriteLine("</ul>");
+                    tocWriter.WriteLine("</body>");
+                    tocWriter.WriteLine("</html>");
                 }
 
-                Console.WriteLine($"HTML conversion completed. TOC created at: {tocPath}");
+                Console.WriteLine($"HTML conversion completed. Files are in '{outputFolder}'.");
+                Console.WriteLine($"Table of Contents generated at '{Path.Combine(outputFolder, tocHtmlPath)}'.");
             }
         }
         catch (Exception ex)

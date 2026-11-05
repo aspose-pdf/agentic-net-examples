@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;   // HtmlSaveOptions resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputHtml = "output.html";
 
         // Verify source file exists
@@ -21,22 +21,23 @@ class Program
             // Load PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Configure HTML conversion options
+                // Configure HTML output – must pass SaveOptions explicitly
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Embed all CSS, fonts and images directly into the HTML file
+                    // Embed all resources (CSS, fonts, images) into the single HTML file
                     PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    // Save raster images as PNGs embedded in SVG to preserve quality
+                    // Render raster images as PNGs embedded in SVG to keep quality
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Produce a single HTML page (default is false, set explicitly for clarity)
+                    // Ensure a single-page HTML (default, but set explicitly)
                     SplitIntoPages = false
                 };
 
-                // HTML conversion relies on GDI+ (Windows only); handle possible platform exceptions
+                // HTML conversion uses GDI+ and works only on Windows.
+                // Wrap in try‑catch to avoid crashes on non‑Windows platforms.
                 try
                 {
                     doc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"PDF successfully converted to HTML: {outputHtml}");
+                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
                 }
                 catch (TypeInitializationException)
                 {
@@ -46,7 +47,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

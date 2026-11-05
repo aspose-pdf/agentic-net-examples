@@ -1,17 +1,16 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string htmlFolderPath    = "HtmlPages";
-        const string combinedHtmlPath  = "combined.html";
-        const string outputPdfPath     = "output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string htmlOutputFolder = "html_pages";
+        const string combinedHtmlPath = "combined.html";
+        const string finalPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -20,94 +19,104 @@ class Program
         }
 
         // Ensure the folder for split HTML pages exists
-        Directory.CreateDirectory(htmlFolderPath);
+        Directory.CreateDirectory(htmlOutputFolder);
 
-        // 1. Convert PDF to HTML pages (one HTML file per PDF page)
+        // -------------------------------------------------
+        // Step 1: Convert PDF to HTML (one file per page)
+        // -------------------------------------------------
         try
         {
             using (Document pdfDoc = new Document(inputPdfPath))
             {
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                var htmlOpts = new HtmlSaveOptions
                 {
-                    SplitIntoPages        = true, // generate separate HTML files
-                    PartsEmbeddingMode    = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                    SplitIntoPages = true,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
                 };
 
-                // The base file name; Aspose will create page.html, page_1.html, page_2.html, ...
-                string baseHtmlPath = Path.Combine(htmlFolderPath, "page.html");
-                pdfDoc.Save(baseHtmlPath, htmlOpts);
+                // Save the PDF as HTML pages into the specified folder
+                pdfDoc.Save(htmlOutputFolder, htmlOpts);
+
+                // Rename generated files to a predictable pattern (page_1.html, page_2.html, ...)
+                var generatedFiles = Directory.GetFiles(htmlOutputFolder, "*.html");
+                Array.Sort(generatedFiles);
+                for (int i = 0; i < generatedFiles.Length; i++)
+                {
+                    string newFileName = Path.Combine(htmlOutputFolder, $"page_{i + 1}.html");
+                    File.Move(generatedFiles[i], newFileName, true);
+                }
             }
         }
         catch (TypeInitializationException)
         {
-            // HTML conversion requires GDI+ (Windows only). Skip on unsupported platforms.
             Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping HTML generation.");
             return;
         }
-
-        // 2. Combine the generated HTML pages into a single HTML file
-        var htmlFiles = Directory.GetFiles(htmlFolderPath, "page*.html")
-                                 .OrderBy(f => f) // ensures correct page order
-                                 .ToArray();
-
-        if (htmlFiles.Length == 0)
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("No HTML pages were generated.");
+            Console.Error.WriteLine($"Error during PDF‑to‑HTML conversion: {ex.Message}");
             return;
         }
 
-        using (StreamWriter writer = new StreamWriter(combinedHtmlPath, false))
-        {
-            bool firstFile = true;
-            foreach (string file in htmlFiles)
-            {
-                string content = File.ReadAllText(file);
-
-                if (firstFile)
-                {
-                    // Write the full content of the first file (includes <html>, <head>, etc.)
-                    writer.Write(content);
-                    firstFile = false;
-                }
-                else
-                {
-                    // For subsequent files, strip the outer <html>/<head>/<body> tags to avoid nesting
-                    // Simple approach: remove everything up to the first <body> tag and after </body>
-                    int bodyStart = content.IndexOf("<body", StringComparison.OrdinalIgnoreCase);
-                    if (bodyStart >= 0)
-                    {
-                        bodyStart = content.IndexOf('>', bodyStart) + 1;
-                        int bodyEnd = content.LastIndexOf("</body>", StringComparison.OrdinalIgnoreCase);
-                        if (bodyEnd > bodyStart)
-                        {
-                            string bodyContent = content.Substring(bodyStart, bodyEnd - bodyStart);
-                            writer.WriteLine(bodyContent);
-                        }
-                    }
-                }
-            }
-        }
-
-        // 3. Convert the combined HTML back to PDF
+        // -------------------------------------------------
+        // Step 2: Combine the split HTML pages into one file
+        // -------------------------------------------------
         try
         {
-            using (Document htmlDoc = new Document(combinedHtmlPath, new HtmlLoadOptions()))
-            {
-                // Save as PDF (default format)
-                htmlDoc.Save(outputPdfPath);
-            }
+            string[] htmlFiles = Directory.GetFiles(htmlOutputFolder, "page_*.html");
+            Array.Sort(htmlFiles); // ensure correct page order
 
-            Console.WriteLine($"Successfully created PDF: {outputPdfPath}");
-        }
-        catch (TypeInitializationException)
-        {
-            // Loading HTML may also require GDI+ on non‑Windows platforms
-            Console.WriteLine("HTML to PDF conversion requires Windows (GDI+). Skipping PDF generation.");
+            using (var writer = new StreamWriter(combinedHtmlPath, false, Encoding.UTF8))
+            {
+                bool firstFile = true;
+                foreach (string file in htmlFiles)
+                {
+                    string content = File.ReadAllText(file, Encoding.UTF8);
+
+                    // Remove duplicate HTML wrappers for all but the first file
+                    if (!firstFile)
+                    {
+                        content = content
+                            .Replace("<html>", string.Empty, StringComparison.OrdinalIgnoreCase)
+                            .Replace("</html>", string.Empty, StringComparison.OrdinalIgnoreCase)
+                            .Replace("<head>", string.Empty, StringComparison.OrdinalIgnoreCase)
+                            .Replace("</head>", string.Empty, StringComparison.OrdinalIgnoreCase)
+                            .Replace("<body>", string.Empty, StringComparison.OrdinalIgnoreCase)
+                            .Replace("</body>", string.Empty, StringComparison.OrdinalIgnoreCase);
+                    }
+
+                    writer.WriteLine(content);
+                    firstFile = false;
+                }
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during HTML to PDF conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error while combining HTML pages: {ex.Message}");
+            return;
+        }
+
+        // -------------------------------------------------
+        // Step 3: Convert the combined HTML back to PDF
+        // -------------------------------------------------
+        try
+        {
+            // Loading HTML also requires GDI+ on non‑Windows platforms
+            using (var htmlDoc = new Document(combinedHtmlPath, new HtmlLoadOptions()))
+            {
+                htmlDoc.Save(finalPdfPath);
+            }
+
+            Console.WriteLine($"Successfully created PDF: {finalPdfPath}");
+        }
+        catch (TypeInitializationException)
+        {
+            Console.WriteLine("HTML‑to‑PDF conversion requires Windows (GDI+). Skipping final PDF generation.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during HTML‑to‑PDF conversion: {ex.Message}");
         }
     }
 }

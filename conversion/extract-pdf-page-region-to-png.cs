@@ -7,54 +7,46 @@ class Program
 {
     static void Main()
     {
-        // Input PDF, page number and output PNG file
-        const string inputPdfPath = "input.pdf";
-        const string outputPngPath = "region.png";
-        const int pageNumber = 1;               // 1‑based page index
-        // Rectangle coordinates (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-        const double llx = 100;                 // left
-        const double lly = 200;                 // bottom
-        const double urx = 400;                 // right
-        const double ury = 600;                 // top
+        const string pdfPath = "input.pdf";
+        const string pngPath = "region.png";
 
-        if (!File.Exists(inputPdfPath))
+        // Define the rectangle (in points, 1/72 inch) to extract
+        double llx = 100; // lower‑left X
+        double lly = 200; // lower‑left Y
+        double urx = 400; // upper‑right X
+        double ury = 600; // upper‑right Y
+
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document pdfDocument = new Aspose.Pdf.Document(inputPdfPath))
+        // Load the PDF document (Document must be disposed)
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Ensure the requested page exists
-            if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
-            {
-                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {pdfDocument.Pages.Count} pages.");
-                return;
-            }
+            // Pages are 1‑based
+            Page page = pdfDoc.Pages[1];
 
-            // Define the resolution (DPI) for the raster image
-            Resolution resolution = new Resolution(300);
-
-            // Create a PNG device with the specified resolution
-            PngDevice pngDevice = new PngDevice(resolution);
-
-            // Get the target page
-            Page page = pdfDocument.Pages[pageNumber];
-
-            // Preserve the original CropBox so we can restore it after rendering
+            // Preserve original CropBox so we can restore it later
             var originalCropBox = page.CropBox;
 
-            // Set the CropBox to the desired region (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            page.CropBox = new Rectangle(llx, lly, urx, ury);
+            // Set the CropBox to the region we want to render
+            page.CropBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Render the selected page region to a PNG file
-            pngDevice.Process(page, outputPngPath);
+            // Create a PNG device with the desired resolution (dpi)
+            var pngDevice = new PngDevice(new Resolution(300));
 
-            // Restore the original CropBox (optional, good practice if the document is used later)
+            // Render the cropped region to a PNG file
+            using (FileStream imageStream = new FileStream(pngPath, FileMode.Create))
+            {
+                pngDevice.Process(page, imageStream);
+            }
+
+            // Restore the original CropBox (good practice if the document is reused)
             page.CropBox = originalCropBox;
         }
 
-        Console.WriteLine($"Region of page {pageNumber} saved as PNG to '{outputPngPath}'.");
+        Console.WriteLine($"Region saved as PNG to '{pngPath}'.");
     }
 }

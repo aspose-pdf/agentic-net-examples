@@ -6,12 +6,12 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtmlBase = "page.html"; // base name for split pages
+        const string inputPdf  = "input.pdf";
+        const string outputHtml = "output.html"; // base name for split pages
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
@@ -20,20 +20,18 @@ class Program
             // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Configure HTML conversion with split‑into‑pages enabled
+                // Configure HTML save options to split each page into a separate file
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    SplitIntoPages = true,
-                    // Embed raster images as PNGs inside SVG to keep output self‑contained
+                    SplitIntoPages        = true,
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // HTML conversion relies on GDI+ (Windows only); handle platform limitations
+                // HTML conversion requires GDI+ (Windows only); handle platform limitations
                 try
                 {
-                    // Save generates multiple files: page.html, page_1.html, page_2.html, ...
-                    doc.Save(outputHtmlBase, htmlOpts);
-                    Console.WriteLine("PDF pages have been saved as individual HTML files.");
+                    doc.Save(outputHtml, htmlOpts);
+                    Console.WriteLine("Each PDF page has been saved as an individual HTML file.");
                 }
                 catch (TypeInitializationException)
                 {
@@ -41,7 +39,7 @@ class Program
                 }
                 catch (DllNotFoundException)
                 {
-                    Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+                    Console.WriteLine("GDI+ library not found. HTML conversion is unavailable on this platform.");
                 }
             }
         }

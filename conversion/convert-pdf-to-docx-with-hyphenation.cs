@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // retained for potential future use, not required for current conversion
 
 class Program
 {
@@ -17,22 +18,20 @@ class Program
 
         try
         {
-            // Load the source PDF inside a using block for deterministic disposal.
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure DOCX save options. Only the Format property is supported for DOCX conversion.
-                // Hyphenation settings are not available on DocSaveOptions; they must be handled after conversion
-                // (e.g., with Aspose.Words) or are applied automatically based on language metadata.
-                var docOptions = new DocSaveOptions
+                // Configure DOCX save options – HyphenationOptions is not supported on DocSaveOptions
+                DocSaveOptions saveOptions = new DocSaveOptions
                 {
                     Format = DocSaveOptions.DocFormat.DocX
                 };
 
-                // Save the PDF as DOCX using the configured options.
-                pdfDoc.Save(outputDocx, docOptions);
+                // Save the PDF as DOCX using the configured options
+                pdfDoc.Save(outputDocx, saveOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to DOCX: {outputDocx}");
+            Console.WriteLine($"Conversion completed: {outputDocx}");
         }
         catch (Exception ex)
         {

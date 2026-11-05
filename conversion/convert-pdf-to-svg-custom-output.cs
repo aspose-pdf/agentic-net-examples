@@ -1,19 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdfPath = "input.pdf";
-
-        // Desired output folder for the SVG file
         const string outputFolder = "SvgOutput";
-
-        // Combine folder and file name for the final SVG path
-        string outputSvgPath = Path.Combine(outputFolder, "output.svg");
 
         // Verify input file exists
         if (!File.Exists(inputPdfPath))
@@ -30,19 +24,22 @@ class Program
             // Load the PDF document inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Configure SVG save options (all options are in Aspose.Pdf namespace)
-                SvgSaveOptions svgOptions = new SvgSaveOptions
+                // Configure SVG save options – treat the target file name as a directory
+                // so each page is saved as a separate SVG file inside the folder.
+                var svgOptions = new SvgSaveOptions
                 {
-                    // Example option: save each page as a separate SVG file inside the folder
-                    // Uncomment the following line if per‑page SVGs are desired
-                    // PageSavingMode = SvgSaveOptions.PageSavingModes.SinglePage
+                    TreatTargetFileNameAsDirectory = true,
+                    // Enable CSS style embedding (required for proper SVG output)
+                    ScaleToPixels = true
                 };
 
-                // Save the PDF as SVG using the specified options
-                pdfDoc.Save(outputSvgPath, svgOptions);
+                // The file name is ignored when TreatTargetFileNameAsDirectory is true;
+                // only the directory part matters.
+                string targetPath = Path.Combine(outputFolder, "page.svg");
+                pdfDoc.Save(targetPath, svgOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to SVG: {outputSvgPath}");
+            Console.WriteLine($"PDF successfully converted to SVG files in folder: {outputFolder}");
         }
         catch (Exception ex)
         {

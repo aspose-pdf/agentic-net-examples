@@ -6,39 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pptx";
+        const string inputPdf = "input.pdf";
+        const string outputPptx = "output.pptx";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
             // Load the source PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPath))
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure PPTX save options: render each slide as an image
-                // and set a high resolution (DPI) for the rasterized images
-                var pptxOptions = new PptxSaveOptions
+                // Configure PPTX save options:
+                // - SlidesAsImages renders each slide as a raster image.
+                // - ImageResolution sets the DPI of those raster images (higher = better quality).
+                var pptxOpts = new PptxSaveOptions
                 {
                     SlidesAsImages = true,
-                    // The property that controls image resolution for PPTX conversion
-                    // is ImageResolution (DPI). Adjust as needed for high‑quality output.
-                    ImageResolution = 300
+                    ImageResolution = 300 // DPI
                 };
 
-                // Save the PDF as PPTX using the specified options
-                pdfDoc.Save(outputPath, pptxOptions);
+                // Save the PDF as a PPTX using the explicit options.
+                pdfDoc.Save(outputPptx, pptxOpts);
             }
 
-            Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
+            Console.WriteLine($"PDF successfully converted to PPTX: {outputPptx}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

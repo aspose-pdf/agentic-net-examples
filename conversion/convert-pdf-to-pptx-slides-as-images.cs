@@ -1,40 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // All SaveOptions subclasses are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pptx";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Configure PPTX save options: render each slide as a raster image
+            PptxSaveOptions pptxOpts = new PptxSaveOptions
             {
-                // Set up PPTX save options to render each slide as a raster image
-                PptxSaveOptions pptxOptions = new PptxSaveOptions
-                {
-                    SlidesAsImages = true
-                };
+                SlidesAsImages = true   // Enable raster image rendering for all slides
+            };
 
-                // Save the PDF as a PPTX file using the explicit save options
-                doc.Save(outputPath, pptxOptions);
-            }
+            // Save the PDF as PPTX using the explicit save options (required for non‑PDF formats)
+            pdfDoc.Save(outputPptxPath, pptxOpts);
+        }
 
-            Console.WriteLine($"PDF successfully converted to PPTX: {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+        Console.WriteLine($"PDF successfully converted to PPTX with slides as images: {outputPptxPath}");
     }
 }

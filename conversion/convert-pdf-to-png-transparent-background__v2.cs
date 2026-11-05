@@ -1,46 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // PngDevice resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
         const string outputDir = "PngPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Define the resolution (DPI) for the PNG output – optional but recommended
+            var resolution = new Resolution(300);
+
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Instantiate PngDevice directly (it does not implement IDisposable)
-                var pngDevice = new PngDevice(new Resolution(300))
+                // PngDevice does NOT implement IDisposable, so do NOT wrap it in a using statement
+                var pngDevice = new PngDevice(resolution)
                 {
-                    TransparentBackground = true
+                    TransparentBackground = true // Enable transparent background
                 };
 
-                string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+                string pngPath = Path.Combine(outputDir, $"Page_{i}.png");
 
-                // Dispose only the stream; the device does not need disposal
-                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
-                }
-
-                Console.WriteLine($"Page {pageNumber} saved as PNG with transparent background.");
+                // Convert the current page to PNG
+                pngDevice.Process(pdfDoc.Pages[i], pngPath);
             }
         }
+
+        Console.WriteLine("PDF pages have been converted to PNG with transparent background.");
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // Required for SimpleFontSubstitution
+using Aspose.Pdf.Text; // SimpleFontSubstitution and FontRepository reside here
 
 class Program
 {
@@ -9,43 +9,35 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa.pdf";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Map missing fonts to fallback fonts using FontRepository.
-        // Example mappings; add as needed for your documents.
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("TimesNewRomanPSMT", "Arial"));
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
-        // If you want a generic fallback for any other missing font, you can add a wildcard substitution.
-        // FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
-
-        try
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
-            {
-                // Configure PDF/A conversion options (PDF/A-1b in this example).
-                PdfFormatConversionOptions opts = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B)
-                {
-                    OptimizeFileSize = true
-                    // Font substitution is already configured via FontRepository above.
-                };
+            // ------------------------------------------------------------
+            // Configure font substitution: map missing fonts to fallback fonts
+            // ------------------------------------------------------------
+            // Use FontRepository.Substitutions with SimpleFontSubstitution (FontSubstitution class has no public ctor)
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("TimesNewRomanPSMT", "Arial"));
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("CourierNewPSMT", "Courier New"));
 
-                // Perform the conversion.
-                doc.Convert(opts);
+            // ------------------------------------------------------------
+            // Convert the document to PDF/A‑1b (PDF/A compliance)
+            // ------------------------------------------------------------
+            // The simple overload logs conversion details and creates PDF/A‑1b
+            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-                // Save the converted PDF/A document.
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF/A saved to '{outputPath}'.");
+            // Save the resulting PDF/A document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/A conversion completed. Output saved to '{outputPath}'.");
     }
 }

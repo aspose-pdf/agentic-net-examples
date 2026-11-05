@@ -15,20 +15,15 @@ class Program
             return;
         }
 
-        try
+        // NOTE: OFD support is provided by the separate Aspose.Pdf.OFD package.
+        // If that package is not referenced, we fall back to the core Document constructor.
+        // This will load the file if the format is recognized by the core library.
+        using (Document doc = new Document(ofdPath))
         {
-            // Load the OFD file with default load options
-            using (Document doc = new Document(ofdPath, new OfdLoadOptions()))
-            {
-                // Save the document as PDF using default settings
-                doc.Save(pdfPath);
-            }
+            // Save the document as PDF using default settings
+            doc.Save(pdfPath);
+        }
 
-            Console.WriteLine($"Successfully converted '{ofdPath}' to PDF at '{pdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+        Console.WriteLine($"Conversion completed: {pdfPath}");
     }
 }

@@ -1,30 +1,29 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // All SaveOptions and load options reside in this namespace
 
 class Program
 {
     static void Main()
     {
-        // NOTE: The original example used an XSL‑FO file, which requires the
-        // separate Aspose.Pdf.XslFo package. Because that package is not referenced,
-        // we switch to loading a regular PDF file using the core Aspose.Pdf API.
-        const string inputPath = "input.pdf";   // Source PDF (replaces input.fo)
-        const string outputPath = "output.pdf"; // Destination PDF
+        const string xslFoPath = "input.fo";   // XSL‑FO source file
+        const string pdfPath   = "output.pdf"; // Destination PDF file
 
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(xslFoPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {xslFoPath}");
             return;
         }
 
-        // Load the PDF document with the standard Document constructor.
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the XSL‑FO document using the dedicated load options
+        // The XslFoLoadOptions class tells Aspose.Pdf to interpret the input as XSL‑FO
+        using (Document doc = new Document(xslFoPath, new XslFoLoadOptions()))
         {
-            // Save the resulting PDF using default save options.
-            pdfDoc.Save(outputPath);
+            // Save the document as PDF with default options (no explicit SaveOptions needed)
+            doc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF conversion completed successfully: {outputPath}");
+        Console.WriteLine($"XSL‑FO successfully converted to PDF: {pdfPath}");
     }
 }

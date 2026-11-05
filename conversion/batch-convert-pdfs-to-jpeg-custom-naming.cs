@@ -10,7 +10,9 @@ class Program
         // Folder containing source PDF files
         const string inputFolder = "InputPdfs";
         // Folder where JPEG images will be written
-        const string outputFolder = "OutputImages";
+        const string outputFolder = "OutputJpegs";
+        // Custom naming pattern: {pdfName}_page{pageNumber}.jpg
+        const string namingPattern = "{pdfName}_page{pageNumber}.jpg";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -18,35 +20,36 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Retrieve all PDF files in the input directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
         foreach (string pdfPath in pdfFiles)
         {
+            string pdfFileName = Path.GetFileNameWithoutExtension(pdfPath);
+
             // Load each PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(pdfPath))
+            using (Document doc = new Document(pdfPath))
             {
-                // Aspose.Pdf uses 1‑based page indexing
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    // Build a custom file name: <pdfname>_page<pageNum>.jpg
-                    string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                    string jpegPath = Path.Combine(outputFolder, $"{baseName}_page{pageNum}.jpg");
+                    // Build the output file name according to the custom pattern
+                    string outputFileName = namingPattern
+                        .Replace("{pdfName}", pdfFileName)
+                        .Replace("{pageNumber}", pageIndex.ToString());
+                    string outputPath = Path.Combine(outputFolder, outputFileName);
 
-                    // JpegDevice is instantiated directly (it does not implement IDisposable)
-                    // Resolution (DPI) and quality are supplied via the constructor
-                    var jpegDevice = new JpegDevice(new Resolution(150), 90);
+                    // Create a JPEG device (does NOT implement IDisposable)
+                    var jpegDevice = new JpegDevice(new Resolution(300), 90);
 
-                    // Write the JPEG image to a file stream (the stream is disposable)
-                    using (FileStream outStream = new FileStream(jpegPath, FileMode.Create, FileAccess.Write))
+                    // Render the page to a JPEG file via a FileStream
+                    using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        jpegDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                        jpegDevice.Process(doc.Pages[pageIndex], outStream);
                     }
 
-                    Console.WriteLine($"Saved: {jpegPath}");
+                    Console.WriteLine($"Saved: {outputPath}");
                 }
             }
         }

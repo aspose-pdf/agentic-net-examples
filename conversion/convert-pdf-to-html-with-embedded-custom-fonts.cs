@@ -1,98 +1,112 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for HtmlSaveOptions
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputHtmlPath = "output.html";
-        const string fontsSourceFolder = "CustomFonts"; // folder containing your .ttf files
-        const string fontsTargetFolder = "fonts";       // folder that will be referenced from HTML
+        // Input PDF and desired HTML output paths
+        const string pdfPath   = "input.pdf";
+        const string htmlPath  = "output.html";
 
-        if (!File.Exists(inputPdfPath))
+        // Custom font files to embed (ensure these files exist next to the executable or provide full paths)
+        var customFonts = new List<string>
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            "fonts/MyFont-Regular.ttf",
+            "fonts/MyFont-Bold.ttf"
+        };
+
+        if (!File.Exists(pdfPath))
+        {
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Ensure the fonts target folder exists and copy custom fonts there
-        Directory.CreateDirectory(fontsTargetFolder);
-        foreach (string fontFile in Directory.GetFiles(fontsSourceFolder, "*.ttf"))
+        // Convert PDF to HTML with explicit HtmlSaveOptions (required for non‑PDF output)
+        HtmlSaveOptions htmlOptions = new HtmlSaveOptions
         {
-            string destPath = Path.Combine(fontsTargetFolder, Path.GetFileName(fontFile));
-            File.Copy(fontFile, destPath, overwrite: true);
-        }
+            // Embed all resources (images, CSS) into the HTML folder
+            PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+            // Render images as PNG inside SVG (cross‑platform safe)
+            RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
+            // Do not split into separate pages (single HTML file)
+            SplitIntoPages = false
+        };
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load PDF and save as HTML inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Configure HTML conversion options – use PartsEmbeddingMode to embed fonts and images
-                HtmlSaveOptions htmlOptions = new HtmlSaveOptions
-                {
-                    // Embed images as PNG inside SVG to keep everything in the HTML file
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Embed all resources (fonts, images, CSS) directly into the HTML
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    // Do not split into separate pages – single HTML file
-                    SplitIntoPages = false
-                };
-
-                // Save PDF as HTML (resources are embedded)
-                pdfDoc.Save(outputHtmlPath, htmlOptions);
+                pdfDoc.Save(htmlPath, htmlOptions);
             }
 
-            // After conversion, inject @font-face rules into the generated HTML
-            string htmlContent = File.ReadAllText(outputHtmlPath);
-
-            // Build CSS with @font-face rules pointing to the copied font files
-            string fontCss = @"
-<style>
-@font-face {
-    font-family: 'MyCustomFont';
-    src: url('fonts/MyFont-Regular.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-@font-face {
-    font-family: 'MyCustomFont';
-    src: url('fonts/MyFont-Bold.ttf') format('truetype');
-    font-weight: bold;
-    font-style: normal;
-}
-</style>
-";
-
-            // Insert the CSS right after the opening <head> tag
-            int headIndex = htmlContent.IndexOf("<head>", StringComparison.OrdinalIgnoreCase);
-            if (headIndex >= 0)
-            {
-                int insertPos = headIndex + "<head>".Length;
-                htmlContent = htmlContent.Insert(insertPos, fontCss);
-            }
-            else
-            {
-                // Fallback: prepend CSS at the very beginning
-                htmlContent = fontCss + htmlContent;
-            }
-
-            // Write the modified HTML back to disk
-            File.WriteAllText(outputHtmlPath, htmlContent);
-
-            Console.WriteLine($"PDF successfully converted to HTML with embedded custom fonts: {outputHtmlPath}");
+            Console.WriteLine($"PDF successfully converted to HTML: {htmlPath}");
         }
         catch (TypeInitializationException)
         {
             // HTML conversion requires GDI+ and is Windows‑only
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping conversion on this platform.");
+            return;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error during PDF‑to‑HTML conversion: {ex.Message}");
+            return;
         }
+
+        // Determine the generated CSS file path (Aspose.Pdf creates a .css file with the same name as the HTML)
+        string cssPath = Path.ChangeExtension(htmlPath, ".css");
+        if (!File.Exists(cssPath))
+        {
+            Console.Error.WriteLine($"CSS file not found: {cssPath}");
+            return;
+        }
+
+        // Read existing CSS content
+        string cssContent = File.ReadAllText(cssPath);
+
+        // Build @font-face rules for each custom font
+        var fontFaceRules = new List<string>();
+        foreach (string fontFile in customFonts)
+        {
+            if (!File.Exists(fontFile))
+            {
+                Console.Error.WriteLine($"Font file not found: {fontFile}");
+                continue; // skip missing fonts
+            }
+
+            // Derive a font family name from the file name (without extension)
+            string fontFamily = Path.GetFileNameWithoutExtension(fontFile).Replace(' ', '_');
+
+            // Build relative URL from the CSS file location to the font file
+            string relativePath = GetRelativePath(cssPath, fontFile);
+
+            string rule = $@"
+@font-face {{
+    font-family: '{fontFamily}';
+    src: url('{relativePath}') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}}";
+            fontFaceRules.Add(rule);
+        }
+
+        // Prepend the @font-face rules to the existing CSS
+        string newCssContent = string.Join(Environment.NewLine, fontFaceRules) + Environment.NewLine + cssContent;
+        File.WriteAllText(cssPath, newCssContent);
+
+        Console.WriteLine($"Custom fonts embedded via @font-face rules in CSS: {cssPath}");
+    }
+
+    // Helper to compute a relative path from one file to another
+    static string GetRelativePath(string fromPath, string toPath)
+    {
+        Uri fromUri = new Uri(Path.GetDirectoryName(Path.GetFullPath(fromPath)) + Path.DirectorySeparatorChar);
+        Uri toUri   = new Uri(Path.GetFullPath(toPath));
+        Uri relUri  = fromUri.MakeRelativeUri(toUri);
+        return Uri.UnescapeDataString(relUri.ToString().Replace('/', Path.DirectorySeparatorChar));
     }
 }

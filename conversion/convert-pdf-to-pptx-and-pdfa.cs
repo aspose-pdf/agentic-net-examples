@@ -1,51 +1,36 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string intermediatePptxPath = "intermediate.pptx";
-        const string pdfAPath       = "archival_output.pdf";
-        const string conversionLog  = "conversion_log.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
+        const string outputPdfaPath = "archival_output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        // -------------------------------------------------
-        // Step 1: Load the source PDF and save it as PPTX
-        // -------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // 1. Convert PDF to PPTX using Aspose.Pdf (no Aspose.Slides required)
+        using (var pdfDoc = new Document(inputPdfPath))
         {
-            // Save as PowerPoint (PPTX) using PptxSaveOptions
-            PptxSaveOptions pptxOptions = new PptxSaveOptions();
-            pdfDoc.Save(intermediatePptxPath, pptxOptions);
+            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        // -------------------------------------------------
-        // Step 2: Load the generated PPTX and convert to PDF/A
-        // -------------------------------------------------
-        if (!File.Exists(intermediatePptxPath))
+        // 2. Convert the original PDF to PDF/A‑1b (archival format) using Aspose.Pdf
+        using (var pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Failed to create PPTX: {intermediatePptxPath}");
-            return;
+            // Convert to PDF/A‑1b; the first argument is the output file path
+            pdfDoc.Convert(outputPdfaPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
         }
 
-        using (Document pptxDoc = new Document(intermediatePptxPath))
-        {
-            // Convert to PDF/A (PDF/A-1B) and log any conversion issues
-            pptxDoc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-            // Save the resulting PDF/A file
-            pptxDoc.Save(pdfAPath);
-        }
-
-        Console.WriteLine($"Conversion complete. PDF/A saved to '{pdfAPath}'.");
+        Console.WriteLine("Conversion completed:");
+        Console.WriteLine($"PPTX file: {outputPptxPath}");
+        Console.WriteLine($"PDF/A file: {outputPdfaPath}");
     }
 }

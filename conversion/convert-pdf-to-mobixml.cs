@@ -1,27 +1,28 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // All SaveOptions subclasses are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.mobi";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document within a using block for deterministic disposal.
+        // Load the PDF and convert it to MobiXml using default save options
         using (Document doc = new Document(inputPath))
         {
-            // Create default MobiXmlSaveOptions (all SaveOptions are in Aspose.Pdf namespace).
+            // MobiXmlSaveOptions has sensible defaults; no custom settings required
             MobiXmlSaveOptions mobiOpts = new MobiXmlSaveOptions();
 
-            // Save the document as MobiXml using the options.
+            // When saving to a non‑PDF format, the SaveOptions instance must be supplied
             doc.Save(outputPath, mobiOpts);
         }
 
