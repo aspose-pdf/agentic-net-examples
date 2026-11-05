@@ -20,9 +20,9 @@ class Program
         {
             // Set custom metadata properties
             pdfDoc.Info.Author = "John Doe";
-            pdfDoc.Info.Title  = "Sample Document";
+            pdfDoc.Info.Title  = "Converted Document";
 
-            // Prepare DOCX save options (required for non‑PDF formats)
+            // Prepare DOCX save options (required to output DOCX format)
             DocSaveOptions docxOptions = new DocSaveOptions
             {
                 Format = DocSaveOptions.DocFormat.DocX
@@ -32,6 +32,6 @@ class Program
             pdfDoc.Save(outputDocxPath, docxOptions);
         }
 
-        Console.WriteLine($"PDF converted to DOCX with metadata saved at '{outputDocxPath}'.");
+        Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
     }
 }

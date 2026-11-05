@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // All SaveOptions, including XpsSaveOptions, are in this namespace
+using Aspose.Pdf;   // All SaveOptions, including XpsSaveOptions, are in this namespace
 
 class Program
 {
@@ -16,24 +16,13 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF and convert it to XPS using default XpsSaveOptions
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // XpsSaveOptions with default settings
-                XpsSaveOptions xpsOptions = new XpsSaveOptions();
-
-                // Save as XPS; must pass the SaveOptions subclass because Document.Save(string) alone always writes PDF
-                pdfDoc.Save(outputXpsPath, xpsOptions);
-            }
-
-            Console.WriteLine($"PDF successfully converted to XPS: {outputXpsPath}");
+            XpsSaveOptions xpsOptions = new XpsSaveOptions(); // default settings
+            pdfDoc.Save(outputXpsPath, xpsOptions);
         }
-        catch (Exception ex)
-        {
-            // Generic error handling – in production you might want more specific catches
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF successfully converted to XPS: {outputXpsPath}");
     }
 }

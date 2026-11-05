@@ -19,27 +19,26 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
                 // Set standard author metadata
                 doc.Info.Author = author;
 
-                // Add custom publisher metadata using the DocumentInfo indexer
+                // Set custom publisher metadata via the Info dictionary
                 doc.Info["Publisher"] = publisher;
 
-                // Prepare MobiXml save options (required for non‑PDF output)
+                // Create MobiXml save options (all SaveOptions are in Aspose.Pdf namespace)
                 MobiXmlSaveOptions mobiOptions = new MobiXmlSaveOptions();
 
-                // Save the document as MobiXml using the explicit options
+                // Save the document as MobiXml
                 doc.Save(outputPath, mobiOptions);
             }
 
-            Console.WriteLine($"PDF successfully converted to MobiXml: {outputPath}");
+            Console.WriteLine($"PDF successfully converted to MobiXml with metadata. Output: {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -1,67 +1,70 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // FontRepository, SimpleFontSubstitution, HtmlLoadOptions, HtmlSaveOptions, DocSaveOptions
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
-        const string outputDocx = "output.docx";
+        const string inputPdfPath   = "input.pdf";
+        const string htmlPath       = "intermediate.html";
+        const string outputDocxPath = "output.docx";
+        const string customFontPath = "MyCustomFont.ttf"; // path to the font to embed
 
-        // Paths to custom font files that should be embedded in the DOCX
-        string[] customFontFiles = { "fonts/CustomFont1.ttf", "fonts/CustomFont2.otf" };
-
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Register custom fonts via FontRepository.Substitutions so they can be used and embedded
-        foreach (string fontPath in customFontFiles)
+        if (!File.Exists(customFontPath))
         {
-            if (File.Exists(fontPath))
+            Console.Error.WriteLine($"Custom font not found: {customFontPath}");
+            return;
+        }
+
+        // -------------------------------------------------
+        // Step 1: Convert PDF to HTML (Windows‑only, GDI+)
+        // -------------------------------------------------
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
             {
-                // Use the file name (without extension) as the font family name for substitution
-                string fontFamily = Path.GetFileNameWithoutExtension(fontPath);
-                FontRepository.Substitutions.Add(new SimpleFontSubstitution(fontFamily, fontPath));
+                PartsEmbeddingMode     = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+            };
+
+            try
+            {
+                pdfDoc.Save(htmlPath, htmlOpts);
+                Console.WriteLine($"PDF converted to HTML: {htmlPath}");
             }
-            else
+            catch (TypeInitializationException)
             {
-                Console.Error.WriteLine($"Font file not found: {fontPath}");
+                Console.WriteLine("HTML conversion requires Windows (GDI+). Operation aborted.");
+                return;
             }
         }
 
-        try
+        // -------------------------------------------------
+        // Step 2: Load the generated HTML and embed fonts
+        // -------------------------------------------------
+        // Register the custom font so that it can be used during conversion.
+        // The substitution maps a logical font name (any name you choose) to the actual TTF file.
+        FontRepository.Substitutions.Add(
+            new SimpleFontSubstitution("MyCustomFont", customFontPath)
+        );
+
+        using (Document htmlDoc = new Document(htmlPath, new HtmlLoadOptions()))
         {
-            // Load the source PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
+            DocSaveOptions docOpts = new DocSaveOptions
             {
-                // ---------- Convert PDF to HTML ----------
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
-                {
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
-                };
-                pdfDoc.Save(outputHtml, htmlOpts);
+                Format = DocSaveOptions.DocFormat.DocX // fonts are embedded automatically when possible
+            };
 
-                // ---------- Save PDF as DOCX with embedded fonts ----------
-                // DocSaveOptions only requires the format; fonts are embedded automatically when registered
-                DocSaveOptions docOpts = new DocSaveOptions
-                {
-                    Format = DocSaveOptions.DocFormat.DocX
-                };
-                pdfDoc.Save(outputDocx, docOpts);
-            }
-
-            Console.WriteLine($"Conversion completed. HTML saved to '{outputHtml}', DOCX saved to '{outputDocx}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            htmlDoc.Save(outputDocxPath, docOpts);
+            Console.WriteLine($"HTML saved as DOCX with embedded fonts: {outputDocxPath}");
         }
     }
 }

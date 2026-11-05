@@ -6,40 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where PPTX files will be saved
-        const string outputFolder = "OutputPptx";
+        // Directory containing source PDF files
+        string inputDir = "InputPdfs";
+        // Directory where the generated PPTX files will be placed
+        string outputDir = "OutputPptx";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // Retrieve all PDF files in the input directory (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to convert.");
+            return;
+        }
+
+        // Configure PPTX save options – rasterize each slide as an image
+        PptxSaveOptions pptxOptions = new PptxSaveOptions
+        {
+            SlidesAsImages = true
+        };
 
         foreach (string pdfPath in pdfFiles)
         {
             string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pptxPath = Path.Combine(outputFolder, baseName + ".pptx");
+            string pptxPath = Path.Combine(outputDir, baseName + ".pptx");
 
             try
             {
-                // Load each PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    // Configure PPTX save options to rasterize each slide as an image
-                    PptxSaveOptions pptxOptions = new PptxSaveOptions
-                    {
-                        SlidesAsImages = true
-                    };
-
-                    // Save as PPTX using the explicit save options (required for non‑PDF formats)
-                    doc.Save(pptxPath, pptxOptions);
+                    // Save the document as PPTX using the configured options
+                    pdfDoc.Save(pptxPath, pptxOptions);
                 }
 
                 Console.WriteLine($"Converted: {pdfPath} → {pptxPath}");
@@ -49,5 +56,7 @@ class Program
                 Console.Error.WriteLine($"Error converting '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch conversion completed.");
     }
 }

@@ -6,71 +6,72 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
-        const string cssPath = "responsive.css";
+        const string inputPdfPath = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        // Simple responsive CSS – you can replace this with a more elaborate stylesheet.
+        const string responsiveCss = @"
+            <style>
+                body { margin:0; padding:0; font-family:Arial,Helvetica,sans-serif; }
+                img { max-width:100%; height:auto; }
+                .page { width:100%; box-sizing:border-box; padding:10px; }
+                @media (max-width:600px) {
+                    .page { padding:5px; }
+                }
+            </style>";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
-        }
-
-        // Ensure a responsive CSS file exists; create a simple one if missing
-        if (!File.Exists(cssPath))
-        {
-            File.WriteAllText(cssPath,
-@"/* Simple responsive CSS */
-body { margin:0; padding:0; font-family:Arial,Helvetica,sans-serif; }
-img { max-width:100%; height:auto; }
-@media only screen and (max-width:600px) {
-    body { font-size:14px; }
-    .page { padding:5px; }
-}");
         }
 
         try
         {
-            // Load PDF and convert to HTML with explicit HtmlSaveOptions (required on all platforms)
-            using (Document pdfDoc = new Document(inputPdf))
+            // Load the PDF document.
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
+                // Configure HTML conversion options. GDI+ is required on non‑Windows platforms,
+                // so we wrap the save in a try‑catch for TypeInitializationException.
                 HtmlSaveOptions htmlOptions = new HtmlSaveOptions
                 {
-                    // Embed raster images as PNG inside SVG to preserve layout
+                    // Embed images as PNGs inside the HTML (cross‑platform friendly).
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Keep output as a single HTML file
+                    // Do not split into separate HTML files per page.
                     SplitIntoPages = false
                 };
 
-                pdfDoc.Save(outputHtml, htmlOptions);
+                try
+                {
+                    // Save PDF as a single HTML file.
+                    pdfDoc.Save(outputHtmlPath, htmlOptions);
+                }
+                catch (TypeInitializationException)
+                {
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
+                    return;
+                }
             }
 
-            // Post‑process the generated HTML to reference the responsive stylesheet
-            string htmlContent = File.ReadAllText(outputHtml);
-            string linkTag = $"<link rel=\"stylesheet\" type=\"text/css\" href=\"{Path.GetFileName(cssPath)}\" />";
+            // At this point the HTML file exists. Insert the responsive CSS.
+            string htmlContent = File.ReadAllText(outputHtmlPath);
 
-            if (htmlContent.Contains("<head>"))
+            // Find the closing </head> tag to inject the CSS before it.
+            int headCloseIndex = htmlContent.IndexOf("</head>", StringComparison.OrdinalIgnoreCase);
+            if (headCloseIndex >= 0)
             {
-                htmlContent = htmlContent.Replace("<head>", $"<head>{Environment.NewLine}{linkTag}");
+                htmlContent = htmlContent.Insert(headCloseIndex, responsiveCss);
             }
             else
             {
-                // Fallback: prepend the link if <head> is missing
-                htmlContent = linkTag + Environment.NewLine + htmlContent;
+                // If no </head> tag is present, prepend the CSS at the start of the file.
+                htmlContent = responsiveCss + htmlContent;
             }
 
-            File.WriteAllText(outputHtml, htmlContent);
+            // Write the modified HTML back to disk.
+            File.WriteAllText(outputHtmlPath, htmlContent);
 
-            Console.WriteLine($"PDF successfully converted to HTML with responsive CSS: {outputHtml}");
-        }
-        catch (TypeInitializationException)
-        {
-            // HTML conversion relies on GDI+ (Windows only)
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-        }
-        catch (DllNotFoundException)
-        {
-            Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+            Console.WriteLine($"PDF successfully converted to HTML with responsive CSS: {outputHtmlPath}");
         }
         catch (Exception ex)
         {

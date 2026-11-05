@@ -6,35 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "output.html";
+        const string inputPdfPath = "input.pdf";
+        const string outputHtmlPath = "output.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
                 // Configure HTML conversion options.
-                // The PngBackground property was removed in newer Aspose.Pdf versions;
-                // rendering of page backgrounds as PNG is now controlled via RasterImagesSavingMode.
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Render raster images (including page backgrounds) as PNG embedded into SVG.
+                    // Render raster images (including page backgrounds) as PNG images embedded into SVG.
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Embed all resources directly into the HTML file.
+
+                    // Optional: embed all resources into a single HTML file.
                     PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
                 };
 
-                // HTML conversion requires GDI+ (Windows only). Handle platforms that lack it gracefully.
+                // HTML conversion requires GDI+ and is Windows‑only.
+                // Wrap the save call to avoid crashes on non‑Windows platforms.
                 try
                 {
-                    doc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"HTML saved to '{outputHtml}'.");
+                    pdfDoc.Save(outputHtmlPath, htmlOpts);
+                    Console.WriteLine($"HTML file saved to '{outputHtmlPath}'.");
                 }
                 catch (TypeInitializationException)
                 {

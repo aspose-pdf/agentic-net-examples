@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Aspose.Pdf contains Document and all SaveOptions subclasses
 
 class Program
 {
@@ -11,19 +11,19 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
                 // Create MarkdownSaveOptions with default settings
                 MarkdownSaveOptions mdOptions = new MarkdownSaveOptions();
 
-                // Save the document as Markdown
+                // Save the document as Markdown; explicit SaveOptions are required for non‑PDF formats
                 doc.Save(outputPath, mdOptions);
             }
 
@@ -31,7 +31,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

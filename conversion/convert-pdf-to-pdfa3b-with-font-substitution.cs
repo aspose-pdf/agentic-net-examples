@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // Required for SimpleFontSubstitution
 
 class Program
 {
@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa3b.pdf";
-        const string conversionLog = "conversion_log.xml";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -19,16 +19,19 @@ class Program
 
         try
         {
-            // Register a fallback font for any missing font in the source PDF.
-            // The wildcard "*" matches all missing fonts.
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial Unicode MS"));
-
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Convert the document to PDF/A‑3b. Errors are handled by deleting the offending objects.
-                doc.Convert(conversionLog, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+                // Register font substitutions for missing fonts
+                // Substitute Helvetica with Arial (add more mappings as required)
+                FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+                // Example of a wildcard substitution for any missing font
+                // FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
 
-                // Save the converted PDF/A‑3b file.
+                // Convert the document to PDF/A‑3b; errors are logged to the specified XML file
+                doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+
+                // Save the converted PDF/A‑3b document
                 doc.Save(outputPath);
             }
 

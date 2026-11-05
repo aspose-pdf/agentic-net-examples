@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -18,34 +17,46 @@ class Program
             return;
         }
 
-        // STEP 1: Load PDF and collect annotation contents per page (optional)
-        var pageNotes = new Dictionary<int, string>(); // 1‑based page number
-
+        // -------------------------------------------------------------------
+        // 1. Load the PDF and extract annotation text per page (optional).
+        //    The extracted notes are kept in an array but are not written to the
+        //    PPTX because Aspose.Slides – the library required for manipulating
+        //    notes slides – is not referenced in this project.
+        // -------------------------------------------------------------------
+        string[] pageNotes;
         using (Document pdfDoc = new Document(pdfPath))
         {
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            int pageCount = pdfDoc.Pages.Count;
+            pageNotes = new string[pageCount];
+
+            for (int i = 1; i <= pageCount; i++)
             {
                 Page page = pdfDoc.Pages[i];
-                var notes = new List<string>();
+                StringBuilder sb = new StringBuilder();
 
-                foreach (Annotation annotation in page.Annotations)
+                foreach (Annotation annot in page.Annotations)
                 {
-                    if (!string.IsNullOrEmpty(annotation.Contents))
-                        notes.Add(annotation.Contents.Trim());
+                    if (annot is TextAnnotation textAnnot)
+                    {
+                        if (!string.IsNullOrEmpty(textAnnot.Title))
+                            sb.AppendLine($"Title: {textAnnot.Title}");
+
+                        if (!string.IsNullOrEmpty(textAnnot.Contents))
+                            sb.AppendLine(textAnnot.Contents);
+                    }
                 }
 
-                if (notes.Count > 0)
-                    pageNotes[i] = string.Join(Environment.NewLine, notes);
+                pageNotes[i - 1] = sb.ToString().Trim();
             }
 
-            // STEP 2: Convert PDF to PPTX directly with Aspose.Pdf
+            // -------------------------------------------------------------------
+            // 2. Convert the PDF directly to PPTX using Aspose.Pdf.
+            //    Aspose.Pdf provides a built‑in SaveFormat.Pptx, eliminating the
+            //    need for the separate Aspose.Slides assembly.
+            // -------------------------------------------------------------------
             pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
 
-        // NOTE: Adding speaker notes to the generated PPTX would require Aspose.Slides,
-        // which is not referenced in this project. The extracted annotation text is
-        // retained in the `pageNotes` dictionary for further processing if needed.
-
-        Console.WriteLine($"Conversion complete. PPTX saved to '{pptxPath}'.");
+        Console.WriteLine($"PDF converted to PPTX: {pptxPath}");
     }
 }

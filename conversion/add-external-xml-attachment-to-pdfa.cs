@@ -6,43 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath   = "source.pdf";
-        const string xmlAttachmentPath = "metadata.xml";
-        const string logPath        = "conversion_log.xml";
+        const string inputPdfPath   = "source.pdf";      // original PDF
+        const string xmlAttachment   = "metadata.xml";   // XML file to attach
+        const string conversionLog  = "conversion_log.xml";
         const string outputPdfPath  = "output_pdfa1b.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(xmlAttachmentPath))
+        if (!File.Exists(xmlAttachment))
         {
-            Console.Error.WriteLine($"XML attachment not found: {xmlAttachmentPath}");
+            Console.Error.WriteLine($"XML attachment not found: {xmlAttachment}");
             return;
         }
 
-        // Load the source PDF and convert it to PDF/A‑1b
-        using (Document doc = new Document(sourcePdfPath))
+        try
         {
-            // Convert to PDF/A‑1b; errors are logged to logPath and problematic objects are removed
-            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-            // Add the external XML file as an embedded file (attachment)
-            var fileSpec = new FileSpecification(Path.GetFileName(xmlAttachmentPath))
+            // Load the source PDF
+            using (Document doc = new Document(inputPdfPath))
             {
-                // The file content must be supplied as a stream
-                Contents = new MemoryStream(File.ReadAllBytes(xmlAttachmentPath)),
-                // Optional but helpful metadata
-                MIMEType = "application/xml"
-            };
-            doc.EmbeddedFiles.Add(fileSpec);
+                // Convert to PDF/A‑1b (PDF/A-1b)
+                doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            // Save the resulting PDF/A‑1b document
-            doc.Save(outputPdfPath);
+                // Embed the external XML file as an attachment using the EmbeddedFiles collection
+                var fileSpec = new FileSpecification(Path.GetFileName(xmlAttachment));
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(xmlAttachment));
+                // Optional: set MIME type for better identification (not required for PDF/A‑1b)
+                fileSpec.MIMEType = "application/xml";
+                doc.EmbeddedFiles.Add(fileSpec);
+
+                // Save the resulting PDF/A‑1b document (attachment is now embedded)
+                doc.Save(outputPdfPath);
+            }
+
+            Console.WriteLine($"PDF/A‑1b file with XML attachment saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"PDF/A‑1b document with XML attachment saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

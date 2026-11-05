@@ -7,66 +7,65 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath          = "input.pdf";
-        const string htmlPath         = "output.html";
-        const string minifiedHtmlPath = "output.min.html";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "HtmlOutput";
 
-        if (!File.Exists(pdfPath))
+        // Verify input PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Convert PDF to HTML (Windows only – GDI+ required)
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Convert PDF to HTML (split into separate pages)
         try
         {
-            using (Document doc = new Document(pdfPath))
+            using (Document doc = new Document(inputPdf))
             {
-                // HtmlSaveOptions must be passed explicitly; otherwise a PDF is written.
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
-                    // Embed all resources into a single HTML file.
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                    // Render images as PNGs embedded in SVG (cross‑platform friendly).
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    // Produce a single HTML file (set to false if you want one file per page).
-                    SplitIntoPages = false
+                    SplitIntoPages = true,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                doc.Save(htmlPath, htmlOpts);
+                // Base file name; Aspose.Pdf will create additional files for each page
+                string outputHtmlBase = Path.Combine(outputDir, "output.html");
+                doc.Save(outputHtmlBase, htmlOpts);
             }
-
-            Console.WriteLine($"PDF converted to HTML: {htmlPath}");
         }
         catch (TypeInitializationException)
         {
-            // GDI+ not available on non‑Windows platforms.
+            // HTML conversion requires GDI+ (Windows only)
             Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping conversion.");
             return;
         }
-        catch (Exception ex)
+        catch (DllNotFoundException)
         {
-            Console.Error.WriteLine($"Error during PDF‑to‑HTML conversion: {ex.Message}");
+            Console.WriteLine("GDI+ not found. HTML conversion is Windows‑only.");
             return;
         }
 
-        // Minify the generated HTML file.
-        try
+        // Minify all generated HTML files
+        string[] htmlFiles = Directory.GetFiles(outputDir, "*.html");
+        foreach (string file in htmlFiles)
         {
-            string htmlContent = File.ReadAllText(htmlPath);
+            string content = File.ReadAllText(file);
 
-            // Simple minification: remove line breaks, tabs, and collapse multiple spaces.
-            // This is a lightweight approach; for more aggressive minification use a dedicated library.
-            string minified = Regex.Replace(htmlContent, @"\s+", " "); // collapse whitespace
-            minified = minified.Replace("> <", "><");               // remove spaces between tags
+            // Collapse consecutive whitespace into a single space
+            string minified = Regex.Replace(content, @"\s+", " ");
 
-            File.WriteAllText(minifiedHtmlPath, minified.Trim());
+            // Remove whitespace between HTML tags
+            minified = Regex.Replace(minified, @">\s+<", "><");
 
-            Console.WriteLine($"Minified HTML saved to: {minifiedHtmlPath}");
+            // Overwrite the original file with the minified version
+            File.WriteAllText(file, minified.Trim());
+
+            Console.WriteLine($"Minified: {Path.GetFileName(file)}");
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during HTML minification: {ex.Message}");
-        }
+
+        Console.WriteLine("PDF to HTML conversion and minification completed.");
     }
 }

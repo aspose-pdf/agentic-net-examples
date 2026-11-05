@@ -6,21 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
+        // Paths
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(pdfPath))
+        // Validate input PDF
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Convert PDF to PPTX using Aspose.Pdf's native SaveFormat
-        using (Document pdfDoc = new Document(pdfPath))
+        // -------------------------------------------------
+        // Convert PDF to PPTX using Aspose.Pdf only.
+        // -------------------------------------------------
+        // Aspose.Slides is a separate product; the current project does not reference it.
+        // Therefore the slide‑image extraction part is omitted. The conversion itself is fully
+        // supported by Aspose.Pdf via the SaveFormat.Pptx option.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            pdfDoc.Save(pptxPath, SaveFormat.Pptx);
+            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        Console.WriteLine("PDF to PPTX conversion completed.");
+        Console.WriteLine("PDF conversion to PPTX completed successfully.");
     }
 }

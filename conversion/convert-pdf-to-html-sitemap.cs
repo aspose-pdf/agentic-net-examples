@@ -1,42 +1,48 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputFolder = "HtmlPages";
-        const string sitemapFile = "sitemap.xml";
+        // Paths and settings
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "HtmlOutput";
+        const string baseFileName = "document.html"; // base name for split HTML files
+        const string sitemapFileName = "sitemap.xml";
+        const string baseUrl = "https://example.com/"; // Change to your site URL
 
-        if (!File.Exists(inputPdf))
+        // Validate input PDF
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
+        // Load PDF and convert to HTML (split into pages)
         try
         {
-            using (Document pdfDoc = new Document(inputPdf))
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
                     SplitIntoPages = true,
-                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // Base HTML file name; Aspose.Pdf will create index.html, index_1.html, etc.
-                string baseHtmlPath = Path.Combine(outputFolder, "index.html");
-                pdfDoc.Save(baseHtmlPath, htmlOpts);
+                string htmlOutputPath = Path.Combine(outputFolder, baseFileName);
+                pdfDoc.Save(htmlOutputPath, htmlOpts);
             }
         }
         catch (TypeInitializationException)
         {
+            // HTML conversion requires GDI+ (Windows only)
             Console.WriteLine("HTML conversion requires Windows (GDI+). Skipping conversion.");
             return;
         }
@@ -49,23 +55,34 @@ class Program
         // Gather all generated HTML files
         string[] htmlFiles = Directory.GetFiles(outputFolder, "*.html", SearchOption.TopDirectoryOnly);
 
-        // Build sitemap.xml
-        XNamespace ns = "http://www.sitemaps.org/schemas/sitemap/0.9";
-        XElement urlset = new XElement(ns + "urlset");
-
-        foreach (string filePath in htmlFiles)
+        // Create sitemap.xml
+        string sitemapPath = Path.Combine(outputFolder, sitemapFileName);
+        try
         {
-            string fileName = Path.GetFileName(filePath);
-            string loc = $"./{fileName}"; // Adjust URL as needed for your site
-            XElement url = new XElement(ns + "url",
-                new XElement(ns + "loc", loc));
-            urlset.Add(url);
+            using (XmlWriter writer = XmlWriter.Create(sitemapPath, new XmlWriterSettings { Indent = true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("urlset", "http://www.sitemaps.org/schemas/sitemap/0.9");
+
+                foreach (string filePath in htmlFiles)
+                {
+                    string fileName = Path.GetFileName(filePath);
+                    string url = $"{baseUrl}{fileName}";
+
+                    writer.WriteStartElement("url");
+                    writer.WriteElementString("loc", url);
+                    writer.WriteEndElement(); // url
+                }
+
+                writer.WriteEndElement(); // urlset
+                writer.WriteEndDocument();
+            }
+
+            Console.WriteLine($"Sitemap generated at: {sitemapPath}");
         }
-
-        XDocument sitemap = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), urlset);
-        string sitemapPath = Path.Combine(outputFolder, sitemapFile);
-        sitemap.Save(sitemapPath);
-
-        Console.WriteLine($"HTML pages saved to '{outputFolder}'. Sitemap generated at '{sitemapPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error generating sitemap: {ex.Message}");
+        }
     }
 }

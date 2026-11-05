@@ -1,46 +1,52 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // All SaveOptions are in this namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputHtmlPath = "output.html";
+        const string inputPdf  = "input.pdf";
+        const string outputHtml = "output.html";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Configure HTML conversion options:
-            // - Embed all resources into a single HTML file
-            // - Render all raster images (including background images) as PNGs embedded into SVG
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            // Load PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
-            };
+                // Configure HTML conversion options
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Embed all resources (CSS, JS, images) into a single HTML file
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Render all raster images, including background images, as PNG embedded in SVG
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                };
 
-            // HTML conversion requires GDI+ (Windows only). Wrap in try‑catch to handle other platforms.
-            try
-            {
-                pdfDoc.Save(outputHtmlPath, htmlOpts);
-                Console.WriteLine($"HTML saved to '{outputHtmlPath}'.");
+                // Save as HTML using the explicit options (required to get PNG backgrounds)
+                doc.Save(outputHtml, htmlOpts);
+                Console.WriteLine($"HTML saved to '{outputHtml}'.");
             }
-            catch (TypeInitializationException)
-            {
-                Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
-            }
-            catch (DllNotFoundException)
-            {
-                Console.WriteLine("GDI+ library not found. HTML conversion is unavailable on this platform.");
-            }
+        }
+        // HTML conversion relies on GDI+ and is Windows‑only
+        catch (TypeInitializationException)
+        {
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+        }
+        catch (DllNotFoundException)
+        {
+            Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

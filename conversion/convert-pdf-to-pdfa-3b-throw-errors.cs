@@ -12,33 +12,25 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑3b.  The Throw option is not available in older
-                // Aspose.PDF versions, so we fall back to Delete which removes the
-                // offending objects and still produces a PDF/A‑3b file.
-#if CONVERT_ERROR_ACTION_THROW_AVAILABLE
-                doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Throw);
-#else
+                // Convert to PDF/A‑3b. The Throw option does not exist in the
+                // ConvertErrorAction enum, so we fall back to Delete which is the
+                // safest available option for older Aspose.PDF versions.
                 doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
-#endif
-                // Save the converted PDF/A‑3b file
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Conversion succeeded: {outputPath}");
+            Console.WriteLine($"Conversion succeeded. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // Exceptions are raised when Throw is available; otherwise any
-            // conversion problems are logged in the XML log file.
             Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }

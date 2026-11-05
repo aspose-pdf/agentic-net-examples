@@ -1,67 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // Provides TiffDevice for PDF‑to‑TIFF conversion
+using Aspose.Pdf.Devices;
 
-class BatchPdfToTiff
+class Program
 {
     static void Main()
     {
-        // Base directory of the running application
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        const string inputFolder = @"C:\PdfInput";
+        const string outputTiff = @"C:\PdfOutput\combined.tiff";
 
-        // Input and output folders (relative to the base directory)
-        string inputFolder = Path.Combine(baseDir, "PdfInputs");
-        string outputFolder = Path.Combine(baseDir, "TiffOutputs");
-
-        // If the expected input folder does not exist, fall back to the base directory
         if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input folder '{inputFolder}' not found. Using base directory as input.");
-            inputFolder = baseDir;
-        }
-
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Retrieve all PDF files in the input folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to convert.");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // TiffDevice does NOT implement IDisposable – instantiate once and reuse
-        TiffDevice tiffDevice = new TiffDevice();
-
-        foreach (string pdfPath in pdfFiles)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            try
-            {
-                // Build the output TIFF file path (same name, .tiff extension)
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-                string tiffPath = Path.Combine(outputFolder, fileNameWithoutExt + ".tiff");
+            Console.Error.WriteLine("No PDF files found to process.");
+            return;
+        }
 
-                // Load the PDF document
-                using (Document pdfDoc = new Document(pdfPath))
+        try
+        {
+            // Load the first PDF as the base document
+            using (Document target = new Document(pdfFiles[0]))
+            {
+                // Append pages from the remaining PDFs
+                for (int i = 1; i < pdfFiles.Length; i++)
                 {
-                    // Create the output stream and let TiffDevice write to it
-                    using (FileStream outStream = new FileStream(tiffPath, FileMode.Create, FileAccess.Write))
+                    using (Document source = new Document(pdfFiles[i]))
                     {
-                        // Convert the whole document (pages 1 .. pdfDoc.Pages.Count)
-                        tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, outStream);
+                        target.Pages.Add(source.Pages);
                     }
                 }
 
-                Console.WriteLine($"Converted '{pdfPath}' → '{tiffPath}'");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to convert '{pdfPath}': {ex.Message}");
-            }
-        }
+                // Convert the combined PDF to a multi‑page TIFF using TiffDevice.
+                // Default DPI (300) and default compression are used.
+                Resolution resolution = new Resolution(300);
+                TiffSettings tiffSettings = new TiffSettings(); // default compression
+                TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
 
-        Console.WriteLine("Batch conversion completed.");
+                // TiffDevice does not implement IDisposable, so we only dispose the stream.
+                using (FileStream tiffStream = new FileStream(outputTiff, FileMode.Create, FileAccess.Write))
+                {
+                    tiffDevice.Process(target, 1, target.Pages.Count, tiffStream);
+                }
+            }
+
+            Console.WriteLine($"Successfully created TIFF archive: {outputTiff}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

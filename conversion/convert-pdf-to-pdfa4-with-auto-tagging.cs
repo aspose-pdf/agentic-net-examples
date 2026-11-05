@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
 
 class Program
 {
@@ -18,24 +19,26 @@ class Program
 
         // Enable auto‑tagging globally before conversion
         AutoTaggingSettings.Default.EnableAutoTagging = true;
+        // Optional: configure heading detection strategy if needed
+        // AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
 
         try
         {
             // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑4, delete any conversion errors, and write a log
+                // Convert to PDF/A‑4; auto‑tagging will be applied during conversion
                 doc.Convert(logPath, PdfFormat.PDF_A_4, ConvertErrorAction.Delete);
 
-                // Save the converted PDF/A‑4 document
+                // Save the resulting PDF/A‑4 document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF successfully converted to PDF/A‑4 with auto‑tagging: {outputPath}");
+            Console.WriteLine($"PDF successfully converted to PDF/A‑4 and saved as '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Conversion error: {ex.Message}");
         }
     }
 }
