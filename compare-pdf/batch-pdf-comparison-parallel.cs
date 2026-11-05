@@ -1,93 +1,98 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
 class PdfBatchComparer
 {
-    // Compare two PDFs: page count and full text content
-    private static bool ComparePdf(string referencePath, string targetPath)
+    static void Main()
     {
-        // Ensure both files exist
-        if (!File.Exists(referencePath) || !File.Exists(targetPath))
-            return false;
+        const string referencePath = "reference.pdf";
+        const string folderPath = "pdfs";
+        const int maxDegree = 4; // limit concurrency to avoid high memory usage
 
-        // Load reference PDF
-        using (Document refDoc = new Document(referencePath))
-        // Load target PDF
-        using (Document tgtDoc = new Document(targetPath))
+        if (!File.Exists(referencePath))
         {
-            // Compare page counts (1‑based indexing)
-            if (refDoc.Pages.Count != tgtDoc.Pages.Count)
-                return false;
+            Console.Error.WriteLine($"Reference PDF not found: {referencePath}");
+            return;
+        }
 
-            // Extract full text from reference PDF
-            TextAbsorber refAbsorber = new TextAbsorber();
-            refDoc.Pages.Accept(refAbsorber);
-            string refText = refAbsorber.Text;
+        if (!Directory.Exists(folderPath))
+        {
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
+            return;
+        }
 
-            // Extract full text from target PDF
-            TextAbsorber tgtAbsorber = new TextAbsorber();
-            tgtDoc.Pages.Accept(tgtAbsorber);
-            string tgtText = tgtAbsorber.Text;
+        // Collect all PDF files in the folder, excluding the reference file itself
+        List<string> pdfFiles = new List<string>();
+        foreach (string file in Directory.EnumerateFiles(folderPath, "*.pdf"))
+        {
+            if (!string.Equals(Path.GetFullPath(file), Path.GetFullPath(referencePath), StringComparison.OrdinalIgnoreCase))
+                pdfFiles.Add(file);
+        }
 
-            // Compare text content (exact match)
-            return string.Equals(refText, tgtText, StringComparison.Ordinal);
+        // Thread‑safe collection for mismatches or errors
+        ConcurrentBag<string> mismatched = new ConcurrentBag<string>();
+
+        // Parallel processing with a bounded degree of parallelism
+        ParallelOptions options = new ParallelOptions { MaxDegreeOfParallelism = maxDegree };
+
+        Parallel.ForEach(pdfFiles, options, pdfPath =>
+        {
+            try
+            {
+                // Load both reference and target PDFs inside using blocks for deterministic disposal
+                using (Document refDoc = new Document(referencePath))
+                using (Document targetDoc = new Document(pdfPath))
+                {
+                    // Quick check: page counts must be equal
+                    if (refDoc.Pages.Count != targetDoc.Pages.Count)
+                    {
+                        mismatched.Add($"{pdfPath} – page count differs (ref:{refDoc.Pages.Count}, target:{targetDoc.Pages.Count})");
+                        return;
+                    }
+
+                    // Extract full text from each document
+                    string refText = ExtractText(refDoc);
+                    string targetText = ExtractText(targetDoc);
+
+                    // Compare extracted text
+                    if (!string.Equals(refText, targetText, StringComparison.Ordinal))
+                    {
+                        mismatched.Add($"{pdfPath} – text content differs");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                mismatched.Add($"{pdfPath} – error: {ex.Message}");
+            }
+        });
+
+        // Output summary
+        Console.WriteLine("Comparison completed.");
+        if (mismatched.IsEmpty)
+        {
+            Console.WriteLine("All PDFs match the reference.");
+        }
+        else
+        {
+            Console.WriteLine("Mismatches / errors:");
+            foreach (string msg in mismatched)
+            {
+                Console.WriteLine(msg);
+            }
         }
     }
 
-    static void Main()
+    // Helper to extract all text from a Document using TextAbsorber
+    private static string ExtractText(Document doc)
     {
-        // Path to the reference PDF against which all others are compared
-        const string referencePdfPath = "reference.pdf";
-
-        // Directory containing PDFs to compare
-        const string pdfDirectory = "PdfBatch";
-
-        if (!File.Exists(referencePdfPath))
-        {
-            Console.Error.WriteLine($"Reference PDF not found: {referencePdfPath}");
-            return;
-        }
-
-        if (!Directory.Exists(pdfDirectory))
-        {
-            Console.Error.WriteLine($"Directory not found: {pdfDirectory}");
-            return;
-        }
-
-        // Gather all PDF files in the directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(pdfDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        // Thread‑safe collection for results
-        ConcurrentBag<string> results = new ConcurrentBag<string>();
-
-        // Limit concurrency to avoid excessive memory usage
-        ParallelOptions options = new ParallelOptions
-        {
-            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount / 2) // adjust as needed
-        };
-
-        // Compare each PDF to the reference in parallel
-        Parallel.ForEach(pdfFiles, options, pdfPath =>
-        {
-            bool isMatch = ComparePdf(referencePdfPath, pdfPath);
-            string fileName = Path.GetFileName(pdfPath);
-            string result = isMatch
-                ? $"{fileName}: MATCH"
-                : $"{fileName}: DIFFERENT";
-
-            results.Add(result);
-        });
-
-        // Output results
-        Console.WriteLine("Comparison results:");
-        foreach (string line in results)
-        {
-            Console.WriteLine(line);
-        }
+        TextAbsorber absorber = new TextAbsorber();
+        doc.Pages.Accept(absorber);
+        return absorber.Text;
     }
 }
