@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -6,42 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "AcroForm_ListBox.pdf";
+        const string outputPath = "AcroFormListBox.pdf";
+
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page where the list box will be placed
+            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle for the list box (lower‑left X/Y, upper‑right X/Y)
-            // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 200, 500);
+            // Define the rectangle where the list box will appear
+            // (llx, lly, urx, ury) – lower‑left and upper‑right corners
+            var rect = new Aspose.Pdf.Rectangle(100, 600, 300, 500);
 
-            // Create the list box field and assign a partial name (field identifier)
-            ListBoxField countryListBox = new ListBoxField(page, rect)
+            // Create the list box field and associate it with the page
+            var countryListBox = new ListBoxField(page, rect)
             {
-                PartialName = "CountryList",
-                // Optional: set the default selected index (0‑based). -1 means no selection.
-                Selected = -1
+                // The field name used in the form data
+                PartialName = "CountryList"
             };
 
-            // Populate the list box with country options using AddOption (Options is read‑only)
+            // Add country options to the list box using AddOption (Option class is not used directly)
             countryListBox.AddOption("United States");
             countryListBox.AddOption("Canada");
-            countryListBox.AddOption("Mexico");
             countryListBox.AddOption("United Kingdom");
             countryListBox.AddOption("Germany");
             countryListBox.AddOption("France");
-            countryListBox.AddOption("Japan");
             countryListBox.AddOption("Australia");
+            countryListBox.AddOption("Japan");
             countryListBox.AddOption("India");
             countryListBox.AddOption("Brazil");
+            countryListBox.AddOption("South Africa");
 
-            // Add the list box to the document's AcroForm (page index is 1‑based)
-            doc.Form.Add(countryListBox, 1);
+            // Add the list box to the document's AcroForm
+            doc.Form.Add(countryListBox);
 
-            // Save the PDF
+            // Save the PDF (no SaveOptions needed for PDF format)
             doc.Save(outputPath);
         }
 

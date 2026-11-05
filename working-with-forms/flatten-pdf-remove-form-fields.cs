@@ -1,15 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "plain.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "plain_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,29 +16,27 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF, delete its interactive form fields, and save the result.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Aspose.Pdf.Document.Form.Delete() requires a field name.
+            // Collect all field names first, then delete them one by one.
+            var fieldNames = new List<string>();
+            foreach (var field in doc.Form)
             {
-                // Gather all form field names
-                var fieldNames = doc.Form.Fields.Select(f => f.FullName).ToList();
-
-                // Remove each field from the document
-                foreach (var name in fieldNames)
-                {
-                    doc.Form.Delete(name);
-                }
-
-                // Save the non‑interactive PDF
-                doc.Save(outputPath);
+                // FullName uniquely identifies the field in the AcroForm.
+                fieldNames.Add(field.FullName);
             }
 
-            Console.WriteLine($"Plain PDF saved to '{outputPath}'.");
+            foreach (var name in fieldNames)
+            {
+                doc.Form.Delete(name);
+            }
+
+            // Save as a regular, non‑interactive PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Plain PDF saved to '{outputPath}'.");
     }
 }

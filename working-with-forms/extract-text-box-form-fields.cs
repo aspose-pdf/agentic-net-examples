@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,7 +10,6 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,34 +17,27 @@ class Program
             return;
         }
 
-        // Load PDF inside a using block for deterministic disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document contains a form with fields
+            // Verify that the PDF contains a form with fields
             if (doc.Form == null || doc.Form.Fields == null)
             {
-                Console.WriteLine("No form fields present.");
-                doc.Save(outputPath);
+                Console.WriteLine("No form fields found in the document.");
                 return;
             }
 
-            // LINQ query: retrieve only TextBoxField instances
-            var textBoxFields = doc.Form.Fields
+            // LINQ query: retrieve only text box fields
+            List<TextBoxField> textBoxFields = doc.Form.Fields
                 .OfType<TextBoxField>()
                 .ToList();
 
-            Console.WriteLine($"Found {textBoxFields.Count} text box field(s).");
-
-            // Example operation: set a default value for each text box
-            foreach (var tb in textBoxFields)
+            Console.WriteLine($"Text box fields found: {textBoxFields.Count}");
+            foreach (TextBoxField tb in textBoxFields)
             {
-                tb.Value = "Sample text";
+                // PartialName is the field's name; Value holds the entered text
+                Console.WriteLine($"Name: {tb.PartialName}, Value: {tb.Value}");
             }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

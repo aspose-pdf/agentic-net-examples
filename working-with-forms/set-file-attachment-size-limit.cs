@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,9 +8,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string fieldName = "fileAttachmentField"; // name of the file attachment field
+        const string inputPath = "input.pdf";   // source PDF containing the file attachment field
+        const string outputPath = "output.pdf"; // PDF after applying the constraint
+        const string fieldName = "fileField";   // name of the attached file field to constrain
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +18,50 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document using the core Document API.
         Document doc = new Document(inputPath);
 
-        // Retrieve the file attachment field from the document's form collection.
-        // Use dynamic to avoid compile‑time dependency on a specific field class.
-        dynamic attachmentField = doc.Form[fieldName];
-        if (attachmentField == null)
+        // Ensure the form exists.
+        if (doc.Form == null)
         {
-            Console.Error.WriteLine($"Field '{fieldName}' not found.");
+            Console.Error.WriteLine("The PDF does not contain a form.");
             return;
         }
 
-        // Set the maximum allowed file size to 2 MB (bytes).
-        // The MaxFileSize property exists on the actual FileAttachmentField type at runtime.
-        attachmentField.MaxFileSize = 2 * 1024 * 1024; // 2097152 bytes
+        // Verify that the specified field exists in the form.
+        bool fieldExists = doc.Form.Fields != null &&
+                           doc.Form.Fields.Any(f =>
+                               string.Equals(f.Name, fieldName, StringComparison.Ordinal) ||
+                               string.Equals(f.FullName, fieldName, StringComparison.Ordinal));
+        if (!fieldExists)
+        {
+            Console.Error.WriteLine($"Form field '{fieldName}' not found in the PDF.");
+            return;
+        }
 
-        // Save the modified PDF
+        // Retrieve the field (no direct cast to FileAttachmentField to avoid version‑specific type issues).
+        var field = doc.Form[fieldName];
+        if (field == null)
+        {
+            Console.Error.WriteLine($"Field '{fieldName}' could not be retrieved.");
+            return;
+        }
+
+        // Attempt to set the maximum allowed file size (2 MB) via reflection – works for FileAttachmentField and safely skips other field types.
+        var maxSizeProp = field.GetType().GetProperty("MaxFileSize");
+        if (maxSizeProp != null && maxSizeProp.CanWrite)
+        {
+            maxSizeProp.SetValue(field, 2 * 1024 * 1024); // 2 megabytes
+        }
+        else
+        {
+            Console.Error.WriteLine($"Field '{fieldName}' does not support a MaxFileSize constraint.");
+            return;
+        }
+
+        // Save the modified PDF.
         doc.Save(outputPath);
 
-        Console.WriteLine($"PDF saved with 2 MB file size constraint on field '{fieldName}' to '{outputPath}'.");
+        Console.WriteLine($"Maximum file size constraint applied to field '{fieldName}'. Saved as '{outputPath}'.");
     }
 }

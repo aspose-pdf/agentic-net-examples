@@ -2,6 +2,7 @@ using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,55 +10,51 @@ class Program
     {
         const string outputPath = "CollapsibleForm.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document())
         {
-            // Add a single page (pages are 1‑based)
+            // Add a single page.
             Page page = doc.Pages.Add();
 
-            // ----- Checkbox field (the trigger) -----
-            // Define the rectangle for the checkbox (lower‑left x,y and upper‑right x,y)
-            var chkRect = new Rectangle(100, 700, 120, 720);
-            var chk = new CheckboxField(page, chkRect)
-            {
-                PartialName = "toggle",   // field name
-                // OnState and OffState are not required – the default values ("On"/"Off") are sufficient
-                Value = "Off"              // start unchecked
-            };
+            // ------------------------------------------------------------
+            // 1. Add a checkbox that will control the collapsible section.
+            // ------------------------------------------------------------
+            CheckboxField checkBox = new CheckboxField(page,
+                new Aspose.Pdf.Rectangle(100, 750, 120, 770));
+            checkBox.PartialName = "ShowSection";
+            checkBox.Checked = false; // Initially unchecked.
+            doc.Form.Add(checkBox, 1);
 
-            // JavaScript that toggles visibility of the collapsible field
-            string js = @"
-var f = this.getField('collapsible');
-if (event.target.value == 'On') {
-    f.display = display.visible;
+            // ------------------------------------------------------------
+            // 2. Add a text box that will serve as the collapsible content.
+            // ------------------------------------------------------------
+            TextBoxField collapsible = new TextBoxField(page,
+                new Aspose.Pdf.Rectangle(100, 600, 400, 730));
+            collapsible.PartialName = "CollapsibleSection";
+            collapsible.Value = "This is the hidden content that becomes visible when the checkbox is checked.";
+            // Initially hide the field by setting the widget annotation flag to Hidden.
+            collapsible.Flags = AnnotationFlags.Hidden;
+            doc.Form.Add(collapsible, 1);
+
+            // ------------------------------------------------------------
+            // 3. Attach JavaScript to the checkbox to toggle visibility.
+            // ------------------------------------------------------------
+            string jsCode = @"
+if (this.getField('ShowSection').value == 'Yes') {
+    this.getField('CollapsibleSection').display = display.visible;
 } else {
-    f.display = display.hidden;
+    this.getField('CollapsibleSection').display = display.hidden;
 }";
-            // Use the OnCalculate action – it fires when the field value changes
-            chk.Actions.OnCalculate = new JavascriptAction(js);
+            JavascriptAction jsAction = new JavascriptAction(jsCode);
+            // Use the ReleaseMouseBtn event (mouse up) – the correct property on the Actions collection.
+            checkBox.Actions.OnReleaseMouseBtn = jsAction;
 
-            // Add the checkbox to the form on page 1
-            doc.Form.Add(chk, 1);
-
-            // ----- Collapsible content (initially hidden) -----
-            // Define rectangle for the hidden text box
-            var txtRect = new Rectangle(100, 600, 400, 680);
-            var txt = new TextBoxField(page, txtRect)
-            {
-                PartialName = "collapsible", // field name referenced in JavaScript
-                Value = "This is the hidden content that becomes visible when the checkbox is checked."
-            };
-
-            // Hide the field initially using the Hidden annotation flag
-            txt.Flags = AnnotationFlags.Hidden;
-
-            // Add the hidden text box to the form on page 1
-            doc.Form.Add(txt, 1);
-
-            // Save the PDF document
+            // ------------------------------------------------------------
+            // 4. Save the PDF.
+            // ------------------------------------------------------------
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form saved to '{outputPath}'.");
+        Console.WriteLine($"PDF form with collapsible section saved to '{outputPath}'.");
     }
 }

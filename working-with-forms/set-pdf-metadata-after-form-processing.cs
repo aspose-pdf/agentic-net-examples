@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "form_input.pdf";
-        const string outputPath = "form_filled_metadata.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +16,34 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF, process form fields, then set metadata
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF and ensure deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Example form processing: fill a text field named "Name"
+            // The indexer may return a WidgetAnnotation in some versions, so we locate the field via the Fields collection.
+            Field nameField = null;
+            foreach (Field field in doc.Form.Fields)
             {
-                // ---- Form processing example ----
-                // Locate a text box field named "NameField" and set its value
-                if (doc.Form["NameField"] is TextBoxField nameField)
+                if (field.PartialName == "Name")
                 {
-                    nameField.Value = "John Doe";
+                    nameField = field;
+                    break;
                 }
-
-                // ---- Set PDF metadata ----
-                doc.Info.Author = "Acme Corp";
-                doc.Info.Title  = "Completed Form";
-
-                // Save the updated PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved with metadata to '{outputPath}'.");
+            if (nameField != null)
+            {
+                nameField.Value = "John Doe";
+            }
+
+            // Set PDF metadata
+            doc.Info.Author = "Jane Smith";
+            doc.Info.Title = "Processed Form Document";
+
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with metadata to '{outputPath}'.");
     }
 }

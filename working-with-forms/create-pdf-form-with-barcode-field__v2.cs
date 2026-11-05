@@ -1,46 +1,44 @@
 using System;
+using System.Drawing; // for System.Drawing.Color
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for AnnotationFlags
-using Aspose.Pdf.Forms;      // for ButtonField, TextBoxField
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
+
+// Alias to avoid ambiguity with System.Drawing.Rectangle
+using PdfRect = Aspose.Pdf.Rectangle;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "FormWithBarcode.pdf";
-        const string numericId   = "1234567890"; // Example identifier
+        const string outputPath = "barcode_form.pdf";
+        const string barcodeFieldName = "BarcodeField";
+        const string numericId = "1234567890";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (first page will be index 1)
+            // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // ------------------------------------------------------------
-            // Create a button form field that will represent the barcode
-            // ------------------------------------------------------------
-            Aspose.Pdf.Rectangle barcodeRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
-            ButtonField barcodeField = new ButtonField(page, barcodeRect);
-            barcodeField.PartialName = "BarcodeField"; // field name
-            // Store the numeric identifier as the button's value (placeholder for a real barcode image)
-            barcodeField.Value = numericId;
-            // Ensure the barcode appears when printed
-            barcodeField.Flags = AnnotationFlags.Print;
-            // Add the button field to the document's AcroForm collection
+            // Define the position and size of the barcode field (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            PdfRect rect = new PdfRect(100, 600, 300, 650);
+
+            // Create a text box field that will hold the barcode
+            TextBoxField barcodeField = new TextBoxField(page, rect);
+            barcodeField.PartialName = barcodeFieldName; // Field name
+
+            // Visual styling – Border needs the field as its parent, background is set via Characteristics
+            barcodeField.Border = new Border(barcodeField) { Width = 1 };
+            barcodeField.Characteristics.Background = System.Drawing.Color.LightGray;
+
+            // Add the field to the document's AcroForm (page number is 1 because we have a single page)
             doc.Form.Add(barcodeField, 1);
 
-            // ------------------------------------------------------------
-            // Create a text box form field to hold the numeric identifier
-            // ------------------------------------------------------------
-            Aspose.Pdf.Rectangle idRect = new Aspose.Pdf.Rectangle(100, 500, 300, 530);
-            TextBoxField idField = new TextBoxField(page, idRect);
-            idField.PartialName = "Identifier";
-            idField.Value = numericId; // Pre‑populate the field with the identifier
-            doc.Form.Add(idField, 1);
+            // Draw the barcode into the field (Code128 is the default symbology for AddBarcode)
+            barcodeField.AddBarcode(numericId);
 
-            // ------------------------------------------------------------
-            // Save the PDF form
-            // ------------------------------------------------------------
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

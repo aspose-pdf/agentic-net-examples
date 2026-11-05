@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -17,23 +18,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by name; cast to TextBoxField to set its value
-            TextBoxField dateField = pdfDoc.Form[fieldName] as TextBoxField;
-            if (dateField != null)
+            // Verify that the form and the specific field exist
+            bool fieldExists = doc.Form?.Fields?.Any(f => f.Name == fieldName) ?? false;
+            if (fieldExists)
             {
-                // Replace the placeholder with the current system date formatted as "MMMM dd, yyyy"
-                dateField.Value = DateTime.Now.ToString("MMMM dd, yyyy");
+                // Cast the field to a TextBoxField (most common for placeholder text)
+                TextBoxField field = doc.Form[fieldName] as TextBoxField;
+                if (field != null)
+                {
+                    // Format the current system date as desired, e.g., "October 27, 2026"
+                    string formattedDate = DateTime.Now.ToString("MMMM dd, yyyy");
+                    // Replace the placeholder with the formatted date
+                    field.Value = formattedDate;
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField.");
+                }
             }
             else
             {
-                Console.Error.WriteLine($"Field '{fieldName}' not found or is not a TextBoxField.");
+                Console.Error.WriteLine($"Field '{fieldName}' not found in the PDF.");
             }
 
             // Save the updated PDF
-            pdfDoc.Save(outputPath);
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Placeholder replaced and saved to '{outputPath}'.");

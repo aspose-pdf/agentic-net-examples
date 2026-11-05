@@ -16,33 +16,29 @@ class Program
             return;
         }
 
-        try
+        // Load the existing PDF inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Define the rectangle where the signature field will appear.
+            // Use fully qualified Aspose.Pdf.Rectangle to avoid ambiguity.
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Create a signature field on the first page.
+            SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
             {
-                // Define the rectangle where the signature field will appear (llx, lly, urx, ury)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+                // The field name (must be unique within the form).
+                PartialName = "Signature1",
+                // Optional: make the field required.
+                Required = true
+            };
 
-                // Create a signature field on the first page
-                SignatureField sigField = new SignatureField(doc.Pages[1], rect)
-                {
-                    Name        = "HandwrittenSignature", // internal name
-                    PartialName = "Signature1"            // optional display name
-                };
+            // Add the signature field to the form on page 1.
+            doc.Form.Add(sigField, 1);
 
-                // Add the signature field to the document's form
-                doc.Form.Add(sigField);
-
-                // Save the modified PDF (no SaveOptions needed for PDF output)
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Signature field added. Saved to '{outputPath}'.");
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Signature field added and saved to '{outputPath}'.");
     }
 }

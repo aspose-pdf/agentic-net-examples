@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -17,97 +18,66 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Collect field names and their values
+            var fieldValues = new Dictionary<string, object>();
+
+            // Iterate over every form field in the document
+            foreach (Field field in doc.Form)
             {
-                var fieldValues = new Dictionary<string, object>();
+                object value = null;
 
-                // Ensure the document contains a form
-                if (doc.Form != null && doc.Form.Fields != null)
+                // Handle known field types explicitly
+                switch (field)
                 {
-                    foreach (Field field in doc.Form.Fields)
-                    {
-                        // FullName may be of a non‑string type in some versions; convert safely.
-                        string name = field.FullName != null ? field.FullName.ToString() : field.Name;
-
-                        // Extract the field's value in a version‑tolerant way
-                        object value = GetFieldValue(field);
-                        fieldValues[name] = value;
-                    }
+                    case TextBoxField txt:
+                        value = txt.Value;
+                        break;
+                    case CheckboxField chk:
+                        // For checkboxes the logical value is the Checked flag
+                        value = chk.Checked;
+                        break;
+                    case RadioButtonField radGroup:
+                        // RadioButtonField represents the whole group. The selected option
+                        // is indicated by the integer index stored in Selected.
+                        if (radGroup.Options != null && radGroup.Options.Count() > 0 &&
+                            radGroup.Selected >= 0 && radGroup.Selected < radGroup.Options.Count())
+                        {
+                            value = radGroup.Options[radGroup.Selected];
+                        }
+                        else
+                        {
+                            value = null;
+                        }
+                        break;
+                    case ListBoxField list:
+                        // ListBox may have multiple selections
+                        if (list.SelectedItems != null && list.SelectedItems.Count() > 0)
+                        {
+                            value = list.SelectedItems.Count() == 1
+                                ? (object)list.SelectedItems[0]
+                                : list.SelectedItems;
+                        }
+                        break;
+                    case ComboBoxField combo:
+                        value = combo.Value;
+                        break;
+                    default:
+                        // Fallback to the generic Value property if present
+                        value = field.Value;
+                        break;
                 }
 
-                // Serialize the dictionary to a formatted JSON string
-                string json = JsonSerializer.Serialize(fieldValues, new JsonSerializerOptions { WriteIndented = true });
-                Console.WriteLine(json);
+                // Use FullName as the key; store empty string for null values
+                fieldValues[field.FullName] = value ?? "";
             }
+
+            // Serialize the dictionary to a formatted JSON string
+            string json = JsonSerializer.Serialize(fieldValues, new JsonSerializerOptions { WriteIndented = true });
+
+            Console.WriteLine(json);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    // Helper method to obtain a field's value based on its concrete type.
-    // Uses runtime type inspection and dynamic dispatch to avoid compile‑time
-    // dependencies on field classes that may be missing in certain Aspose.Pdf versions.
-    private static object GetFieldValue(Field field)
-    {
-        // Simple fields that reliably expose the Value property
-        if (field is TextBoxField || field is SignatureField || field is ButtonField)
-        {
-            return field.Value;
-        }
-
-        // Use the runtime type name for checkbox and radio button option fields.
-        // This sidesteps compile‑time missing‑type errors.
-        string typeName = field.GetType().Name;
-
-        if (typeName == "CheckBoxField")
-        {
-            // CheckBoxField typically has a boolean 'Checked' property.
-            dynamic cb = field;
-            try
-            {
-                return cb.Checked ? "On" : "Off";
-            }
-            catch
-            {
-                // If the property does not exist, fall back to the generic Value.
-                return field.Value;
-            }
-        }
-
-        if (typeName == "RadioButtonOptionField")
-        {
-            // RadioButtonOptionField also usually provides a 'Checked' property.
-            dynamic rb = field;
-            try
-            {
-                return rb.Checked ? rb.Value : null;
-            }
-            catch
-            {
-                return field.Value;
-            }
-        }
-
-        if (field is ListBoxField lb)
-        {
-            // SelectedItems may be strings or integers depending on the library version.
-            var selected = new List<object>();
-            foreach (var item in lb.SelectedItems)
-                selected.Add(item);
-
-            return selected.Count == 1 ? selected[0] : (object)selected;
-        }
-
-        if (field is ComboBoxField combo)
-        {
-            return combo.Value;
-        }
-
-        // Fallback for any other field types.
-        return field.Value;
     }
 }

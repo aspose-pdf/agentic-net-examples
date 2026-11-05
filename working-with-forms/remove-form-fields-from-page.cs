@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int targetPage = 5; // Aspose.Pdf uses 1‑based page numbers
+        const string outputPath = "cleared_page5.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,9 +17,10 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Ensure the document actually contains a form
             if (doc.Form == null || doc.Form.Fields == null)
             {
                 Console.WriteLine("No form fields found in the document.");
@@ -29,36 +28,25 @@ class Program
                 return;
             }
 
-            // Collect the names of fields that belong to the target page
-            List<string> fieldNamesToRemove = new List<string>();
-
-            // Iterate over pages and look for WidgetAnnotation objects (form fields)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Collect all form fields that reside on page 5.
+            // Aspose.Pdf uses a zero‑based PageIndex for fields (0 = first page).
+            List<Field> fieldsOnPage5 = new List<Field>();
+            foreach (Field field in doc.Form.Fields)
             {
-                if (pageIndex != targetPage)
-                    continue;
-
-                Page page = doc.Pages[pageIndex];
-                foreach (Annotation annotation in page.Annotations)
-                {
-                    if (annotation is WidgetAnnotation widget)
-                    {
-                        // The widget's Name corresponds to the field's name in the Form collection
-                        fieldNamesToRemove.Add(widget.Name);
-                    }
-                }
+                if (field.PageIndex == 4) // page 5 (zero‑based index)
+                    fieldsOnPage5.Add(field);
             }
 
-            // Delete the collected fields from the document's form
-            foreach (string fieldName in fieldNamesToRemove)
+            // Delete the collected fields from the form collection
+            foreach (Field field in fieldsOnPage5)
             {
-                doc.Form.Delete(fieldName);
+                doc.Form.Delete(field);
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All form fields on page {targetPage} have been removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Page 5 cleared. Saved to '{outputPath}'.");
     }
 }

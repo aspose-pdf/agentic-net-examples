@@ -2,67 +2,65 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Reflection;
-using System.Drawing; // System.Drawing.Color is required for appearance settings
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // needed for Border, BorderStyle, DefaultAppearance, AnnotationFlags
 
 class AppearanceSetting
 {
-    public string? FieldName { get; set; }
-    public string? FontName { get; set; }
-    public double? FontSize { get; set; }
-    public int[]? TextColor { get; set; }          // [R,G,B] 0‑255
-    public int[]? BackgroundColor { get; set; }    // [R,G,B] 0‑255
-    public int[]? BorderColor { get; set; }        // [R,G,B] 0‑255
-    public double? BorderWidth { get; set; }
+    public required string FieldName { get; set; }
+    public required string FontName { get; set; }
+    public required double FontSize { get; set; }
+    public required string TextColorHex { get; set; }      // e.g. "#FF0000"
+    public required string BorderColorHex { get; set; }
+    public required double BorderWidth { get; set; }
+    public required string BackgroundColorHex { get; set; }
 }
 
 class Program
 {
-    // Convert an int[3] RGB array (0‑255) to System.Drawing.Color (0‑255)
-    static System.Drawing.Color? FromRgbArray(int[]? rgb)
+    // Convert a hex color string ("#RRGGBB") to System.Drawing.Color
+    static System.Drawing.Color HexToDrawingColor(string hex)
     {
-        if (rgb == null || rgb.Length != 3)
-            return null;
-        return System.Drawing.Color.FromArgb(rgb[0], rgb[1], rgb[2]);
-    }
+        if (string.IsNullOrWhiteSpace(hex))
+            throw new ArgumentException("Hex color string cannot be null or empty.");
 
-    // Helper: set a property via reflection if it exists and is writable
-    static void SetPropertyIfExists(object target, string propertyName, object value)
-    {
-        var prop = target.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-        if (prop != null && prop.CanWrite)
-        {
-            prop.SetValue(target, value);
-        }
+        hex = hex.TrimStart('#');
+        if (hex.Length != 6)
+            throw new ArgumentException("Invalid hex color format. Expected 6 characters.");
+
+        int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+        int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+        int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+        return System.Drawing.Color.FromArgb(r, g, b);
     }
 
     static void Main()
     {
+        const string pdfPath = "target.pdf";
         const string jsonPath = "appearance.json";
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string outputPath = "target_appearance_applied.pdf";
+
+        if (!File.Exists(pdfPath))
+        {
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
 
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-            return;
-        }
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"PDF file not found: {inputPdf}");
+            Console.Error.WriteLine($"JSON not found: {jsonPath}");
             return;
         }
 
-        // Load appearance settings from JSON
-        List<AppearanceSetting>? settings;
+        // Deserialize JSON into a list of settings
+        List<AppearanceSetting> settings;
         try
         {
             string json = File.ReadAllText(jsonPath);
             settings = JsonSerializer.Deserialize<List<AppearanceSetting>>(json);
+            if (settings == null)
+                throw new Exception("Deserialized settings are null.");
         }
         catch (Exception ex)
         {
@@ -70,107 +68,80 @@ class Program
             return;
         }
 
-        // Open the target PDF
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(pdfPath))
         {
-            if (doc.Form != null)
+            if (doc.Form == null)
             {
-                foreach (Field field in doc.Form)
+                Console.Error.WriteLine("The PDF does not contain any form fields.");
+                return;
+            }
+
+            foreach (AppearanceSetting setting in settings)
+            {
+                // Retrieve the widget annotation and cast to Field
+                Field field = doc.Form[setting.FieldName] as Field;
+                if (field == null)
                 {
-                    // Resolve field name (FullName preferred, fallback to Name)
-                    string fieldName = field.FullName ?? field.Name;
+                    Console.WriteLine($"Field '{setting.FieldName}' not found or not a form field; skipping.");
+                    continue;
+                }
 
-                    // Find matching appearance setting
-                    AppearanceSetting? setting = settings?.Find(s => s.FieldName == fieldName);
-                    if (setting == null)
-                        continue;
-
-                    // ---------- TextBoxField handling ----------
-                    if (field is TextBoxField textBox)
+                if (field is TextBoxField textBox)
+                {
+                    // ----- Font & Text Appearance -----
+                    if (!string.IsNullOrWhiteSpace(setting.FontName) && setting.FontSize > 0)
                     {
-                        // ----- Font, size, text colour (DefaultAppearance) -----
-                        if (!string.IsNullOrEmpty(setting.FontName) || setting.FontSize.HasValue || setting.TextColor != null)
-                        {
-                            string fontName = setting.FontName ?? "Helvetica";
-                            double fontSize = setting.FontSize ?? 12;
-                            System.Drawing.Color txtColor = FromRgbArray(setting.TextColor) ?? System.Drawing.Color.Black;
-                            var da = new DefaultAppearance(fontName, fontSize, txtColor);
-                            SetPropertyIfExists(textBox, "DefaultAppearance", da);
-                        }
+                        // DefaultAppearance constructor takes font name, size and System.Drawing.Color
+                        System.Drawing.Color textColor = string.IsNullOrWhiteSpace(setting.TextColorHex)
+                            ? System.Drawing.Color.Black
+                            : HexToDrawingColor(setting.TextColorHex);
 
-                        // ----- Background colour -----
-                        System.Drawing.Color? bgColor = FromRgbArray(setting.BackgroundColor);
-                        if (bgColor != null)
-                        {
-                            SetPropertyIfExists(textBox, "BackColor", bgColor.Value);
-                            SetPropertyIfExists(textBox, "BackgroundColor", bgColor.Value);
-                        }
+                        textBox.DefaultAppearance = new DefaultAppearance(
+                            setting.FontName,
+                            setting.FontSize,
+                            textColor);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(setting.TextColorHex))
+                    {
+                        // Only colour change, keep existing font settings
+                        textBox.DefaultAppearance.TextColor = HexToDrawingColor(setting.TextColorHex);
+                    }
 
-                        // ----- Border colour & width -----
-                        System.Drawing.Color? brColor = FromRgbArray(setting.BorderColor);
-                        if (brColor != null)
-                        {
-                            SetPropertyIfExists(textBox, "BorderColor", brColor.Value);
-                        }
-                        if (setting.BorderWidth.HasValue)
-                        {
-                            SetPropertyIfExists(textBox, "BorderWidth", setting.BorderWidth.Value);
-                        }
+                    // ----- Border -----
+                    if (!string.IsNullOrWhiteSpace(setting.BorderColorHex) || setting.BorderWidth >= 0)
+                    {
+                        // Border colour (Characteristics.Border) uses System.Drawing.Color
+                        if (!string.IsNullOrWhiteSpace(setting.BorderColorHex))
+                            textBox.Characteristics.Border = HexToDrawingColor(setting.BorderColorHex);
 
-                        // Fallback for border when explicit BorderColor/BorderWidth properties are missing
-                        if (brColor != null || setting.BorderWidth.HasValue)
+                        // Border width & style need a Border object linked to the field
+                        if (setting.BorderWidth >= 0)
                         {
-                            var borderProp = textBox.GetType().GetProperty("Border");
-                            if (borderProp != null)
+                            // Aspose expects integer width; we round the double value
+                            int width = (int)Math.Round(setting.BorderWidth);
+                            textBox.Border = new Border(textBox)
                             {
-                                var border = borderProp.GetValue(textBox);
-                                if (border == null)
-                                {
-                                    var borderCtor = typeof(Border).GetConstructor(Type.EmptyTypes);
-                                    if (borderCtor != null)
-                                    {
-                                        border = borderCtor.Invoke(null);
-                                        SetPropertyIfExists(textBox, "Border", border);
-                                    }
-                                }
-                                if (border != null)
-                                {
-                                    if (brColor != null)
-                                        SetPropertyIfExists(border, "Color", brColor.Value);
-                                    if (setting.BorderWidth.HasValue)
-                                        SetPropertyIfExists(border, "Width", setting.BorderWidth.Value);
-                                }
-                            }
+                                Width = width,
+                                Style = BorderStyle.Solid // solid is the most common; could be parameterised
+                            };
                         }
                     }
-                    // ---------- CheckboxField handling (example) ----------
-                    else if (field is CheckboxField checkBox)
-                    {
-                        System.Drawing.Color? bgColor = FromRgbArray(setting.BackgroundColor);
-                        if (bgColor != null)
-                        {
-                            SetPropertyIfExists(checkBox, "BackColor", bgColor.Value);
-                            SetPropertyIfExists(checkBox, "BackgroundColor", bgColor.Value);
-                        }
 
-                        System.Drawing.Color? brColor = FromRgbArray(setting.BorderColor);
-                        if (brColor != null)
-                        {
-                            SetPropertyIfExists(checkBox, "BorderColor", brColor.Value);
-                        }
-                        if (setting.BorderWidth.HasValue)
-                        {
-                            SetPropertyIfExists(checkBox, "BorderWidth", setting.BorderWidth.Value);
-                        }
+                    // ----- Background -----
+                    if (!string.IsNullOrWhiteSpace(setting.BackgroundColorHex))
+                    {
+                        textBox.Characteristics.Background = HexToDrawingColor(setting.BackgroundColorHex);
                     }
-                    // Additional field types (RadioButtonField, ListBoxField, etc.) can be handled similarly
+                }
+                else
+                {
+                    Console.WriteLine($"Field '{setting.FieldName}' is not a TextBoxField; appearance not applied.");
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with applied appearance: {outputPdf}");
+        Console.WriteLine($"Appearance settings applied and saved to '{outputPath}'.");
     }
 }

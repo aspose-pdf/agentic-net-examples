@@ -2,64 +2,65 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // Form field API
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the source PDFs
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where the processed PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = "OutputPdfs";
 
-        // Ensure the output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Define the fields to fill and the values to assign (same for every PDF)
+        // Define the values to assign to fields (same for every PDF)
         var fieldValues = new Dictionary<string, string>
         {
             { "FirstName", "John" },
             { "LastName",  "Doe" },
-            { "Date",      DateTime.Today.ToString("yyyy-MM-dd") },
-            { "Company",   "Acme Corp" }
+            { "Date",      DateTime.Today.ToString("yyyy-MM-dd") }
         };
 
         // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath  = Path.Combine(outputFolder, fileName);
+
             try
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(inputPath))
+                // Load PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Iterate over the predefined field/value pairs
-                    foreach (var kvp in fieldValues)
+                    // Iterate over all form fields in the document
+                    foreach (Field field in doc.Form)
                     {
-                        // The Form indexer returns a WidgetAnnotation; cast it to Field safely
-                        Field? field = doc.Form[kvp.Key] as Field;
-                        if (field != null)
+                        // If the field name matches one of our predefined keys, set its value
+                        if (fieldValues.TryGetValue(field.FullName, out string value))
                         {
-                            // Set the field's value
-                            field.Value = kvp.Value;
+                            field.Value = value;
                         }
                     }
 
-                    // Build the output file path (same file name, different folder)
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
-
-                    // Save the modified PDF
-                    doc.Save(outputPath);
+                    // Save the modified PDF (PDF format by default)
+                    doc.Save(outPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(inputPath)}");
+                Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch processing completed.");
     }
 }

@@ -1,82 +1,86 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
 
-class Program
+class CreateAcroFormWithJavaScript
 {
     static void Main()
     {
         const string outputPath = "OrderForm.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page (pages are 1‑based)
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Helper to create a textbox field
-            TextBoxField CreateTextBox(string name, double llx, double lly, double urx, double ury, string defaultValue)
-            {
-                var rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-                var field = new TextBoxField(page, rect)
-                {
-                    PartialName = name,
-                    Value = defaultValue,
-                    // Set border color (the annotation's own Color property)
-                    Color = Aspose.Pdf.Color.Black
-                };
-                // Border requires the parent annotation in its constructor
-                field.Border = new Border(field) { Width = 1 };
-                // Add the field to the document's form
-                doc.Form.Add(field);
-                return field;
-            }
+            // Add labels for the fields
+            TextFragment labelQty = new TextFragment("Quantity:");
+            labelQty.Position = new Position(50, 720);
+            page.Paragraphs.Add(labelQty);
 
-            // Create fields for two line items
-            CreateTextBox("qty1", 50, 750, 100, 770, "0");
-            CreateTextBox("price1", 110, 750, 160, 770, "0.00");
-            CreateTextBox("total1", 170, 750, 220, 770, "0.00");
+            TextFragment labelPrice = new TextFragment("Unit Price:");
+            labelPrice.Position = new Position(50, 680);
+            page.Paragraphs.Add(labelPrice);
 
-            CreateTextBox("qty2", 50, 720, 100, 740, "0");
-            CreateTextBox("price2", 110, 720, 160, 740, "0.00");
-            CreateTextBox("total2", 170, 720, 220, 740, "0.00");
+            TextFragment labelTotal = new TextFragment("Total:");
+            labelTotal.Position = new Position(50, 640);
+            page.Paragraphs.Add(labelTotal);
 
-            // Field for grand total
-            CreateTextBox("grandTotal", 170, 690, 220, 710, "0.00");
+            // Define rectangles for the form fields (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rectQty   = new Aspose.Pdf.Rectangle(150, 710, 250, 730);
+            Aspose.Pdf.Rectangle rectPrice = new Aspose.Pdf.Rectangle(150, 670, 250, 690);
+            Aspose.Pdf.Rectangle rectTotal = new Aspose.Pdf.Rectangle(150, 630, 250, 650);
 
-            // Add a button that triggers the calculation
-            var btnRect = new Aspose.Pdf.Rectangle(50, 690, 120, 710);
-            var calcButton = new ButtonField(page, btnRect);
-            calcButton.PartialName = "calcButton";
-            calcButton.Color = Aspose.Pdf.Color.Black;
-            calcButton.Border = new Border(calcButton) { Width = 1 };
+            // Create TextBox fields (2‑argument constructor) and set their names
+            TextBoxField qtyField = new TextBoxField(page, rectQty);
+            qtyField.PartialName = "Qty";
 
-            // Add the button to the form *before* setting caption or actions
-            doc.Form.Add(calcButton);
+            TextBoxField priceField = new TextBoxField(page, rectPrice);
+            priceField.PartialName = "Price";
 
-            // Set the visible caption after the field is part of the form
-            calcButton.AlternateCaption = "Calculate";
+            TextBoxField totalField = new TextBoxField(page, rectTotal);
+            totalField.PartialName = "Total";
 
-            // JavaScript to compute totals
-            string js = @"
-                var q1 = this.getField('qty1').value;
-                var p1 = this.getField('price1').value;
-                var t1 = q1 * p1;
-                this.getField('total1').value = t1.toFixed(2);
+            // Set default values (optional)
+            qtyField.Value = "0";
+            priceField.Value = "0.00";
+            totalField.Value = "0.00";
 
-                var q2 = this.getField('qty2').value;
-                var p2 = this.getField('price2').value;
-                var t2 = q2 * p2;
-                this.getField('total2').value = t2.toFixed(2);
+            // Add the fields to the document's AcroForm
+            doc.Form.Add(qtyField);
+            doc.Form.Add(priceField);
+            doc.Form.Add(totalField);
 
-                var grand = t1 + t2;
-                this.getField('grandTotal').value = grand.toFixed(2);
-            ";
-            // Assign the JavaScript to the button's mouse‑press action
-            calcButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
+            // JavaScript that calculates the total
+            string calculateScript = @"
+function calculate()
+{
+    var qty = this.getField('Qty').value;
+    var price = this.getField('Price').value;
+    var total = parseFloat(qty) * parseFloat(price);
+    if (!isNaN(total))
+        this.getField('Total').value = total.toFixed(2);
+}
+calculate();
+";
 
-            // Save the PDF (Document.Save writes PDF regardless of extension)
+            // Attach the script to the document open action (runs when the PDF is opened)
+            doc.OpenAction = new JavascriptAction(calculateScript);
+
+            // Attach JavaScript to recalculate total when either Qty or Price changes
+            qtyField.Actions.OnCalculate = new JavascriptAction("calculate();");
+            priceField.Actions.OnCalculate = new JavascriptAction("calculate();");
+
+            // Save the PDF
             doc.Save(outputPath);
         }
 

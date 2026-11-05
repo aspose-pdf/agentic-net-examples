@@ -1,19 +1,19 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // Document, XmlSaveOptions are in this namespace
+using Aspose.Pdf;
 
-class BatchPdfToXmlConverter
+class Program
 {
     static void Main()
     {
-        // Input directory containing PDFs
-        const string inputDir  = @"C:\PdfInput";
-        // Output directory for XML files (will be created if it does not exist)
-        const string outputDir = @"C:\XmlOutput";
+        // Input directory containing PDF files
+        const string inputDir = @"C:\PdfInput";
+        // Output directory for XML form data files
+        const string outputDir = @"C:\PdfOutput";
 
         if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
+            Console.Error.WriteLine($"Input directory does not exist: {inputDir}");
             return;
         }
 
@@ -22,24 +22,24 @@ class BatchPdfToXmlConverter
         // Process each PDF file in the input directory
         foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string xmlPath = Path.Combine(outputDir, fileNameWithoutExt + ".xml");
+
             try
             {
-                // Preserve original file name, change extension to .xml
-                string fileName   = Path.GetFileNameWithoutExtension(pdfPath);
-                string xmlPath    = Path.Combine(outputDir, fileName + ".xml");
-
-                // Load PDF and save as XML using XmlSaveOptions (required to get XML output)
+                // Load the PDF document inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    XmlSaveOptions xmlOptions = new XmlSaveOptions();
-                    doc.Save(xmlPath, xmlOptions);
+                    // Save as XML form data using explicit XmlSaveOptions
+                    XmlSaveOptions xmlOpts = new XmlSaveOptions();
+                    doc.Save(xmlPath, xmlOpts);
                 }
 
-                Console.WriteLine($"Converted: {pdfPath} -> {xmlPath}");
+                Console.WriteLine($"Converted: {Path.GetFileName(pdfPath)} → {Path.GetFileName(xmlPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to convert '{pdfPath}': {ex.Message}");
             }
         }
 

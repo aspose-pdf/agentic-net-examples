@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -10,9 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_rich.pdf";
-        const string fieldName = "RichTextField";
-        const string htmlContent = "<p>This is <b>bold</b>, <i>italic</i> and <u>underlined</u> text.</p>";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,64 +16,44 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Verify that the document contains form fields
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // Retrieve the field from the form's Fields collection
-                TextBoxField tb = doc.Form?.Fields?
-                                      .FirstOrDefault(f => f.Name == fieldName) as TextBoxField;
-
-                if (tb != null)
-                {
-                    // Try to enable rich‑text mode via reflection – works on newer versions
-                    Type tbType = tb.GetType();
-                    PropertyInfo isRichProp = tbType.GetProperty("IsRichText");
-                    PropertyInfo richProp = tbType.GetProperty("RichText");
-
-                    if (isRichProp != null && richProp != null)
-                    {
-                        // Set IsRichText = true
-                        isRichProp.SetValue(tb, true);
-
-                        // Create a RichTextFragment instance via reflection if the type exists
-                        Type rtfType = Type.GetType("Aspose.Pdf.Text.RichTextFragment, Aspose.Pdf");
-                        if (rtfType != null)
-                        {
-                            // ctor: RichTextFragment(string html)
-                            object rtfInstance = Activator.CreateInstance(rtfType, htmlContent);
-                            richProp.SetValue(tb, rtfInstance);
-                        }
-                        else
-                        {
-                            // Fallback – assign the raw HTML string directly
-                            richProp.SetValue(tb, htmlContent);
-                        }
-
-                        // Optional: clear the plain value to avoid fallback rendering
-                        tb.Value = string.Empty;
-                    }
-                    else
-                    {
-                        // The current Aspose.Pdf version does not expose rich‑text API – store as plain text
-                        tb.Value = htmlContent;
-                    }
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a TextBoxField.");
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                Console.WriteLine("No form fields found in the document.");
+                return;
             }
 
-            Console.WriteLine($"Rich text field saved to '{outputPath}'.");
+            // Retrieve the text box field that will hold rich text (replace with your field name)
+            TextBoxField richField = doc.Form["RichTextField"] as TextBoxField;
+            if (richField == null)
+            {
+                Console.WriteLine("RichTextField not found or not a TextBoxField.");
+                return;
+            }
+
+            // Define HTML markup for rich text (supports a subset of HTML tags)
+            string html = "<b>Bold Text</b> <i>Italic Text</i> <u>Underlined</u> " +
+                          "<font color='red'>Red Text</font> " +
+                          "<br/>New line with <span style='font-size:14pt'>larger font</span>";
+
+            // Aspose.Pdf versions prior to the introduction of the RichText property do not expose a direct API
+            // for setting the /RV (rich value) entry. As a workaround, assign the HTML markup to the field's
+            // Value property. When the PDF viewer supports rich text fields, it will render the markup.
+            // If the viewer does not support it, the markup will appear as plain text.
+            richField.Value = html;
+
+            // Optionally set a plain‑text fallback for viewers that do not support rich text.
+            // In this example we reuse the same string without HTML tags.
+            // (If you need a true plain‑text fallback, provide a stripped‑down version here.)
+            // richField.Value = "Bold Text Italic Text Underlined Red Text"; // uncomment if needed
+
+            // Save the modified PDF (PDF format, no SaveOptions needed)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with rich text field to '{outputPath}'.");
     }
 }

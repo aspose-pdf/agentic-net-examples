@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Needed for AnnotationFlags
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
@@ -17,32 +17,44 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document containing form fields
         using (Document doc = new Document(inputPath))
         {
-            // Source field whose value determines visibility (e.g., a checkbox named "ShowDetails")
-            CheckboxField sourceField = doc.Form["ShowDetails"] as CheckboxField;
-
-            // Target field whose visibility will be changed (e.g., a text box named "Details")
-            TextBoxField targetField = doc.Form["Details"] as TextBoxField;
-
-            if (sourceField != null && targetField != null)
+            // Retrieve the source field whose value determines visibility
+            // Replace "SourceField" with the actual field name
+            TextBoxField sourceField = doc.Form["SourceField"] as TextBoxField;
+            if (sourceField == null)
             {
-                // If the checkbox is checked, make the target field visible; otherwise hide it
-                bool isChecked = sourceField.Checked;
+                Console.Error.WriteLine("Source field not found or not a TextBoxField.");
+                return;
+            }
 
-                // Form fields are widget annotations; they inherit the Flags property from Annotation.
-                // Use AnnotationFlags.Hidden to control visibility.
-                if (isChecked)
-                {
-                    // Remove the Hidden flag to show the field
-                    targetField.Flags &= ~AnnotationFlags.Hidden;
-                }
-                else
-                {
-                    // Add the Hidden flag to hide the field
-                    targetField.Flags |= AnnotationFlags.Hidden;
-                }
+            // Retrieve the target field whose visibility will be changed
+            // Replace "TargetField" with the actual field name
+            Field targetField = doc.Form["TargetField"] as Field;
+            if (targetField == null)
+            {
+                Console.Error.WriteLine("Target field not found.");
+                return;
+            }
+
+            // Example logic: make the target field visible only when the source field contains "Show"
+            string sourceValue = sourceField.Value?.ToString() ?? string.Empty;
+            bool shouldShow = sourceValue.Equals("Show", StringComparison.OrdinalIgnoreCase);
+
+            // Set visibility using the Flags property (AnnotationFlags)
+            // Hidden flag makes the field invisible; removing it makes the field visible.
+            if (shouldShow)
+            {
+                // Ensure the field is not hidden. Keep other flags (e.g., Print) if needed.
+                targetField.Flags &= ~AnnotationFlags.Hidden;
+                // Optionally ensure the field is printable
+                targetField.Flags |= AnnotationFlags.Print;
+            }
+            else
+            {
+                // Hide the field
+                targetField.Flags |= AnnotationFlags.Hidden;
             }
 
             // Save the modified PDF

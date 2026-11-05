@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,41 +8,81 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXmlPath = "formdata.xml";
+        const string inputPath = "input.pdf";
+        const string outputXml = "formdata.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDoc = new Document(inputPdfPath);
-
-        // If the document does not contain an AcroForm, exit gracefully.
-        if (pdfDoc.Form == null || pdfDoc.Form.Count == 0)
+        try
         {
-            Console.WriteLine("No AcroForm fields found in the PDF.");
-            return;
-        }
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Verify that the document contains an AcroForm
+                if (doc.Form == null || doc.Form.Count == 0)
+                {
+                    Console.WriteLine("No AcroForm fields found in the document.");
+                    return;
+                }
 
-        // Create an XML structure that holds each field's name and value.
-        XElement root = new XElement("AcroFormData");
-        foreach (Field field in pdfDoc.Form)
+                // Create an XML writer for the output file
+                using (XmlWriter writer = XmlWriter.Create(outputXml, new XmlWriterSettings { Indent = true }))
+                {
+                    writer.WriteStartDocument();
+                    writer.WriteStartElement("FormData");
+
+                    // Iterate over each form field
+                    foreach (Field field in doc.Form)
+                    {
+                        writer.WriteStartElement("Field");
+                        writer.WriteAttributeString("Name", field.FullName);
+                        writer.WriteAttributeString("Type", field.GetType().Name);
+
+                        // Extract the field value based on its concrete type
+                        string value = GetFieldValue(field);
+                        writer.WriteElementString("Value", value ?? string.Empty);
+
+                        writer.WriteEndElement(); // </Field>
+                    }
+
+                    writer.WriteEndElement(); // </FormData>
+                    writer.WriteEndDocument();
+                }
+
+                Console.WriteLine($"Form data exported to '{outputXml}'.");
+            }
+        }
+        catch (Exception ex)
         {
-            string name = field.PartialName ?? string.Empty;
-            string value = field.Value?.ToString() ?? string.Empty;
-            XElement fieldElement = new XElement("Field",
-                new XAttribute("Name", name),
-                new XAttribute("Value", value));
-            root.Add(fieldElement);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
 
-        // Save the XML document to the requested file.
-        XDocument xmlDoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), root);
-        xmlDoc.Save(outputXmlPath);
-
-        Console.WriteLine($"AcroForm data exported to '{outputXmlPath}'.");
+    // Helper method to obtain a string representation of a field's value
+    static string GetFieldValue(Field field)
+    {
+        switch (field)
+        {
+            case TextBoxField txt:
+                return txt.Value;
+            case CheckboxField chk:
+                return chk.Checked ? "true" : "false";
+            case RadioButtonField rad:
+                // RadioButtonField does not expose SelectedItem; use its Value property
+                return rad.Value?.ToString() ?? string.Empty;
+            case ListBoxField lst:
+                return lst.SelectedItems != null ? string.Join(",", lst.SelectedItems) : string.Empty;
+            case ComboBoxField cmb:
+                return cmb.Value;
+            case SignatureField sig:
+                // Indicate whether the signature field is signed
+                return sig.Signature != null ? "Signed" : "Unsigned";
+            default:
+                return field.Value?.ToString();
+        }
     }
 }

@@ -1,47 +1,50 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "dynamic_list_form.pdf";
+        const string outputPath = "DynamicListForm.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to host the form field
+            // Add a blank page (first page is at index 1)
             Page page = doc.Pages.Add();
 
-            // Define the field rectangle (lower‑left x/y, upper‑right x/y)
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
+            // Define the rectangle for the combo box field (llx, lly, urx, ury)
+            // Use Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle comboRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
 
-            // Create a combo box (editable list) field
-            ComboBoxField combo = new ComboBoxField(page, fieldRect);
-            combo.PartialName = "DynamicList";
+            // Create a ComboBoxField (editable list) on the page
+            ComboBoxField combo = new ComboBoxField(page, comboRect)
+            {
+                PartialName = "DynamicList",   // field name
+                Editable    = true,           // allows users to add new items
+                Value       = "Select or type..."
+            };
 
-            // Add initial items – Options is read‑only, use AddOption()
+            // Add some initial items to the list using AddOption (the correct API)
             combo.AddOption("Item 1");
             combo.AddOption("Item 2");
             combo.AddOption("Item 3");
 
-            // If the library version supports it, make the combo box editable so users can type new items
-            // combo.IsEditable = true; // Uncomment when IsEditable is available
-
-            // Visual styling – Border requires the parent annotation and has no Color property
-            combo.Border = new Border(combo) { Width = 1 };
-            // Set the border colour (the Border class does not expose a colour property)
-            combo.Color = Aspose.Pdf.Color.Black;
-
-            // Add the field to the document's form collection
+            // Add the combo box to the document's form collection
             doc.Form.Add(combo);
 
-            // Save the PDF with the form
+            // Optional: add a label for the field
+            TextFragment label = new TextFragment("Dynamic List:");
+            label.Position = new Position(100, 730);
+            page.Paragraphs.Add(label);
+
+            // Save the PDF (no SaveOptions needed for PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form saved to '{outputPath}'.");
+        Console.WriteLine($"PDF form with dynamic list saved to '{outputPath}'.");
     }
 }

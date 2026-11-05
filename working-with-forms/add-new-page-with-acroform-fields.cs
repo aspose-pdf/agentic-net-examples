@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_form.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,30 +16,45 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Add a new blank page at the end of the document
+            // Add a fresh page at the end of the document
             Page newPage = doc.Pages.Add();
 
-            // ----- Create a TextBox field -----
-            Rectangle txtRect = new Rectangle(100, 500, 300, 530);
+            // Page numbers are 1‑based in Aspose.Pdf
+            int newPageNumber = doc.Pages.Count;
+
+            // ----- TextBox field -----
+            var txtRect = new Rectangle(100, 600, 300, 620);
             TextBoxField txtField = new TextBoxField(newPage, txtRect);
             txtField.PartialName = "NewTextBox";
-            txtField.Value       = "Enter text";
-            doc.Form.Add(txtField);
+            txtField.Value = "Sample text";
+            doc.Form.Add(txtField, newPageNumber);
 
-            // ----- Create a CheckBox field -----
-            Rectangle chkRect = new Rectangle(100, 450, 120, 470);
+            // ----- Checkbox field -----
+            var chkRect = new Rectangle(100, 560, 120, 580);
             CheckboxField chkField = new CheckboxField(newPage, chkRect);
             chkField.PartialName = "NewCheckBox";
-            chkField.Checked     = false;
-            doc.Form.Add(chkField);
+            chkField.Checked = true;
+            doc.Form.Add(chkField, newPageNumber);
 
-            // Save the updated PDF (extension determines format; PDF is default)
+            // ----- Radio button group -----
+            RadioButtonField radioField = new RadioButtonField(newPage);
+            radioField.PartialName = "NewRadioGroup";
+            // Option 1
+            var opt1Rect = new Rectangle(100, 520, 120, 540);
+            radioField.AddOption("Option1", opt1Rect);
+            // Option 2
+            var opt2Rect = new Rectangle(100, 500, 120, 520);
+            radioField.AddOption("Option2", opt2Rect);
+            // Select the first option by default (1‑based index)
+            radioField.Selected = 1;
+            doc.Form.Add(radioField, newPageNumber);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with new page and AcroForm fields: {outputPath}");
+        Console.WriteLine($"PDF with new page and AcroForm fields saved to '{outputPath}'.");
     }
 }

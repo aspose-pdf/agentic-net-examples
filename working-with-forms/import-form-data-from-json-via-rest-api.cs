@@ -2,95 +2,54 @@ using System;
 using System.IO;
 using System.Net.Http;
 using System.Text;
-using System.Text.Json;
-using System.Linq;
+using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
 class Program
 {
-    static void Main()
+    // Entry point – async to allow awaiting the REST call
+    static async Task Main(string[] args)
     {
-        const string pdfTemplatePath = "template.pdf";
-        const string outputPath = "filled.pdf";
-        const string apiUrl = "https://example.com/api/formdata";
+        const string pdfPath = "template_form.pdf";   // PDF with AcroForm fields
+        const string outputPath = "filled_form.pdf";
+        const string apiEndpoint = "https://example.com/api/formdata"; // REST API returning JSON
 
-        if (!File.Exists(pdfTemplatePath))
+        // Verify the source PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Template not found: {pdfTemplatePath}");
+            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
             return;
         }
 
         // Retrieve JSON data from the REST API
         string jsonData;
-        using (HttpClient client = new HttpClient())
+        try
         {
-            try
-            {
-                jsonData = client.GetStringAsync(apiUrl).Result;
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error fetching JSON: {ex.Message}");
-                return;
-            }
+            using var client = new HttpClient();
+            jsonData = await client.GetStringAsync(apiEndpoint);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error fetching JSON from API: {ex.Message}");
+            return;
         }
 
-        // Load the PDF, populate the form fields from JSON, and save the result
-        using (Document doc = new Document(pdfTemplatePath))
-        {
-            // Verify that the PDF contains a form
-            if (doc.Form == null || doc.Form.Count == 0)
-            {
-                Console.Error.WriteLine("No form fields found in the PDF.");
-                return;
-            }
+        // Load the PDF document inside a using block for deterministic disposal
+        using var doc = new Document(pdfPath);
 
-            // Enable automatic recalculation (if the form contains JavaScript calculations)
-            doc.Form.AutoRecalculate = true;
+        // Convert the JSON string to a UTF‑8 memory stream – ImportFromJson expects a Stream
+        using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonData));
 
-            // Parse the JSON and assign values to matching form fields
-            try
-            {
-                using (JsonDocument jsonDoc = JsonDocument.Parse(jsonData))
-                {
-                    if (jsonDoc.RootElement.ValueKind == JsonValueKind.Object)
-                    {
-                        foreach (JsonProperty prop in jsonDoc.RootElement.EnumerateObject())
-                        {
-                            // Find a field whose Name or FullName matches the JSON property name
-                            var field = doc.Form.Fields?.FirstOrDefault(f =>
-                                string.Equals(f.Name, prop.Name, StringComparison.OrdinalIgnoreCase) ||
-                                string.Equals(f.FullName, prop.Name, StringComparison.OrdinalIgnoreCase));
+        // Import the JSON data into the PDF form fields (core API)
+        doc.Form.ImportFromJson(jsonStream);
 
-                            if (field != null)
-                            {
-                                // Convert the JSON value to a string representation suitable for the field
-                                string value = prop.Value.ValueKind switch
-                                {
-                                    JsonValueKind.String => prop.Value.GetString(),
-                                    JsonValueKind.Number => prop.Value.GetRawText(),
-                                    JsonValueKind.True => "True",
-                                    JsonValueKind.False => "False",
-                                    _ => prop.Value.GetRawText()
-                                };
+        // Optionally flatten the form to make fields non‑editable
+        // doc.Form.Flatten();
 
-                                field.Value = value;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (JsonException je)
-            {
-                Console.Error.WriteLine($"Failed to parse JSON data: {je.Message}");
-                return;
-            }
+        // Save the populated PDF
+        doc.Save(outputPath);
 
-            // Save the populated PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Form populated and saved to '{outputPath}'.");
+        Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
     }
 }

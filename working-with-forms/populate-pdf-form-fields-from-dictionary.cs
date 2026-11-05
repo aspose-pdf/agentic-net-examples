@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,16 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "filled.pdf";
-
-        // Dictionary containing field names and the values to assign
-        var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "FirstName", "John" },
-            { "LastName",  "Doe" },
-            { "Email",     "john.doe@example.com" }
-        };
 
         if (!File.Exists(inputPath))
         {
@@ -25,17 +17,31 @@ class Program
             return;
         }
 
+        // Map of PDF field names to the values that should be assigned
+        var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "FirstName", "John" },
+            { "LastName",  "Doe" },
+            { "Date",      DateTime.Today.ToShortDateString() }
+            // Add additional field/value pairs as required
+        };
+
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields in the document
-            foreach (Field field in doc.Form.Fields)
+            // Ensure the document actually contains a form
+            var form = doc.Form;
+            if (form != null && form.Fields != null)
             {
-                // Try to find a matching entry in the dictionary
-                if (fieldValues.TryGetValue(field.Name, out string value))
+                // Iterate over every form field in the document
+                foreach (var field in form.Fields)
                 {
-                    // Most field types accept a string via the Value property
-                    field.Value = value;
+                    // Use the field's fully qualified name to look up a value
+                    if (fieldValues.TryGetValue(field.FullName, out string value))
+                    {
+                        // Most field types expose a Value property that accepts a string
+                        field.Value = value;
+                    }
                 }
             }
 
@@ -43,6 +49,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Form fields populated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with populated fields saved to '{outputPath}'.");
     }
 }

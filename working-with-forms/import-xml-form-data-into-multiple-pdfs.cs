@@ -9,64 +9,88 @@ class Program
 {
     static void Main()
     {
-        // Paths to the PDFs that need to share the same form data
-        string[] pdfInputs = { "DocumentA.pdf", "DocumentB.pdf", "DocumentC.pdf" };
-        // Path to the XML file containing the form field values
-        const string xmlDataPath = "FormData.xml";
+        // Input PDF files to be synchronized
+        string[] pdfPaths = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // XML file containing the form data
+        const string xmlDataPath = "formData.xml";
+        // Directory where the updated PDFs will be saved
+        const string outputDir = "Output";
 
-        // Verify the XML file exists before processing
+        // Verify XML data file exists
         if (!File.Exists(xmlDataPath))
         {
             Console.Error.WriteLine($"XML data file not found: {xmlDataPath}");
             return;
         }
 
-        // Load the XML once – it will be used for every PDF
-        XDocument xmlDoc = XDocument.Load(xmlDataPath);
-        // Expected simple structure: <form><field name="FieldName">Value</field>...</form>
-        var xmlFields = xmlDoc.Descendants("field")
-                              .Select(f => new
-                              {
-                                  Name = (string)f.Attribute("name"),
-                                  Value = (string)f.Value
-                              })
-                              .Where(f => !string.IsNullOrEmpty(f.Name))
-                              .ToList();
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Process each PDF independently but using the same XML data
-        foreach (string inputPath in pdfInputs)
+        // Process each PDF
+        foreach (string pdfPath in pdfPaths)
         {
-            if (!File.Exists(inputPath))
+            // Skip missing PDFs but continue with others
+            if (!File.Exists(pdfPath))
             {
-                Console.Error.WriteLine($"PDF file not found: {inputPath}");
-                continue; // skip missing files
+                Console.Error.WriteLine($"PDF not found: {pdfPath}");
+                continue;
             }
 
-            // Use a using block for deterministic disposal (rule: document-disposal-with-using)
-            using (Document pdfDoc = new Document(inputPath))
+            // Load PDF, import XML form data (via custom XML parser), and save
+            using (Document doc = new Document(pdfPath))
             {
-                // Ensure automatic recalculation of JavaScript‑based fields after we set values
-                pdfDoc.Form.AutoRecalculate = true;
+                ImportFormDataFromXml(xmlDataPath, doc);
 
-                // Apply each XML field value to the matching PDF form field
-                foreach (var xmlField in xmlFields)
-                {
-                    var pdfField = pdfDoc.Form?.Fields?.FirstOrDefault(f => f.Name == xmlField.Name);
-                    if (pdfField != null)
-                    {
-                        pdfField.Value = xmlField.Value;
-                    }
-                }
+                // Construct output file path
+                string outputPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
 
-                // Determine an output file name (e.g., add "_Synced" suffix)
-                string outputPath = Path.Combine(
-                    Path.GetDirectoryName(inputPath) ?? string.Empty,
-                    Path.GetFileNameWithoutExtension(inputPath) + "_Synced.pdf");
+                // Save the modified PDF (PDF format by default)
+                doc.Save(outputPath);
 
-                // Save the updated PDF (saving as PDF does not require SaveOptions)
-                pdfDoc.Save(outputPath);
+                Console.WriteLine($"Processed and saved: {outputPath}");
+            }
+        }
+    }
 
-                Console.WriteLine($"Synchronized PDF saved: {outputPath}");
+    /// <summary>
+    /// Imports form field values from an XML file into the given PDF document.
+    /// The XML is expected to have a simple structure like:
+    /// <form>
+    ///   <field name="FieldName1">Value1</field>
+    ///   <field name="FieldName2">Value2</field>
+    ///   ...
+    /// </form>
+    /// </summary>
+    /// <param name="xmlPath">Path to the XML data file.</param>
+    /// <param name="doc">The Aspose.Pdf.Document whose form fields will be populated.</param>
+    private static void ImportFormDataFromXml(string xmlPath, Document doc)
+    {
+        if (doc?.Form?.Fields == null)
+            return;
+
+        XDocument xDoc = XDocument.Load(xmlPath);
+        // Iterate over each <field> element
+        foreach (XElement fieldElem in xDoc.Descendants("field"))
+        {
+            // Field name can be supplied as an attribute "name" or as a child <name> element
+            string fieldName = (string)fieldElem.Attribute("name");
+            if (string.IsNullOrEmpty(fieldName))
+            {
+                XElement nameElem = fieldElem.Element("name");
+                if (nameElem != null)
+                    fieldName = nameElem.Value;
+            }
+            if (string.IsNullOrEmpty(fieldName))
+                continue; // cannot map without a name
+
+            string fieldValue = fieldElem.Value ?? string.Empty;
+
+            // Find the matching field in the PDF form (case‑sensitive match on Name)
+            var pdfField = doc.Form.Fields.FirstOrDefault(f => f.Name == fieldName);
+            if (pdfField != null)
+            {
+                // Most field types expose a Value property that accepts string/object
+                pdfField.Value = fieldValue;
             }
         }
     }

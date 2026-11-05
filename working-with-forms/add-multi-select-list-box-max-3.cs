@@ -1,10 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -12,7 +10,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string listBoxName = "myListBox"; // name of the list box field in the PDF
 
         if (!File.Exists(inputPath))
         {
@@ -20,39 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the list box field from the form collection using the Fields collection
-            var listBox = doc.Form?.Fields?
-                .FirstOrDefault(f => string.Equals(f.Name, listBoxName, StringComparison.Ordinal))
-                as ListBoxField;
+            // Name of the list box field in the PDF form
+            const string listBoxName = "myListBox";
 
-            if (listBox != null)
+            // Retrieve the field and cast to ListBoxField
+            ListBoxField listBox = doc.Form[listBoxName] as ListBoxField;
+            if (listBox == null)
             {
-                // Ensure the list box allows multiple selections
-                listBox.MultiSelect = true;
+                Console.Error.WriteLine($"ListBox field '{listBoxName}' not found.");
+                return;
+            }
 
-                // Set the maximum number of selectable items to three.
-                // The property is called MaxSelection in newer versions; for older versions we set it via reflection.
-                const int maxSelection = 3;
-                PropertyInfo maxSelProp = listBox.GetType().GetProperty("MaxSelection", BindingFlags.Public | BindingFlags.Instance);
-                if (maxSelProp != null && maxSelProp.CanWrite)
-                {
-                    maxSelProp.SetValue(listBox, maxSelection);
-                }
-                else
-                {
-                    // Fallback: add a simple JavaScript validation that limits the selection count.
-                    string js = $"if (event.target.value.split(',').length > {maxSelection}) {{ app.alert('Maximum {maxSelection} items can be selected.'); event.target.value = event.target.value.split(',').slice(0,{maxSelection}).join(','); }}";
-                    // OnValidate expects a PdfAction; use JavascriptAction to wrap the script.
-                    listBox.Actions.OnValidate = new JavascriptAction(js);
-                }
-            }
-            else
-            {
-                Console.Error.WriteLine($"List box field '{listBoxName}' not found.");
-            }
+            // Ensure the list box allows multiple selections
+            listBox.MultiSelect = true;
+
+            // JavaScript validation to enforce a maximum of three selections.
+            // The script runs when the field is validated; if more than three items are selected,
+            // it shows an alert and cancels the change.
+            string js = @"if (event.value && event.value.length > 3) {
+    app.alert('Maximum of 3 items can be selected.');
+    event.rc = false;
+}";
+            listBox.Actions.OnValidate = new JavascriptAction(js);
 
             // Save the modified PDF
             doc.Save(outputPath);

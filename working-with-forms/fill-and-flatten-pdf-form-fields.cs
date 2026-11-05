@@ -7,47 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string inputPath  = "form_template.pdf";
+        const string outputPath = "filled_flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF containing form fields inside a using block for deterministic disposal
+        using (Document pdf = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Example: fill a text box field named "FullName"
+            if (pdf.Form["FullName"] is TextBoxField nameField)
+                nameField.Value = "John Doe";
+
+            // Example: fill a checkbox field named "Subscribe"
+            if (pdf.Form["Subscribe"] is CheckboxField checkField)
+                checkField.Checked = true;
+
+            // Example: fill a radio button group named "Gender".
+            // The group is represented by RadioButtonField, not RadioButtonOptionField.
+            if (pdf.Form["Gender"] is RadioButtonField genderField)
             {
-                var form = doc.Form;
-                if (form != null && form.Count > 0)
-                {
-                    // Fill a text box field named "Name"
-                    if (form["Name"] is TextBoxField nameField)
-                    {
-                        nameField.Value = "John Doe";
-                    }
-
-                    // Fill a check box field named "Agree"
-                    if (form["Agree"] is CheckboxField agreeField)
-                    {
-                        agreeField.Checked = true;
-                    }
-                }
-
-                // Flatten the form so fields become non‑editable content
-                form?.Flatten();
-
-                // Save the flattened PDF
-                doc.Save(outputPath);
+                // The Selected property is 1‑based. Adjust the index to the option you need.
+                // Here we select the first option (e.g., "Male").
+                genderField.Selected = 1;
             }
 
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+            // After all fields are populated, flatten the form so fields become static content
+            pdf.Form.Flatten();
+
+            // Save the resulting PDF; extension alone determines format (PDF)
+            pdf.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form filled and flattened PDF saved to '{outputPath}'.");
     }
 }

@@ -9,8 +9,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string buttonName = "SubmitBtn";
-        const string tooltipText = "Please fill in all required fields before submitting.";
 
         if (!File.Exists(inputPath))
         {
@@ -18,40 +16,34 @@ class Program
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Name of the submit button field in the PDF form
+            const string buttonName = "SubmitButton";
+
+            // Ensure the document contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // Locate the submit button by its name
-                ButtonField submitButton = null;
-                foreach (var field in doc.Form)
-                {
-                    if (field is ButtonField btn && btn.Name == buttonName)
-                    {
-                        submitButton = btn;
-                        break;
-                    }
-                }
-
-                if (submitButton == null)
-                {
-                    Console.Error.WriteLine($"Button field '{buttonName}' not found.");
-                }
-                else
-                {
-                    // Assign tooltip (alternate caption) to the button
-                    submitButton.AlternateCaption = tooltipText; // Correct property for tooltip
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                Console.Error.WriteLine("No form fields found in the document.");
+                return;
             }
 
-            Console.WriteLine($"PDF saved with tooltip to '{outputPath}'.");
+            // Retrieve the button field; cast to ButtonField
+            ButtonField submitButton = doc.Form[buttonName] as ButtonField;
+            if (submitButton == null)
+            {
+                Console.Error.WriteLine($"Button field '{buttonName}' not found.");
+                return;
+            }
+
+            // Set the tooltip (alternate name) that explains required fields
+            const string tooltip = "Please fill in all required fields before submitting.";
+            submitButton.AlternateName = tooltip;
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with tooltip to '{outputPath}'.");
     }
 }

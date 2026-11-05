@@ -2,127 +2,66 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "form_input.pdf";
-        const string outputPdf = "form_modified.pdf";
+        const string inputPath = "form_template.pdf";
+        const string outputPath = "filled_form.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document (core API, no Facades).
-        Document doc = new Document(inputPdf);
-
-        // Set a text field value.
-        SetTextFieldValue(doc, "CustomerName", "John Doe");
-
-        // Set a checkbox value.
-        SetCheckBoxValue(doc, "AgreeTerms", true);
-
-        // Set a radio‑button option.
-        SetRadioButtonValue(doc, "Gender", "Male");
-
-        // Save the modified PDF.
-        doc.Save(outputPdf);
-        Console.WriteLine($"Form fields updated and saved to '{outputPdf}'.");
-    }
-
-    // Helper to set a TextBox field.
-    static void SetTextFieldValue(Document doc, string fieldName, string value)
-    {
-        if (doc.Form[fieldName] is TextBoxField txt)
+        // Load the PDF document containing the form.
+        // The Document implements IDisposable, so wrap it in a using block.
+        using (Document doc = new Document(inputPath))
         {
-            txt.Value = value;
-        }
-        else
-        {
-            Console.Error.WriteLine($"Text field '{fieldName}' not found or not a TextBoxField.");
-        }
-    }
+            // Access the AcroForm object.
+            Form form = doc.Form;
 
-    // Helper to set a CheckBox field using runtime type inspection.
-    static void SetCheckBoxValue(Document doc, string fieldName, bool check)
-    {
-        var field = doc.Form[fieldName];
-        if (field == null)
-        {
-            Console.Error.WriteLine($"Check box '{fieldName}' not found.");
-            return;
-        }
-
-        // TextBoxField is handled separately above; here we handle CheckboxField via reflection/dynamic.
-        if (field.GetType().Name == "CheckboxField")
-        {
-            try
+            // ----- Fill a text box field -----
+            // The field is identified by its name (as defined in the PDF).
+            TextBoxField nameField = form["NameField"] as TextBoxField;
+            if (nameField != null)
             {
-                dynamic chk = field;
-                chk.Checked = check;
+                // Set the field value.
+                nameField.Value = "John Doe";
+
+                // Appearance customization – use dynamic to stay compatible with
+                // different Aspose.Pdf versions where the exact property names may vary.
+                dynamic dyn = nameField;
+                try { dyn.Font = FontRepository.FindFont("Arial"); } catch { }
+                try { dyn.FontSize = 12; } catch { }
+                try { dyn.TextColor = Color.Blue; } catch { }
             }
-            catch (Exception ex)
+
+            // ----- Set a check box field -----
+            // Use runtime type inspection and dynamic dispatch to avoid compile‑time
+            // dependencies on specific checkbox class names.
+            var agreeWidget = form["AgreeCheck"];
+            if (agreeWidget != null)
             {
-                Console.Error.WriteLine($"Failed to set Checked property on '{fieldName}': {ex.Message}");
-            }
-        }
-        else
-        {
-            Console.Error.WriteLine($"Field '{fieldName}' is not a CheckboxField.");
-        }
-    }
-
-    // Helper to select a radio‑button option using runtime inspection.
-    static void SetRadioButtonValue(Document doc, string groupName, string optionValue)
-    {
-        bool found = false;
-        foreach (var field in doc.Form)
-        {
-            if (field.GetType().Name != "RadioButtonOptionField")
-                continue;
-
-            // Retrieve PartialName (group name) and Option (value) via reflection.
-            var partialNameProp = field.GetType().GetProperty("PartialName");
-            var optionProp = field.GetType().GetProperty("Option");
-            if (partialNameProp == null || optionProp == null)
-                continue;
-
-            string partialName = partialNameProp.GetValue(field) as string;
-            string option = optionProp.GetValue(field) as string;
-
-            if (partialName == groupName && option == optionValue)
-            {
-                // Set the Selected property via reflection/dynamic.
-                var selectedProp = field.GetType().GetProperty("Selected");
-                if (selectedProp != null && selectedProp.CanWrite)
+                string widgetType = agreeWidget.GetType().Name;
+                if (widgetType == "CheckBoxField" || widgetType == "CheckboxField")
                 {
-                    selectedProp.SetValue(field, true);
-                    found = true;
-                    break;
-                }
-                else
-                {
-                    // Fallback to dynamic if property exists at runtime.
-                    try
-                    {
-                        dynamic dyn = field;
-                        dyn.Selected = true;
-                        found = true;
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.Error.WriteLine($"Unable to set Selected on radio option: {ex.Message}");
-                    }
+                    dynamic chk = agreeWidget;
+                    try { chk.Checked = true; } catch { }
                 }
             }
+
+            // ----- Optional: flatten the form -----
+            // After flattening, form fields become regular content and are no longer editable.
+            form.Flatten();
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
-        if (!found)
-        {
-            Console.Error.WriteLine($"Radio button option '{optionValue}' for group '{groupName}' not found.");
-        }
+
+        Console.WriteLine($"Form processing completed. Output saved to '{outputPath}'.");
     }
 }

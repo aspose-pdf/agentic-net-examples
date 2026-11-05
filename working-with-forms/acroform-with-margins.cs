@@ -2,80 +2,78 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text; // for Position and TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "AcroForm.pdf";
+        const string outputPath = "AcroFormRelative.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
             // Add a single page
             Page page = doc.Pages.Add();
 
-            // Set explicit margins (left, right, top, bottom) in points using MarginInfo
-            page.PageInfo.Margin = new MarginInfo { Left = 50, Right = 50, Top = 50, Bottom = 50 };
+            // Define page margins (points) – MarginInfo expects float values
+            float marginLeft   = 50f;
+            float marginTop    = 50f;
+            float marginRight  = 50f;
+            float marginBottom = 50f;
+            page.PageInfo.Margin = new MarginInfo(marginLeft, marginTop, marginRight, marginBottom);
 
-            // Compute the usable rectangle inside the margins
-            double left   = page.PageInfo.Margin.Left;
-            double right  = page.PageInfo.Width - page.PageInfo.Margin.Right;
-            double top    = page.PageInfo.Height - page.PageInfo.Margin.Top;
-            double bottom = page.PageInfo.Margin.Bottom;
+            // Retrieve page dimensions
+            double pageWidth  = page.PageInfo.Width;
+            double pageHeight = page.PageInfo.Height;
 
-            // Define field dimensions and spacing
-            double fieldWidth      = 200;
-            double fieldHeight     = 20;
-            double verticalSpacing = 30;
+            // Compute the usable area inside the margins
+            double usableWidth  = pageWidth  - marginLeft - marginRight;
+            double usableHeight = pageHeight - marginTop  - marginBottom;
 
-            // ---- First AcroForm field: TextBox for "Name" ----
-            // Position is relative to the top‑margin (Y decreases downwards)
-            TextBoxField nameField = new TextBoxField(
-                page,
-                new Aspose.Pdf.Rectangle(
-                    left,                     // lower‑left X
-                    top - fieldHeight,        // lower‑left Y
-                    left + fieldWidth,        // upper‑right X
-                    top));                    // upper‑right Y
+            // Position a text box field relative to the margins:
+            //   - 5% from the left margin
+            //   - 10% down from the top margin
+            //   - width = 50% of usable width, height = 20 points
+            double fieldWidth  = usableWidth * 0.5;
+            double fieldHeight = 20;
+            double fieldX = marginLeft + usableWidth * 0.05;
+            double fieldY = pageHeight - marginTop - usableHeight * 0.10 - fieldHeight;
+
+            // Define the rectangle for the text box (lower‑left x,y, upper‑right x,y)
+            Aspose.Pdf.Rectangle textBoxRect = new Aspose.Pdf.Rectangle(
+                fieldX,
+                fieldY,
+                fieldX + fieldWidth,
+                fieldY + fieldHeight);
+
+            // Create the text box AcroForm field
+            TextBoxField nameField = new TextBoxField(page, textBoxRect);
             nameField.PartialName = "Name";
             nameField.Value = "Enter name";
+
+            // Add the field to the document's form (partial name already set on the field)
             doc.Form.Add(nameField);
 
-            // ---- Second AcroForm field: TextBox for "Email" ----
-            double secondTop = top - fieldHeight - verticalSpacing;
-            TextBoxField emailField = new TextBoxField(
-                page,
-                new Aspose.Pdf.Rectangle(
-                    left,
-                    secondTop - fieldHeight,
-                    left + fieldWidth,
-                    secondTop));
-            emailField.PartialName = "Email";
-            emailField.Value = "Enter email";
-            doc.Form.Add(emailField);
+            // Position a checkbox field relative to the text box:
+            //   - placed to the right of the text box with a 5% usable width gap
+            //   - same vertical position as the text box
+            double checkBoxSize = fieldHeight;
+            double checkBoxX = fieldX + fieldWidth + usableWidth * 0.05;
+            double checkBoxY = fieldY;
 
-            // ---- Third AcroForm field: CheckBox for "Subscribe" ----
-            double thirdTop = secondTop - fieldHeight - verticalSpacing;
-            CheckboxField subscribeField = new CheckboxField(
-                page,
-                new Aspose.Pdf.Rectangle(
-                    left,
-                    thirdTop - fieldHeight,
-                    left + 20,   // small square for the box
-                    thirdTop));
-            subscribeField.PartialName = "Subscribe";
-            subscribeField.Checked = false;
-            doc.Form.Add(subscribeField);
+            Aspose.Pdf.Rectangle checkBoxRect = new Aspose.Pdf.Rectangle(
+                checkBoxX,
+                checkBoxY,
+                checkBoxX + checkBoxSize,
+                checkBoxY + checkBoxSize);
 
-            // Add a label next to the checkbox
-            TextFragment label = new TextFragment("Subscribe to newsletter");
-            // Position uses Aspose.Pdf.Text.Position (X,Y) where Y is baseline
-            label.Position = new Position(left + 25, thirdTop - fieldHeight / 2);
-            page.Paragraphs.Add(label);
+            CheckboxField agreeField = new CheckboxField(page, checkBoxRect);
+            agreeField.PartialName = "Agree";
+            agreeField.Checked = false;
 
-            // Save the document as PDF
+            doc.Form.Add(agreeField);
+
+            // Save the PDF (no PreSave required for AcroForm)
             doc.Save(outputPath);
         }
 

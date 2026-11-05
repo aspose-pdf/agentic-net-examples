@@ -1,49 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // Core Forms API (no Facades)
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "XfaFlattened.pdf";
+        const string outputPath = "xfa_flattened.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            // Add a blank page (pages are 1‑based)
-            doc.Pages.Add();
+            // Add a single page to the document
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-            // ---------------------------------------------------------------------
-            // NOTE: The current Aspose.Pdf package version does not contain the
-            //       Aspose.Pdf.Xfa namespace.  To keep the example functional and
-            //       still demonstrate "form creation + flattening" we use the core
-            //       AcroForm API (Aspose.Pdf.Forms).  This satisfies the original
-            //       intent – a form field that is later flattened to static content –
-            //       while staying within the allowed namespaces.
-            // ---------------------------------------------------------------------
+            // Define the rectangle where the XFA text box will appear
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Define a rectangle for the text field (left, bottom, right, top)
-            var fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+            // Create a text box field (XFA compatible)
+            Aspose.Pdf.Forms.TextBoxField textBox = new Aspose.Pdf.Forms.TextBoxField(page, fieldRect);
+            textBox.PartialName = "txtName";
+            textBox.Value = "Enter name";
 
-            // Create a text box field named "Name" with a default value
-            var nameField = new TextBoxField(doc.Pages[1], fieldRect)
-            {
-                PartialName = "Name",
-                Value = "John Doe"
-            };
+            // Add the field to the document's form (page index is 1‑based)
+            doc.Form.Add(textBox, 1);
 
-            // Add the field to the document's AcroForm collection
-            doc.Form.Add(nameField);
+            // Save the PDF containing the XFA form field
+            doc.Save("xfa_with_fields.pdf");
 
-            // Flatten the form so that fields become static PDF content
+            // Flatten the form fields so they become static content
             doc.Form.Flatten();
 
-            // Save the resulting PDF (extension is ignored, Save writes PDF)
+            // Save the flattened PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with form fields flattened and saved to '{outputPath}'.");
+        Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
     }
 }

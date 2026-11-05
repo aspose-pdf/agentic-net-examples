@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -17,22 +16,21 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block (document-disposal-with-using rule)
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate over all form fields in the document
             foreach (Field field in doc.Form)
             {
-                // Mark fields that are considered sensitive
+                // Identify fields that are considered sensitive
                 if (IsSensitive(field))
                 {
-                    // Preserve existing flags and add the NoExport flag (value 0x10).
-                    // AnnotationFlags does not expose NoExport, so we manipulate the underlying integer value.
-                    field.Flags = (AnnotationFlags)((int)field.Flags | 0x10);
+                    // Prevent the field from being exported with form data
+                    field.Exportable = false;
                 }
             }
 
-            // Save the updated PDF (still within the using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
@@ -42,10 +40,10 @@ class Program
     // Simple heuristic to decide if a field is sensitive
     static bool IsSensitive(Field field)
     {
-        string name = field?.FullName?.ToLowerInvariant() ?? string.Empty;
+        string name = field?.PartialName?.ToLowerInvariant() ?? string.Empty;
         return name.Contains("ssn") ||
-               name.Contains("creditcard") ||
                name.Contains("password") ||
-               name.Contains("sensitive");
+               name.Contains("secret") ||
+               name.Contains("pin");
     }
 }

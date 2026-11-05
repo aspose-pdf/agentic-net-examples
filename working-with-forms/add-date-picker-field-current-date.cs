@@ -2,51 +2,59 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_datefield.pdf";
+        const string inputPath = "input.pdf";      // existing PDF or will be created if missing
+        const string outputPath = "output_with_datepicker.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure input file exists; if not, start with a new empty document
+        Document doc;
+        if (File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            doc = new Document(inputPath);
+        }
+        else
+        {
+            doc = new Document();
+            // Add a blank page to host the form field
+            doc.Pages.Add();
         }
 
-        try
+        using (doc)
         {
-            // Open the existing PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Use the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Define the rectangle where the date picker will appear
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
+
+            // Aspose.Pdf does not expose a dedicated DateTimeField in older versions.
+            // Use a TextBoxField and set its default value to the current system date.
+            TextBoxField dateField = new TextBoxField(page, rect)
             {
-                // Access the first page (1‑based indexing)
-                Page page = doc.Pages[1];
+                PartialName = "DatePicker",
+                // Format the date as ISO (yyyy‑MM‑dd) – adjust as needed for your locale.
+                Value = DateTime.Now.ToString("yyyy-MM-dd")
+            };
 
-                // Define the field rectangle (lower‑left x, lower‑right y, upper‑right x, upper‑right y)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 250, 630);
+            // Set appearance using the DefaultAppearance constructor
+            dateField.DefaultAppearance = new DefaultAppearance(
+                "Helvetica",
+                12,
+                System.Drawing.Color.Black);
 
-                // NOTE: In older Aspose.Pdf versions the DateTimeField class may be missing.
-                // Use a TextBoxField to act as a date picker and set its default value to the current date.
-                TextBoxField dateField = new TextBoxField(page, rect);
-                dateField.PartialName = "DatePicker";
-                // Set the default value to the current system date (format can be adjusted as needed)
-                dateField.Value = DateTime.Now.ToString("yyyy-MM-dd");
+            // Add the field to the document's form collection (also appears on the page)
+            doc.Form.Add(dateField, page.Number);
 
-                // Add the field to the page's annotations collection
-                page.Annotations.Add(dateField);
-
-                // Save the modified PDF (default PDF format)
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF saved with date picker field: '{outputPath}'");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF with date picker saved to '{outputPath}'.");
     }
 }

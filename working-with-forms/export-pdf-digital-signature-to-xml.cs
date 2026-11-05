@@ -1,98 +1,94 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Text;
 using System.Security.Cryptography.X509Certificates;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class ExportSignatureInfo
 {
     static void Main()
     {
-        const string inputPdfPath = "signed_document.pdf";
-        const string outputXmlPath = "signature_audit.xml";
+        const string pdfPath = "signed.pdf";
+        const string xmlPath = "signature_audit.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Root element for the XML audit file
+            XElement signaturesRoot = new XElement("Signatures");
+
+            // Iterate over all form fields and pick the signature fields
+            if (pdfDoc?.Form?.Fields != null)
             {
-                // Prepare XML writer
-                XmlWriterSettings settings = new XmlWriterSettings
+                foreach (Field field in pdfDoc.Form.Fields)
                 {
-                    Indent = true,
-                    Encoding = Encoding.UTF8
-                };
-
-                using (XmlWriter writer = XmlWriter.Create(outputXmlPath, settings))
-                {
-                    writer.WriteStartDocument();
-                    writer.WriteStartElement("Signatures");
-
-                    // Iterate over all form fields and process only signature fields
-                    foreach (Field field in pdfDoc.Form.Fields)
+                    if (field is SignatureField sigField)
                     {
-                        if (field is SignatureField sigField && sigField.Signature != null)
+                        // Basic field information
+                        XElement sigElement = new XElement("Signature",
+                            new XAttribute("FieldName", sigField.PartialName ?? string.Empty),
+                            new XElement("Rect",
+                                sigField.Rect != null
+                                    ? $"{sigField.Rect.LLX},{sigField.Rect.LLY},{sigField.Rect.URX},{sigField.Rect.URY}"
+                                    : string.Empty)
+                        );
+
+                        // Information stored on the PKCS7 signature (if the field is signed)
+                        if (sigField.Signature != null)
                         {
-                            // Extract certificate to obtain signer details (if available)
-                            string signerName = string.Empty;
-                            string signDate = string.Empty;
+                            // The concrete signature object is usually PKCS7
+                            if (sigField.Signature is PKCS7 pkcs)
+                            {
+                                sigElement.Add(
+                                    new XElement("Reason",       pkcs.Reason       ?? string.Empty),
+                                    new XElement("Location",     pkcs.Location     ?? string.Empty),
+                                    new XElement("ContactInfo",  pkcs.ContactInfo  ?? string.Empty)
+                                    // NOTE: PKCS7 does not expose SigningTime, SignatureAlgorithm or DigestAlgorithm directly.
+                                );
+                            }
+
+                            // Extract the signing certificate (if present)
                             try
                             {
                                 X509Certificate2 cert = sigField.ExtractCertificateObject();
                                 if (cert != null)
                                 {
-                                    signerName = cert.GetNameInfo(X509NameType.SimpleName, false) ?? string.Empty;
-                                    // Use the certificate's NotBefore as a fallback signing date (ISO‑8601)
-                                    signDate = cert.NotBefore.ToString("o");
+                                    sigElement.Add(
+                                        new XElement("CertificateSubject", cert.Subject ?? string.Empty),
+                                        new XElement("CertificateIssuer",  cert.Issuer  ?? string.Empty),
+                                        new XElement("ValidFrom",          cert.NotBefore.ToString("o")),
+                                        new XElement("ValidTo",            cert.NotAfter.ToString("o"))
+                                    );
                                 }
                             }
                             catch
                             {
-                                // If certificate extraction fails, leave fields empty
+                                // If the certificate cannot be extracted, ignore – the audit will still contain other data.
                             }
-
-                            writer.WriteStartElement("Signature");
-
-                            // Field name (the name of the signature field in the form)
-                            writer.WriteElementString("FieldName", sigField.PartialName ?? string.Empty);
-
-                            // Signer name (extracted from the certificate, if present)
-                            writer.WriteElementString("SignerName", signerName);
-
-                            // Location where the document was signed
-                            writer.WriteElementString("Location", sigField.Signature.Location ?? string.Empty);
-
-                            // Reason for signing
-                            writer.WriteElementString("Reason", sigField.Signature.Reason ?? string.Empty);
-
-                            // Contact information
-                            writer.WriteElementString("ContactInfo", sigField.Signature.ContactInfo ?? string.Empty);
-
-                            // Signing date (fallback to certificate date if Signature.SignDate is unavailable)
-                            writer.WriteElementString("SignDate", signDate);
-
-                            writer.WriteEndElement(); // </Signature>
                         }
+
+                        signaturesRoot.Add(sigElement);
                     }
-
-                    writer.WriteEndElement(); // </Signatures>
-                    writer.WriteEndDocument();
                 }
-
-                Console.WriteLine($"Signature information exported to '{outputXmlPath}'.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+
+            // Build the final XML document
+            XDocument auditXml = new XDocument(
+                new XDeclaration("1.0", "utf-8", "yes"),
+                signaturesRoot
+            );
+
+            // Save the XML audit file
+            auditXml.Save(xmlPath);
+            Console.WriteLine($"Signature audit saved to '{xmlPath}'.");
         }
     }
 }

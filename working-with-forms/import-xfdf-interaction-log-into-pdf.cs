@@ -3,74 +3,89 @@ using System.IO;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
-class InteractionReconstructor
+class InteractionReplayer
 {
     static void Main()
     {
-        const string pdfPath        = "input.pdf";
-        const string xmlLogPath     = "interactions.xml";
-        const string outputPdfPath  = "reconstructed_output.pdf";
+        const string pdfPath = "sample.pdf";
+        const string xmlLogPath = "interaction_log.xml";
+        const string outputPdf = "replayed.pdf";
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(xmlLogPath))
         {
             Console.Error.WriteLine($"XML log not found: {xmlLogPath}");
             return;
         }
 
-        // Load interaction log
+        // Load interaction log (expected format: <Log><Action type="..." .../></Log>)
         XDocument logDoc = XDocument.Load(xmlLogPath);
-        // Load PDF document
+
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // Iterate over each Interaction element
-            foreach (XElement interaction in logDoc.Root.Elements("Interaction"))
+            foreach (XElement action in logDoc.Root.Elements("Action"))
             {
-                // Parse required attributes
-                int pageNumber = (int)interaction.Attribute("Page");
-                double x       = (double)interaction.Attribute("X");
-                double y       = (double)interaction.Attribute("Y");
-                string type    = (string)interaction.Attribute("Type") ?? "Interaction";
-                string desc    = (string)interaction.Attribute("Description") ?? $"{type}";
-
-                // Validate page number (Aspose.Pdf uses 1‑based indexing)
-                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+                string type = (string)action.Attribute("type");
+                switch (type)
                 {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber} in log entry; skipping.");
-                    continue;
+                    case "GoToPage":
+                        int pageNum = (int)action.Attribute("page");
+                        if (pageNum >= 1 && pageNum <= pdfDoc.Pages.Count)
+                        {
+                            Page page = pdfDoc.Pages[pageNum];
+                            TextFragment tf = new TextFragment($"[Visited page {pageNum}]");
+                            tf.TextState.FontSize = 12;
+                            tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.2, 0.2);
+                            tf.Position = new Position(50, page.PageInfo.Height - 50);
+                            page.Paragraphs.Add(tf);
+                        }
+                        break;
+
+                    case "AddTextAnnotation":
+                        int annPage = (int)action.Attribute("page");
+                        double x = (double)action.Attribute("x");
+                        double y = (double)action.Attribute("y");
+                        string text = (string)action.Attribute("text");
+                        if (annPage >= 1 && annPage <= pdfDoc.Pages.Count)
+                        {
+                            Page page = pdfDoc.Pages[annPage];
+                            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + 200, y + 50);
+                            TextAnnotation txtAnn = new TextAnnotation(page, rect);
+                            txtAnn.Title = "Log";
+                            txtAnn.Contents = text;
+                            txtAnn.Open = true;
+                            txtAnn.Icon = TextIcon.Note;
+                            page.Annotations.Add(txtAnn);
+                        }
+                        break;
+
+                    case "Zoom":
+                        int zoomPage = (int)action.Attribute("page");
+                        double factor = (double)action.Attribute("factor");
+                        if (zoomPage >= 1 && zoomPage <= pdfDoc.Pages.Count)
+                        {
+                            Page page = pdfDoc.Pages[zoomPage];
+                            TextFragment zoomTf = new TextFragment($"[Zoom factor: {factor}]");
+                            zoomTf.TextState.FontSize = 10;
+                            zoomTf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.2, 0.2, 0.8);
+                            zoomTf.Position = new Position(50, page.PageInfo.Height - 70);
+                            page.Paragraphs.Add(zoomTf);
+                        }
+                        break;
+
+                    // Additional action types can be handled here
                 }
-
-                Page page = pdfDoc.Pages[pageNumber];
-
-                // Define a small rectangle around the point (width=20, height=20)
-                // Use fully qualified Rectangle to avoid ambiguity
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(x, y, x + 20, y + 20);
-
-                // Create a text annotation showing the interaction description
-                TextAnnotation annotation = new TextAnnotation(page, rect)
-                {
-                    Title    = type,
-                    Contents = desc,
-                    Open     = true,
-                    Icon     = TextIcon.Note,
-                    // Use Aspose.Pdf.Color for cross‑platform compatibility
-                    Color    = Aspose.Pdf.Color.LightYellow
-                };
-
-                // Add the annotation to the page
-                page.Annotations.Add(annotation);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Reconstructed PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Replayed interactions saved to '{outputPdf}'.");
     }
 }
