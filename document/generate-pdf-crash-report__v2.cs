@@ -1,69 +1,77 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class CrashReportGenerator
+class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string reportPath = "crash_report.txt";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Ensure the input file exists before processing
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Example operation: add a simple text fragment to the first page
-                // (Replace with any complex PDF processing as needed)
-                if (doc.Pages.Count > 0)
-                {
-                    var page = doc.Pages[1];
-                    TextFragment text = new TextFragment("Processing successful.");
-                    page.Paragraphs.Add(text);
-                }
+                // Example operation: extract all text from the document
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages.Accept(absorber);
+                string extractedText = absorber.Text;
 
-                // Save the modified document
-                doc.Save(outputPdf);
-                Console.WriteLine($"Document processed and saved to '{outputPdf}'.");
+                // (Optional) Use the extracted text for further processing here
+
+                // Save the (potentially modified) document; no SaveOptions needed for PDF output
+                doc.Save(outputPath);
             }
+
+            Console.WriteLine($"Processing completed successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // Build a custom stack trace message
-            StringWriter customTrace = new StringWriter();
-            customTrace.WriteLine("=== Crash Report ===");
-            customTrace.WriteLine($"Timestamp: {DateTime.UtcNow:O}");
-            customTrace.WriteLine($"Input File: {inputPdf}");
-            customTrace.WriteLine($"Output File: {outputPdf}");
-            customTrace.WriteLine($"Exception Type: {ex.GetType().FullName}");
-            customTrace.WriteLine($"Message: {ex.Message}");
-            customTrace.WriteLine("=== Original Stack Trace ===");
-            customTrace.WriteLine(ex.StackTrace);
-            customTrace.WriteLine("=== End of Report ===");
+            // Build a detailed crash report with a custom stack trace
+            string crashReport = BuildCustomStackTrace(ex);
 
-            // Write the report to a file
-            try
-            {
-                File.WriteAllText(reportPath, customTrace.ToString());
-                Console.Error.WriteLine($"An error occurred. Crash report written to '{reportPath}'.");
-            }
-            catch (Exception writeEx)
-            {
-                // If writing the report fails, output both errors to console
-                Console.Error.WriteLine("Failed to write crash report:");
-                Console.Error.WriteLine(writeEx);
-                Console.Error.WriteLine("Original exception:");
-                Console.Error.WriteLine(ex);
-            }
+            // Write the report to a file for later analysis
+            const string reportPath = "crash_report.txt";
+            File.WriteAllText(reportPath, crashReport);
+
+            Console.Error.WriteLine($"An error occurred. See '{reportPath}' for details.");
         }
+    }
+
+    // Constructs a custom stack trace including timestamp, context, and inner exceptions
+    static string BuildCustomStackTrace(Exception ex)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        sb.AppendLine($"Timestamp: {DateTime.UtcNow:O}");
+        sb.AppendLine($"Exception Type: {ex.GetType().FullName}");
+        sb.AppendLine($"Message: {ex.Message}");
+        sb.AppendLine("Custom Context: PDF processing operation failed.");
+        sb.AppendLine("Original StackTrace:");
+        sb.AppendLine(ex.StackTrace ?? "No stack trace available.");
+
+        // Include any inner exceptions recursively
+        Exception inner = ex.InnerException;
+        while (inner != null)
+        {
+            sb.AppendLine("--- Inner Exception ---");
+            sb.AppendLine($"Type: {inner.GetType().FullName}");
+            sb.AppendLine($"Message: {inner.Message}");
+            sb.AppendLine(inner.StackTrace ?? "No stack trace available.");
+            inner = inner.InnerException;
+        }
+
+        return sb.ToString();
     }
 }

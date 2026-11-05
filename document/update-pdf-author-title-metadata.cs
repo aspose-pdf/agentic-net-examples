@@ -7,29 +7,26 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "updated.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF, modify metadata, and save
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Read existing metadata (optional, for demonstration)
-            string currentAuthor = doc.Info.Author;
-            string currentTitle  = doc.Info.Title;
-            Console.WriteLine($"Current Author: {currentAuthor}");
-            Console.WriteLine($"Current Title : {currentTitle}");
+            // Read existing metadata (optional, just for demonstration)
+            Console.WriteLine($"Original Author: {doc.Info.Author}");
+            Console.WriteLine($"Original Title : {doc.Info.Title}");
 
-            // Modify metadata fields
+            // Modify the metadata fields
             doc.Info.Author = "New Author Name";
             doc.Info.Title  = "New Document Title";
 
-            // Save the updated PDF
+            // Save the changes back to a PDF file
             doc.Save(outputPath);
         }
 

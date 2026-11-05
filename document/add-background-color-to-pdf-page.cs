@@ -16,31 +16,32 @@ class Program
             return;
         }
 
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create a Graph that spans the whole page – Graph is the container for drawing shapes
-            Graph graph = new Graph((float)page.PageInfo.Width, (float)page.PageInfo.Height);
+            // Page dimensions as floats (required by drawing APIs)
+            float pageWidth = (float)page.PageInfo.Width;
+            float pageHeight = (float)page.PageInfo.Height;
 
-            // Create a rectangle that covers the whole page (left, bottom, width, height)
-            var background = new Aspose.Pdf.Drawing.Rectangle(
-                0f,
-                0f,
-                (float)page.PageInfo.Width,
-                (float)page.PageInfo.Height);
+            // Create a Graph that spans the whole page – the Graph is a paragraph
+            Graph graph = new Graph(pageWidth, pageHeight);
 
-            // Initialise GraphInfo and set a semi‑transparent fill colour (30 % opacity)
-            background.GraphInfo = new GraphInfo();
-            // 30 % opacity => alpha ≈ 0.3 × 255 ≈ 76
-            background.GraphInfo.FillColor = Aspose.Pdf.Color.FromArgb(76, 230, 230, 230);
+            // Create a rectangle shape that covers the page (left, bottom, width, height)
+            Aspose.Pdf.Drawing.Rectangle bgRect = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, pageWidth, pageHeight);
 
-            // Add the rectangle to the graph, then add the graph to the page
-            graph.Shapes.Add(background);
-            page.Paragraphs.Add(graph);
+            // Set a semi‑transparent light‑gray fill (alpha ≈ 30% → 77/255)
+            bgRect.GraphInfo.FillColor = Aspose.Pdf.Color.FromArgb(77, 211, 211, 211);
+            // Optional: no visible border
+            bgRect.GraphInfo.Color = Aspose.Pdf.Color.Transparent;
 
-            // Save the modified PDF
+            // Add the rectangle to the graph, then insert the graph at the beginning of the page content
+            graph.Shapes.Add(bgRect);
+            page.Paragraphs.Insert(0, graph);
+
+            // Save the modified PDF (Document.Save writes PDF by default)
             doc.Save(outputPath);
         }
 

@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_metadata.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,18 +18,22 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Update standard document information
-            doc.Info.Title = "Report with Custom XML Metadata";
-            doc.Info.Author = "Acme Corp";
+            // Build custom XML metadata
+            string customXml = $"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                "<customMetadata>\n" +
+                "    <processId>12345</processId>\n" +
+                $"    <timestamp>{DateTime.UtcNow:O}</timestamp>\n" +
+                "    <notes>Downstream processing information</notes>\n" +
+                "</customMetadata>";
 
-            // Add custom XML metadata (key/value pair) to the document info dictionary
-            const string xmlKey = "CustomXml";
-            const string xmlValue = @"<metadata><processId>12345</processId><timestamp>2024-09-28T12:34:56Z</timestamp></metadata>";
+            // Store the raw XML in the document's custom metadata dictionary using the indexer
+            doc.Info["CustomXml"] = customXml;
 
-            // Store custom metadata using the DocumentInfo indexer (supported API)
-            doc.Info[xmlKey] = xmlValue;
+            // Optionally add simple key/value pairs to the custom metadata dictionary
+            doc.Info["ProcessId"] = "12345";
+            doc.Info["Timestamp"] = DateTime.UtcNow.ToString("o");
 
-            // Save the modified PDF
+            // Save while the Document object is still alive
             doc.Save(outputPath);
         }
 

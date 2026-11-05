@@ -6,36 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Define the directory where crash reports will be written
-        string crashReportDir = Path.Combine(Directory.GetCurrentDirectory(), "CrashReports");
-        Directory.CreateDirectory(crashReportDir);
+        // Paths
+        const string inputPdf = "sample.pdf";               // existing PDF
+        const string crashDir = "CrashReports";             // directory for crash reports
 
-        // Intentionally cause an Aspose.Pdf error to generate a crash report
+        // Ensure the crash report directory exists
+        Directory.CreateDirectory(crashDir);
+
         try
         {
-            // Loading a non‑existent file throws an exception and triggers the crash report
-            using (Document doc = new Document("nonexistent.pdf"))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // No further actions needed
+                // Intentionally cause an exception (invalid page index) to trigger a crash report
+                // Aspose.Pdf uses 1‑based indexing; page 0 will throw IndexOutOfRangeException
+                Page invalidPage = doc.Pages[0];
+                Console.WriteLine(invalidPage);
             }
         }
         catch (Exception ex)
         {
-            // Create CrashReportOptions with the caught exception and configure the output location
+            // Generate a crash report in the specified directory
             var crashOptions = new CrashReportOptions(ex)
             {
-                CrashReportDirectory = crashReportDir,
+                CrashReportDirectory = crashDir,
                 CrashReportFilename = "crash_report.html",
                 CustomMessage = "Unexpected error during PDF processing."
             };
-            // Generate the crash report manually
             PdfException.GenerateCrashReport(crashOptions);
+
+            Console.WriteLine($"Caught exception: {ex.Message}");
         }
 
-        // Verify that a crash report file was saved in the specified directory
-        bool reportExists = Directory.GetFiles(crashReportDir, "*.html", SearchOption.TopDirectoryOnly).Length > 0;
-        Console.WriteLine(reportExists
-            ? $"Crash report successfully saved to '{crashReportDir}'."
-            : $"No crash report found in '{crashReportDir}'.");
+        // Verify that at least one crash report file was created in the output directory
+        string[] reportFiles = Directory.GetFiles(crashDir);
+        if (reportFiles.Length > 0)
+        {
+            Console.WriteLine($"Crash report generated successfully. Files:");
+            foreach (string file in reportFiles)
+                Console.WriteLine($"  {Path.GetFileName(file)}");
+        }
+        else
+        {
+            Console.WriteLine("No crash report files were found. Verification failed.");
+        }
     }
 }

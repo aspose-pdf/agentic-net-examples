@@ -16,36 +16,50 @@ class Program
             return;
         }
 
-        // Load the scanned PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over each page and overlay invisible OCR text
-            foreach (Page page in doc.Pages)
+            // Load the scanned PDF inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPath))
             {
-                // TODO: replace this placeholder with actual OCR result for the current page
-                string ocrText = "Extracted searchable text for this page.";
+                // Pages are 1‑based in Aspose.Pdf.
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
 
-                // Create a TextFragment containing the OCR text
-                TextFragment textFragment = new TextFragment(ocrText);
+                    // TODO: Replace this stub with real OCR extraction logic.
+                    string ocrText = GetOcrTextForPage(page, i);
+                    if (string.IsNullOrEmpty(ocrText))
+                        continue;
 
-                // Make the text effectively invisible:
-                //   • Set font size to 0
-                //   • Use a fully transparent color
-                textFragment.TextState.Font = FontRepository.FindFont("Arial");
-                textFragment.TextState.FontSize = 0;
-                textFragment.TextState.ForegroundColor = Color.FromArgb(0, 0, 0, 0);
+                    // Create a text fragment that will be invisible.
+                    TextFragment tf = new TextFragment(ocrText);
+                    tf.TextState.Font = FontRepository.FindFont("Arial");
+                    tf.TextState.FontSize = 0.1F; // float literal required
+                    // Fully transparent text – use an ARGB color with alpha = 0.
+                    tf.TextState.ForegroundColor = Color.FromArgb(0, 0, 0, 0);
+                    tf.Position = new Position(0, 0); // start at page origin
 
-                // Position the text at the lower‑left corner of the page
-                textFragment.Position = new Position(0, 0);
+                    // Add the invisible text to the page.
+                    page.Paragraphs.Add(tf);
+                }
 
-                // Add the invisible text to the page
-                page.Paragraphs.Add(textFragment);
+                // Save the resulting searchable PDF.
+                doc.Save(outputPath);
             }
 
-            // Save the searchable PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Searchable PDF saved to '{outputPath}'.");
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
 
-        Console.WriteLine($"Searchable PDF saved to '{outputPath}'.");
+    // Placeholder OCR method – integrate Aspose.OCR or another OCR engine here.
+    static string GetOcrTextForPage(Page page, int pageNumber)
+    {
+        // Return extracted text for the given page.
+        // For demonstration purposes this returns an empty string.
+        return string.Empty;
     }
 }

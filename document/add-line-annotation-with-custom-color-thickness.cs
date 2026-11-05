@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string searchText = "highlight"; // text to locate
 
         if (!File.Exists(inputPath))
         {
@@ -16,38 +18,56 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Find the first occurrence of the target text
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            doc.Pages.Accept(absorber);
+
+            Rectangle targetRect = null;
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Get the first page (Aspose.Pdf uses 1‑based indexing)
-                Page page = doc.Pages[1];
-
-                // Create a Graph container that spans the whole page
-                Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-                // Define the line geometry (start X,Y and end X,Y)
-                // The constructor expects an array: [x1, y1, x2, y2]
-                Line line = new Line(new float[] { 100f, 500f, 200f, 500f });
-
-                // Customize appearance: color and thickness
-                line.GraphInfo.Color = Color.Blue;
-                line.GraphInfo.LineWidth = 2f; // thickness in points
-
-                // Add the line to the graph and the graph to the page
-                graph.Shapes.Add(line);
-                page.Paragraphs.Add(graph);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                if (!string.IsNullOrEmpty(fragment.Text) && fragment.Text.Contains(searchText))
+                {
+                    targetRect = fragment.Rectangle; // rectangle of the found text fragment
+                    break;
+                }
             }
 
-            Console.WriteLine($"Line annotation added and saved to '{outputPath}'.");
+            if (targetRect != null)
+            {
+                // Create a line annotation that spans the rectangle of the found text
+                var lineAnnot = new LineAnnotation(
+                    doc.Pages[1],
+                    new Rectangle(
+                        targetRect.LLX,
+                        targetRect.LLY,
+                        targetRect.URX,
+                        targetRect.URY),
+                    new Point(targetRect.LLX, targetRect.LLY),
+                    new Point(targetRect.URX, targetRect.URY));
+
+                // Set custom appearance: red color and 2‑point thickness
+                lineAnnot.Color = Color.FromRgb(1.0, 0.0, 0.0); // red
+                lineAnnot.Width = 2; // line thickness
+
+                // (Optional) Explicitly set the start and end points – they are already set by the constructor
+                lineAnnot.Starting = new Point(targetRect.LLX, targetRect.LLY);
+                lineAnnot.Ending   = new Point(targetRect.URX, targetRect.URY);
+
+                // Add the annotation to the page
+                doc.Pages[1].Annotations.Add(lineAnnot);
+            }
+            else
+            {
+                Console.WriteLine($"Text \"{searchText}\" not found in the document.");
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Line annotation added and saved to '{outputPath}'.");
     }
 }

@@ -1,86 +1,68 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-// Minimal NUnit stubs to allow compilation without the NUnit package
-namespace NUnit.Framework
+class Program
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    public static class Assert
+    // Entry point
+    static void Main(string[] args)
     {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        // Input PDF path (adjust as needed)
+        const string inputPdfPath = "sample.pdf";
+
+        // Output directory for generated images
+        const string outputDir = "PageImages";
+
+        // Validate input file existence
+        if (!File.Exists(inputPdfPath))
         {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
-    }
-}
 
-namespace AsposePdfTests
-{
-    [NUnit.Framework.TestFixture]
-    public class PdfConversionTests
-    {
-        [NUnit.Framework.Test]
-        public void ConvertPagesToImages_ShouldGenerateImageForEachPage()
+        // Ensure output directory exists and is empty
+        if (Directory.Exists(outputDir))
         {
-            // Arrange: create temporary directories for input PDF and output images
-            string tempRoot = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(tempRoot);
-            string pdfPath = Path.Combine(tempRoot, "sample.pdf");
-            string imageOutputDir = Path.Combine(tempRoot, "Images");
-            Directory.CreateDirectory(imageOutputDir);
+            foreach (var file in Directory.GetFiles(outputDir))
+                File.Delete(file);
+        }
+        else
+        {
+            Directory.CreateDirectory(outputDir);
+        }
 
-            // Create a PDF with a known number of pages (e.g., 3 pages)
-            const int pageCount = 3;
-            using (Document doc = new Document())
+        // Load PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            int pageCount = pdfDoc.Pages.Count; // 1‑based page count
+
+            // Convert each page to a PNG image
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                for (int i = 1; i <= pageCount; i++) // 1‑based indexing per rule
-                {
-                    doc.Pages.Add();
-                }
-                doc.Save(pdfPath);
-            }
+                string imagePath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
 
-            // Act: convert each PDF page to an image using the core Device API
-            using (Document doc = new Document(pdfPath))
-            {
-                // Use JpegDevice (core API) to render pages as JPEG images
-                var resolution = new Resolution(300);
-                var jpegDevice = new JpegDevice(resolution);
-
-                int pageNumber = 1;
-                foreach (Page page in doc.Pages)
+                // Create a PNG device (default settings)
+                using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
                 {
-                    string imagePath = Path.Combine(imageOutputDir, $"page_{pageNumber}.jpg");
-                    using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
-                    {
-                        jpegDevice.Process(page, imageStream);
-                    }
-                    pageNumber++;
+                    PngDevice pngDevice = new PngDevice();
+                    // Process the specific page and write to the stream
+                    pngDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
                 }
             }
 
-            // Assert: verify that an image file exists for each PDF page
-            string[] generatedImages = Directory.GetFiles(imageOutputDir, "page_*.jpg");
-            NUnit.Framework.Assert.AreEqual(pageCount, generatedImages.Length,
-                $"Expected {pageCount} image files, but found {generatedImages.Length}.");
+            // Verification: count generated image files
+            int generatedImages = Directory.GetFiles(outputDir, "*.png").Length;
 
-            // Cleanup temporary files
-            Directory.Delete(tempRoot, true);
+            if (generatedImages == pageCount)
+            {
+                Console.WriteLine($"Success: {generatedImages} image(s) generated for {pageCount} page(s).");
+            }
+            else
+            {
+                Console.Error.WriteLine($"Failure: Expected {pageCount} images, but found {generatedImages}.");
+            }
         }
-    }
-
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    // In a real test project this class would not be needed, but adding it removes the CS5001 error.
-    public static class Program
-    {
-        public static void Main() { /* No‑op */ }
     }
 }

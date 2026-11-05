@@ -1,12 +1,39 @@
-// URL-STABILITY STUB
-//
-// Customize toc formatting
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/document/AGENTS.md
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using System.Drawing;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF inside a using block to ensure deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Add a top‑level bookmark (outline) that points to the first page.
+            // OutlineItemCollection constructor takes the parent collection (doc.Outlines).
+            OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = "First Page",
+                // Use an explicit destination; XYZExplicitDestination lives in Aspose.Pdf.Annotations.
+                Destination = new XYZExplicitDestination(doc.Pages[1], 0, doc.Pages[1].Rect.Height, 1)
+            };
+            doc.Outlines.Add(bookmark);
+
+            // Save the modified PDF (PDF format)
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Processing completed and saved to '{outputPath}'.");
+    }
+}

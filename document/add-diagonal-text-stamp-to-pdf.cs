@@ -8,8 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string message = "Custom Message";
+        const string outputPath = "output_line_stamp.pdf";
+        const string message = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,34 +17,45 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a TextStamp that will act as a line‑like annotation displaying the custom message
-            TextStamp textStamp = new TextStamp(message);
-            textStamp.Background = false;
-            textStamp.Opacity = 0.5;
-            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            textStamp.VerticalAlignment = VerticalAlignment.Center;
-
-            // Define the visual appearance of the text (modify the existing TextState instance)
-            textStamp.TextState.FontSize = 24;
-            textStamp.TextState.FontStyle = FontStyles.Bold;
-            textStamp.TextState.ForegroundColor = Color.Red;
-
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Load the PDF document
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
             {
-                // Make the stamp span the whole width of the current page
-                textStamp.Width = page.PageInfo.Width;
-                // Add the stamp to the current page
-                page.AddStamp(textStamp);
+                // Iterate through all pages and add a rotated text stamp
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Aspose.Pdf.Page page = doc.Pages[i];
+
+                    // Create a TextStamp with the custom message
+                    Aspose.Pdf.TextStamp textStamp = new Aspose.Pdf.TextStamp(message)
+                    {
+                        Background = false,
+                        Opacity = 0.5,
+                        HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center,
+                        VerticalAlignment = Aspose.Pdf.VerticalAlignment.Center,
+                        // Use RotateAngle (float) instead of the non‑existent Rotate property
+                        RotateAngle = 45f // diagonal across the page
+                    };
+
+                    // Set font and color
+                    textStamp.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Arial");
+                    textStamp.TextState.FontSize = 72;
+                    textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(255, 0, 0); // red
+
+                    // Add the stamp to the current page
+                    page.AddStamp(textStamp);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Line stamp added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Line‑like stamp added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

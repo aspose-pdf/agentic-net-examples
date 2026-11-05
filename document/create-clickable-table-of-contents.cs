@@ -10,92 +10,100 @@ class Program
     {
         const string outputPath = "TableOfContents.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal.
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
             // -----------------------------------------------------------------
-            // 1. Create a Table of Contents (TOC) page.
+            // 1. Create a Table of Contents (TOC) page
             // -----------------------------------------------------------------
             Page tocPage = doc.Pages.Add();
-            // Add a title for the TOC.
+
+            // Title for TOC page
             TextFragment tocTitle = new TextFragment("Table of Contents")
             {
-                TextState = { FontSize = 20, FontStyle = FontStyles.Bold, ForegroundColor = Aspose.Pdf.Color.Black },
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Top,
-                Position = new Position(0, 800) // Y coordinate from top of page.
+                TextState = { FontSize = 20, FontStyle = FontStyles.Bold }
             };
+            tocTitle.Position = new Position(50, 750);
             tocPage.Paragraphs.Add(tocTitle);
 
             // -----------------------------------------------------------------
-            // 2. Create content sections on separate pages.
-            //    Store a reference to each section page for the links.
+            // 2. Create section pages with headings
             // -----------------------------------------------------------------
-            const int sectionCount = 3;
-            Page[] sectionPages = new Page[sectionCount];
-            for (int i = 0; i < sectionCount; i++)
+            // Example: three sections
+            string[] sectionTitles = { "Introduction", "Usage Guidelines", "Conclusion" };
+            int[] sectionPageNumbers = new int[sectionTitles.Length]; // will hold page numbers
+
+            for (int i = 0; i < sectionTitles.Length; i++)
             {
-                // Add a new page for the section.
-                Page sectionPage = doc.Pages.Add();
-                sectionPages[i] = sectionPage;
+                // Add a new page for the section
+                Page secPage = doc.Pages.Add();
 
-                // Add a heading for the section.
-                TextFragment heading = new TextFragment($"Section {i + 1}")
-                {
-                    TextState = { FontSize = 18, FontStyle = FontStyles.Bold, ForegroundColor = Aspose.Pdf.Color.DarkBlue },
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    Position = new Position(0, 750)
-                };
-                sectionPage.Paragraphs.Add(heading);
+                // Record the page number (1‑based indexing)
+                sectionPageNumbers[i] = doc.Pages.Count; // current last page
 
-                // Add some placeholder body text.
-                TextFragment body = new TextFragment($"This is the content of section {i + 1}.")
+                // Add a heading to the section page
+                TextFragment heading = new TextFragment(sectionTitles[i])
                 {
-                    TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.Black },
-                    Position = new Position(50, 700)
+                    TextState = { FontSize = 18, FontStyle = FontStyles.Bold }
                 };
-                sectionPage.Paragraphs.Add(body);
+                heading.Position = new Position(50, 750);
+                secPage.Paragraphs.Add(heading);
+
+                // Add some placeholder body text
+                TextFragment body = new TextFragment("Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                                                      "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
+                {
+                    TextState = { FontSize = 12 }
+                };
+                body.Position = new Position(50, 720);
+                secPage.Paragraphs.Add(body);
             }
 
             // -----------------------------------------------------------------
-            // 3. Populate the TOC page with entries and link annotations.
+            // 3. Populate the TOC page with entries linked to the sections
             // -----------------------------------------------------------------
-            const double startY = 700; // Starting Y coordinate for the first entry.
-            const double lineHeight = 30;
-            for (int i = 0; i < sectionCount; i++)
+            const double startY = 700;   // starting Y coordinate for first entry
+            const double lineHeight = 20;
+            double currentY = startY;
+
+            for (int i = 0; i < sectionTitles.Length; i++)
             {
-                // Text for the TOC entry.
-                string entryText = $"Section {i + 1}";
-                TextFragment entry = new TextFragment(entryText)
+                // Create a visible TOC entry
+                TextFragment entry = new TextFragment($"{i + 1}. {sectionTitles[i]}")
                 {
-                    TextState = { FontSize = 14, ForegroundColor = Aspose.Pdf.Color.Blue },
-                    Position = new Position(100, startY - i * lineHeight)
+                    TextState = { FontSize = 14, ForegroundColor = Color.Blue, Underline = true }
                 };
+                entry.Position = new Position(60, currentY);
                 tocPage.Paragraphs.Add(entry);
 
-                // Approximate width: font size * number of characters * 0.5 (simple heuristic).
-                double textWidth = entry.TextState.FontSize * entryText.Length * 0.5;
-                double textHeight = entry.TextState.FontSize + 2;
-
-                // Define the rectangle for the link annotation.
+                // Approximate width based on character count; adjust as needed.
+                double entryWidth = entry.TextState.FontSize * entry.Text.Length * 0.5;
                 Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(
                     entry.Position.XIndent,
-                    entry.Position.YIndent - textHeight,
-                    entry.Position.XIndent + textWidth,
-                    entry.Position.YIndent);
+                    entry.Position.YIndent,
+                    entry.Position.XIndent + entryWidth,
+                    entry.Position.YIndent + entry.TextState.FontSize);
 
-                // Create a link annotation that jumps to the corresponding section page.
+                // Create a link annotation that jumps to the target page
                 LinkAnnotation link = new LinkAnnotation(tocPage, linkRect)
                 {
-                    Action = new GoToAction(sectionPages[i])
+                    Action = new GoToAction(doc.Pages[sectionPageNumbers[i]])
                 };
 
-                // Add the annotation to the TOC page.
+                // Add the annotation to the TOC page
                 tocPage.Annotations.Add(link);
+
+                // Move to next line
+                currentY -= lineHeight;
             }
 
             // -----------------------------------------------------------------
-            // 4. Save the PDF document.
+            // 4. Save the PDF document
             // -----------------------------------------------------------------
             doc.Save(outputPath);
         }

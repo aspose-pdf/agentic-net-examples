@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Sample data collection that determines the number of table rows
-        var data = new List<(string Name, int Quantity)>
+        // Sample data collection; can be replaced with any dynamic source
+        var data = new List<(string Name, string Value)>
         {
-            ("Apples", 10),
-            ("Bananas", 5),
-            ("Cherries", 12),
-            ("Dates", 7)
+            ("Item A", "100"),
+            ("Item B", "200"),
+            ("Item C", "300")
+            // Add more rows as needed
         };
 
         const string outputPath = "dynamic_table.pdf";
@@ -22,52 +23,75 @@ class Program
         // Create the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a page that will contain the visual table
             Page page = doc.Pages.Add();
 
-            // Create a table with two columns; set column widths and a border
+            // Create a visual Table object
             Table table = new Table
             {
-                ColumnWidths = "200 100", // first column 200 units, second column 100 units
+                ColumnWidths = "200 200", // two equal-width columns
                 Border = new BorderInfo(BorderSide.All, 0.5f)
             };
 
-            // Add a header row
+            // Header row
             Row header = table.Rows.Add();
-            Cell headerCell1 = header.Cells.Add("Product");
-            Cell headerCell2 = header.Cells.Add("Quantity");
+            Cell headerCell1 = header.Cells.Add("Name");
+            Cell headerCell2 = header.Cells.Add("Value");
+            headerCell1.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            headerCell2.BackgroundColor = Aspose.Pdf.Color.LightGray;
 
-            // Style header cells (background color, bold text, margins)
-            foreach (Cell cell in header.Cells)
-            {
-                cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
-                cell.DefaultCellTextState = new TextState
-                {
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold
-                };
-                cell.Margin = new MarginInfo(5, 5, 5, 5);
-            }
-
-            // Dynamically add a row for each item in the data collection
+            // Dynamically add data rows based on the collection size
             foreach (var item in data)
             {
                 Row row = table.Rows.Add();
-                Cell nameCell = row.Cells.Add(item.Name);
-                Cell qtyCell = row.Cells.Add(item.Quantity.ToString());
-
-                // Optional styling for data cells
-                foreach (Cell cell in row.Cells)
-                {
-                    cell.DefaultCellTextState = new TextState { FontSize = 11 };
-                    cell.Margin = new MarginInfo(5, 5, 5, 5);
-                }
+                row.Cells.Add(item.Name);
+                row.Cells.Add(item.Value);
             }
 
-            // Add the completed table to the page's paragraph collection
+            // Add the visual table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF file (no SaveOptions needed for PDF output)
+            // ---------- Accessibility tagging ----------
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Dynamic Data Table");
+
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create a tagged table element
+            TableElement taggedTable = tagged.CreateTableElement();
+            taggedTable.AlternativeText = "Data table with dynamic rows.";
+            root.AppendChild(taggedTable);
+
+            // Table header (thead)
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            taggedTable.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+            TableTHElement thName = tagged.CreateTableTHElement();
+            thName.SetText("Name");
+            headerRow.AppendChild(thName);
+            TableTHElement thValue = tagged.CreateTableTHElement();
+            thValue.SetText("Value");
+            headerRow.AppendChild(thValue);
+
+            // Table body (tbody) with rows matching the data collection
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            taggedTable.AppendChild(tbody);
+            foreach (var item in data)
+            {
+                TableTRElement dataRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
+                TableTDElement tdName = tagged.CreateTableTDElement();
+                tdName.SetText(item.Name);
+                dataRow.AppendChild(tdName);
+                TableTDElement tdValue = tagged.CreateTableTDElement();
+                tdValue.SetText(item.Value);
+                dataRow.AppendChild(tdValue);
+            }
+
+            // Save the PDF (no PreSave needed)
             doc.Save(outputPath);
         }
 

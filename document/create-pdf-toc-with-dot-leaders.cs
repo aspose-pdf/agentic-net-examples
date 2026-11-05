@@ -1,127 +1,93 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class CreatePdfWithToc
 {
     static void Main()
     {
-        // Output file path (adjust as needed)
-        const string outputPath = "TableOfContents.pdf";
+        // Output file path
+        const string outputPath = "toc.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // Sample TOC entries (title and target page number)
+        var tocEntries = new (string Title, int Page)[]
         {
-            // -----------------------------------------------------------------
-            // 1. Create a page that will hold the Table of Contents (TOC)
-            // -----------------------------------------------------------------
-            Page tocPage = doc.Pages.Add();
+            ("Introduction", 1),
+            ("Getting Started", 5),
+            ("Advanced Topics", 12),
+            ("Conclusion", 20)
+        };
 
-            // Determine safe Y‑coordinates based on the page height to avoid out‑of‑range errors
-            double pageHeight = tocPage.PageInfo.Height;
-            double marginTop = 50;               // distance from top edge
-            double currentY = pageHeight - marginTop; // start position for the title
+        // Determine the longest title length for dot leader calculation
+        int maxTitleLength = 0;
+        foreach (var entry in tocEntries)
+        {
+            if (entry.Title.Length > maxTitleLength)
+                maxTitleLength = entry.Title.Length;
+        }
 
-            // Add a title for the TOC
-            TextFragment tocTitle = new TextFragment("Table of Contents")
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        {
+            // Add a page for the Table of Contents
+            Aspose.Pdf.Page tocPage = doc.Pages.Add();
+
+            // Create a table with two columns: Title (with dot leaders) and Page number
+            Aspose.Pdf.Table tocTable = new Aspose.Pdf.Table
             {
-                TextState =
-                {
-                    FontSize = 20,
-                    FontStyle = FontStyles.Bold,
-                    Font = FontRepository.FindFont("Arial") ?? FontRepository.FindFont("Helvetica")
-                },
-                Position = new Position(50, currentY)
+                // Set column widths (percentage of page width)
+                ColumnWidths = "70% 30%"
             };
-            tocPage.Paragraphs.Add(tocTitle);
 
-            // -----------------------------------------------------------------
-            // 2. Create content sections and collect their titles and page numbers
-            // -----------------------------------------------------------------
-            // NOTE: Aspose.Pdf evaluation mode allows a maximum of 4 pages. To stay within the limit we use three sections.
-            string[] sectionTitles = { "Introduction", "Getting Started", "Advanced Topics" };
-            var tocEntries = new List<(string Title, int PageNumber)>();
+            // Header row
+            Aspose.Pdf.Row headerRow = tocTable.Rows.Add();
+            Aspose.Pdf.Cell headerTitleCell = headerRow.Cells.Add();
+            Aspose.Pdf.Cell headerPageCell = headerRow.Cells.Add();
 
-            foreach (string title in sectionTitles)
-            {
-                // Add a new page for each section
-                Page contentPage = doc.Pages.Add();
+            Aspose.Pdf.Text.TextFragment headerTitle = new Aspose.Pdf.Text.TextFragment("Section");
+            // Configure header title style via the existing TextState instance
+            headerTitle.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica-Bold");
+            headerTitle.TextState.FontSize = 14;
+            headerTitle.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            headerTitleCell.Paragraphs.Add(headerTitle);
 
-                // Record the page number (Aspose.Pdf uses 1‑based indexing)
-                int pageNumber = doc.Pages.Count; // current last page index
+            Aspose.Pdf.Text.TextFragment headerPage = new Aspose.Pdf.Text.TextFragment("Page");
+            headerPage.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica-Bold");
+            headerPage.TextState.FontSize = 14;
+            headerPage.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            headerPageCell.Paragraphs.Add(headerPage);
 
-                // Add a heading on the page (positioned safely within page bounds)
-                double headingY = contentPage.PageInfo.Height - 50; // 50 points from top
-                TextFragment heading = new TextFragment(title)
-                {
-                    TextState =
-                    {
-                        FontSize = 18,
-                        FontStyle = FontStyles.Bold,
-                        Font = FontRepository.FindFont("Arial") ?? FontRepository.FindFont("Helvetica")
-                    },
-                    Position = new Position(50, headingY)
-                };
-                contentPage.Paragraphs.Add(heading);
-
-                // Add some placeholder body text (a little lower than the heading)
-                double bodyY = headingY - 30;
-                TextFragment body = new TextFragment(
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                    "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")
-                {
-                    TextState =
-                    {
-                        FontSize = 12,
-                        Font = FontRepository.FindFont("Arial") ?? FontRepository.FindFont("Helvetica")
-                    },
-                    Position = new Position(50, bodyY)
-                };
-                contentPage.Paragraphs.Add(body);
-
-                // Store the entry for later TOC generation
-                tocEntries.Add((title, pageNumber));
-            }
-
-            // -----------------------------------------------------------------
-            // 3. Generate the TOC entries with custom dot leaders
-            // -----------------------------------------------------------------
-            // Starting vertical position for the first entry (some space below the title)
-            double entryY = currentY - 60; // 60 points below the title
-            const double lineSpacing = 20;
-
+            // Add each TOC entry as a row
             foreach (var entry in tocEntries)
             {
-                // Compute dot leader string so that the total line length is consistent
-                const int totalLength = 60; // total characters for visual alignment
-                string pageStr = entry.PageNumber.ToString();
-                int dotCount = totalLength - entry.Title.Length - pageStr.Length;
-                if (dotCount < 2) dotCount = 2; // ensure at least a couple of dots
+                Aspose.Pdf.Row row = tocTable.Rows.Add();
+
+                // Title cell with dot leaders
+                Aspose.Pdf.Cell titleCell = row.Cells.Add();
+                // Calculate number of dots needed to fill space (simple approach)
+                int dotCount = Math.Max(5, 40 - entry.Title.Length);
                 string dots = new string('.', dotCount);
-                string line = $"{entry.Title}{dots}{pageStr}";
+                string titleLine = $"{entry.Title}{dots}{entry.Page}";
+                Aspose.Pdf.Text.TextFragment titleFragment = new Aspose.Pdf.Text.TextFragment(titleLine);
+                // Configure title style via the existing TextState instance
+                titleFragment.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
+                titleFragment.TextState.FontSize = 12;
+                titleFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                titleCell.Paragraphs.Add(titleFragment);
 
-                TextFragment tocLine = new TextFragment(line)
-                {
-                    TextState =
-                    {
-                        FontSize = 12,
-                        Font = FontRepository.FindFont("Arial") ?? FontRepository.FindFont("Helvetica")
-                    },
-                    Position = new Position(50, entryY)
-                };
-                tocPage.Paragraphs.Add(tocLine);
-
-                entryY -= lineSpacing; // move down for the next entry
+                // Page number cell (optional, kept empty because page number already in line)
+                Aspose.Pdf.Cell pageCell = row.Cells.Add();
+                // Leave empty or could add page number separately
             }
 
-            // -----------------------------------------------------------------
-            // 4. Save the PDF (no SaveOptions needed because output is PDF)
-            // -----------------------------------------------------------------
+            // Add the table to the page
+            tocPage.Paragraphs.Add(tocTable);
+
+            // Save the document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with custom TOC saved to '{Path.GetFullPath(outputPath)}'.");
+        Console.WriteLine($"PDF with Table of Contents saved to '{outputPath}'.");
     }
 }

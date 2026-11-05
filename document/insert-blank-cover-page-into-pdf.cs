@@ -9,24 +9,23 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF, insert a blank page at the beginning, and save.
         using (Document doc = new Document(inputPath))
         {
-            // Insert a new blank page at the very beginning (1‑based index).
-            // The overload without a Page argument creates an empty page automatically.
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Insert a new blank page at position 1 (before the original first page).
             doc.Pages.Insert(1);
 
-            // Save the modified document
+            // Save the updated PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Blank cover page inserted. Saved to '{outputPath}'.");
+        Console.WriteLine($"Blank cover page inserted and saved to '{outputPath}'.");
     }
 }

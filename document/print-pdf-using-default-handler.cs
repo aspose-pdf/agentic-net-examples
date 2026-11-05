@@ -1,95 +1,60 @@
 using System;
-using System.Drawing;
-using System.Drawing.Printing;
+using System.Diagnostics;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        // Optional: specify a printer name; leave empty to use the default printer
-        const string printerName = "";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        // Verify the PDF file exists before attempting to print
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
+        // Load the PDF document to ensure it is a valid PDF (optional)
         try
         {
-            using (Document doc = new Document(pdfPath))
+            using (Document doc = new Document(inputPath))
             {
-                // Create a PrintDocument that knows how to render Aspose.Pdf pages
-                using (PdfPrintDocument printDoc = new PdfPrintDocument(doc))
-                {
-                    if (!string.IsNullOrWhiteSpace(printerName))
-                    {
-                        printDoc.PrinterSettings.PrinterName = printerName;
-                    }
-
-                    // Submit the print job
-                    printDoc.Print();
-                }
-            }
-
-            Console.WriteLine("Print job submitted successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error printing PDF: {ex.Message}");
-        }
-    }
-}
-
-/// <summary>
-/// A PrintDocument implementation that renders each PDF page to a bitmap using Aspose.Pdf's
-/// image‑conversion devices and prints the bitmap via the standard .NET printing infrastructure.
-/// </summary>
-public class PdfPrintDocument : PrintDocument
-{
-    private readonly Document _pdfDocument;
-    private int _currentPageIndex = 1; // Aspose.Pdf pages are 1‑based
-
-    public PdfPrintDocument(Document pdfDocument)
-    {
-        _pdfDocument = pdfDocument ?? throw new ArgumentNullException(nameof(pdfDocument));
-        // Set default page settings based on the first page size
-        var firstPage = _pdfDocument.Pages[1];
-        this.DefaultPageSettings.PaperSize = new PaperSize(
-            "Custom",
-            (int)Math.Ceiling(firstPage.PageInfo.Width),
-            (int)Math.Ceiling(firstPage.PageInfo.Height));
-    }
-
-    protected override void OnPrintPage(PrintPageEventArgs e)
-    {
-        // Render the current PDF page to a bitmap (PNG format)
-        using (var imageStream = new MemoryStream())
-        {
-            var pngDevice = new PngDevice();
-            pngDevice.Process(_pdfDocument.Pages[_currentPageIndex], imageStream);
-            imageStream.Position = 0;
-            using (var pageImage = System.Drawing.Image.FromStream(imageStream))
-            {
-                // Fit the image to the printable area while preserving aspect ratio
-                RectangleF printableArea = e.PageSettings.PrintableArea;
-                float scale = Math.Min(printableArea.Width / pageImage.Width, printableArea.Height / pageImage.Height);
-                float imgWidth = pageImage.Width * scale;
-                float imgHeight = pageImage.Height * scale;
-                float posX = printableArea.X + (printableArea.Width - imgWidth) / 2;
-                float posY = printableArea.Y + (printableArea.Height - imgHeight) / 2;
-
-                e.Graphics.DrawImage(pageImage, posX, posY, imgWidth, imgHeight);
+                // Document loaded successfully – now send it to the default printer
+                PrintPdf(inputPath);
             }
         }
+        catch (PdfException ex)
+        {
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
+            return;
+        }
 
-        // Prepare for next page
-        _currentPageIndex++;
-        e.HasMorePages = _currentPageIndex <= _pdfDocument.Pages.Count;
-        base.OnPrintPage(e);
+        Console.WriteLine("Print job sent successfully.");
+    }
+
+    private static void PrintPdf(string pdfPath)
+    {
+        // Use the OS shell "print" verb to send the PDF to the default printer.
+        // This approach does not require Aspose.Pdf.Facades and works with any
+        // PDF viewer that registers the "print" verb (e.g., Adobe Reader, Edge).
+        var psi = new ProcessStartInfo
+        {
+            FileName = pdfPath,
+            Verb = "print",
+            CreateNoWindow = true,
+            UseShellExecute = true
+        };
+
+        using (var process = Process.Start(psi))
+        {
+            // Give the viewer some time to finish the print job.
+            // The exact timing depends on the installed PDF viewer.
+            if (process != null)
+            {
+                process.WaitForExit(10000); // wait up to 10 seconds
+            }
+        }
     }
 }

@@ -12,27 +12,21 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the existing PDF and ensure deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // JavaScript executed when the document is opened
-                doc.OpenAction = new JavascriptAction("app.alert('Document opened');");
+            // Attach a JavaScript action that runs when the document is opened.
+            // The script shows an alert dialog with the specified message.
+            doc.OpenAction = new JavascriptAction("app.alert('Document opened!');");
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
+            // Save the modified PDF.
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
     }
 }
