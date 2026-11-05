@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
@@ -9,44 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string firstPdf = "first.pdf";
-        const string secondPdf = "second.pdf";
-        const string resultPdf = "comparison_result.pdf";
+        const string firstPdfPath = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string outputFolder = "diff_pages";
 
         // Verify input files exist
-        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine("One or both input PDF files are missing.");
             return;
         }
 
-        // Load both documents inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(firstPdf))
-        using (Document doc2 = new Document(secondPdf))
+        // Ensure the folder for diff pages exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Define the pages to compare (1‑based indexing as per Aspose.Pdf)
+        int[] pagesToCompare = new int[] { 1, 2, 3 }; // compare pages 1, 2 and 3
+
+        // Load the two documents inside using blocks for deterministic disposal
+        using (Document doc1 = new Document(firstPdfPath))
+        using (Document doc2 = new Document(secondPdfPath))
         {
-            // Define the pages to compare (Aspose.Pdf uses 1‑based indexing)
-            int[] pagesToCompare = new int[] { 1, 2, 3 };
-
-            // Set up comparison options – keep defaults (visual output is the default)
-            ComparisonOptions options = new ComparisonOptions();
-
-            // Compare all pages and obtain per‑page diff lists; the overload also writes the visual result PDF
-            List<List<DiffOperation>> allPageDiffs = TextPdfComparer.CompareDocumentsPageByPage(
-                doc1, doc2, options, resultPdf);
-
-            // Select diffs for the requested pages (optional – you can further process them)
-            var selectedDiffs = pagesToCompare
-                .Where(p => p >= 1 && p <= allPageDiffs.Count)
-                .Select(p => allPageDiffs[p - 1])
-                .ToList();
-
-            // Example output: number of differences per selected page
-            for (int i = 0; i < selectedDiffs.Count; i++)
+            var options = new SideBySideComparisonOptions
             {
-                Console.WriteLine($"Page {pagesToCompare[i]}: {selectedDiffs[i].Count} differences.");
+                // optional visual settings
+                AdditionalChangeMarks = true,
+                ComparisonMode = ComparisonMode.IgnoreSpaces
+            };
+
+            foreach (int pageNumber in pagesToCompare)
+            {
+                // Validate that the page number exists in both documents
+                if (pageNumber < 1 || pageNumber > Math.Min(doc1.Pages.Count, doc2.Pages.Count))
+                {
+                    Console.WriteLine($"Page {pageNumber} is out of range – skipping.");
+                    continue;
+                }
+
+                string diffPath = Path.Combine(outputFolder, $"diff_page{pageNumber}.pdf");
+
+                // Perform side‑by‑side visual comparison for the specific page
+                SideBySidePdfComparer.Compare(doc1.Pages[pageNumber], doc2.Pages[pageNumber], diffPath, options);
+                Console.WriteLine($"Compared page {pageNumber}, result saved to '{diffPath}'.");
             }
         }
-
-        Console.WriteLine($"Comparison result saved to '{resultPdf}'.");
     }
 }

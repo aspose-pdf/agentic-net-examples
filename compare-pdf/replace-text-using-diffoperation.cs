@@ -7,79 +7,57 @@ class Program
 {
     static void Main()
     {
-        const string originalPath = "first.pdf";
-        const string targetPath = "second.pdf";
-        const string outputPath = "second_fixed.pdf";
+        const string firstPdfPath  = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        const string outputPdfPath = "merged_output.pdf";
 
-        // Ensure the source PDFs exist – create simple placeholders if they are missing.
-        if (!File.Exists(originalPath))
+        if (!File.Exists(firstPdfPath))
         {
-            CreateSamplePdf(originalPath, "This is the original PDF. Page 1.");
-        }
-        if (!File.Exists(targetPath))
-        {
-            CreateSamplePdf(targetPath, "This is the modified PDF. Page 1 with a typo.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            return;
         }
 
-        // Load the PDFs.
-        using (Document originalDoc = new Document(originalPath))
-        using (Document targetDoc = new Document(targetPath))
+        if (!File.Exists(secondPdfPath))
         {
-            int pageCount = Math.Min(originalDoc.Pages.Count, targetDoc.Pages.Count);
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
+            return;
+        }
+
+        // Load both documents inside using blocks for deterministic disposal
+        using (Document docFirst = new Document(firstPdfPath))
+        using (Document docSecond = new Document(secondPdfPath))
+        {
+            // Determine the number of pages to process (use the smaller count)
+            int pageCount = Math.Min(docFirst.Pages.Count, docSecond.Pages.Count);
+
+            // Iterate using 1‑based page indexing (Aspose.Pdf uses 1‑based indexes)
+            for (int i = 1; i <= pageCount; i++)
             {
-                Page originalPage = originalDoc.Pages[pageNumber];
-                Page targetPage   = targetDoc.Pages[pageNumber];
+                // Extract text from the corresponding page of the first PDF
+                Aspose.Pdf.Text.TextAbsorber absorber = new Aspose.Pdf.Text.TextAbsorber();
+                absorber.ExtractionOptions = new Aspose.Pdf.Text.TextExtractionOptions(
+                    Aspose.Pdf.Text.TextExtractionOptions.TextFormattingMode.Pure);
+                docFirst.Pages[i].Accept(absorber);
+                string firstPageText = absorber.Text;
 
-                // Extract the full text from both pages.
-                var originalAbsorber = new TextFragmentAbsorber();
-                originalAbsorber.Visit(originalPage);
-                var targetAbsorber   = new TextFragmentAbsorber();
-                targetAbsorber.Visit(targetPage);
+                // Clear existing content on the second PDF page
+                docSecond.Pages[i].Paragraphs.Clear();
 
-                string originalText = originalAbsorber.Text ?? string.Empty;
-                string targetText   = targetAbsorber.Text   ?? string.Empty;
-
-                // If the texts differ, replace the target page content with the original text.
-                if (!originalText.Equals(targetText, StringComparison.Ordinal))
+                // Insert the extracted text from the first PDF into the second PDF page
+                if (!string.IsNullOrEmpty(firstPageText))
                 {
-                    // Remove existing content.
-                    targetPage.Paragraphs.Clear();
-
-                    // Create a new fragment using the original text.
-                    var fragment = new TextFragment(originalText);
-
-                    // Preserve basic style from the first fragment of the original page, if any.
-                    if (originalAbsorber.TextFragments.Count > 0)
-                    {
-                        // TextFragment collection is 1‑based.
-                        TextFragment sample = originalAbsorber.TextFragments[1];
-                        fragment.Position = sample.Position;
-                        fragment.TextState.Font = sample.TextState.Font;
-                        fragment.TextState.FontSize = sample.TextState.FontSize;
-                        fragment.TextState.ForegroundColor = sample.TextState.ForegroundColor;
-                    }
-
-                    targetPage.Paragraphs.Add(fragment);
+                    Aspose.Pdf.Text.TextFragment fragment = new Aspose.Pdf.Text.TextFragment(firstPageText);
+                    // Optional: set basic text state (font, size, color) if needed
+                    // fragment.TextState.Font = FontRepository.FindFont("Arial");
+                    // fragment.TextState.FontSize = 12;
+                    docSecond.Pages[i].Paragraphs.Add(fragment);
                 }
             }
 
-            // Save the corrected PDF.
-            targetDoc.Save(outputPath);
+            // Save the modified second PDF (now containing the text from the first PDF where differences existed)
+            docSecond.Save(outputPdfPath);
         }
-    }
 
-    // Helper method to create a very simple PDF with a single line of text.
-    private static void CreateSamplePdf(string path, string text)
-    {
-        var doc = new Document();
-        var page = doc.Pages.Add();
-        var tf = new TextFragment(text)
-        {
-            Position = new Position(100, 700),
-            TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial"), ForegroundColor = Color.Black }
-        };
-        page.Paragraphs.Add(tf);
-        doc.Save(path);
+        Console.WriteLine($"Comparison complete. Result saved to '{outputPdfPath}'.");
     }
 }

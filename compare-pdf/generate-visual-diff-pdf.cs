@@ -7,28 +7,28 @@ class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string diffPdfPath   = "visual_diff.pdf";
+        const string leftPath = "left.pdf";
+        const string rightPath = "right.pdf";
+        const string diffPath = "visual_diff.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Verify that both input PDFs exist
+        if (!File.Exists(leftPath) || !File.Exists(rightPath))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Load both PDFs inside using blocks for deterministic disposal
-        using (Document doc1 = new Document(firstPdfPath))
-        using (Document doc2 = new Document(secondPdfPath))
+        // Load the PDFs inside using blocks for deterministic disposal
+        using (Document leftDoc = new Document(leftPath))
+        using (Document rightDoc = new Document(rightPath))
         {
-            // Instantiate the visual comparer
-            GraphicalPdfComparer comparer = new GraphicalPdfComparer();
+            // Instantiate the visual comparer from Aspose.Pdf.Comparison
+            var comparer = new GraphicalPdfComparer();
 
-            // Generate the visual diff PDF using the correct API method
-            comparer.CompareDocumentsToPdf(doc1, doc2, diffPdfPath);
+            // Generate a visual diff PDF; this method writes the result to diffPath
+            comparer.CompareDocumentsToPdf(leftDoc, rightDoc, diffPath);
         }
 
-        Console.WriteLine($"Visual diff PDF created at '{diffPdfPath}'.");
+        Console.WriteLine($"Visual diff PDF saved to '{diffPath}'.");
     }
 }

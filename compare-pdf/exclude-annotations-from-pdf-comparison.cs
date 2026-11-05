@@ -2,60 +2,68 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdfPath = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string outputPath = "comparison_result.pdf";
+        const string firstPath = "first.pdf";
+        const string secondPath = "second.pdf";
+        const string resultPath = "comparison_result.pdf";
 
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        if (!File.Exists(firstPath) || !File.Exists(secondPath))
         {
-            Console.Error.WriteLine("One or both input files are missing.");
+            Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
         }
 
-        // Load both documents inside using blocks for deterministic disposal.
-        using (Document firstDoc = new Document(firstPdfPath))
-        using (Document secondDoc = new Document(secondPdfPath))
+        // Load both PDFs inside using blocks for deterministic disposal
+        using (Document firstDoc = new Document(firstPath))
+        using (Document secondDoc = new Document(secondPath))
         {
-            // Prepare comparison options.
-            SideBySideComparisonOptions options = new SideBySideComparisonOptions();
+            // Prepare comparison options
+            var options = new SideBySideComparisonOptions();
 
-            // Collect annotation bounding rectangles from the first document.
-            List<Rectangle> firstRects = new List<Rectangle>();
-            foreach (Page page in firstDoc.Pages)
+            // -------------------------------------------------
+            // Collect annotation bounding rectangles from the first document
+            // -------------------------------------------------
+            var firstDocRects = new List<Aspose.Pdf.Rectangle>();
+            foreach (Page page in firstDoc.Pages) // 1‑based page indexing
             {
-                foreach (Annotation annotation in page.Annotations)
+                if (page.Annotations != null)
                 {
-                    // The Rect property returns an Aspose.Pdf.Rectangle representing the annotation bounds.
-                    firstRects.Add(annotation.Rect);
+                    foreach (Annotation annotation in page.Annotations)
+                    {
+                        firstDocRects.Add(annotation.Rect);
+                    }
                 }
             }
 
-            // Collect annotation bounding rectangles from the second document.
-            List<Rectangle> secondRects = new List<Rectangle>();
+            // -------------------------------------------------
+            // Collect annotation bounding rectangles from the second document
+            // -------------------------------------------------
+            var secondDocRects = new List<Aspose.Pdf.Rectangle>();
             foreach (Page page in secondDoc.Pages)
             {
-                foreach (Annotation annotation in page.Annotations)
+                if (page.Annotations != null)
                 {
-                    secondRects.Add(annotation.Rect);
+                    foreach (Annotation annotation in page.Annotations)
+                    {
+                        secondDocRects.Add(annotation.Rect);
+                    }
                 }
             }
 
-            // Assign the excluded areas to the comparison options.
-            options.ExcludeAreas1 = firstRects.ToArray();
-            options.ExcludeAreas2 = secondRects.ToArray();
+            // Assign the collected rectangles to the comparison options
+            options.ExcludeAreas1 = firstDocRects.ToArray();
+            options.ExcludeAreas2 = secondDocRects.ToArray();
 
-            // Perform side‑by‑side comparison, applying the excluded areas.
-            // SideBySidePdfComparer is a static class; use its static Compare method.
-            SideBySidePdfComparer.Compare(firstDoc, secondDoc, outputPath, options);
+            // Perform side‑by‑side visual comparison (static class)
+            SideBySidePdfComparer.Compare(firstDoc, secondDoc, resultPath, options);
         }
 
-        Console.WriteLine($"Comparison completed. Result saved to '{outputPath}'.");
+        Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
     }
 }
