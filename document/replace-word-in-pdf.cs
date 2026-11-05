@@ -7,13 +7,11 @@ class Program
 {
     static void Main()
     {
-        // Input parameters
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string oldWord    = "Aspose";
-        const string newWord    = "Aspose.Pdf";
+        const string searchWord = "oldWord";
+        const string replaceWord = "newWord";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -23,28 +21,31 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextFragmentAbsorber to locate all occurrences of the target word.
-            // The search is case‑sensitive by default; set appropriate options if needed.
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldWord);
-
-            // TextSearchOptions requires a constructor argument (searchInAnnotations).
-            // Here we set it to false because we only need to search the page content.
-            TextSearchOptions searchOptions = new TextSearchOptions(false);
-            absorber.TextSearchOptions = searchOptions;
-
-            // Apply the absorber to all pages (1‑based indexing is handled internally).
-            doc.Pages.Accept(absorber);
-
-            // Replace each found fragment's text while keeping its formatting.
-            foreach (TextFragment fragment in absorber.TextFragments)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                fragment.Text = newWord; // Formatting (font, size, color) remains unchanged.
+                // Find all occurrences of the target word on the current page
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchWord);
+
+                // Configure search options – only the constructor argument is required.
+                // The boolean indicates whether to search in annotations; we set it to true.
+                TextSearchOptions searchOptions = new TextSearchOptions(true);
+                absorber.TextSearchOptions = searchOptions;
+
+                // Apply the absorber to the current page
+                doc.Pages[pageNum].Accept(absorber);
+
+                // Replace each found fragment while preserving its original formatting
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    fragment.Text = replaceWord; // only the text changes; font, size, color stay the same
+                }
             }
 
-            // Save the modified PDF. The Document.Save(string) overload writes PDF regardless of extension.
+            // Save the modified document; without SaveOptions this writes a PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All occurrences of \"{oldWord}\" have been replaced with \"{newWord}\" and saved to \"{outputPath}\".");
+        Console.WriteLine($"Replaced all \"{searchWord}\" with \"{replaceWord}\" and saved to \"{outputPath}\".");
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security.HiddenDataSanitization; // Correct namespace for hidden‑data sanitization
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
@@ -16,31 +16,20 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Configure hidden‑data sanitization options
-                var options = new HiddenDataSanitizationOptions
-                {
-                    // Enable removal of search index and private information
-                    RemoveSearchIndexAndPrivateInfo = true
-                };
+            // Configure hidden‑data sanitization to remove search index and private info
+            var options = new HiddenDataSanitizationOptions();
+            options.RemoveSearchIndexAndPrivateInfo = true; // enable the required flag
 
-                // Create the sanitizer with the configured options and apply it
-                var sanitizer = new HiddenDataSanitizer(options);
-                sanitizer.Sanitize(doc);
+            var sanitizer = new HiddenDataSanitizer(options);
+            sanitizer.Sanitize(doc);
 
-                // Save the sanitized PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
+            // Save the sanitized PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
     }
 }

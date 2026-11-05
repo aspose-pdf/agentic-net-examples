@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_captions.pdf";
+        const string outputPath = "output_with_captions.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,51 +16,47 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            int pageNumber = 1;
+
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            foreach (Page page in doc.Pages)
             {
-                int imageIndex = 1; // Counter for captions
+                int imageIndex = 1;
 
-                // Iterate over all pages (1‑based indexing)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // Iterate over the images on the current page
+                foreach (XImage img in page.Resources.Images)
                 {
-                    Page page = doc.Pages[pageNum];
+                    // Build a simple caption text (e.g., "Figure 2‑3")
+                    string caption = $"Figure {pageNumber}-{imageIndex}";
 
-                    // Iterate over each image resource on the page
-                    foreach (XImage img in page.Resources.Images)
-                    {
-                        // Create a caption text fragment
-                        string captionText = $"Figure {imageIndex}: Image description";
-                        TextFragment caption = new TextFragment(captionText);
+                    // Create a styled text fragment for the caption
+                    TextFragment captionFragment = new TextFragment(caption);
+                    captionFragment.TextState.FontSize = 12;                                   // readable size
+                    captionFragment.TextState.FontStyle = FontStyles.Bold;                     // bold style
+                    captionFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;        // gray color
+                    captionFragment.TextState.Font = FontRepository.FindFont("Helvetica");    // standard font
 
-                        // Style the caption (e.g., italic, gray, smaller font)
-                        caption.TextState.FontSize = 10;
-                        caption.TextState.FontStyle = FontStyles.Italic;
-                        caption.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                    // Position the caption near the bottom of the page.
+                    // Precise placement directly under the image would require parsing the content stream;
+                    // here we place it at a fixed offset from the bottom margin.
+                    captionFragment.Position = new Position(0, 20); // 20 points above the page bottom
 
-                        // Position the caption.
-                        // Here we place it at a fixed offset from the bottom left of the page.
-                        // Adjust Y coordinate as needed for your layout.
-                        caption.Position = new Position(50, 50 + (imageIndex - 1) * 15);
+                    // Add the caption to the page's paragraph collection
+                    page.Paragraphs.Add(captionFragment);
 
-                        // Add the caption to the page's paragraphs collection
-                        page.Paragraphs.Add(caption);
-
-                        imageIndex++;
-                    }
+                    imageIndex++;
                 }
 
-                // Save the modified PDF
-                doc.Save(outputPath);
+                pageNumber++;
             }
 
-            Console.WriteLine($"Captions added and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Captions added. Output saved to '{outputPath}'.");
     }
 }

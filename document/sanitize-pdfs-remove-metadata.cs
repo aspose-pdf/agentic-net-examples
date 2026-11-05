@@ -1,103 +1,71 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the original PDFs
-        const string sourceFolder = "SourcePdfs";
-        // Folder where sanitized PDFs will be written
-        const string targetFolder = "SanitizedPdfs";
-
-        if (!Directory.Exists(sourceFolder))
-        {
-            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
-            return;
-        }
+        // Source folder containing PDFs to be sanitized
+        const string sourceFolder = @"C:\InputPdfs";
+        // Target folder where cleaned PDFs will be saved
+        const string targetFolder = @"C:\SanitizedPdfs";
 
         // Ensure the target folder exists
         Directory.CreateDirectory(targetFolder);
 
-        // Get all PDF files in the source folder (non‑recursive)
+        // Get all PDF files in the source folder
         string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found in the source folder.");
+            return;
+        }
 
         foreach (string inputPath in pdfFiles)
         {
-            // Build output file name (append "_clean" to avoid overwriting)
-            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(targetFolder, fileName + "_clean.pdf");
-
             try
             {
-                // Load each PDF inside a using block for deterministic disposal
+                // Load the PDF document
                 using (Document doc = new Document(inputPath))
                 {
-                    // ==== Sanitization steps ====
+                    // ---------- Sanitization steps ----------
+                    // 1. Clear document metadata
+                    doc.Info.Title = string.Empty;
+                    doc.Info.Author = string.Empty;
+                    doc.Info.Subject = string.Empty;
+                    doc.Info.Keywords = string.Empty;
+                    doc.Info.Creator = string.Empty;
+                    doc.Info.Producer = string.Empty;
+                    // DateTime properties are non‑nullable structs; use MinValue to clear them
+                    doc.Info.CreationDate = DateTime.MinValue;
+                    doc.Info.ModDate = DateTime.MinValue;
 
-                    // 1. Clear document metadata (title, author, etc.)
-                    doc.Info.Title        = "";
-                    doc.Info.Author       = "";
-                    doc.Info.Subject      = "";
-                    doc.Info.Keywords     = "";
-                    doc.Info.Creator      = "";
-                    doc.Info.Producer     = "";
-                    doc.Info.ModDate      = DateTime.Now;
-                    doc.Info.CreationDate = DateTime.Now;
-
-                    // 2. Remove any embedded JavaScript actions
-                    // The JavaScriptCollection does not expose Count/Clear. Remove each entry via its key.
-                    if (doc.JavaScript != null && doc.JavaScript.Keys != null && doc.JavaScript.Keys.Count > 0)
+                    // 2. Remove all annotations from each page
+                    // Aspose.Pdf uses 1‑based page indexing
+                    for (int i = 1; i <= doc.Pages.Count; i++)
                     {
-                        // Collect keys first to avoid modifying the collection while iterating
-                        var keys = new System.Collections.Generic.List<string>(doc.JavaScript.Keys);
-                        foreach (string key in keys)
-                        {
-                            doc.JavaScript.Remove(key);
-                        }
-                    }
-                    // Also clear the document level OpenAction if it contains JavaScript
-                    doc.OpenAction = null;
-
-                    // 3. Remove embedded files (attachments)
-                    if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
-                    {
-                        // Delete each embedded file by its name (1‑based indexing)
-                        for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
-                        {
-                            var fileSpec = doc.EmbeddedFiles[i];
-                            if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
-                            {
-                                doc.EmbeddedFiles.Delete(fileSpec.Name);
-                            }
-                        }
+                        Page page = doc.Pages[i];
+                        page.Annotations.Clear();
                     }
 
-                    // 4. Remove all annotations from every page
-                    foreach (Page page in doc.Pages)
-                    {
-                        if (page.Annotations != null && page.Annotations.Count > 0)
-                        {
-                            // Annotations collection also uses 1‑based indexing; clear by deleting each.
-                            for (int i = page.Annotations.Count; i >= 1; i--)
-                            {
-                                page.Annotations.Delete(i);
-                            }
-                        }
-                    }
+                    // Additional sanitization (e.g., remove embedded files) can be added here
+                    // if (doc.EmbeddedFiles != null) doc.EmbeddedFiles.Clear();
 
-                    // Save the sanitized PDF (PDF format is default)
+                    // ---------- Save sanitized PDF ----------
+                    string fileName = Path.GetFileName(inputPath);
+                    string outputPath = Path.Combine(targetFolder, fileName);
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Sanitized: {outputPath}");
+                Console.WriteLine($"Sanitized: {Path.GetFileName(inputPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to process '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Sanitization complete.");
     }
 }

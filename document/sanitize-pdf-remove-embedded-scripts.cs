@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
@@ -16,34 +16,25 @@ class Program
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Remove any embedded file attachments first (optional but often required)
+            doc.EmbeddedFiles?.Delete();
+
+            // Configure hidden‑data sanitization: delete all embedded JavaScript actions
+            var options = new HiddenDataSanitizationOptions
             {
-                // Remove embedded JavaScript actions (if any) – this mimics the
-                // "DeleteEmbeddedScripts" option of HiddenDataSanitizerOptions.
-                if (doc.OpenAction is JavascriptAction)
-                {
-                    doc.OpenAction = null;
-                }
+                RemoveJavaScriptsAndActions = true
+            };
 
-                // Clear all annotations on each page. Annotations may also contain
-                // JavaScript (e.g., JavaScript actions attached to link annotations).
-                foreach (Page page in doc.Pages)
-                {
-                    page.Annotations.Clear();
-                }
+            // Apply the sanitization to the document
+            var sanitizer = new HiddenDataSanitizer(options);
+            sanitizer.Sanitize(doc);
 
-                // Save the sanitized PDF. Document.Save without SaveOptions writes a PDF.
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
+            // Save the sanitized PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Sanitized PDF saved to '{outputPath}'.");
     }
 }

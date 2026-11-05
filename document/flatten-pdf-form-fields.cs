@@ -15,23 +15,16 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Convert all interactive form fields to static content
-                doc.Form.Flatten();
+            // Convert all interactive form fields to static content
+            doc.Form.Flatten();
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
+            // Save the result; without SaveOptions this writes a PDF file
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Form fields flattened and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form fields flattened and saved to '{outputPath}'.");
     }
 }

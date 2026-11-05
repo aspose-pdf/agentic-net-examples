@@ -7,64 +7,60 @@ class Program
 {
     static void Main()
     {
-        // Collection of HTML strings to be rendered as PDF pages
-        string[] htmlContents = new string[]
+        // Collection of HTML strings to be rendered into the PDF
+        string[] htmlPages = new string[]
         {
-            "<html><body><h1>First Page</h1><p>This is the first HTML page.</p></body></html>",
-            "<html><body><h2>Second Page</h2><p>Content of the second page.</p></body></html>",
-            "<html><body><h3>Third Page</h3><p>More content here.</p></body></html>"
+            "<html><body><h1>First Page</h1><p>Hello, world!</p></body></html>",
+            "<html><body><h1>Second Page</h1><p>Another paragraph.</p></body></html>",
+            "<html><body><h1>Third Page</h1><p>More content here.</p></body></html>"
         };
 
-        // Output PDF path
         const string outputPdfPath = "CombinedFromHtml.pdf";
 
-        try
+        // Target PDF document that will contain all rendered pages
+        using (Document target = new Document())
         {
-            // Create an empty target document that will hold all pages
-            using (Document targetDoc = new Document())
+            // Iterate over each HTML string, render it to a temporary PDF document,
+            // then merge its pages into the target document.
+            foreach (string html in htmlPages)
             {
-                // Iterate over each HTML string, load it into a temporary Document,
-                // then merge its pages into the target document.
-                foreach (string html in htmlContents)
+                // Convert the HTML string to a stream for loading
+                using (MemoryStream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
                 {
-                    // Convert the HTML string to a stream (UTF-8 encoding)
-                    using (MemoryStream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
+                    // Custom rendering options for HTML loading
+                    HtmlLoadOptions loadOptions = new HtmlLoadOptions
                     {
-                        // Load HTML with default options (no unsupported properties)
-                        HtmlLoadOptions loadOptions = new HtmlLoadOptions();
-
-                        // Load the HTML into a temporary Document
-                        using (Document tempDoc = new Document(htmlStream, loadOptions))
+                        // Set a fixed page size (A4). Width and Height are in points.
+                        PageInfo = new PageInfo
                         {
-                            // Apply desired page size/orientation to each page of the temporary document
-                            foreach (Page page in tempDoc.Pages)
-                            {
-                                // Set A4 size (portrait) using width and height doubles
-                                page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
-                                // Ensure portrait orientation
-                                page.PageInfo.IsLandscape = false;
-                            }
+                            Width = 595,   // 8.27 inches
+                            Height = 842   // 11.69 inches
+                        }
+                        // Note: The 'FixedLayout' property does not exist in the current
+                        // Aspose.Pdf version and has been removed.
+                    };
 
-                            // Append all pages from the temporary document to the target
-                            targetDoc.Pages.Add(tempDoc.Pages);
+                    // Load the HTML into a temporary PDF document
+                    // Wrap in try-catch because HTML conversion may require GDI+ (Windows only)
+                    try
+                    {
+                        using (Document source = new Document(htmlStream, loadOptions))
+                        {
+                            // Append all pages from the source document to the target
+                            target.Pages.Add(source.Pages);
                         }
                     }
+                    catch (TypeInitializationException)
+                    {
+                        Console.WriteLine("HTML rendering requires Windows (GDI+). Skipping this HTML segment.");
+                    }
                 }
-
-                // Save the combined PDF
-                targetDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"PDF successfully created at '{outputPdfPath}'.");
+            // Save the combined PDF. No SaveOptions needed because the output format is PDF.
+            target.Save(outputPdfPath);
         }
-        catch (TypeInitializationException)
-        {
-            // HTML-to-PDF conversion requires GDI+ (Windows only)
-            Console.WriteLine("HTML rendering requires Windows (GDI+). Operation skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF created at '{outputPdfPath}'.");
     }
 }

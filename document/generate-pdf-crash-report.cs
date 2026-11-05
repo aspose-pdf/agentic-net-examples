@@ -11,30 +11,30 @@ class Program
 
         try
         {
-            // Load a PDF document – this may throw a PdfException
+            // Attempt to load a PDF document – this may throw PdfException
             using (Document doc = new Document(inputPath))
             {
-                // Example operation that could fail
-                Console.WriteLine($"Number of pages: {doc.Pages.Count}");
+                // Perform any processing here
+                Console.WriteLine($"Loaded PDF with {doc.Pages.Count} pages.");
             }
         }
         catch (PdfException ex)
         {
-            // Create and configure crash report options using the constructor that accepts the exception
-            var options = new CrashReportOptions(ex)
+            // Create crash report options using the constructor that requires the exception
+            var crashOptions = new CrashReportOptions(ex)
             {
-                // Directory where the report will be written (fallback to current directory if null)
+                // Directory where the report will be written
                 CrashReportDirectory = Path.GetDirectoryName(crashReportPath) ?? Directory.GetCurrentDirectory(),
-                // File name of the crash report (extension can be .html, .txt, etc.)
+                // File name only (no path) – the directory above is used for the full path
                 CrashReportFilename = Path.GetFileName(crashReportPath),
                 // Optional custom message to include in the report
-                CustomMessage = "Unexpected error while processing the PDF document."
+                CustomMessage = "Error loading PDF document."
             };
 
-            // Generate the crash report using the static helper on PdfException
-            PdfException.GenerateCrashReport(options);
+            // Generate the crash report file
+            PdfException.GenerateCrashReport(crashOptions);
 
-            Console.WriteLine($"Crash report generated at: {Path.Combine(options.CrashReportDirectory, options.CrashReportFilename)}");
+            Console.WriteLine($"Crash report generated at '{crashReportPath}'.");
         }
         catch (Exception ex)
         {

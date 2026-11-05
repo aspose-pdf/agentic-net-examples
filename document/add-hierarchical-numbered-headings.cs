@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
 using Aspose.Pdf.Text;
 
 class Program
@@ -17,53 +16,54 @@ class Program
             return;
         }
 
+        // Load the existing PDF (or create a new one if you prefer)
         using (Document doc = new Document(inputPath))
         {
-            // Enable tagging and set basic metadata
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
-
-            // Root element of the structure tree – use dynamic to avoid compile‑time dependency on StructureElement
-            dynamic root = tagged.RootElement;
-
-            // Create a level‑1 heading with decimal (Arabic) numbering
-            var h1 = new Heading(1)
-            {
-                Text = "Chapter 1: Introduction",
-                IsAutoSequence = true,               // enable automatic numbering
-                Style = NumberingStyle.NumeralsArabic // decimal numbering
-            };
-            root.AppendChild(h1);
-
-            // Create a level‑2 heading with decimal (Arabic) numbering
-            var h2 = new Heading(2)
-            {
-                Text = "Section 1.1: Overview",
-                IsAutoSequence = true,
-                Style = NumberingStyle.NumeralsArabic
-            };
-            root.AppendChild(h2);
-
-            // Add visible text for the headings on the first page
+            // For simplicity we add the headings to the first page.
+            // In a real scenario you would decide where each heading belongs.
             Page page = doc.Pages[1];
 
-            TextFragment tf1 = new TextFragment("Chapter 1: Introduction");
-            tf1.TextState.FontSize = 20;
-            tf1.TextState.Font = FontRepository.FindFont("Arial");
-            tf1.Position = new Position(50, 750);
-            page.Paragraphs.Add(tf1);
+            // ----- First heading (H1) -----
+            Heading heading1 = new Heading(1)
+            {
+                Text = "Chapter 1: Introduction",
+                // Decimal (Arabic) numbering
+                Style = NumberingStyle.NumeralsArabic,
+                // Start numbering at 1 and let Aspose handle the sequence
+                StartNumber = 1,
+                IsAutoSequence = true,
+                // Mark as part of a list so hierarchical numbering is shown
+                IsInList = true
+            };
+            page.Paragraphs.Add(heading1);
 
-            TextFragment tf2 = new TextFragment("Section 1.1: Overview");
-            tf2.TextState.FontSize = 16;
-            tf2.TextState.Font = FontRepository.FindFont("Arial");
-            tf2.Position = new Position(70, 720);
-            page.Paragraphs.Add(tf2);
+            // ----- Sub‑heading (H2) under the first heading -----
+            Heading heading2 = new Heading(2)
+            {
+                Text = "Section 1.1: Overview",
+                Style = NumberingStyle.NumeralsArabic,
+                StartNumber = 1,
+                IsAutoSequence = true,
+                IsInList = true
+            };
+            page.Paragraphs.Add(heading2);
+
+            // ----- Second top‑level heading (H1) continuing the numbering -----
+            Heading heading3 = new Heading(1)
+            {
+                Text = "Chapter 2: Details",
+                Style = NumberingStyle.NumeralsArabic,
+                // Continue numbering from the previous H1 (which started at 1)
+                StartNumber = 2,
+                IsAutoSequence = true,
+                IsInList = true
+            };
+            page.Paragraphs.Add(heading3);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with numbered headings saved to '{outputPath}'.");
     }
 }

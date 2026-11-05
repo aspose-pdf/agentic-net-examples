@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_numbered.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,36 +16,43 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            int pageCount = doc.Pages.Count; // 1‑based page count
-
-            // Iterate using 1‑based indexing (Aspose.Pdf requirement)
-            for (int i = 1; i <= pageCount; i++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
+                // Pages are 1‑based; iterate accordingly
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
 
-                // Create a dynamic footer stamp showing the current page number
-                TextStamp pageNumberStamp = new TextStamp($"Page {i} of {pageCount}");
-                // Position the stamp at the bottom center of the page
-                pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
-                pageNumberStamp.BottomMargin        = 20; // distance from the bottom edge (points)
+                    // Create a TextStamp containing the page number
+                    TextStamp stamp = new TextStamp($"Page {i}");
 
-                // Styling – modify the existing TextState instance (read‑only property)
-                pageNumberStamp.TextState.FontSize        = 12;
-                pageNumberStamp.TextState.Font            = FontRepository.FindFont("Arial");
-                pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    // Position the stamp at the bottom center of the page
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                    // Use XIndent/YIndent instead of the non‑existent Margin property
+                    stamp.YIndent = 20; // distance from the bottom edge (points)
 
-                // Add the stamp to the current page
-                page.AddStamp(pageNumberStamp);
+                    // Optional styling for readability
+                    stamp.TextState.FontSize        = 12;
+                    stamp.TextState.Font            = FontRepository.FindFont("Arial");
+                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+
+                    // Apply the stamp to the current page
+                    page.AddStamp(stamp);
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Page numbers added successfully: {outputPath}");
         }
-
-        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

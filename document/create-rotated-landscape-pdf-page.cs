@@ -1,6 +1,6 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // optional, for TextFragment
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,21 +11,20 @@ class Program
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (Pages are 1‑based)
+            // Add a blank page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Set the page size to landscape by assigning Width > Height.
-            // Example: A4 landscape (842 x 595 points). Adjust as needed.
-            page.PageInfo.Width = 842;   // points (1 point = 1/72 inch)
-            page.PageInfo.Height = 595;
+            // Set the page size so that width > height → landscape orientation.
+            // Example uses A4 dimensions in points (1 point = 1/72 inch).
+            page.PageInfo.Width = 842;   // Landscape width
+            page.PageInfo.Height = 595;  // Landscape height
 
-            // OPTIONAL: add a text fragment to visualize the orientation
-            // TextFragment tf = new TextFragment("Landscape Page");
-            // tf.TextState.FontSize = 24;
-            // tf.TextState.HorizontalAlignment = HorizontalAlignment.Center;
-            // page.Paragraphs.Add(tf);
+            // Optional: add some sample text to verify the orientation
+            TextFragment tf = new TextFragment("Landscape page");
+            tf.TextState.FontSize = 24;
+            page.Paragraphs.Add(tf);
 
-            // Save the PDF (extension .pdf ensures PDF format)
+            // Save the document (PDF format)
             doc.Save(outputPath);
         }
 

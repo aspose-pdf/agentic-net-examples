@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for FontRepository, Font, TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_page_numbers.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,28 +16,28 @@ class Program
             return;
         }
 
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a page number stamp
-            PageNumberStamp pageNumberStamp = new PageNumberStamp
-            {
-                StartingNumber = 1,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                BottomMargin = 20
-            };
+            // Create a PageNumberStamp that will automatically update when pages are added or removed
+            PageNumberStamp pageNumberStamp = new PageNumberStamp();
+            // The default start number is 1, so we omit the non‑existent StartNumber property.
+            pageNumberStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            pageNumberStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            pageNumberStamp.BottomMargin        = 10;
 
-            // Configure appearance via the existing (read‑only) TextState instance
-            pageNumberStamp.TextState.FontSize = 12;
-            pageNumberStamp.TextState.FontStyle = FontStyles.Bold;
-            pageNumberStamp.TextState.ForegroundColor = Color.Black;
+            // Configure the text appearance via the existing TextState instance
+            pageNumberStamp.TextState.Font          = FontRepository.FindFont("Arial");
+            pageNumberStamp.TextState.FontSize      = 12;
+            pageNumberStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Apply the stamp to every page
-            foreach (Page page in doc.Pages)
+            // Apply the stamp to every existing page (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.AddStamp(pageNumberStamp);
+                doc.Pages[i].AddStamp(pageNumberStamp);
             }
 
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

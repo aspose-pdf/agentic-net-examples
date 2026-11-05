@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output_with_background.pdf";
-        const string backgroundImgPath = "background.png";
+        const string inputPdfPath = "input.pdf";          // PDF to which the background will be added
+        const string backgroundImgPath = "background.jpg"; // Image used as background
+        const string outputPdfPath = "output.pdf";         // Resulting PDF
 
         if (!File.Exists(inputPdfPath))
         {
@@ -23,39 +22,28 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block (document-disposal-with-using rule)
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the source PDF
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            // Create a reusable ImageStamp that will be applied to every page
-            ImageStamp bgStamp = new ImageStamp(backgroundImgPath)
+            // Apply the background image to every page.
+            // Aspose.Pdf uses 1‑based page indexing.
+            for (int i = 1; i <= srcDoc.Pages.Count; i++)
             {
-                // Place the image behind the page content
-                Background = true,
-                // Stretch the image to cover the whole page (optional)
-                // Adjust Width/Height if needed; here we use page dimensions later
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Set opacity if a translucent background is desired
-                Opacity = 1.0
-            };
+                // Create an ImageStamp for the current page size.
+                ImageStamp bgStamp = new ImageStamp(backgroundImgPath)
+                {
+                    Width = srcDoc.Pages[i].PageInfo.Width,
+                    Height = srcDoc.Pages[i].PageInfo.Height,
+                    Background = true // Ensure the image is placed behind existing content
+                };
 
-            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
-            {
-                Page page = pdfDoc.Pages[i];
-
-                // Adjust stamp size to match the page dimensions
-                bgStamp.Width  = page.PageInfo.Width;
-                bgStamp.Height = page.PageInfo.Height;
-
-                // Apply the background stamp to the current page (add-stamp-per-page rule)
-                page.AddStamp(bgStamp);
+                srcDoc.Pages[i].AddStamp(bgStamp);
             }
 
-            // Save the modified PDF (save-to-non-pdf-always-use-save-options not needed here)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF. No SaveOptions needed because the output format is PDF.
+            srcDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Background image added to all pages. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Background image added to all pages. Output saved to '{outputPdfPath}'.");
     }
 }

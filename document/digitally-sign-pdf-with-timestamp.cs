@@ -1,17 +1,18 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // PKCS7, TimestampSettings, DigestHashAlgorithm, SignatureCustomAppearance, SignatureField
+using Aspose.Pdf.Forms; // SignatureField, PKCS7, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "signed.pdf";
-        const string certificatePath = "mycert.pfx";
-        const string certificatePassword = "password";
-        const string tsaUrl = "http://timestamp.digicert.com"; // replace with a trusted TSA URL
+        const string inputPdfPath    = "input.pdf";
+        const string outputPdfPath   = "signed_output.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePwd  = "certPassword";
+        const string tsaUrl          = "http://timestamp.digicert.com"; // trusted TSA URL
 
         if (!File.Exists(inputPdfPath))
         {
@@ -25,41 +26,32 @@ class Program
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Define the rectangle for the signature field (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-
-            // Create the signature field on the first page and add it to the document's form collection
-            SignatureField sigField = new SignatureField(doc, sigRect);
-            doc.Form.Add(sigField);
-
-            // Configure visual appearance of the signature using SignatureCustomAppearance
-            SignatureCustomAppearance appearance = new SignatureCustomAppearance
+            // Create a signature field on the first page (pages are 1‑based)
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            SignatureField sigField = new SignatureField(pdfDoc.Pages[1], sigRect)
             {
-                BackgroundColor = Color.LightGray,
-                ShowContactInfo = true,
-                ShowLocation = true,
-                ContactInfoLabel = "Contact:",
-                LocationLabel = "Location:"
-                // Additional appearance options can be set here (e.g., Image, Text, etc.)
+                PartialName = "Signature1"
+            };
+            // Add the signature field to the document's form collection
+            pdfDoc.Form.Add(sigField);
+
+            // Prepare the PKCS7 signature (digital signature) with timestamping
+            PKCS7 pkcs = new PKCS7(certificatePath, certificatePwd)
+            {
+                Reason      = "Document approval",
+                Location    = "Company Headquarters",
+                ContactInfo = "contact@example.com",
+                // Configure timestamping from a trusted TSA
+                TimestampSettings = new TimestampSettings(tsaUrl, null)
             };
 
-            // Create a PKCS#7 signature object, attach certificate, appearance and timestamp settings
-            PKCS7 pkcs = new PKCS7(certificatePath, certificatePassword)
-            {
-                CustomAppearance = appearance,
-                TimestampSettings = new TimestampSettings(
-                    tsaUrl,
-                    null, // no username/password for this TSA
-                    DigestHashAlgorithm.Sha256)
-            };
-
-            // Apply the digital signature to the field
+            // Sign the field (Signature property is read‑only; use Sign method)
             sigField.Sign(pkcs);
 
             // Save the signed PDF
-            doc.Save(outputPdfPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");

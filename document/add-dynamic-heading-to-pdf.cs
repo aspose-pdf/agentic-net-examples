@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath  = "template.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,34 +17,37 @@ class Program
             return;
         }
 
-        // Dynamic data for the heading (e.g., current date and user name)
+        // Dynamic data to insert into the heading
         string userName = Environment.UserName;
-        string currentDate = DateTime.Now.ToString("yyyy-MM-dd");
-        string headingText = $"Report for {userName} – {currentDate}";
+        string dateStr  = DateTime.Now.ToString("yyyy-MM-dd");
 
+        // Load the PDF and work within a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (creates structure if not present)
-            ITaggedContent taggedContent = doc.TaggedContent;
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Access tagged content (creates a tagged structure if none exists)
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Root element of the structure tree
-            StructureElement root = taggedContent.RootElement;
+            // Enable auto‑tagging globally (optional but ensures a structure tree)
+            AutoTaggingSettings.Default.EnableAutoTagging = true;
 
-            // Create a heading (HeaderElement level 1) and set its text dynamically
-            HeaderElement heading = taggedContent.CreateHeaderElement(1);
-            heading.SetText(headingText);
-            // Optional: set language on the heading element itself
-            heading.Language = "en-US";
+            // Set document language and title (optional)
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(outputPath));
 
-            // Append the heading to the root of the structure tree
+            // Root of the structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create a level‑1 heading and set its text dynamically
+            HeaderElement heading = tagged.CreateHeaderElement(1);
+            heading.SetText($"Report for {userName} on {dateStr}");
+
+            // Attach the heading to the root element
             root.AppendChild(heading);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with dynamic heading to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

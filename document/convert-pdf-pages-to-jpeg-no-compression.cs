@@ -7,40 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDir = "Images";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Wrap the Document in a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Pages are 1‑based (global rule)
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                Page page = pdfDoc.Pages[pageNum];
-
-                // PngDevice does not expose a CompressionLevel property.
-                // By not setting any compression‑related options we keep the default
-                // behavior, which preserves the original image data as closely as possible.
+                // Create a PNG device; default settings already produce lossless PNGs.
+                // If a specific resolution is required, it can be passed to the constructor.
                 PngDevice pngDevice = new PngDevice();
 
-                string outPath = Path.Combine(outputDir, $"Page_{pageNum}.png");
+                string outPath = Path.Combine(outputDir, $"Page_{i}.png");
 
-                // Render the page to a PNG file
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                // Convert the page to an image file
+                using (FileStream imageStream = File.Create(outPath))
                 {
-                    pngDevice.Process(page, outStream);
+                    pngDevice.Process(pdfDoc.Pages[i], imageStream);
                 }
 
-                Console.WriteLine($"Saved page {pageNum} as PNG: {outPath}");
+                Console.WriteLine($"Saved page {i} as PNG to '{outPath}'.");
             }
         }
     }

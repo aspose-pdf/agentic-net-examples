@@ -8,28 +8,23 @@ class Program
     {
         const string outputPath = "output.pdf";
 
-        // Ensure the output directory exists (handle case where there is no directory part)
-        string outputDir = Path.GetDirectoryName(outputPath) ?? string.Empty;
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
-
-        // Create a new PDF document and set its metadata
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Set creation and modification dates (local time is required by Aspose.Pdf)
+            // Add a blank page (required for a valid PDF)
+            doc.Pages.Add();
+
+            // Set creation and modification dates
             doc.Info.CreationDate = DateTime.Now;
             doc.Info.ModDate = DateTime.Now;
 
-            // Set custom keywords (comma‑separated)
-            doc.Info.Keywords = "Aspose.Pdf, Metadata, Example";
+            // Set custom keywords (comma‑separated string)
+            doc.Info.Keywords = "sample, accessibility, Aspose.Pdf";
 
-            // Optionally add a blank page so the PDF is not empty
-            doc.Pages.Add();
-
-            // Save the PDF (no SaveOptions needed for PDF format)
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with metadata to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}' with updated properties.");
     }
 }

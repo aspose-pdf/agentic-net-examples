@@ -1,58 +1,49 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "MultiPageTable.pdf";
+        const string outputPath = "multi_page_table.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal.
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add the first page where the table will start.
+            // Add a single page; additional pages will be created automatically when the table overflows
             Page page = doc.Pages.Add();
 
-            // Create a table and define column widths (percentages of the page width).
+            // Create a table element
             Table table = new Table
             {
-                ColumnWidths = "20% 30% 30% 20%"
+                // Define column widths as percentages (optional but improves layout)
+                ColumnWidths = "15% 35% 35% 15%"
             };
 
-            // Add a header row.
+            // Set the first row to repeat as a header on each new page
+            table.RepeatingRowsCount = 1;
+
+            // Add a header row
             Row header = table.Rows.Add();
             header.Cells.Add("ID");
             header.Cells.Add("Name");
             header.Cells.Add("Description");
-            header.Cells.Add("Price");
+            header.Cells.Add("Value");
 
-            // Style the header cells (background color and bold text).
-            foreach (Cell cell in header.Cells)
-            {
-                cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
-                cell.DefaultCellTextState = new TextState
-                {
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold
-                };
-            }
-
-            // Add many data rows to force the table to span multiple pages.
+            // Populate the table with enough rows to span multiple pages
             for (int i = 1; i <= 200; i++)
             {
                 Row row = table.Rows.Add();
                 row.Cells.Add(i.ToString());
                 row.Cells.Add($"Item {i}");
-                row.Cells.Add($"This is a description for item number {i}. It may be quite long to test wrapping.");
-                row.Cells.Add($"${(i * 1.23):F2}");
+                row.Cells.Add($"Detailed description for item {i}, which may wrap onto multiple lines.");
+                row.Cells.Add((i * 10).ToString());
             }
 
-            // Add the table to the page. Aspose.Pdf automatically splits the table across pages.
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF.
+            // Save the document as PDF
             doc.Save(outputPath);
         }
 

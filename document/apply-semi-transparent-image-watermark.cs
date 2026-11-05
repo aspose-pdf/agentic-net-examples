@@ -1,37 +1,38 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TextState, FontRepository, FontStyles
+using Aspose.Pdf.Text; // for FontStyles enum
 
-class Program
+class WatermarkExample
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a semi‑transparent text stamp that will act as a watermark
-            TextStamp stamp = new TextStamp("CONFIDENTIAL");
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
-            stamp.RotateAngle         = 45;      // diagonal watermark
-            stamp.Opacity             = 0.3;     // 30% opacity (semi‑transparent)
-            stamp.Background          = false;   // no opaque background rectangle
+            // Create a semi‑transparent text stamp that will act as the watermark
+            TextStamp stamp = new TextStamp("CONFIDENTIAL")
+            {
+                // Make the stamp large and centered
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                // Set opacity (0 = fully transparent, 1 = opaque)
+                Opacity = 0.25
+            };
 
-            // Configure the TextState of the stamp (TextState is read‑only, so modify its members directly)
-            stamp.TextState.FontSize        = 72;
-            stamp.TextState.FontStyle       = FontStyles.Bold;
-            stamp.TextState.Font            = FontRepository.FindFont("Arial");
-            stamp.TextState.ForegroundColor = Color.FromRgb(0.8, 0.0, 0.0); // light red
+            // Configure text appearance via the existing TextState instance
+            stamp.TextState.FontSize = 72;
+            stamp.TextState.FontStyle = FontStyles.Bold;
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
             // Apply the stamp to every page in the document
             foreach (Page page in doc.Pages)
@@ -39,7 +40,7 @@ class Program
                 page.AddStamp(stamp);
             }
 
-            // Save the watermarked PDF
+            // Save the modified PDF (default Save writes PDF)
             doc.Save(outputPath);
         }
 

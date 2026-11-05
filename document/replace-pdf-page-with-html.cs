@@ -1,75 +1,83 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // not required but harmless
+using Aspose.Pdf.Text;   // for HtmlLoadOptions if needed
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "source.pdf";   // original PDF
-        const string htmlPath      = "page.html";    // HTML to convert
-        const string outputPdfPath = "output.pdf";   // result PDF
-        const int pageToReplace    = 2;              // 1‑based index of page to replace
+        const string inputPdfPath  = "source.pdf";   // existing PDF
+        const string htmlPath      = "newpage.html"; // HTML to convert
+        const string outputPdfPath = "result.pdf";   // PDF with replaced page
+        const int    pageToReplace = 2;              // 1‑based page number to replace
 
-        if (!File.Exists(sourcePdfPath))
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(htmlPath))
         {
-            Console.Error.WriteLine($"HTML file not found: {htmlPath}");
+            Console.Error.WriteLine($"HTML not found: {htmlPath}");
             return;
         }
 
         try
         {
-            // Load the original PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(sourcePdfPath))
+            // Load the original PDF
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Convert the HTML to a temporary PDF document
-                Document htmlDoc;
+                // Ensure the requested page exists
+                if (pageToReplace < 1 || pageToReplace > pdfDoc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Page {pageToReplace} is out of range (1‑{pdfDoc.Pages.Count}).");
+                    return;
+                }
+
+                // Convert HTML to a temporary PDF document
+                Document htmlPdf;
                 try
                 {
-                    // HtmlLoadOptions resides in Aspose.Pdf namespace
-                    htmlDoc = new Document(htmlPath, new HtmlLoadOptions());
+                    // HtmlLoadOptions triggers the HTML‑to‑PDF conversion.
+                    // This operation requires GDI+ and therefore works only on Windows.
+                    htmlPdf = new Document(htmlPath, new HtmlLoadOptions());
                 }
                 catch (TypeInitializationException)
                 {
-                    // HTML‑to‑PDF conversion requires GDI+ (Windows only)
-                    Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped.");
+                    Console.Error.WriteLine("HTML‑to‑PDF conversion requires Windows (GDI+). Operation aborted.");
                     return;
                 }
-                catch (DllNotFoundException)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("GDI+ not found. HTML conversion unavailable on this platform.");
-                    return;
-                }
-
-                // Ensure the HTML conversion produced at least one page
-                if (htmlDoc.Pages.Count == 0)
-                {
-                    Console.Error.WriteLine("HTML conversion produced no pages.");
+                    Console.Error.WriteLine($"Failed to convert HTML to PDF: {ex.Message}");
                     return;
                 }
 
-                // Delete the target page if it exists (1‑based indexing)
-                if (pageToReplace >= 1 && pageToReplace <= pdfDoc.Pages.Count)
+                // The HTML conversion should produce at least one page.
+                if (htmlPdf.Pages.Count == 0)
                 {
-                    pdfDoc.Pages.Delete(pageToReplace);
+                    Console.Error.WriteLine("HTML conversion resulted in an empty PDF.");
+                    return;
                 }
 
-                // Insert the first page from the HTML document at the desired position
-                pdfDoc.Pages.Insert(pageToReplace, htmlDoc.Pages[1]);
+                // Remove the target page from the original PDF
+                pdfDoc.Pages.Delete(pageToReplace);
 
-                // Save the modified PDF (PDF is the default format)
+                // Insert the new page at the same position
+                // Pages.Insert expects a 1‑based index.
+                pdfDoc.Pages.Insert(pageToReplace, htmlPdf.Pages[1]);
+
+                // Save the modified PDF
                 pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"Page {pageToReplace} replaced and saved to '{outputPdfPath}'.");
+                Console.WriteLine($"Page {pageToReplace} replaced successfully. Output saved to '{outputPdfPath}'.");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

@@ -1,50 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
         // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            int imageIndex = 0;
-
-            // Pages are 1‑based in Aspose.Pdf
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Load PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Page page = pdfDoc.Pages[pageNum];
+                int imageCounter = 1;
 
-                // Iterate over all images on the page
-                foreach (XImage img in page.Resources.Images)
+                // Iterate over all pages (1‑based indexing)
+                foreach (Page page in doc.Pages)
                 {
-                    imageIndex++;
-                    string outputPath = Path.Combine(outputFolder,
-                        $"Image_Page{pageNum}_{imageIndex}.png");
-
-                    // Save the image using a FileStream (preserves original resolution)
-                    using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    // XImageCollection is not a dictionary; iterate directly
+                    foreach (XImage img in page.Resources.Images)
                     {
-                        img.Save(fs);
+                        // Build a unique file name for each extracted image
+                        string fileName = $"image_{imageCounter:D4}.png";
+                        string outPath = Path.Combine(outputDir, fileName);
+
+                        // Save the image as PNG using a FileStream (XImage.Save expects a Stream)
+                        using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                        {
+                            img.Save(fs, ImageFormat.Png);
+                        }
+
+                        Console.WriteLine($"Saved {outPath} (Page {page.Number})");
+                        imageCounter++;
                     }
                 }
             }
-        }
 
-        Console.WriteLine("All images have been extracted successfully.");
+            Console.WriteLine("All images have been extracted successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
     }
 }

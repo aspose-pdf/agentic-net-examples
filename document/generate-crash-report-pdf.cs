@@ -16,26 +16,27 @@ class CrashReportGenerator
         }
         catch (Exception ex)
         {
-            // Build the crash report content
-            string report = $"Exception Message:{Environment.NewLine}{ex.Message}{Environment.NewLine}{Environment.NewLine}" +
-                            $"Stack Trace:{Environment.NewLine}{ex.StackTrace}";
-
-            // Create a new PDF document
+            // Create a new PDF document inside a using block for deterministic disposal
             using (Document doc = new Document())
             {
-                // Add a page to the document
+                // Add a single page (pages are 1‑based)
                 Page page = doc.Pages.Add();
 
-                // Create a text fragment containing the report
+                // Build the crash report text
+                string report = $"Exception Type: {ex.GetType().FullName}{Environment.NewLine}" +
+                                $"Message: {ex.Message}{Environment.NewLine}" +
+                                $"Stack Trace:{Environment.NewLine}{ex.StackTrace}";
+
+                // Create a TextFragment to hold the report
                 TextFragment tf = new TextFragment(report);
                 tf.TextState.FontSize = 12;
                 tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                tf.Margin = new MarginInfo { Top = 20, Bottom = 20, Left = 20, Right = 20 };
+                tf.Position = new Position(50, 750); // left/top margin
 
-                // Add the text fragment to the page
+                // Add the fragment to the page
                 page.Paragraphs.Add(tf);
 
-                // Save the PDF
+                // Save the PDF (no SaveOptions needed for PDF output)
                 doc.Save(outputPath);
             }
 
@@ -45,7 +46,8 @@ class CrashReportGenerator
 
     static void ThrowSampleException()
     {
-        // Example exception to demonstrate the crash report
-        throw new InvalidOperationException("Sample operation failed.");
+        // Deliberate divide‑by‑zero to generate an exception
+        int zero = 0;
+        int result = 10 / zero;
     }
 }
