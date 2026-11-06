@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "cleaned.pdf";
+        const string outputPath = "output_cleaned.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,45 +17,44 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Remove duplicate bookmarks (identical title and destination)
-        var seen = new HashSet<string>(StringComparer.Ordinal);
-        // Iterate in reverse order so that removal does not affect the loop index
-        for (int i = doc.Outlines.Count - 1; i >= 0; i--)
+        // Load the PDF for bookmark manipulation
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            OutlineItemCollection item = doc.Outlines[i];
-            string title = item.Title ?? string.Empty;
-            string destKey = GetDestinationKey(item.Destination);
-            string key = title + "|" + destKey;
+            editor.BindPdf(inputPath);
 
-            if (seen.Contains(key))
+            // Extract the existing bookmarks (outline entries)
+            Bookmarks allBookmarks = editor.ExtractBookmarks();
+
+            // Keep track of unique (title, action) pairs
+            HashSet<string> seen = new HashSet<string>(StringComparer.Ordinal);
+            List<Bookmark> uniqueBookmarks = new List<Bookmark>();
+
+            foreach (Bookmark bm in allBookmarks)
             {
-                // Use Remove to delete the outline item; Delete expects a string title.
-                doc.Outlines.Remove(item);
+                // Some bookmarks may not have an Action; treat null as empty string
+                string action = bm.Action ?? string.Empty;
+                string key = $"{bm.Title}|{action}";
+
+                if (!seen.Contains(key))
+                {
+                    seen.Add(key);
+                    uniqueBookmarks.Add(bm);
+                }
             }
-            else
+
+            // Remove all existing bookmarks
+            editor.DeleteBookmarks();
+
+            // Re‑add only the unique bookmarks
+            foreach (Bookmark bm in uniqueBookmarks)
             {
-                seen.Add(key);
+                editor.CreateBookmarks(bm);
             }
+
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        // Save the cleaned PDF
-        doc.Save(outputPath);
         Console.WriteLine($"Duplicate bookmarks removed. Saved to '{outputPath}'.");
-    }
-
-    // Helper to create a stable string representation of a bookmark destination.
-    // We avoid referencing concrete destination types (e.g., PageDestination) that may not exist
-    // in older Aspose.Pdf versions. The default ToString() implementation is sufficient for
-    // equality comparison because identical destinations produce identical strings.
-    private static string GetDestinationKey(object destObj)
-    {
-        if (destObj == null)
-            return "null";
-
-        // Ensure a non‑null string is returned even if ToString() somehow returns null.
-        return destObj.ToString() ?? string.Empty;
     }
 }

@@ -1,34 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Recursively rename bookmarks (outline items) using the provided translation dictionary
-    static void RenameBookmarks(IEnumerable<OutlineItemCollection> items, Dictionary<string, string> translations)
-    {
-        foreach (OutlineItemCollection item in items)
-        {
-            if (!string.IsNullOrEmpty(item.Title) && translations.TryGetValue(item.Title, out string newTitle))
-            {
-                item.Title = newTitle; // replace with translated title
-            }
-
-            // Process child outline items, if any
-            if (item.Count > 0)
-            {
-                // OutlineItemCollection implements IEnumerable<OutlineItemCollection>,
-                // so we can pass it directly to the same method.
-                RenameBookmarks(item, translations);
-            }
-        }
-    }
-
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_translated_bookmarks.pdf";
+        const string outputPath = "output_renamed.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -36,31 +16,31 @@ class Program
             return;
         }
 
-        // Example translation dictionary: original bookmark title -> translated title
-        var translationDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        // Translation dictionary: original bookmark title -> translated title
+        var translations = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             { "Chapter 1", "Capítulo 1" },
             { "Introduction", "Introducción" },
-            { "Conclusion", "Conclusión" }
             // Add more entries as needed
         };
 
-        try
+        // Use the Facade API to rename bookmarks
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
         {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPath);
+            // Bind the source PDF file
+            bookmarkEditor.BindPdf(inputPath);
 
-            // Rename bookmarks according to the translation dictionary
-            RenameBookmarks(pdfDocument.Outlines, translationDict);
+            // Rename each bookmark according to the dictionary
+            foreach (var kvp in translations)
+            {
+                // ModifyBookmarks(sourceTitle, destinationTitle) renames a bookmark if it exists
+                bookmarkEditor.ModifyBookmarks(kvp.Key, kvp.Value);
+            }
 
-            // Save the updated PDF
-            pdfDocument.Save(outputPath);
-
-            Console.WriteLine($"Bookmarks renamed and saved to '{outputPath}'.");
+            // Save the updated PDF to a new file
+            bookmarkEditor.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Bookmarks renamed and saved to '{outputPath}'.");
     }
 }

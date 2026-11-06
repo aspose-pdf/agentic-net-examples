@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "bookmarked_output.pdf";
+        const string outputPath = "output_with_js_bookmarks.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +16,31 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the existing PDF document.
+        Document doc = new Document(inputPath);
 
-        // ------------------------------------------------------------
-        // Create a top‑level bookmark (outline item) that runs JavaScript
-        // when the user clicks it.
-        // ------------------------------------------------------------
-        OutlineItemCollection rootBookmark = new OutlineItemCollection(pdfDocument.Outlines)
+        // Create a root bookmark (outline item) and assign a JavaScript action.
+        OutlineItemCollection rootBookmark = new OutlineItemCollection(doc.Outlines)
         {
-            Title = "Show Message",
+            Title = "Root Bookmark",
             Action = new JavascriptAction("app.alert('Root bookmark clicked');")
         };
-        pdfDocument.Outlines.Add(rootBookmark);
 
-        // ------------------------------------------------------------
-        // Create a child bookmark under the root bookmark.
-        // ------------------------------------------------------------
-        OutlineItemCollection childBookmark = new OutlineItemCollection(pdfDocument.Outlines)
+        // Create a child bookmark with its own JavaScript action.
+        OutlineItemCollection childBookmark = new OutlineItemCollection(doc.Outlines)
         {
-            Title = "Child Action",
+            Title = "Child Bookmark",
             Action = new JavascriptAction("app.alert('Child bookmark clicked');")
         };
-        // Add the child to the parent bookmark (use Add, not Outlines)
+
+        // Attach the child to the root using the Add method (OutlineItemCollection is its own child collection).
         rootBookmark.Add(childBookmark);
 
-        // Save the modified PDF with the new JavaScript bookmarks
-        pdfDocument.Save(outputPath);
+        // Add the root bookmark (which now contains the child) to the document's outline collection.
+        doc.Outlines.Add(rootBookmark);
+
+        // Save the modified PDF.
+        doc.Save(outputPath);
 
         Console.WriteLine($"PDF with JavaScript bookmarks saved to '{outputPath}'.");
     }

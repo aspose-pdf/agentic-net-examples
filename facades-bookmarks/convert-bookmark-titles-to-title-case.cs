@@ -2,23 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
-    // Predefined list of proper nouns (case‑insensitive lookup) with their correct casing
-    private static readonly Dictionary<string, string> ProperNouns = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-    {
-        { "NASA", "NASA" },
-        { "ASP.NET", "ASP.NET" },
-        { "CSharp", "CSharp" },
-        { "Microsoft", "Microsoft" },
-        { "PDF", "PDF" }
-    };
-
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -27,56 +16,60 @@ class Program
             return;
         }
 
-        // Bind the PDF file to the bookmark editor (Facades API)
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPath);
-
-        // Extract existing bookmarks, convert each title to title case while preserving proper nouns,
-        // and apply the change via ModifyBookmarks.
-        Bookmarks bookmarks = editor.ExtractBookmarks();
-        foreach (Bookmark bm in bookmarks)
+        // Proper nouns with desired casing
+        var properNouns = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            string originalTitle = bm.Title ?? string.Empty;
-            string newTitle = ConvertToTitleCase(originalTitle);
-            if (!string.Equals(originalTitle, newTitle, StringComparison.Ordinal))
-            {
-                // ModifyBookmarks updates all bookmarks that match the old title.
-                editor.ModifyBookmarks(originalTitle, newTitle);
-            }
-        }
+            { "nasa", "NASA" },
+            { "asp.net", "ASP.NET" },
+            { "pdf", "PDF" },
+            { "aspose", "Aspose" }
+        };
 
-        // Save the modified PDF and release resources.
-        editor.Save(outputPath);
-        editor.Close();
+        // Load the PDF using the core Document API (not PdfBookmarkEditor)
+        Document doc = new Document(inputPath);
+
+        // Update bookmark (outline) titles recursively
+        UpdateOutlineTitles(doc.Outlines, properNouns);
+
+        // Save the updated PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"Bookmarks updated and saved to '{outputPath}'.");
     }
 
-    // Convert a string to title case, preserving predefined proper nouns
-    private static string ConvertToTitleCase(string text)
+    // Recursively walk the outline collection and fix titles
+    static void UpdateOutlineTitles(IEnumerable<OutlineItemCollection> items, Dictionary<string, string> properNouns)
     {
-        if (string.IsNullOrWhiteSpace(text))
+        foreach (OutlineItemCollection item in items)
+        {
+            item.Title = ToTitleCase(item.Title, properNouns);
+            // The item itself is a collection of its children, so we can recurse directly.
+            if (item.Count > 0)
+                UpdateOutlineTitles(item, properNouns);
+        }
+    }
+
+    static string ToTitleCase(string text, Dictionary<string, string> properNouns)
+    {
+        if (string.IsNullOrEmpty(text))
             return text;
 
-        string[] words = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        var words = text.Split(' ');
         for (int i = 0; i < words.Length; i++)
         {
             string word = words[i];
-
-            // Preserve proper noun if it exists in the list (case‑insensitive lookup)
-            if (ProperNouns.TryGetValue(word, out string proper))
+            if (properNouns.TryGetValue(word, out string proper))
             {
                 words[i] = proper;
-                continue;
             }
-
-            // Simple title‑case conversion: first char upper, rest lower
-            if (word.Length > 1)
-                words[i] = char.ToUpperInvariant(word[0]) + word.Substring(1).ToLowerInvariant();
             else
-                words[i] = word.ToUpperInvariant();
+            {
+                if (word.Length > 1)
+                    words[i] = char.ToUpper(word[0]) + word.Substring(1).ToLower();
+                else
+                    words[i] = word.ToUpper();
+            }
         }
-
         return string.Join(" ", words);
     }
 }
