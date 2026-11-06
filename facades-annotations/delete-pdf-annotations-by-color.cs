@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -9,9 +11,10 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Target RGB color (values 0‑1 for Aspose.Pdf.Color)
-        // Example: pure red (1.0, 0.0, 0.0)
-        Aspose.Pdf.Color targetColor = Aspose.Pdf.Color.FromRgb(1.0, 0.0, 0.0);
+        // Target RGB color to match (example: pure red)
+        const int targetR = 255;
+        const int targetG = 0;
+        const int targetB = 0;
 
         if (!File.Exists(inputPath))
         {
@@ -19,33 +22,42 @@ class Program
             return;
         }
 
-        // Load the PDF with the core API (Document) for color inspection and modification
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document to enumerate its annotations.
+        Document pdfDoc = new Document(inputPath);
+
+        // Aspose.Pdf.Color does not have GetRGBColor. Use FromRgb with normalized (0‑1) values.
+        Aspose.Pdf.Color targetColor = Aspose.Pdf.Color.FromRgb(
+            targetR / 255.0,
+            targetG / 255.0,
+            targetB / 255.0);
+
+        // PdfAnnotationEditor works with annotations without needing a Document instance for deletion.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            editor.BindPdf(inputPath);
+
+            // Iterate through all pages and their annotations.
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Get the annotation collection for the current page
-                var pageAnnotations = doc.Pages[pageNum].Annotations;
-
-                // Iterate backwards so that removal does not affect the loop index
-                for (int i = pageAnnotations.Count; i >= 1; i--)
+                foreach (Annotation annot in page.Annotations)
                 {
-                    var annotation = pageAnnotations[i];
-
-                    // Compare the annotation's color with the target color
-                    if (annotation.Color != null && annotation.Color.Equals(targetColor))
+                    // Some annotation types may not have a Color (e.g., Link). Guard against null.
+                    if (annot.Color != null && annot.Color.Equals(targetColor))
                     {
-                        // Delete the annotation directly from the collection (1‑based index)
-                        pageAnnotations.Delete(i);
+                        // Delete the annotation whose color matches the target RGB value.
+                        // Use the annotation's Name property (Id does not exist on Annotation).
+                        if (!string.IsNullOrEmpty(annot.Name))
+                        {
+                            editor.DeleteAnnotation(annot.Name);
+                        }
                     }
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations with the specified color have been removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Annotations with the specified color removed. Saved to '{outputPath}'.");
     }
 }

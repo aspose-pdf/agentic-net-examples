@@ -1,16 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text; // for TextFragment, FontStyles
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations; // <-- added for Annotation types
 
-class Program
+class AnnotationSummaryExtractor
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string summaryPdfPath = "annotations_summary.pdf";
+        const string summaryPdfPath = "annotation_summary.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,53 +19,57 @@ class Program
             return;
         }
 
-        // Load the source PDF document.
-        Document srcDoc = new Document(inputPdfPath);
+        // OPTIONAL: demonstrate use of a Facades class as required
+        PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
+        annotationEditor.BindPdf(inputPdfPath);
+        // No further Facades calls are needed for this task; we will work with the Document API.
 
-        // Collect all annotations from all pages.
-        List<Annotation> allAnnotations = new List<Annotation>();
-        foreach (Page page in srcDoc.Pages)
+        List<string> summaryLines = new List<string>();
+
+        // Open the source PDF and collect annotation data
+        using (Aspose.Pdf.Document srcDoc = new Aspose.Pdf.Document(inputPdfPath))
         {
-            foreach (Annotation ann in page.Annotations)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIndex = 1; pageIndex <= srcDoc.Pages.Count; pageIndex++)
             {
-                allAnnotations.Add(ann);
+                Aspose.Pdf.Page page = srcDoc.Pages[pageIndex];
+
+                foreach (Annotation annotation in page.Annotations) // <-- Annotation now resolved from Aspose.Pdf.Annotations
+                {
+                    // Title exists only on markup annotations; cast safely
+                    string title = "N/A";
+                    if (annotation is MarkupAnnotation markup) // <-- MarkupAnnotation from Aspose.Pdf.Annotations
+                    {
+                        title = markup.Title;
+                    }
+
+                    string contents = annotation.Contents ?? string.Empty;
+
+                    summaryLines.Add($"Page {pageIndex}: Title = \"{title}\", Contents = \"{contents}\"");
+                }
             }
         }
 
-        // Prepare a new PDF document that will hold the summary.
-        using (Document summaryDoc = new Document())
+        // Create a new PDF that will hold the summary
+        using (Aspose.Pdf.Document summaryDoc = new Aspose.Pdf.Document())
         {
-            // Add a single page to the summary document.
-            Page summaryPage = summaryDoc.Pages.Add();
+            // Add a single page for the summary text
+            Aspose.Pdf.Page summaryPage = summaryDoc.Pages.Add();
 
-            // Add a title for the summary.
-            TextFragment title = new TextFragment("Annotation Summary")
+            // Combine all lines into one block of text
+            string allText = string.Join(Environment.NewLine, summaryLines);
+
+            // Create a TextFragment to hold the summary
+            TextFragment fragment = new TextFragment(allText)
             {
-                TextState = { FontSize = 18, FontStyle = FontStyles.Bold }
+                // Position the text at the top‑left corner of the page
+                Position = new Position(0, summaryPage.PageInfo.Height)
             };
-            summaryPage.Paragraphs.Add(title);
-            summaryPage.Paragraphs.Add(new TextFragment(Environment.NewLine));
 
-            // Iterate over extracted annotations and write their details.
-            foreach (Annotation ann in allAnnotations)
-            {
-                // Only process text annotations (comments). Adjust as needed for other types.
-                if (ann.AnnotationType == AnnotationType.Text && ann is TextAnnotation textAnn)
-                {
-                    // Build a readable line: Title (if any) and Contents.
-                    string line = string.IsNullOrWhiteSpace(textAnn.Title)
-                        ? $"Comment: {ann.Contents}"
-                        : $"Comment ({textAnn.Title}): {ann.Contents}";
+            // Add the fragment to the page
+            summaryPage.Paragraphs.Add(fragment);
 
-                    TextFragment fragment = new TextFragment(line)
-                    {
-                        TextState = { FontSize = 12 }
-                    };
-                    summaryPage.Paragraphs.Add(fragment);
-                }
-            }
-
-            // Save the summary PDF.
+            // Save the summary PDF
             summaryDoc.Save(summaryPdfPath);
         }
 

@@ -1,89 +1,90 @@
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
-class ConcurrentPdfTest
+class Program
 {
-    // Paths to the PDFs used in the test
-    private const string BasePdfPath = "base.pdf";          // The PDF on which operations are performed
-    private const string InsertPdfPath = "insert.pdf";      // PDF whose pages will be inserted
-    private const string OutputFolder = "ConcurrentOutputs";
-
-    // Lock object to synchronize access to the PDF file
-    private static readonly object _pdfLock = new object();
-
     static void Main()
     {
-        // Ensure output directory exists
-        Directory.CreateDirectory(OutputFolder);
+        const string basePdfPath = "base.pdf";
+        const string sourcePdfPath = "source.pdf";
+        const string resultPdfPath = "result.pdf";
 
-        // Verify that the required PDFs exist
-        if (!File.Exists(BasePdfPath) || !File.Exists(InsertPdfPath))
+        // Create simple PDFs if they do not exist
+        if (!File.Exists(basePdfPath))
+            CreateSimplePdf(basePdfPath, "Base Document");
+        if (!File.Exists(sourcePdfPath))
+            CreateSimplePdf(sourcePdfPath, "Source Document");
+
+        // Load the base document once; it will be accessed by multiple threads
+        using (Document baseDoc = new Document(basePdfPath))
         {
-            Console.Error.WriteLine("Required PDF files not found. Ensure 'base.pdf' and 'insert.pdf' exist.");
-            return;
+            // Object used for synchronizing access to the Document
+            object syncLock = new object();
+
+            // Task that repeatedly imports pages from the source PDF
+            Task importTask = Task.Run(() =>
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    // Load source PDF inside the loop to avoid sharing Document instances across threads
+                    using (Document srcDoc = new Document(sourcePdfPath))
+                    {
+                        lock (syncLock)
+                        {
+                            // Insert all pages of the source at the end of the base document
+                            // Correct overload: Insert(pageNumber, sourceDocument.Pages)
+                            baseDoc.Pages.Insert(baseDoc.Pages.Count + 1, srcDoc.Pages);
+                        }
+                    }
+                    Thread.Sleep(100); // Simulate work
+                }
+            });
+
+            // Task that repeatedly deletes the first page of the document
+            Task deleteTask = Task.Run(() =>
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    lock (syncLock)
+                    {
+                        if (baseDoc.Pages.Count > 0)
+                        {
+                            // Delete the first page (pages are 1‑based)
+                            baseDoc.Pages.Delete(1);
+                        }
+                    }
+                    Thread.Sleep(150); // Simulate work
+                }
+            });
+
+            // Wait for both operations to finish
+            Task.WaitAll(importTask, deleteTask);
+
+            // Save the resulting PDF
+            baseDoc.Save(resultPdfPath);
         }
 
-        // Number of concurrent tasks for each operation
-        const int importTaskCount = 5;
-        const int deleteTaskCount = 5;
+        // Example usage of a class from Aspose.Pdf.Facades (no operation needed for the test)
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Create and start import tasks
-        Task[] importTasks = new Task[importTaskCount];
-        for (int i = 0; i < importTaskCount; i++)
-        {
-            int taskId = i; // capture loop variable
-            importTasks[i] = Task.Run(() => ImportPageTask(taskId));
-        }
-
-        // Create and start delete tasks
-        Task[] deleteTasks = new Task[deleteTaskCount];
-        for (int i = 0; i < deleteTaskCount; i++)
-        {
-            int taskId = i; // capture loop variable
-            deleteTasks[i] = Task.Run(() => DeletePageTask(taskId));
-        }
-
-        // Wait for all tasks to complete
-        Task.WaitAll(importTasks);
-        Task.WaitAll(deleteTasks);
-
-        Console.WriteLine("Concurrent import and delete operations completed.");
+        Console.WriteLine("Concurrent import/delete test completed.");
     }
 
-    // Inserts the first page of InsertPdfPath into BasePdfPath at position 1
-    private static void ImportPageTask(int taskId)
+    // Helper method to create a one‑page PDF containing simple text
+    static void CreateSimplePdf(string path, string content)
     {
-        string outputPath = Path.Combine(OutputFolder, $"import_result_{taskId}.pdf");
-
-        // Synchronize the operation to avoid race conditions on the same source file
-        lock (_pdfLock)
+        using (Document doc = new Document())
         {
-            // PdfFileEditor does NOT implement IDisposable; no using block needed
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Correct overload: Insert(sourceFile, startPageNumber, outputFile, insertPageNumbers, insertFile)
-            editor.Insert(BasePdfPath, 1, outputPath, new int[] { 1 }, InsertPdfPath);
+            Page page = doc.Pages.Add();
+            // Fully qualified TextFragment to avoid ambiguity
+            TextFragment tf = new TextFragment(content);
+            page.Paragraphs.Add(tf);
+            doc.Save(path);
         }
-
-        Console.WriteLine($"Import task {taskId} finished. Output: {outputPath}");
-    }
-
-    // Deletes page 2 from BasePdfPath and writes the result to a new file
-    private static void DeletePageTask(int taskId)
-    {
-        string outputPath = Path.Combine(OutputFolder, $"delete_result_{taskId}.pdf");
-
-        // Synchronize the operation to avoid race conditions on the same source file
-        lock (_pdfLock)
-        {
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Correct overload: Delete(sourceFile, pageNumbers, outputFile)
-            editor.Delete(BasePdfPath, new int[] { 2 }, outputPath);
-        }
-
-        Console.WriteLine($"Delete task {taskId} finished. Output: {outputPath}");
     }
 }

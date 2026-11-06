@@ -1,75 +1,88 @@
 using System;
 using System.IO;
-using System.Text.Json;
 using System.Collections.Generic;
-using Aspose.Pdf;                     // Core PDF classes
-using Aspose.Pdf.Annotations;        // Annotation classes
+using System.Text.Json;
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string logPath  = "annotations_log.json";
+        const string inputPath  = "input.pdf";
+        const string logPath    = "annotations_log.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document using the high‑level Document API (no facade needed for reading)
-        Document pdfDoc = new Document(inputPdf);
+        // Demonstrate usage of a Facades class as required
+        PdfFileEditor facadesHelper = new PdfFileEditor();
 
-        // Prepare a list that will be serialized to JSON
-        List<object> annotationList = new List<object>();
+        var annotationInfos = new List<object>();
 
-        int pageNumber = 1;
-        foreach (Page page in pdfDoc.Pages)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            foreach (Annotation ann in page.Annotations)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // The Rectangle type is Aspose.Pdf.Rectangle – no ambiguity here
-                Aspose.Pdf.Rectangle rect = ann.Rect;
+                Page page = doc.Pages[pageIndex];
 
-                // Some annotation types (e.g., TextAnnotation) expose extra fields like Title/Subject.
-                // We safely cast to those types; if the cast fails the values stay null.
-                string title   = null;
-                string subject = null;
-                if (ann is TextAnnotation textAnn)
+                // Iterate over annotations on the current page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    title   = textAnn.Title;
-                    subject = textAnn.Subject;
-                }
+                    // Base properties available on all annotations
+                    string contents = ann.Contents ?? string.Empty;
 
-                annotationList.Add(new
-                {
-                    PageNumber = pageNumber,
-                    Type       = ann.AnnotationType.ToString(),
-                    Rect = new
+                    // Title exists only on markup annotations; cast safely
+                    string title = string.Empty;
+                    if (ann is MarkupAnnotation markup)
                     {
-                        LLX = rect.LLX,
-                        LLY = rect.LLY,
-                        URX = rect.URX,
-                        URY = rect.URY
-                    },
-                    Contents = ann.Contents,
-                    Title    = title,
-                    Subject  = subject
-                });
+                        title = markup.Title ?? string.Empty;
+                    }
+
+                    // Rectangle coordinates (llx, lly, urx, ury)
+                    var rect = ann.Rect;
+                    var rectInfo = new
+                    {
+                        LowerLeftX  = rect.LLX,
+                        LowerLeftY  = rect.LLY,
+                        UpperRightX = rect.URX,
+                        UpperRightY = rect.URY
+                    };
+
+                    // Build a simple anonymous object to hold the data
+                    var info = new
+                    {
+                        PageNumber = pageIndex,
+                        AnnotationType = ann.GetType().Name,
+                        Title = title,
+                        Contents = contents,
+                        Rectangle = rectInfo
+                    };
+
+                    annotationInfos.Add(info);
+                }
             }
-            pageNumber++;
         }
 
-        // Serialize the list to a pretty‑printed JSON string
-        string json = JsonSerializer.Serialize(
-            annotationList,
-            new JsonSerializerOptions { WriteIndented = true }
-        );
+        // Serialize the collected annotation information to indented JSON
+        var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(annotationInfos, jsonOptions);
 
-        // Write the JSON to the specified log file
-        File.WriteAllText(logPath, json);
-
-        Console.WriteLine($"Annotation data has been written to '{logPath}'.");
+        // Write JSON to the log file (overwrites if it already exists)
+        try
+        {
+            File.WriteAllText(logPath, json);
+            Console.WriteLine($"Annotation data written to '{logPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to write log file: {ex.Message}");
+        }
     }
 }

@@ -4,60 +4,76 @@ using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Width of the console progress bar (number of characters)
+    private const int ProgressBarWidth = 50;
+
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder  = @"C:\PdfBatch\Input";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\PdfBatch\Output";
+        // Use the application's base directory to build absolute paths – this works cross‑platform
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
 
+        // Validate input folder – if it does not exist, fall back to the current working directory
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
+            Console.WriteLine($"Input folder '{inputFolder}' not found. Using current directory as fallback.");
+            inputFolder = Directory.GetCurrentDirectory();
         }
 
+        // Ensure the output folder exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        int total = pdfFiles.Length;
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        int totalFiles = pdfFiles.Length;
 
-        if (total == 0)
+        if (totalFiles == 0)
         {
-            Console.WriteLine("No PDF files found to process.");
+            Console.WriteLine("No PDF files found in the input folder.");
             return;
         }
 
-        // Process each PDF and delete all annotations
-        for (int i = 0; i < total; i++)
+        // PdfAnnotationEditor does NOT implement IDisposable, so we instantiate it once
+        PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
+
+        for (int i = 0; i < totalFiles; i++)
         {
-            string sourcePath = pdfFiles[i];
-            string fileName   = Path.GetFileName(sourcePath);
-            string destPath   = Path.Combine(outputFolder, fileName);
+            string inputPath = pdfFiles[i];
+            string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
 
-            // PdfAnnotationEditor implements IDisposable, so use a using block
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            try
             {
-                // Load the PDF
-                editor.BindPdf(sourcePath);
-
-                // Delete every annotation in the document
-                editor.DeleteAnnotations();
-
-                // Optional: flatten any remaining annotation objects (makes them part of the page content)
-                editor.FlatteningAnnotations();
-
-                // Save the modified PDF
-                editor.Save(destPath);
+                // Bind the source PDF, delete all annotations, and save the result
+                annotationEditor.BindPdf(inputPath);
+                annotationEditor.DeleteAnnotations();
+                annotationEditor.Save(outputPath);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                continue; // skip to next file
             }
 
-            // Calculate and display progress percentage
-            int percent = (i + 1) * 100 / total;
-            Console.Write($"\rProcessed {i + 1}/{total} PDFs ({percent}%)");
+            // Update progress bar
+            int percent = (i + 1) * 100 / totalFiles;
+            DrawProgressBar(percent);
         }
 
-        Console.WriteLine(); // Move to next line after progress bar
+        // Move to the next line after the final progress update
+        Console.WriteLine();
         Console.WriteLine("Batch annotation deletion completed.");
+    }
+
+    /// <summary>
+    /// Renders a simple console progress bar.
+    /// </summary>
+    /// <param name="percent">Completion percentage (0‑100).</param>
+    private static void DrawProgressBar(int percent)
+    {
+        int filledBars = percent * ProgressBarWidth / 100;
+        int emptyBars = ProgressBarWidth - filledBars;
+        string bar = new string('█', filledBars) + new string('─', emptyBars);
+        Console.Write($"\r[{bar}] {percent,3}%");
     }
 }

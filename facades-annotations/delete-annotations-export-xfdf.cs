@@ -1,48 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXfdf = "remaining_annotations.xfdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_without_text_annots.pdf";
+        const string xfdfPath = "remaining_annotations.xfdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Delete all Text (Free‑Text) annotations while keeping other types
-        foreach (Page page in pdfDocument.Pages)
+        // Load PDF and delete annotations of a specific type (e.g., TextAnnotation)
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate backwards because we will be removing items
-            for (int i = page.Annotations.Count; i >= 1; i--)
+            // Iterate through pages (1‑based indexing)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Annotation annotation = page.Annotations[i];
-                if (annotation.AnnotationType == AnnotationType.Text) // Free‑text annotation
+                Page page = doc.Pages[pageNum];
+
+                // Delete annotations of type TextAnnotation.
+                // Iterate backwards because Delete shifts indices.
+                for (int i = page.Annotations.Count; i >= 1; i--)
                 {
-                    page.Annotations.Delete(i);
+                    Annotation annot = page.Annotations[i];
+                    if (annot is TextAnnotation)
+                    {
+                        page.Annotations.Delete(i);
+                    }
                 }
+            }
+
+            // Save the PDF after deletion
+            doc.Save(outputPath);
+        }
+
+        // Export the remaining annotations to XFDF using the correct overload
+        using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
+        {
+            annotEditor.BindPdf(outputPath);
+            using (FileStream fs = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+            {
+                // ExportAnnotationsXfdf(stream, startPage, endPage, annotationTypeNames)
+                // Pass (string[])null to export all annotation types.
+                annotEditor.ExportAnnotationsXfdf(fs, 1, annotEditor.Document.Pages.Count, (string[])null);
             }
         }
 
-        // ---------------------------------------------------------------------
-        // Export the remaining annotations to XFDF.
-        // The XFDF functionality lives in the separate Aspose.Pdf.Xfdf assembly.
-        // If you have added a reference to the Aspose.Pdf.Xfdf NuGet package, you
-        // can uncomment the following lines and add the appropriate using
-        // directive (using Aspose.Pdf.Xfdf;).
-        // ---------------------------------------------------------------------
-        // XfdfWriter.WriteAnnotations(pdfDocument, outputXfdf);
-
-        Console.WriteLine("Annotations of type Text removed.");
-        Console.WriteLine($"Remaining annotations would be exported to '{outputXfdf}' if the XFDF assembly is referenced.");
+        Console.WriteLine($"Remaining annotations exported to '{xfdfPath}'.");
     }
 }

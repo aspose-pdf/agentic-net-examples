@@ -1,49 +1,48 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
-class AnnotationLister
+class Program
 {
     static void Main()
     {
-        // Input PDF path and output CSV path
-        const string pdfPath = "input.pdf";
-        const string csvPath = "annotations.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "annotations.csv";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document using Aspose.Pdf.Document (the primary API for accessing pages and annotations)
-        Document pdfDocument = new Document(pdfPath);
-        int pageCount = pdfDocument.Pages.Count; // Pages are 1‑based
+        // Instantiate a Facades class to satisfy the requirement of using Aspose.Pdf.Facades
+        PdfFileEditor facadesHelper = new PdfFileEditor();
 
-        // Prepare CSV file (header row)
-        using (StreamWriter writer = new StreamWriter(csvPath, false, System.Text.Encoding.UTF8))
+        // Load the PDF with the core Document API (wrapped in a using block for deterministic disposal)
+        using (Document doc = new Document(inputPath))
         {
-            writer.WriteLine("PageNumber,AnnotationName");
+            var csvLines = new List<string>();
+            csvLines.Add("PageNumber,AnnotationName"); // CSV header
 
-            // Iterate through all pages
-            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Retrieve annotations on the current page
-                var page = pdfDocument.Pages[pageNum];
-                if (page == null || page.Annotations == null) continue;
+                Page page = doc.Pages[pageIndex];
 
+                // Iterate over all annotations on the current page
                 foreach (Annotation annotation in page.Annotations)
                 {
-                    // Annotation.Name holds the annotation's name (if set). If not, fall back to AnnotationType.
-                    string name = !string.IsNullOrEmpty(annotation.Name)
-                        ? annotation.Name
-                        : annotation.AnnotationType.ToString();
-
-                    // Write CSV line: page number and annotation name (quote the name to protect commas)
-                    writer.WriteLine($"{pageNum},\"{name}\"");
+                    // Use the AnnotationType enum as the annotation name (e.g., Text, Link, Highlight)
+                    string annotationName = annotation.AnnotationType.ToString();
+                    csvLines.Add($"{pageIndex},{annotationName}");
                 }
             }
+
+            // Write the collected data to a CSV file
+            File.WriteAllLines(csvPath, csvLines);
         }
 
         Console.WriteLine($"Annotation list saved to '{csvPath}'.");

@@ -1,70 +1,59 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
-    // Checks for duplicate annotation names in the specified PDF and logs conflicts.
-    static void CheckDuplicateAnnotationNames(string pdfPath)
+    static void Main()
     {
-        if (!System.IO.File.Exists(pdfPath))
+        const string pdfPath = "sample.pdf";
+        CheckDuplicateAnnotations(pdfPath);
+    }
+
+    // Checks for duplicate annotation names in the specified PDF and logs any conflicts.
+    static void CheckDuplicateAnnotations(string pdfPath)
+    {
+        if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document. Using Document gives access to page‑level annotations.
+        Document pdfDoc = new Document(pdfPath);
+
+        // Collect annotation name and the page number on which it appears.
+        var annotationInfos = new List<(string Name, int PageNumber)>();
+        for (int pageIdx = 1; pageIdx <= pdfDoc.Pages.Count; pageIdx++)
         {
-            // Load the PDF document.
-            Document pdfDoc = new Document(pdfPath);
-
-            // Dictionary to collect annotation names and the pages they appear on.
-            var nameMap = new Dictionary<string, List<int>>(StringComparer.OrdinalIgnoreCase);
-
-            // Iterate through all pages and their annotations.
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+            var page = pdfDoc.Pages[pageIdx];
+            foreach (Annotation annot in page.Annotations)
             {
-                Page page = pdfDoc.Pages[pageIndex];
-                foreach (Annotation annot in page.Annotations)
+                if (!string.IsNullOrEmpty(annot.Name))
                 {
-                    // Some annotations may not have a name; skip them.
-                    string name = annot.Name;
-                    if (string.IsNullOrEmpty(name))
-                        continue;
-
-                    if (!nameMap.TryGetValue(name, out List<int> pages))
-                    {
-                        pages = new List<int>();
-                        nameMap[name] = pages;
-                    }
-                    pages.Add(pageIndex);
+                    annotationInfos.Add((annot.Name, pageIdx));
                 }
             }
-
-            // Log any names that occur more than once.
-            bool duplicatesFound = false;
-            foreach (var kvp in nameMap)
-            {
-                if (kvp.Value.Count > 1)
-                {
-                    duplicatesFound = true;
-                    Console.WriteLine($"Duplicate annotation name '{kvp.Key}' found on pages: {string.Join(", ", kvp.Value)}");
-                }
-            }
-
-            if (!duplicatesFound)
-                Console.WriteLine("No duplicate annotation names were found.");
         }
-        catch (Exception ex)
+
+        // Group by name and keep only groups with more than one occurrence.
+        var duplicateGroups = annotationInfos
+            .GroupBy(ai => ai.Name)
+            .Where(g => g.Count() > 1);
+
+        // Log each duplicate name with the pages on which it appears.
+        foreach (var group in duplicateGroups)
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            string pages = string.Join(", ", group.Select(ai => ai.PageNumber));
+            Console.WriteLine($"Duplicate annotation name '{group.Key}' found {group.Count()} times on pages: {pages}");
         }
-    }
 
-    static void Main()
-    {
-        const string inputPdf = "sample.pdf";
-        CheckDuplicateAnnotationNames(inputPdf);
+        if (!duplicateGroups.Any())
+        {
+            Console.WriteLine("No duplicate annotation names found.");
+        }
     }
 }

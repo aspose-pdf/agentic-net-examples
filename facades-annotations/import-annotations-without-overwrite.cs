@@ -1,42 +1,62 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // needed for AnnotationType
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "newAnnotations.pdf";   // PDF containing annotations to import
-        const string destinationPdf = "existing.pdf";   // PDF that already has annotations
-        const string outputPdf = "mergedAnnotations.pdf";
+        const string sourcePdfPath = "source_with_new_annotations.pdf";
+        const string destinationPdfPath = "existing_annotations.pdf";
+        const string outputPdfPath = "merged_annotations.pdf";
+        const string tempXfdfPath = "temp_annotations.xfdf";
 
-        // Verify that both PDFs exist
-        if (!File.Exists(sourcePdf))
+        // Verify that the required PDFs exist
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
             return;
         }
-        if (!File.Exists(destinationPdf))
+        if (!File.Exists(destinationPdfPath))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPdfPath}");
             return;
         }
 
         // Copy the destination PDF to a new file so the original remains unchanged
-        File.Copy(destinationPdf, outputPdf, true);
+        File.Copy(destinationPdfPath, outputPdfPath, true);
 
-        // Create the annotation editor and bind it to the copied PDF
-        PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor();
-        annotationEditor.BindPdf(outputPdf);
+        // ------------------------------------------------------------
+        // Step 1: Export annotations from the source PDF to an XFDF file
+        // ------------------------------------------------------------
+        using (var srcDoc = new Document(sourcePdfPath))
+        {
+            using (var xfdfStream = new FileStream(tempXfdfPath, FileMode.Create, FileAccess.Write))
+            {
+                srcDoc.ExportAnnotationsToXfdf(xfdfStream);
+            }
+        }
 
-        // Import annotations from the source PDF while preserving existing ones.
-        // Pass a string array with the source file and a null AnnotationType array.
-        annotationEditor.ImportAnnotations(new string[] { sourcePdf }, null);
+        // ------------------------------------------------------------
+        // Step 2: Import the exported XFDF into the copied destination PDF
+        // Existing annotations are preserved – the import operation adds
+        // new annotations without overwriting the ones already present.
+        // ------------------------------------------------------------
+        using (var outDoc = new Document(outputPdfPath))
+        {
+            using (var xfdfStream = new FileStream(tempXfdfPath, FileMode.Open, FileAccess.Read))
+            {
+                outDoc.ImportAnnotationsFromXfdf(xfdfStream);
+            }
+            outDoc.Save(outputPdfPath);
+        }
 
-        // Save the changes back to the output file
-        annotationEditor.Save(outputPdf);
+        // Clean up the temporary XFDF file
+        if (File.Exists(tempXfdfPath))
+        {
+            File.Delete(tempXfdfPath);
+        }
 
-        Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Annotations merged successfully. Output saved to '{outputPdfPath}'.");
     }
 }

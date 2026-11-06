@@ -1,80 +1,54 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-// Note: Annotation types are in the Aspose.Pdf.Annotations namespace.
+using Aspose.Pdf.Facades; // PdfAnnotationEditor resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "output.pdf";
+        const string annotationName = "myAnnotation"; // name/id of the annotation to delete
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
+        // Create the annotation editor (facade API)
+        Aspose.Pdf.Facades.PdfAnnotationEditor editor = new Aspose.Pdf.Facades.PdfAnnotationEditor();
+
+        // Initial bind of the PDF document
+        editor.BindPdf(inputPdfPath);
 
         bool deletionSucceeded = false;
-        int attemptCount = 0;
-        const int maxAttempts = 2; // initial try + one retry
+        int attempt = 0;
+        const int maxAttempts = 2; // original try + one retry
 
-        while (!deletionSucceeded && attemptCount < maxAttempts)
+        while (!deletionSucceeded && attempt < maxAttempts)
         {
+            attempt++;
             try
             {
-                // Iterate over all pages and delete their annotations
-                foreach (Page page in doc.Pages)
-                {
-                    // The Annotations property returns an AnnotationCollection defined in Aspose.Pdf.Annotations
-                    Aspose.Pdf.Annotations.AnnotationCollection annotations = page.Annotations;
-
-                    // Collect annotations to delete (example: delete all)
-                    List<Aspose.Pdf.Annotations.Annotation> toRemove = new List<Aspose.Pdf.Annotations.Annotation>();
-                    foreach (Aspose.Pdf.Annotations.Annotation ann in annotations)
-                    {
-                        toRemove.Add(ann);
-                    }
-
-                    // Delete collected annotations
-                    foreach (Aspose.Pdf.Annotations.Annotation ann in toRemove)
-                    {
-                        annotations.Delete(ann);
-                    }
-                }
-
-                deletionSucceeded = true; // no exception, operation succeeded
+                // Delete the annotation by its name (single‑argument overload)
+                editor.DeleteAnnotation(annotationName);
+                deletionSucceeded = true;
             }
             catch (Exception ex)
             {
-                // Log the failure and attempt to rebind (reload) the document
-                Console.Error.WriteLine($"Attempt {attemptCount + 1} failed: {ex.Message}");
-                attemptCount++;
+                Console.Error.WriteLine($"Attempt {attempt} failed: {ex.Message}");
 
-                // Rebind the PDF by reloading it from the original file
-                doc.Dispose();
-                doc = new Document(inputPath);
+                // If we have remaining attempts, re‑bind the PDF and retry
+                if (attempt < maxAttempts)
+                {
+                    editor.BindPdf(inputPdfPath);
+                }
             }
         }
 
-        if (!deletionSucceeded)
-        {
-            Console.Error.WriteLine("Failed to delete annotations after retry.");
-        }
-        else
-        {
-            // Save the modified PDF
-            doc.Save(outputPath);
-            Console.WriteLine($"Annotations deleted and PDF saved to '{outputPath}'.");
-        }
-
-        // Ensure the document is disposed
-        doc.Dispose();
+        // Save the modified PDF (whether deletion succeeded or not)
+        editor.Save(outputPdfPath);
+        Console.WriteLine($"Annotation deletion {(deletionSucceeded ? "succeeded" : "failed")} – saved to '{outputPdfPath}'.");
     }
 }

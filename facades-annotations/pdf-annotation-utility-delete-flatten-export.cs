@@ -1,20 +1,23 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
 
-class PdfUtility
+class Program
 {
     static void Main(string[] args)
     {
+        // Expected arguments:
+        //   operation  inputPath  outputPath  [additional]
+        // operation: delete | flatten | export
         if (args.Length < 3)
         {
-            Console.WriteLine("Usage:");
-            Console.WriteLine("  PdfUtility delete <input.pdf> <output.pdf> <pages>");
-            Console.WriteLine("  PdfUtility flatten <input.pdf> <output.pdf>");
-            Console.WriteLine("  PdfUtility export <input.pdf> <outputFolder>");
+            Console.Error.WriteLine("Usage: <operation> <inputPdf> <outputPath> [options]");
+            Console.Error.WriteLine("Operations:");
+            Console.Error.WriteLine("  delete <pageNumber>   - delete the specified page");
+            Console.Error.WriteLine("  flatten                - flatten form fields");
+            Console.Error.WriteLine("  export                 - export PDF to HTML");
             return;
         }
 
@@ -33,57 +36,70 @@ class PdfUtility
             switch (operation)
             {
                 case "delete":
-                    // Delete specified pages (comma‑separated list, 1‑based)
+                    // Requires a page number as the fourth argument
                     if (args.Length < 4)
                     {
-                        Console.Error.WriteLine("Delete operation requires a page list argument.");
+                        Console.Error.WriteLine("Delete operation requires a page number.");
                         return;
                     }
-                    int[] pagesToDelete = args[3]
-                        .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                        .Select(p => int.Parse(p.Trim()))
-                        .ToArray();
 
-                    // NOTE: PdfFileEditor.Delete signature is (inputPath, pages, outputPath)
-                    PdfFileEditor fileEditor = new PdfFileEditor();
-                    fileEditor.Delete(inputPath, pagesToDelete, outputPath);
-                    Console.WriteLine($"Deleted pages saved to '{outputPath}'.");
+                    if (!int.TryParse(args[3], out int pageNumber))
+                    {
+                        Console.Error.WriteLine("Invalid page number.");
+                        return;
+                    }
+
+                    // Load PDF, delete the page, and save
+                    using (Document doc = new Document(inputPath))
+                    {
+                        // Aspose.Pdf uses 1‑based page indexing
+                        if (pageNumber >= 1 && pageNumber <= doc.Pages.Count)
+                        {
+                            doc.Pages.Delete(pageNumber);
+                            doc.Save(outputPath);
+                            Console.WriteLine($"Page {pageNumber} deleted. Saved to '{outputPath}'.");
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Page number out of range. Document has {doc.Pages.Count} pages.");
+                        }
+                    }
                     break;
 
                 case "flatten":
-                    // Flatten form fields into static content
+                    // Flatten form fields (make them part of the page content)
                     using (Document doc = new Document(inputPath))
                     {
-                        // In current Aspose.Pdf versions, flattening is done via the Form object
-                        if (doc.Form != null)
-                        {
-                            doc.Form.Flatten();
-                        }
+                        // In recent Aspose.Pdf versions the FormFlattening property was removed.
+                        // Use the Form.Flatten() method instead.
+                        doc.Form?.Flatten();
                         doc.Save(outputPath);
+                        Console.WriteLine($"Form fields flattened. Saved to '{outputPath}'.");
                     }
-                    Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
                     break;
 
                 case "export":
-                    // Export each page as a PNG image into the specified folder
-                    string outputFolder = outputPath; // treat third argument as folder for export
-                    Directory.CreateDirectory(outputFolder);
-
+                    // Export PDF to HTML (requires explicit HtmlSaveOptions on all platforms)
                     using (Document doc = new Document(inputPath))
                     {
-                        // Use PngDevice (cross‑platform) instead of PdfConverter/ImageSaveOptions
-                        var resolution = new Resolution(150);
-                        for (int i = 1; i <= doc.Pages.Count; i++)
+                        HtmlSaveOptions htmlOptions = new HtmlSaveOptions
                         {
-                            string imgPath = Path.Combine(outputFolder, $"page_{i}.png");
-                            using (FileStream imgStream = new FileStream(imgPath, FileMode.Create))
-                            {
-                                PngDevice pngDevice = new PngDevice(resolution);
-                                pngDevice.Process(doc.Pages[i], imgStream);
-                            }
+                            PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                            RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                        };
+
+                        // HTML conversion uses GDI+ on Windows; on non‑Windows platforms it will throw,
+                        // so we catch the specific exception type.
+                        try
+                        {
+                            doc.Save(outputPath, htmlOptions);
+                            Console.WriteLine($"PDF exported to HTML at '{outputPath}'.");
+                        }
+                        catch (TypeInitializationException)
+                        {
+                            Console.Error.WriteLine("HTML conversion requires GDI+ and is only supported on Windows.");
                         }
                     }
-                    Console.WriteLine($"Pages exported as PNG images to folder '{outputFolder}'.");
                     break;
 
                 default:

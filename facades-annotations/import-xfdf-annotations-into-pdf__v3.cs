@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Included as requested
 
 class Program
 {
@@ -25,19 +25,17 @@ class Program
 
         try
         {
-            // PdfAnnotationEditor does not implement IDisposable, so no using block is needed.
-            var editor = new PdfAnnotationEditor();
+            // Load the PDF document
+            using (Document pdfDoc = new Document(pdfPath))
+            {
+                // Import annotations from the XFDF file
+                pdfDoc.ImportAnnotationsFromXfdf(xfdfPath);
 
-            // Bind the existing PDF document.
-            editor.BindPdf(pdfPath);
+                // Save the updated PDF
+                pdfDoc.Save(outputPath);
+            }
 
-            // Import annotations from the XFDF file. The method expects a string array.
-            editor.ImportAnnotations(new[] { xfdfPath });
-
-            // Save the PDF with imported annotations.
-            editor.Save(outputPath);
-
-            Console.WriteLine($"Annotations imported successfully to '{outputPath}'.");
+            Console.WriteLine($"Annotations imported and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -1,121 +1,95 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-
-// ---------------------------------------------------------------------------
-// Minimal stubs for Xfdf2Pdf and Pdf2Xfdf when the Aspose.Pdf library version
-// does not contain these façade classes. They provide the same public API used
-// in the sample code so the project can compile and run (the stub methods are
-// no‑ops). If the real Aspose.Pdf package is referenced, these stubs are ignored
-// because the real types will be used instead.
-// ---------------------------------------------------------------------------
-namespace Aspose.Pdf.Facades
-{
-    // Stub for the Xfdf2Pdf façade – imports XFDF annotations into a PDF document.
-    internal class Xfdf2Pdf
-    {
-        private Document _pdfDocument;
-
-        public void BindPdf(Document pdfDocument)
-        {
-            _pdfDocument = pdfDocument;
-        }
-
-        // In the real library this imports annotations from the XFDF file.
-        // The stub simply pretends the operation succeeded.
-        public void ImportXfdf(string xfdfPath)
-        {
-            // No‑op – placeholder for real implementation.
-            // You could add custom logic here if you need to simulate annotation import.
-        }
-    }
-
-    // Stub for the Pdf2Xfdf façade – exports PDF annotations to an XFDF file.
-    internal class Pdf2Xfdf
-    {
-        private Document _pdfDocument;
-
-        public void BindPdf(Document pdfDocument)
-        {
-            _pdfDocument = pdfDocument;
-        }
-
-        // In the real library this writes the accumulated annotations to an XFDF file.
-        // The stub creates an empty file so downstream code can continue.
-        public void ExportXfdf(string outputXfdfPath)
-        {
-            // Create an empty XFDF file if it does not exist.
-            if (!File.Exists(outputXfdfPath))
-            {
-                using (var fs = File.Create(outputXfdfPath))
-                {
-                    // Write a minimal XFDF root element to keep the file well‑formed.
-                    var emptyXfdf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><xfdf xmlns=\"http://ns.adobe.com/xfdf/\"></xfdf>";
-                    var bytes = System.Text.Encoding.UTF8.GetBytes(emptyXfdf);
-                    fs.Write(bytes, 0, bytes.Length);
-                }
-            }
-        }
-    }
-}
 
 class Program
 {
     static void Main()
     {
-        // Input PDF that will receive the merged annotations.
-        const string inputPdfPath = "input.pdf";
-
-        // XFDF files to be merged.
+        // Paths to the XFDF files that need to be merged
         string[] xfdfFiles = { "annotations1.xfdf", "annotations2.xfdf", "annotations3.xfdf" };
-
-        // Path for the resulting merged XFDF.
+        // Input PDF to which the merged XFDF will be applied
+        const string pdfInputPath = "input.pdf";
+        // Output PDF after importing the merged XFDF
+        const string pdfOutputPath = "output.pdf";
+        // Temporary file that will hold the merged XFDF
         const string mergedXfdfPath = "merged.xfdf";
 
-        // Validate input PDF.
-        if (!File.Exists(inputPdfPath))
+        // Verify that all source files exist
+        foreach (var file in xfdfFiles)
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
-            return;
-        }
-
-        // Validate each XFDF file.
-        foreach (string xfdf in xfdfFiles)
-        {
-            if (!File.Exists(xfdf))
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"XFDF not found: {xfdf}");
+                Console.Error.WriteLine($"XFDF file not found: {file}");
                 return;
             }
         }
+        if (!File.Exists(pdfInputPath))
+        {
+            Console.Error.WriteLine($"PDF file not found: {pdfInputPath}");
+            return;
+        }
 
+        // ------------------------------------------------------------
+        // Merge the XFDF files into a single XFDF document
+        // ------------------------------------------------------------
+        // Create an empty XFDF root element with the required namespace
+        XNamespace ns = "http://ns.adobe.com/xfdf/";
+        XDocument mergedXfdf = new XDocument(new XElement(ns + "xfdf"));
+
+        foreach (var xfdfPath in xfdfFiles)
+        {
+            // Load each XFDF file as XML
+            XDocument doc = XDocument.Load(xfdfPath);
+            XElement root = doc.Root;
+            if (root != null)
+            {
+                // Append a copy of each child element (fields, annots, etc.) to the merged root
+                foreach (var element in root.Elements())
+                {
+                    mergedXfdf.Root.Add(new XElement(element));
+                }
+            }
+        }
+
+        // Save the merged XFDF to a temporary file
+        mergedXfdf.Save(mergedXfdfPath);
+
+        // ------------------------------------------------------------
+        // Import the merged XFDF into the PDF using the Form facade
+        // ------------------------------------------------------------
         try
         {
-            // Load the PDF inside a using block for deterministic disposal.
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the source PDF
+            using (Document pdfDoc = new Document(pdfInputPath))
+            using (Form formFacade = new Form(pdfDoc))
             {
-                // Bind the PDF to the XFDF importer.
-                Xfdf2Pdf xfdfImporter = new Xfdf2Pdf();
-                xfdfImporter.BindPdf(pdfDoc);
-
-                // Import each XFDF file; annotations are accumulated in the PDF.
-                foreach (string xfdfPath in xfdfFiles)
+                // Import the merged XFDF annotations (the method expects a Stream)
+                using (FileStream xfdfStream = File.OpenRead(mergedXfdfPath))
                 {
-                    xfdfImporter.ImportXfdf(xfdfPath);
+                    formFacade.ImportXfdf(xfdfStream);
                 }
 
-                // Export the accumulated annotations to a single XFDF file.
-                Pdf2Xfdf xfdfExporter = new Pdf2Xfdf();
-                xfdfExporter.BindPdf(pdfDoc);
-                xfdfExporter.ExportXfdf(mergedXfdfPath);
+                // Save the resulting PDF with the imported annotations
+                formFacade.Save(pdfOutputPath);
             }
-
-            Console.WriteLine($"Merged XFDF saved to '{mergedXfdfPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during XFDF import: {ex.Message}");
+            return;
         }
+        finally
+        {
+            // Clean up the temporary merged XFDF file
+            if (File.Exists(mergedXfdfPath))
+            {
+                try { File.Delete(mergedXfdfPath); } catch { /* ignore cleanup errors */ }
+            }
+        }
+
+        Console.WriteLine($"Merged XFDF imported successfully. Output PDF saved to '{pdfOutputPath}'.");
     }
 }

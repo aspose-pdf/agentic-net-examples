@@ -8,53 +8,42 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_modified.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF to inspect its annotations
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
+            // Load the PDF with the Document class (PdfFileEditor does not support annotation modification).
+            Document pdfDoc = new Document(inputPath);
+
+            // Update the Modified date of every markup annotation to the current system time.
+            DateTime now = DateTime.Now;
+            foreach (Page page in pdfDoc.Pages)
             {
-                Console.Error.WriteLine("The PDF contains no pages.");
-                return;
+                if (page.Annotations == null) continue;
+                foreach (Annotation annotation in page.Annotations)
+                {
+                    // Only markup annotations expose the Modified property.
+                    if (annotation is MarkupAnnotation markup)
+                    {
+                        markup.Modified = now;
+                    }
+                }
             }
 
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Save the updated PDF.
+            pdfDoc.Save(outputPath);
 
-            // If there are no annotations, simply copy the source file
-            if (page.Annotations.Count == 0)
-            {
-                File.Copy(inputPath, outputPath, true);
-                Console.WriteLine("No annotations found – file copied unchanged.");
-                return;
-            }
-
-            // Retrieve the first annotation on the page
-            Annotation annotation = page.Annotations[1];
-
-            // Update its Modified date (only markup annotations expose this property)
-            if (annotation is MarkupAnnotation markup)
-            {
-                markup.Modified = DateTime.Now;
-                Console.WriteLine("Modified date updated for markup annotation.");
-            }
-            else
-            {
-                Console.WriteLine("First annotation is not a markup annotation; Modified date cannot be set.");
-            }
-
-            // Save the updated document
-            doc.Save(outputPath);
+            Console.WriteLine($"Annotations' Modified date updated. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Annotation ModifiedDate updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

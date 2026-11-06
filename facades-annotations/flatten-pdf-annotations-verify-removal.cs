@@ -12,38 +12,56 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Flatten all annotations using the Facades API
-        using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
+        // Flatten annotations using PdfAnnotationEditor (the correct API).
+        try
         {
-            annotEditor.BindPdf(inputPath);
-            // Correct method name – FlatteningAnnotations (not FlattenAnnotations)
-            annotEditor.FlatteningAnnotations();
-            annotEditor.Save(flattenedPath);
+            // Load the source PDF with Document.
+            Document srcDoc = new Document(inputPath);
+
+            // Bind the document to PdfAnnotationEditor and flatten.
+            using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
+            {
+                annotEditor.BindPdf(srcDoc);
+                annotEditor.FlatteningAnnotations(); // correct method name
+                annotEditor.Save(flattenedPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during flattening: {ex.Message}");
+            return;
         }
 
-        // Verify that the resulting PDF contains no annotation objects
-        using (Document doc = new Document(flattenedPath))
+        // Load the flattened PDF and inspect its structure for any remaining annotations.
+        try
         {
-            bool hasAnnotations = false;
-
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            using (Document doc = new Document(flattenedPath))
             {
-                if (doc.Pages[i].Annotations != null && doc.Pages[i].Annotations.Count > 0)
-                {
-                    hasAnnotations = true;
-                    Console.WriteLine($"Page {i} still has {doc.Pages[i].Annotations.Count} annotation(s).");
-                }
-            }
+                bool hasAnnotations = false;
 
-            if (!hasAnnotations)
-                Console.WriteLine("Validation passed: No annotations found after flattening.");
-            else
-                Console.WriteLine("Validation failed: Some annotations remain.");
+                // Aspose.Pdf uses 1‑based page indexing.
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    Page page = doc.Pages[i];
+                    if (page.Annotations != null && page.Annotations.Count > 0)
+                    {
+                        hasAnnotations = true;
+                        break;
+                    }
+                }
+
+                Console.WriteLine(hasAnnotations
+                    ? "Annotations still present after flattening."
+                    : "No annotation objects found after flattening.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during validation: {ex.Message}");
         }
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Validate command‑line arguments
-        if (args.Length < 2)
+        // Expect exactly two arguments: input PDF path and output PDF path
+        if (args.Length != 2)
         {
             Console.Error.WriteLine("Usage: RemoveAnnotations <input.pdf> <output.pdf>");
             return;
@@ -16,31 +16,35 @@ class Program
         string inputPath  = args[0];
         string outputPath = args[1];
 
+        // Verify that the input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file not found – {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
-
-            // Remove all annotations from every page
-            foreach (Page page in pdfDoc.Pages)
+            // Use PdfAnnotationEditor to manipulate annotations
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                page.Annotations.Delete();
+                editor.BindPdf(inputPath);
+
+                // Delete all annotations from the document
+                editor.DeleteAnnotations();
+
+                // If you need to flatten any remaining annotation content, uncomment the line below
+                // editor.FlatteningAnnotations(); // correct method name
+
+                // Save the cleaned PDF to the specified output path
+                editor.Save(outputPath);
             }
 
-            // Save the cleaned PDF
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"All annotations removed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"All annotations removed. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

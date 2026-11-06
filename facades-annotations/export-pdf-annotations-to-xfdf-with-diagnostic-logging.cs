@@ -1,44 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // List of PDF files to process
-        string[] pdfFiles = { "form1.pdf", "form2.pdf" };
-        // Path to the diagnostic log file
-        const string logPath = "xfdf_log.txt";
+        const string inputPdf = "input.pdf";
+        const string xfdfOutput = "output.xfdf";
+        const string logFile = "xfdf_log.txt";
 
-        foreach (string pdfPath in pdfFiles)
+        if (!File.Exists(inputPdf))
         {
-            if (!File.Exists(pdfPath))
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
+                // Bind the Form facade to the document
+                Aspose.Pdf.Facades.Form formFacade = new Aspose.Pdf.Facades.Form();
+                formFacade.BindPdf(doc);
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                // Export XFDF by using the filename‑only overload (no SaveFormat enum required)
-                string xfdfPath = Path.ChangeExtension(pdfPath, ".xfdf");
-                pdfDoc.Save(xfdfPath); // format inferred from ".xfdf" extension
-
-                // Read the exported XFDF content
-                string xfdfContent = File.ReadAllText(xfdfPath);
-
-                // Write the full XFDF content to the diagnostic log
-                using (StreamWriter logWriter = new StreamWriter(logPath, true))
+                // Export XFDF to a memory stream
+                using (MemoryStream xfdfStream = new MemoryStream())
                 {
-                    logWriter.WriteLine($"--- XFDF export for '{pdfPath}' at {DateTime.Now:u} ---");
-                    logWriter.WriteLine(xfdfContent);
-                    logWriter.WriteLine(); // separator
+                    formFacade.ExportXfdf(xfdfStream);
+                    xfdfStream.Position = 0; // reset for reading
+
+                    // Write XFDF to the output file
+                    using (FileStream fileOut = new FileStream(xfdfOutput, FileMode.Create, FileAccess.Write))
+                    {
+                        xfdfStream.CopyTo(fileOut);
+                    }
+
+                    // Write XFDF content to the diagnostic log
+                    xfdfStream.Position = 0;
+                    using (StreamReader reader = new StreamReader(xfdfStream))
+                    {
+                        string xfdfContent = reader.ReadToEnd();
+                        File.AppendAllText(logFile,
+                            $"--- XFDF Export at {DateTime.Now:u} ---{Environment.NewLine}{xfdfContent}{Environment.NewLine}");
+                    }
                 }
 
-                Console.WriteLine($"Exported XFDF for '{pdfPath}' and logged diagnostic info.");
+                // If further PDF modifications are needed, save the document here
+                // doc.Save("modified.pdf");
             }
+
+            Console.WriteLine("XFDF exported and logged successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

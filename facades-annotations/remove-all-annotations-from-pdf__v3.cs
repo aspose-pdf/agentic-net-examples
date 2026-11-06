@@ -6,36 +6,28 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_no_annotations.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_clean.pdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // PdfAnnotationEditor supports IDisposable in recent Aspose.Pdf versions, so we use a using block.
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // PdfAnnotationEditor implements IDisposable, so we can use a using block
-            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-            {
-                // Load the PDF document into the editor
-                editor.BindPdf(inputPath);
+            // Bind the existing PDF document.
+            editor.BindPdf(inputPdf);
 
-                // Remove every annotation from the document – correct method name
-                editor.DeleteAnnotations();
+            // Remove every annotation from the document.
+            editor.DeleteAnnotations();
 
-                // Save the cleaned PDF to a new file
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Annotations removed. Saved to '{outputPath}'.");
+            // Save the cleaned PDF to a new file.
+            editor.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All annotations removed. Saved to '{outputPdf}'.");
     }
 }

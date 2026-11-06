@@ -1,15 +1,13 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -18,42 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF to access its annotations
-        Document pdfDoc = new Document(inputPath);
-        if (pdfDoc.Pages.Count == 0)
+        // Load the PDF using Document (PdfFileEditor is not needed for annotation changes)
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPath))
         {
-            Console.WriteLine("Document contains no pages.");
-            File.Copy(inputPath, outputPath, true);
-            return;
+            // Example: modify the first annotation on the first page
+            // Page and Annotation collections are 1‑based in Aspose.Pdf
+            Aspose.Pdf.Page page = pdfDoc.Pages[1];
+
+            if (page.Annotations.Count > 0)
+            {
+                // Retrieve the annotation (index 1 = first annotation)
+                Aspose.Pdf.Annotations.Annotation annotation = page.Annotations[1];
+
+                // Apply the read‑only flag
+                annotation.Flags = Aspose.Pdf.Annotations.AnnotationFlags.ReadOnly;
+            }
+            else
+            {
+                Console.WriteLine("No annotations found on the first page.");
+            }
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPath);
         }
 
-        // For this example we work with the first page; adjust as needed
-        Page page = pdfDoc.Pages[1];
-        Annotation[] pageAnnotations = page.Annotations.ToArray();
-
-        if (pageAnnotations == null || pageAnnotations.Length == 0)
-        {
-            Console.WriteLine("No annotations found in the document.");
-            File.Copy(inputPath, outputPath, true);
-            return;
-        }
-
-        // Select the annotation you want to modify (first one here)
-        Annotation targetAnnotation = pageAnnotations[0];
-
-        // Apply the ReadOnly flag
-        targetAnnotation.Flags = AnnotationFlags.ReadOnly;
-
-        // Write the modified annotation back using PdfAnnotationEditor
-        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-        {
-            editor.BindPdf(inputPath);
-            // PdfAnnotationEditor.ModifyAnnotations expects (pageNumber, annotationIndex, annotation)
-            // page numbers are 1‑based, annotation indexes are 0‑based
-            editor.ModifyAnnotations(1, 0, targetAnnotation);
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Read‑only flag applied and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with read‑only annotation flag: {outputPath}");
     }
 }

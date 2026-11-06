@@ -6,6 +6,41 @@ using Aspose.Pdf.Annotations;
 
 class Program
 {
+    // Determines whether an IOException is likely transient.
+    static bool IsTransient(IOException ex)
+    {
+        // Simplified check: treat all IOExceptions as transient for this example.
+        return true;
+    }
+
+    // Executes an action with exponential backoff retry on transient file access errors.
+    static void Retry(Action action, int maxAttempts = 5, int baseDelayMs = 500)
+    {
+        int attempt = 0;
+        while (true)
+        {
+            try
+            {
+                action();
+                break; // Success
+            }
+            catch (IOException ex) when (IsTransient(ex))
+            {
+                attempt++;
+                if (attempt >= maxAttempts) throw;
+                int delay = baseDelayMs * (int)Math.Pow(2, attempt - 1);
+                Thread.Sleep(delay);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                attempt++;
+                if (attempt >= maxAttempts) throw;
+                int delay = baseDelayMs * (int)Math.Pow(2, attempt - 1);
+                Thread.Sleep(delay);
+            }
+        }
+    }
+
     static void Main()
     {
         const string inputPath = "input.pdf";
@@ -17,67 +52,33 @@ class Program
             return;
         }
 
-        // Define the annotation bounds using the fully‑qualified Aspose.Pdf.Rectangle
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Define the annotation rectangle (llx, lly, urx, ury).
+        Rectangle annotationRect = new Rectangle(100, 500, 300, 550);
 
-        // Perform the annotation modification with exponential backoff retry
-        ExecuteWithRetry(() =>
+        // Perform the annotation modification with retry policy.
+        Retry(() =>
         {
-            // Load the document inside the retry block so the file handle is released on each attempt
+            // Load the source PDF.
             using (Document doc = new Document(inputPath))
             {
-                // Create the TextAnnotation for the first page (page index is 1‑based)
-                TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+                // Get the first page (pages are 1‑based).
+                Page page = doc.Pages[1];
+
+                // Create a text annotation using the (Page, Rectangle) constructor.
+                TextAnnotation txtAnn = new TextAnnotation(page, annotationRect)
                 {
-                    Title = "Note",
-                    Contents = "This is a retry‑protected annotation.",
-                    Open = true,
-                    Icon = TextIcon.Note
+                    Title = "Sample Note",
+                    Contents = "This annotation was added with exponential backoff retry."
                 };
 
-                // Add the annotation to the page and save the result
-                doc.Pages[1].Annotations.Add(annotation);
+                // Add the annotation to the page.
+                page.Annotations.Add(txtAnn);
+
+                // Save the modified PDF.
                 doc.Save(outputPath);
             }
         });
-    }
 
-    // Helper that retries an action with exponential backoff for transient file access errors
-    static void ExecuteWithRetry(Action action, int maxAttempts = 5, int baseDelayMs = 200)
-    {
-        int attempt = 0;
-        while (true)
-        {
-            try
-            {
-                action();
-                break; // success
-            }
-            catch (IOException ex) when (IsTransient(ex))
-            {
-                attempt++;
-                if (attempt >= maxAttempts) throw;
-                int delay = baseDelayMs * (int)Math.Pow(2, attempt - 1);
-                Console.WriteLine($"Transient I/O error ({ex.Message}). Retrying in {delay} ms (attempt {attempt}/{maxAttempts})...");
-                Thread.Sleep(delay);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                attempt++;
-                if (attempt >= maxAttempts) throw;
-                int delay = baseDelayMs * (int)Math.Pow(2, attempt - 1);
-                Console.WriteLine($"Access error ({ex.Message}). Retrying in {delay} ms (attempt {attempt}/{maxAttempts})...");
-                Thread.Sleep(delay);
-            }
-        }
-    }
-
-    // Simple heuristic to decide if an IOException is likely transient (e.g., file lock)
-    static bool IsTransient(IOException ex)
-    {
-        const int ERROR_SHARING_VIOLATION = 0x20;
-        const int ERROR_LOCK_VIOLATION = 0x21;
-        int hresult = System.Runtime.InteropServices.Marshal.GetHRForException(ex) & 0xFFFF;
-        return hresult == ERROR_SHARING_VIOLATION || hresult == ERROR_LOCK_VIOLATION;
+        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
     }
 }
