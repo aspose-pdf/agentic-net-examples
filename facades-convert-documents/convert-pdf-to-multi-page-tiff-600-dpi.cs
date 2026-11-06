@@ -8,33 +8,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTiffPath = "output.tiff";
+        const string inputPdf = "input.pdf";
+        const string outputTiff = "output.tiff";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            using (PdfConverter converter = new PdfConverter())
-            {
-                // Load the PDF document.
-                converter.BindPdf(inputPdfPath);
+            // Initialize the PdfConverter
+            PdfConverter converter = new PdfConverter();
+            // Set the desired DPI (600) for detailed graphics extraction
+            converter.Resolution = new Resolution(600);
+            // Bind the source PDF
+            converter.BindPdf(inputPdf);
+            // Perform the conversion preparation step
+            converter.DoConvert();
+            // Save all pages as a single multi‑page TIFF using LZW compression (optional)
+            converter.SaveAsTIFF(outputTiff, CompressionType.LZW);
+            // Release resources held by the converter
+            converter.Close();
 
-                // Set the desired resolution (600 DPI) using a Resolution object.
-                converter.Resolution = new Resolution(600);
-
-                // Convert the entire document.
-                converter.DoConvert();
-
-                // Save as a multi‑page TIFF.
-                converter.SaveAsTIFF(outputTiffPath);
-            }
-
-            Console.WriteLine($"PDF successfully converted to TIFF at 600 DPI: {outputTiffPath}");
+            Console.WriteLine($"PDF successfully converted to TIFF at 600 DPI: {outputTiff}");
         }
         catch (Exception ex)
         {

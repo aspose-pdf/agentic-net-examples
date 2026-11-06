@@ -9,43 +9,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "PdfPagesAsJpeg";
+        const string pdfPath = "input.pdf";
+        const string outputDir = "Images";
+        const string substituteFontPath = "substitute.ttf"; // Path to the TTF file used for substitution
+        const string missingFontName = "MissingFont"; // Name of the font that may be missing in the PDF
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        if (!File.Exists(substituteFontPath))
+        {
+            Console.Error.WriteLine($"Substitute font not found: {substituteFontPath}");
+            return;
+        }
+
+        Directory.CreateDirectory(outputDir);
+
+        // Register a substitution for the missing font. The SimpleFontSubstitution constructor can accept the path to the TTF file.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution(missingFontName, substituteFontPath));
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPdfPath);
-
-        // ------------------------------------------------------------
-        // Font substitution – replace missing fonts with available ones
-        // ------------------------------------------------------------
-        // Example: replace any missing "MyMissingFont" with "Arial"
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("MyMissingFont", "Arial"));
-        // Add more substitutions as needed, e.g.:
-        // FontRepository.Substitutions.Add(new SimpleFontSubstitution("AnotherMissingFont", "Times New Roman"));
-
-        // Set up JPEG conversion device (cross‑platform, no System.Drawing)
-        var jpegDevice = new JpegDevice(
-            new Aspose.Pdf.Devices.Resolution(150), // resolution (dpi)
-            100); // image quality (0‑100)
-
-        // Convert each page to JPEG
-        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpeg");
-            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+            // Prepare a JPEG device – 300 DPI resolution, 100% quality (adjust as needed)
+            var jpegDevice = new JpegDevice(new Resolution(300), 100);
+
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                using (var outStream = new MemoryStream())
+                {
+                    // Convert the specific page to JPEG
+                    jpegDevice.Process(pdfDoc.Pages[pageNum], outStream);
+                    outStream.Position = 0;
+
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.jpg");
+                    File.WriteAllBytes(outPath, outStream.ToArray());
+                    Console.WriteLine($"Saved {outPath}");
+                }
             }
-            Console.WriteLine($"Saved page {pageNumber} as JPEG: {outputPath}");
         }
     }
 }

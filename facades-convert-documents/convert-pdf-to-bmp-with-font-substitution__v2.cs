@@ -1,49 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
-class PdfToBmpConverter
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "BmpPages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "BmpPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Load PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF and register custom font substitution (Times New Roman → Calibri)
+        using (Document doc = new Document(inputPath))
         {
-            // Apply custom font substitution: Times New Roman → Calibri
-            // In recent Aspose.Pdf versions use FontRepository.Substitutions.Add with SimpleFontSubstitution
+            // Register substitution – both fonts must be installed or available to Aspose.Pdf
             FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Calibri"));
 
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
-            {
-                // Create a BMP device with desired resolution (e.g., 150 DPI)
-                BmpDevice bmpDevice = new BmpDevice(new Resolution(150));
+            // Create a concrete BMP device (devices are not IDisposable, so no using block)
+            BmpDevice bmpDevice = new BmpDevice(); // you can set resolution, e.g. new BmpDevice(new Resolution(150));
 
-                string bmpPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
-                using (FileStream fs = new FileStream(bmpPath, FileMode.Create, FileAccess.Write))
+            // Convert each page to a BMP image (pages are 1‑based)
+            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            {
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                using (FileStream bmpStream = new FileStream(outPath, FileMode.Create))
                 {
-                    // Convert the specific page to BMP and write to the file stream
-                    bmpDevice.Process(pdfDoc.Pages[pageNumber], fs);
+                    // The device processes the page and writes the image to the stream
+                    bmpDevice.Process(doc.Pages[pageNumber], bmpStream);
                 }
-                Console.WriteLine($"Saved page {pageNumber} as BMP to '{bmpPath}'.");
             }
         }
 
-        Console.WriteLine("PDF to BMP conversion completed.");
+        Console.WriteLine("PDF has been successfully converted to BMP images.");
     }
 }

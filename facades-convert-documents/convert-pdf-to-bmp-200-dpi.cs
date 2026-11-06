@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputFolder = "OutputImages";
+        const string outputDir = "BmpPages";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,34 +16,28 @@ class Program
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        try
+        // Load the PDF document.
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
-            {
-                // 200 DPI resolution – the Resolution struct lives in Aspose.Pdf.Devices
-                var resolution = new Resolution(200);
-                // BmpDevice does NOT implement IDisposable, so instantiate it without a using block
-                var bmpDevice = new BmpDevice(resolution);
+            const int resolutionDpi = 200; // Desired DPI for balanced quality.
+            Resolution resolution = new Resolution(resolutionDpi);
 
-                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            // Iterate through each page and convert it to a BMP image.
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            {
+                string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
+
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
                 {
-                    string outPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
-                    // Save the page directly to a BMP file
-                    using (FileStream imageStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                    {
-                        bmpDevice.Process(doc.Pages[pageNumber], imageStream);
-                    }
+                    // BmpDevice now receives a Resolution object instead of an int.
+                    BmpDevice bmpDevice = new BmpDevice(resolution);
+                    bmpDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
                 }
             }
+        }
 
-            Console.WriteLine("PDF successfully converted to BMP images.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF pages have been saved as BMP images in '{outputDir}'.");
     }
 }

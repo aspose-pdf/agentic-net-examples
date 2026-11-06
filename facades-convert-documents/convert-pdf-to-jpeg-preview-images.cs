@@ -7,11 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const int startPage = 1;
-        const int endPage = 3; // inclusive preview range
-        const int resolutionDpi = 150; // desired image resolution
-        const int jpegQuality = 90; // JPEG quality (0‑100)
+        const string inputPdf = "input.pdf";          // source PDF
+        const string outputDir = "PreviewImages";    // folder for JPEGs
 
         if (!File.Exists(inputPdf))
         {
@@ -19,32 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document.
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Load the PDF document (required for device‑based conversion)
         Document pdfDocument = new Document(inputPdf);
 
-        // Validate the requested page range against the actual page count.
-        int maxPage = Math.Min(endPage, pdfDocument.Pages.Count);
-        if (startPage < 1 || startPage > maxPage)
-        {
-            Console.Error.WriteLine("Invalid start page specified.");
-            return;
-        }
+        // Define the preview range: pages 1 through 3 (or less if the PDF is shorter)
+        int startPage = 1;
+        int endPage   = Math.Min(3, pdfDocument.Pages.Count);
 
-        // Configure a JPEG device – this is the cross‑platform way to render pages as JPEG images.
-        // Resolution controls the DPI of the output image; ImageQuality controls JPEG compression.
-        JpegDevice jpegDevice = new JpegDevice(new Resolution(resolutionDpi), jpegQuality);
+        // Configure JPEG conversion – resolution and quality
+        Resolution resolution = new Resolution(150); // 150 DPI
+        int jpegQuality = 80;                         // 0‑100 (higher = better quality)
+        JpegDevice jpegDevice = new JpegDevice(resolution, jpegQuality);
 
-        for (int pageNumber = startPage; pageNumber <= maxPage; pageNumber++)
+        // Convert each page in the range to a JPEG image
+        for (int pageNumber = startPage; pageNumber <= endPage; pageNumber++)
         {
-            string outputImagePath = $"page_{pageNumber}.jpg";
-            using (FileStream imageStream = new FileStream(outputImagePath, FileMode.Create, FileAccess.Write))
+            using (MemoryStream imageStream = new MemoryStream())
             {
-                // Render the specific page to the JPEG stream.
-                // JpegDevice.Process expects a Page object and an output stream (2 arguments).
-                Page page = pdfDocument.Pages[pageNumber];
-                jpegDevice.Process(page, imageStream);
+                // Convert the specific page to JPEG and write to the stream
+                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+
+                // Save the stream content to a .jpeg file
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.jpeg");
+                File.WriteAllBytes(outPath, imageStream.ToArray());
+                Console.WriteLine($"Saved preview image: {outPath}");
             }
-            Console.WriteLine($"Saved page {pageNumber} as {outputImagePath}");
         }
     }
 }

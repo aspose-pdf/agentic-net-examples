@@ -8,39 +8,40 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDir = "BmpPages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(pdfPath);
-
-        // Enable font substitution for missing fonts using FontRepository
-        // Substitute common missing fonts with Arial (adjust as needed)
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Arial"));
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
-        // Add more substitutions if required
-
-        // Define the resolution for the bitmap images (150 DPI – adjust as required)
-        Resolution resolution = new Resolution(150);
-
-        // Convert each page to a BMP image
-        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        try
         {
-            string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
+            // Load the PDF document.
+            Document pdfDoc = new Document(inputPdf);
 
-            // BmpDevice does not implement IDisposable, so do not use a using block
-            BmpDevice bmpDevice = new BmpDevice(resolution);
-            bmpDevice.Process(pdfDocument.Pages[pageNumber], outPath);
+            // Configure font substitution for any missing fonts using FontRepository.
+            // Example substitution: replace unknown fonts with Arial.
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("MissingFont", "Arial"));
+
+            // Create a BMP device (devices are not IDisposable, so no using block).
+            BmpDevice bmpDevice = new BmpDevice(); // default resolution; customize if needed
+
+            // Convert each page to a BMP image.
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            {
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.bmp");
+                bmpDevice.Process(pdfDoc.Pages[pageNumber], outPath);
+                Console.WriteLine($"Saved {outPath}");
+            }
         }
-
-        Console.WriteLine($"PDF successfully converted to BMP images in '{outputDir}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

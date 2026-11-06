@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "OutputImages";
+        const string outputDir = "Pages";
 
         if (!File.Exists(inputPdf))
         {
@@ -19,25 +19,28 @@ class Program
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-        int pageCount = pdfDocument.Pages.Count;
-
-        // Process each page sequentially and save as JPEG
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
+            // JpegDevice converts PDF pages to JPEG images
+            // You can customize resolution and quality if needed
+            JpegDevice jpegDevice = new JpegDevice();
 
-            // Create a JPEG device with the desired resolution (150 DPI)
-            var jpegDevice = new JpegDevice(new Resolution(150));
-
-            // Convert the current page to JPEG and write directly to a file stream
-            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpeg");
+
+                // Convert the current page to a JPEG file using a FileStream
+                using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    jpegDevice.Process(pdfDoc.Pages[pageNumber], fs);
+                }
+
+                Console.WriteLine($"Saved page {pageNumber} as {outputPath}");
             }
         }
 
-        Console.WriteLine("PDF pages have been converted to JPEG images.");
+        Console.WriteLine("PDF to JPEG conversion completed.");
     }
 }

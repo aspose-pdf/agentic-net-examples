@@ -2,43 +2,50 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Devices; // for CompressionType
+using Aspose.Pdf.Text; // FontRepository, SimpleFontSubstitution
+using Aspose.Pdf.Devices; // Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tiff";
-        const int resolution = 300; // DPI for the TIFF images
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "TiffPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Substitute Courier with Liberation Mono for better rendering.
+        // Must be set before loading the document.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "LiberationMono"));
+
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Apply font substitution: replace Courier with Liberation Mono
-            // Use the Substitutions collection with SimpleFontSubstitution (source, target)
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", "LiberationMono"));
-
-            // Initialize the PdfConverter facade for image conversion
-            using (PdfConverter converter = new PdfConverter(pdfDoc))
+            // Initialise the PDF converter (facade)
+            using (PdfConverter converter = new PdfConverter())
             {
-                // Convert all pages (1‑based indexing)
+                converter.BindPdf(pdfDoc);
                 converter.StartPage = 1;
-                converter.EndPage   = pdfDoc.Pages.Count;
+                converter.EndPage = pdfDoc.Pages.Count;
+                converter.Resolution = new Resolution(150); // 150 DPI – adjust as needed
 
-                // Save the result as a multi‑page TIFF with the specified resolution and compression
-                // The SaveAsTIFF overload expects an int for compression, so cast the enum value.
-                converter.SaveAsTIFF(outputTiff, resolution, (int)CompressionType.LZW);
+                // Perform the conversion
+                converter.DoConvert();
+
+                // Save all pages as a multi‑page TIFF file
+                string tiffPath = Path.Combine(outputFolder, "output.tiff");
+                converter.SaveAsTIFF(tiffPath);
+                Console.WriteLine($"Saved TIFF: {tiffPath}");
             }
         }
 
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputTiff}");
+        Console.WriteLine("PDF to TIFF conversion completed.");
     }
 }
