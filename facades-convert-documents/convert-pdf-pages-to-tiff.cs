@@ -16,33 +16,40 @@ class Program
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPdf);
-            int pageCount = pdfDocument.Pages.Count;
-
-            // Iterate through each page and render it as a separate TIFF image
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            // Load PDF document (IDisposable)
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.tiff");
+                // Define the resolution for the TIFF images (e.g., 300 DPI)
+                var resolution = new Resolution(300);
 
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                // TiffDevice does NOT implement IDisposable – instantiate it once and reuse.
+                var tiffDevice = new TiffDevice(resolution);
+
+                // Iterate over each page (Aspose.Pdf pages are 1‑based)
+                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
                 {
-                    // TiffDevice renders a single page to the provided stream.
-                    // Resolution can be adjusted as needed (e.g., 300 DPI).
-                    TiffDevice tiffDevice = new TiffDevice(new Resolution(300));
-                    tiffDevice.Process(pdfDocument.Pages[pageNumber], outStream);
+                    // Convert the page to a TIFF image stored in a memory stream
+                    using (var ms = new MemoryStream())
+                    {
+                        tiffDevice.Process(pdfDoc.Pages[pageIndex], ms);
+                        ms.Position = 0; // rewind
+
+                        string outPath = Path.Combine(outputDir, $"page_{pageIndex}.tiff");
+                        File.WriteAllBytes(outPath, ms.ToArray());
+                        Console.WriteLine($"Saved page {pageIndex} as TIFF: {outPath}");
+                    }
                 }
             }
-
-            Console.WriteLine("PDF successfully converted to separate TIFF images.");
         }
+        // The TiffDevice works on all platforms; no GDI+ dependency.
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

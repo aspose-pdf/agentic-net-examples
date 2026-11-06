@@ -7,41 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "JpegPages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "OutputImages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document (Document implements IDisposable, so a using block is fine)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        try
         {
-            // Define the resolution (96 DPI) and JPEG quality (0‑100)
-            var resolution = new Resolution(96);
-            const int jpegQuality = 90;
-
-            // JpegDevice does NOT implement IDisposable – instantiate it directly
-            var jpegDevice = new JpegDevice(resolution, jpegQuality);
-
-            // Convert each page to a separate JPEG file
-            for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
-                // Dispose only the stream; JpegDevice is reused for all pages
-                using (var imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
-                }
-                Console.WriteLine($"Page {pageNumber} saved as {outputPath}");
-            }
-        }
+                // Create a JPEG device with 96 DPI resolution and 80% quality (web‑friendly)
+                // JpegDevice does not expose an ImageQuality property in this version; quality is set via the constructor.
+                var jpegDevice = new JpegDevice(new Resolution(96), 80);
 
-        Console.WriteLine("PDF to JPEG conversion completed.");
+                // Iterate pages using 1‑based indexing
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    string outPath = Path.Combine(outputDir, $"page_{i}.jpg");
+                    // Convert the current page to a JPEG file
+                    jpegDevice.Process(doc.Pages[i], outPath);
+                }
+            }
+
+            Console.WriteLine("PDF pages have been successfully converted to JPEG images.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

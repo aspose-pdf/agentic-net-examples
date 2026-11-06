@@ -7,42 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "BmpPages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "BmpPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
+        Document pdfDocument = new Document(inputPdfPath);
 
-        // Desired resolution (dots per inch)
-        var resolution = new Resolution(150);
+        // Define the resolution (dpi) for the output BMP images
+        Resolution resolution = new Resolution(300);
 
-        // Iterate through each page and render it as a BMP using the CropBox area
+        // Convert each page to a BMP image. The device uses the page's CropBox by default,
+        // so margins are trimmed automatically – no explicit PageSize property is required.
         for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            Page page = pdfDocument.Pages[pageNumber];
+            // Create a BMP device; it works cross‑platform and does not depend on System.Drawing
+            BmpDevice bmpDevice = new BmpDevice(resolution);
 
-            // Use the CropBox if it is defined; otherwise fall back to the page rectangle
-            var cropRect = (!page.CropBox.IsEmpty) ? page.CropBox : page.Rect;
+            string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
 
-            // BmpDevice does NOT implement IDisposable – instantiate it directly
-            BmpDevice bmpDevice = new BmpDevice((int)cropRect.Width, (int)cropRect.Height, resolution);
+            // Render the page to the BMP file
+            bmpDevice.Process(pdfDocument.Pages[pageNumber], outputPath);
 
-            // Render the page into a memory stream (the stream *is* disposable)
-            using (var ms = new MemoryStream())
-            {
-                bmpDevice.Process(page, ms);
-                string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
-                File.WriteAllBytes(outPath, ms.ToArray());
-                Console.WriteLine($"Saved: {outPath}");
-            }
+            Console.WriteLine($"Saved page {pageNumber} as BMP: {outputPath}");
         }
+
+        Console.WriteLine("PDF to BMP conversion completed.");
     }
 }

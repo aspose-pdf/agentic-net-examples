@@ -1,57 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // BmpDevice, Resolution, PageCoordinateType
+using Aspose.Pdf.Devices; // Resolution, BmpDevice
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
+        const string outputFolder = "BmpPages";
 
-        // Base output path for BMP images (page number will be appended automatically)
-        const string outputBasePath = "output/page"; // e.g., "output/page" -> page1.bmp, page2.bmp, ...
-
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists (handle case where Path.GetDirectoryName returns null)
-        string outputDir = Path.GetDirectoryName(outputBasePath);
-        if (string.IsNullOrEmpty(outputDir))
-            outputDir = "."; // current directory
-        if (!Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Configure the desired resolution (DPI) for the BMP images
-        Resolution resolution = new Resolution(300); // 300 DPI
-
-        // BmpDevice does NOT implement IDisposable – instantiate it directly.
-        // Use the constructor that accepts a Resolution (width/height are optional and default to page size).
-        BmpDevice bmpDevice = new BmpDevice(resolution);
-        // Optional: set the coordinate system you need (CropBox, MediaBox, etc.)
-        // bmpDevice.CoordinateType = PageCoordinateType.CropBox;
-
-        // Iterate through each page and convert it to a BMP image using BmpDevice
-        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            string outputPath = $"{outputBasePath}{pageNumber}.bmp";
+            // Create a BmpDevice with the desired resolution.
+            // Recent Aspose.Pdf versions use CropBox as the default coordinate type,
+            // so we do not set CoordinateType explicitly (the property no longer exists).
+            BmpDevice bmpDevice = new BmpDevice(new Resolution(300));
 
-            // Create a file stream for the output BMP. The stream is disposable, so we use a using block.
-            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // Convert each page to a BMP image.
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Convert the current page to BMP. The Process method takes (Page, Stream).
-                bmpDevice.Process(pdfDocument.Pages[pageNumber], outStream);
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.bmp");
+                // Process writes the bitmap directly to the file.
+                bmpDevice.Process(pdfDoc.Pages[pageNumber], outputPath);
             }
         }
 
-        Console.WriteLine("PDF has been converted to BMP images.");
+        Console.WriteLine("PDF pages have been successfully converted to BMP images.");
     }
 }

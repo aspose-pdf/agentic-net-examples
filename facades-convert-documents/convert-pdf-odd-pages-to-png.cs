@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // For PngDevice
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "OddPagesImages";
+        const string outputDir = "OddPages";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,28 +16,36 @@ class Program
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-        int pageCount = pdfDocument.Pages.Count;
-
-        // Define the resolution for the PNG images
-        var resolution = new Resolution(150);
-
-        // Process only odd‑numbered pages
-        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber += 2)
+        try
         {
-            using (var imageStream = new MemoryStream())
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Convert the current page to PNG using PngDevice (cross‑platform)
-                var pngDevice = new PngDevice(resolution);
-                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                // Iterate over odd‑numbered pages (Aspose.Pdf uses 1‑based indexing)
+                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum += 2)
+                {
+                    // Build the output file name for the current page
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.png");
 
-                string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
-                File.WriteAllBytes(outputPath, imageStream.ToArray());
-                Console.WriteLine($"Saved odd page {pageNumber} as {outputPath}");
+                    // Create a PNG device – this defines the image format and options
+                    PngDevice pngDevice = new PngDevice();
+
+                    // Convert the specific page to PNG and save it
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create))
+                    {
+                        pngDevice.Process(doc.Pages[pageNum], outStream);
+                    }
+                }
             }
+
+            Console.WriteLine("Odd pages have been saved as PNG images.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

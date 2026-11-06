@@ -16,32 +16,28 @@ class Program
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Determine how many pages to process (max 5)
-        int totalPages = pdfDocument.Pages.Count;
-        int endPage = Math.Min(5, totalPages);
-
-        // Set resolution to 200 DPI for JPEG conversion
-        Resolution resolution = new Resolution(200);
-
-        // Convert each selected page to a JPEG image
-        for (int pageNumber = 1; pageNumber <= endPage; pageNumber++)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.jpg");
-            using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+            // Convert only the first five pages (or fewer if the document has less)
+            int pageCount = Math.Min(5, pdfDoc.Pages.Count);
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                // JpegDevice handles per‑page conversion
-                JpegDevice jpegDevice = new JpegDevice(resolution);
-                jpegDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
+                // Create a JPEG device with the required resolution (200 DPI)
+                var jpegDevice = new JpegDevice(new Resolution(200));
+
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.jpg");
+                // Save the page as a JPEG image
+                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+                {
+                    jpegDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
+                }
             }
-            Console.WriteLine($"Saved page {pageNumber} as JPEG to '{outputPath}'.");
         }
 
-        Console.WriteLine("Conversion completed.");
+        Console.WriteLine("PDF to JPEG conversion completed.");
     }
 }
