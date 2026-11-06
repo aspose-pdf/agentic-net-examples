@@ -1,16 +1,13 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations; // for GoToAction and ExplicitDestinationType
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "bookmarked.pdf";
+        const string outputPath = "bookmarked_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,51 +15,45 @@ class Program
             return;
         }
 
-        // Collect chapter titles and their page numbers.
-        // Simple heuristic: a line that starts with "Chapter" is considered a title.
-        List<(string Title, int Page)> chapters = new List<(string, int)>();
-
-        // Load the PDF document.
-        using (Document doc = new Document(inputPath))
+        // Example chapter titles with their starting page numbers.
+        var chapters = new (string Title, int Page)[]
         {
-            // Scan each page for chapter headings.
-            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based page indexing
+            ("Chapter 1: Introduction", 1),
+            ("Chapter 2: Getting Started", 5),
+            ("Chapter 3: Advanced Topics", 12)
+        };
+
+        // Bind the PDF to the bookmark editor and create hierarchical bookmarks.
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        {
+            bookmarkEditor.BindPdf(inputPath);
+
+            // Root bookmark (optional top‑level entry).
+            Bookmark root = new Bookmark
             {
-                TextAbsorber absorber = new TextAbsorber
-                {
-                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-                };
-                doc.Pages[i].Accept(absorber);
-                string pageText = absorber.Text;
+                Title = "Document Outline",
+                Action = "GoTo" // required for a functional bookmark
+            };
+            // Initialise the collection that will hold child bookmarks.
+            root.ChildItems = new Bookmarks();
 
-                string[] lines = pageText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (string line in lines)
-                {
-                    if (line.StartsWith("Chapter", StringComparison.OrdinalIgnoreCase))
-                    {
-                        chapters.Add((line.Trim(), i));
-                        break; // assume first matching line per page is the chapter title
-                    }
-                }
-            }
-
-            // Add hierarchical bookmarks (level 1 = top‑level).
+            // Add each chapter as a child of the root bookmark.
             foreach (var (title, page) in chapters)
             {
-                // Create a GoTo action that points to the target page.
-                Page targetPage = doc.Pages[page];
-                GoToAction goTo = new GoToAction(targetPage, ExplicitDestinationType.Fit);
-
-                OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
+                Bookmark chapterBookmark = new Bookmark
                 {
                     Title = title,
-                    Action = goTo
+                    PageNumber = page,
+                    Action = "GoTo"
                 };
-                doc.Outlines.Add(bookmark);
+                root.ChildItems.Add(chapterBookmark);
             }
 
+            // Attach the bookmark hierarchy to the PDF.
+            bookmarkEditor.CreateBookmarks(root);
+
             // Save the PDF with the new bookmarks.
-            doc.Save(outputPath);
+            bookmarkEditor.Save(outputPath);
         }
 
         Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");

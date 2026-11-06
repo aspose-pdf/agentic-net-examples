@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // For bookmark extraction
+using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
-class ExportBookmarksToExcel
+class Program
 {
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string csvPath = "bookmarks.csv";
+        const string csvPath = "bookmarks.csv"; // Excel can open CSV files
 
         if (!File.Exists(pdfPath))
         {
@@ -15,51 +16,43 @@ class ExportBookmarksToExcel
             return;
         }
 
-        // Extract bookmarks from the PDF
-        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        try
         {
-            bookmarkEditor.BindPdf(pdfPath);
-            // In recent Aspose.Pdf versions ExtractBookmarks returns a "Bookmarks" collection
-            var bookmarks = bookmarkEditor.ExtractBookmarks();
+            // PdfBookmarkEditor does not implement IDisposable, so we instantiate it directly.
+            var editor = new PdfBookmarkEditor();
+            editor.BindPdf(pdfPath);
 
-            // Write bookmarks to a CSV file (Excel can open CSV directly)
+            // Extract the bookmarks from the PDF.
+            Bookmarks bookmarks = editor.ExtractBookmarks();
+
+            // Write bookmarks to a CSV file (compatible with Excel).
             using (var writer = new StreamWriter(csvPath))
             {
                 // Header row
                 writer.WriteLine("Title,Level,Destination");
 
-                // Recursive traversal to flatten bookmarks while preserving level
-                void WriteBookmarks(Bookmarks collection, int level)
+                foreach (Bookmark bm in bookmarks)
                 {
-                    foreach (Bookmark bm in collection)
+                    // Escape commas and quotes in the title.
+                    string title = bm.Title ?? string.Empty;
+                    title = title.Replace("\"", "\"\"");
+                    if (title.Contains(",") || title.Contains("\""))
                     {
-                        string title = EscapeCsv(bm.Title);
-                        string destination = EscapeCsv(bm.Destination?.ToString() ?? string.Empty);
-                        writer.WriteLine($"{title},{level},{destination}");
-
-                        // Process child bookmarks, if any
-                        if (bm.ChildItems != null && bm.ChildItems.Count > 0)
-                        {
-                            WriteBookmarks(bm.ChildItems, level + 1);
-                        }
+                        title = $"\"{title}\"";
                     }
-                }
 
-                WriteBookmarks(bookmarks, 1); // Top‑level bookmarks start at level 1
+                    writer.WriteLine($"{title},{bm.Level},{bm.PageNumber}");
+                }
             }
 
-            Console.WriteLine($"Bookmarks exported to '{csvPath}'.");
-        }
-    }
+            // Clean up the editor.
+            editor.Close();
 
-    // Helper to escape CSV fields containing commas, quotes or new‑lines
-    static string EscapeCsv(string value)
-    {
-        if (value.Contains('"') || value.Contains(',') || value.Contains('\n'))
-        {
-            value = value.Replace("\"", "\"\"");
-            return $"\"{value}\"";
+            Console.WriteLine($"Bookmarks successfully exported to '{csvPath}'.");
         }
-        return value;
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
+        }
     }
 }
