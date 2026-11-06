@@ -6,11 +6,17 @@ class Program
 {
     static void Main()
     {
-        const string sourcePath      = "source.pdf";      // PDF containing pages to insert
-        const string destinationPath = "destination.pdf"; // PDF into which pages will be inserted
-        const string outputPath      = "merged_output.pdf";
+        // Paths to the source PDF (pages to insert) and the destination PDF (where pages will be inserted)
+        const string sourcePath = "source.pdf";
+        const string destinationPath = "destination.pdf";
+        const string outputPath = "result.pdf";
 
-        // Validate input files
+        // Define the page range to insert (1‑based inclusive) and the insertion point in the destination PDF
+        int startPage = 2;   // first page of the range in the source PDF
+        int endPage   = 5;   // last page of the range in the source PDF
+        int insertAtPage = 3; // insert after this page number in the destination PDF (0 = at the beginning)
+
+        // Verify that the input files exist
         if (!File.Exists(sourcePath))
         {
             Console.Error.WriteLine($"Source file not found: {sourcePath}");
@@ -22,49 +28,44 @@ class Program
             return;
         }
 
-        // Define the page range to copy from the source PDF (inclusive)
-        int startPage   = 2; // first page of the range (1‑based)
-        int endPage     = 4; // last page of the range (1‑based)
-        // Define after which page in the destination PDF the range will be inserted
-        int insertAfter = 5; // insert after this page number (1‑based)
-
-        // Load PDFs from streams (no temporary files needed)
+        // Load both PDFs from streams
         using (FileStream srcStream = File.OpenRead(sourcePath))
         using (FileStream dstStream = File.OpenRead(destinationPath))
         {
-            // Load documents
-            Document srcDoc = new Document(srcStream);
-            Document dstDoc = new Document(dstStream);
+            // Aspose.Pdf.Document can be constructed directly from a Stream
+            Document sourceDoc = new Document(srcStream);
+            Document destDoc   = new Document(dstStream);
 
-            // Ensure the requested range is valid
-            if (startPage < 1 || endPage > srcDoc.Pages.Count || startPage > endPage)
+            // Validate page numbers
+            if (startPage < 1 || endPage > sourceDoc.Pages.Count || startPage > endPage)
             {
-                Console.Error.WriteLine("Invalid page range specified for the source PDF.");
+                Console.Error.WriteLine("Invalid source page range.");
                 return;
             }
-            if (insertAfter < 0 || insertAfter > dstDoc.Pages.Count)
+            if (insertAtPage < 0 || insertAtPage > destDoc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid insert position for the destination PDF.");
+                Console.Error.WriteLine("Invalid insertion position.");
                 return;
             }
 
-            // The position where the first new page will be inserted (1‑based index).
-            // Insert after page 'insertAfter' means the new page becomes insertAfter+1.
-            int insertPos = insertAfter + 1;
-
-            // Insert each page from the source range into the destination document.
+            // Insert pages one by one preserving order
+            // Aspose.Pdf uses 1‑based indexing for Pages collection.
+            // We want to insert after 'insertAtPage', so the first inserted page should go to position insertAtPage + 1.
+            int insertionIndex = insertAtPage + 1; // 1‑based index where the first new page will be placed
             for (int p = startPage; p <= endPage; p++)
             {
-                // The Insert method automatically imports the page into the target document.
-                dstDoc.Pages.Insert(insertPos, srcDoc.Pages[p]);
-                insertPos++; // subsequent pages should follow the previously inserted one
+                // Clone the page from the source document to avoid reference issues
+                Page pageToInsert = sourceDoc.Pages[p];
+                // Insert a copy of the page into the destination document
+                destDoc.Pages.Insert(insertionIndex, pageToInsert);
+                insertionIndex++; // subsequent pages go after the previously inserted one
             }
 
-            // Save the merged document to the desired output location.
-            dstDoc.Save(outputPath);
+            // Save the resulting PDF to the output file (or to a MemoryStream if needed)
+            destDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages {startPage}-{endPage} from '{sourcePath}' inserted after page {insertAfter} of '{destinationPath}'.");
-        Console.WriteLine($"Result saved to '{outputPath}'.");
+        Console.WriteLine($"Inserted pages {startPage}-{endPage} from '{sourcePath}' into '{destinationPath}' at position {insertAtPage}.");
+        Console.WriteLine($"Result saved as '{outputPath}'.");
     }
 }

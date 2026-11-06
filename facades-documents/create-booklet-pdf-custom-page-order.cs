@@ -1,32 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string sourcePdf = "source.pdf";
-        const string outputPdf = "booklet.pdf";
+        // Input PDF files: left pages (1‑10) and right pages (11‑20)
+        const string leftPath  = "left_pages.pdf";
+        const string rightPath = "right_pages.pdf";
+        const string outputPath = "booklet.pdf";
 
-        if (!File.Exists(sourcePdf))
+        // Verify source files exist
+        if (!File.Exists(leftPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Left PDF not found: {leftPath}");
+            return;
+        }
+        if (!File.Exists(rightPath))
+        {
+            Console.Error.WriteLine($"Right PDF not found: {rightPath}");
             return;
         }
 
-        // PdfFileEditor does not implement IDisposable; no using block needed.
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Use the correct MakeBooklet overload (no PageSize argument).
-        // This creates a booklet from pages 1‑20 where left pages appear first.
-        bool success = editor.MakeBooklet(sourcePdf, outputPdf);
-        if (!success)
+        // Load source documents
+        using (Document leftDoc = new Document(leftPath))
+        using (Document rightDoc = new Document(rightPath))
+        using (Document booklet = new Document())
         {
-            Console.Error.WriteLine("Failed to create booklet.");
-            return;
+            // Interleave pages: left page i, then right page i (i = 1..10)
+            for (int i = 1; i <= 10; i++)
+            {
+                // Insert left‑hand page
+                booklet.Pages.Insert(booklet.Pages.Count + 1, leftDoc.Pages[i]);
+
+                // Insert corresponding right‑hand page directly after the left page
+                booklet.Pages.Insert(booklet.Pages.Count + 1, rightDoc.Pages[i]);
+            }
+
+            // Save the resulting booklet
+            booklet.Save(outputPath);
         }
 
-        Console.WriteLine($"Booklet created successfully: {outputPdf}");
+        Console.WriteLine($"Booklet created successfully: {outputPath}");
     }
 }

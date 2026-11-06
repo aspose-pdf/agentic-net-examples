@@ -1,76 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 public static class PdfSplitter
 {
     /// <summary>
-    /// Splits the input PDF stream into multiple bulk page sets.
-    /// Each set contains up to <paramref name="bulkSize"/> pages.
-    /// Returns an array of MemoryStream objects, each representing a subset PDF.
+    /// Splits the PDF contained in <paramref name="inputPdfStream"/> into multiple
+    /// bulk page sets, each set containing up to <paramref name="pagesPerSet"/> pages.
+    /// Returns an array of MemoryStream objects, each representing a split PDF.
     /// </summary>
-    /// <param name="pdfStream">Input PDF as a seekable stream.</param>
-    /// <param name="bulkSize">Maximum number of pages per output set.</param>
-    /// <returns>Array of MemoryStream, each containing a PDF fragment.</returns>
-    public static MemoryStream[] SplitPdfIntoBulkSets(Stream pdfStream, int bulkSize)
+    public static MemoryStream[] SplitPdfIntoBulkSets(Stream inputPdfStream, int pagesPerSet)
     {
-        if (pdfStream == null) throw new ArgumentNullException(nameof(pdfStream));
-        if (!pdfStream.CanSeek) throw new ArgumentException("Stream must support seeking.", nameof(pdfStream));
-        if (bulkSize <= 0) throw new ArgumentOutOfRangeException(nameof(bulkSize), "Bulk size must be greater than zero.");
+        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
+        if (pagesPerSet <= 0) throw new ArgumentOutOfRangeException(nameof(pagesPerSet));
 
-        // Read the entire PDF into a byte array so it can be reused for each extraction.
-        byte[] pdfBytes;
-        using (MemoryStream temp = new MemoryStream())
-        {
-            pdfStream.CopyTo(temp);
-            pdfBytes = temp.ToArray();
-        }
+        // Ensure the stream is positioned at the beginning before loading.
+        inputPdfStream.Position = 0;
 
-        // Determine total page count using Document (wrapped in using for proper disposal).
-        int pageCount;
-        using (Document doc = new Document(new MemoryStream(pdfBytes)))
-        {
-            pageCount = doc.Pages.Count;
-        }
+        // Load the source PDF using the Document class (no BindPdf needed).
+        Document sourceDoc = new Document(inputPdfStream);
+        int totalPages = sourceDoc.Pages.Count;
 
-        // Calculate how many bulk sets are needed.
-        int setCount = (pageCount + bulkSize - 1) / bulkSize;
-        var result = new MemoryStream[setCount];
+        var resultStreams = new List<MemoryStream>();
+        int setCount = (totalPages + pagesPerSet - 1) / pagesPerSet;
 
         for (int i = 0; i < setCount; i++)
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            int startPage = i * bulkSize + 1;
-            int endPage   = Math.Min(startPage + bulkSize - 1, pageCount);
+            int startPage = i * pagesPerSet + 1; // 1‑based indexing
+            int endPage = Math.Min(startPage + pagesPerSet - 1, totalPages);
 
-            // Create a fresh source stream for each extraction.
-            using (MemoryStream srcStream = new MemoryStream(pdfBytes))
-            using (Document srcDoc = new Document(srcStream))
+            // Create a new document for the current bulk set.
+            Document splitDoc = new Document();
+
+            // Copy the required pages from the source document.
+            for (int p = startPage; p <= endPage; p++)
             {
-                // Create a new document that will hold the selected page range.
-                Document subsetDoc = new Document();
-
-                for (int p = startPage; p <= endPage; p++)
-                {
-                    // Add a copy of each required page to the subset document.
-                    subsetDoc.Pages.Add(srcDoc.Pages[p]);
-                }
-
-                MemoryStream destStream = new MemoryStream();
-                subsetDoc.Save(destStream);
-                destStream.Position = 0; // Reset for consumer reading.
-                result[i] = destStream; // Store the resulting MemoryStream.
+                // The Add method clones the page into the new document.
+                splitDoc.Pages.Add(sourceDoc.Pages[p]);
             }
+
+            // Save the split document into a memory stream.
+            MemoryStream outStream = new MemoryStream();
+            splitDoc.Save(outStream, SaveFormat.Pdf);
+            outStream.Position = 0; // Reset for reading by the caller.
+            resultStreams.Add(outStream);
         }
 
-        return result;
+        return resultStreams.ToArray();
     }
+}
 
-    // Minimal entry point to satisfy the compiler when the project is built as an executable.
+// Minimal entry point to satisfy the compiler when the project is built as an executable.
+public class Program
+{
     public static void Main(string[] args)
     {
-        // The method is intentionally left empty – the library functionality is exercised
-        // via the SplitPdfIntoBulkSets method from user code or unit tests.
+        // The library method can be called from here if needed.
+        // Example (commented out to avoid runtime errors when no PDF is supplied):
+        // using var fs = File.OpenRead("sample.pdf");
+        // var parts = PdfSplitter.SplitPdfIntoBulkSets(fs, 10);
+        // Console.WriteLine($"Created {parts.Length} split PDFs.");
     }
 }

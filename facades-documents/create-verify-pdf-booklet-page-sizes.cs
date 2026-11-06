@@ -1,87 +1,117 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
-class BookletTestSuite
+class BookletTests
 {
-    // Create a simple PDF with the specified page size (width x height in points)
-    static void CreatePdf(string filePath, double width, double height)
+    // Creates a single‑page PDF with a custom size and simple text.
+    static void CreatePdfWithSize(string path, double width, double height)
     {
-        // Ensure the directory exists
-        string dir = Path.GetDirectoryName(filePath);
-        if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-
-        // Create a new PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        // Ensure the directory exists.
+        string? dir = Path.GetDirectoryName(path);
+        if (!string.IsNullOrEmpty(dir))
         {
-            // Add four pages to have enough content for booklet layout
-            for (int i = 1; i <= 4; i++)
-            {
-                // Add a blank page
-                Aspose.Pdf.Page page = doc.Pages.Add();
+            Directory.CreateDirectory(dir);
+        }
 
-                // Set custom page size
-                page.SetPageSize(width, height);
+        using (Document doc = new Document())
+        {
+            // Define a custom page size (points).
+            Page page = doc.Pages.Add();
+            page.PageInfo.Width = width;
+            page.PageInfo.Height = height;
 
-                // Add simple text indicating page number
-                Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment($"Page {i}");
-                tf.Position = new Aspose.Pdf.Text.Position(50, height - 50);
-                page.Paragraphs.Add(tf);
-            }
+            // Add a text fragment so the page is not empty.
+            TextFragment tf = new TextFragment($"Page size: {width} x {height}");
+            tf.TextState.FontSize = 12;
+            tf.Position = new Position(50, height - 50);
+            page.Paragraphs.Add(tf);
 
-            // Save the PDF
-            doc.Save(filePath);
+            doc.Save(path);
         }
     }
 
-    // Perform booklet conversion on the given PDF
-    static bool ConvertToBooklet(string inputPath, string outputPath)
+    // Creates a booklet from the given source PDFs and verifies the result.
+    static void TestBooklet(string[] sourcePaths, string outputPath)
     {
-        // PdfFileEditor does NOT implement IDisposable; no using block needed
-        Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
+        // Combine source PDFs into a temporary merged PDF.
+        string mergedPath = Path.Combine(Path.GetTempPath(), $"merged_{Guid.NewGuid()}.pdf");
+        using (Document merged = new Document())
+        {
+            foreach (string src in sourcePaths)
+            {
+                using (Document srcDoc = new Document(src))
+                {
+                    // Append all pages from the source document.
+                    merged.Pages.Add(srcDoc.Pages);
+                }
+            }
+            merged.Save(mergedPath);
+        }
 
-        // Use the overload that does not require a PageSize argument
-        bool success = editor.MakeBooklet(inputPath, outputPath);
+        // Create a booklet from the merged PDF.
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using.
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // No need to call Close() on editor
-        return success;
+        // Use the overload that does not require explicit BookletSettings.
+        // The correct method name is MakeBooklet.
+        editor.MakeBooklet(mergedPath, outputPath);
+
+        // Verify that the output PDF exists and its page count is a multiple of 4.
+        using (Document result = new Document(outputPath))
+        {
+            int pageCount = result.Pages.Count;
+            if (pageCount % 4 != 0)
+            {
+                Console.Error.WriteLine($"[FAIL] Booklet page count ({pageCount}) is not a multiple of 4.");
+            }
+            else
+            {
+                Console.WriteLine($"[PASS] Booklet created successfully with {pageCount} pages.");
+            }
+        }
+
+        // Clean up temporary merged file.
+        try { File.Delete(mergedPath); } catch { /* ignore */ }
     }
 
     static void Main()
     {
-        // Define test cases with custom page sizes (width, height in points)
-        var testCases = new[]
+        // Define custom page sizes (width x height in points).
+        var pageSizes = new List<(double width, double height)>
         {
-            new { Name = "LetterSize", Width = 612.0, Height = 792.0 },   // 8.5" x 11"
-            new { Name = "LegalSize",  Width = 612.0, Height = 1008.0 }, // 8.5" x 14"
-            new { Name = "CustomA5",   Width = 420.0, Height = 595.0 }, // approx A5
-            new { Name = "CustomSquare", Width = 600.0, Height = 600.0 }
+            (595, 842),   // A4
+            (612, 792),   // Letter
+            (400, 600)    // Custom small size
         };
 
-        string baseDir = Path.Combine(Directory.GetCurrentDirectory(), "BookletTests");
-        if (!Directory.Exists(baseDir))
-            Directory.CreateDirectory(baseDir);
-
-        foreach (var tc in testCases)
+        // Create temporary PDFs with the defined sizes.
+        var sourceFiles = new List<string>();
+        int index = 1;
+        foreach (var (w, h) in pageSizes)
         {
-            string sourcePdf = Path.Combine(baseDir, $"{tc.Name}_source.pdf");
-            string bookletPdf = Path.Combine(baseDir, $"{tc.Name}_booklet.pdf");
-
-            // Create source PDF with the specified page size
-            CreatePdf(sourcePdf, tc.Width, tc.Height);
-            Console.WriteLine($"Created source PDF: {sourcePdf}");
-
-            // Convert to booklet
-            bool ok = ConvertToBooklet(sourcePdf, bookletPdf);
-            if (ok)
-                Console.WriteLine($"Booklet created successfully: {bookletPdf}");
-            else
-                Console.WriteLine($"Failed to create booklet for: {sourcePdf}");
+            string path = Path.Combine(Path.GetTempPath(), $"sample_{index}.pdf");
+            CreatePdfWithSize(path, w, h);
+            sourceFiles.Add(path);
+            index++;
         }
 
-        Console.WriteLine("Booklet test suite completed.");
+        // Output booklet path.
+        string bookletPath = Path.Combine(Path.GetTempPath(), $"booklet_{Guid.NewGuid()}.pdf");
+
+        // Run the booklet test.
+        TestBooklet(sourceFiles.ToArray(), bookletPath);
+
+        // Clean up source PDFs.
+        foreach (var file in sourceFiles)
+        {
+            try { File.Delete(file); } catch { /* ignore */ }
+        }
+
+        // Optionally delete the booklet after verification.
+        // try { File.Delete(bookletPath); } catch { /* ignore */ }
     }
 }

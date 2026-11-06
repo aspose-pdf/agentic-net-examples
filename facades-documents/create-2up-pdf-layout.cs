@@ -6,23 +6,23 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";      // source PDF
-        const string outputPath = "output_2up.pdf"; // result PDF
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_2up.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so no using block is needed
+        // PdfFileEditor does NOT implement IDisposable, so we instantiate it directly.
         PdfFileEditor editor = new PdfFileEditor();
 
-        // MakeNup expects an array of source files and a landscape flag.
-        // For a simple 2‑up (two pages per sheet) we pass a single source file
-        // and set isLandscape to false (portrait). The method will arrange pages
-        // side‑by‑side automatically.
+        // Create a 2‑up layout (two pages per sheet). The MakeNUp overload expects:
+        //   1. An array of source PDF file paths.
+        //   2. The output PDF file path.
+        //   3. A bool indicating whether the resulting pages should be in landscape orientation.
+        // Here we use portrait orientation (isLandscape = false).
         bool success = editor.MakeNUp(new[] { inputPath }, outputPath, false);
 
         if (success)

@@ -6,43 +6,53 @@ class Program
 {
     static void Main()
     {
-        const string destinationPath = "destination.pdf";
-        const string sourcePath      = "source.pdf";
-        const string outputPath      = "merged_output.pdf";
+        // Paths to the PDFs
+        const string destinationPdf = "destination.pdf";
+        const string sourcePdf = "source.pdf";
+        const string outputPdf = "merged_output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(destinationPath))
+        // Verify that input files exist
+        if (!File.Exists(destinationPdf))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
             return;
         }
-        if (!File.Exists(sourcePath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // Determine the middle position of the destination PDF (1‑based indexing)
-        int insertPosition;
-        using (Document destDoc = new Document(destinationPath))
+        try
         {
-            int pageCount = destDoc.Pages.Count;
-            // Insert after the first half of pages
-            insertPosition = (pageCount / 2) + 1;
+            // Determine the middle position of the destination PDF (0‑based index for insertion)
+            int insertAfterPage;
+            using (Document destDoc = new Document(destinationPdf))
+            {
+                // Pages are 1‑based; inserting after page 0 means prepend.
+                // For an even number of pages we insert after the first half.
+                insertAfterPage = destDoc.Pages.Count / 2;
+            }
+
+            // Load both documents
+            Document destination = new Document(destinationPdf);
+            Document source = new Document(sourcePdf);
+
+            // Insert all pages from source after the calculated page.
+            // Insert(pageNumber, sourcePages) inserts BEFORE the specified pageNumber.
+            // Therefore we add 1 to insert AFTER the desired page.
+            int insertionIndex = insertAfterPage + 1; // 1‑based page number where insertion starts
+            destination.Pages.Insert(insertionIndex, source.Pages);
+
+            // Save the merged document
+            destination.Save(outputPdf);
+
+            Console.WriteLine($"Pages from '{sourcePdf}' inserted into '{destinationPdf}' after page {insertAfterPage}.");
+            Console.WriteLine($"Result saved as '{outputPdf}'.");
         }
-
-        // Load both PDFs
-        Document destinationDoc = new Document(destinationPath);
-        Document sourceDoc      = new Document(sourcePath);
-
-        // Insert all pages from source PDF into destination PDF at the calculated position
-        // Pages.Insert takes the position (1‑based) and a PageCollection to insert.
-        destinationDoc.Pages.Insert(insertPosition, sourceDoc.Pages);
-
-        // Save the merged document
-        destinationDoc.Save(outputPath);
-
-        Console.WriteLine($"Pages from '{sourcePath}' inserted into '{destinationPath}' at position {insertPosition}.");
-        Console.WriteLine($"Result saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
+        }
     }
 }

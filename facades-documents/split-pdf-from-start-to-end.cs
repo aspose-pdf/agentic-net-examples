@@ -1,44 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 public static class PdfSplitter
 {
     /// <summary>
-    /// Splits the input PDF stream from the specified start page to the last page
-    /// and returns the resulting PDF as a MemoryStream.
+    /// Splits the input PDF stream from the specified start page to the last page.
+    /// The result is returned as a MemoryStream.
     /// </summary>
-    /// <param name="inputPdf">Stream containing the source PDF (must be readable and seekable).</param>
-    /// <param name="startPage">1‑based page number to start the split (inclusive).</param>
+    /// <param name="inputPdfStream">Stream containing the source PDF. Must be readable and seekable.</param>
+    /// <param name="startPage">1‑based index of the first page to include in the split.</param>
     /// <returns>MemoryStream with the extracted pages.</returns>
-    public static MemoryStream SplitFromStartToEnd(Stream inputPdf, int startPage)
+    public static MemoryStream SplitFromStartToEnd(Stream inputPdfStream, int startPage)
     {
-        if (inputPdf == null) throw new ArgumentNullException(nameof(inputPdf));
-        if (!inputPdf.CanSeek) throw new ArgumentException("Input stream must support seeking.", nameof(inputPdf));
+        if (inputPdfStream == null) throw new ArgumentNullException(nameof(inputPdfStream));
         if (startPage < 1) throw new ArgumentOutOfRangeException(nameof(startPage), "Start page must be >= 1.");
 
-        // Output stream that will hold the split PDF
+        // Ensure the stream is positioned at the beginning before processing.
+        if (inputPdfStream.CanSeek)
+            inputPdfStream.Position = 0;
+
+        // Prepare the output stream.
         var output = new MemoryStream();
         var editor = new PdfFileEditor();
 
-        // SplitToEnd returns true on success; it writes the result into the output stream
-        bool success = editor.SplitToEnd(inputPdf, startPage, output);
+        // Split from the start page to the end of the document.
+        bool success = editor.SplitToEnd(inputPdfStream, startPage, output);
         if (!success)
             throw new InvalidOperationException("Split operation failed.");
 
-        // Rewind the stream so the caller can read from the beginning
+        // Reset position for the caller.
         output.Position = 0;
         return output;
     }
 }
 
-// Minimal entry point to satisfy the console‑app project configuration.
-public class Program
+// Dummy entry point to satisfy the compiler when the project is built as an executable.
+public static class Program
 {
     public static void Main(string[] args)
     {
-        // No implementation required for the library functionality.
-        // This stub exists solely to provide a valid Main method.
+        // No operation – the library functionality is exposed via PdfSplitter.
     }
 }

@@ -1,12 +1,12 @@
 {
   "category": "facades-documents",
-  "nuget_version": "26.9.0",
-  "last_updated": "2026-10-26T07:28:50Z",
+  "nuget_version": "26.10.0",
+  "last_updated": "2026-11-06T16:11:13Z",
   "examples": {
     "insert-page-range-into-pdf": {
-      "title": "Insert a Range of Pages from One PDF into Another",
+      "title": "Insert Page Range from One PDF into Another",
       "filename": "insert-page-range-into-pdf.cs",
-      "description": "Demonstrates loading two PDF documents with Aspose.Pdf, validating a page range, and inserting the selected pages from the source PDF into a specific position of the destination PDF.",
+      "description": "Demonstrates how to copy a range of pages from a source PDF and insert them at a specific position in a destination PDF using Aspose.Pdf's Document and Pages.Insert APIs.",
       "tags": [
         "pdf",
         "page-insertion",
@@ -16,158 +16,153 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Pages.Insert",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21255"
-    },
-    "insert-selected-pages-into-pdf": {
-      "title": "Insert Selected Pages from One PDF into Another",
-      "filename": "insert-selected-pages-into-pdf.cs",
-      "description": "Demonstrates loading two PDFs, selecting specific pages from a source file, and inserting them into a destination PDF at a given position using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "insert-pages",
-        "aspose.pdf",
-        "document-manipulation",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Pages.Insert",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21257"
-    },
-    "insert-specific-pages-into-pdf": {
-      "title": "Insert Selected PDF Pages at a Specific Position",
-      "filename": "insert-specific-pages-into-pdf.cs",
-      "description": "Demonstrates opening PDFs as streams, selecting specific pages from a source PDF, and inserting them into a destination PDF at a defined page index using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "page-insertion",
-        "streams",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
         "Aspose.Pdf.PageCollection.Insert",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21255"
+    },
+    "insert-selected-pages-into-pdf": {
+      "title": "Insert Selected Pages into PDF at Specific Position",
+      "filename": "insert-selected-pages-into-pdf.cs",
+      "description": "Demonstrates how to insert specific pages from a source PDF into a destination PDF at a given page index using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "insert-pages",
+        "aspose.pdf",
+        "csharp",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Insert"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21257"
+    },
+    "insert-specific-pages-into-pdf": {
+      "title": "Insert Selected Pages from One PDF into Another Using Streams",
+      "filename": "insert-specific-pages-into-pdf.cs",
+      "description": "Shows how to load PDFs into memory streams, pick specific pages from a source PDF, and insert them at a defined position in a destination PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "pages",
+        "insert",
+        "streams",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Pages.Insert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21258"
     },
     "insert-pdf-pages-at-beginning": {
       "title": "Insert PDF Pages at Beginning of Another PDF",
       "filename": "insert-pdf-pages-at-beginning.cs",
-      "description": "Demonstrates how to load two PDF documents and insert all pages from a source PDF at the start of a destination PDF using Aspose.Pdf's page collection API.",
+      "description": "Shows how to insert all pages from a source PDF at the start of a destination PDF using Aspose.Pdf's Document and Pages.Insert methods.",
       "tags": [
         "pdf",
-        "page-insertion",
+        "insert-pages",
         "aspose.pdf",
-        "csharp",
-        "document-merge"
+        "document-manipulation",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21259"
-    },
-    "insert-pages-into-middle-of-pdf": {
-      "title": "Insert PDF Pages at Middle Position Using Aspose.Pdf",
-      "filename": "insert-pages-into-middle-of-pdf.cs",
-      "description": "Demonstrates how to insert all pages from a source PDF into the middle of a destination PDF using Aspose.Pdf's Document and PageCollection APIs.",
-      "tags": [
-        "pdf",
-        "page-insertion",
-        "aspose",
-        "csharp",
-        "document-manipulation"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.PageCollection",
         "Aspose.Pdf.PageCollection.Insert",
         "Aspose.Pdf.Document.Save"
       ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21259"
+    },
+    "insert-pages-into-middle-of-pdf": {
+      "title": "Insert PDF Pages into the Middle of Another PDF",
+      "filename": "insert-pages-into-middle-of-pdf.cs",
+      "description": "Demonstrates how to calculate the middle position of a destination PDF and insert all pages from a source PDF at that point using Aspose.Pdf's Document and Pages.Insert APIs.",
+      "tags": [
+        "pdf",
+        "pages",
+        "insert",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Insert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21260"
     },
     "append-pages-to-pdf": {
-      "title": "Append Pages from One PDF to Another",
+      "title": "Append Pages from One PDF to Another Using File Path Insertion",
       "filename": "append-pages-to-pdf.cs",
-      "description": "Demonstrates how to load two PDF files with Aspose.Pdf, append all pages from a source document to the end of a destination document, and save the merged result.",
+      "description": "Shows how to append all pages of a source PDF to the end of a destination PDF by using Aspose.Pdf.Facades.PdfFileEditor.Insert with file paths.",
       "tags": [
         "pdf",
         "append",
         "pages",
         "aspose",
-        "document"
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Insert",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Pages.Insert",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageCollection.Count"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21261"
     },
     "insert-pages-into-pdf-in-memory": {
-      "title": "Insert Pages from One PDF into Another In-Memory",
+      "title": "Insert PDF Pages from Memory and Save to MemoryStream",
       "filename": "insert-pages-into-pdf-in-memory.cs",
-      "description": "Shows how to create PDFs entirely in memory, insert all pages from a source document into a destination document at a specific position, and save the merged PDF to a MemoryStream using Aspose.Pdf.",
+      "description": "Shows how to load source and destination PDFs from byte arrays, insert all pages of the source document into the destination using Aspose.Pdf, and save the combined PDF to a MemoryStream.",
       "tags": [
         "pdf",
-        "page-insertion",
+        "pages",
         "memorystream",
-        "aspose-pdf",
-        "in-memory"
+        "aspose",
+        "insert"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Document.Pages.Insert",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21262"
     },
     "batch-insert-page-ranges": {
       "title": "Batch Insert Page Ranges from Multiple PDFs",
       "filename": "batch-insert-page-ranges.cs",
-      "description": "Demonstrates merging specific page ranges from several source PDF files into a single destination PDF by inserting pages sequentially with Aspose.Pdf.",
+      "description": "Demonstrates how to merge specific page ranges from several source PDF files into a single destination PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "merge",
@@ -178,178 +173,173 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Pages.Insert",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21263"
     },
     "append-pages-from-multiple-pdfs": {
-      "title": "Insert Pages from Multiple PDFs Using Ranges",
+      "title": "Insert Selected Pages from Multiple PDFs into a Single Document",
       "filename": "append-pages-from-multiple-pdfs.cs",
-      "description": "Demonstrates how to merge pages from several source PDFs into a single document by specifying page ranges for each source file.",
+      "description": "Shows how to merge specific page ranges from several source PDF files into one PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "merge",
-        "pages",
-        "range",
-        "aspose"
+        "page-range",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.PageCollection.Delete"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21264"
     },
     "load-pdf-and-save-with-aspose-pdf": {
-      "title": "Load PDF and Extract First Page",
+      "title": "Load PDF and Retrieve Page Count",
       "filename": "load-pdf-and-save-with-aspose-pdf.cs",
-      "description": "Demonstrates loading a PDF file, obtaining its page count with the Document class, and extracting a specific page using PdfFileEditor.",
+      "description": "Shows how to verify a PDF file's existence, load it with Aspose.Pdf.Document, and obtain the total number of pages. It also hints at using PdfFileEditor for further operations.",
       "tags": [
         "pdf",
         "load",
-        "extract",
-        "page",
-        "aspose-pdf"
+        "page-count",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Count",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Extract"
+        "Aspose.Pdf.Facades.PdfFileEditor"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21265"
     },
     "load-pdf-and-save-copy": {
-      "title": "Insert PDF into Another PDF Using PdfFileEditor",
+      "title": "Extract All Pages to New PDF Using PdfFileEditor",
       "filename": "load-pdf-and-save-copy.cs",
-      "description": "Shows how to load a destination PDF, retrieve the page count of a source PDF, and insert all source pages at the beginning of the destination PDF, saving the merged result.",
+      "description": "Demonstrates loading a PDF with PdfFileEditor and extracting all pages from a source file into a new destination PDF, using Document to obtain page numbers.",
       "tags": [
         "pdf",
-        "insert",
-        "merge",
-        "aspose",
-        "facade"
+        "extract",
+        "aspose-pdf",
+        "csharp",
+        "document"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Insert",
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract",
+        "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Pages.Count"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21266"
     },
     "insert-pages-into-pdf-and-save": {
-      "title": "Insert a Page from One PDF into Another",
+      "title": "Insert Pages from One PDF into Another and Save",
       "filename": "insert-pages-into-pdf-and-save.cs",
-      "description": "Demonstrates loading two PDFs with Aspose.Pdf, inserting a page from the source document into the destination document, and saving the result to a new file.",
+      "description": "Demonstrates loading two PDFs, appending each page from a source PDF to a destination PDF, and saving the merged document to a new file.",
       "tags": [
         "pdf",
-        "page-insertion",
+        "merge",
+        "insert-pages",
         "aspose.pdf",
-        "document-manipulation",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Insert",
+        "Aspose.Pdf.Document.Pages.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21267"
     },
     "rotate-pdf-page-save-to-memorystream": {
-      "title": "Add Text Stamp to PDF and Save to MemoryStream",
+      "title": "Add Text to PDF and Save to MemoryStream",
       "filename": "rotate-pdf-page-save-to-memorystream.cs",
-      "description": "Demonstrates loading a PDF from a file into a MemoryStream, applying a text stamp watermark, and saving the modified document back to a MemoryStream without touching the file system.",
+      "description": "Demonstrates loading a PDF from a byte array, inserting a TextFragment annotation on a page, and saving the modified document to a MemoryStream without any disk I/O.",
       "tags": [
         "pdf",
-        "watermark",
+        "text",
         "memorystream",
-        "aspose-pdf",
-        "textstamp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.Color",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21268"
-    },
-    "split-pdf-from-first-to-end-page": {
-      "title": "Extract First N Pages from PDF",
-      "filename": "split-pdf-from-first-to-end-page.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, copy pages 1 through a specified end page into a new document, and save the extracted pages to a separate file.",
-      "tags": [
-        "pdf",
-        "extraction",
-        "pages",
-        "aspose.pdf",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.Position",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21268"
+    },
+    "split-pdf-from-first-to-end-page": {
+      "title": "Split PDF from First Page to Specified End Page",
+      "filename": "split-pdf-from-first-to-end-page.cs",
+      "description": "Demonstrates extracting pages 1 through a given end page from a PDF and saving the result as a new file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "split",
+        "extract",
+        "pages",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract(string, int, int, string)"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21269"
     },
     "split-pdf-from-first-page-to-end-page": {
-      "title": "Split PDF from First Page to Specified End Page In-Memory",
+      "title": "Extract First Pages of PDF Using Memory Streams",
       "filename": "split-pdf-from-first-page-to-end-page.cs",
-      "description": "Demonstrates how to split a PDF using Aspose.Pdf.Facades.PdfFileEditor, extracting pages 1 through a given end page entirely in memory via streams.",
+      "description": "Demonstrates how to split a PDF by extracting pages 1 through a specified end page using Aspose.Pdf.Facades with in‑memory streams, avoiding temporary files.",
       "tags": [
         "pdf",
+        "extract",
         "split",
         "memory-stream",
-        "aspose-pdf",
-        "facade"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21270"
     },
     "split-pdf-into-bulk-page-sets": {
       "title": "Split PDF into Multiple Page Ranges",
       "filename": "split-pdf-into-bulk-page-sets.cs",
-      "description": "Demonstrates how to split a PDF into several files by specifying start‑end page ranges using Aspose.Pdf.Facades.PdfFileEditor.",
+      "description": "Shows how to extract defined start‑end page ranges from a PDF and save each range as a separate file using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "split",
@@ -361,15 +351,15 @@
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21271"
     },
     "split-pdf-from-page-to-end": {
-      "title": "Extract PDF Pages from Start Page to End",
+      "title": "Split PDF from Specific Page to End",
       "filename": "split-pdf-from-page-to-end.cs",
-      "description": "Shows how to split a PDF by extracting all pages from a given start page to the end of the document using Aspose.Pdf's PdfFileEditor.",
+      "description": "Shows how to extract pages starting at a given page number through the end of a PDF using Aspose.Pdf's PdfFileEditor and save the result as a new file.",
       "tags": [
         "pdf",
         "split",
@@ -380,60 +370,57 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Extract(string, int, int, string)"
+        "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21273"
     },
     "split-pdf-from-start-to-end": {
       "title": "Split PDF from Start Page to End Using Streams",
       "filename": "split-pdf-from-start-to-end.cs",
-      "description": "Shows how to extract pages from a given start page to the last page of a PDF using Aspose.Pdf's PdfFileEditor and return the result as a MemoryStream.",
+      "description": "Shows how to extract pages from a specified start page to the end of a PDF using Aspose.Pdf.Facades and return the result as a MemoryStream.",
       "tags": [
         "pdf",
         "split",
         "stream",
-        "aspose",
-        "memorystream"
+        "memorystream",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21274"
     },
     "split-pdf-into-individual-page-pdfs": {
-      "title": "Split PDF into Single-Page PDFs Using MemoryStream",
+      "title": "Split PDF into Individual Page PDFs Using MemoryStreams",
       "filename": "split-pdf-into-individual-page-pdfs.cs",
-      "description": "Shows how to split a PDF into separate one-page PDF files by cloning each page into a new Document, saving it to a MemoryStream, and writing the stream to disk.",
+      "description": "Shows how to split a PDF into separate page PDFs by retrieving each page as a MemoryStream with PdfFileEditor.SplitToPages and writing the streams to individual files.",
       "tags": [
         "pdf",
         "split",
         "pages",
         "memorystream",
-        "aspose.pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21276"
     },
     "split-pdf-into-single-page-pdfs": {
-      "title": "Split PDF into Single-Page PDFs Using MemoryStream",
+      "title": "Split PDF into Individual Pages Using MemoryStream",
       "filename": "split-pdf-into-single-page-pdfs.cs",
-      "description": "The example splits a PDF into individual pages using Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks, obtains each page as a MemoryStream, and writes them to uniquely named PDF files.",
+      "description": "Demonstrates how to split a PDF into separate page PDFs by using Aspose.Pdf.Facades.PdfFileEditor.SplitToPages to obtain MemoryStream objects and saving each stream to a uniquely named file.",
       "tags": [
         "pdf",
         "split",
@@ -443,82 +430,80 @@
       ],
       "apis_used": [
         "PdfFileEditor",
-        "PdfFileEditor.SplitToBulks",
-        "Document",
-        "Document.Pages"
+        "PdfFileEditor.SplitToPages"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21277"
     },
     "concatenate-split-pdfs": {
-      "title": "Concatenate Split PDFs into a Single Document",
+      "title": "Merge Split PDF Files into a Single Document",
       "filename": "concatenate-split-pdfs.cs",
-      "description": "Shows how to merge multiple PDF files (e.g., split pages) into one PDF by inserting each source document's pages into a target document using Aspose.Pdf.",
+      "description": "The example loads PDF files from a folder, appends each page to a base document using Aspose.Pdf, and saves the combined result as a single PDF.",
       "tags": [
         "pdf",
-        "concatenation",
         "merge",
+        "pages",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Pages.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21278"
     },
     "extract-front-part-pdf-splitfromfirst": {
       "title": "Extract First N Pages from PDF using SplitFromFirst",
       "filename": "extract-front-part-pdf-splitfromfirst.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst to extract pages from the beginning of a PDF up to a specified end page and save them as a new document.",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst to extract pages 1 through a specified end page and save them as a new PDF document.",
       "tags": [
         "pdf",
         "split",
         "pages",
         "aspose",
-        "facade"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21279"
     },
     "extract-front-pages-splitfromfirst-streams": {
-      "title": "Extract First N Pages In-Memory Using SplitFromFirst",
+      "title": "Extract First N Pages from PDF Using PdfFileEditor and Streams",
       "filename": "extract-front-pages-splitfromfirst-streams.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst with streams to extract pages 1 through a specified end page entirely in memory, without creating temporary files.",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst with input and output streams to extract pages 1 through a specified end page, keeping the operation in memory before optionally saving to disk.",
       "tags": [
         "pdf",
-        "split",
-        "in-memory",
+        "extraction",
+        "streams",
         "aspose",
-        "facade"
+        "split"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.SplitFromFirst"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21280"
     },
     "split-pdf-into-multiple-page-ranges": {
-      "title": "Split PDF into Multiple Bulks by Page Ranges",
+      "title": "Split PDF into Multiple Page Ranges Using SplitToBulks",
       "filename": "split-pdf-into-multiple-page-ranges.cs",
-      "description": "Demonstrates how to split a PDF into separate files based on defined page ranges using Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks and save each bulk to disk.",
+      "description": "Demonstrates how to split a PDF into separate files based on defined page ranges using the PdfFileEditor.SplitToBulks method.",
       "tags": [
         "pdf",
         "split",
@@ -531,14 +516,14 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21281"
     },
     "split-pdf-into-multiple-bulks": {
-      "title": "Split PDF into Multiple Bulks Using MemoryStream",
+      "title": "Split PDF into Multiple Bulks Using Streams",
       "filename": "split-pdf-into-multiple-bulks.cs",
-      "description": "Shows how to split a PDF into defined page‑range bulks with Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks and process the resulting MemoryStream objects.",
+      "description": "Shows how to split a PDF into defined page ranges (bulks) with PdfFileEditor.SplitToBulks and write each resulting MemoryStream to a separate file.",
       "tags": [
         "pdf",
         "split",
@@ -551,188 +536,193 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToBulks"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21282"
     },
     "split-pdf-from-start-page-to-end": {
       "title": "Split PDF from a Specific Page to End",
       "filename": "split-pdf-from-start-page-to-end.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd to extract pages from a given start page through the end of a PDF and save them as a new file.",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd to extract pages starting at a given page through the end of a PDF and save the result as a new file.",
       "tags": [
         "pdf",
         "split",
-        "pages",
         "aspose",
-        "facade"
+        "facade",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21283"
     },
     "split-pdf-from-start-page-to-end-using-streams": {
-      "title": "Split PDF from a Start Page to End Using In-Memory Streams",
+      "title": "Split PDF from Specific Page to End Using Streams",
       "filename": "split-pdf-from-start-page-to-end-using-streams.cs",
-      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd with input and output streams to split a PDF from a specified start page to the end, keeping the result in memory before optionally saving it.",
+      "description": "Demonstrates how to split a PDF starting at a given page through the end of the document using Aspose.Pdf.Facades with in‑memory streams, avoiding temporary files.",
       "tags": [
         "pdf",
         "split",
-        "stream",
-        "in-memory",
-        "Aspose.Pdf"
+        "streams",
+        "aspose-pdf",
+        "in-memory"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToEnd"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21284"
     },
     "split-pdf-into-page-streams": {
-      "title": "Split PDF into MemoryStreams per Page",
+      "title": "Split PDF into Individual Page Streams",
       "filename": "split-pdf-into-page-streams.cs",
-      "description": "Demonstrates how to split a PDF into individual pages and store each page in a separate MemoryStream using Aspose.Pdf.",
+      "description": "Shows how to split a PDF into separate pages and store each page in a MemoryStream using Aspose.Pdf.",
       "tags": [
         "pdf",
         "split",
         "memorystream",
-        "pages",
-        "aspose"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.SaveFormat",
-        "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21286"
     },
     "delete-pages-from-pdf-file-path": {
-      "title": "Delete Pages 2‑5 from PDF Using File‑Path Overload",
+      "title": "Delete Pages 2-5 from PDF",
       "filename": "delete-pages-from-pdf-file-path.cs",
-      "description": "Demonstrates how to remove specific pages (2 through 5) from a PDF file by using Aspose.Pdf.Facades.PdfFileEditor's file‑path overload of the Delete method.",
+      "description": "Shows how to load a PDF from a file path, delete a range of pages (2 through 5), and save the modified document using Aspose.Pdf.",
       "tags": [
         "pdf",
         "delete-pages",
         "aspose-pdf",
-        "file-path",
-        "csharp"
+        "csharp",
+        "file-path"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.PageCollection.Count"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21287"
     },
     "delete-specific-pages-from-pdf": {
-      "title": "Delete Specific Pages from PDF",
+      "title": "Delete Specific Pages from PDF Using Streams",
       "filename": "delete-specific-pages-from-pdf.cs",
-      "description": "Demonstrates how to remove selected pages from a PDF file using Aspose.Pdf.Facades.PdfFileEditor and save the result to a new file.",
+      "description": "Shows how to load a PDF from an input stream, delete selected pages, and save the modified document to an output stream with Aspose.Pdf.",
       "tags": [
         "pdf",
         "delete-pages",
-        "aspose",
-        "facades",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21288"
-    },
-    "remove-first-and-last-pages-from-pdf": {
-      "title": "Remove First and Last Pages from PDF",
-      "filename": "remove-first-and-last-pages-from-pdf.cs",
-      "description": "Shows how to delete the first and last pages of a PDF using Aspose.Pdf's PdfFileEditor.Delete method with an integer array.",
-      "tags": [
-        "pdf",
-        "delete-pages",
-        "aspose",
-        "csharp",
-        "facades"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Delete",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Count"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21289"
-    },
-    "batch-delete-pages-from-multiple-pdfs": {
-      "title": "Batch Delete Specific Pages from PDFs",
-      "filename": "batch-delete-pages-from-multiple-pdfs.cs",
-      "description": "Shows how to iterate over PDF files in a directory, delete selected pages from each document using Aspose.Pdf, and save the modified files to an output folder.",
-      "tags": [
-        "pdf",
-        "batch-processing",
-        "page-deletion",
-        "aspose.pdf",
+        "streams",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.PageCollection.Count",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21288"
+    },
+    "remove-first-and-last-pages-from-pdf": {
+      "title": "Remove First and Last Pages from PDF",
+      "filename": "remove-first-and-last-pages-from-pdf.cs",
+      "description": "Shows how to delete the first and last pages of a PDF by obtaining the page count with Aspose.Pdf.Document and calling PdfFileEditor.Delete with an integer array.",
+      "tags": [
+        "pdf",
+        "page-deletion",
+        "aspose",
+        "csharp",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Count",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21289"
+    },
+    "batch-delete-pages-from-multiple-pdfs": {
+      "title": "Batch Delete Pages from PDFs in a Directory",
+      "filename": "batch-delete-pages-from-multiple-pdfs.cs",
+      "description": "Demonstrates how to iterate over PDF files in a folder and remove specified pages from each document using Aspose.Pdf, saving the trimmed versions with a new name.",
+      "tags": [
+        "pdf",
+        "batch",
+        "page-deletion",
+        "filesystem",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Pages.Count",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21290"
     },
     "validate-pdf-page-deletion": {
       "title": "Delete a PDF Page and Verify Page Count",
       "filename": "validate-pdf-page-deletion.cs",
-      "description": "Loads a PDF, records the original page count, deletes a specified page, saves the document, then reloads it to confirm the page count decreased by one.",
+      "description": "Demonstrates how to remove a specific page from a PDF using Aspose.Pdf, save the result, and validate that the total page count decreased by one.",
       "tags": [
         "pdf",
         "delete-page",
         "validation",
-        "aspose-pdf",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.PageCollection.Delete",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21291"
     },
     "concatenate-three-pdfs-into-one": {
-      "title": "Concatenate Multiple PDFs Using PdfFileEditor",
+      "title": "Concatenate Three PDFs with PdfFileEditor",
       "filename": "concatenate-three-pdfs-into-one.cs",
       "description": "Demonstrates merging three PDF files into a single document using Aspose.Pdf.Facades.PdfFileEditor’s three‑argument Concatenate method, with temporary file handling.",
       "tags": [
         "pdf",
-        "concatenate",
+        "concatenation",
         "merge",
         "aspose.pdf",
         "facade"
@@ -742,41 +732,80 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21292"
     },
     "merge-multiple-pdf-streams": {
-      "title": "Merge Multiple PDF Streams into a Single PDF",
+      "title": "Merge Multiple PDFs into a Single Stream",
       "filename": "merge-multiple-pdf-streams.cs",
-      "description": "Shows how to combine an array of PDF input streams into one PDF using Aspose.Pdf's PdfFileEditor.Concatenate method, including placeholder creation and stream positioning.",
-      "tags": [
-        "pdf-merge",
-        "streams",
-        "aspose-pdf",
-        "concatenate",
-        "memory-stream"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21293"
-    },
-    "concatenate-two-pdfs-using-pdffileeditor": {
-      "title": "Merge Two PDFs Using PdfFileEditor Concatenate",
-      "filename": "concatenate-two-pdfs-using-pdffileeditor.cs",
-      "description": "Demonstrates how to combine two PDF files on disk into a single PDF using Aspose.Pdf.Facades.PdfFileEditor’s two‑file Concatenate method.",
+      "description": "Shows how to concatenate several PDF files using Aspose.Pdf.Facades.PdfFileEditor and write the merged result to an output stream.",
       "tags": [
         "pdf",
         "merge",
         "concatenate",
+        "stream",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21293"
+    },
+    "concatenate-two-pdfs-using-pdffileeditor": {
+      "title": "Merge Two PDFs into a Single Document",
+      "filename": "concatenate-two-pdfs-using-pdffileeditor.cs",
+      "description": "Demonstrates how to combine two existing PDF files on disk into one PDF using Aspose.Pdf's two‑file overload. The example loads each file into a Document, appends pages, and saves the merged result.",
+      "tags": [
+        "pdf",
+        "merge",
+        "aspose.pdf",
+        "document",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21294"
+    },
+    "concatenate-pdfs-from-memory-streams": {
+      "title": "Concatenate PDFs from Memory Streams to File",
+      "filename": "concatenate-pdfs-from-memory-streams.cs",
+      "description": "Shows how to merge multiple PDF documents that are loaded into memory streams directly into an output PDF file using Aspose.Pdf's PdfFileEditor, avoiding any intermediate file storage.",
+      "tags": [
+        "pdf",
+        "concatenate",
+        "memory-stream",
+        "aspose",
+        "file-io"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21295"
+    },
+    "batch-concatenate-pdfs": {
+      "title": "Batch Concatenate PDFs in a Folder",
+      "filename": "batch-concatenate-pdfs.cs",
+      "description": "Shows how to gather all PDF files from a directory and merge them into a single PDF using Aspose.Pdf.Facades.PdfFileEditor.",
+      "tags": [
+        "pdf",
+        "merge",
+        "batch",
         "aspose",
         "c#"
       ],
@@ -785,54 +814,14 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21294"
-    },
-    "concatenate-pdfs-from-memory-streams": {
-      "title": "Concatenate PDFs from Memory Streams to File",
-      "filename": "concatenate-pdfs-from-memory-streams.cs",
-      "description": "Shows how to load PDF files into memory streams and merge them directly into an output file using Aspose.Pdf.Facades.PdfFileEditor without creating intermediate files.",
-      "tags": [
-        "pdf",
-        "concatenate",
-        "memory-stream",
-        "aspose",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21295"
-    },
-    "batch-concatenate-pdfs": {
-      "title": "Batch Concatenate PDFs in a Folder",
-      "filename": "batch-concatenate-pdfs.cs",
-      "description": "Shows how to gather all PDF files from a directory and merge them into a single PDF using Aspose.Pdf.Facades PdfFileEditor.",
-      "tags": [
-        "pdf",
-        "concatenate",
-        "batch",
-        "facades",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21296"
     },
     "concatenate-multiple-pdfs-measure-time": {
-      "title": "Concatenate Multiple PDFs and Measure Execution Time",
+      "title": "Measure PDF Concatenation Performance Using Streams",
       "filename": "concatenate-multiple-pdfs-measure-time.cs",
-      "description": "Demonstrates how to create several small PDFs in memory, concatenate them using Aspose.Pdf's stream overload, and measure the operation's execution time.",
+      "description": "Demonstrates how to concatenate fifty small PDFs in memory using Aspose.Pdf stream overloads and measures the execution time with a Stopwatch.",
       "tags": [
         "pdf",
         "concatenation",
@@ -842,34 +831,34 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21297"
     },
     "compare-pdf-concatenation-paths-streams": {
-      "title": "Compare PDF Concatenation via File Path and Stream Overloads",
+      "title": "Compare Memory Usage of PdfFileEditor Concatenate Overloads",
       "filename": "compare-pdf-concatenation-paths-streams.cs",
-      "description": "Shows how to merge multiple PDFs using Aspose.Pdf's PdfFileEditor with both file‑path and stream overloads, and measures the memory impact of each approach.",
+      "description": "Merges multiple PDF files using Aspose.Pdf.Facades.PdfFileEditor via the file‑path overload and the stream overload, measuring process memory before and after each operation to compare their memory consumption.",
       "tags": [
         "pdf",
         "concatenation",
-        "stream",
         "memory",
-        "aspose-pdf"
+        "stream",
+        "aspose.pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate(String[],String)",
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate(Stream[],Stream)"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21298"
     },
@@ -880,114 +869,115 @@
       "tags": [
         "booklet",
         "pdf",
-        "aspose",
-        "facade",
-        "csharp"
+        "Aspose.Pdf",
+        "PdfFileEditor",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21299"
     },
     "create-a5-booklet-from-pdf": {
-      "title": "Create Booklet PDF with A5 Page Size",
+      "title": "Create Booklet with Custom A5 Page Size",
       "filename": "create-a5-booklet-from-pdf.cs",
-      "description": "Demonstrates how to generate a booklet from an existing PDF using Aspose.Pdf.Facades.PdfFileEditor with the A5 page size overload.",
+      "description": "Demonstrates generating a booklet PDF using Aspose.Pdf with A5 page dimensions by configuring BookletSettings and invoking the CreateBooklet overload via reflection.",
       "tags": [
         "booklet",
-        "A5",
-        "PdfFileEditor",
-        "Aspose.Pdf",
-        "page-size"
+        "a5",
+        "custom-page-size",
+        "reflection",
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.Facades.BookletSettings",
+        "Aspose.Pdf.Facades.PdfFileEditor.CreateBooklet",
         "Aspose.Pdf.PageSize"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21300"
     },
     "create-booklet-with-custom-page-order": {
-      "title": "Create Booklet PDF with Left‑Hand Odd and Right‑Hand Even Pages",
+      "title": "Create Booklet PDF with Left-Hand Odd and Right-Hand Even Pages",
       "filename": "create-booklet-with-custom-page-order.cs",
-      "description": "Shows how to generate a booklet PDF by assigning odd-numbered pages to the left side and even-numbered pages to the right side using Aspose.Pdf.",
+      "description": "Demonstrates how to generate a booklet PDF using Aspose.Pdf.Facades.BookletCreator and configure left‑hand pages as odd and right‑hand pages as even.",
       "tags": [
         "booklet",
-        "odd-pages",
-        "even-pages",
         "pdf",
-        "aspose-pdf"
+        "page-order",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.Facades.BookletCreator",
+        "Aspose.Pdf.Facades.BookletCreator.LeftHandOddPages",
+        "Aspose.Pdf.Facades.BookletCreator.RightHandEvenPages",
+        "Aspose.Pdf.Facades.BookletCreator.CreateBooklet"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21301"
     },
     "create-booklet-pdf-custom-page-size": {
-      "title": "Create Booklet PDF with Custom Page Size Using Streams",
+      "title": "Create PDF Booklet with Custom Page Dimensions Using Streams",
       "filename": "create-booklet-pdf-custom-page-size.cs",
-      "description": "Shows how to load a PDF from a stream, reorder its pages into booklet order, apply custom page dimensions, and save the result using Aspose.Pdf.",
+      "description": "Demonstrates how to generate a booklet from a PDF using stream‑based APIs, then modify each page's width and height before saving the final document.",
       "tags": [
         "booklet",
-        "custom-size",
+        "pdf",
         "streams",
-        "page-reordering",
+        "page-size",
         "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageInfo"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21302"
     },
     "create-pdf-booklet-in-separate-folders": {
-      "title": "Create PDF Booklets and Save to Separate Directories",
+      "title": "Create PDF Booklets and Store Each in Its Own Folder",
       "filename": "create-pdf-booklet-in-separate-folders.cs",
-      "description": "The example processes all PDF files in a folder, creates a booklet for each using Aspose.Pdf.Facades, and stores the resulting booklet in its own subdirectory under a specified output root.",
+      "description": "The example shows how to generate a booklet PDF for each source file using Aspose.Pdf.Facades and place the resulting booklet in a dedicated sub‑directory under a common output root.",
       "tags": [
-        "pdf",
         "booklet",
-        "facades",
-        "batch",
-        "output-directory"
+        "pdf",
+        "aspose",
+        "facade",
+        "batch"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21303"
     },
     "delete-pages-and-create-booklet": {
       "title": "Delete Pages and Create Booklet from PDF",
       "filename": "delete-pages-and-create-booklet.cs",
-      "description": "Shows how to remove specific pages from a PDF document and then generate a booklet using Aspose.Pdf.",
+      "description": "Shows how to remove selected pages from a PDF using Aspose.Pdf.Document and then generate a booklet with PdfFileEditor.MakeBooklet.",
       "tags": [
-        "pdf",
-        "page-deletion",
+        "delete-pages",
         "booklet",
+        "pdf",
         "aspose-pdf",
         "csharp"
       ],
@@ -999,42 +989,43 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21304"
     },
     "delete-pages-concatenate-pdfs": {
-      "title": "Delete PDF Pages and Concatenate with Another Document",
+      "title": "Delete Pages and Concatenate PDFs",
       "filename": "delete-pages-concatenate-pdfs.cs",
-      "description": "Shows how to remove specific pages from a PDF and then merge the edited PDF with a second document using Aspose.Pdf.",
+      "description": "Shows how to remove specific pages from a PDF and then concatenate the edited PDF with another document using Aspose.Pdf.",
       "tags": [
         "pdf",
         "delete-pages",
         "concatenate",
-        "aspose-pdf",
-        "facade"
+        "Aspose.Pdf",
+        "PdfFileEditor"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Document.Pages.Delete",
-        "Document.Save",
-        "PdfFileEditor.Concatenate"
+        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21305"
     },
     "delete-specific-pages-pdf-error-handling": {
-      "title": "Delete PDF Pages with File-Path Overload and Error Handling",
+      "title": "Delete PDF Page with File Path and Error Handling",
       "filename": "delete-specific-pages-pdf-error-handling.cs",
-      "description": "Demonstrates how to delete specific pages from a PDF using Aspose.Pdf.Facades.PdfFileEditor Delete method with the file‑path overload, including validation for missing input files and exception handling.",
+      "description": "Demonstrates how to delete a specific page from a PDF using Aspose.Pdf.Facades.PdfFileEditor with file‑path overloads, including validation for missing input files and exception handling.",
       "tags": [
         "pdf",
-        "delete-pages",
+        "delete-page",
         "error-handling",
-        "aspose-pdf",
+        "aspose",
         "facade"
       ],
       "apis_used": [
@@ -1042,67 +1033,66 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Delete"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21306"
     },
     "create-pdf-booklet-with-audit-log": {
-      "title": "Create Booklet PDF with Logging",
+      "title": "Create Booklet PDF with Audit Logging",
       "filename": "create-pdf-booklet-with-audit-log.cs",
-      "description": "Shows how to merge multiple PDF files, reorder pages to form a booklet, and log each step to a text file for audit using Aspose.Pdf.",
+      "description": "Demonstrates how to reorder pages of a PDF to form a booklet and log each step of the batch process to a text file for audit purposes using Aspose.Pdf.",
       "tags": [
         "pdf",
         "booklet",
-        "merge",
         "logging",
-        "Aspose.Pdf"
+        "aspose",
+        "batch"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Pages.Add"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21307"
     },
     "resize-pdf-to-letter-size": {
       "title": "Resize PDF Pages to Letter Size",
       "filename": "resize-pdf-to-letter-size.cs",
-      "description": "Shows how to load a PDF, change every page to US Letter dimensions (8.5\" x 11\"), and save the modified document using Aspose.Pdf.",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, change each page's dimensions to US Letter size, and save the result to a new file.",
       "tags": [
         "pdf",
         "resize",
         "letter-size",
-        "aspose",
-        "document"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.PageInfo.IsLandscape"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21309"
     },
     "resize-pdf-pages-to-8-5x11-using-stream": {
-      "title": "Resize PDF Pages to Custom Dimensions via Stream",
+      "title": "Resize PDF Pages to Custom Dimensions Using Stream Overload",
       "filename": "resize-pdf-pages-to-8-5x11-using-stream.cs",
-      "description": "Demonstrates how to load a PDF from a file stream, set each page's size to 8.5×11 inches, and save the result using Aspose.Pdf's stream overloads.",
+      "description": "Demonstrates how to load a PDF from a stream, set each page's width and height to 8.5×11 inches (in points), and save the resized document back to a stream using Aspose.Pdf.",
       "tags": [
         "pdf",
         "resize",
         "pages",
         "stream",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1112,37 +1102,36 @@
         "Aspose.Pdf.Document..ctor(Stream)"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21310"
     },
     "batch-resize-pdfs-to-a4": {
-      "title": "Batch Resize PDFs to A4",
+      "title": "Batch Resize PDFs to A4 Size",
       "filename": "batch-resize-pdfs-to-a4.cs",
-      "description": "Shows how to iterate over PDF files in a folder, resize each page to A4 size using Aspose.Pdf, and save the resized documents to a target directory.",
+      "description": "Shows how to iterate over all PDF files in a source folder, resize each page to A4 dimensions using Aspose.Pdf, and save the resized PDFs to a target directory.",
       "tags": [
         "pdf",
-        "batch",
         "resize",
+        "batch",
         "a4",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.SetPageSize"
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21311"
     },
     "measure-pdf-resize-performance-path-vs-stream": {
-      "title": "Resize PDF Pages and Compare File‑Path vs Stream Overloads",
+      "title": "Measure PDF Resize Performance: Path vs Stream",
       "filename": "measure-pdf-resize-performance-path-vs-stream.cs",
-      "description": "Loads a large PDF, resizes every page to A4 dimensions, and saves the result using both file‑path and stream overloads while measuring execution time to compare their performance.",
+      "description": "The example loads a large PDF, resizes all pages to A4 dimensions, and measures the elapsed time when using the file‑path overload versus the stream overload of Aspose.Pdf's Document class.",
       "tags": [
         "pdf",
         "resize",
@@ -1152,179 +1141,172 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document(string)",
+        "Aspose.Pdf.Document(Stream)",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageInfo.Width",
+        "Aspose.Pdf.PageInfo.Height"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21312"
     },
     "create-2up-pdf-layout": {
       "title": "Create 2‑up PDF Layout with PdfFileEditor",
       "filename": "create-2up-pdf-layout.cs",
-      "description": "Demonstrates how to generate a 2‑up (two pages per sheet) PDF using Aspose.Pdf.Facades.PdfFileEditor.MakeNUp and save the result.",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileEditor to arrange two PDF pages on a single sheet (2‑up) and save the resulting document.",
       "tags": [
         "pdf",
-        "2up",
         "nup",
-        "Aspose.Pdf",
-        "facade"
+        "2up",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21313"
     },
     "create-4up-pdf-with-pdffileeditor": {
-      "title": "Create 4‑up PDF Using Stream Overload",
+      "title": "Create 4Up Pdf With Pdffileeditor",
       "filename": "create-4up-pdf-with-pdffileeditor.cs",
-      "description": "Demonstrates applying a 4‑up (N‑up) layout to an existing PDF by using Aspose.Pdf.Facades.PdfFileEditor.MakeNUp with stream parameters and saving the result in a memory stream.",
-      "tags": [
-        "pdf",
-        "n-up",
-        "memory-stream",
-        "aspose",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21314"
     },
     "nup-to-booklet-pdf": {
       "title": "Create N‑up Layout and Convert to Booklet PDF",
       "filename": "nup-to-booklet-pdf.cs",
-      "description": "Demonstrates how to generate a 2‑up (portrait) PDF using N‑up processing and then transform the result into a printable booklet with Aspose.Pdf.Facades.",
+      "description": "Shows how to generate a 2‑up PDF using PdfFileEditor.MakeNUp and then convert it into a printable booklet with PdfFileEditor.MakeBooklet.",
       "tags": [
         "n-up",
         "booklet",
         "pdf",
-        "aspose",
+        "aspose-pdf",
         "facades"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.NUpPdfProcessor",
-        "Aspose.Pdf.Facades.NUpPdfProcessor.BindPdf",
-        "Aspose.Pdf.Facades.NUpPdfProcessor.Process",
-        "Aspose.Pdf.Facades.BookletPdfProcessor",
-        "Aspose.Pdf.Facades.BookletPdfProcessor.BindPdf",
-        "Aspose.Pdf.Facades.BookletPdfProcessor.Process"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21316"
     },
     "delete-pages-resize-pdf": {
-      "title": "Delete Pages and Resize PDF Document",
+      "title": "Delete Pages and Resize PDF to A4",
       "filename": "delete-pages-resize-pdf.cs",
-      "description": "Shows how to remove specific pages from a PDF and then resize the remaining pages using Aspose.Pdf.",
+      "description": "Shows how to remove specific pages from a PDF and then resize the remaining pages to A4 dimensions before saving, using Aspose.Pdf.",
       "tags": [
         "pdf",
         "delete-pages",
         "resize",
-        "Aspose.Pdf",
-        "document"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageSize",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document.Pages.Delete"
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21317"
     },
     "remove-pages-from-multiple-pdfs-in-parallel": {
-      "title": "Remove Pages from Multiple PDFs in Parallel",
+      "title": "Remove Specified Pages from Multiple PDFs in Parallel",
       "filename": "remove-pages-from-multiple-pdfs-in-parallel.cs",
-      "description": "Demonstrates how to delete specified pages from several PDF files concurrently using Aspose.Pdf and Parallel.ForEach, saving the trimmed PDFs to an output folder.",
+      "description": "Demonstrates how to parse a list of page numbers and delete those pages from several PDF files concurrently using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page-removal",
         "parallel",
-        "aspose",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Count"
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21318"
     },
     "concatenate-pdfs-using-stream-overloads": {
       "title": "Concatenate PDFs Using Streams",
       "filename": "concatenate-pdfs-using-stream-overloads.cs",
-      "description": "Shows how to merge multiple PDF files into a single document by opening each file as a stream and using Aspose.Pdf.Facades.PdfFileEditor.Concatenate.",
+      "description": "Shows how to merge multiple PDF files passed as command‑line arguments into a single PDF using Aspose.Pdf's stream overloads.",
       "tags": [
         "pdf",
         "concatenate",
         "streams",
-        "aspose",
-        "command-line"
+        "command-line",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21319"
     },
     "pdffileeditor-delete-invalid-page-test": {
-      "title": "Test Delete Throws Exception for Out‑of‑Range Page Numbers",
+      "title": "Delete Non‑existent PDF Page Throws Exception",
       "filename": "pdffileeditor-delete-invalid-page-test.cs",
-      "description": "Demonstrates an NUnit unit test that verifies Aspose.Pdf's PdfFileEditor.Delete method throws an exception when a page number beyond the document length is requested.",
+      "description": "Demonstrates creating a temporary PDF, adding pages, and verifying that deleting a page number beyond the document length raises an ArgumentOutOfRangeException.",
       "tags": [
         "pdf",
-        "nunit",
+        "delete-page",
+        "exception",
         "unit-test",
-        "aspose",
-        "delete-page"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Pages.Count",
+        "Aspose.Pdf.Document.Pages.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21320"
     },
     "create-booklet-pdf": {
-      "title": "Create Booklet PDF from Stream using Aspose.Pdf",
+      "title": "Create Booklet PDF from Stream",
       "filename": "create-booklet-pdf.cs",
-      "description": "Shows how to convert an input PDF stream into a booklet‑style PDF by using Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet and returning the result as a MemoryStream.",
+      "description": "Shows how to convert an input PDF stream into a booklet PDF using Aspose.Pdf.Facades.PdfFileEditor and return the generated booklet as a MemoryStream.",
       "tags": [
         "booklet",
         "pdf",
-        "aspose",
         "memorystream",
+        "aspose",
         "facade"
       ],
       "apis_used": [
@@ -1332,264 +1314,265 @@
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21321"
     },
     "create-booklet-pdf-custom-page-order": {
-      "title": "Generate PDF Booklet Using Aspose.Pdf",
+      "title": "Create PDF Booklet by Interleaving Two PDFs",
       "filename": "create-booklet-pdf-custom-page-order.cs",
-      "description": "Demonstrates how to create a booklet PDF from a source document with pages 1‑10 as left pages and 11‑20 as right pages using Aspose.Pdf.Facades.PdfFileEditor.",
+      "description": "Demonstrates how to combine two PDF files—left pages 1‑10 and right pages 11‑20—into a single booklet by interleaving their pages using Aspose.Pdf.",
       "tags": [
         "pdf",
         "booklet",
-        "aspose.pdf",
-        "csharp",
-        "pdf-manipulation"
+        "interleave",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Pages.Insert",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21322"
     },
     "validate-pdf-concatenation-page-order": {
       "title": "Validate PDF Concatenation Preserves Page Order",
       "filename": "validate-pdf-concatenation-page-order.cs",
-      "description": "Demonstrates concatenating multiple PDFs with Aspose.Pdf.Facades.PdfFileEditor and verifying that the merged document retains the original page sequence by checking page counts and order.",
+      "description": "Demonstrates how to concatenate multiple PDFs with Aspose.Pdf and verify that the resulting document retains the original page sequence by comparing extracted page text before and after merging.",
       "tags": [
         "pdf",
         "concatenation",
         "validation",
-        "aspose.pdf",
-        "page-order"
+        "page-order",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Document.Pages.Accept",
+        "Aspose.Pdf.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21324"
     },
     "delete-specific-pages-from-pdfs": {
-      "title": "Delete Pages 3 and 4 from PDFs in a Folder",
+      "title": "Delete Pages 3 and 4 from PDFs",
       "filename": "delete-specific-pages-from-pdfs.cs",
-      "description": "Loads each PDF from a source directory, removes pages 3 and 4 when they exist, and saves the modified files to an output directory using Aspose.Pdf.",
+      "description": "Loads each PDF in a source folder, removes pages 3 and 4 (if they exist), and saves the modified files to an output folder using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "page-deletion",
+        "delete-pages",
+        "aspose",
         "batch-processing",
-        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
         "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Count"
+        "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21325"
     },
     "concatenate-multiple-pdfs-with-logging": {
-      "title": "Merge Multiple PDFs with Step-by-Step Logging",
+      "title": "Merge Multiple PDFs with Logging Using PdfFileEditor",
       "filename": "concatenate-multiple-pdfs-with-logging.cs",
-      "description": "Shows how to sequentially concatenate several PDF files using Aspose.Pdf.Facades.PdfFileEditor while logging each input and output file name for every merge step.",
+      "description": "Demonstrates how to concatenate several PDF files into a single document while logging each merge step, using Aspose.Pdf.Facades.PdfFileEditor.",
       "tags": [
         "pdf",
         "merge",
         "concatenate",
         "logging",
-        "aspose"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21326"
     },
     "create-booklet-pdf-left-odd-pages": {
-      "title": "Create Booklet PDF with Left Pages Odd Layout",
+      "title": "Create Booklet from PDF Stream with PdfFileEditor",
       "filename": "create-booklet-pdf-left-odd-pages.cs",
-      "description": "Shows how to use Aspose.Pdf's PdfFileEditor to generate a booklet PDF where left pages are odd-numbered, and explains the version limitation that may require upgrading the library.",
+      "description": "Loads a PDF from a stream, writes it to a temporary file, and uses Aspose.Pdf.Facades.PdfFileEditor.MakeNUp to generate a simple 2‑up booklet, demonstrating left‑page odd handling via default ordering.",
       "tags": [
-        "booklet",
         "pdf",
-        "Aspose.Pdf",
-        "left-pages-odd",
-        "document"
+        "booklet",
+        "make-nup",
+        "pdffileeditor",
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Count",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.BookletOptions",
-        "Aspose.Pdf.Facades.BookletLayout",
-        "Aspose.Pdf.Facades.PdfFileEditor.CreateBooklet",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21327"
     },
     "resize-pdf-streams-verify-tiff": {
       "title": "Resize PDF Pages to Custom Dimensions Using Streams",
       "filename": "resize-pdf-streams-verify-tiff.cs",
-      "description": "Shows how to load a PDF from a file stream, set each page size to 1024 × 768 points, save the result to a memory stream, and verify the new dimensions.",
+      "description": "Demonstrates how to load a PDF from a stream, resize each page to 1024x768 points, verify the new dimensions, and save the result using Aspose.Pdf Facades and Document APIs.",
       "tags": [
         "pdf",
         "resize",
-        "streams",
-        "page-size",
+        "stream",
+        "facade",
         "verification"
       ],
       "apis_used": [
+        "Aspose.Pdf.Facades.PdfPageEditor.BindPdf",
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document..ctor(Stream)"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21328"
     },
     "batch-delete-pages-merge-pdfs": {
       "title": "Batch Delete Pages and Merge PDFs",
       "filename": "batch-delete-pages-merge-pdfs.cs",
-      "description": "Demonstrates how to remove specified pages from several PDF files and then concatenate the cleaned PDFs into a single document using Aspose.Pdf.",
+      "description": "Demonstrates how to remove specific pages from multiple PDF files, save the cleaned versions temporarily, and then concatenate them into a single merged PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "page-deletion",
         "merge",
-        "batch-processing",
-        "aspose-pdf"
+        "batch",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.Document.Pages.Delete",
         "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21329"
     },
     "concatenate-multiple-pdfs": {
       "title": "Concatenate Multiple PDFs into a Single Document",
       "filename": "concatenate-multiple-pdfs.cs",
-      "description": "Demonstrates how to merge several PDF files into one using Aspose.Pdf.Facades.PdfFileEditor from a command‑line application.",
+      "description": "Shows how to merge several PDF files into one output file using Aspose.Pdf's PdfFileEditor class.",
       "tags": [
         "pdf",
-        "concatenation",
+        "concatenate",
+        "merge",
         "aspose",
-        "facade",
-        "command-line"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21330"
     },
     "merge-pdfs-from-network-streams": {
-      "title": "Merge PDFs from URLs without Temporary Files",
+      "title": "Merge PDFs from Streams without Temporary Files",
       "filename": "merge-pdfs-from-network-streams.cs",
-      "description": "Shows how to download PDF files as streams from HTTP URLs and merge them directly into a single PDF using Aspose.Pdf.Facades, avoiding any intermediate file creation.",
+      "description": "Shows how to merge multiple PDF streams (e.g., network streams) into a single PDF document using Aspose.Pdf, avoiding any intermediate files on disk.",
       "tags": [
-        "pdf-merge",
-        "http-stream",
-        "aspose-pdf",
-        "csharp",
+        "pdf",
+        "merge",
+        "stream",
+        "aspose",
         "no-temp-files"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor(Stream)",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21331"
     },
     "validate-makebooklet-null-pagesize": {
-      "title": "Test MakeBooklet Throws on Null PageSize",
+      "title": "Test MakeBooklet Throws Exception for Null Custom Page Size",
       "filename": "validate-makebooklet-null-pagesize.cs",
-      "description": "Creates a minimal PDF and calls a helper that validates the custom PageSize before invoking PdfFileEditor.MakeBooklet, showing that an ArgumentNullException is thrown when the PageSize argument is null.",
+      "description": "Shows how to verify that PdfBooklet.MakeBooklet validates the customPageSize argument and throws an ArgumentNullException when a null value is supplied.",
       "tags": [
-        "makebooklet",
-        "validation",
-        "exception",
         "pdf",
+        "booklet",
+        "exception",
+        "unit-test",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
-        "Aspose.Pdf.PageSize"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21332"
     },
     "delete-pdf-pages-get-size": {
-      "title": "Delete PDF Pages and Get Resulting File Size",
+      "title": "Delete Specific Pages from PDF and Return New Size",
       "filename": "delete-pdf-pages-get-size.cs",
-      "description": "Shows how to remove specified pages from a PDF with Aspose.Pdf, save the modified document to a temporary file, replace the original, and return the new file size in bytes.",
+      "description": "Demonstrates how to remove selected pages from a PDF using Aspose.Pdf, overwrite the original file, and obtain the updated file size.",
       "tags": [
         "pdf",
         "delete-pages",
-        "aspose-pdf",
+        "aspose.pdf",
         "file-size",
-        "csharp"
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document..ctor(string)",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Delete(int)",
-        "Aspose.Pdf.Document.Save(string)"
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.PageCollection.Count"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21333"
     },
     "concatenate-pdfs-with-blank-pages": {
-      "title": "Concatenate PDFs with Blank Pages Between Documents",
+      "title": "Concatenate PDFs with Blank Page Separator",
       "filename": "concatenate-pdfs-with-blank-pages.cs",
-      "description": "Shows how to merge multiple PDF files and automatically insert a blank page between each document using Aspose.Pdf.",
+      "description": "Shows how to merge multiple PDF files into one document and automatically insert a blank page between each source PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "concatenate",
         "blank-page",
         "aspose",
-        "csharp"
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1599,66 +1582,67 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21334"
     },
     "batch-resize-pdfs-to-a5-and-create-booklets": {
       "title": "Resize PDFs to A5 and Create Booklet",
       "filename": "batch-resize-pdfs-to-a5-and-create-booklets.cs",
-      "description": "Shows how to batch‑process PDF files by resizing each page to A5 size and then generating a booklet using Aspose.Pdf.",
+      "description": "Shows how to batch‑process PDF files by resizing each page to A5 dimensions and then generating a booklet version using Aspose.Pdf.",
       "tags": [
         "pdf",
         "resize",
         "booklet",
         "batch",
-        "aspose"
+        "a5"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.PageSize",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21335"
     },
     "delete-pages-create-2up-pdf": {
-      "title": "Delete Pages and Apply 2‑up Layout to PDF",
+      "title": "Delete PDF Pages and Apply 2‑up Layout",
       "filename": "delete-pages-create-2up-pdf.cs",
-      "description": "Demonstrates how to remove selected pages from a PDF stream, then create a 2‑up (two‑pages‑per‑sheet) layout and write the result back to a stream using Aspose.Pdf.",
+      "description": "Demonstrates how to remove specific pages from a PDF using Aspose.Pdf.Document and then create a portrait 2‑up layout with Aspose.Pdf.Facades.PdfFileEditor.",
       "tags": [
         "pdf",
         "page-deletion",
         "2-up",
-        "nup",
-        "aspose"
+        "Aspose.Pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Document.Pages.Delete",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21336"
     },
     "concatenate-pdfs-preserve-metadata": {
-      "title": "Concatenate PDFs and Preserve Metadata",
+      "title": "Concatenate PDFs and Preserve Metadata with PdfFileEditor",
       "filename": "concatenate-pdfs-preserve-metadata.cs",
-      "description": "Shows how to merge multiple PDF files using PdfFileEditor and copy the original document metadata (author, title, subject, etc.) to the merged PDF.",
+      "description": "Shows how to merge multiple PDF files using Aspose.Pdf.Facades.PdfFileEditor and retain the original author and title metadata from the first source document.",
       "tags": [
         "pdf",
         "concatenate",
         "metadata",
         "aspose.pdf",
-        "facade"
+        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
@@ -1668,81 +1652,81 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21338"
     },
     "create-booklet-pdf-delete-resize": {
-      "title": "Create Booklet PDF with Page Deletion and Resize",
+      "title": "Create Booklet PDF After Deleting Pages and Resizing",
       "filename": "create-booklet-pdf-delete-resize.cs",
-      "description": "Demonstrates loading a PDF from a stream, deleting a specified page range, resizing all pages, and generating a booklet using Aspose.Pdf.Facades, returning the result as a MemoryStream.",
+      "description": "Demonstrates how to load a PDF from a stream, delete a specified page range, resize all pages, and generate a booklet version using Aspose.Pdf.",
       "tags": [
         "pdf",
         "booklet",
         "page-deletion",
         "resize",
-        "stream"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21339"
-    },
-    "create-verify-pdf-booklet-page-sizes": {
-      "title": "Create PDF Booklet with Custom Page Sizes",
-      "filename": "create-verify-pdf-booklet-page-sizes.cs",
-      "description": "Demonstrates generating PDFs with various custom page dimensions and converting them into booklet format using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "booklet",
-        "custom-page-size",
-        "aspose",
-        "testing"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21339"
+    },
+    "create-verify-pdf-booklet-page-sizes": {
+      "title": "Create Booklet from PDFs with Custom Page Sizes",
+      "filename": "create-verify-pdf-booklet-page-sizes.cs",
+      "description": "Generates PDFs with custom dimensions, merges them, creates a booklet using Aspose.Pdf.Facades, and verifies that the resulting booklet's page count is a multiple of four.",
+      "tags": [
+        "booklet",
+        "custom-page-size",
+        "pdf-merge",
+        "aspose-pdf",
+        "validation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21340"
     },
     "concatenate-pdfs-in-zip": {
-      "title": "Concatenate PDFs from a ZIP Archive and Save Merged PDF Back into the Archive",
+      "title": "Merge PDFs from a ZIP Archive and Save Back to ZIP",
       "filename": "concatenate-pdfs-in-zip.cs",
-      "description": "The example extracts all PDF files from a ZIP archive, merges them into a single PDF using Aspose.Pdf.Facades, and writes the merged document back into the same archive as \"merged.pdf\".",
+      "description": "Extracts all PDF files from a ZIP archive, concatenates them using Aspose.Pdf.Facades, and creates a new ZIP containing the merged PDF along with the original non‑PDF entries.",
       "tags": [
         "pdf",
         "zip",
-        "concatenation",
-        "aspose",
-        "facades"
+        "merge",
+        "aspose-pdf",
+        "facade"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21341"
     },
     "delete-pdf-pages-cli": {
-      "title": "Delete Specific Pages from a PDF",
+      "title": "Delete Specified Pages from a PDF",
       "filename": "delete-pdf-pages-cli.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, removing selected pages, and saving the modified document to a new file via a command‑line tool.",
+      "description": "Demonstrates parsing a page range string, deleting the indicated pages from a PDF with Aspose.Pdf, and saving the modified document to a new file.",
       "tags": [
         "pdf",
         "delete-pages",
@@ -1754,101 +1738,111 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.PageCollection.Delete",
-        "Aspose.Pdf.PageCollection.Count",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21342"
     },
     "parallel-pdf-page-deletion": {
-      "title": "Parallel Deletion of PDF Pages",
+      "title": "Parallel Deletion of PDF Pages using Aspose.Pdf",
       "filename": "parallel-pdf-page-deletion.cs",
-      "description": "Demonstrates processing multiple PDF files concurrently and removing a specified page from each document using Aspose.Pdf.",
+      "description": "Demonstrates how to delete specified pages from multiple PDF files concurrently with Aspose.Pdf, using Parallel.ForEach to improve processing throughput.",
       "tags": [
         "pdf",
-        "parallel",
         "page-deletion",
-        "aspose",
+        "parallel",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Pages.Delete",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21343"
     },
     "resize-pdf-landscape-booklet": {
       "title": "Resize PDF Pages to Landscape and Create Booklet",
       "filename": "resize-pdf-landscape-booklet.cs",
-      "description": "The example loads a PDF, rotates any portrait pages to landscape orientation, saves the modified document, and then uses Aspose.Pdf.Facades to generate a booklet PDF.",
+      "description": "Shows how to change each page of a PDF to landscape orientation and then generate a booklet using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "rotation",
+        "landscape",
         "booklet",
-        "aspose",
-        "facades"
+        "resize",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rotation",
+        "Aspose.Pdf.PageInfo",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21344"
     },
     "test-pdffileeditor-concatenate-empty-streams": {
-      "title": "Test PdfFileEditor Concatenate Throws on Empty Input",
+      "title": "Validate PdfFileEditor Concatenate Throws on Empty Input",
       "filename": "test-pdffileeditor-concatenate-empty-streams.cs",
-      "description": "Demonstrates an NUnit unit test that verifies PdfFileEditor.Concatenate throws an ArgumentException when provided with an empty array of input streams.",
+      "description": "Demonstrates a unit test that verifies Aspose.Pdf.Facades.PdfFileEditor.Concatenate throws an ArgumentException when the input stream array is empty.",
       "tags": [
-        "unit-test",
         "pdf",
-        "concatenate",
+        "unit-test",
         "nunit",
+        "concatenate",
         "aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
+        "PdfFileEditor",
+        "PdfFileEditor.Concatenate"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21345"
     },
     "audit-log-pdf-page-deletion": {
-      "title": "Audit Log Pdf Page Deletion",
+      "title": "Delete PDF Pages with Audit Logging",
       "filename": "audit-log-pdf-page-deletion.cs",
-      "description": "",
-      "tags": [],
-      "apis_used": [],
-      "difficulty": "",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "description": "Demonstrates removing specific pages from a PDF using Aspose.Pdf.Facades.PdfFileEditor while logging the number of pages deleted and reporting the resulting page count.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "audit",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21347"
     },
     "resize-pdfs-create-booklet": {
-      "title": "Resize PDFs and Create a Booklet",
+      "title": "Resize PDFs and Create a Booklet PDF",
       "filename": "resize-pdfs-create-booklet.cs",
-      "description": "Shows how to resize each page of multiple PDF files to a fixed 1024x768 size and then merge them into a single booklet PDF using Aspose.Pdf.",
+      "description": "Demonstrates how to resize all pages of multiple PDF files to a fixed 1024x768 size using Aspose.Pdf.Document and then merge the resized PDFs into a single booklet PDF with Aspose.Pdf.Facades.PdfFileEditor.",
       "tags": [
         "pdf-resize",
-        "pdf-merge",
-        "booklet",
+        "pdf-concatenate",
         "aspose-pdf",
-        "csharp"
+        "batch-processing",
+        "booklet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1858,224 +1852,241 @@
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21348"
     },
     "delete-pages-from-pdfs": {
-      "title": "Delete Specified Pages from Multiple PDFs",
+      "title": "Delete Specific Pages from Multiple PDFs",
       "filename": "delete-pages-from-pdfs.cs",
-      "description": "Demonstrates loading PDFs with Aspose.Pdf, removing selected pages, and saving the cleaned documents with a \"_cleaned\" suffix.",
+      "description": "Demonstrates removing specified page numbers from one or more PDF files using Aspose.Pdf and saving the cleaned copies.",
       "tags": [
         "pdf",
         "page-deletion",
         "aspose",
-        "document-manipulation",
+        "batch",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.PageCollection.Delete"
+        "Aspose.Pdf.PageCollection.Delete",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21349"
     },
     "merge-pdfs-with-blank-separator-pages": {
-      "title": "Add Blank Separator Pages Between PDFs",
+      "title": "Insert Blank Separator Pages Between Merged PDFs",
       "filename": "merge-pdfs-with-blank-separator-pages.cs",
-      "description": "Shows how to create a temporary blank PDF page and insert it as a separator between multiple PDFs while concatenating them with Aspose.Pdf.",
+      "description": "Demonstrates how to create a temporary blank PDF page and insert it as a separator between multiple PDFs when concatenating them using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "concatenate",
+        "concatenation",
         "separator",
         "blank-page",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Document.Pages.Add",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21350"
     },
     "resize-and-concatenate-pdfs": {
-      "title": "Resize PDFs to 1024x768 and Concatenate",
+      "title": "Resize PDFs to 1024x768 and Merge into a Single Document",
       "filename": "resize-and-concatenate-pdfs.cs",
-      "description": "Shows how to batch resize each page of multiple PDFs to 1024x768 points and then merge the resized files into a single PDF using Aspose.Pdf.",
+      "description": "The example loads multiple PDF files, resizes each page to 1024 × 768 points, saves the temporary files, and then concatenates them into one merged PDF.",
       "tags": [
         "pdf",
         "resize",
+        "merge",
         "concatenate",
-        "batch",
-        "facades"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.SetPageSize",
         "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageInfo.Width",
+        "Aspose.Pdf.PageInfo.Height",
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21351"
     },
     "delete-and-resize-pdf-pages": {
       "title": "Delete and Resize PDF Pages",
       "filename": "delete-and-resize-pdf-pages.cs",
-      "description": "Loads a PDF, removes the specified pages, resizes the remaining pages to new dimensions, and returns the modified document as a MemoryStream.",
+      "description": "Loads a PDF, optionally deletes specified pages, resizes the remaining pages to a given size, and returns the processed document as a MemoryStream.",
       "tags": [
         "pdf",
-        "aspose",
-        "page-deletion",
+        "delete-pages",
         "resize",
+        "aspose-pdf",
         "memorystream"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.PageInfo",
-        "Aspose.Pdf.Pages.Delete"
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21352"
     },
     "concatenate-pdfs-add-page-numbers": {
       "title": "Concatenate PDFs and Add Page Numbers",
       "filename": "concatenate-pdfs-add-page-numbers.cs",
-      "description": "Shows how to merge several PDF files into a single document and automatically insert sequential page numbers on each page using Aspose.Pdf.",
+      "description": "Demonstrates how to merge multiple PDF files into a single document using Aspose.Pdf.Facades.PdfFileEditor and then add sequential page numbers to each page of the merged PDF.",
       "tags": [
         "pdf",
-        "concatenate",
-        "page-number",
-        "aspose",
+        "concatenation",
+        "page-numbering",
+        "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor.Concatenate",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "PdfFileEditor.Concatenate",
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.Position",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Text.HorizontalAlignment"
+        "FontRepository.FindFont",
+        "Aspose.Pdf.Position"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21353"
     },
     "create-left-half-booklet": {
-      "title": "Generate Left-Page Booklet from PDF",
+      "title": "Generate Booklet with Left Pages from First Half of PDF",
       "filename": "create-left-half-booklet.cs",
-      "description": "Shows how to extract even‑numbered (left) pages from the first half of a PDF, save them to a temporary document, and create a booklet using Aspose.Pdf.Facades.",
+      "description": "Creates a new PDF that contains only the even‑numbered (left) pages from the first half of a source PDF using Aspose.Pdf and the Facades API.",
       "tags": [
         "booklet",
-        "pdf",
-        "pages",
-        "aspose",
-        "csharp"
+        "page extraction",
+        "left pages",
+        "Aspose.Pdf",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21354"
     },
     "create-booklet-from-second-half": {
-      "title": "Generate Booklet from Second Half Right Pages",
+      "title": "Generate Booklet with Right Pages from Second Half of PDF",
       "filename": "create-booklet-from-second-half.cs",
-      "description": "Demonstrates extracting the second half of a PDF, selecting only the odd‑numbered (right‑hand) pages, and saving them as a new booklet PDF using Aspose.Pdf and the Facades API.",
+      "description": "Demonstrates how to create a booklet PDF that contains only the odd‑numbered (right) pages from the second half of a source document using Aspose.Pdf's Facades API.",
       "tags": [
         "booklet",
-        "pdf",
-        "extraction",
+        "page-extraction",
         "right-pages",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.Extract",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Add"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21355"
-    },
-    "insert-page-range-into-pdf__v2": {
-      "title": "Insert Page Range from One PDF into Another Using Streams",
-      "filename": "insert-page-range-into-pdf__v2.cs",
-      "description": "Demonstrates loading source and destination PDFs from file streams, validating a page range, and inserting those pages into a specific position in the destination document using Aspose.Pdf.",
-      "tags": [
-        "pdf",
-        "page-insertion",
-        "streams",
-        "aspose.pdf",
-        "c#"
+        "Aspose.Pdf",
+        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.PageCollection",
-        "Aspose.Pdf.PageCollection.Insert",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection.Count"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Extract"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21355"
+    },
+    "insert-page-range-into-pdf__v2": {
+      "title": "Insert Page Range from One PDF into Another",
+      "filename": "insert-page-range-into-pdf__v2.cs",
+      "description": "Demonstrates loading PDFs from streams, validating a page range, and inserting the selected pages from a source PDF into a destination PDF at a specified position.",
+      "tags": [
+        "pdf",
+        "page-range",
+        "insert",
+        "streams",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Pages",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Pages.Insert"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21256"
     },
     "split-pdf-into-bulk-page-sets__v2": {
       "title": "Split PDF into Bulk Page Sets Using Streams",
       "filename": "split-pdf-into-bulk-page-sets__v2.cs",
-      "description": "Shows how to split an input PDF stream into multiple smaller PDFs, each containing up to a specified number of pages, and return the results as an array of MemoryStream objects.",
+      "description": "Shows how to split a PDF into multiple documents each containing a specified number of pages and return each part as a MemoryStream using Aspose.Pdf.",
       "tags": [
         "pdf",
         "split",
+        "pageset",
         "memorystream",
-        "bulk",
-        "aspnet"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.Document.Pages.Count"
+        "Aspose.Pdf.SaveFormat",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Pages.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21272"
     },
     "split-pdf-into-individual-pages__v3": {
       "title": "Split PDF into Individual Page Files",
       "filename": "split-pdf-into-individual-pages__v3.cs",
-      "description": "Demonstrates how to split a PDF into separate one‑page PDF files using Aspose.Pdf.Facades and save each page to a specified output folder.",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileEditor to split a PDF into separate one‑page PDF files and save each page to a designated output folder.",
+      "tags": [
+        "pdf",
+        "split",
+        "pages",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
+      "status": "verified",
+      "task_id": "21275"
+    },
+    "split-pdf-into-individual-pages__v4": {
+      "title": "Split PDF into Individual Page PDFs",
+      "filename": "split-pdf-into-individual-pages__v4.cs",
+      "description": "Shows how to split a PDF into separate one‑page PDF files using Aspose.Pdf.Facades.PdfFileEditor.SplitToPages.",
       "tags": [
         "pdf",
         "split",
@@ -2088,139 +2099,113 @@
         "Aspose.Pdf.Facades.PdfFileEditor.SplitToPages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
-      "status": "verified",
-      "task_id": "21275"
-    },
-    "split-pdf-into-individual-pages__v4": {
-      "title": "Split PDF into Individual Page PDFs",
-      "filename": "split-pdf-into-individual-pages__v4.cs",
-      "description": "Shows how to split a multi‑page PDF into separate one‑page PDF files using Aspose.Pdf's Document class and page collection methods.",
-      "tags": [
-        "pdf",
-        "split",
-        "pages",
-        "aspose",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.PageCollection.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21285"
     },
     "create-booklet-custom-page-order": {
-      "title": "Create Booklet with Custom Page Order using Aspose.Pdf",
+      "title": "Create Booklet PDF with Custom Left/Right Page Order",
       "filename": "create-booklet-custom-page-order.cs",
-      "description": "Demonstrates building a source PDF, defining custom left and right page arrays, manually assembling a booklet that respects those arrays, and extracting the resulting page order.",
+      "description": "Demonstrates how to generate a simple PDF, define custom left and right page sequences, and use Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet to produce a booklet with the specified page order, then verifies the result by extracting page text.",
       "tags": [
         "booklet",
+        "pdf",
         "custom-page-order",
-        "aspose-pdf",
-        "pdf-manipulation",
-        "text-extraction"
+        "Aspose.Pdf",
+        "facades"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21308"
     },
     "batch-create-nup-pdfs-3x2": {
-      "title": "Batch Create 3x2 N-up PDFs",
+      "title": "Batch Create 3‑by‑2 N‑up PDFs",
       "filename": "batch-create-nup-pdfs-3x2.cs",
-      "description": "The example iterates over all PDF files in a folder and uses Aspose.Pdf's NUpPdfProcessor to generate N-up PDFs with three columns and two rows (6-up) for each document.",
+      "description": "Processes a list of PDF files and uses Aspose.Pdf.Facades.PdfFileEditor.MakeNUp to generate N‑up PDFs with three columns and two rows per sheet.",
       "tags": [
-        "n-up",
         "pdf",
+        "n-up",
         "batch",
         "aspose",
-        "facades"
+        "csharp"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.NUpPdfProcessor",
-        "Aspose.Pdf.Facades.NUpPdfProcessor.BindPdf",
-        "Aspose.Pdf.Facades.NUpPdfProcessor.Process",
-        "Aspose.Pdf.Facades.NUpPdfProcessor.Save",
-        "Aspose.Pdf.Facades.NUpOptions"
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21315"
     },
     "create-booklet-pdf-custom-page-size__v2": {
-      "title": "Create Booklet PDF with Custom Page Size from Stream",
+      "title": "Create Booklet PDF with Custom 5.5x8.5 Inch Page Size",
       "filename": "create-booklet-pdf-custom-page-size__v2.cs",
-      "description": "Demonstrates how to generate a booklet from a PDF stream, set each page to a custom 5.5×8.5‑inch size, and save the result to disk using Aspose.Pdf.",
+      "description": "Shows how to load a PDF from a stream, resize every page to 5.5 × 8.5 inches, optionally apply a 2‑up booklet layout using PdfFileEditor, and save the resulting booklet PDF.",
       "tags": [
         "booklet",
-        "custom-size",
+        "custom-page-size",
         "pdf",
-        "stream",
-        "Aspose.Pdf"
+        "aspose-pdf",
+        "nup"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileEditor",
-        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.SetPageSize",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21323"
     },
     "create-booklet-pdf-custom-page-order__v2": {
       "title": "Create Booklet PDF with Default Page Size",
       "filename": "create-booklet-pdf-custom-page-order__v2.cs",
-      "description": "Demonstrates how to generate a booklet PDF from an existing document using Aspose.Pdf.Facades.PdfFileEditor's MakeBooklet method with the default page size.",
+      "description": "Demonstrates how to generate a booklet PDF from an existing document using Aspose.Pdf.Facades with the default page size. The example checks the source file, invokes MakeBooklet, and handles success or errors.",
       "tags": [
         "booklet",
         "pdf",
-        "Aspose.Pdf",
-        "MakeBooklet",
-        "C#"
+        "aspose",
+        "facade",
+        "makebooklet"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21337"
     },
     "concatenate-multiple-pdfs__v2": {
-      "title": "Merge Multiple PDFs into a Single Document",
+      "title": "Concatenate Multiple PDFs Using Aspose.Pdf",
       "filename": "concatenate-multiple-pdfs__v2.cs",
-      "description": "Shows how to concatenate several PDF files into one PDF using Aspose.Pdf.Facades.PdfFileEditor.",
+      "description": "Demonstrates merging several PDF files into a single document with Aspose.Pdf's PdfFileEditor in a console application.",
       "tags": [
         "pdf",
-        "merge",
-        "concatenate",
+        "concatenation",
         "aspose",
-        "facade"
+        "csharp",
+        "console"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.PdfFileEditor",
         "Aspose.Pdf.Facades.PdfFileEditor.Concatenate"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-26T07:28:50Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21346"
     }

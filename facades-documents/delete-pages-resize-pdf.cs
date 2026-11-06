@@ -1,62 +1,53 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_resized.pdf";
+        const string inputFilePath = "input.pdf";
+        const string outputFilePath = "resized_output.pdf";
 
-        // ---------------------------------------------------------------
-        // Ensure the input PDF exists. If it does not, create a minimal
-        // placeholder PDF so the example can run in a sandbox that starts
-        // with an empty file system.
-        // ---------------------------------------------------------------
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputFilePath))
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPath);
+            Console.Error.WriteLine($"Input file not found: {inputFilePath}");
+            return;
         }
 
-        // Pages to delete (1‑based indexing). Adjust as needed.
-        int[] pagesToDelete = new int[] { 2, 3 };
+        // Pages to delete (1‑based indexing). Delete in descending order to keep indices stable.
+        int[] pagesToDelete = { 2, 4 }; // example: delete page 2 and page 4
 
-        // ---------------------------------------------------------------
-        // 1. Load the PDF using the Document class (the recommended API).
-        // ---------------------------------------------------------------
-        Document pdfDoc = new Document(inputPath);
-
-        // ---------------------------------------------------------------
-        // 2. Delete the specified pages.
-        //    Deletions must be performed in descending order so that
-        //    subsequent page numbers remain valid.
-        // ---------------------------------------------------------------
-        Array.Sort(pagesToDelete); // ensure order
-        for (int i = pagesToDelete.Length - 1; i >= 0; i--)
+        try
         {
-            int pageNumber = pagesToDelete[i];
-            if (pageNumber >= 1 && pageNumber <= pdfDoc.Pages.Count)
+            // Load the PDF with Document – it can also be loaded from a Stream if needed.
+            using (Document doc = new Document(inputFilePath))
             {
-                pdfDoc.Pages.Delete(pageNumber);
+                // Delete pages one by one in descending order.
+                foreach (int pageNum in pagesToDelete.OrderByDescending(p => p))
+                {
+                    if (pageNum >= 1 && pageNum <= doc.Pages.Count)
+                    {
+                        doc.Pages.Delete(pageNum);
+                    }
+                }
+
+                // Resize every remaining page to A4 dimensions (595 x 842 points).
+                foreach (Page page in doc.Pages)
+                {
+                    page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                }
+
+                // Save the resized document.
+                doc.Save(outputFilePath);
             }
-        }
 
-        // ---------------------------------------------------------------
-        // 3. Resize each remaining page (e.g., to A4 size).
-        // ---------------------------------------------------------------
-        foreach (Page page in pdfDoc.Pages)
+            Console.WriteLine($"Pages deleted and document resized. Output saved to '{outputFilePath}'.");
+        }
+        catch (Exception ex)
         {
-            page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // ---------------------------------------------------------------
-        // 4. Save the modified PDF.
-        // ---------------------------------------------------------------
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"Pages deleted and document resized. Saved to '{outputPath}'.");
     }
 }

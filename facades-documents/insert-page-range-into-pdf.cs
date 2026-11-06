@@ -1,69 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, Page classes are here
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the PDFs
-        const string sourcePdfPath      = "source.pdf";      // PDF containing pages to insert
-        const string destinationPdfPath = "destination.pdf"; // PDF into which pages will be inserted
-        const string outputPdfPath      = "output.pdf";      // Resulting PDF after insertion
+        // Paths to the source PDF (pages to insert) and the destination PDF (where pages will be inserted)
+        const string sourcePath = "source.pdf";
+        const string destinationPath = "destination.pdf";
+        // Output file – we copy the destination first to avoid overwriting the original file
+        const string outputPath = "result.pdf";
 
-        // Validate that the input files exist
-        if (!File.Exists(sourcePdfPath))
+        // Define the page range to insert (inclusive) and the position after which to insert in the destination
+        const int startPage = 2;      // first page of the range in source PDF (1‑based)
+        const int endPage   = 5;      // last page of the range in source PDF (1‑based)
+        const int insertAfterPage = 3; // insert after this page number in the destination PDF (1‑based)
+
+        // Verify that the input files exist
+        if (!File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            return;
+        }
+        if (!File.Exists(destinationPath))
+        {
+            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
             return;
         }
 
-        if (!File.Exists(destinationPdfPath))
+        // Prepare the output file (overwrite if it already exists)
+        File.Copy(destinationPath, outputPath, true);
+
+        // Load the PDFs using the Document class (PdfFileEditor does not provide InsertPage)
+        Document destDoc = new Document(outputPath);
+        Document srcDoc  = new Document(sourcePath);
+
+        // Insert each page from the source range into the destination PDF.
+        // After each insertion the target page index shifts, so we calculate the new insert position.
+        for (int srcPage = startPage; srcPage <= endPage; srcPage++)
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPdfPath}");
-            return;
+            // Calculate the position in the destination where the current source page will be inserted.
+            // The first inserted page goes after 'insertAfterPage', the next one after that, etc.
+            int insertPos = insertAfterPage + (srcPage - startPage) + 1; // 1‑based index where the new page will be placed
+
+            // Insert the page from the source document into the destination document.
+            // The Insert method automatically imports the page into the target document.
+            destDoc.Pages.Insert(insertPos, srcDoc.Pages[srcPage]);
         }
 
-        // Parameters for insertion
-        // Insert after page 1 (i.e., at position 2)
-        int insertAtPage = 2; // 1‑based index where the first new page will be placed
+        // Save the modified document to the output path.
+        destDoc.Save(outputPath);
 
-        // Define the range of pages to take from the source PDF (inclusive)
-        int startPage = 3;
-        int endPage   = 5;
-
-        try
-        {
-            // Load both PDFs using the Document class (the recommended way for page manipulation)
-            Document srcDoc  = new Document(sourcePdfPath);
-            Document destDoc = new Document(destinationPdfPath);
-
-            // Ensure the requested range is within the source document bounds
-            if (startPage < 1 || endPage > srcDoc.Pages.Count || startPage > endPage)
-            {
-                Console.Error.WriteLine("Invalid page range specified for the source PDF.");
-                return;
-            }
-
-            // Insert each page from the source range into the destination document.
-            // After each insertion we increment insertAtPage so that pages keep their original order.
-            for (int i = startPage; i <= endPage; i++)
-            {
-                // Clone the page from the source document. The Clone method creates a deep copy.
-                Page pageToInsert = srcDoc.Pages[i];
-                destDoc.Pages.Insert(insertAtPage, pageToInsert);
-                insertAtPage++; // move the insertion point forward for the next page
-            }
-
-            // Save the modified document to the desired output location.
-            destDoc.Save(outputPdfPath);
-
-            Console.WriteLine($"Pages {startPage}-{endPage} from '{sourcePdfPath}' inserted into '{destinationPdfPath}' at position {insertAtPage - (endPage - startPage + 1)}.");
-            Console.WriteLine($"Result saved as '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during page insertion: {ex.Message}");
-        }
+        Console.WriteLine($"Inserted pages {startPage}-{endPage} from '{sourcePath}' into '{destinationPath}'.");
+        Console.WriteLine($"Result saved as '{outputPath}'.");
     }
 }

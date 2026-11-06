@@ -1,57 +1,56 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 
 public static class PdfProcessor
 {
     /// <summary>
-    /// Loads a PDF, deletes the specified pages, resizes all remaining pages,
-    /// and returns the result as a MemoryStream.
+    /// Loads a PDF, deletes the specified pages, resizes all remaining pages to the given size,
+    /// and returns the resulting PDF as a stream.
     /// </summary>
     /// <param name="pdfPath">Path to the source PDF file.</param>
-    /// <param name="pagesToDelete">Zero‑based page numbers to delete (e.g., new[] {0,2} deletes pages 1 and 3).</param>
-    /// <param name="newWidth">Desired page width in points (1 point = 1/72 inch).</param>
-    /// <param name="newHeight">Desired page height in points.</param>
-    /// <returns>A stream containing the processed PDF.</returns>
-    public static Stream DeleteAndResize(string pdfPath, int[] pagesToDelete, double newWidth, double newHeight)
+    /// <param name="pagesToDelete">Array of 1‑based page numbers to remove. Pass null or empty array to skip deletion.</param>
+    /// <param name="newSize">Desired page size (e.g., PageSize.A4 or new PageSize(width, height)).</param>
+    /// <returns>A MemoryStream containing the processed PDF. Caller is responsible for disposing the stream.</returns>
+    public static Stream DeleteAndResizePdf(string pdfPath, int[] pagesToDelete, PageSize newSize)
     {
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+        // Load the PDF directly with Document (recommended over PdfFileEditor for most operations).
+        Document pdfDoc = new Document(pdfPath);
 
-        // Load the PDF using the core Document API.
-        Document doc = new Document(pdfPath);
-
-        // Delete pages.  Aspose.Pdf uses 1‑based page numbers, so convert.
-        // Deleting from highest index to lowest prevents index shifting.
-        foreach (int pageIndex in pagesToDelete.OrderByDescending(p => p))
+        // ---------------------------------------------------------------------
+        // Step 1 – Delete pages (if any).
+        // ---------------------------------------------------------------------
+        if (pagesToDelete != null && pagesToDelete.Length > 0)
         {
-            int pageNumber = pageIndex + 1; // 1‑based
-            if (pageNumber <= doc.Pages.Count && pageNumber > 0)
-                doc.Pages.Delete(pageNumber);
+            // Aspose.Pdf.Document.Pages.Delete accepts a collection of 1‑based page numbers.
+            pdfDoc.Pages.Delete(pagesToDelete);
         }
 
-        // Resize each remaining page.
-        for (int i = 1; i <= doc.Pages.Count; i++)
+        // ---------------------------------------------------------------------
+        // Step 2 – Resize every remaining page to the requested size.
+        // ---------------------------------------------------------------------
+        foreach (Page page in pdfDoc.Pages)
         {
-            Page page = doc.Pages[i];
-            page.PageInfo.Width = newWidth;
-            page.PageInfo.Height = newHeight;
+            // The SetPageSize overload expects width and height as doubles.
+            // Use the Width and Height properties of the PageSize instance.
+            page.SetPageSize((double)newSize.Width, (double)newSize.Height);
         }
 
-        // Save the modified document into a MemoryStream.
-        MemoryStream outputStream = new MemoryStream();
-        doc.Save(outputStream);
-        outputStream.Position = 0; // reset for consumer
-        return outputStream;
+        // ---------------------------------------------------------------------
+        // Step 3 – Save the modified document into a MemoryStream and return it.
+        // ---------------------------------------------------------------------
+        MemoryStream resultStream = new MemoryStream();
+        pdfDoc.Save(resultStream);
+        resultStream.Position = 0; // rewind for the caller
+        return resultStream;
     }
-}
 
-// Dummy entry point to satisfy console‑app projects that require a Main method.
-public class Program
-{
+    // ---------------------------------------------------------------------
+    // Dummy entry point – required only to satisfy the compiler when the project
+    // is built as an executable. In a real library this method would be removed.
+    // ---------------------------------------------------------------------
     public static void Main(string[] args)
     {
-        // No operation – the library methods are intended to be called from other code.
+        // No operation – the class is intended to be used as a library.
     }
 }

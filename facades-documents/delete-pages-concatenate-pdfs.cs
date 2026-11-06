@@ -7,62 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Input files
-        const string sourcePdfPath   = "source.pdf";      // PDF from which pages will be removed
-        const string secondPdfPath   = "second.pdf";      // PDF to concatenate after editing
-        const string finalOutputPath = "merged_output.pdf";
+        const string inputPath = "input.pdf";          // PDF to edit
+        const string otherPath = "other.pdf";          // PDF to concatenate
+        const string tempPath = "temp_edited.pdf";    // intermediate edited file
+        const string outputPath = "final.pdf";        // final result
 
-        // Verify files exist
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(inputPath) || !File.Exists(otherPath))
         {
-            Console.Error.WriteLine($"File not found: {sourcePdfPath}");
-            return;
-        }
-        if (!File.Exists(secondPdfPath))
-        {
-            Console.Error.WriteLine($"File not found: {secondPdfPath}");
+            Console.Error.WriteLine("One or more input files are missing.");
             return;
         }
 
-        // Temporary file to hold the edited source PDF
-        string tempEditedPath = Path.GetTempFileName();
-
-        try
+        // Load the first PDF, delete pages, and save to a temporary file
+        using (Document doc = new Document(inputPath))
         {
-            // Load source PDF, delete pages, and save to temporary file
-            using (Document srcDoc = new Document(sourcePdfPath))
+            // Example: delete pages 2 and 3 if they exist.
+            // Delete higher page numbers first to keep indices valid (1‑based indexing).
+            int pageCount = doc.Pages.Count;
+            if (pageCount >= 3)
             {
-                // Example: delete page 2 (1‑based indexing)
-                // Adjust or loop as needed for multiple pages
-                if (srcDoc.Pages.Count >= 2)
-                {
-                    srcDoc.Pages.Delete(2);
-                }
-
-                // Save the edited document to the temporary location
-                srcDoc.Save(tempEditedPath);
+                doc.Pages.Delete(3);
+                doc.Pages.Delete(2);
+            }
+            else if (pageCount == 2)
+            {
+                doc.Pages.Delete(2);
             }
 
-            // Concatenate the edited PDF with the second PDF
-            // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
-            PdfFileEditor editor = new PdfFileEditor();
+            // Save the edited PDF for later concatenation
+            doc.Save(tempPath);
+        }
 
-            // The order of files determines the sequence in the merged result
-            editor.Concatenate(tempEditedPath, secondPdfPath, finalOutputPath);
+        // Concatenate the edited PDF with the second document using PdfFileEditor
+        PdfFileEditor editor = new PdfFileEditor();
+        string[] sources = new string[] { tempPath, otherPath };
+        editor.Concatenate(sources, outputPath);
 
-            Console.WriteLine($"Pages deleted and PDFs concatenated successfully. Output: {finalOutputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            // Clean up the temporary edited file
-            if (File.Exists(tempEditedPath))
-            {
-                try { File.Delete(tempEditedPath); } catch { /* ignore cleanup errors */ }
-            }
-        }
+        // Clean up the temporary file
+        try { File.Delete(tempPath); } catch { }
+
+        Console.WriteLine($"Concatenated PDF saved to '{outputPath}'.");
     }
 }

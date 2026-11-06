@@ -1,17 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the PDFs
-        const string destinationPath = "destination.pdf"; // existing PDF to which pages will be appended
-        const string sourcePath      = "source.pdf";      // PDF whose pages will be appended
-        const string outputPath      = "merged_output.pdf"; // result PDF
+        const string destinationPath = "destination.pdf";
+        const string sourcePath = "source.pdf";
 
-        // Verify that input files exist
+        // Verify that both files exist
         if (!File.Exists(destinationPath))
         {
             Console.Error.WriteLine($"Destination file not found: {destinationPath}");
@@ -23,18 +22,25 @@ class Program
             return;
         }
 
-        // Load PDFs using Aspose.Pdf.Document (PdfFileEditor does not expose GetPageCount or the required Insert overload)
-        Document destDoc = new Document(destinationPath);
-        Document srcDoc  = new Document(sourcePath);
+        try
+        {
+            // Load source document only to obtain the page count
+            Document srcDoc = new Document(sourcePath);
+            int pageCount = srcDoc.Pages.Count;
+            int[] sourcePages = new int[pageCount];
+            for (int i = 0; i < pageCount; i++)
+                sourcePages[i] = i + 1; // Aspose.Pdf uses 1‑based page numbers
 
-        // Append all pages from the source document to the end of the destination document
-        // The correct way is to use Pages.Insert with the source document's Pages collection.
-        destDoc.Pages.Insert(destDoc.Pages.Count + 1, srcDoc.Pages);
+            // Use PdfFileEditor to insert all source pages at the end of the destination PDF
+            PdfFileEditor editor = new PdfFileEditor();
+            // int.MaxValue forces insertion after the last existing page
+            editor.Insert(destinationPath, int.MaxValue, sourcePath, sourcePages, destinationPath);
 
-        // Save the merged document to a new file so the original destination remains unchanged
-        destDoc.Save(outputPath);
-
-        Console.WriteLine($"Pages from '{sourcePath}' have been appended to '{destinationPath}'.");
-        Console.WriteLine($"Result saved as '{outputPath}'.");
+            Console.WriteLine($"Successfully appended {pageCount} page(s) from '{sourcePath}' to '{destinationPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during append operation: {ex.Message}");
+        }
     }
 }

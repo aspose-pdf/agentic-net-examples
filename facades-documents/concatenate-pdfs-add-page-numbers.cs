@@ -8,54 +8,53 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files to be concatenated
-        string[] sourceFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-        // Path for the combined PDF (will be overwritten after adding page numbers)
-        const string outputPath = "combined_with_page_numbers.pdf";
+        // Input PDF files to concatenate
+        string[] inputFiles = { "part1.pdf", "part2.pdf", "part3.pdf" };
+        // Path for the intermediate merged PDF
+        string mergedPath = "merged.pdf";
+        // Final output PDF with page numbers
+        string outputPath = "merged_with_page_numbers.pdf";
 
-        // Verify that all source files exist
-        foreach (string path in sourceFiles)
+        // Verify that all input files exist
+        foreach (string file in inputFiles)
         {
-            if (!File.Exists(path))
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"Source file not found: {path}");
+                Console.Error.WriteLine($"Input file not found: {file}");
                 return;
             }
         }
 
-        // ---------- Concatenate PDFs ----------
-        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+        // Concatenate PDFs using Aspose.Pdf.Facades.PdfFileEditor
         PdfFileEditor editor = new PdfFileEditor();
-        // Concatenate all source PDFs into the output file
-        editor.Concatenate(sourceFiles, outputPath);
+        // Concatenate overload that accepts an array of source files
+        editor.Concatenate(inputFiles, mergedPath);
 
-        // ---------- Add page numbers ----------
-        // Open the concatenated PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(outputPath))
+        // Open the merged document to add page numbers
+        using (Document doc = new Document(mergedPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            // Loop through all pages (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a text fragment containing the page number
+                // Create a text fragment with the page number
                 TextFragment pageNumber = new TextFragment(i.ToString());
 
                 // Set visual appearance
+                pageNumber.TextState.Font = FontRepository.FindFont("Arial");
                 pageNumber.TextState.FontSize = 12;
                 pageNumber.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                pageNumber.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-                // Position the fragment at the bottom center of the page
-                double x = page.PageInfo.Width / 2;   // center horizontally
-                double y = 20;                        // 20 points from the bottom edge
-                pageNumber.Position = new Position(x, y);
+                // Position the page number at bottom‑right corner
+                // Adjust X/Y as needed (here 500, 20 for typical A4)
+                pageNumber.Position = new Position(500, 20);
 
-                // Add the fragment to the page's paragraph collection
+                // Add the fragment to the page's paragraphs collection
                 page.Paragraphs.Add(pageNumber);
             }
 
-            // Save the modified document (overwrites the same file)
+            // Save the final PDF (overwrites if same path)
             doc.Save(outputPath);
         }
 

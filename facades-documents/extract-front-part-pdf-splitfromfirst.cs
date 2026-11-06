@@ -6,23 +6,30 @@ class Program
 {
     static void Main()
     {
-        const string sourcePath = "input.pdf";
-        const string outputPath = "extracted_pages.pdf";
-        const int endPage = 5; // extract pages from the start up to this page (inclusive)
+        const string sourcePdf = "input.pdf";          // source document
+        const string outputPdf = "extracted.pdf";      // result document
+        const int endPage = 5;                         // extract pages 1..5
 
-        if (!File.Exists(sourcePath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
-        PdfFileEditor editor = new PdfFileEditor();
+        try
+        {
+            // PdfFileEditor does not implement IDisposable, so no using block is needed
+            PdfFileEditor editor = new PdfFileEditor();
 
-        // Use SplitFromFirst to extract pages from the beginning up to endPage.
-        // Signature: SplitFromFirst(string sourceFile, int endPage, string outputFile)
-        editor.SplitFromFirst(sourcePath, endPage, outputPath);
+            // SplitFromFirst extracts pages from the first page up to endPage (inclusive)
+            // Signature: SplitFromFirst(string sourceFile, int endPage, string outputFile)
+            editor.SplitFromFirst(sourcePdf, endPage, outputPdf);
 
-        Console.WriteLine($"Pages 1 to {endPage} have been saved to '{outputPath}'.");
+            Console.WriteLine($"Pages 1-{endPage} saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during split: {ex.Message}");
+        }
     }
 }

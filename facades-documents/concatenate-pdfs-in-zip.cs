@@ -1,78 +1,102 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Collections.Generic;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string zipPath = "input.zip";
+        const string zipPath = "input.zip";               // source zip containing PDFs
+        const string outputZipPath = "output.zip";        // zip to write result
+        const string mergedPdfName = "merged.pdf";        // name of concatenated PDF inside zip
 
         if (!File.Exists(zipPath))
         {
-            Console.Error.WriteLine($"Zip file not found: {zipPath}");
+            Console.Error.WriteLine($"Zip not found: {zipPath}");
             return;
         }
 
-        // Lists to hold temporary PDF file paths
-        List<string> tempPdfFiles = new List<string>();
-        string mergedTempFile = Path.GetTempFileName();
+        // Temporary folder for extracted PDFs and the merged result
+        string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+        var pdfFiles = new List<string>();
 
         try
         {
-            // Open the zip archive for update
-            using (FileStream zipStream = new FileStream(zipPath, FileMode.Open, FileAccess.ReadWrite))
-            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
+            // Extract all PDF entries from the source zip to temporary files
+            using (FileStream zipStream = new FileStream(zipPath, FileMode.Open, FileAccess.Read))
+            using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Read))
             {
-                // Extract each PDF entry to a temporary file
-                foreach (ZipArchiveEntry entry in archive.Entries)
+                foreach (var entry in archive.Entries)
                 {
-                    if (!entry.FullName.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    string tempPath = Path.GetTempFileName();
-                    using (Stream entryStream = entry.Open())
-                    using (FileStream tempFile = new FileStream(tempPath, FileMode.Create, FileAccess.Write))
+                    if (Path.GetExtension(entry.FullName).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                     {
-                        entryStream.CopyTo(tempFile);
+                        string tempPdfPath = Path.Combine(tempDir, entry.Name);
+                        using (Stream entryStream = entry.Open())
+                        using (FileStream tempFile = new FileStream(tempPdfPath, FileMode.Create, FileAccess.Write))
+                        {
+                            entryStream.CopyTo(tempFile);
+                        }
+                        pdfFiles.Add(tempPdfPath);
                     }
-                    tempPdfFiles.Add(tempPath);
-                }
-
-                if (tempPdfFiles.Count == 0)
-                {
-                    Console.WriteLine("No PDF files found in the archive.");
-                    return;
-                }
-
-                // Concatenate PDFs using PdfFileEditor (no using needed)
-                PdfFileEditor editor = new PdfFileEditor();
-                editor.Concatenate(tempPdfFiles.ToArray(), mergedTempFile);
-
-                // Replace or add the merged PDF entry in the archive
-                ZipArchiveEntry existing = archive.GetEntry("merged.pdf");
-                existing?.Delete();
-
-                ZipArchiveEntry mergedEntry = archive.CreateEntry("merged.pdf");
-                using (Stream entryStream = mergedEntry.Open())
-                using (FileStream mergedFile = new FileStream(mergedTempFile, FileMode.Open, FileAccess.Read))
-                {
-                    mergedFile.CopyTo(entryStream);
                 }
             }
 
-            Console.WriteLine("PDF files concatenated and saved back into the zip archive as 'merged.pdf'.");
+            if (pdfFiles.Count == 0)
+            {
+                Console.Error.WriteLine("No PDF files found in the zip archive.");
+                return;
+            }
+
+            // Concatenate PDFs using PdfFileEditor (no using – it does not implement IDisposable)
+            PdfFileEditor editor = new PdfFileEditor();
+            string mergedTempPath = Path.Combine(tempDir, mergedPdfName);
+            editor.Concatenate(pdfFiles.ToArray(), mergedTempPath);
+
+            // Create the output zip and copy original non-PDF entries, then add the merged PDF
+            using (FileStream outZipStream = new FileStream(outputZipPath, FileMode.Create))
+            using (ZipArchive outArchive = new ZipArchive(outZipStream, ZipArchiveMode.Update))
+            {
+                // Copy all original entries except the PDFs (to avoid duplication)
+                using (FileStream inZipStream = new FileStream(zipPath, FileMode.Open, FileAccess.Read))
+                using (ZipArchive inArchive = new ZipArchive(inZipStream, ZipArchiveMode.Read))
+                {
+                    foreach (var entry in inArchive.Entries)
+                    {
+                        if (Path.GetExtension(entry.FullName).Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+                            continue; // skip original PDFs
+
+                        var newEntry = outArchive.CreateEntry(entry.FullName, CompressionLevel.Optimal);
+                        using (Stream src = entry.Open())
+                        using (Stream dst = newEntry.Open())
+                        {
+                            src.CopyTo(dst);
+                        }
+                    }
+                }
+
+                // Add the concatenated PDF as a new entry
+                var mergedEntry = outArchive.CreateEntry(mergedPdfName, CompressionLevel.Optimal);
+                using (Stream mergedEntryStream = mergedEntry.Open())
+                using (FileStream mergedFile = new FileStream(mergedTempPath, FileMode.Open, FileAccess.Read))
+                {
+                    mergedFile.CopyTo(mergedEntryStream);
+                }
+            }
+
+            Console.WriteLine($"Successfully created '{outputZipPath}' with merged PDF '{mergedPdfName}'.");
         }
         finally
         {
-            // Clean up temporary files
-            foreach (string path in tempPdfFiles)
+            // Clean up temporary files and directory
+            foreach (var file in pdfFiles)
             {
-                try { File.Delete(path); } catch { /* ignore */ }
+                try { File.Delete(file); } catch { }
             }
-            try { File.Delete(mergedTempFile); } catch { /* ignore */ }
+            try { File.Delete(Path.Combine(tempDir, mergedPdfName)); } catch { }
+            try { Directory.Delete(tempDir, true); } catch { }
         }
     }
 }

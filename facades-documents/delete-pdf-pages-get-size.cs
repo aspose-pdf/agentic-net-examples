@@ -1,72 +1,83 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
-public static class PdfUtilities
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Deletes the specified pages from a PDF file and returns the size (in bytes) of the resulting file.
-    /// </summary>
-    /// <param name="pdfPath">Full path to the source PDF.</param>
-    /// <param name="pageNumbers">Array of 1‑based page numbers to delete.</param>
-    /// <returns>File size of the PDF after deletion, in bytes.</returns>
-    public static long DeletePagesAndGetSize(string pdfPath, int[] pageNumbers)
+    public static class PdfUtility
     {
-        if (string.IsNullOrWhiteSpace(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException("Source PDF not found.", pdfPath);
-
-        if (pageNumbers == null || pageNumbers.Length == 0)
-            throw new ArgumentException("At least one page number must be specified.", nameof(pageNumbers));
-
-        // Load the PDF using Aspose.Pdf.Document (PdfFileEditor does not expose DeletePages).
-        Document pdfDoc = new Document(pdfPath);
-
-        // Delete pages in descending order to keep indexes valid.
-        foreach (int pageNum in pageNumbers.OrderByDescending(p => p))
+        /// <summary>
+        /// Deletes the specified pages from a PDF file using Aspose.Pdf.Document and returns the size (in bytes) of the resulting file.
+        /// </summary>
+        /// <param name="pdfPath">Full path to the source PDF file.</param>
+        /// <param name="pagesToDelete">Collection of 1‑based page numbers to delete.</param>
+        /// <returns>File size of the PDF after deletion, in bytes.</returns>
+        public static long DeletePagesAndGetSize(string pdfPath, IEnumerable<int> pagesToDelete)
         {
-            // Guard against out‑of‑range page numbers.
-            if (pageNum < 1 || pageNum > pdfDoc.Pages.Count)
-                throw new ArgumentOutOfRangeException(nameof(pageNumbers), $"Page number {pageNum} is out of range.");
+            if (string.IsNullOrWhiteSpace(pdfPath))
+                throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
 
-            pdfDoc.Pages.Delete(pageNum);
+            if (!File.Exists(pdfPath))
+                throw new FileNotFoundException("PDF file not found.", pdfPath);
+
+            // Ensure page numbers are distinct and sorted descending to avoid index shift during deletion.
+            var pages = pagesToDelete
+                .Where(p => p > 0)
+                .Distinct()
+                .OrderByDescending(p => p)
+                .ToArray();
+
+            if (pages.Length == 0)
+                return new FileInfo(pdfPath).Length; // nothing to delete
+
+            // Load the PDF with Document (which implements IDisposable).
+            using (var doc = new Document(pdfPath))
+            {
+                foreach (int pageNumber in pages)
+                {
+                    // Guard against out‑of‑range page numbers.
+                    if (pageNumber <= doc.Pages.Count)
+                    {
+                        doc.Pages.Delete(pageNumber);
+                    }
+                }
+
+                // Overwrite the original file.
+                doc.Save(pdfPath);
+            }
+
+            // Return the size of the updated PDF.
+            return new FileInfo(pdfPath).Length;
         }
-
-        // Prepare a temporary file path.
-        string directory = Path.GetDirectoryName(pdfPath) ?? string.Empty;
-        string tempPath = Path.Combine(directory,
-            Path.GetFileNameWithoutExtension(pdfPath) + "_temp.pdf");
-
-        // Save the modified document to the temporary file.
-        pdfDoc.Save(tempPath);
-
-        // Get the size of the resulting PDF.
-        long resultSize = new FileInfo(tempPath).Length;
-
-        // Replace the original file with the modified one.
-        File.Delete(pdfPath);
-        File.Move(tempPath, pdfPath);
-
-        return resultSize;
     }
 
-    // Simple entry point to satisfy the compiler when the project is built as an executable.
-    // This can be removed if the project is changed to a class‑library.
-    public static void Main(string[] args)
+    class Program
     {
-        // Example usage (not required for the library functionality).
-        if (args.Length < 2)
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: <pdfPath> <page1> [<page2> ...]");
-            return;
-        }
+            // Simple demonstration: first argument is the PDF path, the rest are page numbers to delete.
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: <pdfPath> <page1> [page2] ...");
+                return;
+            }
 
-        string pdfPath = args[0];
-        int[] pagesToDelete = args.Skip(1).Select(arg => int.Parse(arg)).ToArray();
-        long newSize = DeletePagesAndGetSize(pdfPath, pagesToDelete);
-        Console.WriteLine($"New PDF size: {newSize} bytes");
+            string pdfPath = args[0];
+            var pages = args.Skip(1)
+                            .Select(s => int.TryParse(s, out var p) ? p : -1)
+                            .Where(p => p > 0);
+
+            try
+            {
+                long newSize = PdfUtility.DeletePagesAndGetSize(pdfPath, pages);
+                Console.WriteLine($"Updated PDF size: {newSize} bytes");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
+        }
     }
 }
