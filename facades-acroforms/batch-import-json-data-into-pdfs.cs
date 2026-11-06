@@ -1,77 +1,76 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs and matching JSON files
-        const string inputFolder = @"C:\InputFiles";
-        // Folder where the updated PDFs will be saved
-        const string outputFolder = @"C:\OutputFiles";
+        // Base directory of the application (cross‑platform safe)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        if (!Directory.Exists(inputFolder))
+        // Input folders (relative to the base directory)
+        string jsonFolder = Path.Combine(baseDir, "JsonData");
+        string pdfFolder = Path.Combine(baseDir, "PdfTemplates");
+        string outputFolder = Path.Combine(baseDir, "PdfFilled");
+
+        // Ensure folders exist – if a folder is missing we fall back to the current directory
+        if (!Directory.Exists(jsonFolder))
         {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
+            Console.Error.WriteLine($"JSON folder not found: {jsonFolder}. Using current directory instead.");
+            jsonFolder = Directory.GetCurrentDirectory();
         }
-
+        if (!Directory.Exists(pdfFolder))
+        {
+            Console.Error.WriteLine($"PDF template folder not found: {pdfFolder}. Using current directory instead.");
+            pdfFolder = Directory.GetCurrentDirectory();
+        }
         Directory.CreateDirectory(outputFolder);
 
-        // Build a list of PDF/JSON file pairs (same base name)
-        var filePairs = Directory.GetFiles(inputFolder, "*.pdf")
-            .Select(pdfPath =>
-            {
-                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                string jsonPath = Path.Combine(inputFolder, baseName + ".json");
-                return File.Exists(jsonPath)
-                    ? new { PdfPath = pdfPath, JsonPath = jsonPath, OutputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath)) }
-                    : null;
-            })
-            .Where(pair => pair != null)
-            .ToList();
-
-        if (!filePairs.Any())
+        // Collect all JSON files
+        string[] jsonFiles = Directory.GetFiles(jsonFolder, "*.json");
+        if (jsonFiles.Length == 0)
         {
-            Console.WriteLine("No matching PDF/JSON pairs found.");
+            Console.WriteLine("No JSON files found – nothing to process.");
             return;
         }
 
         // Process each pair in parallel
-        Parallel.ForEach(filePairs, pair =>
+        Parallel.ForEach(jsonFiles, jsonPath =>
         {
             try
             {
-                // Load the PDF document
-                using (Document pdfDoc = new Document(pair.PdfPath))
-                {
-                    // Bind the document to a Form facade
-                    using (Aspose.Pdf.Facades.Form pdfForm = new Aspose.Pdf.Facades.Form())
-                    {
-                        pdfForm.BindPdf(pdfDoc);
-                        // Import data from the JSON file into the form fields (stream overload)
-                        using (FileStream jsonStream = File.OpenRead(pair.JsonPath))
-                        {
-                            pdfForm.ImportJson(jsonStream);
-                        }
-                    }
+                // Derive PDF name from JSON file name
+                string baseName = Path.GetFileNameWithoutExtension(jsonPath);
+                string pdfPath = Path.Combine(pdfFolder, baseName + ".pdf");
 
-                    // Save the updated PDF
-                    pdfDoc.Save(pair.OutputPath);
+                if (!File.Exists(pdfPath))
+                {
+                    Console.Error.WriteLine($"PDF not found for JSON: {jsonPath}");
+                    return;
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pair.PdfPath)}");
+                string outputPath = Path.Combine(outputFolder, baseName + ".pdf");
+
+                // Use the Form facade to bind the PDF, import JSON data, and save
+                using (var form = new Aspose.Pdf.Facades.Form())
+                {
+                    form.BindPdf(pdfPath);
+                    // ImportJson expects a Stream, so open the JSON file as a FileStream
+                    using (FileStream jsonStream = File.OpenRead(jsonPath))
+                    {
+                        form.ImportJson(jsonStream);
+                    }
+                    form.Save(outputPath);
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {pair.PdfPath}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{jsonPath}': {ex.Message}");
             }
         });
 
-        Console.WriteLine("Batch import completed.");
+        Console.WriteLine("Batch import of form data completed.");
     }
 }

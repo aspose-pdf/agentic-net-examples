@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string sourcePdfPath = "form.pdf";          // PDF containing form fields
-        const string reportPdfPath = "form_report.pdf";   // Output report
+        // Paths for the source PDF (with form fields) and the generated report PDF
+        const string sourcePdfPath = "form_input.pdf";
+        const string reportPdfPath = "form_report.pdf";
 
         if (!File.Exists(sourcePdfPath))
         {
@@ -19,122 +19,114 @@ class Program
         }
 
         // -----------------------------------------------------------------
-        // 1. Load the PDF and get its form fields via Document.Form.Fields
+        // 1. Load the source PDF and retrieve its form fields using Document.Form
         // -----------------------------------------------------------------
         Document srcDoc = new Document(sourcePdfPath);
-        var fields = srcDoc.Form.Fields; // Collection of Field objects
+        // Document.Form implements IEnumerable<Field>
+        var formFields = srcDoc.Form; // collection of Field objects
 
         // -----------------------------------------------------------------
-        // 2. Create a new PDF document for the report
+        // 2. Create a new PDF document that will contain the report table
         // -----------------------------------------------------------------
         using (Document reportDoc = new Document())
         {
-            // Add a single page
+            // Add a single page to the report document
             Page page = reportDoc.Pages.Add();
 
-            // -----------------------------------------------------------------
-            // 3. Build a table: Header row + one row per form field
-            // -----------------------------------------------------------------
+            // Create a table with three columns: Name, Type, Value
             Table table = new Table
             {
-                ColumnWidths = "150 100 200",
+                // Define column widths (in points). Adjust as needed.
+                ColumnWidths = "150 100 250",
+                // Optional: set border for visual clarity
                 Border = new BorderInfo(BorderSide.All, 0.5f)
             };
-
-            // Header row
-            Row header = table.Rows.Add();
-            header.Cells.Add(CreateHeaderCell("Field Name"));
-            header.Cells.Add(CreateHeaderCell("Field Type"));
-            header.Cells.Add(CreateHeaderCell("Field Value"));
-
-            // Data rows
-            foreach (Field field in fields)
-            {
-                Row row = table.Rows.Add();
-
-                // Field name
-                row.Cells.Add(CreateDataCell(field.PartialName));
-
-                // Field type – use runtime type name because Field does not expose FieldType
-                string typeStr = field.GetType().Name;
-                row.Cells.Add(CreateDataCell(typeStr));
-
-                // Field value – use reflection/dynamic to obtain a value if the field supports it
-                string value = GetFieldValueAsString(field);
-                row.Cells.Add(CreateDataCell(value));
-            }
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
             // -----------------------------------------------------------------
-            // 4. Save the report PDF
+            // 3. Add header row
+            // -----------------------------------------------------------------
+            Row headerRow = new Row();
+            headerRow.BackgroundColor = Color.LightGray; // Aspose.Pdf.Color
+
+            Cell CreateHeaderCell(string text)
+            {
+                var cell = new Cell();
+                var tf = new TextFragment(text)
+                {
+                    TextState = { FontSize = 12, FontStyle = FontStyles.Bold }
+                };
+                cell.Paragraphs.Add(tf);
+                return cell;
+            }
+
+            headerRow.Cells.Add(CreateHeaderCell("Field Name"));
+            headerRow.Cells.Add(CreateHeaderCell("Field Type"));
+            headerRow.Cells.Add(CreateHeaderCell("Field Value"));
+            table.Rows.Add(headerRow);
+
+            // -----------------------------------------------------------------
+            // 4. Populate the table with form field information
+            // -----------------------------------------------------------------
+            foreach (Field field in formFields)
+            {
+                Row row = new Row();
+
+                // Field Name
+                var nameCell = new Cell();
+                nameCell.Paragraphs.Add(new TextFragment(field.FullName ?? string.Empty));
+                row.Cells.Add(nameCell);
+
+                // Field Type (exact class name)
+                var typeCell = new Cell();
+                typeCell.Paragraphs.Add(new TextFragment(field.GetType().Name));
+                row.Cells.Add(typeCell);
+
+                // Field Value – handle known field types, fallback to empty string
+                string valueText = string.Empty;
+                switch (field)
+                {
+                    case TextBoxField tb:
+                        valueText = tb.Value ?? string.Empty;
+                        break;
+                    case CheckboxField cb:
+                        valueText = cb.Checked.ToString();
+                        break;
+                    case RadioButtonField rb:
+                        // Selected is 1‑based index of the chosen option; 0 means none
+                        valueText = rb.Selected > 0 ? rb.Selected.ToString() : string.Empty;
+                        break;
+                    case ListBoxField lb:
+                        if (lb.SelectedItems != null && lb.SelectedItems.Length > 0)
+                            valueText = string.Join(", ", lb.SelectedItems);
+                        break;
+                    case ComboBoxField cbx:
+                        valueText = cbx.Value ?? string.Empty;
+                        break;
+                    case SignatureField sig:
+                        valueText = "<Signature>";
+                        break;
+                    default:
+                        // For any other field types attempt a generic ToString()
+                        valueText = field.ToString();
+                        break;
+                }
+
+                var valueCell = new Cell();
+                valueCell.Paragraphs.Add(new TextFragment(valueText));
+                row.Cells.Add(valueCell);
+
+                table.Rows.Add(row);
+            }
+
+            // -----------------------------------------------------------------
+            // 5. Save the report PDF
             // -----------------------------------------------------------------
             reportDoc.Save(reportPdfPath);
         }
 
-        Console.WriteLine($"Form fields report saved to '{reportPdfPath}'.");
-    }
-
-    // Helper to create a header cell with bold text
-    private static Cell CreateHeaderCell(string text)
-    {
-        Cell cell = new Cell
-        {
-            BackgroundColor = Color.LightGray,
-            Border = new BorderInfo(BorderSide.All, 0.5f)
-        };
-        TextFragment tf = new TextFragment(text)
-        {
-            TextState = { FontSize = 12, FontStyle = FontStyles.Bold }
-        };
-        cell.Paragraphs.Add(tf);
-        return cell;
-    }
-
-    // Helper to create a regular data cell
-    private static Cell CreateDataCell(string text)
-    {
-        Cell cell = new Cell
-        {
-            Border = new BorderInfo(BorderSide.All, 0.5f)
-        };
-        TextFragment tf = new TextFragment(text)
-        {
-            TextState = { FontSize = 10 }
-        };
-        cell.Paragraphs.Add(tf);
-        return cell;
-    }
-
-    // Retrieves the value of a form field as a string, handling different field types safely.
-    private static string GetFieldValueAsString(Field field)
-    {
-        // Most concrete field types expose a "Value" property (e.g., TextBoxField, ComboBoxField).
-        // Use dynamic dispatch; if the property does not exist, fall back to an empty string.
-        try
-        {
-            dynamic dynField = field;
-            var val = dynField.Value;
-            return val?.ToString() ?? string.Empty;
-        }
-        catch
-        {
-            // For fields without a Value property (e.g., CheckBoxField, RadioButtonOptionField),
-            // attempt to read a boolean "Checked" property.
-            try
-            {
-                dynamic dynField = field;
-                var checkedProp = dynField.Checked;
-                if (checkedProp is bool b)
-                    return b.ToString();
-                return checkedProp?.ToString() ?? string.Empty;
-            }
-            catch
-            {
-                // Unknown field type – return empty string.
-                return string.Empty;
-            }
-        }
+        Console.WriteLine($"Form field report generated: {reportPdfPath}");
     }
 }

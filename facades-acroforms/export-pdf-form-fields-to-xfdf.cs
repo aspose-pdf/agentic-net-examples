@@ -1,40 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.xfdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputXfdfPath = "form_data.xfdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Form (Facades) implements IDisposable, so wrap it in a using block.
+        using (Form pdfForm = new Form())
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
-            // Create a stream for the XFDF output
-            using (FileStream xfdfStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-            {
-                // Use the Form facade to export form data to XFDF
-                Form formFacade = new Form();
-                formFacade.BindPdf(doc);
-                // Export the form data to the XFDF stream
-                formFacade.ExportXfdf(xfdfStream);
-            }
+            // Bind the PDF document that contains the form fields.
+            pdfForm.BindPdf(inputPdfPath);
 
-            Console.WriteLine($"Form data successfully exported to '{outputPath}'.");
+            // Export all form field data to XFDF (actually FDF) format.
+            // The Form facade provides ExportFdf which writes the data to a stream.
+            using (FileStream xfdfStream = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
+            {
+                pdfForm.ExportFdf(xfdfStream);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data exported to XFDF: {outputXfdfPath}");
     }
 }

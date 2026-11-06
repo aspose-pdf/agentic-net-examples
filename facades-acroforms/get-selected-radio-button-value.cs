@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";               // input PDF containing the form
-        const string radioFieldName = "Gender";          // name of the radio button group
+        const string pdfPath = "input.pdf";          // Path to the PDF containing the form
+        const string radioFieldName = "RadioGroup1"; // Name of the radio button group
 
         if (!File.Exists(pdfPath))
         {
@@ -15,22 +15,30 @@ class Program
             return;
         }
 
+        // Form is a Facade class; it does not implement IDisposable, so no using block is needed.
+        Form form = new Form();
+
         try
         {
-            // Form is a Facades class; it does not implement IDisposable, so no using block.
-            Form form = new Form();
-
-            // Load the PDF document into the Form object.
+            // Bind the PDF document to the Form object.
             form.BindPdf(pdfPath);
 
             // Retrieve the currently selected option value of the specified radio button group.
             string selectedValue = form.GetButtonOptionCurrentValue(radioFieldName);
 
-            Console.WriteLine($"Radio button \"{radioFieldName}\" selected value: {selectedValue}");
+            if (selectedValue != null)
+                Console.WriteLine($"Selected value for '{radioFieldName}': {selectedValue}");
+            else
+                Console.WriteLine($"Radio button group '{radioFieldName}' has no selection or does not exist.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error reading radio button value: {ex.Message}");
+            Console.Error.WriteLine($"Error processing form: {ex.Message}");
+        }
+        finally
+        {
+            // Release resources held by the Form object.
+            form.Dispose();
         }
     }
 }
