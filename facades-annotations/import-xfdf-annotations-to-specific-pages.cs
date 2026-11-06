@@ -2,57 +2,76 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string xfdfPath       = "annotations.xfdf";
-        const string outputPdfPath  = "output.pdf";
-        const int startPage = 2; // first page of the range (1‑based)
-        const int endPage   = 4; // last page of the range (inclusive)
+        // Input PDF, XFDF file with annotations, and output PDF paths
+        const string pdfPath = "input.pdf";
+        const string xfdfPath = "annotations.xfdf";
+        const string outputPath = "output.pdf";
 
-        // Verify that source files exist
-        if (!File.Exists(inputPdfPath))
+        // Define the page range where the XFDF annotations should be applied (e.g., pages 2 to 4)
+        const string pageRange = "2-4";
+
+        // Validate input files
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"XFDF file not found: {xfdfPath}");
+            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
             return;
         }
 
         // Load the target PDF document
-        Document targetDoc = new Document(inputPdfPath);
+        Document targetDoc = new Document(pdfPath);
 
         // Load XFDF annotations into a temporary PDF document
         Document xfdfDoc = new Document();
         using (FileStream xfdfStream = File.OpenRead(xfdfPath))
         {
-            // The XfdfReader reads XFDF and creates annotation objects on the pages of xfdfDoc
             XfdfReader.ReadAnnotations(xfdfStream, xfdfDoc);
         }
 
-        // Ensure the requested page range is within the bounds of both documents
-        int maxPage = Math.Min(Math.Min(targetDoc.Pages.Count, xfdfDoc.Pages.Count), endPage);
-        for (int pageNumber = startPage; pageNumber <= maxPage; pageNumber++)
+        // Parse the page range (expected format "start-end")
+        int startPage = 1;
+        int endPage = targetDoc.Pages.Count;
+        if (!string.IsNullOrWhiteSpace(pageRange))
         {
-            Page srcPage = xfdfDoc.Pages[pageNumber];
-            Page dstPage = targetDoc.Pages[pageNumber];
+            string[] parts = pageRange.Split('-');
+            if (parts.Length == 2 &&
+                int.TryParse(parts[0], out int s) &&
+                int.TryParse(parts[1], out int e))
+            {
+                startPage = s;
+                endPage = e;
+            }
+        }
 
-            // Copy each annotation from the XFDF page to the target PDF page
+        // Ensure the range is within the document bounds
+        startPage = Math.Max(startPage, 1);
+        endPage = Math.Min(endPage, Math.Min(targetDoc.Pages.Count, xfdfDoc.Pages.Count));
+
+        // Copy annotations from the XFDF document to the target document for the specified pages
+        for (int i = startPage; i <= endPage; i++)
+        {
+            Page srcPage = xfdfDoc.Pages[i];
+            Page dstPage = targetDoc.Pages[i];
             foreach (Annotation ann in srcPage.Annotations)
             {
-                // Clone creates a deep copy so the annotation can be added to another document
+                // Clone the annotation to avoid reference issues
                 dstPage.Annotations.Add((Annotation)ann.Clone());
             }
         }
 
-        // Save the resulting PDF with the imported annotations
-        targetDoc.Save(outputPdfPath);
-        Console.WriteLine($"Annotations imported to pages {startPage}-{endPage} and saved to '{outputPdfPath}'.");
+        // Save the modified PDF with the imported annotations
+        targetDoc.Save(outputPath);
+
+        Console.WriteLine($"Annotations imported to pages {pageRange} and saved as '{outputPath}'.");
     }
 }

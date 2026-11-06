@@ -1,68 +1,75 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Program
+class AnnotationSummaryUtility
 {
     static void Main(string[] args)
     {
-        // Expect one or more PDF file paths as command‑line arguments.
-        if (args.Length == 0)
+        // Input folder containing PDFs (first argument or current directory)
+        string inputFolder = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
+        // Output report file
+        string reportPath = Path.Combine(inputFolder, "AnnotationReport.txt");
+
+        // Prepare the report writer
+        using (StreamWriter writer = new StreamWriter(reportPath, false))
         {
-            Console.WriteLine("Usage: AnnotationSummary <pdf1> [pdf2 ...]");
-            return;
-        }
+            writer.WriteLine("Annotation Summary Report");
+            writer.WriteLine($"Generated on: {DateTime.Now}");
+            writer.WriteLine(new string('=', 40));
+            writer.WriteLine();
 
-        foreach (string pdfPath in args)
-        {
-            if (!File.Exists(pdfPath))
+            // Process each PDF file in the folder
+            foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
+                writer.WriteLine($"File: {Path.GetFileName(pdfFile)}");
 
-            try
-            {
-                // Load the PDF document. Aspose.Pdf.Document provides access to page annotations.
-                Document pdfDoc = new Document(pdfPath);
-
-                // Aggregate counts per annotation type.
-                Dictionary<string, int> typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-                foreach (Page page in pdfDoc.Pages)
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfFile))
                 {
-                    foreach (Annotation ann in page.Annotations)
+                    // Dictionary to hold counts per annotation type
+                    Dictionary<string, int> typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+                    // Iterate through pages and collect annotation types – works for all supported Aspose.Pdf versions
+                    for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
                     {
-                        // AnnotationType is an enum; use its name for a readable key.
-                        string typeName = ann.AnnotationType.ToString();
-                        if (typeCounts.ContainsKey(typeName))
-                            typeCounts[typeName]++;
-                        else
-                            typeCounts[typeName] = 1;
+                        Page page = doc.Pages[i];
+                        foreach (Annotation annot in page.Annotations)
+                        {
+                            // Use the strongly‑typed AnnotationType enum; fallback to "Unknown" if needed
+                            string typeName = annot.AnnotationType != AnnotationType.Unknown
+                                ? annot.AnnotationType.ToString()
+                                : "Unknown";
+
+                            if (typeCounts.ContainsKey(typeName))
+                                typeCounts[typeName]++;
+                            else
+                                typeCounts[typeName] = 1;
+                        }
+                    }
+
+                    // Write the counts to the report
+                    if (typeCounts.Count == 0)
+                    {
+                        writer.WriteLine("  No annotations found.");
+                    }
+                    else
+                    {
+                        foreach (var kvp in typeCounts)
+                        {
+                            writer.WriteLine($"  {kvp.Key}: {kvp.Value}");
+                        }
                     }
                 }
 
-                // Output the summary for the current PDF.
-                Console.WriteLine($"Report for: {pdfPath}");
-                if (typeCounts.Count == 0)
-                {
-                    Console.WriteLine("  No annotations found.");
-                }
-                else
-                {
-                    foreach (var kvp in typeCounts.OrderBy(k => k.Key))
-                    {
-                        Console.WriteLine($"  {kvp.Key}: {kvp.Value}");
-                    }
-                }
+                writer.WriteLine(); // separate entries
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing {pdfPath}: {ex.Message}");
-            }
+
+            writer.WriteLine("Report generation completed.");
         }
+
+        Console.WriteLine($"Annotation summary written to: {reportPath}");
     }
 }

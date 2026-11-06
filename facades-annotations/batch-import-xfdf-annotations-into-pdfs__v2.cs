@@ -3,99 +3,77 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-// Wrapper that uses the Form facade to import XFDF data.
-public class PdfXfdfForm : IDisposable
-{
-    private Document? _document;
-    private Form? _formFacade;
-
-    // Binds the PDF file to the wrapper and prepares the Form facade.
-    public void BindPdf(string pdfPath)
-    {
-        _document = new Document(pdfPath);
-        _formFacade = new Form();
-        _formFacade.BindPdf(_document);
-    }
-
-    // Imports XFDF data into the PDF's form fields using the facade.
-    public void ImportXfdf(string xfdfPath)
-    {
-        if (_formFacade == null)
-            throw new InvalidOperationException("PDF has not been bound. Call BindPdf first.");
-
-        // The ImportXfdf overload expects a Stream in recent Aspose.Pdf versions.
-        using (FileStream xfdfStream = File.OpenRead(xfdfPath))
-        {
-            _formFacade.ImportXfdf(xfdfStream);
-        }
-    }
-
-    // Saves the modified PDF to the specified path.
-    public void Save(string outputPath)
-    {
-        _document?.Save(outputPath);
-    }
-
-    // Clean up unmanaged resources.
-    public void Dispose()
-    {
-        _formFacade?.Dispose();
-        _document?.Dispose();
-    }
-}
-
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs and corresponding XFDF files
-        const string inputFolder = "BatchInput";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = "BatchOutput";
+        // Base directory of the application (works cross‑platform)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        if (!Directory.Exists(inputFolder))
+        // Directories containing source PDFs, XFDF files and the output PDFs
+        string pdfDirectory = Path.Combine(baseDir, "pdfs");
+        string xfdfDirectory = Path.Combine(baseDir, "xfdfs");
+        string outputDirectory = Path.Combine(baseDir, "output");
+
+        // Ensure the required folders exist (create output folder, warn if source folders are missing)
+        if (!Directory.Exists(pdfDirectory))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"PDF source folder not found: {pdfDirectory}");
             return;
         }
-
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        if (!Directory.Exists(xfdfDirectory))
         {
-            // Determine base file name without extension
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            // Expected XFDF file with the same base name
-            string xfdfPath = Path.Combine(inputFolder, baseName + ".xfdf");
+            Console.Error.WriteLine($"XFDF source folder not found: {xfdfDirectory}");
+            return;
+        }
+        Directory.CreateDirectory(outputDirectory);
+
+        int processed = 0;
+        int skipped = 0;
+        int failed = 0;
+
+        // Iterate over all PDF files in the source folder
+        foreach (string pdfPath in Directory.GetFiles(pdfDirectory, "*.pdf"))
+        {
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string xfdfPath = Path.Combine(xfdfDirectory, fileNameWithoutExt + ".xfdf");
 
             if (!File.Exists(xfdfPath))
             {
-                Console.WriteLine($"No matching XFDF for '{baseName}.pdf' – skipping.");
+                Console.WriteLine($"No matching XFDF for '{pdfPath}'. Skipping.");
+                skipped++;
                 continue;
             }
 
+            string outputPdfPath = Path.Combine(outputDirectory, Path.GetFileName(pdfPath));
+
             try
             {
-                using (PdfXfdfForm xfdfForm = new PdfXfdfForm())
+                // Load the PDF document inside a using block to ensure proper disposal
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    xfdfForm.BindPdf(pdfPath);
-                    xfdfForm.ImportXfdf(xfdfPath);
-
-                    string outputPdfPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-                    xfdfForm.Save(outputPdfPath);
-
-                    Console.WriteLine($"Imported XFDF into PDF: {outputPdfPath}");
+                    // Use the Form facade to import XFDF data (the facade works with streams)
+                    using (Form formFacade = new Form(pdfDoc))
+                    {
+                        using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+                        {
+                            formFacade.ImportXfdf(xfdfStream);
+                        }
+                        // Save the resulting PDF via the facade
+                        formFacade.Save(outputPdfPath);
+                    }
                 }
+
+                Console.WriteLine($"Imported XFDF '{xfdfPath}' into PDF '{outputPdfPath}'.");
+                processed++;
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{baseName}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to import XFDF for '{pdfPath}': {ex.Message}");
+                failed++;
             }
         }
 
-        Console.WriteLine("Batch XFDF import completed.");
+        Console.WriteLine($"Batch XFDF import completed. Processed: {processed}, Skipped: {skipped}, Failed: {failed}.");
     }
 }

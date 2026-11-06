@@ -1,53 +1,82 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document API provides validation support
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
-public class PdfIntegrityValidator
+class Program
 {
-    /// <summary>
-    /// Validates PDF integrity after annotation modifications.
-    /// Returns true if no corrupted objects are found.
-    /// </summary>
-    /// <param name="pdfPath">Path to the PDF file to be validated.</param>
-    /// <param name="reportPath">Optional path where the validation XML report will be saved.</param>
-    /// <returns>True when the PDF is valid; otherwise false.</returns>
-    public static bool ValidatePdfIntegrity(string pdfPath, string reportPath = "validation_report.xml")
+    // Entry point
+    static void Main()
     {
-        if (string.IsNullOrEmpty(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
+        const string inputPath  = "input.pdf";
+        const string outputPath = "annotated_output.pdf";
 
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException("PDF file not found.", pdfPath);
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-        // Remove any previous report.
-        if (File.Exists(reportPath))
-            File.Delete(reportPath);
+        // Load the PDF, add an annotation, and validate integrity
+        using (Document doc = new Document(inputPath))
+        {
+            // ---- Add a simple text annotation (cross‑platform) ----
+            // Use fully qualified Rectangle to avoid ambiguity
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+            {
+                Title    = "Sample Note",
+                Contents = "This is a test annotation.",
+                Open     = true,
+                Icon     = TextIcon.Note
+            };
+            doc.Pages[1].Annotations.Add(annotation);
 
-        // Load the PDF using the Document class – PdfFileEditor does not expose a Validate method.
-        Document pdfDoc = new Document(pdfPath);
+            // Validate the modified document
+            bool isValid = ValidatePdfIntegrity(doc);
+            Console.WriteLine($"PDF integrity after annotation: {(isValid ? "OK" : "Corrupted")}");
 
-        // Perform validation; this creates an XML report at the supplied path and returns a bool indicating validity.
-        // The second argument specifies the PDF standard to validate against – PDF/A‑1B is a common choice for integrity checks.
-        bool isValid = pdfDoc.Validate(reportPath, PdfFormat.PDF_A_1B);
-
-        return isValid;
+            // Save only if the document is valid
+            if (isValid)
+            {
+                doc.Save(outputPath);
+                Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+            }
+            else
+            {
+                Console.Error.WriteLine("Document is corrupted; not saved.");
+            }
+        }
     }
 
-    // Example usage.
-    public static void Main()
+    // Validates PDF integrity by attempting to save to a memory stream.
+    // Any exception during the save indicates a problem with the PDF structure.
+    static bool ValidatePdfIntegrity(Document pdfDocument)
     {
-        const string inputPdf = "annotated.pdf";
-
         try
         {
-            bool isValid = ValidatePdfIntegrity(inputPdf);
-            Console.WriteLine(isValid
-                ? "PDF integrity check passed. No corrupted objects detected."
-                : "PDF integrity check failed. Corrupted objects were found.");
+            // Use a memory stream to avoid creating a file on disk.
+            using (MemoryStream ms = new MemoryStream())
+            {
+                // Save the document; if the PDF contains corrupted objects,
+                // Aspose.Pdf will throw a PdfException.
+                pdfDocument.Save(ms);
+            }
+            // No exception -> PDF is considered valid.
+            return true;
+        }
+        catch (PdfException ex)
+        {
+            // Log the specific PDF error.
+            Console.Error.WriteLine($"PDF validation error: {ex.Message}");
+            return false;
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Validation error: {ex.Message}");
+            // Catch any other unexpected errors.
+            Console.Error.WriteLine($"Unexpected error during validation: {ex.Message}");
+            return false;
         }
     }
 }

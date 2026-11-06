@@ -1,19 +1,56 @@
 using System;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Included as per requirement
 
 class AnnotationPerformanceLogger
 {
-    // Executes an annotation operation and logs its duration.
-    public static void Execute(Action operation, string operationName)
+    private readonly Document _doc;
+
+    public AnnotationPerformanceLogger(Document doc)
     {
-        var stopwatch = Stopwatch.StartNew();
+        _doc = doc;
+    }
+
+    // Executes an annotation operation and logs its duration
+    public void Execute(string operationName, Action operation)
+    {
+        Stopwatch sw = Stopwatch.StartNew();
         operation();
-        stopwatch.Stop();
-        Console.WriteLine($"{operationName} completed in {stopwatch.ElapsedMilliseconds} ms");
+        sw.Stop();
+        Console.WriteLine($"{operationName} took {sw.ElapsedMilliseconds} ms");
+    }
+
+    // Adds a text annotation to a specific page
+    public void AddTextAnnotation(int pageNumber, Aspose.Pdf.Rectangle rect, string title, string contents)
+    {
+        Execute("AddTextAnnotation", () =>
+        {
+            Page page = _doc.Pages[pageNumber];
+            TextAnnotation annot = new TextAnnotation(page, rect);
+            annot.Title = title;
+            annot.Contents = contents;
+            annot.Open = true;
+            annot.Icon = TextIcon.Note;
+            page.Annotations.Add(annot);
+        });
+    }
+
+    // Adds an image stamp to a specific page
+    public void AddImageStamp(int pageNumber, string imagePath)
+    {
+        Execute("AddImageStamp", () =>
+        {
+            Page page = _doc.Pages[pageNumber];
+            ImageStamp stamp = new ImageStamp(imagePath);
+            stamp.Background = false;
+            stamp.Opacity = 0.5;
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment = VerticalAlignment.Center;
+            page.AddStamp(stamp);
+        });
     }
 }
 
@@ -22,7 +59,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "annotated_output.pdf";
+        const string outputPath = "output.pdf";
+        const string stampImage = "stamp.png";
 
         if (!File.Exists(inputPath))
         {
@@ -30,65 +68,23 @@ class Program
             return;
         }
 
-        // Load the PDF document – this is the object that supports annotations and stamps.
-        Document doc = new Document(inputPath);
+        using (Document doc = new Document(inputPath))
+        {
+            var logger = new AnnotationPerformanceLogger(doc);
 
-        // -------------------------------------------------
-        // Example 1: Add a text annotation (performance‑monitored)
-        // -------------------------------------------------
-        AnnotationPerformanceLogger.Execute(
-            () =>
+            // Add a text annotation to the first page
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            logger.AddTextAnnotation(1, rect, "Note", "Performance monitored annotation.");
+
+            // Add an image stamp to each page
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Rectangle that defines the annotation bounds.
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                logger.AddImageStamp(i, stampImage);
+            }
 
-                // Create and configure the text annotation. Note the constructor now receives the target page and the rectangle.
-                TextAnnotation textAnnotation = new TextAnnotation(doc.Pages[1], rect)
-                {
-                    Title    = "Note",
-                    Contents = "This is a performance‑monitored text annotation.",
-                    Open     = true,
-                    Icon     = TextIcon.Note
-                };
-
-                // Add the annotation to the first page.
-                doc.Pages[1].Annotations.Add(textAnnotation);
-            },
-            "AddTextAnnotation");
-
-        // -------------------------------------------------
-        // Example 2: Add an image stamp to every page (performance‑monitored)
-        // -------------------------------------------------
-        const string stampImagePath = "stamp.png";
-        if (File.Exists(stampImagePath))
-        {
-            AnnotationPerformanceLogger.Execute(
-                () =>
-                {
-                    // Create an image stamp.
-                    ImageStamp imageStamp = new ImageStamp(stampImagePath)
-                    {
-                        Background          = false,
-                        Opacity             = 0.7,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment   = VerticalAlignment.Center
-                    };
-
-                    // Apply the stamp to every page.
-                    foreach (Page page in doc.Pages)
-                    {
-                        page.AddStamp(imageStamp);
-                    }
-                },
-                "AddImageStamp");
-        }
-        else
-        {
-            Console.WriteLine($"Stamp image not found: {stampImagePath}. Skipping image stamp.");
+            doc.Save(outputPath);
         }
 
-        // Save the modified PDF.
-        doc.Save(outputPath);
-        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Document saved to {outputPath}");
     }
 }

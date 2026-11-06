@@ -2,32 +2,33 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+class DeleteAnnotationsExample
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create the annotation editor and bind it to the PDF file
+        // Initialize the Facade that works with PDF annotations
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
+
+        // Load the PDF document into the editor
         editor.BindPdf(inputPath);
 
-        // Delete an annotation using a string literal for its name
+        // Delete an annotation by specifying its name directly as a string literal
         editor.DeleteAnnotation("MyAnnotation");
 
-        // Delete an annotation using a variable that holds the name
+        // Delete an annotation by using a variable that holds the annotation name
         string annotationName = "AnotherAnnotation";
         editor.DeleteAnnotation(annotationName);
 
-        // Save the modified PDF to a new file
+        // Persist the changes to a new file
         editor.Save(outputPath);
 
         Console.WriteLine($"Annotations removed. Output saved to '{outputPath}'.");

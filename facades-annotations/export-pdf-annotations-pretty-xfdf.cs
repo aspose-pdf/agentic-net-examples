@@ -1,47 +1,41 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using System.Xml.Linq;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xfdfPath = "annotations_pretty.xfdf";
+        const string inputPdf = "input.pdf";
+        const string outputXfdf = "annotations.xfdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF into the annotation editor
+        using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
         {
-            // Bind the loaded PDF document to the annotation editor
-            PdfAnnotationEditor annotEditor = new PdfAnnotationEditor();
-            annotEditor.BindPdf(doc);
+            editor.BindPdf(inputPdf);
 
-            // Attempt to export annotations to XFDF. The XfdfWriter class is not present in
-            // newer Aspose.Pdf versions, so we fall back to a graceful message.
-            try
+            // Export all annotations to XFDF (pretty‑printed)
+            using (MemoryStream ms = new MemoryStream())
             {
-                // If a future version provides XfdfWriter, the following pattern can be used:
-                // using (var writer = new XfdfWriter())
-                // {
-                //     writer.WriteAnnotations(doc, xfdfPath);
-                // }
-                // For now we simply inform the user that the feature is unavailable.
-                Console.WriteLine("Export to XFDF is skipped because XfdfWriter is not available in the current Aspose.Pdf version.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Export to XFDF failed: {ex.Message}");
+                // Use the overload that accepts a string[] and cast null to that type
+                int startPage = 1;
+                int endPage = editor.Document.Pages.Count;
+                editor.ExportAnnotationsXfdf(ms, startPage, endPage, (string[])null);
+                ms.Position = 0; // rewind for reading
+
+                // Load the XFDF XML and save it with indentation (pretty‑print)
+                XDocument xfdfDoc = XDocument.Load(ms);
+                xfdfDoc.Save(outputXfdf);
             }
         }
 
-        Console.WriteLine($"Processing completed. If XfdfWriter becomes available, annotations can be exported to '{xfdfPath}'.");
+        Console.WriteLine($"Annotations exported to '{outputXfdf}'.");
     }
 }

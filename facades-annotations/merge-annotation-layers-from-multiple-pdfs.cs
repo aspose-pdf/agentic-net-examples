@@ -2,59 +2,81 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
-    static void Main()
+    // Merges annotation layers from multiple PDFs into a single PDF.
+    // All source PDFs are expected to have the same page count.
+    // Annotations from the first PDF are kept, and annotations from the
+    // remaining PDFs are added to the corresponding pages.
+    static void MergeAnnotationLayers(string[] sourcePdfPaths, string outputPdfPath)
     {
-        // Input PDFs – each file may contain its own annotation layer
-        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        string outputFile = "merged_annotations.pdf";
-
-        // Verify that all input files exist
-        foreach (string f in inputFiles)
+        if (sourcePdfPaths == null || sourcePdfPaths.Length == 0)
         {
-            if (!File.Exists(f))
-            {
-                Console.Error.WriteLine($"File not found: {f}");
-                return;
-            }
+            Console.Error.WriteLine("No source PDFs provided.");
+            return;
         }
 
-        // Use the first PDF as the base document
-        using (Document target = new Document(inputFiles[0]))
+        // Load the first PDF as the target document.
+        using (Document targetDoc = new Document(sourcePdfPaths[0]))
         {
-            // Process remaining PDFs and copy their annotations onto the target
-            for (int i = 1; i < inputFiles.Length; i++)
+            // Process each additional PDF.
+            for (int srcIndex = 1; srcIndex < sourcePdfPaths.Length; srcIndex++)
             {
-                using (Document source = new Document(inputFiles[i]))
+                string srcPath = sourcePdfPaths[srcIndex];
+                if (!File.Exists(srcPath))
                 {
-                    // Iterate through pages – Aspose.Pdf uses 1‑based indexing
-                    int pageCount = Math.Min(target.Pages.Count, source.Pages.Count);
-                    for (int p = 1; p <= pageCount; p++)
+                    Console.Error.WriteLine($"Source file not found: {srcPath}");
+                    continue;
+                }
+
+                using (Document srcDoc = new Document(srcPath))
+                {
+                    // Ensure the target has at least as many pages as the source.
+                    while (targetDoc.Pages.Count < srcDoc.Pages.Count)
                     {
-                        Page targetPage = target.Pages[p];
-                        Page sourcePage = source.Pages[p];
+                        targetDoc.Pages.Add();
+                    }
 
-                        // Copy each annotation from the source page to the target page
-                        for (int a = 0; a < sourcePage.Annotations.Count; a++)
+                    // Iterate through pages (1‑based indexing).
+                    for (int pageNum = 1; pageNum <= srcDoc.Pages.Count; pageNum++)
+                    {
+                        Aspose.Pdf.Page srcPage = srcDoc.Pages[pageNum];
+                        Aspose.Pdf.Page tgtPage = targetDoc.Pages[pageNum];
+
+                        // Copy each annotation from the source page to the target page.
+                        foreach (Annotation annot in srcPage.Annotations)
                         {
-                            // Retrieve the annotation from the source document
-                            Aspose.Pdf.Annotations.Annotation srcAnnotation = sourcePage.Annotations[a];
-
-                            // Add the same annotation instance to the target page.
-                            // The annotation is detached from the source document and attached to the target.
-                            targetPage.Annotations.Add(srcAnnotation);
+                            // Directly add the annotation to the target page.
+                            // Aspose.Pdf allows adding an existing annotation instance to another page.
+                            tgtPage.Annotations.Add(annot);
                         }
                     }
                 }
             }
 
-            // Save the merged PDF containing all annotation layers
-            target.Save(outputFile);
+            // Save the merged document with all annotation layers.
+            targetDoc.Save(outputPdfPath);
+        }
+    }
+
+    // Entry point required for a console application.
+    static void Main(string[] args)
+    {
+        // Example usage:
+        // args[0] = output PDF path
+        // args[1..n] = input PDF paths to merge annotation layers from
+        if (args.Length < 2)
+        {
+            Console.WriteLine("Usage: MergeAnnotations <output.pdf> <input1.pdf> [<input2.pdf> ...]");
+            return;
         }
 
-        Console.WriteLine($"Merged PDF with combined annotations saved to '{outputFile}'.");
+        string outputPath = args[0];
+        string[] inputPaths = new string[args.Length - 1];
+        Array.Copy(args, 1, inputPaths, 0, inputPaths.Length);
+
+        MergeAnnotationLayers(inputPaths, outputPath);
+        Console.WriteLine($"Merged annotation layers saved to '{outputPath}'.");
     }
 }

@@ -5,49 +5,42 @@ using Aspose.Pdf;
 
 class AnnotationReporter
 {
-    // Returns a dictionary where the key is the page number (1‑based) and the value is the annotation count on that page.
-    public static Dictionary<int, int> GetAnnotationsCountPerPage(string pdfPath)
+    static void Main()
     {
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
+        const string pdfPath = "input.pdf";
 
+        if (!File.Exists(pdfPath))
+        {
+            Console.Error.WriteLine($"File not found: {pdfPath}");
+            return;
+        }
+
+        // Retrieve annotation counts per page
+        Dictionary<int, int> pageAnnotationCounts = GetAnnotationsCountPerPage(pdfPath);
+
+        // Report the results
+        foreach (KeyValuePair<int, int> kvp in pageAnnotationCounts)
+        {
+            Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
+        }
+    }
+
+    // Returns a dictionary where key = page number (1‑based) and value = annotation count
+    static Dictionary<int, int> GetAnnotationsCountPerPage(string pdfFilePath)
+    {
         var counts = new Dictionary<int, int>();
 
-        // Load the PDF once and iterate through its pages.
-        // Document implements IDisposable, so we wrap it in a using block for deterministic cleanup.
-        using (Document doc = new Document(pdfPath))
+        // Load the document; Aspose.Pdf uses 1‑based page indexing
+        Document pdfDoc = new Document(pdfFilePath);
+        int pageCount = pdfDoc.Pages.Count;
+
+        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
         {
-            int pageCount = doc.Pages.Count;
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
-            {
-                // Each Page object exposes an Annotations collection.
-                // The collection may be null, but in current Aspose.Pdf versions it is always instantiated.
-                int annotationCount = doc.Pages[pageNumber].Annotations?.Count ?? 0;
-                counts[pageNumber] = annotationCount;
-            }
+            // Directly use the Annotations collection of the page
+            int annotationCount = pdfDoc.Pages[pageNumber].Annotations?.Count ?? 0;
+            counts[pageNumber] = annotationCount;
         }
 
         return counts;
-    }
-
-    // Example usage
-    static void Main()
-    {
-        const string inputPdf = "sample.pdf";
-
-        try
-        {
-            Dictionary<int, int> pageAnnotationCounts = GetAnnotationsCountPerPage(inputPdf);
-
-            Console.WriteLine($"Annotation counts for '{inputPdf}':");
-            foreach (var kvp in pageAnnotationCounts)
-            {
-                Console.WriteLine($"Page {kvp.Key}: {kvp.Value} annotation(s)");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
     }
 }

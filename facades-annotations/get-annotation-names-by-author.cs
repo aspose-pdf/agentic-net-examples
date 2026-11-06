@@ -7,52 +7,61 @@ using Aspose.Pdf.Annotations;
 public static class PdfAnnotationHelper
 {
     /// <summary>
-    /// Returns the names of all annotations in the specified PDF whose Author matches the given string.
+    /// Returns a list of annotation names whose author (stored in the Subject of a markup annotation) matches the supplied filter.
     /// </summary>
     /// <param name="pdfPath">Full path to the PDF file.</param>
-    /// <param name="author">Author name to filter annotations by (case‑sensitive).</param>
+    /// <param name="authorFilter">Author string to filter annotations (case‑insensitive).</param>
     /// <returns>List of annotation names.</returns>
-    public static List<string> GetAnnotationNamesByAuthor(string pdfPath, string author)
+    public static List<string> GetAnnotationNamesByAuthor(string pdfPath, string authorFilter)
     {
-        // Validate input
-        if (string.IsNullOrEmpty(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException("PDF file not found.", pdfPath);
-        if (author == null)
-            throw new ArgumentNullException(nameof(author));
+        var matchingNames = new List<string>();
 
-        // Load the PDF document using Aspose.Pdf.Document
-        Document doc = new Document(pdfPath);
-        List<string> matchingNames = new List<string>();
+        // Validate input file existence.
+        if (string.IsNullOrEmpty(pdfPath) || !File.Exists(pdfPath))
+            return matchingNames;
 
-        // Iterate through each page and collect matching annotations
-        foreach (Page page in doc.Pages)
+        // Load the PDF document.
+        Document pdfDocument;
+        try
         {
-            // Annotations collection may contain different types; we are interested in markup annotations
-            foreach (Annotation ann in page.Annotations)
+            pdfDocument = new Document(pdfPath);
+        }
+        catch (Exception)
+        {
+            // If the file cannot be opened (e.g., encrypted), return empty list.
+            return matchingNames;
+        }
+
+        // Iterate through all pages and their annotations.
+        foreach (Page page in pdfDocument.Pages)
+        {
+            if (page.Annotations == null) continue;
+
+            foreach (Annotation annotation in page.Annotations)
             {
-                // Only markup annotations have a Title property that stores the author information
-                if (ann is MarkupAnnotation markup && markup.Title != null &&
-                    markup.Title.Equals(author, StringComparison.Ordinal))
+                // Only markup annotations expose the Subject property that we use as "author".
+                if (annotation is MarkupAnnotation markup &&
+                    !string.IsNullOrEmpty(markup.Subject) &&
+                    string.Equals(markup.Subject, authorFilter, StringComparison.OrdinalIgnoreCase))
                 {
-                    // The Name property holds the annotation's identifier (may be null/empty)
-                    if (!string.IsNullOrEmpty(ann.Name))
-                        matchingNames.Add(ann.Name);
+                    // Name is defined on the base Annotation class.
+                    if (!string.IsNullOrEmpty(annotation.Name))
+                        matchingNames.Add(annotation.Name);
                 }
             }
         }
 
         return matchingNames;
     }
+}
 
-    // ---------------------------------------------------------------------
-    // A minimal entry point is required for the project to compile as an
-    // executable. It does not perform any work; it simply satisfies the
-    // compiler's expectation of a static Main method.
-    // ---------------------------------------------------------------------
+// Added entry point to satisfy the executable project requirement.
+public class Program
+{
     public static void Main(string[] args)
     {
-        // No‑op – the library method can be called from other code or unit tests.
+        // Example usage (commented out to keep the method side‑effect free):
+        // var names = PdfAnnotationHelper.GetAnnotationNamesByAuthor("sample.pdf", "John Doe");
+        // Console.WriteLine(string.Join(", ", names));
     }
 }

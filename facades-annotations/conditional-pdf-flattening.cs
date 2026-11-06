@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "flattened_output.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,50 +16,28 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF to inspect for digital signatures
+        using (Document doc = new Document(inputPath))
         {
-            using (Document pdfDoc = new Document(inputPath))
+            // Determine if any signature fields exist (signed or unsigned)
+            bool hasSignatures = doc?.Form?.SignaturesExist ?? false;
+            // Alternative approach (if SignaturesExist is unavailable):
+            // bool hasSignatures = doc?.Form?.Fields?.OfType<SignatureField>().Any() ?? false;
+
+            if (hasSignatures)
             {
-                // Detect digital signature fields by inspecting Form.Fields collection
-                bool hasSignature = false;
-                if (pdfDoc.Form != null && pdfDoc.Form.Fields != null)
-                {
-                    foreach (var field in pdfDoc.Form.Fields)
-                    {
-                        if (field is SignatureField)
-                        {
-                            hasSignature = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (hasSignature)
-                {
-                    Console.WriteLine("PDF contains digital signatures. Skipping flattening to preserve signature validity.");
-                    // Copy the original file to the output location
-                    File.Copy(inputPath, outputPath, overwrite: true);
-                    Console.WriteLine($"Original PDF copied to '{outputPath}'.");
-                    return;
-                }
-
-                // No signatures – flatten form fields
-                pdfDoc.Form?.Flatten();
-
-                // Flatten annotations using PdfAnnotationEditor (correct API)
-                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                {
-                    editor.BindPdf(pdfDoc);
-                    editor.FlatteningAnnotations();
-                }
-
-                pdfDoc.Save(outputPath);
+                // Preserve signature validity by skipping flattening
+                Console.WriteLine("PDF contains digital signatures. Skipping flattening to preserve signatures.");
+                // Optionally copy the original file to the output location
+                File.Copy(inputPath, outputPath, true);
+            }
+            else
+            {
+                // Safe to flatten when no signatures are present
+                doc.Form.Flatten();
+                doc.Save(outputPath);
                 Console.WriteLine($"Flattening completed. Output saved to '{outputPath}'.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }
