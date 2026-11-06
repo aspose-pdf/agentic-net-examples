@@ -8,85 +8,63 @@ class Program
 {
     static void Main()
     {
-        // Input PDF files for the booklet
-        string[] inputFiles = { "chapter1.pdf", "chapter2.pdf", "chapter3.pdf" };
-        // Output booklet PDF
-        string outputFile = "booklet.pdf";
-        // Log file for audit
-        string logPath = "booklet_creation_log.txt";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "booklet.pdf";
+        const string logPath    = "process.log";
 
-        // Open log file
+        // Open log file for writing (overwrite any existing log)
         using (StreamWriter log = new StreamWriter(logPath, false))
         {
-            log.WriteLine($"[{DateTime.Now}] Booklet creation started.");
+            log.WriteLine($"{DateTime.Now}: Batch booklet creation started.");
 
-            // Verify input files exist
-            List<string> existingFiles = new List<string>();
-            foreach (string file in inputFiles)
+            if (!File.Exists(inputPath))
             {
-                if (File.Exists(file))
-                {
-                    existingFiles.Add(file);
-                    log.WriteLine($"[{DateTime.Now}] Found input file: {file}");
-                }
-                else
-                {
-                    log.WriteLine($"[{DateTime.Now}] Missing input file: {file}");
-                }
-            }
-
-            if (existingFiles.Count == 0)
-            {
-                log.WriteLine($"[{DateTime.Now}] No input files found. Aborting.");
+                log.WriteLine($"{DateTime.Now}: ERROR - Input file not found: {inputPath}");
                 return;
             }
 
-            // ---------- Merge PDFs ----------
-            // PdfFileEditor (Facades) does NOT implement IDisposable – do NOT wrap in using
-            PdfFileEditor editor = new PdfFileEditor();
-
-            // Create a temporary file that will hold the merged result
-            string tempMerged = "temp_merged.pdf";
-            File.Copy(existingFiles[0], tempMerged, true);
-            log.WriteLine($"[{DateTime.Now}] Initialized temporary merged file with: {existingFiles[0]}");
-
-            // Append remaining PDFs to the temporary merged file
-            for (int i = 1; i < existingFiles.Count; i++)
+            // Load the source PDF
+            using (Document srcDoc = new Document(inputPath))
             {
-                string src = existingFiles[i];
-                editor.Concatenate(tempMerged, src, tempMerged);
-                log.WriteLine($"[{DateTime.Now}] Appended {src} to temporary merged file.");
-            }
+                int pageCount = srcDoc.Pages.Count;
+                log.WriteLine($"{DateTime.Now}: Loaded source PDF with {pageCount} pages.");
 
-            // ---------- Reorder pages for booklet ----------
-            // Example reordering: reverse page order (replace with real imposition logic as needed)
-            using (Document doc = new Document(tempMerged))
-            {
-                int pageCount = doc.Pages.Count;
-                log.WriteLine($"[{DateTime.Now}] Reordering pages for booklet. Total pages: {pageCount}");
-
-                // New document to hold reordered pages
-                Document reordered = new Document();
-
-                for (int i = pageCount; i >= 1; i--)
+                // Compute a simple booklet page order:
+                // Example for a single signature: last, first, second, second‑last, …
+                List<int> newOrder = new List<int>();
+                int left = 1;
+                int right = pageCount;
+                while (left < right)
                 {
-                    reordered.Pages.Add(doc.Pages[i]);
-                    log.WriteLine($"[{DateTime.Now}] Added page {i} to reordered document.");
+                    newOrder.Add(right); // back page
+                    newOrder.Add(left);  // front page
+                    left++;
+                    right--;
+                }
+                if (left == right) // odd number of pages – middle page stays at end
+                {
+                    newOrder.Add(left);
                 }
 
-                // Save the final booklet PDF
-                reordered.Save(outputFile);
-                log.WriteLine($"[{DateTime.Now}] Booklet saved to {outputFile}");
+                log.WriteLine($"{DateTime.Now}: Computed new page order: {string.Join(",", newOrder)}");
+
+                // Create a new document that will hold the booklet pages
+                using (Document bookletDoc = new Document())
+                {
+                    foreach (int pageNumber in newOrder)
+                    {
+                        // Add a copy of the source page to the booklet document
+                        bookletDoc.Pages.Add(srcDoc.Pages[pageNumber]);
+                        log.WriteLine($"{DateTime.Now}: Added source page {pageNumber} to booklet.");
+                    }
+
+                    // Save the resulting booklet PDF
+                    bookletDoc.Save(outputPath);
+                    log.WriteLine($"{DateTime.Now}: Booklet PDF saved to {outputPath}.");
+                }
             }
 
-            // Clean up temporary file
-            if (File.Exists(tempMerged))
-            {
-                File.Delete(tempMerged);
-                log.WriteLine($"[{DateTime.Now}] Deleted temporary file {tempMerged}");
-            }
-
-            log.WriteLine($"[{DateTime.Now}] Booklet creation completed.");
+            log.WriteLine($"{DateTime.Now}: Batch booklet creation completed.");
         }
     }
 }

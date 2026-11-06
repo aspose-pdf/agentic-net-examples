@@ -1,60 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path, output PDF path and the last page to extract
+        // Input PDF, output PDF and the last page to include in the split
         const string inputPath  = "input.pdf";
-        const string outputPath = "extracted.pdf";
-        const string endPageStr = "5"; // change as needed
+        const string outputPath = "split_output.pdf";
+        const int    endPage    = 5;   // inclusive; change as needed
 
-        // Validate input file
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Parse the end page number
-        if (!int.TryParse(endPageStr, out int endPage) || endPage < 1)
-        {
-            Console.Error.WriteLine($"Invalid end page number: {endPageStr}");
-            return;
-        }
-
+        // Validate the requested page range using a Document (disposed via using)
+        int totalPages;
         try
         {
-            // Load the source PDF using Document (PdfFileEditor does not expose ExtractPages in this version)
-            Document sourceDoc = new Document(inputPath);
-
-            // Ensure the requested end page does not exceed the source document page count
-            if (endPage > sourceDoc.Pages.Count)
+            using (Document srcDoc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Requested end page ({endPage}) exceeds source page count ({sourceDoc.Pages.Count}).");
-                return;
+                totalPages = srcDoc.Pages.Count;
             }
-
-            // Create a new document to hold the extracted pages
-            Document extractedDoc = new Document();
-
-            // Copy pages 1 through endPage from the source document
-            for (int pageNumber = 1; pageNumber <= endPage; pageNumber++)
-            {
-                // Import the page into the new document (preserves resources)
-                extractedDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
-            }
-
-            // Save the extracted pages to the output file
-            extractedDoc.Save(outputPath);
-
-            Console.WriteLine($"Pages 1-{endPage} extracted to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+            Console.Error.WriteLine($"Failed to read source PDF: {ex.Message}");
+            return;
+        }
+
+        if (endPage < 1 || endPage > totalPages)
+        {
+            Console.Error.WriteLine($"Invalid end page: {endPage}. Document has {totalPages} pages.");
+            return;
+        }
+
+        // Use PdfFileEditor (does NOT implement IDisposable) to extract the page range
+        try
+        {
+            PdfFileEditor editor = new PdfFileEditor();
+            // Extract pages 1 through endPage into a new PDF file
+            // Correct overload: Extract(string sourceFile, int startPage, int endPage, string outputFile)
+            editor.Extract(inputPath, 1, endPage, outputPath);
+            Console.WriteLine($"Pages 1‑{endPage} saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
         }
     }
 }

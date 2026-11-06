@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;                 // Core API for reading page count
+using Aspose.Pdf.Facades;        // Facade API for page deletion
 
 class Program
 {
@@ -16,26 +16,27 @@ class Program
             return;
         }
 
-        // Determine the first and last page numbers using a Document (must be disposed)
-        int firstPage;
-        int lastPage;
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            firstPage = 1;
-            lastPage  = doc.Pages.Count;
+            // Determine the last page number using the core Document API
+            int lastPage;
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+            {
+                lastPage = doc.Pages.Count;   // 1‑based indexing
+            }
+
+            // Prepare an integer array with the first and last page numbers
+            int[] pagesToDelete = new int[] { 1, lastPage };
+
+            // Use the Facade PdfFileEditor to delete the specified pages
+            PdfFileEditor editor = new PdfFileEditor();
+            editor.Delete(inputPath, pagesToDelete, outputPath);
+
+            Console.WriteLine($"First and last pages removed. Result saved to '{outputPath}'.");
         }
-
-        // Prepare the array of pages to delete (first and last)
-        int[] pagesToDelete = new int[] { firstPage, lastPage };
-
-        // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Delete the specified pages and write the result to outputPath
-        // Correct parameter order: input file, pages to delete, output file
-        editor.Delete(inputPath, pagesToDelete, outputPath);
-
-        Console.WriteLine($"First and last pages removed. Result saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

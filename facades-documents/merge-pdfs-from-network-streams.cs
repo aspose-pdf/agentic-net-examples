@@ -1,70 +1,77 @@
 using System;
-using System.IO;
-using System.Net.Http;
 using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using System.IO;
+using System.Linq;
+using Aspose.Pdf;
 
-class PdfMergeUtility
+namespace AsposePdfApi
 {
-    // Merges PDF files obtained from the specified URLs and saves the result to outputPath.
-    // No intermediate files are created; PDFs are streamed directly.
-    public static void MergeFromUrls(string[] pdfUrls, string outputPath)
+    /// <summary>
+    /// Utility class that merges multiple PDF streams into a single PDF file without creating temporary files on disk.
+    /// </summary>
+    public static class PdfMergerUtility
     {
-        // List to hold the open network streams for each PDF.
-        List<Stream> inputStreams = new List<Stream>();
-
-        // Single HttpClient instance for all requests (recommended practice).
-        using (HttpClient httpClient = new HttpClient())
+        /// <summary>
+        /// Merges the supplied PDF streams and writes the combined document to <paramref name="outputPath"/>.
+        /// </summary>
+        /// <param name="pdfStreams">A collection of input PDF streams (e.g., network streams).</param>
+        /// <param name="outputPath">Full path where the merged PDF will be saved.</param>
+        public static void MergeFromStreams(IEnumerable<Stream> pdfStreams, string outputPath)
         {
-            foreach (string url in pdfUrls)
+            if (pdfStreams == null) throw new ArgumentNullException(nameof(pdfStreams));
+            if (string.IsNullOrWhiteSpace(outputPath)) throw new ArgumentException("Output path must be provided.", nameof(outputPath));
+
+            // Ensure none of the input streams are null and are positioned at the beginning.
+            foreach (var s in pdfStreams)
             {
-                // Synchronously download the PDF content as a stream.
-                // The stream remains open until the merge operation completes.
-                HttpResponseMessage response = httpClient.GetAsync(url).Result;
-                response.EnsureSuccessStatusCode();
-                Stream pdfStream = response.Content.ReadAsStreamAsync().Result;
-                inputStreams.Add(pdfStream);
+                if (s == null) throw new ArgumentException("One of the input streams is null.", nameof(pdfStreams));
+                if (s.CanSeek) s.Position = 0;
             }
-        }
 
-        // PdfFileEditor does NOT implement IDisposable; instantiate directly.
-        PdfFileEditor editor = new PdfFileEditor();
+            // Create an empty document that will hold the merged result.
+            Document mergedDocument = new Document();
 
-        // Create the output file stream where the merged PDF will be written.
-        using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-        {
-            // Concatenate all input streams into the output stream.
-            // This method merges PDFs without creating temporary files.
-            editor.Concatenate(inputStreams.ToArray(), outputStream);
-        }
+            // Append pages from each source document.
+            foreach (var stream in pdfStreams)
+            {
+                // Load the source PDF from the stream.
+                Document srcDoc = new Document(stream);
+                // Add all pages of the source document to the merged document.
+                mergedDocument.Pages.Add(srcDoc.Pages);
+            }
 
-        // Dispose all input streams now that merging is finished.
-        foreach (Stream s in inputStreams)
-        {
-            s.Dispose();
+            // Save the merged PDF to the specified path.
+            mergedDocument.Save(outputPath);
         }
     }
 
-    // Example usage.
-    static void Main()
+    class Program
     {
-        string[] pdfUrls = new string[]
+        /// <summary>
+        /// Entry point required by the build system. Demonstrates merging PDFs that are read from a folder
+        /// (simulating network streams) and writing the result to a file named "merged.pdf" in the same folder.
+        /// </summary>
+        static void Main()
         {
-            "https://example.com/doc1.pdf",
-            "https://example.com/doc2.pdf",
-            "https://example.com/doc3.pdf"
-        };
+            // Folder that contains the PDFs to be merged – replace with your actual source.
+            string inputFolder = "InputPdfs";
+            Directory.CreateDirectory(inputFolder);
 
-        string outputPath = "merged_result.pdf";
+            // Collect all PDF files in the folder and open them as read‑only streams.
+            var pdfStreams = Directory.GetFiles(inputFolder, "*.pdf")
+                                      .Select(path => (Stream)File.OpenRead(path))
+                                      .ToList();
 
-        try
-        {
-            MergeFromUrls(pdfUrls, outputPath);
-            Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during merge: {ex.Message}");
+            // Define where the merged PDF will be saved.
+            string outputPath = Path.Combine(inputFolder, "merged.pdf");
+
+            // Perform the merge.
+            PdfMergerUtility.MergeFromStreams(pdfStreams, outputPath);
+
+            // Clean‑up the opened streams.
+            foreach (var s in pdfStreams) s.Dispose();
+
+            Console.WriteLine($"Merged PDF saved to: {outputPath}");
         }
     }
 }

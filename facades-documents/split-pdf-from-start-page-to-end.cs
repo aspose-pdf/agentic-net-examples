@@ -6,32 +6,30 @@ class Program
 {
     static void Main()
     {
-        // Input PDF to split
-        const string sourcePath = "input.pdf";
-        // Output PDF containing pages from startPage to the end
-        const string outputPath = "split_from_page5.pdf";
-        // Page number to start splitting (Aspose.Pdf uses 1‑based indexing)
-        const int startPage = 5;
+        const string sourcePdf = "input.pdf";
+        const string outputPdf = "split_from_page5.pdf";
+        const int startPage = 5; // 1‑based page index
 
-        // Verify the source file exists before attempting the operation
-        if (!File.Exists(sourcePath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block
-        PdfFileEditor editor = new PdfFileEditor();
-
         try
         {
-            // Split the PDF from startPage to the end and save to outputPath
-            editor.SplitToEnd(sourcePath, startPage, outputPath);
-            Console.WriteLine($"PDF successfully split. Output saved to '{outputPath}'.");
+            // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Split from startPage to the end of the document and save to outputPdf
+            // NOTE: SplitToEnd signature is (string sourceFile, int startPage, string outputFile)
+            editor.SplitToEnd(sourcePdf, startPage, outputPdf);
+
+            Console.WriteLine($"PDF split saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
+            Console.Error.WriteLine($"Error during split: {ex.Message}");
         }
     }
 }

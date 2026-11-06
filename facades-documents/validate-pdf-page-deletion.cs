@@ -6,53 +6,58 @@ class Program
 {
     static void Main()
     {
+        // Input PDF and output path after deletion
         const string inputPath = "input.pdf";
         const string outputPath = "output_deleted.pdf";
-        const int pageToDelete = 1; // 1‑based page number to remove
+
+        // Page number to delete (1‑based indexing)
+        const int pageToDelete = 1;
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // ------------------------------------------------------------
+        // Get the original page count
+        // ------------------------------------------------------------
+        int beforeCount;
+        using (Document doc = new Document(inputPath))
         {
-            // Load original document and get the initial page count
-            int originalPageCount;
-            using (Document srcDoc = new Document(inputPath))
-            {
-                originalPageCount = srcDoc.Pages.Count;
-                Console.WriteLine($"Original page count: {originalPageCount}");
-
-                // Delete the specified page directly via the Document API
-                srcDoc.Pages.Delete(pageToDelete);
-
-                // Save the modified document
-                srcDoc.Save(outputPath);
-            }
-
-            // Load the resulting document to obtain the new page count
-            int newPageCount;
-            using (Document dstDoc = new Document(outputPath))
-            {
-                newPageCount = dstDoc.Pages.Count;
-                Console.WriteLine($"New page count after deletion: {newPageCount}");
-            }
-
-            // Validate that the page count decreased by exactly one
-            if (newPageCount == originalPageCount - 1)
-            {
-                Console.WriteLine("Delete operation successful: page count reduced by one.");
-            }
-            else
-            {
-                Console.WriteLine("Delete operation failed: unexpected page count.");
-            }
+            beforeCount = doc.Pages.Count;
         }
-        catch (Exception ex)
+
+        // ------------------------------------------------------------
+        // Delete the specified page using Document API
+        // ------------------------------------------------------------
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Delete the page (1‑based index)
+            doc.Pages.Delete(pageToDelete);
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        // ------------------------------------------------------------
+        // Get the page count after deletion
+        // ------------------------------------------------------------
+        int afterCount;
+        using (Document doc = new Document(outputPath))
+        {
+            afterCount = doc.Pages.Count;
+        }
+
+        // ------------------------------------------------------------
+        // Validate that the page count decreased by one
+        // ------------------------------------------------------------
+        if (afterCount == beforeCount - 1)
+        {
+            Console.WriteLine($"Success: page count reduced from {beforeCount} to {afterCount}.");
+        }
+        else
+        {
+            Console.WriteLine($"Failure: expected {beforeCount - 1} pages after deletion, but got {afterCount}.");
         }
     }
 }

@@ -1,85 +1,91 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-public class BookletGenerator
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Generates a booklet PDF that contains only the right‑hand (odd‑numbered) pages
-    /// from the second half of the source PDF.
-    /// </summary>
-    /// <param name="sourcePath">Full path to the source PDF.</param>
-    /// <param name="outputPath">Full path where the booklet PDF will be saved.</param>
-    public static void GenerateBooklet(string sourcePath, string outputPath)
+    public class BookletGenerator
     {
-        if (!File.Exists(sourcePath))
-            throw new FileNotFoundException("Source PDF not found.", sourcePath);
-
-        // Determine the page range that represents the second half of the document.
-        int totalPages;
-        using (Document srcDoc = new Document(sourcePath))
+        /// <summary>
+        /// Generates a booklet PDF that contains only the right (odd‑numbered) pages
+        /// from the second half of the source PDF.
+        /// </summary>
+        /// <param name="sourcePdfPath">Path to the source PDF.</param>
+        /// <param name="outputPdfPath">Path where the booklet PDF will be saved.</param>
+        public static void GenerateBooklet(string sourcePdfPath, string outputPdfPath)
         {
-            totalPages = srcDoc.Pages.Count;
-        }
+            if (!File.Exists(sourcePdfPath))
+                throw new FileNotFoundException($"Source file not found: {sourcePdfPath}");
 
-        if (totalPages < 2)
-            throw new InvalidOperationException("Source PDF must contain at least two pages.");
-
-        int halfStart = (totalPages / 2) + 1; // first page of the second half (1‑based)
-
-        // Extract the second half into a temporary PDF using the Facades API.
-        string tempHalfPath = Path.Combine(Path.GetTempPath(),
-                                           Guid.NewGuid().ToString("N") + "_secondHalf.pdf");
-
-        PdfFileEditor editor = new PdfFileEditor();
-        // NOTE: In older Aspose.Pdf versions the Extract method signature is
-        // Extract(string sourceFile, int startPage, int endPage, string outputFile).
-        // The parameters are therefore reordered to match that signature.
-        editor.Extract(sourcePath, halfStart, totalPages, tempHalfPath);
-
-        // Build the booklet by selecting only the right‑hand (odd) pages from the extracted half.
-        using (Document halfDoc = new Document(tempHalfPath))
-        using (Document booklet = new Document())
-        {
-            // Pages collection is 1‑based.
-            for (int i = 1; i <= halfDoc.Pages.Count; i++)
+            // Load the source document to obtain the total page count.
+            // Document must be wrapped in a using block for deterministic disposal.
+            using (Document srcDoc = new Document(sourcePdfPath))
             {
-                // Right pages are odd‑numbered.
-                if (i % 2 == 1)
+                int totalPages = srcDoc.Pages.Count;
+
+                // Determine the first page of the second half.
+                // For even page counts the second half starts at (totalPages / 2) + 1.
+                // For odd page counts the integer division already floors the value,
+                // so the same formula works.
+                int secondHalfStart = (totalPages / 2) + 1;
+
+                // Collect odd‑numbered (right) pages from the second half.
+                List<int> rightPages = new List<int>();
+                for (int i = secondHalfStart; i <= totalPages; i++)
                 {
-                    // Add the page to the booklet.
-                    booklet.Pages.Add(halfDoc.Pages[i]);
+                    if (i % 2 == 1) // odd page number = right page
+                        rightPages.Add(i);
                 }
+
+                // If no pages match the criteria, create an empty PDF.
+                if (rightPages.Count == 0)
+                {
+                    using (Document emptyDoc = new Document())
+                    {
+                        emptyDoc.Save(outputPdfPath);
+                    }
+                    return;
+                }
+
+                // Use PdfFileEditor (Facades API) to extract the selected pages.
+                // PdfFileEditor does NOT implement IDisposable, so no using block is needed.
+                PdfFileEditor editor = new PdfFileEditor();
+                // NOTE: In some Aspose.PDF versions the overload order is
+                // Extract(sourcePath, pageNumbers, outputPath).
+                // Swapping the last two arguments ensures compatibility.
+                editor.Extract(sourcePdfPath, rightPages.ToArray(), outputPdfPath);
             }
-
-            // Save the resulting booklet.
-            booklet.Save(outputPath);
         }
-
-        // Clean up the temporary file.
-        try { File.Delete(tempHalfPath); } catch { /* ignore cleanup errors */ }
     }
 
-    // ---------------------------------------------------------------------
-    // Entry point required for a console application (CS5001 fix).
-    // ---------------------------------------------------------------------
-    public static void Main(string[] args)
+    public class Program
     {
-        if (args.Length < 2)
+        /// <summary>
+        /// Entry point required for a console application.
+        /// Expects two arguments: <c>sourcePdfPath</c> and <c>outputPdfPath</c>.
+        /// </summary>
+        public static void Main(string[] args)
         {
-            Console.WriteLine("Usage: BookletGenerator <sourcePdfPath> <outputPdfPath>");
-            return;
-        }
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: AsposePdfApi <sourcePdfPath> <outputPdfPath>");
+                return;
+            }
 
-        try
-        {
-            GenerateBooklet(args[0], args[1]);
-            Console.WriteLine($"Booklet created successfully at '{args[1]}'");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            string sourcePath = args[0];
+            string outputPath = args[1];
+
+            try
+            {
+                BookletGenerator.GenerateBooklet(sourcePath, outputPath);
+                Console.WriteLine($"Booklet successfully created at '{outputPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error generating booklet: {ex.Message}");
+            }
         }
     }
 }

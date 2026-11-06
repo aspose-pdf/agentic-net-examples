@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
@@ -6,55 +7,51 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Expect at least two input PDF files and one output path.
-        // Usage: dotnet run input1.pdf input2.pdf ... output.pdf
-        if (args.Length < 3)
+        // Expect at least two PDF files to concatenate
+        if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: <input1.pdf> <input2.pdf> ... <output.pdf>");
+            Console.Error.WriteLine("Usage: ConcatenatePdf <input1.pdf> <input2.pdf> [more... ]");
             return;
         }
 
-        // The last argument is the output file; all preceding arguments are inputs.
-        string outputPath = args[args.Length - 1];
-        string[] inputPaths = new string[args.Length - 1];
-        Array.Copy(args, inputPaths, args.Length - 1);
-
-        // Validate input files exist.
-        foreach (string path in inputPaths)
+        // Verify that all input files exist
+        foreach (string path in args)
         {
             if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"Input file not found: {path}");
+                Console.Error.WriteLine($"File not found: {path}");
                 return;
             }
         }
 
-        // Prepare input streams.
-        Stream[] inputStreams = new Stream[inputPaths.Length];
+        // Prepare a list to hold the opened input streams
+        List<Stream> inputStreams = new List<Stream>();
         try
         {
-            for (int i = 0; i < inputPaths.Length; i++)
+            // Open each input PDF as a read‑only FileStream
+            foreach (string path in args)
             {
-                // Open each PDF file for reading.
-                inputStreams[i] = new FileStream(inputPaths[i], FileMode.Open, FileAccess.Read);
+                inputStreams.Add(File.OpenRead(path));
             }
 
-            // Open output stream for writing the concatenated PDF.
-            using (FileStream outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // Create the output stream (will be overwritten if it exists)
+            using (FileStream outputStream = new FileStream("merged.pdf", FileMode.Create, FileAccess.Write))
             {
-                // PdfFileEditor provides a Concatenate overload that works with streams.
+                // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block
                 PdfFileEditor editor = new PdfFileEditor();
-                editor.Concatenate(inputStreams, outputStream);
+
+                // Concatenate using the stream overloads
+                editor.Concatenate(inputStreams.ToArray(), outputStream);
             }
 
-            Console.WriteLine($"Successfully concatenated {inputPaths.Length} PDFs into '{outputPath}'.");
+            Console.WriteLine("PDF files successfully concatenated to 'merged.pdf'.");
         }
         finally
         {
-            // Ensure all input streams are closed even if an exception occurs.
+            // Ensure all input streams are properly disposed
             foreach (Stream s in inputStreams)
             {
-                s?.Dispose();
+                s.Dispose();
             }
         }
     }

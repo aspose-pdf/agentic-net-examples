@@ -1,96 +1,94 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class BatchPdfProcessor
+class Program
 {
     static void Main()
     {
-        // Define input PDF files and the pages to delete from each (1‑based indexing)
-        var filesToProcess = new Dictionary<string, int[]>
+        // Define each source PDF and the pages (1‑based) that must be removed.
+        // Adjust the array as needed for your batch.
+        var inputs = new (string Path, int[] PagesToDelete)[]
         {
-            // Example: delete pages 2 and 4 from "doc1.pdf"
-            { "doc1.pdf", new int[] { 2, 4 } },
-
-            // Example: delete page 1 from "doc2.pdf"
-            { "doc2.pdf", new int[] { 1 } },
-
-            // Add more entries as needed
-            // { "path/to/other.pdf", new int[] { 3, 5, 7 } },
+            ("doc1.pdf", new int[] { 2, 5 }),   // delete pages 2 and 5 from doc1.pdf
+            ("doc2.pdf", new int[] { 1 }),      // delete page 1 from doc2.pdf
+            ("doc3.pdf", new int[0])            // no pages to delete from doc3.pdf
         };
 
-        // Output path for the final concatenated PDF
-        const string finalOutputPath = "merged_cleaned.pdf";
+        // Temporary folder to store the cleaned PDFs before concatenation.
+        string tempDir = Path.Combine(Path.GetTempPath(), "AsposePdfCleaned");
+        Directory.CreateDirectory(tempDir);
 
-        // List to hold paths of the intermediate cleaned PDFs
-        var cleanedPdfPaths = new List<string>();
+        var cleanedFiles = new List<string>();
 
-        // Process each source PDF: delete specified pages and save to a temporary file
-        foreach (var kvp in filesToProcess)
+        // PdfFileEditor does NOT implement IDisposable – instantiate once and reuse.
+        PdfFileEditor editor = new PdfFileEditor();
+
+        foreach (var (sourcePath, pagesToDelete) in inputs)
         {
-            string sourcePath = kvp.Key;
-            int[] pagesToDelete = kvp.Value;
-
             if (!File.Exists(sourcePath))
             {
-                Console.Error.WriteLine($"Source file not found: {sourcePath}");
+                Console.Error.WriteLine($"Input file not found: {sourcePath}");
                 continue;
             }
 
-            // Create a temporary file for the cleaned PDF
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+            // Path for the intermediate cleaned PDF.
+            string cleanedPath = Path.Combine(
+                tempDir,
+                Path.GetFileNameWithoutExtension(sourcePath) + "_cleaned.pdf");
 
-            // Load the PDF with Document (Aspose.Pdf) – PdfFileEditor has no DeletePages method in this version
-            using (Document pdfDoc = new Document(sourcePath))
+            // Load the PDF with the Document API (PdfFileEditor has no DeletePages).
+            Document doc = new Document(sourcePath);
+
+            if (pagesToDelete != null && pagesToDelete.Length > 0)
             {
-                // Sort pages descending so removal does not affect subsequent indices
-                Array.Sort(pagesToDelete);
-                for (int i = pagesToDelete.Length - 1; i >= 0; i--)
+                // Delete pages in descending order to keep indices stable.
+                foreach (int pageNum in pagesToDelete.OrderByDescending(p => p))
                 {
-                    int pageNumber = pagesToDelete[i];
-                    if (pageNumber >= 1 && pageNumber <= pdfDoc.Pages.Count)
+                    if (pageNum >= 1 && pageNum <= doc.Pages.Count)
                     {
-                        pdfDoc.Pages.Delete(pageNumber);
+                        doc.Pages.Delete(pageNum);
                     }
                     else
                     {
-                        Console.Error.WriteLine($"Page {pageNumber} is out of range for file {sourcePath} (1‑{pdfDoc.Pages.Count})");
+                        Console.Error.WriteLine($"Page {pageNum} is out of range for '{sourcePath}'.");
                     }
                 }
-
-                // Save the cleaned PDF to the temporary location
-                pdfDoc.Save(tempPath);
             }
+            // Save the cleaned version.
+            doc.Save(cleanedPath);
 
-            cleanedPdfPaths.Add(tempPath);
+            cleanedFiles.Add(cleanedPath);
         }
 
-        if (cleanedPdfPaths.Count == 0)
+        // Final merged PDF that contains all cleaned documents.
+        string outputPath = "merged_cleaned.pdf";
+
+        if (cleanedFiles.Count > 0)
         {
-            Console.Error.WriteLine("No cleaned PDFs were generated. Exiting.");
-            return;
+            // Concatenate the cleaned PDFs into a single document.
+            // Concatenate expects an array of source file names.
+            editor.Concatenate(cleanedFiles.ToArray(), outputPath);
+            Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
+        }
+        else
+        {
+            Console.Error.WriteLine("No cleaned files were generated; merging skipped.");
         }
 
-        // Concatenate all cleaned PDFs into the final document using PdfFileEditor
-        PdfFileEditor concatEditor = new PdfFileEditor();
-        concatEditor.Concatenate(cleanedPdfPaths.ToArray(), finalOutputPath);
-
-        Console.WriteLine($"Merged PDF created at: {finalOutputPath}");
-
-        // Optional: clean up temporary files
-        foreach (string tempFile in cleanedPdfPaths)
+        // Optional: delete temporary cleaned files and folder.
+        try
         {
-            try
-            {
-                if (File.Exists(tempFile))
-                    File.Delete(tempFile);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to delete temporary file '{tempFile}': {ex.Message}");
-            }
+            foreach (var file in cleanedFiles)
+                File.Delete(file);
+            Directory.Delete(tempDir);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Cleanup error: {ex.Message}");
         }
     }
 }

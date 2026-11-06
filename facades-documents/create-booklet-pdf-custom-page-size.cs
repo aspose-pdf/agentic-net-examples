@@ -1,78 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;   // Facade namespace as required
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
         const string outputPath = "booklet.pdf";
+        const double pageWidth = 420;   // example width in points
+        const double pageHeight = 595;  // example height in points
 
-        // Custom page dimensions (in points). Example: A5 size 420 x 595 points.
-        const double customWidth  = 420.0;
-        const double customHeight = 595.0;
+        // ------------------------------------------------------------
+        // 1. Create a minimal source PDF in memory (self‑contained example)
+        // ------------------------------------------------------------
+        using var sourceDoc = new Document();
+        sourceDoc.Pages.Add(); // at least one page so MakeBooklet has something to work with
+        using var sourceStream = new MemoryStream();
+        sourceDoc.Save(sourceStream);
+        sourceStream.Position = 0; // reset for reading by MakeBooklet
 
-        if (!File.Exists(inputPath))
+        // ------------------------------------------------------------
+        // 2. Create the booklet using the stream‑based overload
+        // ------------------------------------------------------------
+        using var bookletStream = new MemoryStream();
+        var editor = new PdfFileEditor();
+        bool success = editor.MakeBooklet(sourceStream, bookletStream);
+        if (!success)
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.WriteLine("Failed to create booklet.");
             return;
         }
 
-        // Facade instance (not used directly but satisfies the requirement to use Aspose.Pdf.Facades)
-        PdfFileEditor facade = new PdfFileEditor();
-
-        // Load source PDF from a stream
-        using (FileStream inputStream = File.OpenRead(inputPath))
-        using (Document srcDoc = new Document(inputStream))
-        // Create an empty target PDF
-        using (Document resultDoc = new Document())
+        // ------------------------------------------------------------
+        // 3. Load the generated booklet, adjust page dimensions, and save
+        // ------------------------------------------------------------
+        bookletStream.Position = 0; // rewind before loading into Document
+        using var bookletDoc = new Document(bookletStream);
+        foreach (Page page in bookletDoc.Pages)
         {
-            int pageCount = srcDoc.Pages.Count;
-
-            // Compute booklet order: first, last, second, second‑last, ...
-            // If the number of pages is odd, add a blank page at the end.
-            int totalPages = pageCount;
-            if (totalPages % 2 != 0)
-            {
-                // Add a blank page to make the count even
-                srcDoc.Pages.Add();
-                totalPages++;
-            }
-
-            int left = 1;               // 1‑based index for the first page
-            int right = totalPages;     // 1‑based index for the last page
-
-            while (left < right)
-            {
-                // Add left page
-                resultDoc.Pages.Add(srcDoc.Pages[left]);
-                SetCustomSize(resultDoc.Pages[resultDoc.Pages.Count], customWidth, customHeight);
-
-                // Add right page
-                resultDoc.Pages.Add(srcDoc.Pages[right]);
-                SetCustomSize(resultDoc.Pages[resultDoc.Pages.Count], customWidth, customHeight);
-
-                left++;
-                right--;
-            }
-
-            // If there was an original middle page (even count), it has already been added.
-            // Save the booklet PDF to a stream
-            using (FileStream outputStream = File.Create(outputPath))
-            {
-                resultDoc.Save(outputStream);
-            }
+            page.PageInfo.Width = pageWidth;
+            page.PageInfo.Height = pageHeight;
         }
 
-        Console.WriteLine($"Booklet PDF created at '{outputPath}'.");
-    }
-
-    // Helper to set custom dimensions on a page
-    private static void SetCustomSize(Aspose.Pdf.Page page, double width, double height)
-    {
-        page.PageInfo.Width  = width;
-        page.PageInfo.Height = height;
+        // Save the final booklet to the desired file path
+        bookletDoc.Save(outputPath);
+        Console.WriteLine($"Booklet created at '{outputPath}'.");
     }
 }

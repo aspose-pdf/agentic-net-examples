@@ -1,51 +1,53 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the split PDF files (e.g., Page_1.pdf, Page_2.pdf, ...)
-        const string splitFolder   = "SplitPages";
-        // Path for the final concatenated PDF
-        const string outputPdfPath = "combined.pdf";
+        // Directory containing the split PDF files
+        const string inputDir = "SplitPages";
+        // Path for the final merged PDF
+        const string outputPath = "merged_selected.pdf";
 
-        if (!Directory.Exists(splitFolder))
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Folder not found: {splitFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        // Get all PDF files in the folder – adjust the search pattern if needed
-        string[] splitFiles = Directory.GetFiles(splitFolder, "*.pdf");
-        if (splitFiles.Length == 0)
+        // Get all PDF files in the directory, sorted to ensure deterministic order
+        var pdfFiles = Directory.GetFiles(inputDir, "*.pdf")
+                                .OrderBy(f => f)
+                                .ToArray();
+
+        if (pdfFiles.Length == 0)
         {
-            Console.Error.WriteLine("No PDF files found to concatenate.");
+            Console.Error.WriteLine("No PDF files found to merge.");
             return;
         }
 
-        // Create an empty target document
-        using (Document target = new Document())
+        // Load the first PDF as the base document
+        Document mergedDoc = new Document(pdfFiles[0]);
+
+        // Append pages from each subsequent PDF
+        for (int i = 1; i < pdfFiles.Length; i++)
         {
-            // Iterate over each split PDF and insert its pages at the end of the target
-            foreach (string filePath in splitFiles)
+            string srcPath = pdfFiles[i];
+            using (Document srcDoc = new Document(srcPath))
             {
-                using (Document source = new Document(filePath))
+                // Add each page from the source document to the merged document
+                foreach (Page page in srcDoc.Pages)
                 {
-                    // Pages are 1‑based in Aspose.Pdf
-                    for (int i = 1; i <= source.Pages.Count; i++)
-                    {
-                        // Insert the page after the current last page (i.e., at position Count + 1)
-                        target.Pages.Insert(target.Pages.Count + 1, source.Pages[i]);
-                    }
+                    mergedDoc.Pages.Add(page);
                 }
             }
-
-            // Save the concatenated document
-            target.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Concatenated PDF saved to '{outputPdfPath}'.");
+        // Save the merged PDF
+        mergedDoc.Save(outputPath);
+        Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
     }
 }

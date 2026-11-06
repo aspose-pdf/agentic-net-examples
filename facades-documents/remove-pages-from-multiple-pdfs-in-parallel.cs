@@ -1,63 +1,41 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Aspose.Pdf; // Use Document class for PDF manipulation
+using Aspose.Pdf; // Document API for page manipulation
 
 class PdfPageRemover
 {
-    // Removes the specified pages from each PDF file in parallel.
-    // pdfPaths: full paths to source PDF files.
-    // pagesToRemove: list of 1‑based page numbers to delete from each PDF.
-    // outputFolder: folder where the processed PDFs will be saved.
-    public static void RemovePagesFromMultiplePdfs(
-        List<string> pdfPaths,
-        List<int> pagesToRemove,
-        string outputFolder)
+    // Entry point: args[0] = comma‑separated page numbers to delete,
+    // args[1..] = paths of PDF files to process.
+    static void Main(string[] args)
     {
-        if (pdfPaths == null) throw new ArgumentNullException(nameof(pdfPaths));
-        if (pagesToRemove == null) throw new ArgumentNullException(nameof(pagesToRemove));
-        if (string.IsNullOrWhiteSpace(outputFolder)) throw new ArgumentException("Output folder must be specified.", nameof(outputFolder));
-
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputFolder);
-
-        // Prepare a descending‑sorted array of pages to delete – this prevents index shifting when removing multiple pages.
-        int[] pagesArray = pagesToRemove.Distinct().OrderByDescending(p => p).ToArray();
-
-        // Process each PDF file concurrently.
-        Parallel.ForEach(pdfPaths, pdfPath =>
+        if (args.Length < 2)
         {
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                return;
-            }
+            Console.Error.WriteLine("Usage: PdfPageRemover <pages> <pdf1> [<pdf2> ...]");
+            Console.Error.WriteLine("  <pages> : comma‑separated list of 1‑based page numbers to remove (e.g. 2,5,7)");
+            return;
+        }
 
-            // Build the output file name (e.g., "document_trimmed.pdf").
-            string outputPath = Path.Combine(
-                outputFolder,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_trimmed.pdf");
+        // Parse page numbers (1‑based) into an int array.
+        int[] pagesToRemove = ParsePageNumbers(args[0]);
+        if (pagesToRemove.Length == 0)
+        {
+            Console.Error.WriteLine("No valid page numbers supplied.");
+            return;
+        }
 
+        // Collect PDF file paths.
+        string[] pdfFiles = args.Skip(1).ToArray();
+
+        // Process each PDF in parallel.
+        Parallel.ForEach(pdfFiles, pdfPath =>
+        {
             try
             {
-                // Load the PDF document.
-                Document pdfDoc = new Document(pdfPath);
-
-                // Remove the requested pages. The Pages collection is 1‑based.
-                foreach (int pageNum in pagesArray)
-                {
-                    if (pageNum >= 1 && pageNum <= pdfDoc.Pages.Count)
-                    {
-                        pdfDoc.Pages.Delete(pageNum);
-                    }
-                }
-
-                // Save the modified document.
-                pdfDoc.Save(outputPath);
-
-                Console.WriteLine($"Processed: {pdfPath} -> {outputPath}");
+                ProcessPdf(pdfPath, pagesToRemove);
+                Console.WriteLine($"Processed: {pdfPath}");
             }
             catch (Exception ex)
             {
@@ -66,23 +44,45 @@ class PdfPageRemover
         });
     }
 
-    // Example entry point.
-    static void Main()
+    // Converts a comma‑separated string into an array of distinct, sorted page numbers.
+    private static int[] ParsePageNumbers(string pagesCsv)
     {
-        // Example input: list of PDF files.
-        var pdfFiles = new List<string>
+        var numbers = new HashSet<int>();
+        foreach (var part in pagesCsv.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
         {
-            @"C:\Docs\Report1.pdf",
-            @"C:\Docs\Report2.pdf",
-            @"C:\Docs\Report3.pdf"
-        };
+            if (int.TryParse(part.Trim(), out int n) && n > 0)
+                numbers.Add(n);
+        }
+        // Aspose.Pdf expects the page numbers in ascending order for our own logic.
+        return numbers.OrderBy(n => n).ToArray();
+    }
 
-        // Pages to remove (1‑based indexing).
-        var pagesToDelete = new List<int> { 2, 5, 7 };
+    // Removes the specified pages from a single PDF file.
+    private static void ProcessPdf(string inputPath, int[] pagesToRemove)
+    {
+        if (!File.Exists(inputPath))
+            throw new FileNotFoundException("Input PDF not found.", inputPath);
 
-        // Output directory for the trimmed PDFs.
-        string outputDir = @"C:\Docs\Trimmed";
+        // Determine output path (overwrite original safely).
+        string tempPath = Path.Combine(Path.GetDirectoryName(inputPath) ?? string.Empty,
+                                       Path.GetFileNameWithoutExtension(inputPath) + "_tmp.pdf");
 
-        RemovePagesFromMultiplePdfs(pdfFiles, pagesToDelete, outputDir);
+        // Load the PDF with Document (thread‑local instance).
+        using (var pdfDoc = new Document(inputPath))
+        {
+            // Delete pages in descending order to keep indexes stable.
+            foreach (int pageNum in pagesToRemove.Reverse())
+            {
+                if (pageNum <= pdfDoc.Pages.Count)
+                    pdfDoc.Pages.Delete(pageNum);
+            }
+
+            // Save the modified document to a temporary file.
+            pdfDoc.Save(tempPath);
+        }
+
+        // Replace original file with the trimmed version.
+        File.Delete(inputPath);
+        File.Move(tempPath, inputPath);
     }
 }
