@@ -1,67 +1,60 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Facades; // Included as per requirement
+using Aspose.Pdf.Facades;   // Facade namespace as required
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files whose data will be exported to JSON
-        string[] pdfFiles = { "input1.pdf", "input2.pdf", "input3.pdf" };
-        // Output JSON file that will contain a single JSON array
-        const string outputJsonPath = "combined.json";
+        // List of PDF files whose JSON exports will be combined.
+        // It is assumed that each PDF has a corresponding JSON file
+        // with the same name and a ".json" extension.
+        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
 
-        // Validate input files
+        // Collect individual JSON objects.
+        List<string> jsonObjects = new List<string>();
+
+        // PdfFileEditor does NOT implement IDisposable; instantiate once.
+        PdfFileEditor editor = new PdfFileEditor();
+
         foreach (string pdfPath in pdfFiles)
         {
             if (!File.Exists(pdfPath))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                return;
+                Console.Error.WriteLine($"PDF not found: {pdfPath}");
+                continue;
             }
-        }
 
-        // List to hold individual JSON objects as strings
-        List<string> jsonObjects = new List<string>();
+            // Determine the expected JSON export file name.
+            string jsonPath = Path.ChangeExtension(pdfPath, ".json");
 
-        try
-        {
-            // Extract text from each PDF and build a JSON object
-            foreach (string pdfPath in pdfFiles)
+            if (!File.Exists(jsonPath))
             {
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Extract all text from the document
-                    TextAbsorber absorber = new TextAbsorber();
-                    doc.Pages.Accept(absorber);
-                    string rawText = absorber.Text ?? string.Empty;
-
-                    // Escape characters for valid JSON string values
-                    string escapedText = rawText
-                        .Replace("\\", "\\\\")
-                        .Replace("\"", "\\\"")
-                        .Replace("\r", "")
-                        .Replace("\n", "\\n");
-
-                    // Build a simple JSON object containing the file name and its text
-                    string jsonObject = $"{{\"file\":\"{Path.GetFileName(pdfPath)}\",\"text\":\"{escapedText}\"}}";
-                    jsonObjects.Add(jsonObject);
-                }
+                Console.Error.WriteLine($"JSON export not found for {pdfPath}");
+                continue;
             }
 
-            // Combine all objects into a single JSON array
-            string combinedJson = "[" + string.Join(",", jsonObjects) + "]";
+            // Read the JSON content.
+            string jsonContent = File.ReadAllText(jsonPath).Trim();
 
-            // Write the combined JSON array to the output file
-            File.WriteAllText(outputJsonPath, combinedJson);
-            Console.WriteLine($"Combined JSON written to '{outputJsonPath}'.");
+            // Validate that the content is a JSON object.
+            if (jsonContent.StartsWith("{") && jsonContent.EndsWith("}"))
+            {
+                jsonObjects.Add(jsonContent);
+            }
+            else
+            {
+                Console.Error.WriteLine($"Invalid JSON format in {jsonPath}");
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
+
+        // Combine all objects into a single JSON array.
+        string combinedJson = "[" + string.Join(",", jsonObjects) + "]";
+
+        // Write the combined array to the output file.
+        string outputPath = "combined.json";
+        File.WriteAllText(outputPath, combinedJson);
+        Console.WriteLine($"Combined JSON written to {outputPath}");
     }
 }

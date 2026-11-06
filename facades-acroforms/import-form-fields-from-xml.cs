@@ -1,42 +1,50 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
-        const string xmlPath = "data.xml";
-        const string outputPath = "filled_form.pdf";
+        const string pdfPath   = "input_form.pdf";   // PDF with form fields
+        const string xmlPath   = "form_data.xml";    // XML containing field values
+        const string outputPdf = "filled_form.pdf";
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
+
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Use the Form facade to bind the PDF and import XML data
-        using (Form form = new Form())
+        try
         {
-            // Bind the source PDF
-            form.BindPdf(pdfPath);
-
-            // Import field values from the XML stream using the correct API
-            using (FileStream xmlStream = File.OpenRead(xmlPath))
+            // Load the PDF document
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                form.ImportXml(xmlStream);
+                // Open the XML file as a stream
+                using (FileStream xmlStream = File.OpenRead(xmlPath))
+                {
+                    // Use the Form facade to import XML data
+                    using (Form form = new Form(pdfDoc))
+                    {
+                        form.ImportXml(xmlStream);   // <-- corrected method
+                        form.Save(outputPdf);         // Save via the facade (disposes Document internally)
+                    }
+                }
             }
 
-            // Save the updated PDF to the desired output path
-            form.Save(outputPath);
+            Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

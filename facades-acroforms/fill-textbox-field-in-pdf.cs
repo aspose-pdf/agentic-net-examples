@@ -1,42 +1,37 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "filled.pdf";
-        const string fieldName  = "TextBox1";          // name of the textbox field in the PDF
-        const string fieldValue = "Hello, World!";    // value to set
+        const string inputPdf  = "input.pdf";      // PDF containing the textbox field
+        const string outputPdf = "filled_output.pdf";
+        const string fieldName = "TextBox1";       // name of the form field to fill
+        const string fieldValue = "Hello, Aspose!";
 
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Form is a Facades class that implements IDisposable – use a using block for deterministic cleanup
+        using (Form form = new Form())
         {
-            // Form implements IDisposable, so wrap it in a using block
-            using (Form form = new Form())
-            {
-                // Load the existing PDF document
-                form.BindPdf(inputPath);
+            // Load the PDF document into the Form object
+            form.BindPdf(inputPdf);
 
-                // Fill the specified textbox field with the desired value
-                form.FillField(fieldName, fieldValue);
+            // Fill the specified textbox field with the desired string value
+            form.FillField(fieldName, fieldValue);
 
-                // Save the updated PDF to a new file
-                form.Save(outputPath);
-            }
-
-            Console.WriteLine($"Field '{fieldName}' filled and saved to '{outputPath}'.");
+            // Save the modified PDF to a new file
+            form.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form field '{fieldName}' filled and saved to '{outputPdf}'.");
     }
 }

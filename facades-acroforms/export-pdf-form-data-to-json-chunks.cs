@@ -2,79 +2,75 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // Added for direct form field access
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "FormDataParts";
+        const string inputPdfPath = "input.pdf";               // source PDF with form fields
+        const string tempJsonPath = "formdata_full.json";      // temporary full JSON export
+        const string outputDir    = "FormDataChunks";          // folder for split files
+        const int   maxFieldsPerFile = 100;                    // limit per JSON file
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block (lifecycle rule)
+        // Load PDF and export all form data to a single JSON file.
+        // In recent Aspose.PDF versions the FormDataExtractor class is obsolete;
+        // the Document.Form object provides ExportToJson directly.
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // -----------------------------------------------------------------
-            // NOTE: The original code used FormDataExtractor which is not available
-            // in the referenced Aspose.Pdf version.  Instead we extract the form
-            // fields directly via the Aspose.Pdf.Forms namespace.
-            // -----------------------------------------------------------------
-            var form = pdfDoc.Form;
-            if (form == null || form.Fields == null || form.Fields.Count() == 0)
+            // Export the entire form data to JSON.
+            pdfDoc.Form.ExportToJson(tempJsonPath);
+        }
+
+        // Read the generated JSON and parse it into a JsonObject
+        string fullJson = File.ReadAllText(tempJsonPath);
+        JsonObject allFields = JsonNode.Parse(fullJson).AsObject();
+
+        // Split the fields into chunks of at most maxFieldsPerFile
+        int fileIndex = 0;
+        int fieldCount = 0;
+        JsonObject chunk = new JsonObject();
+
+        foreach (KeyValuePair<string, JsonNode?> kvp in allFields)
+        {
+            // Add current field to the current chunk
+            chunk.Add(kvp.Key, kvp.Value);
+            fieldCount++;
+
+            // When the chunk reaches the limit, write it out and start a new one
+            if (fieldCount == maxFieldsPerFile)
             {
-                Console.WriteLine("No form fields found in the PDF.");
-                return;
-            }
-
-            // Build a dictionary of field name -> field value (as JsonElement compatible objects)
-            var allFields = new Dictionary<string, object>(form.Fields.Count());
-            foreach (var field in form.Fields)
-            {
-                // Most field types expose a "Value" property that can be directly used.
-                // For safety we convert nulls to empty strings.
-                object value = field?.Value ?? string.Empty;
-                allFields[field?.FullName ?? string.Empty] = value;
-            }
-
-            // -----------------------------------------------------------------
-            // Split the dictionary into batches of at most 100 fields each.
-            // -----------------------------------------------------------------
-            const int batchSize = 100;
-            var fieldEntries = new List<KeyValuePair<string, object>>(allFields);
-            int totalBatches = (fieldEntries.Count + batchSize - 1) / batchSize;
-
-            for (int batchIndex = 0; batchIndex < totalBatches; batchIndex++)
-            {
-                int start = batchIndex * batchSize;
-                int count = Math.Min(batchSize, fieldEntries.Count - start);
-
-                var batchDict = new Dictionary<string, object>(count);
-                for (int i = 0; i < count; i++)
-                {
-                    var kv = fieldEntries[start + i];
-                    batchDict[kv.Key] = kv.Value;
-                }
-
-                // Serialize the batch to JSON with indentation for readability
-                string batchJson = JsonSerializer.Serialize(batchDict, new JsonSerializerOptions { WriteIndented = true });
-
-                // Write the batch to a file
-                string batchFilePath = Path.Combine(outputFolder, $"formdata_part{batchIndex + 1}.json");
-                File.WriteAllText(batchFilePath, batchJson);
-                Console.WriteLine($"Created: {batchFilePath}");
+                fileIndex++;
+                string chunkPath = Path.Combine(outputDir, $"formdata_{fileIndex}.json");
+                File.WriteAllText(chunkPath, chunk.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+                // Reset for next chunk
+                chunk = new JsonObject();
+                fieldCount = 0;
             }
         }
 
-        Console.WriteLine("Form data export and splitting completed.");
+        // Write any remaining fields that didn't fill a complete chunk
+        if (fieldCount > 0)
+        {
+            fileIndex++;
+            string chunkPath = Path.Combine(outputDir, $"formdata_{fileIndex}.json");
+            File.WriteAllText(chunkPath, chunk.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+        }
+
+        // Optionally delete the temporary full JSON file
+        File.Delete(tempJsonPath);
+
+        Console.WriteLine($"Form data exported and split into {fileIndex} file(s) under '{outputDir}'.");
     }
 }

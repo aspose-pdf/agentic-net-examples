@@ -7,40 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";   // source PDF with form fields
-        const string xfdfPath = "data.xfdf";       // XFDF file containing field values
-        const string outputPdfPath = "output.pdf"; // PDF after importing data
+        const string pdfPath = "input.pdf";   // source PDF with form fields
+        const string xfdfPath = "data.xfdf"; // XFDF file containing field values
+        const string outputPath = "output.pdf"; // PDF after importing data
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify that the required files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(xfdfPath))
         {
-            Console.Error.WriteLine($"Error: XFDF file not found – {xfdfPath}");
+            Console.Error.WriteLine($"XFDF not found: {xfdfPath}");
             return;
         }
 
-        // Form is a Facade class that works with PDF documents.
-        // It implements IDisposable, so wrap it in a using block for deterministic cleanup.
-        using (Form form = new Form())
+        // Load the PDF document and bind it to the Form facade
+        using (Document doc = new Document(pdfPath))
+        using (Form formFacade = new Form(doc))
         {
-            // Bind the existing PDF document to the Form object.
-            form.BindPdf(inputPdfPath);
-
-            // Import form field values from the XFDF file.
-            // The ImportXfdf overload expects a Stream, so open the XFDF file as a read‑only stream.
+            // Import form field values from the XFDF file into the PDF.
+            // The ImportXfdf overload expects a Stream, so open the file as a stream.
             using (FileStream xfdfStream = File.OpenRead(xfdfPath))
             {
-                form.ImportXfdf(xfdfStream);
+                formFacade.ImportXfdf(xfdfStream);
             }
 
-            // Save the updated PDF to a new file.
-            form.Save(outputPdfPath);
+            // Save the updated PDF to the specified output path.
+            formFacade.Save(outputPath);
         }
 
-        Console.WriteLine($"Form data imported successfully. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
     }
 }
