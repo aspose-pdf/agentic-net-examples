@@ -3,14 +3,16 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 using Aspose.Pdf.Annotations;
+// System.Drawing is kept for potential future use, but all Aspose.Pdf types are fully qualified to avoid ambiguity.
+using System.Drawing; // only needed if you explicitly use System.Drawing types elsewhere
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "highlighted.pdf";
-        const string searchText = "SELECTED TEXT"; // replace with the exact text to highlight
+        const string outputPath = "highlighted_output.pdf";
+        const string searchText = "sample text"; // text to highlight on page 3
 
         if (!File.Exists(inputPath))
         {
@@ -18,32 +20,45 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Search for the text on page 3 only (page index is 1‑based)
-        TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
-        doc.Pages[3].Accept(absorber);
-
-        // If nothing was found, exit gracefully
-        if (absorber.TextFragments.Count == 0)
+        // 1. Locate the rectangle of the selected text on page 3
+        Aspose.Pdf.Rectangle textRect;
+        using (Document doc = new Document(inputPath))
         {
-            Console.WriteLine("No matching text found on page 3.");
-            return;
+            // Ensure page indexing is 1‑based
+            if (doc.Pages.Count < 3)
+            {
+                Console.Error.WriteLine("The document has fewer than 3 pages.");
+                return;
+            }
+
+            // Search for the text fragment
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
+            doc.Pages[3].Accept(absorber);
+
+            if (absorber.TextFragments.Count == 0)
+            {
+                Console.Error.WriteLine($"Text \"{searchText}\" not found on page 3.");
+                return;
+            }
+
+            // Take the first occurrence's rectangle
+            textRect = absorber.TextFragments[1].Rectangle;
         }
 
-        // Add a highlight annotation for each found fragment
-        foreach (TextFragment fragment in absorber.TextFragments)
+        // 2. Add a highlight annotation using the Document API (not PdfAnnotationEditor)
+        using (Document doc = new Document(inputPath))
         {
-            // Create a HighlightAnnotation on the same page using the fragment rectangle
-            HighlightAnnotation highlight = new HighlightAnnotation(doc.Pages[3], fragment.Rectangle);
-            highlight.Color = Color.Yellow; // set highlight color
-            doc.Pages[3].Annotations.Add(highlight);
+            Page page = doc.Pages[3];
+            var highlight = new HighlightAnnotation(page, textRect)
+            {
+                Color = Aspose.Pdf.Color.Yellow, // fully qualified to avoid CS0104
+                Title = "Highlight",
+                Contents = searchText
+            };
+            page.Annotations.Add(highlight);
+            doc.Save(outputPath);
         }
 
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Highlight annotation applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation added. Saved to '{outputPath}'.");
     }
 }

@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using System.Drawing; // Needed for System.Drawing.Rectangle
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "edited.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,29 +20,25 @@ class Program
         // PdfContentEditor implements IDisposable, so wrap it in a using block.
         using (PdfContentEditor editor = new PdfContentEditor())
         {
-            // Load the source PDF.
+            // Bind the PDF – this keeps the editor available for any other
+            // facade‑level operations you might need later.
             editor.BindPdf(inputPath);
 
-            // Example edit: add a simple text annotation on the first page.
-            // PdfContentEditor.CreateText expects a System.Drawing.Rectangle.
-            // Rectangle constructor: (x, y, width, height).
-            // Convert the Aspose rectangle (left, bottom, right, top) to System.Drawing.Rectangle.
-            System.Drawing.Rectangle rect = new System.Drawing.Rectangle(
-                x: 100,               // left
-                y: 500,               // bottom (Y coordinate in PDF space)
-                width: 300 - 100,     // right - left
-                height: 550 - 500);   // top - bottom
+            // Add text using the high‑level Document API (PdfContentEditor does not expose AddText).
+            Document pdf = new Document(inputPath);
+            TextFragment tf = new TextFragment("Hello, Aspose!");
+            // Position specifies the lower‑left corner of the text.
+            tf.Position = new Position(100, 500);
+            // Optional styling (font, size, color, etc.)
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Color.Black;
 
-            editor.CreateText(
-                rect,
-                "Edited with PdfContentEditor",
-                "Arial",      // font name
-                true,          // embed the font
-                "Blue",       // text color (named color or hex string)
-                0);            // open flag (0 = false, 1 = true)
+            // Add the fragment to page 1 (pages are 1‑based).
+            pdf.Pages[1].Paragraphs.Add(tf);
 
             // Save the modified PDF.
-            editor.Save(outputPath);
+            pdf.Save(outputPath);
         }
 
         Console.WriteLine($"Edited PDF saved to '{outputPath}'.");

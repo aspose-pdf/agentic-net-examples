@@ -1,8 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class BatchPdfProcessor
@@ -14,58 +15,43 @@ class BatchPdfProcessor
         // Output directory for edited PDFs
         const string outputDir = @"C:\PdfBatch\Output";
 
-        if (!Directory.Exists(inputDir))
-        {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
-
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Collect all PDF file paths
+        // Gather all PDF files from the input directory
         List<string> pdfFiles = new List<string>(Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly));
 
         // Process each PDF in parallel
-        Parallel.ForEach(pdfFiles, inputPath =>
+        Parallel.ForEach(pdfFiles, pdfPath =>
         {
             try
             {
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputDir, $"{fileName}_edited.pdf");
+                // Determine output file path
+                string outputPath = Path.Combine(outputDir,
+                    Path.GetFileNameWithoutExtension(pdfPath) + "_edited.pdf");
 
-                // Load the PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(inputPath))
+                // Load the PDF using the high‑level Document API (thread‑safe per instance)
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Create a text stamp to be added to every page
-                    TextStamp stamp = new TextStamp("Confidential")
-                    {
-                        TextState =
-                        {
-                            FontSize = 12,
-                            FontStyle = FontStyles.Bold,
-                            // Use ForegroundColor instead of the non‑existent FontColor
-                            ForegroundColor = Color.FromRgb(1, 0, 0)
-                        },
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                        BottomMargin = 10
-                    };
+                    // Create a text stamp to indicate processing
+                    TextStamp stamp = new TextStamp("Processed");
+                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    stamp.VerticalAlignment   = VerticalAlignment.Center;
+                    stamp.TextState.FontSize = 36;
+                    stamp.TextState.FontStyle = FontStyles.Bold;
+                    stamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // Red
 
-                    // Apply the stamp to each page of the document
-                    foreach (Page page in doc.Pages)
-                    {
-                        page.AddStamp(stamp);
-                    }
+                    // Add the stamp to the first page (pages are 1‑based)
+                    doc.Pages[1].AddStamp(stamp);
 
-                    // Save the modified document
+                    // Save the edited PDF
                     doc.Save(outputPath);
                 }
-
-                Console.WriteLine($"Processed: {inputPath} → {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                // Log any errors for this file
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         });
 

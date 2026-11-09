@@ -1,30 +1,51 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!System.IO.File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF using the Document class (PdfFileInfo does not expose ViewerPreferences)
-        Document pdfDocument = new Document(inputPath);
+        Document pdfDoc;
+        try
+        {
+            pdfDoc = new Document(inputPath);
+        }
+        catch (PdfException ex)
+        {
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
+            return;
+        }
 
-        // NOTE: The ViewerPreferences property was introduced in later versions of Aspose.Pdf.
-        // If your library version supports it, you can enable the preferences by uncommenting the line below:
-        // pdfDocument.ViewerPreferences = ViewerPreferences.HideToolbar | ViewerPreferences.HideMenubar;
+        // Attempt to set viewer preferences if the current Aspose.Pdf version supports it.
+        try
+        {
+            dynamic docDyn = pdfDoc;
+            docDyn.ViewerPreferences.HideToolbar = true;
+            docDyn.ViewerPreferences.HideMenubar = true;
+        }
+        catch (RuntimeBinderException)
+        {
+            Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf version. Skipping preference changes.");
+        }
 
-        // Save the edited PDF to a new file
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"PDF saved with updated viewer preferences to '{outputPath}'.");
+        try
+        {
+            pdfDoc.Save(outputPath);
+            Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to save PDF: {ex.Message}");
+        }
     }
 }

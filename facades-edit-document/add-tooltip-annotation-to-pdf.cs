@@ -1,4 +1,3 @@
-// Program.cs
 using System;
 using System.IO;
 using Aspose.Pdf;
@@ -9,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "tooltip_annotated.pdf";
+        const string outputPath = "tooltip_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,40 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Define the annotation rectangle (lower‑left x,y, upper‑right x,y)
+        var rect = new Rectangle(100, 500, 200, 550);
+
+        // Create a text annotation (tooltip)
+        var textAnnotation = new TextAnnotation(doc.Pages[1], rect)
         {
-            // Define the annotation rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            Title = "Info",
+            Contents = "Additional information shown when the mouse hovers over this area.",
+            Icon = TextIcon.Note,
+            Open = false // not opened by default; appears as tooltip on hover
+        };
 
-            // Create a TextAnnotation that works as a tooltip.
-            // "Contents" is the text shown on hover, "Title" is optional.
-            // Setting Open = false makes the annotation appear only when the mouse hovers.
-            TextAnnotation tooltip = new TextAnnotation(doc.Pages[1], rect)
-            {
-                Contents = "This is additional information shown when the mouse hovers over the annotation.",
-                Title    = "Info",
-                Open     = false,
-                // Optional visual styling (e.g., background color)
-                Color    = Aspose.Pdf.Color.Yellow
-            };
+        // Add the annotation to the first page
+        doc.Pages[1].Annotations.Add(textAnnotation);
 
-            // Add the annotation to the first page
-            doc.Pages[1].Annotations.Add(tooltip);
+        // Save the modified PDF
+        doc.Save(outputPath);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Tooltip annotation added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Tooltip annotation added and saved to '{outputPath}'.");
     }
 }
-
-// ---------------------------------------------------------------------------
-// File: AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig
-// ---------------------------------------------------------------------------
-// The project file references this source file, but its content is not required
-// for the example. Providing an empty (or comment‑only) file satisfies the
-// compiler and eliminates the CS2001 error.
-// ---------------------------------------------------------------------------
-// This file intentionally contains no executable code.

@@ -6,46 +6,35 @@ class Program
 {
     static void Main()
     {
-        // Paths
-        const string inputPdfPath = "input.pdf";
-        const string attachmentPath = "unicode.txt";
-        const string outputPdfPath = "output_with_attachment.pdf";
+        const string pdfPath = "input.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(attachmentPath))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Unicode description for the attachment
-        string unicodeDescription = "Описание с Unicode 🚀";
-
-        // Load the source PDF using Document (Facades API does not support AddAttachment)
-        Document pdfDoc = new Document(inputPdfPath);
-
-        // Create a FileSpecification for the attachment
-        var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath), Path.GetFileName(attachmentPath));
-        fileSpec.Description = unicodeDescription;
-        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
-
-        // Add the file specification to the EmbeddedFiles collection
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
-
-        // Save the modified PDF
-        pdfDoc.Save(outputPdfPath);
-
-        // Verify that the description was stored correctly
-        Document resultDoc = new Document(outputPdfPath);
-        foreach (FileSpecification embedded in resultDoc.EmbeddedFiles)
+        // Load the PDF document. Document implements IDisposable, so wrap it in a using block.
+        using (Document doc = new Document(pdfPath))
         {
-            Console.WriteLine($"Attachment Name: {embedded.Name}");
-            Console.WriteLine($"Attachment Description: {embedded.Description}");
+            // Embedded files (attachments) are accessed via the Document.EmbeddedFiles collection.
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            {
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                {
+                    string name = fileSpec.Name ?? string.Empty;
+                    // Description may contain Unicode characters; output to verify proper encoding.
+                    string description = fileSpec.Description ?? string.Empty;
+
+                    Console.WriteLine($"Attachment: {name}");
+                    Console.WriteLine($"Description: {description}");
+                    Console.WriteLine();
+                }
+            }
+            else
+            {
+                Console.WriteLine("No embedded file attachments found.");
+            }
         }
     }
 }

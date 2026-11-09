@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // for TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,41 +17,39 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least four pages
-            if (doc.Pages.Count < 4)
+            // Create a TextStamp with multiline content (use newline characters)
+            TextStamp stamp = new TextStamp("First line of text\nSecond line of text\nThird line");
+
+            // Right‑align the text within the stamp
+            stamp.TextAlignment = HorizontalAlignment.Right;
+
+            // Position the stamp at the bottom of the page
+            stamp.VerticalAlignment = VerticalAlignment.Bottom;
+
+            // Optional margins to fine‑tune placement
+            stamp.BottomMargin = 10; // distance from bottom edge
+            stamp.RightMargin  = 10; // distance from right edge
+
+            // Set a cross‑platform color for the text
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+            // Page indexing in Aspose.Pdf is 1‑based; ensure page 4 exists
+            if (doc.Pages.Count >= 4)
             {
-                Console.Error.WriteLine("The document contains fewer than 4 pages.");
-                return;
+                doc.Pages[4].AddStamp(stamp);
+            }
+            else
+            {
+                Console.Error.WriteLine("The document has fewer than 4 pages.");
             }
 
-            // Create a TextStamp with multiline content
-            TextStamp textStamp = new TextStamp("First line\r\nSecond line\r\nThird line")
-            {
-                // Align the stamp to the right side of the page
-                HorizontalAlignment = HorizontalAlignment.Right,
-                // Align the stamp to the bottom of the page
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Optional margin from the bottom edge (in points)
-                BottomMargin        = 10,
-                // Optional margin from the right edge (in points)
-                RightMargin         = 10
-            };
-
-            // Configure the appearance of the text
-            textStamp.TextState.Font = FontRepository.FindFont("Arial");
-            textStamp.TextState.FontSize = 12;
-            textStamp.TextState.ForegroundColor = Color.Black;
-
-            // Apply the stamp to page 4 (pages are 1‑based)
-            doc.Pages[4].AddStamp(textStamp);
-
-            // Save the modified PDF
+            // Save the modified PDF (PDF format, so no SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp added to page 4 and saved as '{outputPath}'.");
+        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
     }
 }

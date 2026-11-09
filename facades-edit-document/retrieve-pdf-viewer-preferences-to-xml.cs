@@ -1,52 +1,59 @@
 using System;
 using System.IO;
-using System.Reflection;
 using System.Xml.Serialization;
-using Aspose.Pdf; // Document class
+using Aspose.Pdf.Facades;
+using Microsoft.CSharp.RuntimeBinder; // for RuntimeBinderException
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "viewerPreferences.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputXmlPath = "viewerPreferences.xml";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPdf);
-
-            // Try to obtain the ViewerPreferences property via reflection.
-            // This avoids compile‑time errors when the property is not present in the referenced Aspose.Pdf version.
-            PropertyInfo viewerPrefProp = pdfDoc.GetType().GetProperty("ViewerPreferences", BindingFlags.Public | BindingFlags.Instance);
-            if (viewerPrefProp == null)
+            // PdfFileInfo implements IDisposable, so wrap it in a using block.
+            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPdfPath))
             {
-                Console.WriteLine("The current Aspose.Pdf library version does not expose a ViewerPreferences property.");
-                return;
-            }
+                // Attempt to retrieve ViewerPreferences via dynamic access.
+                // This avoids a compile‑time dependency on the ViewerPreferences type,
+                // which may not exist in older Aspose.Pdf versions.
+                object preferencesObj = null;
+                Type preferencesType = null;
+                try
+                {
+                    dynamic dynInfo = pdfInfo;
+                    preferencesObj = dynInfo.ViewerPreferences; // may throw RuntimeBinderException
+                    preferencesType = preferencesObj?.GetType();
+                }
+                catch (RuntimeBinderException)
+                {
+                    Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
+                }
 
-            object viewerPreferences = viewerPrefProp.GetValue(pdfDoc);
-            if (viewerPreferences == null)
-            {
-                Console.WriteLine("ViewerPreferences property exists but returned null.");
-                return;
+                if (preferencesObj != null && preferencesType != null)
+                {
+                    // Serialize the ViewerPreferences object to XML using its runtime type.
+                    XmlSerializer serializer = new XmlSerializer(preferencesType);
+                    using (FileStream fs = new FileStream(outputXmlPath, FileMode.Create, FileAccess.Write))
+                    {
+                        serializer.Serialize(fs, preferencesObj);
+                    }
+                    Console.WriteLine($"Viewer preferences saved to '{outputXmlPath}'.");
+                }
+                else
+                {
+                    // Fallback: create an empty file or skip serialization.
+                    File.WriteAllText(outputXmlPath, "<!-- ViewerPreferences not available -->");
+                }
             }
-
-            // Serialize the retrieved preferences object to XML.
-            // The actual runtime type is used for the XmlSerializer constructor.
-            XmlSerializer serializer = new XmlSerializer(viewerPreferences.GetType());
-            using (FileStream fs = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
-            {
-                serializer.Serialize(fs, viewerPreferences);
-            }
-
-            Console.WriteLine($"Viewer preferences saved to '{outputXml}'.");
         }
         catch (Exception ex)
         {

@@ -1,55 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facade namespace usage
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
         // Folder containing PDFs to protect
-        const string secureFolder = "secure";
-
-        // Identical user password for all PDFs
+        const string secureFolder = @"secure";
+        // Password to apply to every PDF (user password)
         const string userPassword = "MySecurePassword";
+        // Owner password (can be same as user password if desired)
+        const string ownerPassword = "MySecurePassword";
 
-        // Owner password can be empty or a separate value
-        const string ownerPassword = "";
-
+        // Verify folder exists
         if (!Directory.Exists(secureFolder))
         {
             Console.Error.WriteLine($"Folder not found: {secureFolder}");
             return;
         }
 
-        // Instantiate a Facade class (required by the task)
-        // No disposable pattern needed for PdfFileEditor
-        PdfFileEditor facade = new PdfFileEditor();
-
-        // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.GetFiles(secureFolder, "*.pdf"))
+        // Get all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(secureFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
         {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
+
+        // Permissions to grant after encryption (example: allow printing and content extraction)
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+        // Process each PDF
+        foreach (string inputPath in pdfFiles)
+        {
+            // Output path – overwrite the original file
+            string outputPath = inputPath;
+
             try
             {
-                // Load the PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
+                // Load the PDF with the Document API (PdfFileEditor does not support SetPassword)
+                using (Document pdfDoc = new Document(inputPath))
                 {
-                    // Define permissions (adjust as needed)
-                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                    // Apply encryption with AES-256
-                    doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-                    // Overwrite the original file with the encrypted version
-                    doc.Save(pdfPath);
+                    // Apply password protection. AES‑128 is a common secure algorithm.
+                    // Note: the overload expects (userPwd, ownerPwd, Permissions, CryptoAlgorithm)
+                    pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx128);
+                    pdfDoc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Encrypted: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Protected: {Path.GetFileName(inputPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to encrypt '{Path.GetFileName(pdfPath)}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(inputPath)}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch password protection completed.");
     }
 }

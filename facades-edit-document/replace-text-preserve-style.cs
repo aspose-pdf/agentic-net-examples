@@ -1,15 +1,17 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath   = "input.pdf";
-        const string outputPath  = "output.pdf";
-        const string searchText  = "Old Text";
-        const string replaceText = "New Text";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string searchText = "OldText";
+        const string replaceText = "NewText";
 
         if (!File.Exists(inputPath))
         {
@@ -17,20 +19,41 @@ class Program
             return;
         }
 
-        // PdfContentEditor replaces text while preserving the original font style, size, and color.
-        using (PdfContentEditor editor = new PdfContentEditor())
+        try
         {
-            // Load the source PDF.
-            editor.BindPdf(inputPath);
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Create a TextFragmentAbsorber to locate the text to replace
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
 
-            // Replace all occurrences of the search text on all pages.
-            // This overload keeps the original formatting of the replaced text.
-            editor.ReplaceText(searchText, replaceText);
+                // Search all pages
+                doc.Pages.Accept(absorber);
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
+                // Iterate over each found fragment
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    // Preserve the original text style
+                    TextState originalState = fragment.TextState;
+
+                    // Replace the text content
+                    fragment.Text = replaceText;
+
+                    // Reapply the original style (font, size, color)
+                    fragment.TextState.Font = originalState.Font;
+                    fragment.TextState.FontSize = originalState.FontSize;
+                    fragment.TextState.ForegroundColor = originalState.ForegroundColor;
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Text replacement completed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

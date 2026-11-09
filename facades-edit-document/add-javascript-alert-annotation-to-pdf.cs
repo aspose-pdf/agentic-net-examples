@@ -1,16 +1,15 @@
-// Program.cs
 using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_js.pdf";
-        const string javaScript = "app.alert('Hello from JavaScript!');";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,34 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDoc = new Document(inputPath);
-
-        // Add a document‑level JavaScript action (optional – shows alert when the PDF is opened).
-        pdfDoc.OpenAction = new JavascriptAction(javaScript);
-
-        // Add a page annotation that triggers the same JavaScript when the annotation is activated.
-        // Here we use a LinkAnnotation with a rectangular area on the first page.
-        Page firstPage = pdfDoc.Pages[1];
-        Aspose.Pdf.Rectangle annotRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-        LinkAnnotation jsAnnotation = new LinkAnnotation(firstPage, annotRect)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            Action = new JavascriptAction(javaScript)
-        };
-        firstPage.Annotations.Add(jsAnnotation);
+            // Get the first page (required for LinkAnnotation constructor)
+            Page page = doc.Pages[1];
 
-        // Save the modified PDF.
-        pdfDoc.Save(outputPath);
+            // Define the annotation rectangle (lower‑left x,y, upper‑right x,y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-        Console.WriteLine($"JavaScript annotation added. Saved to '{outputPath}'.");
+            // Create a link annotation that will execute JavaScript
+            LinkAnnotation link = new LinkAnnotation(page, rect);
+
+            // JavaScript action to show an alert
+            JavascriptAction jsAction = new JavascriptAction("app.alert('Hello from Aspose.Pdf!');");
+            link.Action = jsAction;
+
+            // Optional visual settings
+            link.Color = Aspose.Pdf.Color.Blue;
+            link.Border = new Border(link) { Width = 1 };
+            link.Highlighting = HighlightingMode.Invert;
+
+            // Add the annotation to the first page
+            page.Annotations.Add(link);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"JavaScript annotation added and saved to '{outputPath}'.");
     }
-}
-
-// AsposePdfApi.GeneratedMSBuildEditorConfig.editorconfig (dummy source file to satisfy the project reference)
-// This file is intentionally left empty. It exists only to prevent the CS2001 build error
-// caused by a missing source file entry in the project file.
-
-namespace Dummy
-{
-    // No implementation needed.
 }

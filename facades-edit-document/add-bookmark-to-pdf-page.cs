@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for GoToAction and ExplicitDestinationType
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,36 +15,18 @@ class Program
             return;
         }
 
-        try
-        {
-            // Load the PDF document
-            Document doc = new Document(inputPath);
+        // PdfBookmarkEditor does not implement IDisposable, so we manage its lifetime manually.
+        var bookmarkEditor = new PdfBookmarkEditor();
+        bookmarkEditor.BindPdf(inputPath);
 
-            // Verify that the document has at least five pages
-            if (doc.Pages.Count < 5)
-            {
-                Console.Error.WriteLine("The document does not contain page 5.");
-                return;
-            }
+        // Create a top‑level bookmark titled "Project Overview" that navigates to page 5.
+        // PdfBookmarkEditor provides CreateBookmarkOfPage for this purpose.
+        bookmarkEditor.CreateBookmarkOfPage("Project Overview", 5);
 
-            // Create a bookmark that navigates to page 5 (1‑based index)
-            var bookmark = new OutlineItemCollection(doc.Outlines)
-            {
-                Title = "Project Overview",
-                Action = new GoToAction(doc.Pages[5], ExplicitDestinationType.Fit)
-            };
+        // Save the modified PDF and close the editor.
+        bookmarkEditor.Save(outputPath);
+        bookmarkEditor.Close();
 
-            // Add the bookmark to the document outline
-            doc.Outlines.Add(bookmark);
-
-            // Save the updated PDF
-            doc.Save(outputPath);
-
-            Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }
 }

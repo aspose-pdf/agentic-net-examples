@@ -15,32 +15,25 @@ class Program
             return;
         }
 
-        // Load the document inside a using block (lifecycle rule)
-        using (Document doc = new Document(inputPath))
+        // Load the source PDF using Document (PdfFileEditor does not provide InsertPage/DeletePage).
+        using (Document pdfDoc = new Document(inputPath))
         {
-            int pageCount = doc.Pages.Count;
+            int pageCount = pdfDoc.Pages.Count; // 1‑based page count
 
-            // If the document has 0 or 1 pages, just copy it to the output path
-            if (pageCount <= 1)
-            {
-                // Ensure the original file is copied unchanged
-                File.Copy(inputPath, outputPath, overwrite: true);
-                Console.WriteLine("Document has zero or one page; copied without changes.");
-                return;
-            }
+            // Insert the last page at the beginning (position 1).
+            // Insert inserts *after* the specified index, so inserting after index 0 (or after 1 and then deleting the duplicate) works.
+            // Using Insert(1, ...) places the page after the first page, then we delete the original last page.
+            // To truly place it at the very start we insert after index 0 by using Insert(1, ...) and then move it.
+            // Simpler: insert after page 0 by using Insert(1, ...) and then delete the original duplicate.
+            pdfDoc.Pages.Insert(1, pdfDoc.Pages[pageCount]); // now the last page appears twice: at position 1 and at original position +1
 
-            // Reorder: move the last page to the beginning
-            // 1‑based indexing: Pages[pageCount] is the last page
-            Page lastPage = doc.Pages[pageCount];
-            // Remove the last page from its original position
-            doc.Pages.Delete(pageCount);
-            // Insert it at position 1 (the beginning)
-            doc.Pages.Insert(1, lastPage);
+            // Delete the original last page, which is now at position pageCount + 1.
+            pdfDoc.Pages.Delete(pageCount + 1);
 
-            // Save the reordered document
-            doc.Save(outputPath);
+            // Save the reordered PDF.
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered: last page moved to the beginning. Saved as '{outputPath}'.");
     }
 }

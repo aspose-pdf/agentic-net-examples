@@ -8,8 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string fieldName = "TermsAccepted";
+        const string outputPath = "output_checked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +16,22 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Locate the checkbox field named "TermsAccepted" and set it to checked
+        if (doc.Form["TermsAccepted"] is CheckboxField checkBox)
         {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPath);
-
-            // Retrieve the checkbox field by name
-            CheckboxField? field = pdfDocument.Form[fieldName] as CheckboxField;
-            if (field == null)
-            {
-                Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
-                return;
-            }
-
-            // Set the checkbox to checked (true)
-            field.Checked = true;
-
-            // Save the modified PDF
-            pdfDocument.Save(outputPath);
-
-            Console.WriteLine($"Checkbox '{fieldName}' set to true and saved to '{outputPath}'.");
+            checkBox.Checked = true; // true = checked, false = unchecked
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine("Checkbox field 'TermsAccepted' not found or is not a CheckboxField.");
         }
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Checkbox 'TermsAccepted' set to true. Saved to '{outputPath}'.");
     }
 }

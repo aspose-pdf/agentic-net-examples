@@ -15,18 +15,17 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the source PDF
         Document pdf = new Document(inputPath);
 
-        // Register the PDF namespace (http://ns.adobe.com/pdf/1.3/) with a prefix
-        pdf.Metadata.RegisterNamespaceUri("pdf", "http://ns.adobe.com/pdf/1.3/");
+        // Add custom XMP metadata field "Department" with value "Finance"
+        // Use the DocumentInfo indexer to store custom metadata; this updates the XMP packet
+        // and makes the entry visible in the PDF properties dialog.
+        pdf.Info["Department"] = "Finance";
 
-        // Add or replace the custom XMP property Department with value Finance
-        pdf.Metadata["pdf:Department"] = "Finance";
-
-        // Save the updated PDF
+        // Save the PDF with updated metadata
         pdf.Save(outputPath);
 
-        Console.WriteLine($"XMP metadata 'Department=Finance' added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"XMP metadata added. Saved to '{outputPath}'.");
     }
 }

@@ -6,37 +6,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPng = "page2_image1.png";
+        const string pdfPath = "input.pdf";
+        const string outputImagePath = "page2_image1.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // PdfExtractor implements IDisposable, so wrap it in a using block.
+        // Initialize the PDF extractor from Aspose.Pdf.Facades
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the source PDF.
-            extractor.BindPdf(inputPdf);
+            // Load the PDF document
+            extractor.BindPdf(pdfPath);
 
-            // Limit extraction to page 2 only.
-            extractor.StartPage = 2; // first page to extract (1‑based)
-            extractor.EndPage   = 2; // last page to extract
+            // Restrict extraction to page 2 only (pages are 1‑based)
+            extractor.StartPage = 2;
+            extractor.EndPage   = 2;
 
-            // Optional: enable resource‑based image extraction.
-            // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-
-            // Extract images from the specified page.
+            // Enable image extraction
             extractor.ExtractImage();
 
-            // Save the first extracted image, if any.
+            // Retrieve the first image on the specified page
             if (extractor.HasNextImage())
             {
-                // GetNextImage writes the current image to the supplied file path.
-                extractor.GetNextImage(outputPng);
-                Console.WriteLine($"First image from page 2 saved to '{outputPng}'.");
+                // Save the extracted image as PNG
+                using (FileStream imgStream = new FileStream(outputImagePath, FileMode.Create, FileAccess.Write))
+                {
+                    extractor.GetNextImage(imgStream);
+                }
+
+                Console.WriteLine($"First image from page 2 saved to '{outputImagePath}'.");
             }
             else
             {

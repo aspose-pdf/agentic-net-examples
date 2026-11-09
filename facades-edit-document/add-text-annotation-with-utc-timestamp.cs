@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "annotated.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,23 +20,22 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a text (markup) annotation on the first page
-            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+            // Add a text annotation directly to the page (PdfAnnotationEditor.AddTextAnnotation does not exist)
+            Page page = doc.Pages[1];
+            var textAnnotation = new TextAnnotation(page, rect)
             {
-                Title        = "Timestamp",
-                Contents     = "Annotation with UTC creation date.",
-                CreationDate = DateTime.UtcNow // set current UTC time
+                Contents = "Annotation with UTC creation date",
+                // Use the existing Modified property to store the timestamp (CreationDate is not available)
+                Modified = DateTime.UtcNow
             };
-
-            // Add the annotation directly to the page's Annotations collection
-            doc.Pages[1].Annotations.Add(annotation);
+            page.Annotations.Add(textAnnotation);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation added with UTC timestamp. Saved to '{outputPath}'.");
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // FontRepository, TextStamp, TextState
 
 class Program
 {
@@ -12,38 +12,34 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Multiline text for the stamp
-        string stampText = "First line\r\nSecond line\r\nThird line";
+        // Load the PDF document using Document (PdfFileEditor does not support stamping)
+        Document pdfDoc = new Document(inputPath);
 
-        // Create and configure the TextStamp
-        TextStamp textStamp = new TextStamp(stampText)
+        // Create a multiline text stamp
+        TextStamp stamp = new TextStamp("First line\nSecond line\nThird line")
         {
-            // Optional positioning – centre the stamp on each page
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment   = VerticalAlignment.Center
         };
 
-        // Set font, size and colour via TextState (the correct API in recent Aspose.Pdf versions)
-        textStamp.TextState.Font = FontRepository.FindFont("Arial");
-        textStamp.TextState.FontSize = 14;
-        textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+        // Set custom font (Arial), size 14, and blue color
+        stamp.TextState.Font = FontRepository.FindFont("Arial");
+        stamp.TextState.FontSize = 14;
+        stamp.TextState.ForegroundColor = Color.Blue;
 
-        // Load the PDF using the high‑level Document API
-        Document pdfDocument = new Document(inputPath);
-
-        // Apply the stamp to each page
-        foreach (Page page in pdfDocument.Pages)
+        // Apply the stamp to every page in the document
+        foreach (Page page in pdfDoc.Pages)
         {
-            page.AddStamp(textStamp);
+            page.AddStamp(stamp);
         }
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        // Save the stamped PDF
+        pdfDoc.Save(outputPath);
 
-        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

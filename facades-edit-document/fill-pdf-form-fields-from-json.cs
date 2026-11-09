@@ -1,83 +1,68 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // <-- required for Form fields
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "form.pdf";
-        const string outputPdfPath = "filled_form.pdf";
-        const string jsonPath      = "data.json";
+        const string pdfTemplatePath = "template.pdf";
+        const string jsonDataPath    = "data.json";
+        const string outputPdfPath   = "filled.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfTemplatePath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(jsonPath))
-        {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
             return;
         }
 
-        // Load JSON mapping of field names to values
-        Dictionary<string, string> fieldValues;
-        try
+        if (!File.Exists(jsonDataPath))
         {
-            string jsonContent = File.ReadAllText(jsonPath);
-            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent) ?? new Dictionary<string, string>();
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read or parse JSON: {ex.Message}");
+            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument;
-        try
-        {
-            pdfDocument = new Document(inputPdfPath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
-            return;
-        }
+        // Load JSON mapping field names -> values
+        string jsonContent = File.ReadAllText(jsonDataPath);
+        var fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent) ??
+                          new Dictionary<string, string>();
 
-        // Fill form fields using the values from the JSON dictionary
+        // Build XFDF (XML Forms Data Format) from the JSON data
+        StringBuilder xfdfBuilder = new StringBuilder();
+        xfdfBuilder.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+        xfdfBuilder.AppendLine("<xfdf xmlns=\"http://ns.adobe.com/xfdf/\" xml:space=\"preserve\">");
+        xfdfBuilder.AppendLine("<fields>");
         foreach (var kvp in fieldValues)
         {
-            // Retrieve the form field by its partial name (the key from JSON)
-            // Document.Form indexer returns a WidgetAnnotation; cast to Aspose.Pdf.Forms.Field to access the Value property.
-            Field formField = pdfDocument.Form[kvp.Key] as Field;
-            if (formField != null)
+            // Escape XML special characters
+            string name  = System.Security.SecurityElement.Escape(kvp.Key);
+            string value = System.Security.SecurityElement.Escape(kvp.Value);
+            xfdfBuilder.AppendLine($"  <field name=\"{name}\"><value>{value}</value></field>");
+        }
+        xfdfBuilder.AppendLine("</fields>");
+        xfdfBuilder.AppendLine("</xfdf>");
+
+        // Load the PDF document
+        using (Document pdfDoc = new Document(pdfTemplatePath))
+        {
+            // Use the Form facade to import XFDF data and save the filled PDF
+            using (Form formFacade = new Form(pdfDoc))
             {
-                // Most field types expose a Value property that accepts a string.
-                // For specific types (e.g., CheckBoxField) you may want to set the appropriate property,
-                // but assigning to Value works for the majority of cases.
-                formField.Value = kvp.Value;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Warning: Form field '{kvp.Key}' not found in the PDF.");
+                // Import XFDF – the facade provides ImportXfdf for XFDF data
+                using (MemoryStream xfdfStream = new MemoryStream(Encoding.UTF8.GetBytes(xfdfBuilder.ToString())))
+                {
+                    formFacade.ImportXfdf(xfdfStream);
+                }
+
+                // Save the result
+                formFacade.Save(outputPdfPath);
             }
         }
 
-        // Save the modified PDF
-        try
-        {
-            pdfDocument.Save(outputPdfPath);
-            Console.WriteLine($"Form fields have been filled and saved to '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error saving PDF: {ex.Message}");
-        }
+        Console.WriteLine($"Form fields have been filled and saved to '{outputPdfPath}'.");
     }
 }

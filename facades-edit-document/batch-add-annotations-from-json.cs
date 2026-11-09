@@ -1,44 +1,61 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-namespace PdfBatchAnnotation
+namespace PdfAnnotationBatch
 {
-    // Represents a single annotation instruction read from JSON
+    // Represents a single annotation definition from the JSON file
     public class AnnotationDefinition
     {
-        public string? InputPdf { get; set; }          // Path to source PDF
-        public string? OutputPdf { get; set; }         // Path where annotated PDF will be saved
-        public int PageNumber { get; set; }           // 1‑based page index
-        public string? Type { get; set; }              // "Text", "Link", "Stamp", "Highlight"
-        public double[]? Rect { get; set; }            // [llx, lly, urx, ury] in points
-        public string? Content { get; set; }           // Text for Text/Highlight annotations
-        public string? Url { get; set; }               // Target URL for Link annotations
-        public string? ImagePath { get; set; }         // Image file for Stamp annotations
+        public string Type { get; set; }          // "text", "link", "stamp"
+        public int Page { get; set; }             // 1‑based page number
+        public double Llx { get; set; }           // lower‑left X
+        public double Lly { get; set; }           // lower‑left Y
+        public double Urx { get; set; }           // upper‑right X
+        public double Ury { get; set; }           // upper‑right Y
+        public string Content { get; set; }       // text for "text", URL for "link"
+        public string ImagePath { get; set; }     // path to image for "stamp"
+    }
+
+    // Represents a PDF processing job (input, output and its annotations)
+    public class PdfJob
+    {
+        public required string InputPath { get; set; }
+        public required string OutputPath { get; set; }
+        // Initialise the collection to satisfy the non‑nullable warning
+        public List<AnnotationDefinition> Annotations { get; set; } = new();
     }
 
     class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            const string jsonPath = "annotations.json";
+            // Expect the first argument to be the JSON definition file
+            if (args.Length == 0)
+            {
+                Console.Error.WriteLine("Usage: PdfAnnotationBatch <definition.json>");
+                return;
+            }
 
+            string jsonPath = args[0];
             if (!File.Exists(jsonPath))
             {
                 Console.Error.WriteLine($"Definition file not found: {jsonPath}");
                 return;
             }
 
-            // Deserialize JSON into a list of annotation definitions
-            List<AnnotationDefinition>? definitions;
+            // Deserialize the JSON into a list of jobs
+            List<PdfJob> jobs;
             try
             {
                 string json = File.ReadAllText(jsonPath);
-                definitions = JsonSerializer.Deserialize<List<AnnotationDefinition>>(json,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                jobs = JsonSerializer.Deserialize<List<PdfJob>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
             }
             catch (Exception ex)
             {
@@ -46,117 +63,96 @@ namespace PdfBatchAnnotation
                 return;
             }
 
-            if (definitions == null || definitions.Count == 0)
+            if (jobs == null || jobs.Count == 0)
             {
-                Console.WriteLine("No annotation definitions found.");
+                Console.WriteLine("No jobs defined in the JSON file.");
                 return;
             }
 
-            // Process each definition independently
-            foreach (var def in definitions)
+            foreach (var job in jobs)
             {
-                if (string.IsNullOrWhiteSpace(def.InputPdf) || !File.Exists(def.InputPdf))
+                if (string.IsNullOrWhiteSpace(job.InputPath) || string.IsNullOrWhiteSpace(job.OutputPath))
                 {
-                    Console.Error.WriteLine($"Input PDF not found: {def.InputPdf}");
+                    Console.Error.WriteLine("Job missing input or output path; skipping.");
                     continue;
                 }
 
-                // Ensure rectangle coordinates are valid
-                if (def.Rect == null || def.Rect.Length != 4)
+                if (!File.Exists(job.InputPath))
                 {
-                    Console.Error.WriteLine($"Invalid rectangle for {def.InputPdf} page {def.PageNumber}");
+                    Console.Error.WriteLine($"Input PDF not found: {job.InputPath}; skipping.");
                     continue;
                 }
 
-                // Wrap Document in a using block for deterministic disposal
-                using (Document doc = new Document(def.InputPdf))
+                // Ensure the output directory exists
+                string outDir = Path.GetDirectoryName(job.OutputPath);
+                if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
                 {
-                    // Validate page number (Aspose.Pdf uses 1‑based indexing)
-                    if (def.PageNumber < 1 || def.PageNumber > doc.Pages.Count)
+                    Directory.CreateDirectory(outDir);
+                }
+
+                // Load the PDF document
+                using Document doc = new Document(job.InputPath);
+
+                // Process each annotation definition
+                foreach (var ann in job.Annotations ?? new List<AnnotationDefinition>())
+                {
+                    // Build the rectangle (Aspose uses lower‑left X/Y, upper‑right X/Y)
+                    var rect = new Aspose.Pdf.Rectangle(ann.Llx, ann.Lly, ann.Urx, ann.Ury);
+
+                    // Validate page number (Aspose pages are 1‑based)
+                    if (ann.Page < 1 || ann.Page > doc.Pages.Count)
                     {
-                        Console.Error.WriteLine($"Page number {def.PageNumber} out of range for {def.InputPdf}");
+                        Console.Error.WriteLine($"Invalid page number {ann.Page} for {job.InputPath}; skipping annotation.");
                         continue;
                     }
 
-                    // Build the rectangle using Aspose.Pdf.Rectangle
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                        def.Rect[0], def.Rect[1], def.Rect[2], def.Rect[3]);
+                    Page page = doc.Pages[ann.Page];
 
-                    // Add the appropriate annotation based on the Type field
-                    switch (def.Type?.Trim().ToLowerInvariant())
+                    switch (ann.Type?.Trim().ToLowerInvariant())
                     {
                         case "text":
+                            var txtAnn = new TextAnnotation(page, rect)
                             {
-                                // TextAnnotation displays a pop‑up note
-                                TextAnnotation txtAnn = new TextAnnotation(doc.Pages[def.PageNumber], rect)
-                                {
-                                    Title = "Note",
-                                    Contents = def.Content ?? string.Empty,
-                                    Open = true,
-                                    Icon = TextIcon.Note
-                                };
-                                doc.Pages[def.PageNumber].Annotations.Add(txtAnn);
-                                break;
-                            }
+                                Title = "Note",
+                                Contents = ann.Content ?? string.Empty,
+                                Open = true,
+                                Icon = TextIcon.Note
+                            };
+                            page.Annotations.Add(txtAnn);
+                            break;
+
                         case "link":
+                            var linkAnn = new LinkAnnotation(page, rect)
                             {
-                                // LinkAnnotation creates a clickable hyperlink
-                                LinkAnnotation linkAnn = new LinkAnnotation(doc.Pages[def.PageNumber], rect)
-                                {
-                                    Action = new GoToURIAction(def.Url ?? string.Empty)
-                                };
-                                doc.Pages[def.PageNumber].Annotations.Add(linkAnn);
-                                break;
-                            }
+                                Action = new GoToURIAction(ann.Content ?? string.Empty)
+                            };
+                            page.Annotations.Add(linkAnn);
+                            break;
+
                         case "stamp":
+                            if (!string.IsNullOrWhiteSpace(ann.ImagePath) && File.Exists(ann.ImagePath))
                             {
-                                // StampAnnotation places an image on the page
-                                if (string.IsNullOrEmpty(def.ImagePath) || !File.Exists(def.ImagePath))
-                                {
-                                    Console.Error.WriteLine($"Stamp image not found: {def.ImagePath}");
-                                    break;
-                                }
-
-                                ImageStamp stamp = new ImageStamp(def.ImagePath);
-                                // Set size based on rectangle
-                                double width = rect.URX - rect.LLX;
-                                double height = rect.URY - rect.LLY;
-                                stamp.Width = width;
-                                stamp.Height = height;
-                                // Position using alignment + indents (Left/Bottom alignment)
-                                stamp.HorizontalAlignment = HorizontalAlignment.Left;
-                                stamp.VerticalAlignment = VerticalAlignment.Bottom;
-                                stamp.XIndent = rect.LLX;
-                                stamp.YIndent = rect.LLY;
-
-                                // Apply the stamp to the target page
-                                doc.Pages[def.PageNumber].AddStamp(stamp);
-                                break;
+                                var stampAnn = new StampAnnotation(page, rect);
+                                // Use a stream for the image as recommended by Aspose
+                                byte[] imgBytes = File.ReadAllBytes(ann.ImagePath);
+                                stampAnn.Image = new MemoryStream(imgBytes);
+                                page.Annotations.Add(stampAnn);
                             }
-                        case "highlight":
+                            else
                             {
-                                // HighlightAnnotation highlights a region of text
-                                HighlightAnnotation hlAnn = new HighlightAnnotation(doc.Pages[def.PageNumber], rect)
-                                {
-                                    Color = Color.FromRgb(1.0, 1.0, 0.0), // Yellow
-                                    Opacity = 0.5,
-                                    Contents = def.Content ?? string.Empty
-                                };
-                                doc.Pages[def.PageNumber].Annotations.Add(hlAnn);
-                                break;
+                                Console.Error.WriteLine($"Stamp image not found: {ann.ImagePath}; skipping stamp annotation.");
                             }
+                            break;
+
                         default:
-                            {
-                                Console.Error.WriteLine($"Unsupported annotation type: {def.Type}");
-                                break;
-                            }
+                            Console.Error.WriteLine($"Unsupported annotation type '{ann.Type}' in job for {job.InputPath}; skipping.");
+                            break;
                     }
-
-                    // Save the modified PDF; the output path may be the same as input or different
-                    string outputPath = def.OutputPdf ?? def.InputPdf;
-                    doc.Save(outputPath);
-                    Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
                 }
+
+                // Save the modified PDF to the specified output path
+                doc.Save(job.OutputPath);
+                Console.WriteLine($"Processed '{job.InputPath}' → '{job.OutputPath}'.");
             }
         }
     }

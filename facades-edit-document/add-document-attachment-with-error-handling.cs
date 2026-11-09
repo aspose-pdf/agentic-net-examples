@@ -6,9 +6,11 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "input.pdf";          // PDF to which the attachment will be added
-        const string attachmentPath = "attachment.docx";    // File to attach
-        const string attachmentName = "DocumentAttachment"; // Name shown in the PDF attachment list
+        // Paths for the source PDF, the file to attach, and the resulting PDF
+        const string sourcePdfPath = "input.pdf";
+        const string attachmentFilePath = "attachment.txt";
+        const string attachmentName = "MyAttachment.txt";
+        const string outputPdfPath = "output.pdf";
 
         // Verify that the source PDF exists
         if (!File.Exists(sourcePdfPath))
@@ -18,37 +20,37 @@ class Program
         }
 
         // Verify that the attachment file path is provided and the file exists
-        if (string.IsNullOrWhiteSpace(attachmentPath) || !File.Exists(attachmentPath))
+        if (string.IsNullOrWhiteSpace(attachmentFilePath) || !File.Exists(attachmentFilePath))
         {
-            Console.Error.WriteLine($"Attachment file not found or path is invalid: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment file not found or path is invalid: {attachmentFilePath ?? "<null>"}");
             return;
         }
 
         try
         {
-            // Load the PDF document. Document.EmbeddedFiles is the correct collection for attachments.
-            using (Document pdfDoc = new Document(sourcePdfPath))
-            {
-                // Create a FileSpecification for the attachment.
-                // The constructor argument is the name that will appear in the attachment list.
-                var fileSpec = new FileSpecification(attachmentName);
-                // Load the file contents into a memory stream and assign it to the specification.
-                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
-                // Optionally set a description (shown in some PDF viewers).
-                fileSpec.Description = Path.GetFileName(attachmentPath);
+            // Copy the source PDF to the output location so the original file remains unchanged
+            File.Copy(sourcePdfPath, outputPdfPath, overwrite: true);
 
-                // Add the file specification to the EmbeddedFiles collection.
+            // Load the copied PDF using the Document API (PdfFileEditor does not support AddDocumentAttachment)
+            using (Document pdfDoc = new Document(outputPdfPath))
+            {
+                // Create a FileSpecification for the attachment using a stream (required by Aspose.Pdf)
+                var fileSpec = new FileSpecification(attachmentName);
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
+                fileSpec.Description = "Embedded attachment";
+
+                // Add the file specification to the EmbeddedFiles collection
                 pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-                // Save the modified PDF, overwriting the original file.
-                pdfDoc.Save(sourcePdfPath);
+                // Save the modified PDF back to the output path
+                pdfDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Attachment '{attachmentName}' added to '{sourcePdfPath}'.");
+            Console.WriteLine($"Attachment '{attachmentName}' added successfully. Output saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
-            // Handle any unexpected errors (e.g., permission issues, corrupted PDF)
+            // Catch any unexpected errors (e.g., I/O issues, permission problems)
             Console.Error.WriteLine($"Error adding attachment: {ex.Message}");
         }
     }

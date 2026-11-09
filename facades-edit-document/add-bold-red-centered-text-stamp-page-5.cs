@@ -1,14 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;          // TextStamp resides here
+using Aspose.Pdf.Text;            // TextState, FontStyles, FontRepository
+using Aspose.Pdf;                 // for Color (cross‑platform)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string stampText  = "Confidential";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +19,39 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdf = new Document(inputPath);
-
-        // Create a TextStamp with bold, red, centered text
-        TextStamp stamp = new TextStamp("Sample Text")
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment   = VerticalAlignment.Center
-        };
-        // TextState is read‑only – modify the existing instance instead of assigning a new one
-        stamp.TextState.Font            = FontRepository.FindFont("Arial");
-        stamp.TextState.FontSize        = 14;
-        stamp.TextState.FontStyle       = FontStyles.Bold;
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+            // Ensure the document has at least five pages
+            if (doc.Pages.Count < 5)
+            {
+                Console.Error.WriteLine("The document has fewer than 5 pages.");
+                return;
+            }
 
-        // Add the stamp to page 5 (pages are 1‑based)
-        pdf.Pages[5].AddStamp(stamp);
+            // Create a TextStamp (Aspose.Pdf.Facades)
+            TextStamp textStamp = new TextStamp(stampText)
+            {
+                // Center the stamp horizontally on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                // Optional vertical positioning (e.g., middle of the page)
+                VerticalAlignment   = VerticalAlignment.Center
+            };
 
-        // Save the modified PDF
-        pdf.Save(outputPath);
+            // Configure the appearance: bold font, red color
+            textStamp.TextState.Font = FontRepository.FindFont("Arial");
+            textStamp.TextState.FontSize = 24;
+            textStamp.TextState.FontStyle = FontStyles.Bold;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
 
-        Console.WriteLine($"Text stamp added to page 5 and saved as '{outputPath}'.");
+            // Apply the stamp to page five (1‑based indexing)
+            Page pageFive = doc.Pages[5];
+            pageFive.AddStamp(textStamp);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
     }
 }

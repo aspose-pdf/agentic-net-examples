@@ -6,41 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath = "input.pdf";
-        const string attachmentPath = "largeAttachment.bin";
-        const string outputPdfPath = "output_with_attachment.pdf";
+        const string inputPdfPath  = "source.pdf";          // PDF to which the attachment will be added
+        const string outputPdfPath = "source_with_attachment.pdf";
+        const string largeFilePath = "large_file.bin";      // Path to the large file to attach
+        const string attachmentName = "large_file.bin";     // Name that will appear in the PDF attachment list
 
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(attachmentPath))
+        if (!File.Exists(largeFilePath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment source not found: {largeFilePath}");
             return;
         }
 
-        // Define a buffer size (e.g., 4 MB) to limit memory usage while reading the attachment.
-        const int bufferSize = 4 * 1024 * 1024;
-
-        // Load the PDF document.
-        Document pdfDoc = new Document(sourcePdfPath);
-
-        // Open the attachment file as a buffered stream so that only chunks are kept in memory.
-        using (FileStream fileStream = new FileStream(attachmentPath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (BufferedStream bufferedStream = new BufferedStream(fileStream, bufferSize))
+        try
         {
-            // Create a FileSpecification from the buffered stream. The name shown in the PDF is the file name.
-            var fileSpec = new FileSpecification(bufferedStream, Path.GetFileName(attachmentPath), "Embedded attachment");
-            // Add the file specification to the EmbeddedFiles collection.
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Open the large file as a read‑only stream. The stream is passed directly to the
+                // FileSpecification so the whole file is never loaded into memory.
+                using (FileStream fileStream = new FileStream(
+                    largeFilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    var fileSpec = new FileSpecification(attachmentName);
+                    fileSpec.Contents = fileStream; // attach via stream
+                    pdfDoc.EmbeddedFiles.Add(fileSpec);
+
+                    // Save the modified PDF.
+                    pdfDoc.Save(outputPdfPath);
+                }
+            }
+
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        // Save the modified PDF.
-        pdfDoc.Save(outputPdfPath);
-
-        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

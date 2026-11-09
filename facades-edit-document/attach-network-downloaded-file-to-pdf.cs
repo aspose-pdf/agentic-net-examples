@@ -8,14 +8,12 @@ class Program
 {
     static async Task Main()
     {
-        // Paths for the source PDF and the resulting PDF with attachment
-        const string sourcePdfPath = "input.pdf";
-        const string outputPdfPath = "output_with_attachment.pdf";
+        const string sourcePdfPath = "input.pdf";               // existing PDF
+        const string outputPdfPath = "output_attached.pdf";     // result PDF
+        const string attachmentUrl = "https://example.com/file.bin"; // file to download
+        const string attachmentFileName = "downloaded.bin";     // name to appear in PDF
 
-        // URL of the file to download and attach
-        const string fileUrl = "https://example.com/file-to-attach.bin";
-
-        // Ensure the source PDF exists
+        // Verify source PDF exists
         if (!File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
@@ -23,12 +21,12 @@ class Program
         }
 
         // Download the file into a byte array
-        byte[] fileBytes;
+        byte[] attachmentData;
         using (HttpClient http = new HttpClient())
         {
             try
             {
-                fileBytes = await http.GetByteArrayAsync(fileUrl);
+                attachmentData = await http.GetByteArrayAsync(attachmentUrl);
             }
             catch (Exception ex)
             {
@@ -37,33 +35,39 @@ class Program
             }
         }
 
+        // Load the source PDF using Document (PdfFileEditor does not provide AttachFile)
+        Document pdfDoc;
         try
         {
-            // Copy the original PDF to the output location (preserve the original)
-            File.Copy(sourcePdfPath, outputPdfPath, overwrite: true);
+            pdfDoc = new Document(sourcePdfPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to load source PDF: {ex.Message}");
+            return;
+        }
 
-            // Load the copied PDF using Aspose.Pdf.Document
-            Document pdfDoc = new Document(outputPdfPath);
-
-            // Create a FileSpecification from the downloaded bytes and add it to the EmbeddedFiles collection
-            using (var attachmentStream = new MemoryStream(fileBytes))
+        // Create a FileSpecification from the byte array and add it to the PDF's EmbeddedFiles collection
+        try
+        {
+            using (var ms = new MemoryStream(attachmentData))
             {
-                var fileSpec = new FileSpecification(attachmentStream, "attachment.bin", "Downloaded attachment")
-                {
-                    MIMEType = "application/octet-stream",
-                    AFRelationship = AFRelationship.Data
-                };
+                // Use the constructor that takes a file name and description, then assign the stream to Contents.
+                var fileSpec = new FileSpecification(attachmentFileName, attachmentFileName);
+                fileSpec.Contents = ms; // embed the stream content
                 pdfDoc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // Save the changes back to the output file
             pdfDoc.Save(outputPdfPath);
-
             Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during attachment process: {ex.Message}");
+            Console.Error.WriteLine($"Error attaching file: {ex.Message}");
+        }
+        finally
+        {
+            pdfDoc?.Dispose();
         }
     }
 }

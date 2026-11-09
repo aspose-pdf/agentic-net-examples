@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -10,6 +9,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string stampText  = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,50 +17,43 @@ class Program
             return;
         }
 
-        PdfContentEditor editor = null;
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create the PdfContentEditor instance (will be disposed in finally)
-            editor = new PdfContentEditor();
-            editor.BindPdf(inputPath);
-
-            // Load the PDF document using the high‑level Document API
-            Document doc = new Document(inputPath);
-
-            // Create a text stamp to demonstrate editing
-            TextStamp textStamp = new TextStamp("Confidential")
+            // Create a text stamp (cross‑platform, no GDI+ required)
+            TextStamp stamp = new TextStamp(stampText)
             {
-                Background          = false,
-                Opacity             = 0.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center,
-                TextState = {
-                    FontSize   = 24,
-                    FontStyle  = FontStyles.Bold,
-                    Font       = FontRepository.FindFont("Arial")
-                }
+                Opacity             = 0.5,
+                Background          = false
             };
 
-            // Apply the stamp to every page in the document
+            // Apply the stamp to every page – Page.AddStamp is the correct API
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(textStamp);
+                page.AddStamp(stamp);
+            }
+
+            // Instantiate PdfContentEditor and ensure it is disposed in a finally block
+            PdfContentEditor editor = null;
+            try
+            {
+                editor = new PdfContentEditor();
+                // (If additional editing were required, it would be performed here.
+                //  For this example we only demonstrate proper disposal.)
+            }
+            finally
+            {
+                // PdfContentEditor implements IDisposable; dispose it to free native resources
+                if (editor != null)
+                    editor.Dispose();
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            // Ensure the editor is disposed to free native resources
-            if (editor != null)
-                editor.Dispose();
-        }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

@@ -1,61 +1,53 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string imagePath = "stamp.png";
 
-        // ------------------------------------------------------------
-        // 1️⃣ Ensure the source PDF exists – create a simple placeholder
-        //    if it is missing. This makes the sample self‑contained.
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdfPath);
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(imagePath))
+        {
+            Console.Error.WriteLine($"Image not found: {imagePath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2️⃣ Prepare an image *in memory* – no file on disk is used.
-        //    The example uses a tiny 1×1 red PNG encoded as Base64.
-        //    Replace the Base64 string with any image you need.
-        // ------------------------------------------------------------
-        const string base64Png =
-            "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII="; // 1x1 red pixel
-        byte[] imageBytes = Convert.FromBase64String(base64Png);
-        using var imageStream = new MemoryStream(imageBytes);
-
-        // ------------------------------------------------------------
-        // 3️⃣ Create the ImageStamp directly from the stream.
-        // ------------------------------------------------------------
-        var imgStamp = new ImageStamp(imageStream)
+        // Load the image into a memory stream – no file is written to disk.
+        using (FileStream imgStream = File.OpenRead(imagePath))
         {
-            Background = false,                     // place on top of page content
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center,
-            Opacity = 0.7                           // semi‑transparent
-        };
+            // Create an ImageStamp directly from the stream using the Drawing namespace.
+            ImageStamp imgStamp = new ImageStamp(imgStream)
+            {
+                Background = false,               // place stamp on top of page content.
+                Opacity = 0.5,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
 
-        // ------------------------------------------------------------
-        // 4️⃣ Load the PDF and apply the stamp to every page.
-        // ------------------------------------------------------------
-        using var pdfDoc = new Document(inputPdfPath);
-        foreach (Page page in pdfDoc.Pages)
-        {
-            page.AddStamp(imgStamp);
+            // Open the PDF document.
+            using (Document doc = new Document(pdfPath))
+            {
+                // Apply the stamp to every page.
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
+
+                // Save the modified PDF.
+                doc.Save(outputPath);
+            }
         }
 
-        // ------------------------------------------------------------
-        // 5️⃣ Save the modified PDF.
-        // ------------------------------------------------------------
-        pdfDoc.Save(outputPdfPath);
-
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

@@ -2,13 +2,12 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,32 +16,43 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Page numbers are 1‑based, annotation indexes are 0‑based
+        int pageNumber = 1;
+        int annotationIndex = 0;
+
+        if (pageNumber <= doc.Pages.Count)
         {
-            // Ensure there is at least one page
-            Page page = doc.Pages[1];
+            Page page = doc.Pages[pageNumber];
+            if (annotationIndex >= 0 && annotationIndex < page.Annotations.Count)
+            {
+                Annotation annotation = page.Annotations[annotationIndex];
 
-            // Define the annotation rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create a text annotation
-            TextAnnotation annotation = new TextAnnotation(page, rect);
-            annotation.Title    = "Note";
-            annotation.Contents = "This annotation is semi‑transparent.";
-            annotation.Open     = true;
-            annotation.Icon     = TextIcon.Note;
-
-            // Set opacity to 50%
-            annotation.Opacity = 0.5f;
-
-            // Add the annotation to the page
-            page.Annotations.Add(annotation);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Opacity is defined on MarkupAnnotation (and its derived types)
+                if (annotation is MarkupAnnotation markup)
+                {
+                    // Set opacity to 50% (partially transparent)
+                    markup.Opacity = 0.5f;
+                }
+                else
+                {
+                    Console.WriteLine("The selected annotation type does not support opacity.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No annotation found at the specified index.");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Page number out of range.");
         }
 
-        Console.WriteLine($"Annotation with opacity saved to '{outputPath}'.");
+        // Save the updated PDF
+        doc.Save(outputPath);
+        Console.WriteLine($"PDF saved with updated annotation opacity to '{outputPath}'.");
     }
 }

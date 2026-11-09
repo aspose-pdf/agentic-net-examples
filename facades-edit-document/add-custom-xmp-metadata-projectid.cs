@@ -7,9 +7,9 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string customKey = "ProjectID";
-        const string customValue = "12345";
+        const string outputPath = "output_with_projectid.pdf";
+        const string metaKey = "ProjectID";
+        const string metaValue = "12345";
 
         if (!File.Exists(inputPath))
         {
@@ -20,18 +20,21 @@ class Program
         try
         {
             // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
+            using (Document doc = new Document(inputPath))
+            {
+                // Add or update a custom metadata entry using the DocumentInfo indexer
+                doc.Info[metaKey] = metaValue;
 
-            // Add or update a custom XMP metadata field using the Metadata dictionary
-            pdfDoc.Metadata[customKey] = customValue;
+                // Save the updated PDF
+                doc.Save(outputPath);
+            }
 
-            // Also add the same value to the document's Info dictionary so it appears in the UI properties dialog
-            pdfDoc.Info[customKey] = customValue;
-
-            // Save the PDF with the updated metadata
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"Custom XMP metadata '{customKey}={customValue}' added and saved to '{outputPath}'.");
+            // ----- Verification -----
+            using (Document verifyDoc = new Document(outputPath))
+            {
+                string retrieved = verifyDoc.Info[metaKey];
+                Console.WriteLine($"Custom metadata '{metaKey}' = '{retrieved}'");
+            }
         }
         catch (Exception ex)
         {

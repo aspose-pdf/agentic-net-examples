@@ -8,10 +8,10 @@ class Program
 {
     static void Main()
     {
-        const string firstPdfPath = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-        const string annotatedPdfPath = "first_annotated.pdf";
-        const string outputPdfPath = "merged.pdf";
+        const string firstPdfPath   = "first.pdf";
+        const string secondPdfPath  = "second.pdf";
+        const string annotatedPath  = "first_annotated.pdf";
+        const string mergedPath     = "merged.pdf";
 
         // Verify input files exist
         if (!File.Exists(firstPdfPath))
@@ -25,43 +25,57 @@ class Program
             return;
         }
 
-        // Load the first PDF, add a text annotation, and save to a temporary file
-        using (Document doc = new Document(firstPdfPath))
+        try
         {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
+            // -------------------------------------------------
+            // 1. Load the first PDF and add a text annotation
+            // -------------------------------------------------
+            using (Document doc = new Document(firstPdfPath))
             {
-                Console.Error.WriteLine("First PDF contains no pages.");
-                return;
+                // Use 1‑based page indexing
+                Page page = doc.Pages[1];
+
+                // Fully qualified rectangle to avoid ambiguity
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+                // Create a text annotation
+                TextAnnotation annotation = new TextAnnotation(page, rect)
+                {
+                    Title    = "Note",
+                    Contents = "This is an added annotation.",
+                    Open     = true,
+                    Icon     = TextIcon.Note
+                };
+
+                // Add the annotation to the page
+                page.Annotations.Add(annotation);
+
+                // Save the annotated PDF to a temporary file
+                doc.Save(annotatedPath);
             }
 
-            // Define annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // -------------------------------------------------
+            // 2. Merge the annotated first PDF with the second PDF
+            //    using the Facades PdfFileEditor (no using block needed)
+            // -------------------------------------------------
+            PdfFileEditor editor = new PdfFileEditor();
 
-            // Create the annotation and set its properties
-            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
-            {
-                Title = "Note",
-                Contents = "Added by Aspose.Pdf.Facades example.",
-                Open = true,
-                Icon = TextIcon.Note
-            };
+            // Concatenate the two PDFs in the desired order
+            editor.Concatenate(new[] { annotatedPath, secondPdfPath }, mergedPath);
 
-            // Attach the annotation to the first page
-            doc.Pages[1].Annotations.Add(annotation);
-
-            // Save the annotated document to a temporary file
-            doc.Save(annotatedPdfPath);
+            Console.WriteLine($"Merged PDF saved to '{mergedPath}'.");
         }
-
-        // Merge the annotated first PDF with the second PDF using PdfFileEditor (Facades)
-        PdfFileEditor editor = new PdfFileEditor();
-        string[] filesToMerge = { annotatedPdfPath, secondPdfPath };
-        editor.Concatenate(filesToMerge, outputPdfPath);
-
-        // Clean up the temporary annotated file
-        try { File.Delete(annotatedPdfPath); } catch { }
-
-        Console.WriteLine($"Merged PDF saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Optional cleanup of the intermediate annotated file
+            if (File.Exists(annotatedPath))
+            {
+                try { File.Delete(annotatedPath); } catch { /* ignore */ }
+            }
+        }
     }
 }

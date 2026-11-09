@@ -6,39 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";               // source PDF
-        const string attachmentPath = "invoice.pdf";           // file to attach
-        const string outputPdfPath = "output_with_attachment.pdf";
+        const string inputPdf = "input.pdf";          // source PDF
+        const string attachmentPdf = "invoice.pdf";   // file to attach
+        const string outputPdf = "output.pdf";        // result PDF
 
         // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(attachmentPath))
+        if (!File.Exists(attachmentPdf))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPdf}");
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDoc = new Document(inputPdfPath);
-
-        // Create a FileSpecification for the attachment with custom MIME type and description.
-        FileSpecification fileSpec = new FileSpecification(attachmentPath, "Invoice Document")
+        try
         {
-            MIMEType = "application/pdf",
-            // Optional: set relationship if you want to mark it as data.
-            // AFRelationship = AFRelationship.Data
-        };
+            // Load the source PDF
+            Document pdfDoc = new Document(inputPdf);
 
-        // Add the file specification to the EmbeddedFiles collection.
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Create a FileSpecification for the attachment
+            // Constructor takes the display name and a description.
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPdf), "Invoice Document");
+            // Load the file bytes into a stream and assign it to the Contents property.
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPdf));
 
-        // Save the modified PDF.
-        pdfDoc.Save(outputPdfPath);
+            // Add the file specification to the EmbeddedFiles collection.
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        Console.WriteLine($"Attachment added. Output saved to '{outputPdfPath}'.");
+            // Save the result PDF
+            pdfDoc.Save(outputPdf);
+
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

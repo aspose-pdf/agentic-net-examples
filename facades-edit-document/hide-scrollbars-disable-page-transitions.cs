@@ -10,7 +10,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "clean_view.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,45 +18,58 @@ class Program
             return;
         }
 
-        // Load the PDF, remove any page transition effects, set viewer preferences and save.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // ------------------------------------------------------------
-            // 1. Remove page transition effects.
-            //    The Page.Transition property does not exist in older
-            //    Aspose.Pdf versions. Use PdfPageEditor to clear the
-            //    transition by setting TransitionType to "None" (0).
-            // ------------------------------------------------------------
-            var editor = new PdfPageEditor(doc);
-            editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
-            editor.TransitionType = 0;          // 0 = TransitionType.None
-            editor.TransitionDuration = 0;      // no duration
-            editor.ApplyChanges();
-
-            // ------------------------------------------------------------
-            // 2. Set viewer preferences (hide UI elements & scrollbars).
-            //    ViewerPreferences was added in later library versions.
-            //    Access it via dynamic to keep the code compiling against
-            //    older versions; if the property is missing, the catch block
-            //    logs a friendly message and continues.
-            // ------------------------------------------------------------
-            dynamic dynDoc = doc;
+            // ---------- Viewer Preferences (runtime‑safe) ----------
+            // The ViewerPreferences property may not exist in older Aspose.Pdf versions.
+            // Access it via dynamic and handle the possible RuntimeBinderException.
+            dynamic d = doc;
             try
             {
-                dynDoc.ViewerPreferences.HideScrollbars = true;   // hide scrollbars
-                dynDoc.ViewerPreferences.HideToolbar   = true;   // hide toolbar (optional)
-                dynDoc.ViewerPreferences.HideMenubar   = true;   // hide menubar (optional)
-                dynDoc.ViewerPreferences.HideWindowUI = true;   // hide window UI (optional)
+                d.ViewerPreferences.HideWindowUI = true;   // hides scrollbars and other UI elements
+                d.ViewerPreferences.HideToolbar = true;
+                d.ViewerPreferences.HideMenubar = true;
             }
             catch (RuntimeBinderException)
             {
                 Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
             }
 
-            // Save the final PDF.
+            // ---------- Disable Page Transitions ----------
+            // In recent Aspose.Pdf versions the Page class no longer exposes a "Transition" property.
+            // The recommended way is to use PdfPageEditor and set the transition type to "None" for all pages.
+            try
+            {
+                using (PdfPageEditor editor = new PdfPageEditor(doc))
+                {
+                    // Apply to every page (1‑based indexing)
+                    editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+                    // TransitionType enum value 0 corresponds to "None" – using the integer literal keeps the code version‑agnostic.
+                    editor.TransitionType = 0; // None
+                    editor.TransitionDuration = 0; // No duration
+                    editor.ApplyChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Fallback for very old versions that might still expose the property via dynamic.
+                Console.WriteLine($"Failed to clear transitions via PdfPageEditor: {ex.Message}");
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    dynamic pageDyn = doc.Pages[i];
+                    try
+                    {
+                        pageDyn.Transition = null;
+                    }
+                    catch (RuntimeBinderException) { /* ignore – transition removal not supported */ }
+                }
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden UI and no page transitions: {outputPath}");
     }
 }

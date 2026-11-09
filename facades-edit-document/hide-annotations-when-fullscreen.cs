@@ -1,18 +1,14 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // required by task specification
-using Microsoft.CSharp.RuntimeBinder; // for RuntimeBinderException
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_hidden_annotations.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -23,28 +19,44 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Attempt to enable FullScreen viewer preference.
-            // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
-            // Use dynamic access to keep the code compatible with older versions.
+            // -----------------------------------------------------------------
+            // Enable FullScreen viewer preference if the current Aspose.Pdf version
+            // supports the ViewerPreferences property.  Older versions do not expose
+            // this member, which leads to a compile‑time error because the ViewerPreferences
+            // type is missing.  To keep the source compatible with both newer and older
+            // releases we use reflection to set the FullScreen flag without referencing
+            // the concrete ViewerPreferences type.
+            // -----------------------------------------------------------------
             try
             {
-                dynamic d = doc;
-                d.ViewerPreferences.FullScreen = true;
+                var vpProp = doc.GetType().GetProperty("ViewerPreferences");
+                if (vpProp != null)
+                {
+                    var vpInstance = vpProp.GetValue(doc);
+                    if (vpInstance != null)
+                    {
+                        var fullScreenProp = vpInstance.GetType().GetProperty("FullScreen");
+                        if (fullScreenProp != null && fullScreenProp.CanWrite)
+                        {
+                            fullScreenProp.SetValue(vpInstance, true);
+                        }
+                    }
+                }
             }
-            catch (RuntimeBinderException)
+            catch (Exception ex)
             {
-                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf version; FullScreen mode will not be set.");
+                // If anything goes wrong we simply continue – the rest of the logic
+                // (hiding annotations) still works.
+                Console.WriteLine($"Unable to set FullScreen viewer preference: {ex.Message}");
             }
 
-            // Iterate all pages and hide every annotation (guard against null collection)
+            // Iterate over all pages and hide each annotation
             foreach (Page page in doc.Pages)
             {
-                // page.Annotations can be null when a page has no annotations
-                var annotations = page.Annotations ?? Enumerable.Empty<Annotation>();
-                foreach (Annotation annot in annotations)
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Set the Hidden flag (overwrites other flags)
-                    annot.Flags = AnnotationFlags.Hidden;
+                    // Add the Hidden flag while preserving any existing flags
+                    annot.Flags |= AnnotationFlags.Hidden;
                 }
             }
 
@@ -52,6 +64,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with hidden annotations to '{outputPath}'.");
     }
 }

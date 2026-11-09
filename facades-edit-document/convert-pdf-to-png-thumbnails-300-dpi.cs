@@ -12,35 +12,37 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
         {
-            // Iterate through each page (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Create a PNG device with 300 DPI resolution
+            Aspose.Pdf.Devices.PngDevice pngDevice = new Aspose.Pdf.Devices.PngDevice(new Aspose.Pdf.Devices.Resolution(300));
+            // Enable transparent background for UI thumbnails
+            pngDevice.TransparentBackground = true;
+
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
+                Aspose.Pdf.Page page = pdfDoc.Pages[pageIndex];
 
-                // Create a PNG device with the required DPI (300) and transparent background
-                var resolution = new Resolution(300);
-                var pngDevice = new PngDevice(resolution)
+                string outputPath = Path.Combine(outputFolder, $"page_{pageIndex}.png");
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
-                    TransparentBackground = true // enable transparent background
-                };
-
-                // Render the current page to the PNG stream
-                using (var outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                    // Render the page to PNG with the specified DPI and transparency
+                    pngDevice.Process(page, outStream);
                 }
 
                 Console.WriteLine($"Saved thumbnail: {outputPath}");
             }
         }
+
+        Console.WriteLine("PDF to PNG conversion completed.");
     }
 }

@@ -1,69 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "output_centered.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        try
+        // Load the PDF document
+        Document doc = new Document(inputPdf);
+
+        // Verify that page 8 exists (Aspose.Pdf uses 1‑based indexing)
+        if (doc.Pages.Count < 8)
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
-            {
-                // Verify that page 8 exists (pages are 1‑based)
-                if (doc.Pages.Count < 8)
-                {
-                    Console.Error.WriteLine("The document contains fewer than 8 pages.");
-                    return;
-                }
-
-                // Get page 8
-                Aspose.Pdf.Page page = doc.Pages[8];
-
-                // Create an image stamp from the specified image file
-                Aspose.Pdf.ImageStamp stamp = new Aspose.Pdf.ImageStamp(stampImagePath);
-
-                // Retrieve page dimensions
-                double pageWidth = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
-
-                // Retrieve stamp dimensions (automatically set to the image size)
-                double stampWidth = stamp.Width;
-                double stampHeight = stamp.Height;
-
-                // Center the stamp horizontally and vertically
-                stamp.XIndent = (pageWidth - stampWidth) / 2;
-                stamp.YIndent = (pageHeight - stampHeight) / 2;
-
-                // Add the stamp to page 8
-                page.AddStamp(stamp);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Stamp centered on page 8 saved to '{outputPath}'.");
+            Console.Error.WriteLine("PDF contains fewer than 8 pages.");
+            return;
         }
-        catch (Exception ex)
+
+        // Get page 8 (no need to read dimensions when using alignment)
+        Page page = doc.Pages[8];
+
+        // Define stamp size (in points). Adjust as needed.
+        const double stampWidth  = 200; // points
+        const double stampHeight = 100; // points
+
+        // Create an ImageStamp and position it at the centre of the page
+        ImageStamp stamp = new ImageStamp(stampImg)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+            Width  = stampWidth,
+            Height = stampHeight,
+            // Center horizontally and vertically
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Center,
+            // Ensure the stamp is drawn in the foreground (default)
+            Background = false
+        };
+
+        // Add the stamp to page 8
+        page.AddStamp(stamp);
+
+        // Save the result
+        doc.Save(outputPdf);
+
+        Console.WriteLine($"Centered stamp saved to '{outputPdf}'.");
     }
 }
