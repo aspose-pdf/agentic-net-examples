@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // TextAnnotation, TextIcon, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,40 +16,30 @@ class Program
             return;
         }
 
-        // Define annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Load the PDF document.
+        Document doc = new Document(inputPath);
+        // Work on the first page (pages are 1‑based).
+        Page page = doc.Pages[1];
 
-        // Load the source PDF with the core Document API
-        using (Document doc = new Document(inputPath))
+        // Define the annotation rectangle (llx, lly, urx, ury) – coordinates are in points.
+        var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+        // Create a TextAnnotation with the desired properties.
+        var textAnnotation = new TextAnnotation(page, rect)
         {
-            // Access the first page (pages are 1‑based)
-            Page page = doc.Pages[1];
+            Title = "Note",
+            Contents = "This annotation has a light‑gray background for readability on dark pages.",
+            Icon = TextIcon.Note,
+            Open = true,
+            // Apply a light gray background for better readability on dark pages.
+            Color = Aspose.Pdf.Color.LightGray // use Annotation.Color instead of non‑existent BackgroundColor
+        };
 
-            // Create a TextAnnotation and configure its properties
-            TextAnnotation textAnn = new TextAnnotation(page, rect)
-            {
-                Title    = "Note",
-                Contents = "This is a note with light gray background.",
-                Icon     = TextIcon.Note,
-                Open     = true
-            };
+        // Add the annotation to the page.
+        page.Annotations.Add(textAnnotation);
 
-            // The older Aspose.Pdf versions do not expose a BackgroundColor property on TextAnnotation.
-            // To improve readability on dark pages we set the border (Color) to a light gray shade.
-            // This gives a visual cue similar to a light‑gray background.
-            textAnn.Color = Aspose.Pdf.Color.LightGray;
-            textAnn.Border = new Border(textAnn)
-            {
-                Style = BorderStyle.Solid,
-                Width = 1
-            };
-
-            // Add the annotation to the page
-            page.Annotations.Add(textAnn);
-
-            // Save the final PDF with the annotation
-            doc.Save(outputPath);
-        }
+        // Save the modified PDF.
+        doc.Save(outputPath);
 
         Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
     }

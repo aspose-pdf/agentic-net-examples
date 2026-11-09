@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace included as requested
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,45 +18,32 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Attempt to set viewer preferences via reflection.
-                // This works on newer Aspose.Pdf versions where Document.ViewerPreferences exists.
-                // On older versions the property is absent; the code will simply skip setting it.
-                PropertyInfo vpProp = typeof(Document).GetProperty("ViewerPreferences");
-                if (vpProp != null && vpProp.CanRead && vpProp.CanWrite)
+                // The ViewerPreferences property exists only in newer versions of Aspose.Pdf.
+                // To keep the code compatible with older versions we access it dynamically and
+                // handle the case where the property is absent at runtime.
+                dynamic d = doc;
+                try
                 {
-                    object viewerPrefs = vpProp.GetValue(doc);
-                    if (viewerPrefs != null)
-                    {
-                        Type vpType = viewerPrefs.GetType();
-
-                        PropertyInfo hideToolbar = vpType.GetProperty("HideToolbar");
-                        PropertyInfo hideMenubar = vpType.GetProperty("HideMenubar");
-
-                        if (hideToolbar != null && hideToolbar.CanWrite)
-                            hideToolbar.SetValue(viewerPrefs, true);
-
-                        if (hideMenubar != null && hideMenubar.CanWrite)
-                            hideMenubar.SetValue(viewerPrefs, true);
-                    }
+                    d.ViewerPreferences.HideToolbar = true;
+                    d.ViewerPreferences.HideMenubar = true;
                 }
-                else
+                catch (RuntimeBinderException)
                 {
-                    // ViewerPreferences not available in this version of Aspose.Pdf
-                    Console.WriteLine("ViewerPreferences property not found; cannot hide toolbar/menubar.");
+                    Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
                 }
 
-                // Save the modified document
+                // Save the updated PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved with viewer preferences to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with hidden toolbar and menu bar (if supported): {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

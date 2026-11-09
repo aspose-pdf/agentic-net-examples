@@ -6,64 +6,59 @@ class Program
 {
     static void Main()
     {
-        // List of PDF files to process
-        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // Folder containing the source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where PDFs with the added attachment will be saved
+        const string outputFolder = "OutputPdfs";
+        // Path to the file that will be attached to every PDF
+        const string attachmentPath = "AttachmentFile.pdf";
+        // Name that will appear for the attachment inside the PDF
+        const string attachmentName = "AttachedDocument.pdf";
 
-        // Path to the attachment that will be added to each PDF
-        const string attachmentPath = "attachment.txt";
-
-        // Directory where the output PDFs will be saved
-        const string outputDir = "Output";
-
-        // Verify the attachment exists before processing
+        // Verify that the attachment file exists
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Create the output directory if it does not exist
+        Directory.CreateDirectory(outputFolder);
 
-        foreach (string pdfPath in pdfFiles)
+        // Get all PDF files from the input directory
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
         {
-            // Skip missing source PDFs
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"PDF not found: {pdfPath}");
-                continue;
-            }
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
 
-            // Build the output file name (original name + suffix)
-            string outputPath = Path.Combine(
-                outputDir,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_attached.pdf");
+        foreach (string sourcePdfPath in pdfFiles)
+        {
+            string fileName = Path.GetFileName(sourcePdfPath);
+            string targetPdfPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Load the source PDF using Document (Aspose.Pdf)
-                using (Document pdfDoc = new Document(pdfPath))
-                {
-                    // Create a FileSpecification for the attachment
-                    var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
-                    {
-                        // Load the attachment bytes into a stream
-                        Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
-                    };
+                // Load the source PDF using the Document API (PdfFileEditor does not support AddAttachment)
+                Document pdfDoc = new Document(sourcePdfPath);
 
-                    // Add the file specification to the EmbeddedFiles collection
-                    pdfDoc.EmbeddedFiles.Add(fileSpec);
+                // Create a FileSpecification for the attachment
+                var fileSpec = new FileSpecification(attachmentName);
+                // Load the attachment bytes into a MemoryStream and assign to the specification
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
 
-                    // Save the modified PDF to the output location
-                    pdfDoc.Save(outputPath);
-                }
+                // Add the specification to the EmbeddedFiles collection
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-                Console.WriteLine($"Attachment added: {outputPath}");
+                // Save the modified PDF to the output folder
+                pdfDoc.Save(targetPdfPath);
+
+                Console.WriteLine($"Attachment added to: {targetPdfPath}");
             }
             catch (Exception ex)
             {
-                // Report any errors but continue processing remaining files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to process '{sourcePdfPath}': {ex.Message}");
             }
         }
     }

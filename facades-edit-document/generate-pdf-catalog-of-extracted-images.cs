@@ -1,78 +1,69 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;          // PdfExtractor lives here
-using Aspose.Pdf.Drawing;          // ImageStamp lives here
+using Aspose.Pdf.Facades;
 
-class ImageCatalogGenerator
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "catalog.pdf";
+        const string sourcePdfPath = "input.pdf";
+        const string catalogPdfPath = "image_catalog.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Extract all images from the source PDF using PdfExtractor.
-        // -----------------------------------------------------------------
-        List<byte[]> extractedImages = new List<byte[]>();
-
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Load the source PDF
+        using (Document sourceDoc = new Document(sourcePdfPath))
         {
-            extractor.BindPdf(inputPdfPath);
-            extractor.ExtractImage();
-
-            while (extractor.HasNextImage())
+            // Create an empty PDF that will hold the image catalog
+            using (Document catalogDoc = new Document())
             {
-                // Get the next image into a memory stream (newer API requires a stream).
-                using (MemoryStream imgStream = new MemoryStream())
+                // Iterate over all pages (1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= sourceDoc.Pages.Count; pageIndex++)
                 {
-                    extractor.GetNextImage(imgStream);
-                    extractedImages.Add(imgStream.ToArray());
-                }
-            }
-        }
+                    Page srcPage = sourceDoc.Pages[pageIndex];
 
-        // -----------------------------------------------------------------
-        // 2. Create a new PDF document that will serve as the image catalog.
-        // -----------------------------------------------------------------
-        using (Document catalog = new Document())
-        {
-            // For each extracted image, add a new page with a thumbnail.
-            foreach (byte[] imgData in extractedImages)
-            {
-                // Add a blank page to the catalog.
-                Page page = catalog.Pages.Add();
-
-                // Create a memory stream for the image data.
-                using (MemoryStream imgStream = new MemoryStream(imgData))
-                {
-                    // Create an ImageStamp from the stream (Aspose.Pdf.Drawing namespace).
-                    ImageStamp stamp = new ImageStamp(imgStream)
+                    // Iterate over each image resource on the page
+                    foreach (XImage xImg in srcPage.Resources.Images)
                     {
-                        // Set thumbnail width; height scales proportionally.
-                        Width = 200,
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        // Ensure the stamp is placed over page content.
-                        Background = false
-                    };
+                        // Export the XImage to a memory stream (PNG format works for all image types)
+                        using (MemoryStream imgStream = new MemoryStream())
+                        {
+                            // XImage.Save writes the raw image bytes; the format is preserved
+                            xImg.Save(imgStream);
+                            imgStream.Position = 0; // reset for reading
 
-                    // Place the stamp on the page.
-                    page.AddStamp(stamp);
+                            // Create a new page in the catalog PDF for this thumbnail
+                            Page catalogPage = catalogDoc.Pages.Add();
+
+                            // Create an ImageStamp from the image stream
+                            ImageStamp imgStamp = new ImageStamp(imgStream);
+
+                            // Define thumbnail size (adjust as needed)
+                            const double thumbWidth = 200;
+                            const double thumbHeight = 200;
+
+                            imgStamp.Width = thumbWidth;
+                            imgStamp.Height = thumbHeight;
+
+                            // Center the thumbnail on the page
+                            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
+
+                            // Add the stamp to the newly created page
+                            catalogPage.AddStamp(imgStamp);
+                        }
+                    }
                 }
+
+                // Save the catalog PDF
+                catalogDoc.Save(catalogPdfPath);
+                Console.WriteLine($"Image catalog saved to '{catalogPdfPath}'.");
             }
-
-            // Save the catalog PDF.
-            catalog.Save(outputPdfPath);
         }
-
-        Console.WriteLine($"Image catalog created: {outputPdfPath}");
     }
 }

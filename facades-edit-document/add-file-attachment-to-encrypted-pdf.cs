@@ -1,54 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "secured.pdf";
-        const string userPassword = "user123";
-        const string attachmentPath = "attachment.txt";
-        const string outputPath = "secured_with_attachment.pdf";
+        const string inputPdfPath      = "secured.pdf";
+        const string userPassword      = "userPass";
+        const string attachmentFilePath = "attachment.txt";
+        const string outputPdfPath      = "secured_with_attachment.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(attachmentPath))
+
+        if (!File.Exists(attachmentFilePath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
             return;
         }
 
         try
         {
             // Open the encrypted PDF using the user password
-            using (Document doc = new Document(inputPath, userPassword))
+            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath, userPassword))
             {
-                // Create a FileSpecification for the attachment and load its contents into a stream
-                var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
-                {
-                    // The file data must be supplied via a stream for embedding
-                    Contents = new MemoryStream(File.ReadAllBytes(attachmentPath)),
-                    // Optional description shown in PDF viewers
-                    Description = "Embedded attachment"
-                };
+                // Create a file specification for the attachment
+                var fileSpec = new Aspose.Pdf.FileSpecification(Path.GetFileName(attachmentFilePath));
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
 
-                // Add the attachment to the PDF's EmbeddedFiles collection
-                doc.EmbeddedFiles.Add(fileSpec);
+                // Add the file specification to the EmbeddedFiles collection
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-                // Save the modified PDF (encryption is preserved automatically)
-                doc.Save(outputPath);
+                // Save the PDF (encryption is preserved)
+                pdfDoc.Save(outputPdfPath);
             }
 
-            Console.WriteLine($"Attachment added and saved to '{outputPath}'.");
+            Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
         }
         catch (InvalidPasswordException ex)
         {
-            Console.Error.WriteLine($"Password error: {ex.Message}");
+            Console.Error.WriteLine($"Invalid password: {ex.Message}");
         }
         catch (Exception ex)
         {

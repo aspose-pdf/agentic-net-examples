@@ -1,47 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "output.pdf";
+        const int    pageNum   = 1; // 1‑based page index
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(stampImg))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Choose the page where the stamp will be placed (first page in this example)
-            Page page = doc.Pages[1];
+            // Load the source PDF
+            Document pdfDocument = new Document(inputPdf);
 
-            // Define the rectangle that matches the underlying image position.
-            // Fully qualified type name avoids ambiguity with System.Drawing.Rectangle.
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Get the target page (Aspose.Pdf pages are 1‑based)
+            Page page = pdfDocument.Pages[pageNum];
 
-            // Create a TextStamp – we only need the annotation box, so the text is empty.
-            TextStamp stamp = new TextStamp(" ");
-            stamp.Width = rect.Width;          // set stamp width
-            stamp.Height = rect.Height;        // set stamp height
-            stamp.XIndent = rect.LLX;          // horizontal position (left)
-            stamp.YIndent = rect.LLY;          // vertical position (bottom)
-            stamp.RotateAngle = 90f;           // rotate 90° clockwise around the stamp centre
-            stamp.Opacity = 0;                 // make the visual part invisible (only the annotation remains)
+            // Create an image stamp using the modern Aspose.Pdf.Drawing namespace
+            ImageStamp imgStamp = new ImageStamp(stampImg)
+            {
+                // Rotate 90 degrees clockwise around the stamp centre
+                RotateAngle = 90f,
+                // Position the stamp – centre of the page in this example
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Ensure the stamp is drawn over the existing content
+                Background = false
+            };
 
-            // Add the stamp to the page – this creates a StampAnnotation internally.
-            page.AddStamp(stamp);
+            // Add the stamp to the selected page
+            page.AddStamp(imgStamp);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified document
+            pdfDocument.Save(outputPdf);
+
+            Console.WriteLine($"Rotated stamp added. Output saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Stamp annotation rotated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

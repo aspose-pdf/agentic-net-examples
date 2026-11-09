@@ -1,42 +1,42 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_hide_menubar.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF document
+        // Load the PDF document
         Document pdfDocument = new Document(inputPath);
 
-        // Attempt to enable the HideMenubar viewer preference.
-        // This property exists only in newer versions of Aspose.Pdf.
+        // Attempt to set the HideMenubar viewer preference.
+        // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
         // Using dynamic bypasses compile‑time checks and allows the code to compile
-        // against older versions as well. If the property is missing at runtime,
-        // a RuntimeBinderException is caught and a friendly message is shown.
-        dynamic doc = pdfDocument;
+        // against older versions. If the property is absent at runtime, we catch
+        // the RuntimeBinderException and continue without failing.
         try
         {
+            dynamic doc = pdfDocument;
             doc.ViewerPreferences.HideMenubar = true;
         }
         catch (RuntimeBinderException)
         {
-            Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
+            Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. HideMenubar preference was not applied.");
         }
 
-        // Save the PDF with the (potentially) updated viewer preference
+        // Save the modified PDF
         pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"PDF saved with HideMenubar preference to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with HideMenubar preference (if supported) to '{outputPath}'.");
     }
 }

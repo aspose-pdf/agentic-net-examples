@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,35 +16,43 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        Document doc = new Document(inputPath);
-
-        // Define the rectangle for the button (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-        var rect = new Rectangle(100, 500, 200, 540);
-
-        // Create a push‑button field (Aspose.Pdf uses ButtonField for push buttons)
-        var calcButton = new ButtonField(doc.Pages[1], rect)
+        try
         {
-            PartialName = "CalcButton",
-            // The caption of a button is set via the Value property
-            Value = "Calculate Total"
-        };
+            // Load the PDF and work with form fields using FormEditor
+            using (FormEditor formEditor = new FormEditor())
+            {
+                formEditor.BindPdf(inputPath);
 
-        // JavaScript that reads "Quantity" and "UnitPrice" fields, multiplies them, and writes to "Total"
-        string js = @"var qty   = this.getField('Quantity').value;
-var price = this.getField('UnitPrice').value;
-var total = parseFloat(qty) * parseFloat(price);
-this.getField('Total').value = total;";
+                // Define the button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+                float llx = 100f;
+                float lly = 500f;
+                float urx = 200f;
+                float ury = 530f;
 
-        // Attach the JavaScript to the button – use the OnPressMouseBtn action for a button field
-        calcButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
+                // Add a push‑button field named "calcButton" on page 1
+                formEditor.AddField(FieldType.PushButton, "calcButton", 1, llx, lly, urx, ury);
 
-        // Add the button to the form on page 1
-        doc.Form.Add(calcButton, 1);
+                // JavaScript that reads "price" and "quantity" fields, multiplies them, and sets "total"
+                string js = @"
+var price = this.getField('price').value;
+var qty = this.getField('quantity').value;
+if (!isNaN(price) && !isNaN(qty)) {
+    this.getField('total').value = price * qty;
+}
+";
 
-        // Save the modified PDF
-        doc.Save(outputPath);
+                // Attach the JavaScript action to the button
+                formEditor.AddFieldScript("calcButton", js);
 
-        Console.WriteLine($"PDF with JavaScript button saved to '{outputPath}'.");
+                // Save the modified PDF
+                formEditor.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with JavaScript button saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

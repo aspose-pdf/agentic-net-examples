@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";          // source PDF
+        const string attachmentFilePath = "attachment.txt"; // file to attach
         const string outputPdfPath = "output_with_attachment.pdf";
-        const string attachmentFilePath = "attachment.txt";
 
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(attachmentFilePath))
@@ -23,35 +22,25 @@ class Program
             return;
         }
 
-        // Example usage of a class from Aspose.Pdf.Facades (required by the task)
-        PdfFileEditor facadesHelper = new PdfFileEditor();
+        // Load the PDF
+        Document pdfDoc = new Document(inputPdfPath);
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        // Create a FileSpecification for the embedded file using the correct constructor
+        var fileSpec = new FileSpecification(attachmentFilePath, "Added by Aspose.Pdf")
         {
-            // Create a FileSpecification for the attachment using the constructor that accepts the file path and a description.
-            FileSpecification fileSpec = new FileSpecification(attachmentFilePath, "Attachment for auditing");
+            Description = "Added by Aspose.Pdf"
+        };
+        // Set the modification (audit) date via Params.ModDate
+        fileSpec.Params.ModDate = DateTime.UtcNow;
+        // Load the file contents into a stream
+        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
 
-            // Set the modification date via the Params property (the direct ModDate property no longer exists).
-            fileSpec.Params.ModDate = DateTime.UtcNow;
+        // Add the file specification to the EmbeddedFiles collection
+        pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-            // Define where the attachment annotation will appear on page 1
-            Rectangle rect = new Rectangle(100, 700, 120, 720);
+        // Save the updated PDF
+        pdfDoc.Save(outputPdfPath);
 
-            // Create the file attachment annotation
-            FileAttachmentAnnotation attachmentAnn = new FileAttachmentAnnotation(doc.Pages[1], rect, fileSpec)
-            {
-                Title = "Attached File",
-                Contents = "Attachment added for auditing purposes."
-            };
-
-            // Add the annotation to the page
-            doc.Pages[1].Annotations.Add(attachmentAnn);
-
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"PDF saved with attachment and UTC modification date: {outputPdfPath}");
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

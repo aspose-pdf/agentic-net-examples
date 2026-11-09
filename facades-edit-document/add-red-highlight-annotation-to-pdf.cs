@@ -16,35 +16,27 @@ class Program
             return;
         }
 
-        // Define the annotation rectangle (example coordinates)
-        double llx = 100; // lower‑left X
-        double lly = 500; // lower‑left Y
-        double urx = 300; // upper‑right X
-        double ury = 550; // upper‑right Y
-
-        // Bright red border color (RGB 255,0,0) – Aspose.Pdf.Color uses 0‑1 range
-        Color redBorder = Color.FromRgb(1, 0, 0);
-        // Transparent fill (no background) – default is transparent, so no property needed
-
         // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
-        // Get the first page (1‑based index)
-        Page page = pdfDoc.Pages[1];
+        Document doc = new Document(inputPath);
 
-        // Create a square annotation with the specified rectangle
-        Rectangle rect = new Rectangle(llx, lly, urx, ury);
-        SquareAnnotation square = new SquareAnnotation(page, rect)
-        {
-            Color = redBorder // border color
-            // No FillColor property in this version; omission leaves the interior transparent
-        };
+        // Define the rectangle area for the annotation (lower‑left X/Y, upper‑right X/Y)
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-        // Add the annotation to the page
-        page.Annotations.Add(square);
+        // Create a square (highlight) annotation on page 1
+        SquareAnnotation square = new SquareAnnotation(doc.Pages[1], rect);
+        square.Title = "Note";
+        square.Contents = "Highlighted area";
+        // Set the border color to bright red (RGB 255,0,0)
+        square.Color = Aspose.Pdf.Color.FromRgb(255, 0, 0);
+        // Optionally define border width/style
+        square.Border = new Border(square) { Width = 1, Style = BorderStyle.Solid };
+
+        // Add the annotation to the page's annotation collection
+        doc.Pages[1].Annotations.Add(square);
 
         // Save the modified PDF
-        pdfDoc.Save(outputPath);
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Annotation added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation with red border saved to '{outputPath}'.");
     }
 }

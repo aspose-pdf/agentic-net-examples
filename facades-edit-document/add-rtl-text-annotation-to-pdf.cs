@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "annotated_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Define the annotation rectangle (left, bottom, right, top) in points.
+        // Width = 200, Height = 100 → right = left + 200, top = bottom + 100
+        var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+
+        // Right‑to‑left Unicode text (Arabic) to verify proper rendering.
+        string rtlContent = "مرحبا بالعالم"; // "Hello World" in Arabic
+        string title      = "ملاحظة";        // "Note" in Arabic
+
+        // Load the PDF document.
+        Document doc = new Document(inputPath);
+        // Get the first page (1‑based index).
+        Page page = doc.Pages[1];
+
+        // Create a text annotation with RTL content.
+        var textAnnotation = new TextAnnotation(page, rect)
         {
-            // Access the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            Title    = title,
+            Contents = rtlContent,
+            Open     = true,               // annotation window opened by default
+            Icon     = TextIcon.Note       // standard note icon
+        };
 
-            // Define the annotation rectangle (llx, lly, urx, ury) in points
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Add the annotation to the page.
+        page.Annotations.Add(textAnnotation);
 
-            // Create a TextAnnotation with right‑to‑left Unicode text (Arabic example)
-            var annotation = new Aspose.Pdf.Annotations.TextAnnotation(page, rect);
-            annotation.Title = "ملاحظة"; // Arabic for "Note"
-            annotation.Contents = "هذا نص تجريبي للتحقق من عرض Unicode من اليمين إلى اليسار.";
-            annotation.Open = true;
-            annotation.Icon = Aspose.Pdf.Annotations.TextIcon.Note;
+        // Save the updated PDF.
+        doc.Save(outputPath);
 
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(annotation);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Text annotation with RTL language added to '{outputPath}'.");
     }
 }

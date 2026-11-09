@@ -1,10 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-// The Microsoft.CSharp.RuntimeBinder namespace is required only if you reference the RuntimeBinderException type explicitly.
-// It is safe to include it; the compiler will ignore it if the assembly is not referenced.
-using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
@@ -19,48 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF. Use dynamic to access ViewerPreferences so the code compiles
+        // with older Aspose.Pdf versions that do not expose the ViewerPreferences type.
+        dynamic doc = new Document(inputPath);
+
+        try
         {
-            bool preferenceSet = false;
-
-            // Attempt to use the ViewerPreferences property (available in newer Aspose.Pdf versions).
-            // If the property does not exist (older versions), fall back to a JavaScript OpenAction that forces full‑screen.
-            try
-            {
-                // "dynamic" bypasses compile‑time member checking.
-                dynamic dynDoc = doc;
-                dynDoc.ViewerPreferences.FullScreen = true;
-                preferenceSet = true;
-            }
-            catch (RuntimeBinderException)
-            {
-                // ViewerPreferences is not supported – use JavaScript as an alternative.
-                try
-                {
-                    doc.OpenAction = new JavascriptAction("this.fullScreen = true;");
-                    preferenceSet = true;
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Failed to set full‑screen via JavaScript: {ex.Message}");
-                }
-            }
-            catch (Exception ex)
-            {
-                // Any other unexpected exception while accessing ViewerPreferences.
-                Console.Error.WriteLine($"Unexpected error when setting ViewerPreferences: {ex.Message}");
-            }
-
-            if (!preferenceSet)
-            {
-                Console.Error.WriteLine("Full‑screen preference could not be applied. The PDF will be saved without it.");
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Attempt to set the FullScreen viewer preference.
+            // The PageMode enum is part of Aspose.Pdf and is available even in older releases.
+            doc.ViewerPreferences.PageMode = PageMode.FullScreen;
+        }
+        catch (RuntimeBinderException)
+        {
+            // The current Aspose.Pdf version does not support ViewerPreferences.
+            Console.WriteLine("ViewerPreferences property is not available in the referenced Aspose.Pdf version. " +
+                              "Consider upgrading the Aspose.Pdf NuGet package to enable FullScreen mode.");
+        }
+        catch (Exception ex)
+        {
+            // Any other unexpected error while setting the preference.
+            Console.WriteLine($"An error occurred while setting viewer preferences: {ex.Message}");
         }
 
-        Console.WriteLine($"PDF saved{(File.Exists(outputPath) ? " with" : " without")} FullScreen preference: {outputPath}");
+        // Save the (potentially) modified PDF.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved with FullScreen preference (if supported): {outputPath}");
     }
 }

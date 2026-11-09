@@ -1,57 +1,85 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 
-public static class PdfViewerPreferenceHelper
+class Program
 {
-    /// <summary>
-    /// Toggles the FullScreen viewer preference of a PDF file.
-    /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the modified PDF will be saved.</param>
-    /// <param name="enableFullScreen">True to enable FullScreen mode; false to disable.</param>
-    public static void ToggleFullScreen(string inputPdfPath, string outputPdfPath, bool enableFullScreen)
+    // Toggles the FullScreen viewer preference of a PDF.
+    // If the current Aspose.Pdf version supports ViewerPreferences,
+    // the method sets the FullScreen flag via reflection.
+    // Otherwise it leaves the document unchanged.
+    static void ToggleFullScreen(string inputPdfPath, string outputPdfPath, bool enableFullScreen)
     {
-        // Ensure the source file exists.
         if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException("Source PDF not found.", inputPdfPath);
-
-        // Load the PDF document.
-        Document pdfDoc = new Document(inputPdfPath);
-
-        // The ViewerPreferences class may not exist in older Aspose.Pdf versions.
-        // Use reflection to set the FullScreen flag if the API is available.
-        var viewerPrefsProp = typeof(Document).GetProperty("ViewerPreferences");
-        if (viewerPrefsProp != null)
         {
-            var viewerPrefs = viewerPrefsProp.GetValue(pdfDoc);
-            if (viewerPrefs != null)
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            return;
+        }
+
+        try
+        {
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPdfPath))
             {
-                var fullScreenProp = viewerPrefs.GetType().GetProperty("FullScreen");
-                if (fullScreenProp != null && fullScreenProp.CanWrite)
+                // Attempt to obtain the ViewerPreferences property via reflection.
+                PropertyInfo viewerPrefProp = doc.GetType().GetProperty("ViewerPreferences", BindingFlags.Public | BindingFlags.Instance);
+                if (viewerPrefProp != null)
                 {
-                    fullScreenProp.SetValue(viewerPrefs, enableFullScreen);
+                    // Get the ViewerPreferences instance.
+                    object viewerPrefs = viewerPrefProp.GetValue(doc);
+                    if (viewerPrefs != null)
+                    {
+                        // Try to set the FullScreen property on the ViewerPreferences object.
+                        PropertyInfo fullScreenProp = viewerPrefs.GetType().GetProperty("FullScreen", BindingFlags.Public | BindingFlags.Instance);
+                        if (fullScreenProp != null && fullScreenProp.CanWrite)
+                        {
+                            fullScreenProp.SetValue(viewerPrefs, enableFullScreen);
+                            Console.WriteLine($"FullScreen viewer preference set to {enableFullScreen}.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("FullScreen property not found or read‑only on ViewerPreferences.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("ViewerPreferences instance is null.");
+                    }
                 }
                 else
                 {
-                    // FullScreen property not available – nothing to do.
+                    // The current Aspose.Pdf version does not expose ViewerPreferences.
+                    Console.WriteLine("ViewerPreferences property not available in this Aspose.Pdf version. No changes applied.");
                 }
+
+                // Save the (potentially modified) document.
+                doc.Save(outputPdfPath);
+                Console.WriteLine($"Document saved to '{outputPdfPath}'.");
             }
         }
-        else
+        catch (Exception ex)
         {
-            // ViewerPreferences property not available – nothing to do.
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
-
-        // Save the modified document.
-        pdfDoc.Save(outputPdfPath);
     }
 
-    // Entry point required for compilation when the project is built as an executable.
-    public static void Main(string[] args)
+    static void Main(string[] args)
     {
-        // This placeholder Main allows the project to compile.
-        // Example usage (uncomment for testing):
-        // ToggleFullScreen("input.pdf", "output.pdf", true);
+        // Example usage:
+        // args[0] = input PDF path
+        // args[1] = output PDF path
+        // args[2] = "on" or "off" to enable/disable FullScreen
+        if (args.Length < 3)
+        {
+            Console.WriteLine("Usage: <inputPdf> <outputPdf> <on|off>");
+            return;
+        }
+
+        string inputPath = args[0];
+        string outputPath = args[1];
+        bool enable = string.Equals(args[2], "on", StringComparison.OrdinalIgnoreCase);
+
+        ToggleFullScreen(inputPath, outputPath, enable);
     }
 }

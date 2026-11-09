@@ -7,42 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDir = "BmpPages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Document implements IDisposable – use using for proper disposal
-            using (Document doc = new Document(pdfPath))
+            // Load the PDF document (Document implements IDisposable, so we use a using block)
+            using (Document pdfDocument = new Document(inputPdf))
             {
-                // BmpDevice creates 24‑bit BMP images. Resolution can be adjusted as needed.
-                var resolution = new Resolution(150); // 150 DPI – change if required
-                var bmpDevice = new BmpDevice(resolution);
+                // Define the resolution (DPI) for the output BMP images.
+                var resolution = new Resolution(150);
 
-                // Pages are 1‑based (global rule)
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                // BmpDevice renders each page to a 24‑bit BMP by default.
+                // NOTE: Device classes are NOT IDisposable, therefore they must NOT be placed in a using statement.
+                BmpDevice bmpDevice = new BmpDevice(resolution);
+
+                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
                 {
-                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.bmp");
-                    using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    string outputPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
+
+                    // Render the current page to a BMP file.
+                    using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        // Convert the current page to BMP and write directly to the file stream
-                        bmpDevice.Process(doc.Pages[pageNum], fs);
+                        bmpDevice.Process(pdfDocument.Pages[pageNumber], fs);
                     }
-                    Console.WriteLine($"Saved page {pageNum} as BMP → {outPath}");
+
+                    Console.WriteLine($"Saved page {pageNumber} as BMP → {outputPath}");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

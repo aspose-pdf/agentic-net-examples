@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades; // required by the task (not used directly but kept per specification)
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_js.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +16,27 @@ class Program
             return;
         }
 
-        // Instantiate a Facades class as required (no disposal needed)
-        var editor = new PdfFileEditor();
+        // Copy the original PDF to a new file that will receive the JavaScript actions
+        File.Copy(inputPath, outputPath, true);
 
-        // Load the PDF and ensure deterministic disposal
-        using (var doc = new Document(inputPath))
+        // Load the PDF document (Document implements IDisposable)
+        using (Document doc = new Document(outputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // JavaScript that logs the current page number to the console when the page is opened
+            string js = "console.log('Page opened: ' + this.pageNum);";
+
+            // Attach the JavaScript to the Open action of each page
+            foreach (Page page in doc.Pages)
             {
-                var page = doc.Pages[i];
-
-                // JavaScript that logs the current page number to the console on page open
-                // In PDF JavaScript, 'this.pageNum' gives the page number (1‑based)
-                // 'app.console.println' writes to the JavaScript console
-                var js = new JavascriptAction("app.console.println('Page opened: ' + this.pageNum);");
-
-                // Assign the action to the page's OnOpen event
-                page.Actions.OnOpen = js;
+                // Page‑level JavaScript actions are accessed via the `Actions` collection.
+                // The correct property for the page‑open event is `OnOpen`.
+                page.Actions.OnOpen = new JavascriptAction(js);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
+        Console.WriteLine($"JavaScript added to all pages and saved as '{outputPath}'.");
     }
 }

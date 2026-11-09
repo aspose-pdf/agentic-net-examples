@@ -6,14 +6,15 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdfPath   = "input.pdf";
-        const string attachmentPath  = "attachment.txt";
-        const string outputPdfPath   = "output_with_attachment.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_attachment.pdf";
+        const string attachmentPath = "attachment.txt";
+        const string attachmentName = "MyAttachment.txt";
 
-        // Verify that source files exist
-        if (!File.Exists(sourcePdfPath))
+        // Verify that the source PDF and the attachment exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
@@ -23,22 +24,25 @@ class Program
             return;
         }
 
-        // Load the original PDF (Document class is the primary API for PDF manipulation)
-        Document pdfDoc = new Document(sourcePdfPath);
+        // Load the PDF using Document (PdfFileEditor does not provide AddAttachment)
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Create a file specification for the attachment using the correct constructor
+            FileSpecification fileSpec = new FileSpecification(attachmentPath, attachmentName)
+            {
+                Description = attachmentName
+            };
 
-        // Create a file specification for the attachment using the correct constructor
-        FileSpecification fileSpec = new FileSpecification(attachmentPath, "Sample attachment description");
-        // Optional: set a friendly display name (auto‑derived from the file name if not set)
-        fileSpec.Name = Path.GetFileName(attachmentPath);
-        // Optional: set a description (already supplied via constructor, but can be overridden)
-        fileSpec.Description = "Sample attachment description";
+            // Optional: set the modification date of the attachment
+            fileSpec.Params.ModDate = DateTime.UtcNow;
 
-        // Add the file specification to the EmbeddedFiles name tree – this defines the relationship as an embedded file
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Add the attachment to the EmbeddedFiles collection (defines it as an embedded file)
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        // Save the modified PDF to a new file so the original remains unchanged
-        pdfDoc.Save(outputPdfPath);
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
+        }
 
-        Console.WriteLine($"Attachment added successfully to '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

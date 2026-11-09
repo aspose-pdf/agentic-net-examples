@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_none.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,19 +18,26 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document doc = new Document(inputPath))
-            {
-                // The PageMode property controls the initial view mode of the PDF.
-                // Setting it to UseNone hides all navigation panels when the document is opened.
-                // This property exists in all supported Aspose.Pdf versions, unlike ViewerPreferences.
-                doc.PageMode = PageMode.UseNone;
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPath);
 
-                // Save the modified PDF.
-                doc.Save(outputPath);
+            // Attempt to set viewer preferences. The ViewerPreferences property
+            // exists only in newer versions of Aspose.Pdf. To keep the code
+            // compatible with older versions we access it via dynamic and handle
+            // the possible RuntimeBinderException.
+            dynamic doc = pdfDocument;
+            try
+            {
+                doc.ViewerPreferences.PageMode = PageMode.UseNone;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Skipping this setting.");
             }
 
-            Console.WriteLine($"PDF saved with PageMode.UseNone to '{outputPath}'.");
+            // Save the updated PDF
+            pdfDocument.Save(outputPath);
+            Console.WriteLine($"Viewer preference applied (if supported) and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

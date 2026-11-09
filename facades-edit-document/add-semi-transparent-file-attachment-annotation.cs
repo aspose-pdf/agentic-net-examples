@@ -7,47 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "annotated_page3.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
-        // Verify source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document (loads only the needed parts into memory)
+        Document doc = new Document(inputPath);
 
-        // Ensure the document has at least three pages
-        if (pdfDocument.Pages.Count < 3)
+        // Verify that page 3 exists (pages are 1‑based)
+        if (doc.Pages.Count < 3)
         {
-            Console.Error.WriteLine("The PDF does not contain a third page.");
+            Console.Error.WriteLine("The document does not contain a page 3.");
             return;
         }
 
-        // Define the rectangle that bounds the annotation (llx, lly, urx, ury)
-        // Use the fully‑qualified Aspose.Pdf.Rectangle to avoid ambiguity.
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Define the annotation rectangle (llx, lly, urx, ury) in points
+        var rect = new Rectangle(100, 500, 300, 550);
 
-        // Create a TextAnnotation on page 3 with the desired properties.
-        // The constructor requires the target Page object and the rectangle.
-        TextAnnotation annotation = new TextAnnotation(pdfDocument.Pages[3], rect)
+        // Retrieve the target page
+        Page targetPage = doc.Pages[3];
+
+        // Create a text annotation with semi‑transparent opacity
+        var txtAnnot = new TextAnnotation(targetPage, rect)
         {
             Title    = "Note",
-            Contents = "Semi‑transparent annotation on page 3.",
+            Contents = "Semi‑transparent annotation",
             Open     = true,
             Icon     = TextIcon.Note,
-            Opacity  = 0.6 // 60% opacity for a semi‑transparent effect
+            Opacity  = 0.6f // 60% opacity
         };
 
-        // Add the annotation to the page's annotation collection.
-        pdfDocument.Pages[3].Annotations.Add(annotation);
+        // Add the annotation to the page's annotation collection
+        targetPage.Annotations.Add(txtAnnot);
 
-        // Save the modified PDF.
-        pdfDocument.Save(outputPath);
+        // Save the modified PDF
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation added to page 3 and saved as '{outputPath}'.");
     }
 }

@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Document, EmbeddedFiles handling
 
 class Program
 {
@@ -16,39 +16,37 @@ class Program
             return;
         }
 
-        // Work on a copy to keep the original file unchanged
+        // Work on a copy so the original file remains unchanged
         File.Copy(inputPath, outputPath, true);
 
-        // Load the PDF. Attachments are accessed via the EmbeddedFiles collection.
+        // Load the PDF using the Document API (EmbeddedFiles is the correct collection for attachments)
         Document pdfDoc = new Document(outputPath);
 
-        // Delete all embedded files (attachments) if any exist
-        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
+        // Delete all embedded files. The Delete method expects the attachment name (string),
+        // not an index. Collect the names first to avoid modifying the collection while iterating.
+        var embeddedFiles = pdfDoc.EmbeddedFiles;
+        string[] attachmentNames = new string[embeddedFiles.Count];
+        for (int i = 0; i < embeddedFiles.Count; i++)
         {
-            // EmbeddedFileCollection uses 1‑based indexing. Iterate backwards and delete by name.
-            for (int i = pdfDoc.EmbeddedFiles.Count; i >= 1; i--)
-            {
-                var fileSpec = pdfDoc.EmbeddedFiles[i];
-                if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
-                {
-                    pdfDoc.EmbeddedFiles.Delete(fileSpec.Name);
-                }
-            }
-
-            // Save the document after removals
-            pdfDoc.Save(outputPath);
+            attachmentNames[i] = embeddedFiles[i].Name; // each item is an EmbeddedFile object
+        }
+        foreach (var name in attachmentNames)
+        {
+            embeddedFiles.Delete(name);
         }
 
-        // Verify that no attachments remain
+        // Save the changes
+        pdfDoc.Save(outputPath);
+
+        // Verify that no embedded files remain
         Document verifyDoc = new Document(outputPath);
-        int remaining = verifyDoc.EmbeddedFiles != null ? verifyDoc.EmbeddedFiles.Count : 0;
-        if (remaining == 0)
+        if (verifyDoc.EmbeddedFiles.Count == 0)
         {
-            Console.WriteLine("All attachments deleted successfully. Count = 0.");
+            Console.WriteLine("All attachments deleted successfully. Attachment count is zero.");
         }
         else
         {
-            Console.WriteLine($"Deletion failed. Remaining attachments: {remaining}");
+            Console.WriteLine($"Error: {verifyDoc.EmbeddedFiles.Count} attachment(s) still present.");
         }
     }
 }

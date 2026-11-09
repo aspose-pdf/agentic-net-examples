@@ -1,43 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for CompressionType and Resolution
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTiffPath = "output.tiff";
+        const string inputPdf = "input.pdf";
+        const string outputTiff = "output.tiff";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Initialize the PdfConverter which supports TIFF output
-                using (PdfConverter converter = new PdfConverter())
-                {
-                    // Optional: set DPI resolution for the TIFF images
-                    // converter.Resolution = new Resolution(300);
+            // Initialize the PDF converter (facade API)
+            using var converter = new PdfConverter();
 
-                    converter.BindPdf(pdfDoc);
-                    converter.DoConvert();
+            // Bind the PDF file to the converter
+            converter.BindPdf(inputPdf);
 
-                    // Save the whole PDF as a multi‑page TIFF using LZW compression
-                    converter.SaveAsTIFF(outputTiffPath, CompressionType.LZW);
-                    converter.Close();
-                }
-            }
+            // Prepare the converter for conversion
+            converter.DoConvert();
 
-            Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiffPath}");
+            // Convert all pages and save as a multi‑page TIFF file using LZW compression
+            converter.SaveAsTIFF(outputTiff, CompressionType.LZW);
+
+            Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiff}");
         }
         catch (Exception ex)
         {

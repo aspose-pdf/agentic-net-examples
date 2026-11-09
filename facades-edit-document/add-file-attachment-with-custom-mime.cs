@@ -6,40 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdf = "input.pdf";          // original PDF
-        const string attachmentFile = "data.bin";      // file to attach
-        const string outputPdf = "output.pdf";        // PDF with attachment
-        const string description = "Custom data attachment";
-        const string customMimeType = "application/x-custom-data"; // custom MIME type
+        const string pdfPath = "document.pdf";          // PDF to which the attachment will be added
+        const string attachmentPath = "data.bin";      // File to attach
+        const string description = "Custom binary data";
+        const string customMimeType = "application/x-custom-binary"; // Your custom MIME type
 
-        // Verify input files exist
-        if (!File.Exists(sourcePdf))
+        // Verify that both source files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
-            return;
-        }
-        if (!File.Exists(attachmentFile))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the source PDF using Document (PdfFileEditor does not support AddAttachment)
-        Document pdfDoc = new Document(sourcePdf);
-
-        // Create a file specification for the attachment, set its contents and the custom MIME type
-        FileSpecification fileSpec = new FileSpecification(Path.GetFileName(attachmentFile), description)
+        if (!File.Exists(attachmentPath))
         {
-            Contents = new MemoryStream(File.ReadAllBytes(attachmentFile)),
+            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
+            return;
+        }
+
+        // Load the PDF document using the Document class (PdfFileEditor does not support AttachFile)
+        Document pdfDoc = new Document(pdfPath);
+
+        // Create a FileSpecification for the attachment and set the custom MIME type
+        var fileSpec = new FileSpecification(attachmentPath, description)
+        {
             MIMEType = customMimeType
         };
 
-        // Add the attachment to the PDF via the EmbeddedFiles collection
+        // Add the file specification to the EmbeddedFiles collection
         pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        // Save the modified PDF to the output path
-        pdfDoc.Save(outputPdf);
+        // Save the updated PDF (overwrites the original file)
+        pdfDoc.Save(pdfPath);
 
-        Console.WriteLine($"Attachment added with MIME type '{customMimeType}' to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added to '{pdfPath}' with MIME type '{customMimeType}'.");
     }
 }

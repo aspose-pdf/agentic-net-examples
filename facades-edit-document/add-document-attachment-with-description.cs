@@ -6,40 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string attachmentFile = "attachment.txt";
-        const string outputPdf = "output_with_attachment.pdf";
-        const string description = "Sample attachment for metadata";
+        const string inputPdfPath   = "input.pdf";          // source PDF
+        const string attachmentPath = "attachment.txt";     // file to attach
+        const string attachmentLabel = "Project Documentation"; // descriptive label
+        const string outputPdfPath  = "output.pdf";         // result PDF
 
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(attachmentPath))
+        {
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        if (!File.Exists(attachmentFile))
-        {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
-            return;
-        }
+        // Load the source PDF
+        Document pdfDoc = new Document(inputPdfPath);
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPdf);
+        // Create a FileSpecification for the attachment, set its description, and provide the file data via a stream
+        var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath), attachmentLabel);
+        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
 
-        // Create a FileSpecification for the attachment
-        var fileSpec = new FileSpecification(Path.GetFileName(attachmentFile))
-        {
-            Description = description,
-            // Embed the file data
-            Contents = new MemoryStream(File.ReadAllBytes(attachmentFile))
-        };
-
-        // Add the file specification to the EmbeddedFiles collection
+        // Add the file specification to the EmbeddedFiles collection (Attachments collection does not exist)
         pdfDoc.EmbeddedFiles.Add(fileSpec);
 
         // Save the modified PDF
-        pdfDoc.Save(outputPdf);
+        pdfDoc.Save(outputPdfPath);
 
-        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
     }
 }

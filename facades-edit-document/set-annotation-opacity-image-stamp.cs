@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // required namespace
 
 class Program
 {
@@ -16,30 +17,40 @@ class Program
             return;
         }
 
-        // Load the PDF, create a text annotation and set visual properties.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Define the rectangle for the annotation (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y).
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // Create the markup annotation with opacity. BlendMode is not supported in the current Aspose.Pdf version.
-            TextAnnotation annotation = new TextAnnotation(doc.Pages[1], rect)
+            // Load PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Title    = "Note",
-                Contents = "Sample annotation",
-                Open     = true,
-                Icon     = TextIcon.Note,
-                Opacity  = 0.75f // 75% opacity
-                // BlendMode = BlendMode.Multiply // <-- not available in this version
-            };
+                // Use the first page for the annotation (adjust as needed)
+                Page page = doc.Pages[1];
 
-            // Add the annotation to the first page.
-            doc.Pages[1].Annotations.Add(annotation);
+                // Define annotation rectangle (llx, lly, urx, ury) in points
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Save the modified PDF.
-            doc.Save(outputPath);
+                // Create a text annotation
+                TextAnnotation annotation = new TextAnnotation(page, rect);
+                annotation.Title = "Note";
+                annotation.Contents = "Subtle annotation with opacity.";
+                annotation.Open = true;
+                annotation.Icon = TextIcon.Note;
+
+                // Set visual property: 75% opacity.
+                // BlendMode is not supported on TextAnnotation in the current Aspose.PDF version, so it is omitted.
+                annotation.Opacity = 0.75f;
+
+                // Add the annotation to the page
+                page.Annotations.Add(annotation);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Annotation with opacity saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

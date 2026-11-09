@@ -1,73 +1,83 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // required by task specification
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // original PDF
-        const string outputPdf = "output.pdf"; // final PDF with new attachments
+        // Input and output PDF paths
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Files to be attached to the PDF
-        string[] newAttachments = { "file1.txt", "image.png", "data.xml" };
-
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        // Files that will be added as new attachments
+        string[] filesToAdd = new string[]
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            "file1.txt",
+            "image.png",
+            "document.docx"
+        };
+
+        // Verify input PDF exists
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Verify that each attachment file exists
-        foreach (string att in newAttachments)
+        // Verify each file to add exists
+        foreach (string f in filesToAdd)
         {
-            if (!File.Exists(att))
+            if (!File.Exists(f))
             {
-                Console.Error.WriteLine($"Attachment file not found: {att}");
+                Console.Error.WriteLine($"Attachment file not found: {f}");
                 return;
             }
         }
 
-        // Load the PDF document using Aspose.Pdf.Document
-        Document pdfDoc = new Document(inputPdf);
-
-        // -----------------------------------------------------------------
-        // 1. Remove all existing embedded files (if any).
-        // -----------------------------------------------------------------
-        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
         {
-            // EmbeddedFileCollection uses 1‑based indexing. Delete by name starting from the end.
-            for (int i = pdfDoc.EmbeddedFiles.Count; i >= 1; i--)
+            // ------------------------------------------------------------
+            // Remove all existing embedded files (attachments)
+            // ------------------------------------------------------------
+            if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
             {
-                var existingSpec = pdfDoc.EmbeddedFiles[i];
-                if (existingSpec != null && !string.IsNullOrEmpty(existingSpec.Name))
+                // Collect the names of existing embedded files first
+                List<string> existingNames = new List<string>();
+                foreach (Aspose.Pdf.FileSpecification spec in pdfDoc.EmbeddedFiles)
                 {
-                    pdfDoc.EmbeddedFiles.Delete(existingSpec.Name);
+                    existingNames.Add(spec.Name);
+                }
+
+                // Delete each embedded file by name
+                foreach (string name in existingNames)
+                {
+                    pdfDoc.EmbeddedFiles.Delete(name);
                 }
             }
+
+            // ------------------------------------------------------------
+            // Add the fresh set of files as embedded files
+            // ------------------------------------------------------------
+            foreach (string filePath in filesToAdd)
+            {
+                // Create a FileSpecification with the file name
+                Aspose.Pdf.FileSpecification fileSpec = new Aspose.Pdf.FileSpecification(Path.GetFileName(filePath));
+
+                // Load the file contents into a memory stream
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
+
+                // Add the specification to the document's EmbeddedFiles collection
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
+            }
+
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // -----------------------------------------------------------------
-        // 2. Add the fresh set of attachments as embedded files.
-        // -----------------------------------------------------------------
-        foreach (string attPath in newAttachments)
-        {
-            // Create a FileSpecification for the file (name only constructor).
-            var fileSpec = new FileSpecification(Path.GetFileName(attPath));
-            // Load the file content into a memory stream.
-            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attPath));
-            // Optionally set MIME type (helps some PDF viewers).
-            // fileSpec.MIMEType = MimeMapping.GetMimeMapping(attPath);
-            // Add to the EmbeddedFiles collection.
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
-        }
-
-        // Save the updated PDF
-        if (File.Exists(outputPdf))
-            File.Delete(outputPdf);
-        pdfDoc.Save(outputPdf);
-
-        Console.WriteLine($"All attachments refreshed. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF updated successfully. Saved to '{outputPdfPath}'.");
     }
 }

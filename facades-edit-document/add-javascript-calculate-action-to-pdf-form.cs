@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Needed for JavascriptAction
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +16,23 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // JavaScript that multiplies Quantity and UnitPrice and stores the result in Total
+        string jsCode = @"
+var qty   = this.getField('Quantity').value;
+var price = this.getField('UnitPrice').value;
+if (!isNaN(qty) && !isNaN(price)) {
+    this.getField('Total').value = qty * price;
+}";
+
+        // Use FormEditor.AddFieldScript to attach the JavaScript to the Quantity field.
+        using (FormEditor editor = new FormEditor())
         {
-            // JavaScript that recalculates Total = Quantity * Price whenever Quantity changes
-            string js = @"
-                var qty   = this.getField('Quantity').value;
-                var price = this.getField('Price').value;
-                // Ensure numeric calculation
-                qty   = parseFloat(qty)   || 0;
-                price = parseFloat(price) || 0;
-                this.getField('Total').value = qty * price;
-            ";
-
-            // Attach the script to the Quantity field's calculation event (value change)
-            var quantityField = doc.Form["Quantity"] as TextBoxField;
-            if (quantityField != null)
-            {
-                // Use a JavascriptAction and a supported action property (OnCalculate)
-                quantityField.Actions.OnCalculate = new JavascriptAction(js);
-            }
-            else
-            {
-                Console.Error.WriteLine("Quantity field not found or is not a TextBoxField.");
-            }
-
-            // Persist the changes
-            doc.Save(outputPath);
+            editor.BindPdf(inputPath);
+            // The script will be executed when the field value changes (on blur/commit).
+            editor.AddFieldScript("Quantity", jsCode);
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
     }
 }

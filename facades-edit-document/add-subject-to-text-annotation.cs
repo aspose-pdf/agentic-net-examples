@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "annotated_output.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,33 +16,31 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Define the annotation rectangle (llx, lly, urx, ury)
+        var rect = new Rectangle(100, 500, 300, 550);
+
+        // Get the first page (Aspose.Pdf pages are 1‑based)
+        Page page = doc.Pages[1];
+
+        // Create a text annotation on the retrieved page
+        var annotation = new TextAnnotation(page, rect)
         {
-            // Load the PDF document
-            Document pdf = new Document(inputPath);
+            Title = "Note",
+            Subject = "Important", // Subject for easier searching/categorization
+            Contents = "This is a subject‑tagged annotation.",
+            Icon = TextIcon.Note,
+            Open = true
+        };
 
-            // Define the rectangle that bounds the annotation (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle annRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Add the annotation to the page's Annotations collection
+        page.Annotations.Add(annotation);
 
-            // Create a TextAnnotation (a markup annotation) on the first page
-            TextAnnotation textAnn = new TextAnnotation(pdf.Pages[1], annRect)
-            {
-                Title = "Sample Title",          // Title of the annotation
-                Subject = "Sample Subject",      // Subject property for categorization
-                Contents = "This is the annotation contents." // Popup text
-            };
+        // Save the modified document
+        doc.Save(outputPath);
 
-            // Add the annotation to the page's annotation collection
-            pdf.Pages[1].Annotations.Add(textAnn);
-
-            // Save the modified PDF
-            pdf.Save(outputPath);
-
-            Console.WriteLine($"Annotation added. Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Annotation added with subject. Saved to '{outputPath}'.");
     }
 }

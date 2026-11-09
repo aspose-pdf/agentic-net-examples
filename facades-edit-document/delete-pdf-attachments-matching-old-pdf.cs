@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 
@@ -7,42 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Verify source PDF exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document (Document implements IDisposable)
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF and look for an embedded file whose name ends with "_old.pdf".
+        string nameToRemove = null;
+        using (Document doc = new Document(inputPdf))
         {
-            // Collect the embedded file specifications that match the pattern
-            var toRemove = new List<FileSpecification>();
-            foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                if (!string.IsNullOrEmpty(fileSpec.Name) &&
-                    fileSpec.Name.EndsWith("_old.pdf", StringComparison.OrdinalIgnoreCase))
+                // Aspose collections are 1‑based.
+                for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
                 {
-                    toRemove.Add(fileSpec);
+                    FileSpecification fileSpec = doc.EmbeddedFiles[i];
+                    if (!string.IsNullOrEmpty(fileSpec.Name) &&
+                        fileSpec.Name.EndsWith("_old.pdf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        nameToRemove = fileSpec.Name;
+                        break; // remove the first match
+                    }
                 }
             }
 
-            // Remove the matching attachments using the Delete method (required by Aspose.Pdf)
-            foreach (FileSpecification fileSpec in toRemove)
+            if (nameToRemove == null)
             {
-                // The EmbeddedFiles collection does not expose a Remove(FileSpecification) overload.
-                // Use Delete(string name) to remove the attachment by its name.
-                pdfDoc.EmbeddedFiles.Delete(fileSpec.Name);
+                // No matching attachment – simply copy the original file.
+                doc.Save(outputPdf);
+                Console.WriteLine("No matching attachment found; original PDF saved unchanged.");
+                return;
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPath);
+            // Remove the identified embedded file by its name.
+            doc.EmbeddedFiles.Delete(nameToRemove);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Removed matching attachments and saved to '{outputPath}'.");
+        Console.WriteLine($"Attachment '{nameToRemove}' removed. Output saved to '{outputPdf}'.");
     }
 }

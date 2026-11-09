@@ -9,52 +9,54 @@ class Program
     static void Main()
     {
         // List of PDF file paths to process
-        List<string> pdfFiles = new List<string>
+        List<string> pdfPaths = new List<string>
         {
-            "doc1.pdf",
-            "doc2.pdf",
-            "doc3.pdf"
+            "input1.pdf",
+            "input2.pdf",
+            "input3.pdf"
         };
 
-        foreach (string path in pdfFiles)
+        // Directory where the modified PDFs will be saved
+        string outputDir = "ProcessedPdfs";
+        Directory.CreateDirectory(outputDir);
+
+        // Define the viewer preferences that will be applied to every PDF
+        bool hideToolbar   = true;
+        bool hideMenubar   = true;
+        bool centerWindow  = true;
+        bool displayDocTitle = true;
+
+        foreach (string inputPath in pdfPaths)
         {
-            if (!File.Exists(path))
+            if (!File.Exists(inputPath))
             {
-                Console.Error.WriteLine($"File not found: {path}");
+                Console.Error.WriteLine($"File not found: {inputPath}");
                 continue;
             }
 
+            // Determine output file path (same name, different folder)
+            string outputPath = Path.Combine(outputDir, Path.GetFileName(inputPath));
+
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPath);
+
+            // Apply viewer preferences – use dynamic access to stay compatible with older Aspose.Pdf versions
+            dynamic doc = pdfDocument;
             try
             {
-                // Open each PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(path))
-                {
-                    // Attempt to apply viewer preferences using dynamic access.
-                    // This works only with Aspose.Pdf versions that expose the ViewerPreferences property.
-                    dynamic d = doc;
-                    try
-                    {
-                        var prefs = d.ViewerPreferences;
-                        prefs.HideToolbar = true;
-                        prefs.HideMenubar = true;
-                        prefs.CenterWindow = true;
-                        prefs.DisplayDocTitle = true;
-                    }
-                    catch (RuntimeBinderException)
-                    {
-                        Console.WriteLine($"ViewerPreferences property is not supported by the current Aspose.Pdf version for file '{path}'.");
-                    }
-
-                    // Overwrite the original file with the (potentially) updated preferences
-                    doc.Save(path);
-                }
-
-                Console.WriteLine($"Viewer preferences processed for: {path}");
+                doc.ViewerPreferences.HideToolbar   = hideToolbar;
+                doc.ViewerPreferences.HideMenubar   = hideMenubar;
+                doc.ViewerPreferences.CenterWindow  = centerWindow;
+                doc.ViewerPreferences.DisplayDocTitle = displayDocTitle;
             }
-            catch (Exception ex)
+            catch (RuntimeBinderException)
             {
-                Console.Error.WriteLine($"Error processing '{path}': {ex.Message}");
+                Console.WriteLine($"ViewerPreferences property is not supported by the current Aspose.Pdf library version for file '{inputPath}'. Skipping preference changes.");
             }
+
+            // Save the modified PDF
+            pdfDocument.Save(outputPath);
+            Console.WriteLine($"Processed '{inputPath}' → '{outputPath}'");
         }
     }
 }

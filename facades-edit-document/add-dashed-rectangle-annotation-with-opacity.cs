@@ -8,16 +8,14 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "annotated_page6.pdf";
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
-
-        // Define rectangle coordinates (lower‑left x,y and upper‑right x,y)
-        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
         // Load the PDF document
         Document doc = new Document(inputPath);
@@ -25,31 +23,34 @@ class Program
         // Ensure the document has at least 6 pages
         if (doc.Pages.Count < 6)
         {
-            Console.Error.WriteLine("The source PDF does not contain page 6.");
+            Console.Error.WriteLine("The document does not contain a page 6.");
             return;
         }
 
-        // Get page 6 (1‑based indexing)
+        // Get page 6 (1‑based index)
         Page page = doc.Pages[6];
 
-        // Create a square (rectangle) annotation
-        SquareAnnotation squareAnnotation = new SquareAnnotation(page, rect)
+        // Define the rectangle bounds (lower‑left (100,500), upper‑right (300,700))
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+
+        // Create a square (rectangle) annotation. The constructor requires the target page and bounds.
+        SquareAnnotation rectAnnotation = new SquareAnnotation(page, rect)
         {
-            Color = Color.Black,          // border color
-            Opacity = 0.5,                // 50% opacity
-            Title = "Author",            // tooltip title
-            Contents = "Rectangle annotation" // tooltip contents
+            // Set the fill/border color
+            Color = Aspose.Pdf.Color.Blue,
+            // Set 50% opacity (value between 0 and 1)
+            Opacity = 0.5f
         };
 
-        // Set dashed border style with width 1 (Border.Width expects an int)
-        squareAnnotation.Border = new Border(squareAnnotation)
+        // Configure the border – Border requires the parent annotation in its constructor.
+        rectAnnotation.Border = new Border(rectAnnotation)
         {
             Style = BorderStyle.Dashed,
-            Width = 1 // integer value
+            Width = 2
         };
 
-        // Add the annotation to the page
-        page.Annotations.Add(squareAnnotation);
+        // Add the annotation to the page's annotation collection
+        page.Annotations.Add(rectAnnotation);
 
         // Save the modified PDF
         doc.Save(outputPath);

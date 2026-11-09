@@ -2,114 +2,96 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using System.Drawing;                     // System.Drawing.Rectangle is required by PdfContentEditor
+using Aspose.Pdf.Facades;                // PdfContentEditor resides here
 
-namespace PdfAnnotationImporter
+// Define a POCO that matches the JSON structure for an annotation
+public class AnnotationDefinition
 {
-    // Structure that matches the JSON annotation definition
-    public class AnnotationDefinition
-    {
-        public int PageNumber { get; set; }          // 1‑based page index
-        public float X { get; set; }                // Lower‑left X coordinate (points)
-        public float Y { get; set; }                // Lower‑left Y coordinate (points)
-        public float Width { get; set; }            // Width of the annotation rectangle (points)
-        public float Height { get; set; }           // Height of the annotation rectangle (points)
-        public string? Title { get; set; }          // Optional title of the annotation (nullable)
-        public string? Contents { get; set; }       // Text shown when the annotation is opened (nullable)
-        public string? Icon { get; set; }           // Icon name (e.g., "Note", "Comment") (nullable)
-    }
+    public int    PageNumber { get; set; }   // 1‑based page index
+    public int    X          { get; set; }   // lower‑left X coordinate (points)
+    public int    Y          { get; set; }   // lower‑left Y coordinate (points)
+    public int    Width      { get; set; }   // rectangle width (points)
+    public int    Height     { get; set; }   // rectangle height (points)
+    public string? Title      { get; set; }   // annotation title (shown in UI) – nullable to satisfy non‑nullable warning
+    public string? Contents   { get; set; }   // annotation body text – nullable to satisfy non‑nullable warning
+    public string? Icon       { get; set; }   // optional icon name (e.g., "Note") – nullable as it is optional
+}
 
-    class Program
+class Program
+{
+    static void Main()
     {
-        static void Main()
+        const string inputPdfPath   = "input.pdf";
+        const string outputPdfPath  = "annotated_output.pdf";
+        const string jsonPath       = "annotations.json";
+
+        // Validate files exist
+        if (!File.Exists(inputPdfPath))
         {
-            const string inputPdfPath = "input.pdf";
-            const string jsonPath = "annotations.json";
-            const string outputPdfPath = "annotated_output.pdf";
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(jsonPath))
+        {
+            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            return;
+        }
 
-            if (!File.Exists(inputPdfPath))
+        // Load annotation definitions from JSON
+        List<AnnotationDefinition> annotations;
+        try
+        {
+            string json = File.ReadAllText(jsonPath);
+            annotations = JsonSerializer.Deserialize<List<AnnotationDefinition>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<AnnotationDefinition>();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+            return;
+        }
+
+        // Initialize PdfContentEditor and bind the source PDF
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPdfPath);
+
+        // Apply each annotation definition
+        foreach (var ann in annotations)
+        {
+            // Ensure page number is within range (PdfContentEditor uses 1‑based indexing)
+            if (ann.PageNumber < 1)
             {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-                return;
+                Console.Error.WriteLine($"Invalid page number {ann.PageNumber}; skipping annotation.");
+                continue;
             }
 
-            if (!File.Exists(jsonPath))
-            {
-                Console.Error.WriteLine($"JSON file not found: {jsonPath}");
-                return;
-            }
+            // Build the rectangle for the annotation (System.Drawing.Rectangle expects X,Y,Width,Height)
+            Rectangle rect = new Rectangle(ann.X, ann.Y, ann.Width, ann.Height);
 
-            // ------------------------------------------------------------
-            // Load annotation definitions from the JSON file
-            // ------------------------------------------------------------
-            List<AnnotationDefinition> annotations;
+            // Create a text annotation. PdfContentEditor.CreateText signature:
+            // CreateText(Rectangle rect, string title, string contents, bool isOpen, string icon, int pageNumber)
+            // We use default values for isOpen (false) and icon (empty string) when they are not supplied.
             try
             {
-                string jsonContent = File.ReadAllText(jsonPath);
-                annotations = JsonSerializer.Deserialize<List<AnnotationDefinition>>(jsonContent,
-                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                if (annotations == null)
-                {
-                    Console.Error.WriteLine("No annotations found in JSON.");
-                    return;
-                }
+                bool isOpen = false; // default – annotation is closed
+                string icon  = ann.Icon ?? string.Empty;
+                editor.CreateText(
+                    rect,
+                    ann.Title   ?? string.Empty,
+                    ann.Contents ?? string.Empty,
+                    isOpen,
+                    icon,
+                    ann.PageNumber);
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to read JSON: {ex.Message}");
-                return;
+                Console.Error.WriteLine($"Failed to add annotation on page {ann.PageNumber}: {ex.Message}");
             }
-
-            // ------------------------------------------------------------
-            // Load the PDF with the high‑level Document API.
-            // ------------------------------------------------------------
-            Document pdf = new Document(inputPdfPath);
-
-            foreach (var def in annotations)
-            {
-                // Validate page number (Aspose.Pdf uses 1‑based indexing)
-                if (def.PageNumber < 1 || def.PageNumber > pdf.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {def.PageNumber} – skipping annotation.");
-                    continue;
-                }
-
-                // Build the rectangle (lower‑left X/Y, upper‑right X/Y)
-                double llx = def.X;
-                double lly = def.Y;
-                double urx = def.X + def.Width;
-                double ury = def.Y + def.Height;
-                Rectangle rect = new Rectangle(llx, lly, urx, ury);
-
-                // Resolve the icon – default to Note if parsing fails or is empty
-                TextIcon icon = TextIcon.Note;
-                if (!string.IsNullOrWhiteSpace(def.Icon) &&
-                    Enum.TryParse<TextIcon>(def.Icon, true, out TextIcon parsedIcon))
-                {
-                    icon = parsedIcon;
-                }
-
-                // Create the TextAnnotation and set optional properties
-                Page page = pdf.Pages[def.PageNumber];
-                TextAnnotation textAnnot = new TextAnnotation(page, rect)
-                {
-                    Icon = icon
-                };
-
-                if (!string.IsNullOrWhiteSpace(def.Title))
-                    textAnnot.Title = def.Title;
-
-                if (!string.IsNullOrWhiteSpace(def.Contents))
-                    textAnnot.Contents = def.Contents;
-
-                // Add the annotation to the page
-                page.Annotations.Add(textAnnot);
-            }
-
-            // Save the annotated PDF
-            pdf.Save(outputPdfPath);
-            Console.WriteLine($"Annotations applied and saved to '{outputPdfPath}'.");
         }
+
+        // Save the modified PDF
+        editor.Save(outputPdfPath);
+        Console.WriteLine($"Annotations applied and saved to '{outputPdfPath}'.");
     }
 }
