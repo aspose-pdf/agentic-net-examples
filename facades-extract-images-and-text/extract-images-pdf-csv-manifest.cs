@@ -1,74 +1,91 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Drawing;
-using System.Drawing.Imaging;
-using Aspose.Pdf;               // <-- added for Document
+using System.Collections.Generic;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class ImageExtractorWithManifest
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";                 // source PDF
-        const string outputDir = "ExtractedImages";         // folder for images
-        const string csvPath = "image_manifest.csv";        // manifest file
+        const string inputPdf = "input.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
+        string csvPath = Path.Combine(outputFolder, "manifest.csv");
 
-        // Prepare CSV writer
-        using (StreamWriter csvWriter = new StreamWriter(csvPath, false, Encoding.UTF8))
+        // -------------------------------------------------------------------
+        // 1. Collect image dimensions from the PDF resources (core API).
+        // -------------------------------------------------------------------
+        var imageDimensions = new Dictionary<(int page, int index), (double width, double height)>();
+        using (Document doc = new Document(inputPdf))
         {
-            // Write CSV header
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            {
+                Page page = doc.Pages[pageNum];
+                int imgIdx = 0;
+                foreach (XImage img in page.Resources.Images)
+                {
+                    imgIdx++;
+                    imageDimensions[(pageNum, imgIdx)] = (img.Width, img.Height);
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // 2. Extract images page‑by‑page using PdfExtractor and write the CSV.
+        // -------------------------------------------------------------------
+        using (StreamWriter csvWriter = new StreamWriter(csvPath))
+        {
             csvWriter.WriteLine("FileName,PageNumber,Width,Height");
 
-            // Load the PDF to know the total page count
-            using (Document pdfDoc = new Document(pdfPath))
+            // Load the document once to know the total page count.
+            using (Document doc = new Document(inputPdf))
             {
-                int totalPages = pdfDoc.Pages.Count;
-
-                // Loop through each page and extract images from that page only
-                for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
                 {
                     using (PdfExtractor extractor = new PdfExtractor())
                     {
-                        extractor.BindPdf(pdfPath);
-                        // Restrict extraction to the current page
+                        extractor.BindPdf(inputPdf);
+                        // Restrict extraction to the current page.
                         extractor.StartPage = pageNumber;
                         extractor.EndPage   = pageNumber;
-                        // Extract only images
+                        // Ensure we extract images defined in the page resources.
+                        extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
                         extractor.ExtractImage();
 
-                        int imageIndex = 1;
+                        int imageIndex = 0;
                         while (extractor.HasNextImage())
                         {
-                            // Build a unique file name – we store everything as PNG for simplicity
-                            string fileName = $"image_page{pageNumber}_idx{imageIndex}.png";
-                            string filePath = Path.Combine(outputDir, fileName);
+                            imageIndex++;
+                            string imageFileName = $"image_page{pageNumber}_{imageIndex}.png";
+                            string imagePath = Path.Combine(outputFolder, imageFileName);
 
-                            // Save the extracted image to disk
-                            extractor.GetNextImage(filePath, ImageFormat.Png);
+                            // Save the image as PNG. The overload writes the image to disk.
+                            extractor.GetNextImage(imagePath, ImageFormat.Png);
 
-                            // Load the saved image to obtain its dimensions (fully qualified to avoid ambiguity)
-                            using (System.Drawing.Image img = System.Drawing.Image.FromFile(filePath))
+                            // Retrieve dimensions (fallback to 0 if not found).
+                            double width = 0, height = 0;
+                            if (imageDimensions.TryGetValue((pageNumber, imageIndex), out var dims))
                             {
-                                csvWriter.WriteLine($"{fileName},{pageNumber},{img.Width},{img.Height}");
+                                width = dims.width;
+                                height = dims.height;
                             }
 
-                            imageIndex++;
+                            csvWriter.WriteLine($"{imageFileName},{pageNumber},{width},{height}");
                         }
                     }
                 }
             }
         }
 
-        Console.WriteLine($"Extraction complete. Images saved to '{outputDir}'. Manifest saved to '{csvPath}'.");
+        Console.WriteLine($"Extraction complete. Images and manifest saved to '{outputFolder}'.");
     }
 }

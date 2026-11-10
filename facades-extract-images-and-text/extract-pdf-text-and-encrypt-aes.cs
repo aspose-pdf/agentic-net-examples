@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,67 +9,66 @@ class Program
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string outputPath = "output.txt";
-        const string password = "StrongPassword";
+        const string txtPath = "extracted.txt";
+        const string encryptedPath = "extracted_encrypted.bin";
+        const string password = "StrongPassword123";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Extract text from the PDF using PdfExtractor (Aspose.Pdf.Facades)
+        // Extract text from PDF using Aspose.Pdf.Facades.PdfExtractor
         string extractedText;
         using (PdfExtractor extractor = new PdfExtractor())
         {
             extractor.BindPdf(pdfPath);
             extractor.ExtractText();
 
-            using (MemoryStream ms = new MemoryStream())
+            // GetText requires a destination stream
+            using (MemoryStream textStream = new MemoryStream())
             {
-                extractor.GetText(ms);
-                ms.Position = 0;
-                using (StreamReader reader = new StreamReader(ms))
+                extractor.GetText(textStream);
+                textStream.Position = 0;
+                using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
                 {
                     extractedText = reader.ReadToEnd();
                 }
             }
         }
 
-        // Prepare AES encryption parameters
-        byte[] salt = new byte[16];
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+        // Save extracted text to a temporary .txt file
+        File.WriteAllText(txtPath, extractedText);
+
+        // Derive AES key and IV from password (simple SHA-256 based derivation)
+        byte[] key, iv;
+        using (SHA256 sha = SHA256.Create())
         {
-            rng.GetBytes(salt);
+            key = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
+            iv = new byte[16];
+            Array.Copy(key, iv, 16);
         }
 
-        // Derive a 256‑bit key from the password using PBKDF2 (Rfc2898DeriveBytes)
-        const int iterations = 100000; // iteration count
-        using (var kdf = new Rfc2898DeriveBytes(password, salt, iterations))
+        // Encrypt the .txt file using AES (CBC, PKCS7 padding)
+        using (Aes aes = Aes.Create())
         {
-            byte[] key = kdf.GetBytes(32); // 256 bits
+            aes.Key = key;
+            aes.IV = iv;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
 
-            using (Aes aes = Aes.Create())
+            using (FileStream inputFile = new FileStream(txtPath, FileMode.Open, FileAccess.Read))
+            using (FileStream outputFile = new FileStream(encryptedPath, FileMode.Create, FileAccess.Write))
+            using (CryptoStream cryptoStream = new CryptoStream(outputFile, aes.CreateEncryptor(), CryptoStreamMode.Write))
             {
-                aes.Key = key;
-                aes.GenerateIV();
-                byte[] iv = aes.IV;
-
-                // Write encrypted data (salt + IV + ciphertext) to the output file
-                using (FileStream outFile = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    outFile.Write(salt, 0, salt.Length);
-                    outFile.Write(iv, 0, iv.Length);
-
-                    using (CryptoStream cryptoStream = new CryptoStream(outFile, aes.CreateEncryptor(), CryptoStreamMode.Write))
-                    using (StreamWriter writer = new StreamWriter(cryptoStream))
-                    {
-                        writer.Write(extractedText);
-                    }
-                }
+                inputFile.CopyTo(cryptoStream);
             }
         }
 
-        Console.WriteLine($"Extracted text encrypted and saved to '{outputPath}'.");
+        // Clean up the plain text file
+        try { File.Delete(txtPath); } catch { }
+
+        Console.WriteLine($"Text extracted and encrypted to '{encryptedPath}'.");
     }
 }

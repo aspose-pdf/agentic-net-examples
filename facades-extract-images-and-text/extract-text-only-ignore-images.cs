@@ -6,41 +6,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "extracted_text.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // PdfExtractor does NOT implement IDisposable, so no using block is required.
+        PdfExtractor extractor = new PdfExtractor();
+
+        // Bind the source PDF file.
+        extractor.BindPdf(inputPdf);
+
+        // Perform the extraction of text only. Do NOT call ExtractImage().
+        extractor.ExtractText();
+
+        // Retrieve the extracted text via a stream (GetText requires a destination stream).
+        string extractedText;
+        using (MemoryStream textStream = new MemoryStream())
         {
-            // Create the PdfExtractor facade and bind the source PDF
-            PdfExtractor extractor = new PdfExtractor();
-            extractor.BindPdf(inputPath);
-
-            // Enable text extraction only (do NOT call ExtractImage())
-            extractor.ExtractText();
-
-            // Extract the text into a memory stream, then read it as a string
-            using (MemoryStream textStream = new MemoryStream())
+            extractor.GetText(textStream); // write text to the stream
+            textStream.Position = 0;
+            using (StreamReader reader = new StreamReader(textStream))
             {
-                extractor.GetText(textStream); // write text to the stream
-                textStream.Position = 0;        // rewind for reading
-                using (StreamReader reader = new StreamReader(textStream))
-                {
-                    string extractedText = reader.ReadToEnd();
-                    File.WriteAllText(outputPath, extractedText);
-                }
+                extractedText = reader.ReadToEnd();
             }
+        }
 
-            Console.WriteLine($"Text extracted (images ignored) and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save the text to a file.
+        File.WriteAllText(outputTxt, extractedText);
+
+        Console.WriteLine($"Text extracted to '{outputTxt}' (images ignored).");
     }
 }

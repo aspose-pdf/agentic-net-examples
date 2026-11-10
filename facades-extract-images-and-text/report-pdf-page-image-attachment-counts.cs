@@ -1,43 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
-class Program
+class PdfDiagnosticTool
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
-        {
-            // Total pages (1‑based indexing, but Count gives the total)
-            int pageCount = doc.Pages.Count;
+        int pageCount;
+        int attachmentCount;
+        int imageCount = 0;
 
-            // Count images by iterating each page's image collection
-            int imageCount = 0;
-            foreach (Aspose.Pdf.Page page in doc.Pages)
+        // Load the document once – it provides page count, embedded files (attachments) and resources.
+        using (Document doc = new Document(inputPath))
+        {
+            // Pages are 1‑based in Aspose.Pdf
+            pageCount = doc.Pages.Count;
+
+            // Attachments are represented by embedded files in the PDF.
+            attachmentCount = doc.EmbeddedFiles != null ? doc.EmbeddedFiles.Count : 0;
+
+            // Count images on each page.
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
+                Page page = doc.Pages[i];
+                // page.Resources.Images implements IEnumerable<XImage>
+                foreach (XImage img in page.Resources.Images)
                 {
                     imageCount++;
                 }
             }
-
-            // Count embedded files (attachments) – Document.Attachments does not exist
-            int attachmentCount = (doc.EmbeddedFiles != null) ? doc.EmbeddedFiles.Count : 0;
-
-            // Report the diagnostics
-            Console.WriteLine($"Pages      : {pageCount}");
-            Console.WriteLine($"Images     : {imageCount}");
-            Console.WriteLine($"Attachments: {attachmentCount}");
         }
+
+        Console.WriteLine($"Pages: {pageCount}");
+        Console.WriteLine($"Images: {imageCount}");
+        Console.WriteLine($"Attachments: {attachmentCount}");
     }
 }

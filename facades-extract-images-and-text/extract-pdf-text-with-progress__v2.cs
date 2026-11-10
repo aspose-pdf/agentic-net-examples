@@ -1,26 +1,22 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     // Simple console progress bar
-    static void ShowProgress(int currentPage, int totalPages)
+    static void ShowProgress(int processed, int total)
     {
-        int percent = (int)((double)currentPage / totalPages * 100);
-        const int barWidth = 50;
-        int filled = percent * barWidth / 100;
-        string bar = new string('#', filled) + new string('-', barWidth - filled);
-        Console.Write($"\r[{bar}] {percent}%");
-        if (currentPage == totalPages)
-            Console.WriteLine(); // move to next line when done
+        int percent = (int)((processed / (double)total) * 100);
+        Console.Write($"\rProcessing pages: {processed}/{total} ({percent}%)");
     }
 
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string inputPdf  = "input.pdf";
+        const string outputTxt = "extracted_text.txt";
 
         if (!File.Exists(inputPdf))
         {
@@ -28,52 +24,53 @@ class Program
             return;
         }
 
-        // Ensure the output file is empty before appending page texts
-        File.WriteAllText(outputTxt, string.Empty);
-
-        // Get total page count via Document (PdfExtractor has no PageCount property)
-        int pageCount;
-        using (var doc = new Document(inputPdf))
+        try
         {
-            pageCount = doc.Pages.Count;
-        }
-
-        // PdfExtractor implements IDisposable – wrap in using per lifecycle rule
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Bind the source PDF
-            extractor.BindPdf(inputPdf);
-
-            // Process each page individually to report progress
-            for (int page = 1; page <= pageCount; page++)
+            // Use Document to obtain the total page count (PdfExtractor has no GetPageCount())
+            int totalPages;
+            using (var doc = new Document(inputPdf))
             {
-                // Set the range to a single page using properties
-                extractor.StartPage = page;
-                extractor.EndPage   = page;
+                totalPages = doc.Pages.Count;
+            }
 
-                // Extract text from the current page
-                extractor.ExtractText();
+            var sb = new StringBuilder();
 
-                // Retrieve extracted text via stream overload
-                string pageText;
-                using (MemoryStream ms = new MemoryStream())
+            // Extract text page‑by‑page to report progress
+            for (int page = 1; page <= totalPages; page++)
+            {
+                using (var extractor = new PdfExtractor())
                 {
-                    extractor.GetText(ms);
-                    ms.Position = 0;
-                    using (StreamReader reader = new StreamReader(ms))
+                    extractor.BindPdf(inputPdf);
+                    // Set the page range via StartPage / EndPage (ExtractPage method does not exist)
+                    extractor.StartPage = page;
+                    extractor.EndPage   = page;
+                    extractor.ExtractText();
+
+                    // GetText requires a destination stream
+                    using (var ms = new MemoryStream())
                     {
-                        pageText = reader.ReadToEnd();
+                        extractor.GetText(ms);
+                        ms.Position = 0;
+                        using (var reader = new StreamReader(ms))
+                        {
+                            string pageText = reader.ReadToEnd();
+                            sb.AppendLine(pageText);
+                        }
                     }
                 }
 
-                // Append page text to the output file
-                File.AppendAllText(outputTxt, pageText);
-
-                // Update progress bar
-                ShowProgress(page, pageCount);
+                ShowProgress(page, totalPages);
             }
-        }
 
-        Console.WriteLine($"Text extraction completed. Output saved to '{outputTxt}'.");
+            Console.WriteLine(); // move to next line after progress bar
+
+            // Save the accumulated text
+            File.WriteAllText(outputTxt, sb.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Extraction complete. Text saved to '{outputTxt}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -15,45 +14,39 @@ class Program
             return;
         }
 
-        // Optional: load a license to avoid evaluation limitations.
         try
         {
-            // var license = new Aspose.Pdf.License();
-            // license.SetLicense("Aspose.Pdf.lic");
-        }
-        catch (Exception licEx)
-        {
-            Console.Error.WriteLine($"License loading failed: {licEx.Message}");
-            // Continue in evaluation mode.
-        }
-
-        // StringWriter will hold the extracted text for logging integration
-        using (var stringWriter = new StringWriter())
-        {
-            // Load the PDF document; using ensures deterministic disposal
-            using (var doc = new Document(inputPath))
+            // Bind the PDF to the extractor and extract all text
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                try
-                {
-                    // Extract all text from the document using TextAbsorber (recommended API)
-                    var absorber = new TextAbsorber();
-                    doc.Pages.Accept(absorber);
+                extractor.BindPdf(inputPath);
+                extractor.ExtractText();
 
-                    // Write the extracted text into the StringWriter
-                    stringWriter.Write(absorber.Text);
-                }
-                catch (Exception ex)
+                // Get the extracted text via a stream (required overload)
+                string extractedText;
+                using (MemoryStream textStream = new MemoryStream())
                 {
-                    // This catch specifically handles errors that may occur during extraction.
-                    Console.Error.WriteLine($"Error during text extraction: {ex.Message}");
-                    Console.Error.WriteLine("Make sure the Aspose.Pdf NuGet package is referenced and that all native files are present in the output directory.");
-                    return;
+                    extractor.GetText(textStream); // write text to the stream
+                    textStream.Position = 0;        // rewind for reading
+                    using (StreamReader reader = new StreamReader(textStream))
+                    {
+                        extractedText = reader.ReadToEnd();
+                    }
+                }
+
+                // Write the text to a StringWriter (suitable for logging frameworks)
+                using (StringWriter stringWriter = new StringWriter())
+                {
+                    stringWriter.Write(extractedText);
+
+                    // Example output – replace with your logger as needed
+                    Console.WriteLine(stringWriter.ToString());
                 }
             }
-
-            // The StringWriter now contains the PDF text; it can be passed to any logging framework
-            Console.WriteLine("Extracted text:");
-            Console.WriteLine(stringWriter.ToString());
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error extracting text: {ex.Message}");
         }
     }
 }

@@ -8,57 +8,53 @@ class Program
     {
         // Folder containing the PDF files to process
         const string inputFolder = @"C:\PdfInput";
-        // Folder where the extracted text files will be saved
+        // Folder where extracted text files will be saved
         const string outputFolder = @"C:\PdfOutput";
 
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
-            return;
-        }
-
-        // Ensure the output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
+            // Derive the output text file name (same base name, .txt extension)
+            string txtFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".txt";
+            string txtPath = Path.Combine(outputFolder, txtFileName);
+
             try
             {
-                // Use PdfExtractor from Aspose.Pdf.Facades to extract text
+                // PdfExtractor implements IDisposable, so wrap it in a using block
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    // Bind the PDF file to the extractor
+                    // Bind the PDF document to the extractor
                     extractor.BindPdf(pdfPath);
 
-                    // Extract text from the whole document
+                    // Enable text extraction
                     extractor.ExtractText();
 
-                    // Retrieve the extracted text via a MemoryStream (GetText requires a Stream argument)
+                    // Retrieve the extracted text via the Stream overload
                     string extractedText;
                     using (MemoryStream textStream = new MemoryStream())
                     {
-                        extractor.GetText(textStream);
-                        textStream.Position = 0; // rewind to beginning
+                        extractor.GetText(textStream); // write text to the stream
+                        textStream.Position = 0;        // rewind for reading
                         using (StreamReader reader = new StreamReader(textStream))
                         {
                             extractedText = reader.ReadToEnd();
                         }
                     }
 
-                    // Build the output .txt file path (same filename, .txt extension)
-                    string txtFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".txt";
-                    string txtPath = Path.Combine(outputFolder, txtFileName);
-
-                    // Write the extracted text to the .txt file
+                    // Write the text to the output file (UTF‑8)
                     File.WriteAllText(txtPath, extractedText);
                 }
 
-                Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{Path.GetFileNameWithoutExtension(pdfPath)}.txt'");
+                Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{txtFileName}'.");
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing other files
+                // Log any errors but continue processing remaining files
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }

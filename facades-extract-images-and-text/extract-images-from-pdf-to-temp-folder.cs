@@ -1,48 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
+        // Path to the source PDF
         const string inputPdf = "input.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Create a unique temporary folder for the extracted images
-        string tempFolder = Path.Combine(Path.GetTempPath(),
-                                         "PdfImages_" + Guid.NewGuid().ToString("N"));
+        // Create a temporary folder for extracted images
+        string tempFolder = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(tempFolder);
 
         try
         {
-            // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
+            // PdfExtractor implements IDisposable – wrap it in a using block
             using (PdfExtractor extractor = new PdfExtractor())
             {
                 // Load the PDF document
                 extractor.BindPdf(inputPdf);
 
-                // Extract images using the default extraction mode (all pages)
+                // Use default extraction mode – no additional settings required
                 extractor.ExtractImage();
 
-                // Save each extracted image to the temporary folder
+                // Iterate over all extracted images
                 int imageIndex = 1;
                 while (extractor.HasNextImage())
                 {
-                    // Build a file name – using PNG extension; Aspose will convert the image accordingly
+                    // Determine output file name (using PNG as a safe default format)
                     string imagePath = Path.Combine(tempFolder, $"Image_{imageIndex}.png");
-                    extractor.GetNextImage(imagePath);
+
+                    // Save the image directly to the file system with the chosen format
+                    extractor.GetNextImage(imagePath, ImageFormat.Png);
+
+                    Console.WriteLine($"Extracted image saved to: {imagePath}");
                     imageIndex++;
                 }
             }
 
-            Console.WriteLine($"Images have been extracted to: {tempFolder}");
+            Console.WriteLine($"All images extracted to temporary folder: {tempFolder}");
         }
         catch (Exception ex)
         {

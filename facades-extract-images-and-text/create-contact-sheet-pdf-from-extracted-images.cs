@@ -1,18 +1,14 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-
-// NOTE: Add the Aspose.Pdf NuGet package to the project (e.g., <PackageReference Include="Aspose.Pdf" Version="23.12" />)
-// This resolves the missing "AsposePdfApi.csproj.nuget.g.targets" import error.
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath = "source.pdf";
         const string outputPdfPath = "contact_sheet.pdf";
 
         if (!File.Exists(inputPdfPath))
@@ -21,84 +17,106 @@ class Program
             return;
         }
 
-        // ---------------------------------------------------------------------
-        // 1. Extract all images from the source PDF using ImagePlacementAbsorber
-        // ---------------------------------------------------------------------
-        List<MemoryStream> imageStreams = new List<MemoryStream>();
-        Document srcDoc = new Document(inputPdfPath);
-        ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
-        srcDoc.Pages.Accept(absorber);
-        foreach (var placement in absorber.ImagePlacements)
+        // -----------------------------------------------------------------
+        // 1. Load the source PDF and collect all images from all pages.
+        // -----------------------------------------------------------------
+        List<XImage> extractedImages = new List<XImage>();
+        using (Document srcDoc = new Document(inputPdfPath))
         {
-            // The ImagePlacement provides an Image object. Save it to a memory stream.
-            var img = placement.Image;
-            MemoryStream ms = new MemoryStream();
-            img.Save(ms, ImageFormat.Png); // PNG preserves quality and works for all image types
-            ms.Position = 0;
-            imageStreams.Add(ms);
+            // Pages are 1‑based.
+            for (int p = 1; p <= srcDoc.Pages.Count; p++)
+            {
+                Page page = srcDoc.Pages[p];
+                // XImageCollection is enumerable – use direct foreach.
+                foreach (XImage img in page.Resources.Images)
+                {
+                    extractedImages.Add(img);
+                }
+            }
         }
 
-        if (imageStreams.Count == 0)
+        if (extractedImages.Count == 0)
         {
-            Console.WriteLine("No images found in the PDF.");
+            Console.WriteLine("No images found in the source PDF.");
             return;
         }
 
-        // ---------------------------------------------------------------
-        // 2. Create a new PDF that will hold the contact‑sheet thumbnails
-        // ---------------------------------------------------------------
+        // -----------------------------------------------------------------
+        // 2. Create a new PDF that will hold the contact sheet.
+        // -----------------------------------------------------------------
         using (Document contactDoc = new Document())
         {
-            // Add a single page (default size A4)
-            Page page = contactDoc.Pages.Add();
+            // Define page size (A4) and margins.
+            const double pageWidth = 595;   // A4 width in points
+            const double pageHeight = 842;  // A4 height in points
+            const double margin = 20;       // points
+            const int columns = 3;          // thumbnails per row
+            const double thumbWidth = 150;  // desired thumbnail width
+            const double thumbHeight = 200; // desired thumbnail height
 
-            // Layout parameters
-            const int columns = 3;                     // thumbnails per row
-            const double thumbWidth = 150;             // width of each thumbnail
-            const double thumbHeight = 150;            // height of each thumbnail
-            const double spacing = 10;                 // space between thumbnails
-            double pageWidth = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
+            // Calculate how many rows fit on a page.
+            int rowsPerPage = (int)((pageHeight - 2 * margin) / (thumbHeight + margin));
 
-            // Calculate starting offsets to centre the grid horizontally
-            double totalRowWidth = columns * thumbWidth + (columns - 1) * spacing;
-            double startX = (pageWidth - totalRowWidth) / 2;
-            double startY = pageHeight - spacing - thumbHeight; // start from top
-
-            int currentColumn = 0;
-            int currentRow = 0;
-
-            foreach (MemoryStream imgStream in imageStreams)
+            // Helper to add a new blank page.
+            Page AddNewPage()
             {
-                // Use ImageStamp for absolute positioning on the page
-                ImageStamp stamp = new ImageStamp(imgStream)
-                {
-                    Width = thumbWidth,
-                    Height = thumbHeight,
-                    XIndent = startX + currentColumn * (thumbWidth + spacing),
-                    YIndent = startY - currentRow * (thumbHeight + spacing)
-                };
+                Page newPage = contactDoc.Pages.Add();
+                newPage.PageInfo.Width = pageWidth;
+                newPage.PageInfo.Height = pageHeight;
+                return newPage;
+            }
 
-                // Add the stamp to the page
-                page.AddStamp(stamp);
+            Page currentPage = AddNewPage();
+            int currentRow = 0;
+            int currentCol = 0;
 
-                // Move to next cell in the grid
-                currentColumn++;
-                if (currentColumn >= columns)
+            foreach (XImage srcImg in extractedImages)
+            {
+                // If the current row exceeds the page capacity, start a new page.
+                if (currentRow >= rowsPerPage)
                 {
-                    currentColumn = 0;
+                    currentPage = AddNewPage();
+                    currentRow = 0;
+                    currentCol = 0;
+                }
+
+                // -----------------------------------------------------------------
+                // 3. Create a thumbnail stamp for the image.
+                // -----------------------------------------------------------------
+                // Save the XImage into a memory stream so ImageStamp can consume it.
+                using (MemoryStream imgStream = new MemoryStream())
+                {
+                    srcImg.Save(imgStream);
+                    imgStream.Position = 0;
+
+                    // ImageStamp works with a stream or file path.
+                    Aspose.Pdf.ImageStamp stamp = new Aspose.Pdf.ImageStamp(imgStream)
+                    {
+                        // Set explicit size for the thumbnail.
+                        Width = thumbWidth,
+                        Height = thumbHeight,
+                        // Position the stamp using XIndent/YIndent.
+                        XIndent = margin + currentCol * (thumbWidth + margin),
+                        YIndent = margin + currentRow * (thumbHeight + margin)
+                    };
+
+                    // Add the stamp to the current page.
+                    currentPage.AddStamp(stamp);
+                }
+
+                // Move to next column; wrap to next row when needed.
+                currentCol++;
+                if (currentCol >= columns)
+                {
+                    currentCol = 0;
                     currentRow++;
                 }
             }
 
-            // Save the contact sheet PDF
+            // -----------------------------------------------------------------
+            // 4. Save the contact sheet PDF.
+            // -----------------------------------------------------------------
             contactDoc.Save(outputPdfPath);
-        }
-
-        // Dispose all extracted image streams
-        foreach (var ms in imageStreams)
-        {
-            ms.Dispose();
         }
 
         Console.WriteLine($"Contact sheet created: {outputPdfPath}");

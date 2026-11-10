@@ -7,50 +7,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // List to hold extracted image byte arrays
-        List<byte[]> images = new List<byte[]>();
+        // List to hold the extracted image data as byte arrays
+        List<byte[]> extractedImages = new List<byte[]>();
 
-        // PdfExtractor (Aspose.Pdf.Facades) extracts images from PDFs
-        PdfExtractor extractor = new PdfExtractor();
-
-        // Bind the PDF file to the extractor
-        extractor.BindPdf(inputPath);
-
-        // Restrict extraction to the first page only
-        extractor.StartPage = 1;
-        extractor.EndPage   = 1;
-
-        // Perform the image extraction
-        extractor.ExtractImage();
-
-        // Retrieve each image as a byte array using a MemoryStream
-        while (extractor.HasNextImage())
+        // PdfExtractor implements IDisposable, so wrap it in a using block
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            using (MemoryStream ms = new MemoryStream())
+            // Load the PDF file
+            extractor.BindPdf(pdfPath);
+
+            // Restrict extraction to the first page only (1‑based index)
+            extractor.StartPage = 1;
+            extractor.EndPage   = 1;
+
+            // Perform image extraction for the selected page range
+            // (ExtractImageMode property does not exist in the referenced version)
+            extractor.ExtractImage();
+
+            // Iterate through the extracted images using the supported API
+            while (extractor.HasNextImage())
             {
-                // GetNextImage writes the image data into the provided stream
-                extractor.GetNextImage(ms);
-                byte[] imageBytes = ms.ToArray();
-                images.Add(imageBytes);
+                using (MemoryStream imgStream = new MemoryStream())
+                {
+                    // Get the next image into the memory stream
+                    extractor.GetNextImage(imgStream);
+                    extractedImages.Add(imgStream.ToArray());
+                }
             }
         }
 
-        Console.WriteLine($"Extracted {images.Count} image(s) from page 1.");
-
-        // Optional: write each image to a file for verification
-        for (int i = 0; i < images.Count; i++)
+        // Report the results (or pass the byte arrays to further analysis)
+        Console.WriteLine($"Extracted {extractedImages.Count} image(s) from page 1.");
+        for (int i = 0; i < extractedImages.Count; i++)
         {
-            string outPath = $"page1_image_{i + 1}.bin";
-            File.WriteAllBytes(outPath, images[i]);
-            Console.WriteLine($"Saved image {i + 1} to {outPath}");
+            Console.WriteLine($"Image {i + 1}: {extractedImages[i].Length} bytes");
         }
     }
 }

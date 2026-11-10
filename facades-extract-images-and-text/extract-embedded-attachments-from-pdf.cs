@@ -1,68 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Included as per requirement
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "Attachments";
+        // Input PDF containing embedded file attachments
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Directory where extracted attachments will be saved
+        const string outputDir = "ExtractedAttachments";
+
+        // Validate input file
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Load the PDF document using the Document class (PdfFileEditor does not support extracting embedded files).
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // EmbeddedFiles collection uses 1‑based indexing
-                int fileCount = doc.EmbeddedFiles.Count;
-
-                for (int i = 1; i <= fileCount; i++)
+                // Check if there are any embedded files.
+                if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
                 {
-                    // Retrieve the file specification for each embedded file
-                    FileSpecification fileSpec = doc.EmbeddedFiles[i];
-                    string fileName = fileSpec.Name ?? $"attachment_{i}";
-
-                    // Build a unique output path (handle possible name collisions)
-                    string outPath = Path.Combine(outputDir, fileName);
-                    int duplicateIndex = 1;
-                    while (File.Exists(outPath))
+                    // Iterate over the embedded files (1‑based indexing) and write each to the output directory.
+                    for (int i = 1; i <= pdfDoc.EmbeddedFiles.Count; i++)
                     {
-                        string nameOnly = Path.GetFileNameWithoutExtension(fileName);
-                        string ext = Path.GetExtension(fileName);
-                        outPath = Path.Combine(outputDir, $"{nameOnly}_{duplicateIndex}{ext}");
-                        duplicateIndex++;
-                    }
+                        FileSpecification fileSpec = pdfDoc.EmbeddedFiles[i];
+                        string attachmentName = fileSpec.Name;
+                        string outputPath = Path.Combine(outputDir, attachmentName);
 
-                    // Copy the embedded file's content stream to the output file
-                    using (FileStream outStream = File.Create(outPath))
-                    using (Stream content = fileSpec.Contents)
-                    {
-                        content.CopyTo(outStream);
-                    }
+                        using (FileStream outStream = File.Create(outputPath))
+                        using (Stream contentStream = fileSpec.Contents)
+                        {
+                            contentStream.CopyTo(outStream);
+                        }
 
-                    Console.WriteLine($"Extracted: {outPath}");
+                        Console.WriteLine($"Extracted: {attachmentName} -> {Path.GetFullPath(outputPath)}");
+                    }
                 }
-
-                if (fileCount == 0)
+                else
                 {
-                    Console.WriteLine("No embedded files found in the PDF.");
+                    Console.WriteLine("No embedded attachments were found in the PDF.");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Extraction failed: {ex.Message}");
         }
     }
 }
