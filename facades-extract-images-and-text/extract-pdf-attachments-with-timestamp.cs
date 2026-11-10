@@ -6,52 +6,63 @@ class Program
 {
     static void Main()
     {
+        // Input PDF that contains attachments
         const string pdfPath = "input.pdf";
-        const string outputDir = "ExtractedAttachments";
+
+        // Folder where extracted (and renamed) attachments will be saved
+        const string outputFolder = "ExtractedAttachments";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists.
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document.
+        // Load the PDF – this class exposes the EmbeddedFiles collection
         Document pdfDoc = new Document(pdfPath);
 
-        // Check if there are any embedded files (attachments).
-        if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
+        // Get all embedded file specifications (attachments)
+        var embeddedFiles = pdfDoc.EmbeddedFiles;
+        if (embeddedFiles == null || embeddedFiles.Count == 0)
         {
             Console.WriteLine("No attachments found in the PDF.");
             return;
         }
 
-        int index = 0;
-        foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+        int counter = 0;
+        foreach (FileSpecification fileSpec in embeddedFiles)
         {
-            // Original attachment name.
-            string originalName = fileSpec.Name;
-
-            // Create a timestamp prefix; include an index to guarantee uniqueness.
-            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-            string newFileName = $"{timestamp}_{index}_{originalName}";
-            string outputPath = Path.Combine(outputDir, newFileName);
-
-            // Write the embedded file's contents to disk.
-            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            try
             {
-                if (fileSpec.Contents != null)
+                // Original attachment name stored in the PDF
+                string originalName = fileSpec.Name;
+
+                // Build a timestamp prefix (yyyyMMddHHmmssfff) and a unique counter
+                string timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                string newFileName = $"{timestamp}_{counter}_{originalName}";
+                counter++;
+
+                string outPath = Path.Combine(outputFolder, newFileName);
+
+                // Write the attachment contents to disk using the new name
+                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                 {
+                    // Ensure the stream is positioned at the beginning
                     if (fileSpec.Contents.CanSeek)
                         fileSpec.Contents.Position = 0;
+
                     fileSpec.Contents.CopyTo(outStream);
                 }
-            }
 
-            Console.WriteLine($"Extracted and renamed: {newFileName}");
-            index++;
+                Console.WriteLine($"Extracted and renamed: {outPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing attachment '{fileSpec.Name}': {ex.Message}");
+            }
         }
     }
 }

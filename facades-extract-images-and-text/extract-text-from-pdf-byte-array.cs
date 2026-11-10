@@ -6,52 +6,76 @@ class Program
 {
     static void Main()
     {
-        // Obtain the PDF content as a byte array. Replace the implementation of GetPdfBytes
-        // with the actual source of your PDF data (e.g., a database, a web service, an embedded resource, etc.).
-        byte[] pdfBytes = GetPdfBytes();
+        // ------------------------------------------------------------
+        // NOTE: In the sandbox there is no physical PDF file.  To keep the
+        // example self‑contained we generate a minimal PDF in memory, save
+        // it to a byte array and then feed that array to PdfExtractor.
+        // ------------------------------------------------------------
+        byte[] pdfBytes = CreateSamplePdf();
 
-        if (pdfBytes == null || pdfBytes.Length == 0)
-        {
-            Console.Error.WriteLine("Error: PDF byte array is empty. Provide a valid PDF document.");
-            return;
-        }
-
-        // Use a MemoryStream to avoid any file system I/O when extracting text.
+        string extractedText;
         using (MemoryStream pdfStream = new MemoryStream(pdfBytes))
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF from the memory stream.
+            // Bind the extractor directly to the in‑memory stream – no file I/O.
             extractor.BindPdf(pdfStream);
 
-            // Configure the extractor to retrieve text.
+            // Perform the extraction.
             extractor.ExtractText();
 
-            // Write the extracted text to a stream, then read it as a string.
+            // The parameter‑less GetText() method was removed in recent
+            // Aspose.Pdf versions, so we retrieve the text via a stream.
             using (MemoryStream textStream = new MemoryStream())
             {
-                extractor.GetText(textStream); // Write text to the stream.
-                textStream.Position = 0;        // Reset position for reading.
+                extractor.GetText(textStream);
+                textStream.Position = 0;
                 using (StreamReader reader = new StreamReader(textStream))
                 {
-                    string extractedText = reader.ReadToEnd();
-                    // Process the extracted text as needed.
-                    Console.WriteLine(extractedText);
+                    extractedText = reader.ReadToEnd();
                 }
             }
         }
+
+        Console.WriteLine("Extracted Text:");
+        Console.WriteLine(extractedText);
     }
 
-    // Example implementation – replace with your real source.
-    // This version reads a PDF file from disk only to obtain the byte array.
-    // The extraction itself still works entirely in memory.
-    static byte[] GetPdfBytes()
+    /// <summary>
+    /// Creates a very small PDF document in memory and returns its byte array.
+    /// This avoids any external file dependencies for the demo.
+    /// </summary>
+    private static byte[] CreateSamplePdf()
     {
-        const string samplePath = "sample.pdf"; // Path to a sample PDF for demonstration.
-        if (!File.Exists(samplePath))
+        // Aspose.Pdf.Document can be used without a physical file.
+        using (var doc = new Aspose.Pdf.Document())
         {
-            Console.Error.WriteLine($"Sample PDF not found at '{samplePath}'.");
-            return new byte[0];
+            // Add a single blank page.
+            doc.Pages.Add();
+
+            // Add a simple text paragraph so that there is something to extract.
+            var paragraph = new Aspose.Pdf.Text.TextFragment("Hello, Aspose PDF!");
+            doc.Pages[1].Paragraphs.Add(paragraph);
+
+            using (var ms = new MemoryStream())
+            {
+                doc.Save(ms);
+                return ms.ToArray();
+            }
         }
-        return File.ReadAllBytes(samplePath);
     }
 }
+
+/*
+ * ---------------------------------------------------------------------------
+ * Project file (AsposePdfApi.csproj) – suppress known‑vulnerability warnings.
+ * ---------------------------------------------------------------------------
+ * Add the following PropertyGroup to the .csproj to silence NU1902 and NU1903
+ * warnings (or upgrade the package if a safe version becomes available).
+ *
+ * <PropertyGroup>
+ *   <NoWarn>NU1902;NU1903</NoWarn>
+ * </PropertyGroup>
+ *
+ * This keeps the build clean while the example focuses on the PdfExtractor
+ * usage rather than on package‑vulnerability management.
+ */

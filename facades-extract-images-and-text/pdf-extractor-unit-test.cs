@@ -1,63 +1,51 @@
 using System;
 using System.IO;
+using System.Text;
+using Aspose.Pdf.Facades;
 
-public class PdfExtractorUnitTest
+class Program
 {
-    // Entry point required for compilation
-    public static void Main(string[] args)
+    // Path to the known sample PDF file. Adjust as needed for your test environment.
+    private const string SamplePdfPath = "sample.pdf";
+
+    // The exact text expected to be extracted from the sample PDF.
+    // Ensure this matches the content of sample.pdf.
+    private const string ExpectedText = "Hello World";
+
+    static void Main()
     {
-        // Path to the known sample PDF file
-        const string samplePdfPath = "sample.pdf";
-
-        // Expected text content of the sample PDF (adjust to match the actual file)
-        const string expectedText = "Hello World";
-
-        // Verify the sample file exists
-        if (!File.Exists(samplePdfPath))
+        // Verify that the sample PDF exists before running the check.
+        if (!File.Exists(SamplePdfPath))
         {
-            Console.Error.WriteLine($"Sample PDF not found: {samplePdfPath}");
+            Console.WriteLine($"FAIL: Sample PDF not found at path: {SamplePdfPath}");
             return;
         }
 
-        // Extract text using PdfExtractor
-        string extractedText = ExtractTextFromPdf(samplePdfPath);
-
-        // Simple assertion – compare extracted text with the expected value
-        if (extractedText.Trim() == expectedText)
+        // PdfExtractor implements IDisposable, so wrap it in a using block for deterministic disposal.
+        using (var extractor = new PdfExtractor())
         {
-            Console.WriteLine("PdfExtractor test passed.");
-        }
-        else
-        {
-            Console.WriteLine("PdfExtractor test failed.");
-            Console.WriteLine($"Expected: \"{expectedText}\"");
-            Console.WriteLine($"Extracted: \"{extractedText}\"");
-        }
-    }
+            // Bind the PDF file to the extractor.
+            extractor.BindPdf(SamplePdfPath);
 
-    // Helper method that encapsulates the extraction logic
-    private static string ExtractTextFromPdf(string pdfPath)
-    {
-        // PdfExtractor resides in Aspose.Pdf.Facades
-        using (Aspose.Pdf.Facades.PdfExtractor extractor = new Aspose.Pdf.Facades.PdfExtractor())
-        {
-            // Bind the PDF document to the extractor
-            extractor.BindPdf(pdfPath);
+            // Enable text extraction. Use an explicit encoding because GetText requires a stream.
+            extractor.ExtractText(Encoding.UTF8);
 
-            // Instruct the extractor to extract text
-            extractor.ExtractText();
-
-            // GetText requires a destination stream – use a MemoryStream
-            using (MemoryStream textStream = new MemoryStream())
+            // Retrieve the extracted text via a MemoryStream (GetText has no parameter‑less overload).
+            string extractedText;
+            using (var ms = new MemoryStream())
             {
-                extractor.GetText(textStream); // writes extracted text into the stream
-                textStream.Position = 0;       // reset position for reading
+                extractor.GetText(ms);
+                extractedText = Encoding.UTF8.GetString(ms.ToArray()).Trim();
+            }
 
-                // Read the stream content as a string
-                using (StreamReader reader = new StreamReader(textStream))
-                {
-                    return reader.ReadToEnd();
-                }
+            // Simple pass/fail output – no test framework required.
+            if (extractedText == ExpectedText)
+            {
+                Console.WriteLine("PASS: Extracted text matches expected content.");
+            }
+            else
+            {
+                Console.WriteLine($"FAIL: Extracted text does not match. Expected \"{ExpectedText}\", got \"{extractedText}\"");
             }
         }
     }

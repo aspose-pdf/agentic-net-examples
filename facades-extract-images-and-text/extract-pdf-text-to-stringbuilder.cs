@@ -16,30 +16,38 @@ class Program
             return;
         }
 
-        // StringBuilder to hold the extracted text for further manipulation
+        // StringBuilder will hold the extracted text for further processing
         StringBuilder sb = new StringBuilder();
 
-        // Use PdfExtractor from Aspose.Pdf.Facades to extract text
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(inputPath);
-        extractor.ExtractText();
-
-        // Get the extracted text via a stream (PdfExtractor.GetText requires a Stream)
-        using (MemoryStream textStream = new MemoryStream())
+        // PdfExtractor (Aspose.Pdf.Facades) is used for text extraction
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            extractor.GetText(textStream); // write text to the stream
-            textStream.Position = 0;        // rewind for reading
-            using (StreamReader reader = new StreamReader(textStream))
+            // Load the PDF file
+            extractor.BindPdf(inputPath);
+
+            // Extract text from all pages
+            extractor.ExtractText();
+
+            // Get the extracted text via a stream (correct overload)
+            using (MemoryStream textStream = new MemoryStream())
             {
-                sb.Append(reader.ReadToEnd());
+                extractor.GetText(textStream); // write text to the stream
+                textStream.Position = 0;        // rewind for reading
+                using (StreamReader reader = new StreamReader(textStream))
+                {
+                    string extractedText = reader.ReadToEnd();
+                    sb.Append(extractedText);
+                }
             }
         }
 
-        // Example of further manipulation (optional)
-        // sb.Replace("\r\n", "\n");
+        // Example manipulation: normalize line endings and trim whitespace
+        string finalText = sb.ToString()
+                             .Replace("\r\n", "\n")
+                             .Trim();
 
-        // Write the StringBuilder content to a file
-        File.WriteAllText(outputPath, sb.ToString());
+        // Write the manipulated text to a file
+        File.WriteAllText(outputPath, finalText);
 
         Console.WriteLine($"Text extracted and saved to '{outputPath}'.");
     }

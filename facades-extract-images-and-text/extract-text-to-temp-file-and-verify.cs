@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Facades; // Included as per requirement
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,41 +14,51 @@ class Program
             return;
         }
 
-        // Load the PDF and extract its text
-        string extractedText;
-        using (Document doc = new Document(inputPdfPath))
-        {
-            TextAbsorber absorber = new TextAbsorber();
-            // Accept the absorber for all pages (pages are 1‑based)
-            doc.Pages.Accept(absorber);
-            extractedText = absorber.Text;
-        }
-
-        // Save the extracted text to a temporary file
-        string tempFilePath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".txt");
-        File.WriteAllText(tempFilePath, extractedText);
-
-        // Read the text back from the temporary file
-        string readBackText = File.ReadAllText(tempFilePath);
-
-        // Verify that the saved and read text match the original extraction
-        if (extractedText == readBackText)
-        {
-            Console.WriteLine("Verification succeeded: extracted text matches the saved content.");
-        }
-        else
-        {
-            Console.WriteLine("Verification failed: mismatch between extracted and saved text.");
-        }
-
-        // Clean up the temporary file
         try
         {
-            File.Delete(tempFilePath);
+            // Extract text from PDF using PdfExtractor (Facades API)
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                extractor.BindPdf(inputPdfPath);
+                extractor.ExtractText();
+
+                // Get the extracted text via the overload that writes to a Stream
+                string extractedText;
+                using (MemoryStream textStream = new MemoryStream())
+                {
+                    extractor.GetText(textStream); // write text to the stream
+                    textStream.Position = 0;        // rewind for reading
+                    using (StreamReader reader = new StreamReader(textStream))
+                    {
+                        extractedText = reader.ReadToEnd();
+                    }
+                }
+
+                // Save extracted text to a temporary .txt file
+                string tempFilePath = Path.Combine(Path.GetTempPath(),
+                                                   Path.GetRandomFileName() + ".txt");
+                File.WriteAllText(tempFilePath, extractedText);
+
+                // Read the text back from the temporary file
+                string readBackText = File.ReadAllText(tempFilePath);
+
+                // Verify that the read text matches the originally extracted text
+                if (extractedText == readBackText)
+                {
+                    Console.WriteLine("Verification succeeded: extracted text matches the saved content.");
+                }
+                else
+                {
+                    Console.WriteLine("Verification failed: mismatch between extracted and saved text.");
+                }
+
+                // Optional cleanup of the temporary file
+                try { File.Delete(tempFilePath); } catch { /* ignore cleanup errors */ }
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Could not delete temporary file: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

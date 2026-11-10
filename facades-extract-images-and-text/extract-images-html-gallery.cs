@@ -1,87 +1,80 @@
 using System;
 using System.IO;
-using System.Text;
+using System.Drawing.Imaging;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";
-        const string imagesFolder   = "ExtractedImages";
-        const string outputHtmlPath = "gallery.html";
+        const string inputPdf = "input.pdf";
+        const string imagesDir = "Images";
+        const string htmlPath = "gallery.html";
 
-        // Verify input PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Ensure the folder for extracted images exists
-        Directory.CreateDirectory(imagesFolder);
+        // Ensure the output folder exists
+        Directory.CreateDirectory(imagesDir);
 
-        // -----------------------------------------------------------------
-        // Extract images using Aspose.Pdf.Facades.PdfExtractor
-        // -----------------------------------------------------------------
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Determine total number of pages in the PDF
+        int totalPages = new Document(inputPdf).Pages.Count;
+        int imageIndex = 1;
+
+        // Extract images page‑by‑page
+        for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
         {
-            // Bind the source PDF
-            extractor.BindPdf(inputPdfPath);
-
-            // Extract all images from the document
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-            while (true)
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Build a file name for the next image
-                string imagePath = Path.Combine(imagesFolder, $"image_{imageIndex}.png");
+                extractor.BindPdf(inputPdf);
+                // Restrict extraction to the current page
+                extractor.StartPage = pageNumber;
+                extractor.EndPage   = pageNumber;
+                // Optional: extract images defined in resources
+                extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+                extractor.ExtractImage();
 
-                // GetNextImage returns true if an image was written, false otherwise
-                bool hasImage = extractor.GetNextImage(imagePath);
-                if (!hasImage)
-                    break; // No more images
-
-                Console.WriteLine($"Extracted: {imagePath}");
-                imageIndex++;
+                while (extractor.HasNextImage())
+                {
+                    string imgFileName = $"page{pageNumber}_img{imageIndex}.png";
+                    string imgPath = Path.Combine(imagesDir, imgFileName);
+                    // Save the image directly to a file in PNG format
+                    extractor.GetNextImage(imgPath, ImageFormat.Png);
+                    imageIndex++;
+                }
             }
         }
 
-        // -----------------------------------------------------------------
-        // Generate a simple HTML gallery referencing the extracted images
-        // -----------------------------------------------------------------
-        StringBuilder htmlBuilder = new StringBuilder();
-
-        htmlBuilder.AppendLine("<!DOCTYPE html>");
-        htmlBuilder.AppendLine("<html lang=\"en\">");
-        htmlBuilder.AppendLine("<head>");
-        htmlBuilder.AppendLine("    <meta charset=\"UTF-8\">");
-        htmlBuilder.AppendLine("    <title>PDF Image Gallery</title>");
-        htmlBuilder.AppendLine("    <style>");
-        htmlBuilder.AppendLine("        body { font-family: Arial, sans-serif; }");
-        htmlBuilder.AppendLine("        .gallery { display: flex; flex-wrap: wrap; gap: 10px; }");
-        htmlBuilder.AppendLine("        .gallery img { max-width: 200px; height: auto; border: 1px solid #ccc; }");
-        htmlBuilder.AppendLine("    </style>");
-        htmlBuilder.AppendLine("</head>");
-        htmlBuilder.AppendLine("<body>");
-        htmlBuilder.AppendLine("    <h1>Extracted Images</h1>");
-        htmlBuilder.AppendLine("    <div class=\"gallery\">");
-
-        // Add an <img> tag for each extracted image file
-        foreach (string imgFile in Directory.GetFiles(imagesFolder, "image_*.png"))
+        // Build a simple HTML gallery referencing the extracted images
+        using (StreamWriter writer = new StreamWriter(htmlPath, false))
         {
-            string relativePath = Path.GetFileName(imgFile);
-            htmlBuilder.AppendLine($"        <img src=\"{relativePath}\" alt=\"Extracted image\" />");
+            writer.WriteLine("<!DOCTYPE html>");
+            writer.WriteLine("<html lang=\"en\">");
+            writer.WriteLine("<head>");
+            writer.WriteLine("    <meta charset=\"UTF-8\">");
+            writer.WriteLine("    <title>PDF Image Gallery</title>");
+            writer.WriteLine("    <style>");
+            writer.WriteLine("        img { margin:10px; max-width:200px; height:auto; }");
+            writer.WriteLine("    </style>");
+            writer.WriteLine("</head>");
+            writer.WriteLine("<body>");
+            writer.WriteLine("    <h1>Extracted Images</h1>");
+
+            foreach (string imgFile in Directory.GetFiles(imagesDir))
+            {
+                // Use forward slashes for HTML src attribute
+                string relativePath = Path.Combine(imagesDir, Path.GetFileName(imgFile)).Replace("\\", "/");
+                writer.WriteLine($"    <img src=\"{relativePath}\" alt=\"Extracted image\" />");
+            }
+
+            writer.WriteLine("</body>");
+            writer.WriteLine("</html>");
         }
 
-        htmlBuilder.AppendLine("    </div>");
-        htmlBuilder.AppendLine("</body>");
-        htmlBuilder.AppendLine("</html>");
-
-        // Write the HTML file (saved in the same folder as the images)
-        File.WriteAllText(outputHtmlPath, htmlBuilder.ToString(), Encoding.UTF8);
-        Console.WriteLine($"HTML gallery generated: {outputHtmlPath}");
+        Console.WriteLine($"Images extracted to '{imagesDir}'. HTML gallery created at '{htmlPath}'.");
     }
 }

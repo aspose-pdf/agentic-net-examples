@@ -1,95 +1,103 @@
-global using System;
-global using System.IO;
-global using System.Drawing;
-global using System.Drawing.Imaging;
-global using Aspose.Pdf;
-global using Aspose.Pdf.Facades;
+using System;
+using System.IO;
+using Aspose.Pdf.Facades;
 
-namespace AsposePdfApi
+class Program
 {
-    // ---------------------------------------------------------------------------
-    // Minimal stub for ImageExtractor when the real Aspose.Pdf.Facades assembly is not
-    // referenced. This allows the project to compile and run (the stub throws
-    // NotImplementedException at runtime). In a real project you should reference
-    // the official Aspose.Pdf NuGet package which provides the full implementation.
-    // ---------------------------------------------------------------------------
-    public class ImageExtractor
+    static void Main()
     {
-        private Document _doc;
+        // Input PDF file
+        const string inputPdf = "input.pdf";
 
-        public void BindPdf(Document doc)
+        // Destination UNC network share (ensure proper escaping)
+        const string uncPath = @"\\myServer\shared\Images";
+
+        // Verify input file exists
+        if (!File.Exists(inputPdf))
         {
-            _doc = doc ?? throw new ArgumentNullException(nameof(doc));
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
         }
 
-        // Returns the number of images on the specified page. The real library
-        // inspects the page resources; the stub simply returns 0.
-        public int GetImageCount(int pageNumber) => 0;
+        // Ensure the destination directory exists (creates it if missing)
+        Directory.CreateDirectory(uncPath);
 
-        // Extracts the image at the given index on the page. The stub returns null.
-        public System.Drawing.Image ExtractImage(int pageNumber, int imageIndex) => null;
-    }
-
-    class Program
-    {
-        static void Main()
+        try
         {
-            // Path to the source PDF
-            const string inputPdf = "input.pdf";
-
-            // UNC network share where images will be saved (e.g. \\server\share\folder)
-            const string uncFolder = @"\\myserver\shared\images";
-
-            // Validate source PDF existence
-            if (!File.Exists(inputPdf))
+            // PdfExtractor implements IDisposable – use a using block for deterministic cleanup
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-                return;
-            }
+                // Bind the source PDF
+                extractor.BindPdf(inputPdf);
 
-            // Validate destination UNC folder existence
-            if (!Directory.Exists(uncFolder))
-            {
-                Console.Error.WriteLine($"Destination folder does not exist: {uncFolder}");
-                return;
-            }
+                // Enable image extraction
+                extractor.ExtractImage();
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
-            {
-                // Initialize the ImageExtractor facade and bind it to the loaded document
-                var extractor = new ImageExtractor();
-                extractor.BindPdf(doc);
-
-                // Aspose.Pdf uses 1‑based page indexing
-                for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                int imageIndex = 1;
+                // Iterate through all extracted images
+                while (extractor.HasNextImage())
                 {
-                    // Get the number of images on the current page
-                    int imageCount = extractor.GetImageCount(pageNum);
-
-                    for (int imgIndex = 1; imgIndex <= imageCount; imgIndex++)
+                    // Retrieve the next image as a stream
+                    using (MemoryStream imageStream = new MemoryStream())
                     {
-                        // Extract the image as a System.Drawing.Image
-                        System.Drawing.Image img = extractor.ExtractImage(pageNum, imgIndex);
-                        if (img != null)
+                        extractor.GetNextImage(imageStream);
+                        imageStream.Position = 0; // reset stream position before saving
+
+                        // Determine image format from the stream (Aspose.Pdf can infer from data)
+                        // Save with appropriate extension based on the image format
+                        string extension = GetImageExtension(imageStream);
+                        string fileName = $"Image_{imageIndex}{extension}";
+                        string fullPath = Path.Combine(uncPath, fileName);
+
+                        // Write the image to the UNC location
+                        using (FileStream file = new FileStream(fullPath, FileMode.Create, FileAccess.Write))
                         {
-                            // Build a unique file name for each extracted image
-                            string fileName = $"page{pageNum}_img{imgIndex}.png";
-
-                            // Combine the UNC folder with the file name (Path.Combine handles UNC correctly)
-                            string destPath = System.IO.Path.Combine(uncFolder, fileName);
-
-                            // Save the image in PNG format
-                            img.Save(destPath, ImageFormat.Png);
-
-                            // Release the image resources
-                            img.Dispose();
-
-                            Console.WriteLine($"Saved image to {destPath}");
+                            imageStream.CopyTo(file);
                         }
+
+                        Console.WriteLine($"Saved image {imageIndex} to {fullPath}");
                     }
+
+                    imageIndex++;
+                }
+
+                if (imageIndex == 1)
+                {
+                    Console.WriteLine("No images were found in the PDF.");
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
+    }
+
+    // Helper method to infer image file extension from the stream header
+    private static string GetImageExtension(Stream imageStream)
+    {
+        // Read first few bytes to identify common image signatures
+        byte[] header = new byte[8];
+        imageStream.Read(header, 0, header.Length);
+        imageStream.Position = 0; // reset after reading
+
+        // JPEG
+        if (header[0] == 0xFF && header[1] == 0xD8)
+            return ".jpg";
+
+        // PNG
+        if (header[0] == 0x89 && header[1] == 0x50 && header[2] == 0x4E && header[3] == 0x47)
+            return ".png";
+
+        // GIF
+        if (header[0] == 0x47 && header[1] == 0x49 && header[2] == 0x46)
+            return ".gif";
+
+        // BMP
+        if (header[0] == 0x42 && header[1] == 0x4D)
+            return ".bmp";
+
+        // Default to .bin if format is unknown
+        return ".bin";
     }
 }

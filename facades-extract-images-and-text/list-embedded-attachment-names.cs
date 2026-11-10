@@ -8,33 +8,27 @@ class Program
     {
         const string inputPath = "input.pdf";
 
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-            // List the names of all embedded attachments (no file saving)
-            if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
+        // Check for embedded files (attachments) and list their names
+        if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+        {
+            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
             {
-                foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
-                {
-                    Console.WriteLine($"Attachment: {fileSpec.Name}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("No embedded attachments found.");
+                Console.WriteLine(fileSpec.Name);
             }
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine("No embedded files found.");
         }
     }
 }

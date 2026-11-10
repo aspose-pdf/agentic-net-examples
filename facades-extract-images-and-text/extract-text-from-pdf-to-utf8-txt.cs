@@ -7,40 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string txtPath = "output.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "output.txt";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // PdfExtractor implements IDisposable, so wrap it in a using block.
-        using (var extractor = new PdfExtractor())
+        try
         {
-            // Load the PDF document.
-            extractor.BindPdf(pdfPath);
-
-            // Extract all text from the PDF.
-            extractor.ExtractText();
-
-            // Get the extracted text via a stream (PdfExtractor.GetText requires a Stream).
-            string extractedText;
-            using (var textStream = new MemoryStream())
+            // PdfExtractor implements IDisposable, so wrap it in a using block.
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetText(textStream); // write text to the stream
-                textStream.Position = 0; // rewind for reading
-                using (var reader = new StreamReader(textStream, Encoding.UTF8))
+                // Bind the PDF file to the extractor.
+                extractor.BindPdf(inputPdf);
+
+                // Extract plain text from all pages.
+                extractor.ExtractText();
+
+                // Retrieve the extracted text via the overload that writes to a Stream.
+                string extractedText;
+                using (MemoryStream textStream = new MemoryStream())
                 {
-                    extractedText = reader.ReadToEnd();
+                    extractor.GetText(textStream); // write text to the stream
+                    textStream.Position = 0;        // rewind for reading
+                    using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
+                    {
+                        extractedText = reader.ReadToEnd();
+                    }
                 }
+
+                // Write the text to a UTF‑8 encoded .txt file.
+                File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
             }
 
-            // Write the text to a UTF‑8 encoded file.
-            File.WriteAllText(txtPath, extractedText, Encoding.UTF8);
+            Console.WriteLine($"Text extracted to '{outputTxt}'.");
         }
-
-        Console.WriteLine($"Text extracted to '{txtPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

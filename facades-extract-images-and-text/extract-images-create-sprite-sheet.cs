@@ -1,15 +1,15 @@
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath   = "input.pdf";
         const string outputSpritePath = "sprite_sheet.png";
 
         if (!File.Exists(inputPdfPath))
@@ -18,15 +18,20 @@ class Program
             return;
         }
 
-        // List to hold extracted images
-        List<Image> extractedImages = new List<Image>();
+        // Temporary folder for extracted images
+        string tempDir = Path.Combine(Path.GetTempPath(), "PdfImages_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
 
-        // Extract images using PdfExtractor (Facades API)
-        using (PdfExtractor extractor = new PdfExtractor())
+        var extractedImageFiles = new List<string>();
+
+        try
         {
+            // ---------- Extract images using Aspose.Pdf.Facades ----------
+            PdfExtractor extractor = new PdfExtractor();
             extractor.BindPdf(inputPdfPath);
             extractor.ExtractImage();
 
+            int imageIndex = 0;
             while (extractor.HasNextImage())
             {
                 using (MemoryStream imgStream = new MemoryStream())
@@ -34,54 +39,61 @@ class Program
                     extractor.GetNextImage(imgStream);
                     imgStream.Position = 0; // reset stream position
 
-                    // Load the image into System.Drawing.Image
-                    Image img = Image.FromStream(imgStream);
-                    extractedImages.Add(img);
+                    // Load the image and re‑save it as PNG (ensures uniform format)
+                    using (Image img = Image.FromStream(imgStream))
+                    {
+                        string imgPath = Path.Combine(tempDir, $"img_{imageIndex++}.png");
+                        img.Save(imgPath, ImageFormat.Png);
+                        extractedImageFiles.Add(imgPath);
+                    }
                 }
             }
-        }
 
-        if (extractedImages.Count == 0)
-        {
-            Console.WriteLine("No images were found in the PDF.");
-            return;
-        }
-
-        // Determine sprite sheet dimensions (horizontal layout)
-        int totalWidth = 0;
-        int maxHeight = 0;
-        foreach (var img in extractedImages)
-        {
-            totalWidth += img.Width;
-            if (img.Height > maxHeight)
-                maxHeight = img.Height;
-        }
-
-        // Create the sprite sheet bitmap
-        using (Bitmap spriteSheet = new Bitmap(totalWidth, maxHeight))
-        {
-            using (Graphics g = Graphics.FromImage(spriteSheet))
+            if (extractedImageFiles.Count == 0)
             {
-                g.Clear(Color.Transparent); // clear background
+                Console.WriteLine("No images were found in the PDF.");
+                return;
+            }
+
+            // ---------- Build sprite sheet ----------
+            // Compute total width (horizontal layout) and max height
+            int totalWidth = 0;
+            int maxHeight  = 0;
+            var loadedImages = new List<Image>();
+
+            foreach (string file in extractedImageFiles)
+            {
+                Image img = Image.FromFile(file);
+                loadedImages.Add(img);
+                totalWidth += img.Width;
+                if (img.Height > maxHeight) maxHeight = img.Height;
+            }
+
+            using (Bitmap sprite = new Bitmap(totalWidth, maxHeight))
+            using (Graphics g = Graphics.FromImage(sprite))
+            {
+                g.Clear(Color.Transparent); // use transparent background
 
                 int offsetX = 0;
-                foreach (var img in extractedImages)
+                foreach (Image img in loadedImages)
                 {
                     g.DrawImage(img, offsetX, 0, img.Width, img.Height);
                     offsetX += img.Width;
+                    img.Dispose(); // release each image after drawing
                 }
+
+                sprite.Save(outputSpritePath, ImageFormat.Png);
             }
 
-            // Save the sprite sheet as PNG
-            spriteSheet.Save(outputSpritePath, ImageFormat.Png);
+            Console.WriteLine($"Sprite sheet created: {outputSpritePath}");
         }
-
-        // Dispose extracted images
-        foreach (var img in extractedImages)
+        finally
         {
-            img.Dispose();
+            // Clean up temporary files
+            if (Directory.Exists(tempDir))
+            {
+                try { Directory.Delete(tempDir, true); } catch { /* ignore cleanup errors */ }
+            }
         }
-
-        Console.WriteLine($"Sprite sheet created: {outputSpritePath}");
     }
 }
