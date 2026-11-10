@@ -4,95 +4,103 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
+    // Maximum allowed PDF size in bytes (example: 5 MB)
+    const long MaxPdfSizeBytes = 5 * 1024 * 1024;
+
     static void Main()
     {
+        // Paths
         const string templatePath = "template.pdf";
         const string outputPath   = "filled.pdf";
-        const long maxSizeBytes   = 5 * 1024 * 1024; // 5 MB
+        const string extraPdfPath = "extra.pdf"; // optional PDF to insert pages from
 
-        // ------------------------------------------------------------
-        // Prepare sample data (replace with real data in production)
-        // ------------------------------------------------------------
-        DataTable data = new DataTable();
-        data.Columns.Add("Name",    typeof(string));
-        data.Columns.Add("Address", typeof(string));
-        for (int i = 0; i < 100; i++)
-        {
-            data.Rows.Add($"Customer {i + 1}", $"Address {i + 1}");
-        }
-
-        // ------------------------------------------------------------
-        // Ensure a PDF template with matching form fields exists.
-        // ------------------------------------------------------------
+        // Validate input files
         if (!File.Exists(templatePath))
         {
-            CreateTemplate(templatePath, data);
+            Console.Error.WriteLine($"Template not found: {templatePath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Fill the template using AutoFiller.
-        // ------------------------------------------------------------
-        using (AutoFiller filler = new AutoFiller())
+        // Prepare a DataTable with sample data
+        DataTable table = new DataTable();
+        table.Columns.Add("Name", typeof(string));
+        table.Columns.Add("Amount", typeof(decimal));
+        table.Rows.Add("Alice", 123.45m);
+        table.Rows.Add("Bob",   678.90m);
+        // ... add more rows as needed ...
+
+        // Fill the PDF form fields using the DataTable
+        using (Document doc = new Document(templatePath))
         {
-            filler.BindPdf(templatePath);   // Load the template PDF
-            filler.ImportDataTable(data);   // Merge all rows
-            filler.Save(outputPath);        // Save the result
+            // Example: assume the template has fields named "Name_1", "Amount_1", "Name_2", etc.
+            // Iterate over rows and set corresponding fields.
+            for (int i = 0; i < table.Rows.Count; i++)
+            {
+                DataRow row = table.Rows[i];
+                string nameField   = $"Name_{i + 1}";
+                string amountField = $"Amount_{i + 1}";
+
+                // Set field values if they exist
+                if (doc.Form != null && doc.Form.HasField(nameField))
+                {
+                    // Most simple text fields are TextBoxField; cast accordingly
+                    if (doc.Form[nameField] is TextBoxField nameTxt)
+                    {
+                        nameTxt.Value = row["Name"].ToString();
+                    }
+                }
+
+                if (doc.Form != null && doc.Form.HasField(amountField))
+                {
+                    if (doc.Form[amountField] is TextBoxField amountTxt)
+                    {
+                        amountTxt.Value = row["Amount"].ToString();
+                    }
+                }
+            }
+
+            // Save the filled document to a temporary file
+            string tempPath = Path.GetTempFileName();
+            doc.Save(tempPath);
+
+            // OPTIONAL: Insert additional pages from another PDF using PdfFileEditor
+            if (File.Exists(extraPdfPath))
+            {
+                // Insert all pages of extraPdfPath after the last page of the filled document
+                PdfFileEditor editor = new PdfFileEditor();
+                using (Document extraDoc = new Document(extraPdfPath))
+                {
+                    int pageCount = extraDoc.Pages.Count; // 1‑based count
+                    int[] pagesToInsert = new int[pageCount];
+                    for (int p = 1; p <= pageCount; p++)
+                        pagesToInsert[p - 1] = p;
+
+                    // Insert at the end of the original document (position = int.MaxValue)
+                    editor.Insert(tempPath, int.MaxValue, extraPdfPath, pagesToInsert, outputPath);
+                }
+            }
+            else
+            {
+                // No extra pages – just move temp file to final output
+                File.Copy(tempPath, outputPath, true);
+            }
+
+            // Clean up temporary file
+            File.Delete(tempPath);
         }
 
-        // ------------------------------------------------------------
-        // Verify that the generated PDF does not exceed the size limit.
-        // ------------------------------------------------------------
+        // Validate the final PDF size
         FileInfo resultInfo = new FileInfo(outputPath);
-        if (resultInfo.Length > maxSizeBytes)
+        if (resultInfo.Length > MaxPdfSizeBytes)
         {
-            Console.Error.WriteLine(
-                $"Error: Output PDF size {resultInfo.Length} bytes exceeds the limit of {maxSizeBytes} bytes.");
+            Console.Error.WriteLine($"Error: PDF size {resultInfo.Length} bytes exceeds limit of {MaxPdfSizeBytes} bytes.");
         }
         else
         {
-            Console.WriteLine(
-                $"Success: Output PDF size {resultInfo.Length} bytes is within the allowed limit.");
+            Console.WriteLine($"Success: PDF size {resultInfo.Length} bytes is within the limit.");
         }
-    }
-
-    // --------------------------------------------------------------------
-    // Helper: creates a minimal PDF template containing a TextBoxField for
-    // each column in the supplied DataTable. Field.PartialName must match
-    // the column name for AutoFiller to bind correctly.
-    // --------------------------------------------------------------------
-    private static void CreateTemplate(string path, DataTable schema)
-    {
-        Document doc = new Document();
-        Page page = doc.Pages.Add();
-
-        float yPos = 750;                     // starting vertical position
-        const float left = 100;               // left margin
-        const float fieldWidth = 300;
-        const float fieldHeight = 20;
-        const float verticalSpacing = 30;    // space between fields
-
-        foreach (DataColumn col in schema.Columns)
-        {
-            // Use the fully‑qualified Aspose.Pdf.Rectangle to avoid ambiguity
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                left,
-                yPos,
-                left + fieldWidth,
-                yPos + fieldHeight);
-
-            TextBoxField txt = new TextBoxField(page, rect)
-            {
-                PartialName = col.ColumnName,
-                Value = string.Empty
-            };
-            doc.Form.Add(txt);
-            yPos -= verticalSpacing;
-        }
-
-        doc.Save(path);
     }
 }

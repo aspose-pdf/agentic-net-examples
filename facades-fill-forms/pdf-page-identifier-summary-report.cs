@@ -2,106 +2,83 @@ using System;
 using System.Data;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Facades; // required by task specification
 
-class SummaryReportGenerator
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string reportCsvPath = "PageSummaryReport.csv";
+        const string pdfPath = "input.pdf";          // source PDF
+        const string csvPath = "data.csv";           // DataTable source (CSV with PageNumber,Identifier columns)
+        const string reportPath = "summary_report.csv"; // output report
 
-        if (!File.Exists(inputPdfPath))
+        // Validate input files
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(csvPath))
+        {
+            Console.Error.WriteLine($"CSV not found: {csvPath}");
             return;
         }
 
-        // Example DataTable containing row identifiers.
-        // In a real scenario this would be supplied by the caller.
-        DataTable identifierTable = CreateSampleIdentifierTable();
-
-        // Open the PDF document inside a using block (document disposal rule).
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load CSV into a DataTable
+        DataTable table = new DataTable();
+        using (StreamReader reader = new StreamReader(csvPath))
         {
-            // Prepare a StringWriter to build CSV content.
-            using (StringWriter csvWriter = new StringWriter())
+            bool headerRead = false;
+            while (!reader.EndOfStream)
             {
-                // Write CSV header.
-                csvWriter.WriteLine("PageNumber,RowIdentifier");
+                string line = reader.ReadLine();
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
-                // Iterate pages using 1‑based indexing (page-indexing-one-based rule).
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                string[] parts = line.Split(',');
+
+                if (!headerRead)
                 {
-                    Page page = pdfDoc.Pages[pageNum];
-
-                    // Extract tables from the current page (TableAbsorber from Aspose.Pdf.Text).
-                    TableAbsorber tableAbsorber = new TableAbsorber();
-                    tableAbsorber.Visit(page);
-
-                    string rowId = "N/A";
-
-                    // If a table is found, attempt to read an identifier from the first cell.
-                    if (tableAbsorber.TableList.Count > 0 &&
-                        tableAbsorber.TableList[0].RowList.Count > 0 &&
-                        tableAbsorber.TableList[0].RowList[0].CellList.Count > 0 &&
-                        tableAbsorber.TableList[0].RowList[0].CellList[0].TextFragments.Count > 0)
-                    {
-                        // Grab the text of the first fragment in the first cell.
-                        TextFragment fragment = tableAbsorber.TableList[0].RowList[0].CellList[0].TextFragments[0];
-                        rowId = fragment.Text.Trim();
-                    }
-                    else
-                    {
-                        // Fallback: try to match the page number with a row in the supplied DataTable.
-                        // Assumes the DataTable has a column named "PageNumber".
-                        DataRow[] matches = identifierTable.Select($"PageNumber = {pageNum}");
-                        if (matches.Length > 0 && identifierTable.Columns.Contains("Identifier"))
-                        {
-                            rowId = matches[0]["Identifier"].ToString();
-                        }
-                    }
-
-                    // Write the mapping to CSV.
-                    csvWriter.WriteLine($"{pageNum},{EscapeCsv(rowId)}");
+                    // First line defines column names
+                    foreach (string col in parts)
+                        table.Columns.Add(col.Trim());
+                    headerRead = true;
                 }
-
-                // Save the CSV report to disk.
-                File.WriteAllText(reportCsvPath, csvWriter.ToString());
-                Console.WriteLine($"Summary report saved to '{reportCsvPath}'.");
+                else
+                {
+                    // Subsequent lines are data rows
+                    table.Rows.Add(parts);
+                }
             }
-
-            // No modifications to the PDF are required, but if you need to save a copy:
-            // pdfDoc.Save("output_copy.pdf"); // example of using the save rule
         }
-    }
 
-    // Helper to create a sample DataTable with PageNumber ↔ Identifier mapping.
-    private static DataTable CreateSampleIdentifierTable()
-    {
-        DataTable dt = new DataTable("PageIdentifiers");
-        dt.Columns.Add("PageNumber", typeof(int));
-        dt.Columns.Add("Identifier", typeof(string));
-
-        // Sample data – replace with real data as needed.
-        dt.Rows.Add(1, "INV-1001");
-        dt.Rows.Add(2, "INV-1002");
-        dt.Rows.Add(3, "INV-1003");
-        // Add more rows as required.
-
-        return dt;
-    }
-
-    // CSV escaping for values that may contain commas or quotes.
-    private static string EscapeCsv(string value)
-    {
-        if (value == null) return "";
-        if (value.Contains(",") || value.Contains("\"") || value.Contains("\n"))
+        // Obtain page count using Document (PdfFileEditor does not expose GetPageCount)
+        int pageCount;
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            string escaped = value.Replace("\"", "\"\"");
-            return $"\"{escaped}\"";
+            pageCount = pdfDoc.Pages.Count; // pages are 1‑based
         }
-        return value;
+
+        // Create the summary report (CSV)
+        using (StreamWriter writer = new StreamWriter(reportPath, false))
+        {
+            // Header
+            writer.WriteLine("PageNumber,Identifier");
+
+            // Iterate through each PDF page
+            for (int pageNum = 1; pageNum <= pageCount; pageNum++)
+            {
+                // Find the DataTable row that matches the current page number
+                // Assumes the DataTable has columns named "PageNumber" and "Identifier"
+                DataRow[] matches = table.Select($"PageNumber = {pageNum}");
+
+                string identifier = matches.Length > 0
+                    ? matches[0]["Identifier"]?.ToString() ?? "N/A"
+                    : "N/A";
+
+                // Write the mapping to the report
+                writer.WriteLine($"{pageNum},{identifier}");
+            }
+        }
+
+        Console.WriteLine($"Summary report generated: {reportPath}");
     }
 }

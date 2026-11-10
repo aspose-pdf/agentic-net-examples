@@ -1,98 +1,118 @@
 using System;
 using System.Data;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-// Minimal NUnit stubs to allow compilation without the NUnit package.
-namespace NUnit.Framework
+namespace PdfFormComparison
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    public static class Assert
+    class Program
     {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        private const string TemplatePdfPath = "template_form.pdf";
+        private const string FilledPdfPath   = "filled_form.pdf";
+
+        // Creates a sample DataTable whose column names match the PDF form field names.
+        private static DataTable CreateSampleData()
         {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+            var table = new DataTable();
+            table.Columns.Add("FirstName", typeof(string));
+            table.Columns.Add("LastName", typeof(string));
+            table.Columns.Add("Email", typeof(string));
+
+            var row = table.NewRow();
+            row["FirstName"] = "John";
+            row["LastName"]  = "Doe";
+            row["Email"]     = "john.doe@example.com";
+            table.Rows.Add(row);
+
+            return table;
         }
-    }
-}
 
-namespace AsposePdfTests
-{
-    [NUnit.Framework.TestFixture]
-    public class AutoFillerFieldComparisonTests
-    {
-        // Path to a PDF template that contains form fields named "FirstName", "LastName", "Address"
-        private const string TemplatePdfPath = "template.pdf";
-
-        [NUnit.Framework.Test]
-        public void FilledPdfFields_ShouldMatchOriginalDataTableValues()
+        static void Main()
         {
-            // ------------------------------------------------------------
-            // 1. Prepare source data in a DataTable (column names must match PDF field names)
-            // ------------------------------------------------------------
-            DataTable sourceTable = new DataTable("MailMerge");
-            sourceTable.Columns.Add("FirstName", typeof(string));
-            sourceTable.Columns.Add("LastName",  typeof(string));
-            sourceTable.Columns.Add("Address",   typeof(string));
-
-            // Add a single row of test data
-            sourceTable.Rows.Add("John", "Doe", "123 Main St");
-
-            // ------------------------------------------------------------
-            // 2. Fill the PDF template using AutoFiller and capture the result in a MemoryStream
-            // ------------------------------------------------------------
-            using (AutoFiller autoFiller = new AutoFiller())
+            // 1. Verify that the template PDF exists.
+            if (!File.Exists(TemplatePdfPath))
             {
-                // Bind the template PDF file
-                autoFiller.BindPdf(TemplatePdfPath);
+                Console.WriteLine($"FAIL: Template PDF not found at path: {TemplatePdfPath}");
+                return;
+            }
 
-                // Import the DataTable values
-                autoFiller.ImportDataTable(sourceTable);
+            // 2. Prepare source data.
+            DataTable sourceData = CreateSampleData();
+            DataRow   sourceRow  = sourceData.Rows[0];
 
-                // Save the filled PDF into a memory stream (merged output)
-                using (MemoryStream filledStream = new MemoryStream())
+            // 3. Fill the PDF form using Aspose.Pdf.Facades.Form.
+            try
+            {
+                using (var doc = new Document(TemplatePdfPath))
                 {
-                    autoFiller.Save(filledStream);
-                    filledStream.Position = 0; // Reset for reading
-
-                    // ------------------------------------------------------------
-                    // 3. Load the filled PDF with the Form facade to read back field values
-                    // ------------------------------------------------------------
-                    using (Form form = new Form(filledStream))
+                    // The Form facade works with a Document instance.
+                    using (var pdfForm = new Form(doc))
                     {
-                        // Iterate over each column/field and compare values
-                        foreach (DataColumn column in sourceTable.Columns)
+                        foreach (DataColumn col in sourceData.Columns)
                         {
-                            // Retrieve the value from the PDF field (returns object?)
-                            object? fieldValueObj = form.GetField(column.ColumnName);
-                            string fieldValue = fieldValueObj?.ToString() ?? string.Empty;
+                            string fieldName  = col.ColumnName;
+                            string fieldValue = Convert.ToString(sourceRow[col]);
+                            // Correct method to set a field value.
+                            pdfForm.FillField(fieldName, fieldValue);
+                        }
+                    }
+                    doc.Save(FilledPdfPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"FAIL: Exception while filling PDF – {ex.Message}");
+                return;
+            }
 
-                            // Expected value from the original DataTable
-                            string expectedValue = sourceTable.Rows[0][column.ColumnName]?.ToString() ?? string.Empty;
+            // 4. Verify that each field in the filled PDF matches the original DataTable values.
+            bool allMatch = true;
+            try
+            {
+                using (var filledDoc = new Document(FilledPdfPath))
+                {
+                    var fields = filledDoc.Form?.Fields;
+                    foreach (DataColumn col in sourceData.Columns)
+                    {
+                        string fieldName     = col.ColumnName;
+                        string expectedValue = Convert.ToString(sourceRow[col]);
 
-                            // Assert that the filled field matches the source value
-                            NUnit.Framework.Assert.AreEqual(expectedValue, fieldValue,
-                                $"Field '{column.ColumnName}' value mismatch. Expected: '{expectedValue}', Actual: '{fieldValue}'.");
+                        // Locate the field by its name (or FullName if Name is null).
+                        var field = fields?.FirstOrDefault(f =>
+                            string.Equals(f.Name, fieldName, StringComparison.Ordinal) ||
+                            string.Equals(f.FullName, fieldName, StringComparison.Ordinal));
+
+                        string actualValue = field?.Value?.ToString() ?? string.Empty;
+
+                        if (!string.Equals(expectedValue, actualValue))
+                        {
+                            allMatch = false;
+                            Console.WriteLine($"FAIL: Field '{fieldName}' mismatch. Expected: '{expectedValue}', Actual: '{actualValue}'.");
                         }
                     }
                 }
             }
-        }
-    }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"FAIL: Exception while reading filled PDF – {ex.Message}");
+                allMatch = false;
+            }
 
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    internal static class Program
-    {
-        public static void Main(string[] args)
-        {
-            // No-op – the real work is performed by the NUnit test runner.
+            // 5. Report overall result.
+            Console.WriteLine(allMatch ? "PASS: All form fields match the source data." : "FAIL: One or more fields did not match.");
+
+            // 6. Cleanup generated file.
+            try
+            {
+                if (File.Exists(FilledPdfPath))
+                    File.Delete(FilledPdfPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WARNING: Could not delete temporary file – {ex.Message}");
+            }
         }
     }
 }

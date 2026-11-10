@@ -1,30 +1,35 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;   // Facade API for PDF manipulation
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF with form fields
-        const string outputPath = "filled_output.pdf";  // destination PDF
+        // Paths for the source PDF and the output PDF
+        const string inputPath  = "input.pdf";
+        const string outputPath = "filled_output.pdf";
 
-        // Verify source file exists
+        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF using the Form facade (creates and loads the document)
-        Form form = new Form(inputPath);
+        // Use the Form facade to fill form fields. This preserves the original layout.
+        using (Form form = new Form())
+        {
+            // Load the existing PDF document
+            form.BindPdf(inputPath);
 
-        // Example: fill a text field named "Name" – adjust field name/value as needed
-        form.FillField("Name", "John Doe");
+            // Fill the required fields
+            form.FillField("Name", "John Doe");
+            form.FillField("Date", DateTime.Now.ToShortDateString());
 
-        // The Form facade preserves the original layout and appearance of the PDF.
-        // Save the modified document using the facade's Save method (provided save rule).
-        form.Save(outputPath);
+            // Save the modified PDF to the specified output path
+            form.Save(outputPath);
+        }
 
         Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
     }

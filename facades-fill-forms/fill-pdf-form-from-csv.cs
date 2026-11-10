@@ -1,98 +1,99 @@
 using System;
 using System.IO;
 using System.Data;
-using Aspose.Pdf.Facades;
+using System.Collections.Generic;
+using Aspose.Pdf.Facades; // AutoFiller is in this namespace
 
-class PdfFormFiller
+class Program
 {
+    // Entry point: args[0] = template PDF path, args[1] = data CSV path, args[2] = output PDF path
     static void Main(string[] args)
     {
-        // Expect three arguments: template PDF, source CSV (originally XLSX), output PDF
-        if (args.Length < 3)
+        if (args.Length != 3)
         {
-            Console.Error.WriteLine("Usage: PdfFormFiller <template.pdf> <data.csv> <output.pdf>");
+            Console.Error.WriteLine("Usage: <template.pdf> <data.csv> <output.pdf>");
             return;
         }
 
-        string pdfPath      = args[0];
-        string csvPath      = args[1]; // CSV file that contains the data (replaces XLSX/OleDb)
-        string outputPath   = args[2];
+        string templatePdfPath = args[0];
+        string dataCsvPath     = args[1];
+        string outputPdfPath   = args[2];
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(templatePdfPath))
         {
-            Console.Error.WriteLine($"PDF template not found: {pdfPath}");
-            return;
-        }
-        if (!File.Exists(csvPath))
-        {
-            Console.Error.WriteLine($"Data file not found: {csvPath}");
+            Console.Error.WriteLine($"Template PDF not found: {templatePdfPath}");
             return;
         }
 
-        // Load the CSV file into a DataTable
-        DataTable dataTable = LoadCsvToDataTable(csvPath);
-        if (dataTable == null || dataTable.Rows.Count == 0)
+        if (!File.Exists(dataCsvPath))
         {
-            Console.Error.WriteLine("No data found in the CSV file.");
+            Console.Error.WriteLine($"Data CSV not found: {dataCsvPath}");
             return;
         }
 
-        // Use the first row of the table to fill the form
-        DataRow row = dataTable.Rows[0];
-
-        // Fill the PDF form using Aspose.Pdf.Facades.Form
-        using (Form form = new Form(pdfPath))
+        try
         {
-            foreach (DataColumn column in dataTable.Columns)
+            // Load CSV data into a DataTable (no OleDb usage)
+            DataTable dataTable = LoadCsvToDataTable(dataCsvPath);
+
+            // Use AutoFiller to bind the PDF template and import the data
+            using (AutoFiller filler = new AutoFiller())
             {
-                string fieldName  = column.ColumnName; // PDF field name
-                string fieldValue = row[column]?.ToString() ?? string.Empty; // Value from CSV
-                form.FillField(fieldName, fieldValue);
+                filler.BindPdf(templatePdfPath);
+                filler.ImportDataTable(dataTable);
+                filler.Save(outputPdfPath);
             }
 
-            // Save the filled PDF to the specified output path
-            form.Save(outputPath);
+            Console.WriteLine($"Form filled PDF saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 
-    // Simple CSV → DataTable loader (comma‑separated, first line = headers)
-    private static DataTable LoadCsvToDataTable(string csvFilePath)
+    // Reads a CSV file and returns a DataTable.
+    // Assumes the first line contains column headers.
+    private static DataTable LoadCsvToDataTable(string csvPath)
     {
-        var table = new DataTable();
-        using (var reader = new StreamReader(csvFilePath))
+        DataTable table = new DataTable();
+
+        using (var reader = new StreamReader(csvPath))
         {
             bool isFirstLine = true;
             while (!reader.EndOfStream)
             {
-                var line = reader.ReadLine();
+                string line = reader.ReadLine();
                 if (line == null) continue;
-                // Split on commas – this is a minimal parser; it does not handle escaped commas or quotes.
-                var values = line.Split(',');
+
+                // Simple CSV split – does not handle quoted commas.
+                string[] fields = line.Split(',');
+
                 if (isFirstLine)
                 {
-                    // Create columns from header line
-                    foreach (var header in values)
+                    // Create columns from header row
+                    foreach (string header in fields)
                     {
-                        var colName = header.Trim();
+                        string colName = header.Trim();
                         if (string.IsNullOrEmpty(colName))
-                            colName = $"Column{table.Columns.Count}"; // fallback name
+                            colName = $"Column{table.Columns.Count + 1}";
                         table.Columns.Add(colName, typeof(string));
                     }
                     isFirstLine = false;
                 }
                 else
                 {
-                    var row = table.NewRow();
-                    for (int i = 0; i < table.Columns.Count && i < values.Length; i++)
+                    // Add data rows
+                    DataRow row = table.NewRow();
+                    for (int i = 0; i < fields.Length && i < table.Columns.Count; i++)
                     {
-                        row[i] = values[i].Trim();
+                        row[i] = fields[i].Trim();
                     }
                     table.Rows.Add(row);
                 }
             }
         }
+
         return table;
     }
 }

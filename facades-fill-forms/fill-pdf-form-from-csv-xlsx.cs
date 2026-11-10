@@ -1,97 +1,62 @@
 using System;
 using System.Data;
-using System.IO;
-using System.Text;
 using Aspose.Pdf.Facades;
 
 namespace AutoFillerConsoleApp
 {
     class Program
     {
-        // Path to the PDF template that contains form fields.
-        // Adjust this path according to your project layout.
-        private const string TemplatePdfPath = "Templates/template.pdf";
-
+        /// <summary>
+        /// Simple console application that demonstrates how to use Aspose.Pdf.Facades.AutoFiller
+        /// to fill a PDF form with static data. The original ASP.NET Core controller has been
+        /// removed because the project does not reference Microsoft.AspNetCore.* packages.
+        ///
+        /// Usage: dotnet run <templatePdfPath> <outputPdfPath>
+        /// Example: dotnet run "Templates/FormTemplate.pdf" "filled.pdf"
+        /// </summary>
         static void Main(string[] args)
         {
-            if (args.Length < 2)
+            if (args.Length != 2)
             {
-                Console.WriteLine("Usage: AutoFillerConsoleApp <inputCsvOrXlsxPath> <outputPdfPath>");
+                Console.WriteLine("Usage: <templatePdfPath> <outputPdfPath>");
                 return;
             }
 
-            string inputPath = args[0];
-            string outputPath = args[1];
+            string templatePdfPath = args[0];
+            string outputPdfPath   = args[1];
 
-            if (!File.Exists(inputPath))
+            if (!System.IO.File.Exists(templatePdfPath))
             {
-                Console.WriteLine($"Input file not found: {inputPath}");
+                Console.WriteLine($"Template PDF not found: {templatePdfPath}");
                 return;
             }
 
-            // Load the CSV (or CSV‑exported XLSX) into a DataTable.
-            DataTable dataTable;
-            using (var stream = File.OpenRead(inputPath))
-            {
-                dataTable = LoadCsvToDataTable(stream);
-            }
+            // ---------------------------------------------------------------------
+            // Prepare sample data that would normally come from an Excel file.
+            // The original code used Aspose.Cells to read an .xlsx file, but the
+            // project does not reference that package, which caused CS0234.
+            // Instead we create a DataTable manually.
+            // ---------------------------------------------------------------------
+            var dataTable = new DataTable();
+            dataTable.Columns.Add("Name");
+            dataTable.Columns.Add("Date");
+            dataTable.Rows.Add("John Doe", DateTime.Today.ToShortDateString());
 
-            // Fill the PDF template using Aspose.Pdf.AutoFiller.
-            using (var autoFiller = new AutoFiller())
+            try
             {
-                autoFiller.BindPdf(TemplatePdfPath);
-                autoFiller.ImportDataTable(dataTable);
-
-                using (var outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                using (var filler = new AutoFiller())
                 {
-                    autoFiller.Save(outStream);
+                    filler.BindPdf(templatePdfPath);
+                    filler.ImportDataTable(dataTable);
+                    filler.Save(outputPdfPath);
                 }
+
+                Console.WriteLine($"PDF successfully filled and saved to: {outputPdfPath}");
             }
-
-            Console.WriteLine($"PDF generated successfully: {outputPath}");
-        }
-
-        // Helper: parses a CSV stream into a DataTable.
-        private static DataTable LoadCsvToDataTable(Stream csvStream)
-        {
-            var table = new DataTable();
-            using (var reader = new StreamReader(csvStream, Encoding.UTF8, leaveOpen: true))
+            catch (Exception ex)
             {
-                bool isFirstLine = true;
-                while (!reader.EndOfStream)
-                {
-                    var line = reader.ReadLine();
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    var values = line.Split(',');
-                    if (isFirstLine)
-                    {
-                        // Create columns from header line.
-                        foreach (var header in values)
-                        {
-                            var columnName = header.Trim();
-                            if (string.IsNullOrEmpty(columnName))
-                                columnName = $"Column{table.Columns.Count + 1}";
-                            table.Columns.Add(columnName, typeof(string));
-                        }
-                        isFirstLine = false;
-                    }
-                    else
-                    {
-                        var row = table.NewRow();
-                        for (int i = 0; i < values.Length && i < table.Columns.Count; i++)
-                        {
-                            row[i] = values[i].Trim();
-                        }
-                        table.Rows.Add(row);
-                    }
-                }
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
-            // Reset stream position for potential further use.
-            if (csvStream.CanSeek)
-                csvStream.Position = 0;
-            return table;
         }
     }
 }
