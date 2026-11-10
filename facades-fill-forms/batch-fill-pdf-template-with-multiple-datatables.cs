@@ -1,85 +1,106 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
+using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class BatchPdfFiller
 {
-    /// <summary>
-    /// Fills a PDF template with each DataTable in the list.
-    /// Generates separate PDF files for each data set.
-    /// </summary>
-    /// <param name="templatePath">Path to the PDF template containing form fields.</param>
-    /// <param name="dataTables">List of DataTable objects, each representing a data set.</param>
-    /// <param name="outputDirectory">Directory where the filled PDFs will be saved.</param>
-    public static void FillTemplateBatch(string templatePath, List<DataTable> dataTables, string outputDirectory)
+    static void Main()
     {
+        // Path to the PDF form template
+        const string templatePath = "template.pdf";
+
+        // Verify that the template exists
         if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Template file not found: {templatePath}");
+            Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDirectory);
+        // Prepare a list of DataTable objects, each representing a data set.
+        // In a real scenario these would be populated from a database, CSV, etc.
+        List<DataTable> dataSets = GetDataSets();
 
-        // Process each DataTable
-        for (int i = 0; i < dataTables.Count; i++)
+        // Output directory for the filled PDFs
+        const string outputDir = "FilledOutputs";
+        Directory.CreateDirectory(outputDir);
+
+        // Process each data set
+        for (int i = 0; i < dataSets.Count; i++)
         {
-            DataTable table = dataTables[i];
+            DataTable table = dataSets[i];
 
-            // AutoFiller implements IDisposable, so use a using block
-            using (AutoFiller filler = new AutoFiller())
-            {
-                // Bind the PDF template
-                filler.BindPdf(templatePath);
+            // Load the template PDF into a Document instance
+            Document pdfDocument = new Document(templatePath);
 
-                // Set the path where the generated files will be placed
-                filler.GeneratingPath = outputDirectory;
+            // Enable automatic recalculation of JavaScript fields (if any)
+            pdfDocument.Form.AutoRecalculate = true;
 
-                // Base file name for this batch (e.g., filled_0, filled_1, ...)
-                filler.BasicFileName = $"filled_{i}";
+            // Fill the form fields using column names that match the PDF field names
+            FillFormFromDataTable(pdfDocument, table);
 
-                // Import the current DataTable. Column names must match field names in the template.
-                filler.ImportDataTable(table);
+            // Define the output file name (e.g., Filled_1.pdf, Filled_2.pdf, ...)
+            string outputPath = Path.Combine(outputDir, $"Filled_{i + 1}.pdf");
 
-                // Save generates one PDF per row in the DataTable.
-                // Files will be named like "filled_0_0.pdf", "filled_0_1.pdf", etc.
-                filler.Save();
-            }
+            // Save the filled PDF
+            pdfDocument.Save(outputPath);
+
+            Console.WriteLine($"Saved filled PDF: {outputPath}");
         }
 
         Console.WriteLine("Batch filling completed.");
     }
 
-    // Example usage
-    static void Main()
+    /// <summary>
+    /// Populates the fields of a PDF document using the first row of the supplied DataTable.
+    /// Column names must match the PDF field names.
+    /// </summary>
+    private static void FillFormFromDataTable(Document doc, DataTable table)
     {
-        string templatePdf = "TemplateForm.pdf";
+        if (table == null || table.Rows.Count == 0)
+            return;
 
-        // Prepare example data tables
-        var dataTables = new List<DataTable>();
+        DataRow row = table.Rows[0];
+        foreach (DataColumn col in table.Columns)
+        {
+            // Find the field with the same name as the column
+            Field field = doc.Form?.Fields?.FirstOrDefault(f => f.Name == col.ColumnName);
+            if (field != null)
+            {
+                // Convert the cell value to string (handle DBNull)
+                object cellValue = row[col];
+                string value = cellValue == DBNull.Value ? string.Empty : cellValue.ToString();
+                field.Value = value;
+            }
+        }
+    }
 
-        // First data set
-        DataTable dt1 = new DataTable("DataSet1");
-        dt1.Columns.Add("FirstName", typeof(string));
-        dt1.Columns.Add("LastName", typeof(string));
-        dt1.Columns.Add("Address", typeof(string));
-        dt1.Rows.Add("John", "Doe", "123 Main St");
-        dt1.Rows.Add("Jane", "Smith", "456 Oak Ave");
-        dataTables.Add(dt1);
+    // Mock method to generate example DataTables.
+    // Replace this with actual data retrieval logic.
+    static List<DataTable> GetDataSets()
+    {
+        var list = new List<DataTable>();
 
-        // Second data set
-        DataTable dt2 = new DataTable("DataSet2");
-        dt2.Columns.Add("FirstName", typeof(string));
-        dt2.Columns.Add("LastName", typeof(string));
-        dt2.Columns.Add("Address", typeof(string));
-        dt2.Rows.Add("Alice", "Brown", "789 Pine Rd");
-        dataTables.Add(dt2);
+        // Example DataTable 1
+        DataTable dt1 = new DataTable();
+        dt1.Columns.Add("FirstName");
+        dt1.Columns.Add("LastName");
+        dt1.Columns.Add("Email");
+        dt1.Rows.Add("John", "Doe", "john.doe@example.com");
+        list.Add(dt1);
 
-        string outputDir = "FilledOutputs";
+        // Example DataTable 2
+        DataTable dt2 = new DataTable();
+        dt2.Columns.Add("FirstName");
+        dt2.Columns.Add("LastName");
+        dt2.Columns.Add("Email");
+        dt2.Rows.Add("Jane", "Smith", "jane.smith@example.com");
+        list.Add(dt2);
 
-        FillTemplateBatch(templatePdf, dataTables, outputDir);
+        // Add more DataTables as needed
+        return list;
     }
 }

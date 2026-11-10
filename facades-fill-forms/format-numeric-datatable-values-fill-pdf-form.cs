@@ -1,98 +1,98 @@
 using System;
 using System.Data;
+using System.Globalization;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the template PDF and the resulting filled PDF
-        const string templatePath = "template.pdf";
-        const string outputPath   = "filled.pdf";
+        const string pdfTemplatePath = "template.pdf";
+        const string outputPdfPath = "filled.pdf";
 
-        // ------------------------------------------------------------
-        // Create a PDF template with form fields that match the DataTable column names.
-        // ------------------------------------------------------------
-        if (!System.IO.File.Exists(templatePath))
+        if (!File.Exists(pdfTemplatePath))
         {
-            Document templateDoc = new Document();
-            Page page = templateDoc.Pages.Add();
-
-            // Define positions for the three fields (you can adjust as needed).
-            float left = 100f, width = 300f, height = 20f;
-            float startY = 750f, verticalSpacing = 30f;
-
-            // CustomerName field
-            Rectangle rectName = new Rectangle(left, startY, left + width, startY + height);
-            TextBoxField nameField = new TextBoxField(page, rectName) { PartialName = "CustomerName" };
-            templateDoc.Form.Add(nameField);
-
-            // InvoiceAmount field
-            Rectangle rectAmount = new Rectangle(left, startY - verticalSpacing, left + width, startY - verticalSpacing + height);
-            TextBoxField amountField = new TextBoxField(page, rectAmount) { PartialName = "InvoiceAmount" };
-            templateDoc.Form.Add(amountField);
-
-            // InvoiceDate field
-            Rectangle rectDate = new Rectangle(left, startY - 2 * verticalSpacing, left + width, startY - 2 * verticalSpacing + height);
-            TextBoxField dateField = new TextBoxField(page, rectDate) { PartialName = "InvoiceDate" };
-            templateDoc.Form.Add(dateField);
-
-            templateDoc.Save(templatePath);
+            Console.Error.WriteLine($"Template not found: {pdfTemplatePath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Create and populate a DataTable with sample data.
-        // ------------------------------------------------------------
-        DataTable data = new DataTable("FormData");
-        data.Columns.Add("CustomerName", typeof(string));
-        data.Columns.Add("InvoiceAmount", typeof(decimal));
-        data.Columns.Add("InvoiceDate", typeof(DateTime));
+        // Example DataTable; replace with actual data source as needed
+        DataTable table = GetSampleData();
 
-        data.Rows.Add("Alice", 1234.567m, DateTime.Today);
-        data.Rows.Add("Bob",   89.10m,   DateTime.Today);
+        // Load the PDF document
+        Document pdfDocument = new Document(pdfTemplatePath);
 
-        // ------------------------------------------------------------
-        // Build a new DataTable where numeric values are formatted as strings ("N2").
-        // ------------------------------------------------------------
-        DataTable formatted = new DataTable();
-        foreach (DataColumn col in data.Columns)
+        // Populate fields from the DataTable
+        foreach (DataRow row in table.Rows)
         {
-            if (col.ColumnName == "InvoiceAmount")
-                formatted.Columns.Add(col.ColumnName, typeof(string)); // formatted as string
-            else
-                formatted.Columns.Add(col.ColumnName, col.DataType);
-        }
-
-        foreach (DataRow row in data.Rows)
-        {
-            DataRow newRow = formatted.NewRow();
-            foreach (DataColumn col in data.Columns)
+            foreach (DataColumn col in table.Columns)
             {
-                if (col.ColumnName == "InvoiceAmount" && row[col] != DBNull.Value)
+                string fieldName = col.ColumnName;
+                object value = row[col];
+
+                string formattedValue;
+
+                // Format numeric types with two decimal places, using invariant culture
+                if (value is IFormattable && !(value is string))
                 {
-                    decimal amount = Convert.ToDecimal(row[col]);
-                    newRow[col.ColumnName] = amount.ToString("N2"); // two decimal places with thousand separator
+                    formattedValue = ((IFormattable)value).ToString("N2", CultureInfo.InvariantCulture);
+                }
+                else if (value is DateTime dt)
+                {
+                    // Example date formatting – adjust pattern as required
+                    formattedValue = dt.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
                 }
                 else
                 {
-                    newRow[col.ColumnName] = row[col];
+                    formattedValue = value?.ToString() ?? string.Empty;
+                }
+
+                // Attempt to set the field; ignore if the field does not exist
+                try
+                {
+                    if (pdfDocument.Form.HasField(fieldName))
+                    {
+                        // The Form indexer returns a WidgetAnnotation; cast it to Field before using Value
+                        Field field = pdfDocument.Form[fieldName] as Field;
+                        if (field != null)
+                        {
+                            field.Value = formattedValue;
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Field '{fieldName}' exists but is not a form field that supports a Value property.");
+                        }
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Field '{fieldName}' not found in the PDF template.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Failed to set field '{fieldName}': {ex.Message}");
                 }
             }
-            formatted.Rows.Add(newRow);
         }
 
-        // ------------------------------------------------------------
-        // Use AutoFiller to merge the formatted DataTable into the PDF.
-        // ------------------------------------------------------------
-        using (AutoFiller autoFiller = new AutoFiller())
-        {
-            autoFiller.BindPdf(templatePath);
-            autoFiller.ImportDataTable(formatted);
-            autoFiller.Save(outputPath);
-        }
+        // Save the filled PDF
+        pdfDocument.Save(outputPdfPath);
 
-        Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
+    }
+
+    // Sample method to create a DataTable; replace with real data retrieval logic
+    static DataTable GetSampleData()
+    {
+        DataTable dt = new DataTable();
+        dt.Columns.Add("InvoiceNumber", typeof(string));
+        dt.Columns.Add("Amount", typeof(decimal));
+        dt.Columns.Add("Tax", typeof(double));
+        dt.Columns.Add("Date", typeof(DateTime));
+
+        dt.Rows.Add("INV-001", 1234.5m, 123.45, DateTime.Today);
+        return dt;
     }
 }

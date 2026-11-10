@@ -1,47 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "filled.pdf";          // PDF that has been filled
-        const string tempPath = "temp_filled.pdf";      // intermediate file
-        const string outputPath = "protected.pdf";      // final protected PDF
+        const string inputPdfPath = "input.pdf";          // source PDF to fill
+        const string protectedPdfPath = "protected.pdf";  // final password‑protected PDF
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
-        const string userPassword = "user123";          // user password
-        const string ownerPassword = "owner123";        // owner password
-
-        // Verify the source file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the filled PDF and save it (ensures a clean copy before encryption)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            doc.Save(tempPath); // Save as PDF (no SaveOptions needed for PDF)
+            // ---------- Fill the PDF ----------
+            using (Document doc = new Document(inputPdfPath))
+            {
+                const string fieldName = "SampleField";
+                // Ensure the form and the specific field exist
+                if (doc.Form != null && doc.Form.HasField(fieldName))
+                {
+                    // The indexer returns a WidgetAnnotation; cast it to Field before using Value.
+                    Field? field = doc.Form[fieldName] as Field;
+                    if (field != null)
+                    {
+                        field.Value = "Filled value";
+                    }
+                }
+
+                // ---------- Apply password protection ----------
+                // Use Document.Encrypt for AES‑256 encryption (no extra NuGet packages required).
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the protected document directly.
+                doc.Save(protectedPdfPath);
+            }
+
+            Console.WriteLine($"Password‑protected PDF saved to '{protectedPdfPath}'.");
         }
-
-        // Apply password protection using the PdfFileSecurity facade
-        PdfFileSecurity fileSecurity = new PdfFileSecurity(tempPath, outputPath);
-        // Encrypt with 256‑bit AES and allow printing (DocumentPrivilege.Print)
-        bool success = fileSecurity.EncryptFile(userPassword, ownerPassword, DocumentPrivilege.Print, KeySize.x256);
-
-        if (!success)
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Failed to encrypt the PDF.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-        else
-        {
-            Console.WriteLine($"Protected PDF saved to '{outputPath}'.");
-        }
-
-        // Remove the temporary file
-        try { File.Delete(tempPath); } catch { }
     }
 }

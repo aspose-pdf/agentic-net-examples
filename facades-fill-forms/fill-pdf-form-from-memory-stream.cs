@@ -3,105 +3,86 @@ using System.Data;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;          // <-- added for TextBoxField and other form field types
-using Aspose.Pdf.Annotations;    // <-- added for Border and BorderStyle
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Prepare data for the form fields – column names must match field names exactly
-        DataTable data = new DataTable("FormData");
-        data.Columns.Add("FirstName", typeof(string));
-        data.Columns.Add("LastName", typeof(string));
-        data.Columns.Add("Address", typeof(string));
+        // Path to the source PDF (could be any source, e.g., received from a web request)
+        const string sourcePdfPath = "source.pdf";
 
-        // Add a single row of data (multiple rows are also supported)
-        DataRow row = data.NewRow();
-        row["FirstName"] = "John";
-        row["LastName"] = "Doe";
-        row["Address"] = "123 Main St, Anytown";
-        data.Rows.Add(row);
-
-        // Create a PDF template in memory that contains form fields matching the DataTable columns
-        byte[] templateBytes = CreatePdfTemplate(data);
-
-        // Fill the PDF using AutoFiller and obtain the result as a byte array
-        byte[] filledPdf = FillPdfTemplate(templateBytes, data);
-
-        // For demonstration, write the result to a file (no intermediate files were used during filling)
-        File.WriteAllBytes("filled_output.pdf", filledPdf);
-        Console.WriteLine("PDF filled and saved to 'filled_output.pdf'.");
-    }
-
-    /// <summary>
-    /// Generates a minimal PDF template containing a TextBoxField for each column in the supplied DataTable.
-    /// The template is returned as a byte array.
-    /// </summary>
-    static byte[] CreatePdfTemplate(DataTable dataTable)
-    {
-        using (var doc = new Document())
+        // Verify the source PDF exists before attempting to read it
+        if (!File.Exists(sourcePdfPath))
         {
-            // Add a single page – the fields will be placed vertically
-            var page = doc.Pages.Add();
+            Console.WriteLine($"Source PDF not found: {Path.GetFullPath(sourcePdfPath)}");
+            return;
+        }
 
-            // Simple layout parameters
-            const float left = 100f;
-            const float width = 300f;
-            const float height = 20f;
-            const float verticalSpacing = 30f;
-            float yPos = 750f; // start near top of page
-
-            foreach (DataColumn col in dataTable.Columns)
+        // Load the source PDF into a memory stream (simulating in‑memory input)
+        byte[] pdfBytes = File.ReadAllBytes(sourcePdfPath);
+        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
+        {
+            // Load the PDF document from the memory stream
+            using (Document pdfDoc = new Document(inputStream))
             {
-                var rect = new Rectangle(left, yPos, left + width, yPos + height);
-                var txtField = new TextBoxField(page, rect)
+                // Create the AutoFiller facade
+                using (AutoFiller filler = new AutoFiller())
                 {
-                    PartialName = col.ColumnName,
-                    Value = string.Empty
-                };
-                // Optional visual styling
-                txtField.Border = new Border(txtField)
-                {
-                    Style = BorderStyle.Solid,
-                    Width = 1
-                };
-                txtField.Color = Color.Black;
-                doc.Form.Add(txtField);
+                    // Bind the loaded PDF document to the filler
+                    filler.BindPdf(pdfDoc);
 
-                yPos -= verticalSpacing;
-            }
+                    // -----------------------------------------------------------------
+                    // Prepare data to fill the form fields.
+                    // The DataTable column names must exactly match the PDF field
+                    // PartialName values. In this example the PDF contains fields named
+                    // "FirstName", "LastName" and "Email".
+                    // -----------------------------------------------------------------
+                    DataTable table = new DataTable("FormData");
+                    table.Columns.Add("FirstName", typeof(string));
+                    table.Columns.Add("LastName",  typeof(string));
+                    table.Columns.Add("Email",     typeof(string));
 
-            // Save the template to a memory stream and return the bytes
-            using (var ms = new MemoryStream())
-            {
-                doc.Save(ms);
-                return ms.ToArray();
+                    // Example rows – replace with real data source
+                    table.Rows.Add("John", "Doe", "john.doe@example.com");
+
+                    // Import the DataTable into the filler. All columns are strings, so
+                    // no additional formatting is required.
+                    filler.ImportDataTable(table);
+
+                    // Save the filled PDF to an output memory stream (no intermediate file)
+                    using (MemoryStream outputStream = new MemoryStream())
+                    {
+                        filler.Save(outputStream);
+
+                        // At this point the filled PDF is in outputStream.
+                        // For demonstration, write it to a file; in real scenarios you could
+                        // return the byte[] directly (e.g., as an HTTP response).
+                        File.WriteAllBytes("filled_output.pdf", outputStream.ToArray());
+                    }
+                }
             }
         }
-    }
 
-    /// <summary>
-    /// Fills a PDF template using Aspose.Pdf.Facades.AutoFiller.
-    /// The template is supplied as a byte array (memory stream) and the result is returned as a byte array.
-    /// </summary>
-    static byte[] FillPdfTemplate(byte[] templatePdfBytes, DataTable data)
-    {
-        using (var inputStream = new MemoryStream(templatePdfBytes))
-        using (var outputStream = new MemoryStream())
-        using (var autoFiller = new AutoFiller())
-        {
-            // Bind the PDF template from the input stream
-            autoFiller.BindPdf(inputStream);
-
-            // Import the data table; column names must match form field names (case‑sensitive)
-            autoFiller.ImportDataTable(data);
-
-            // Save the generated PDF to the output stream
-            autoFiller.Save(outputStream);
-
-            return outputStream.ToArray();
-        }
+        Console.WriteLine("PDF form filled and saved to 'filled_output.pdf'.");
     }
 }
+
+/*
+ * NOTE:
+ * The original build produced NuGet warnings (NU1902, NU1903) for the
+ * 'System.Security.Cryptography.Pkcs' package version 9.0.0, which has known
+ * vulnerabilities. To resolve these warnings, update the package to a newer,
+ * non‑vulnerable version (e.g., 9.0.1 or later) in the project file:
+ *
+ *   <PackageReference Include="System.Security.Cryptography.Pkcs" Version="9.0.1" />
+ *
+ * Alternatively, you can suppress the warnings by adding the following to the
+ * .csproj file:
+ *
+ *   <PropertyGroup>
+ *       <NoWarn>NU1902;NU1903</NoWarn>
+ *   </PropertyGroup>
+ *
+ * Updating the package is the recommended approach to keep the application
+ * secure.
+ */

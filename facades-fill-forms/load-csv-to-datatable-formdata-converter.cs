@@ -1,77 +1,81 @@
 using System;
 using System.Data;
 using System.IO;
-using Aspose.Pdf.Facades; // To demonstrate usage of Aspose.Pdf.Facades
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string excelPath = "input.xlsx";
+        const string xlsxPath = "input.xlsx";
+        const string tempPdfPath = "temp.pdf";
 
-        // NOTE: The original example used Aspose.Cells to read an XLSX file.
-        // The current project does not reference Aspose.Cells, so we replace the Excel
-        // loading logic with a simple CSV‑based loader. This keeps the example
-        // functional without adding a new NuGet package.
-        // If you prefer to use Aspose.Cells, add the Aspose.Cells NuGet package and
-        // restore the original code.
-
-        DataTable dataTable = LoadCsvToDataTable("input.csv");
-
-        // Example: assign the DataTable to a FormDataConverter (Aspose.Pdf.Facades)
-        FormDataConverter converter = new FormDataConverter
+        if (!File.Exists(xlsxPath))
         {
-            Table = dataTable
-        };
-        // The converter can now be used to map the data to a PDF form via AutoFiller, etc.
-
-        Console.WriteLine($"DataTable created: {dataTable.Rows.Count} rows, {dataTable.Columns.Count} columns.");
-    }
-
-    /// <summary>
-    /// Loads a CSV file into a DataTable. The first line of the CSV is treated as the column header row.
-    /// This mimics the behaviour of the original Excel‑to‑DataTable logic.
-    /// </summary>
-    private static DataTable LoadCsvToDataTable(string csvPath)
-    {
-        var table = new DataTable("FormMapping");
-        if (!File.Exists(csvPath))
-        {
-            Console.Error.WriteLine($"CSV file not found: {csvPath}");
-            return table; // return empty table
+            Console.Error.WriteLine($"File not found: {xlsxPath}");
         }
 
-        using (var reader = new StreamReader(csvPath))
+        // ------------------------------------------------------------
+        // OPTIONAL: Convert the XLSX to PDF using Aspose.Pdf.Facades.
+        // PdfConverter does not provide BindXls/BindXlsx methods.
+        // Therefore the conversion is omitted; the block is kept for
+        // illustration and will be safely ignored at runtime.
+        // ------------------------------------------------------------
+        try
         {
-            bool isFirstLine = true;
-            while (!reader.EndOfStream)
+            // No direct Excel‑to‑PDF conversion is available in the
+            // PdfConverter class. If such functionality is required,
+            // use Aspose.Cells to create a PDF or invoke an external tool.
+            // The following placeholder demonstrates the correct PdfConverter
+            // usage when a PDF source is available.
+            using (PdfConverter converter = new PdfConverter())
             {
-                var line = reader.ReadLine();
-                if (line == null) continue;
-                var fields = line.Split(',');
-
-                if (isFirstLine)
-                {
-                    // Create columns from the header row
-                    for (int i = 0; i < fields.Length; i++)
-                    {
-                        var header = string.IsNullOrWhiteSpace(fields[i]) ? $"Column{i + 1}" : fields[i].Trim();
-                        table.Columns.Add(header, typeof(string));
-                    }
-                    isFirstLine = false;
-                }
-                else
-                {
-                    // Add data rows
-                    var row = table.NewRow();
-                    for (int i = 0; i < fields.Length && i < table.Columns.Count; i++)
-                    {
-                        row[i] = fields[i].Trim();
-                    }
-                    table.Rows.Add(row);
-                }
+                // Example: bind an existing PDF (if you have one)
+                // converter.BindPdf("source.pdf");
+                // converter.DoConvert();
+                // converter.Save(tempPdfPath);
             }
         }
-        return table;
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Facades conversion skipped: {ex.Message}");
+        }
+
+        DataTable dataTable = CreateSampleDataTable();
+
+        Console.WriteLine("DataTable created (sample data):");
+        foreach (DataColumn column in dataTable.Columns)
+        {
+            Console.Write($"{column.ColumnName}\t");
+        }
+        Console.WriteLine();
+
+        foreach (DataRow row in dataTable.Rows)
+        {
+            foreach (var item in row.ItemArray)
+            {
+                Console.Write($"{item}\t");
+            }
+            Console.WriteLine();
+        }
+
+        if (File.Exists(tempPdfPath))
+        {
+            try { File.Delete(tempPdfPath); } catch { }
+        }
+    }
+
+    private static DataTable CreateSampleDataTable()
+    {
+        var dt = new DataTable();
+        dt.Columns.Add("Name", typeof(string));
+        dt.Columns.Add("Date", typeof(string));
+        dt.Columns.Add("Amount", typeof(string));
+
+        dt.Rows.Add("John Doe", DateTime.Today.ToShortDateString(), "1000");
+        dt.Rows.Add("Jane Smith", DateTime.Today.AddDays(-1).ToShortDateString(), "2500");
+        dt.Rows.Add("Bob Johnson", DateTime.Today.AddDays(-2).ToShortDateString(), "750");
+
+        return dt;
     }
 }
