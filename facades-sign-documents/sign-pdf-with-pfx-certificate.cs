@@ -1,53 +1,55 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using System.Drawing;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // Added namespace for PKCS7
 
 class Program
 {
     static void Main()
     {
-        const string inputPath   = "input.pdf";
-        const string outputPath  = "signed_output.pdf";
-        const string pfxPath     = "certificate.pfx";
-        const string pfxPassword = "pfxPassword";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_output.pdf";
+        const string pfxPath = "certificate.pfx";
+        const string pfxPassword = "yourPfxPassword";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
         if (!File.Exists(pfxPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {pfxPath}");
+            Console.Error.WriteLine($"PFX file not found: {pfxPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            Document doc = new Document(inputPath);
+            // Create a PKCS7 signature object directly from the PFX file.
+            PKCS7 pkcs = new PKCS7(pfxPath, pfxPassword)
+            {
+                Reason = "Document signed",
+                ContactInfo = "contact@example.com",
+                Location = "My Company"
+            };
 
-            // Create a signature field on the first page (pages are 1‑based)
-            SignatureField sigField = new SignatureField(
-                doc,
-                new Aspose.Pdf.Rectangle(100, 100, 250, 150));
-            sigField.PartialName = "Signature1";
+            // Define the visible signature rectangle (coordinates are in points).
+            Rectangle signatureRect = new Rectangle(100, 100, 200, 50);
 
-            // Add the signature field to the document's form collection on page 1
-            doc.Form.Add(sigField, 1);
+            using (PdfFileSignature signer = new PdfFileSignature())
+            {
+                signer.BindPdf(inputPdf);
 
-            // Create a PKCS#1 signature using the PFX file
-            PKCS1 pkcs1Signature = new PKCS1(pfxPath, pfxPassword);
+                // Sign page 1, make the signature visible, and use the PKCS7 object.
+                signer.Sign(1, true, signatureRect, pkcs);
 
-            // Sign the field directly – this also sets a default appearance
-            sigField.Sign(pkcs1Signature);
+                // Save the signed document.
+                signer.Save(outputPdf);
+            }
 
-            // Save the signed PDF
-            doc.Save(outputPath);
-
-            Console.WriteLine($"PDF signed successfully: {outputPath}");
+            Console.WriteLine($"PDF signed successfully: {outputPdf}");
         }
         catch (Exception ex)
         {

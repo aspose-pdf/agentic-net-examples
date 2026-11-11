@@ -14,23 +14,15 @@ class Program
             return;
         }
 
-        try
-        {
-            // Use PdfFileSignature (the correct class for signature operations in Aspose.Pdf.Facades)
-            using (PdfFileSignature pdfSignature = new PdfFileSignature())
-            {
-                // Load the PDF into the signature handler
-                pdfSignature.BindPdf(pdfPath);
+        // Load the PDF for signature operations
+        PdfFileSignature pdfSignature = new PdfFileSignature();
+        pdfSignature.BindPdf(pdfPath);
 
-                // Verify whether a signature named 'ContractSigner' exists and is valid
-                bool isSigned = pdfSignature.VerifySigned("ContractSigner");
+        // Verify whether a signature named 'ContractSigner' exists and is valid
+        bool hasValidSignature = pdfSignature.VerifySigned("ContractSigner");
 
-                Console.WriteLine($"Signature 'ContractSigner' present and valid: {isSigned}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Verification error: {ex.Message}");
-        }
+        Console.WriteLine(hasValidSignature
+            ? "Signature 'ContractSigner' is present and valid."
+            : "Signature 'ContractSigner' not found or invalid.");
     }
 }

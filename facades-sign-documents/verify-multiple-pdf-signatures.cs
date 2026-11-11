@@ -1,45 +1,42 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "signed_document.pdf";
+        const string pdfPath = "signed.pdf";
 
-        if (!System.IO.File.Exists(pdfPath))
+        if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // Bind the PDF to PdfFileSignature. The class does not implement IDisposable.
+        var pdfSignature = new PdfFileSignature();
+        pdfSignature.BindPdf(pdfPath);
+
+        // Retrieve all signature names present in the document.
+        IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames();
+
+        if (signatureNames == null || signatureNames.Count == 0)
         {
-            // Bind the PDF to the signature facade
-            PdfFileSignature signatureFacade = new PdfFileSignature();
-            signatureFacade.BindPdf(pdfPath);
-
-            // Retrieve all signature names (true = include inactive signatures)
-            IList<SignatureName> signatureNames = signatureFacade.GetSignatureNames(true);
-
-            if (signatureNames == null || signatureNames.Count == 0)
-            {
-                Console.WriteLine("No signatures were found in the document.");
-                return;
-            }
-
-            // Verify each signature using VerifySigned and report its status
-            foreach (SignatureName sigName in signatureNames)
-            {
-                // VerifySigned expects the signature name as a string, not the SignatureName object
-                bool isValid = signatureFacade.VerifySigned(sigName.Name);
-                Console.WriteLine($"Signature '{sigName.Name}': {(isValid ? "Valid" : "Invalid")}");
-            }
+            Console.WriteLine("Document signed: false");
+            Console.WriteLine("No signatures detected.");
+            return;
         }
-        catch (Exception ex)
+
+        Console.WriteLine("Document signed: true");
+        Console.WriteLine("Signatures found:");
+
+        // Verify each signature individually using the non‑obsolete VerifySignature method.
+        foreach (SignatureName sigName in signatureNames)
         {
-            Console.Error.WriteLine($"Error during verification: {ex.Message}");
+            bool isValid = pdfSignature.VerifySignature(sigName);
+            Console.WriteLine($"- Name: {sigName.Name}, Valid: {isValid}");
         }
     }
 }
