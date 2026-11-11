@@ -2,60 +2,79 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
         // List of PDF files to process
-        string[] pdfFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
-
-        // New owner password to apply to all PDFs
-        const string newOwnerPassword = "NewOwnerPass123";
-
-        // Mapping of each PDF to its existing user password
-        var userPasswords = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        var pdfFiles = new List<string>
         {
-            { "file1.pdf", "UserPass1" },
-            { "file2.pdf", "UserPass2" },
-            { "file3.pdf", "UserPass3" }
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
         };
 
-        foreach (string pdfPath in pdfFiles)
+        // Mapping of each file to its current user password (empty string if none)
+        var userPasswords = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            if (!File.Exists(pdfPath))
+            { "doc1.pdf", "userPass1" },
+            { "doc2.pdf", "userPass2" },
+            { "doc3.pdf", "" } // no user password
+        };
+
+        // New owner password to apply to all PDFs
+        const string newOwnerPassword = "newOwner123";
+
+        // Permissions to retain (adjust as needed)
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+        // Crypto algorithm to use (AES-256 is recommended)
+        CryptoAlgorithm algorithm = CryptoAlgorithm.AESx256;
+
+        foreach (string inputPath in pdfFiles)
+        {
+            if (!File.Exists(inputPath))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
+                Console.Error.WriteLine($"File not found: {inputPath}");
                 continue;
             }
 
-            // Retrieve the original user password; assume empty string if not provided
-            string userPassword = userPasswords.TryGetValue(pdfPath, out string pwd) ? pwd : string.Empty;
+            // Determine the user password for this file (default to empty string)
+            userPasswords.TryGetValue(inputPath, out string userPassword);
+            userPassword ??= string.Empty;
 
-            // Load the PDF document using Document (the recommended API)
-            Document pdfDoc = new Document(pdfPath);
+            // Define a temporary output path
+            string tempOutput = Path.Combine(
+                Path.GetDirectoryName(inputPath) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(inputPath) + "_temp.pdf");
 
-            // Combine the permission flags that are available in the current Aspose.Pdf version.
-            // Flags that are not present in older versions (ModifyAnnotations, FillForms,
-            // AccessibilitySupport, PrintHighResolution) have been removed.
-            Permissions perms =
-                Permissions.PrintDocument |
-                Permissions.ModifyContent |
-                Permissions.ExtractContent |
-                Permissions.AssembleDocument;
+            try
+            {
+                // Load the PDF with the existing user password (if any)
+                using (Document pdfDoc = string.IsNullOrEmpty(userPassword)
+                    ? new Document(inputPath)
+                    : new Document(inputPath, userPassword))
+                {
+                    // Re‑encrypt the document with the same user password and the new owner password
+                    pdfDoc.Encrypt(userPassword, newOwnerPassword, perms, algorithm);
 
-            // Apply the new owner password while keeping the original user password.
-            pdfDoc.Encrypt(userPassword, newOwnerPassword, perms, CryptoAlgorithm.AESx256);
+                    // Save to a temporary file
+                    pdfDoc.Save(tempOutput);
+                }
 
-            // Save the updated PDF (writes to a new file to avoid overwriting the source)
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(pdfPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_updated.pdf");
-
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"Updated owner password for '{pdfPath}' → '{outputPath}'");
+                // Replace the original file with the newly encrypted version
+                File.Replace(tempOutput, inputPath, null);
+                Console.WriteLine($"Updated owner password for: {inputPath}");
+            }
+            catch (InvalidPasswordException)
+            {
+                Console.Error.WriteLine($"Invalid user password for file: {inputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing {inputPath}: {ex.Message}");
+            }
         }
     }
 }

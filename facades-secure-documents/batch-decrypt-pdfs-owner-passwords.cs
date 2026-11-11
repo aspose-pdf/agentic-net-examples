@@ -1,61 +1,89 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+
+class DecryptConfigEntry
+{
+    public required string InputPath { get; set; }
+    public required string OutputPath { get; set; }
+    public required string OwnerPassword { get; set; }
+}
 
 class Program
 {
     static void Main()
     {
-        // Path to the configuration file.
-        // Each line should contain: <pdfPath>|<ownerPassword>
-        const string configPath = "decrypt_config.txt";
+        const string configFile = "decrypt_config.json";
 
-        if (!File.Exists(configPath))
+        if (!File.Exists(configFile))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Configuration file not found: {configFile}");
             return;
         }
 
-        // Process each entry in the configuration file.
-        foreach (string rawLine in File.ReadLines(configPath))
+        List<DecryptConfigEntry> entries;
+        try
         {
-            // Skip empty lines or comments.
-            if (string.IsNullOrWhiteSpace(rawLine) || rawLine.TrimStart().StartsWith("#"))
-                continue;
+            string json = File.ReadAllText(configFile);
+            entries = JsonSerializer.Deserialize<List<DecryptConfigEntry>>(json);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
+            return;
+        }
 
-            // Expected format: inputPdfPath|ownerPassword
-            string[] parts = rawLine.Split('|');
-            if (parts.Length != 2)
+        if (entries == null || entries.Count == 0)
+        {
+            Console.WriteLine("No decryption entries found in configuration.");
+            return;
+        }
+
+        foreach (var entry in entries)
+        {
+            if (string.IsNullOrWhiteSpace(entry.InputPath) ||
+                string.IsNullOrWhiteSpace(entry.OutputPath) ||
+                string.IsNullOrWhiteSpace(entry.OwnerPassword))
             {
-                Console.Error.WriteLine($"Invalid line (expected 'path|password'): {rawLine}");
+                Console.Error.WriteLine("Invalid entry detected; skipping.");
                 continue;
             }
 
-            string inputPdf = parts[0].Trim();
-            string ownerPassword = parts[1].Trim();
-
-            if (!File.Exists(inputPdf))
+            if (!File.Exists(entry.InputPath))
             {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+                Console.Error.WriteLine($"Input PDF not found: {entry.InputPath}");
                 continue;
             }
-
-            // Build output file name (original name with "_decrypted" suffix).
-            string outputPdf = Path.Combine(
-                Path.GetDirectoryName(inputPdf) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(inputPdf) + "_decrypted.pdf");
 
             try
             {
-                // Load the encrypted PDF using the owner password.
-                Document pdfDoc = new Document(inputPdf, ownerPassword);
-                // Saving without providing a password writes an unencrypted PDF.
-                pdfDoc.Save(outputPdf);
-                Console.WriteLine($"Decrypted: {inputPdf} → {outputPdf}");
+                // Check whether the PDF is encrypted.
+                var fileInfo = new PdfFileInfo(entry.InputPath);
+                bool isEncrypted = fileInfo.IsEncrypted;
+
+                if (!isEncrypted)
+                {
+                    // If the file is not encrypted, just copy it to the output location.
+                    File.Copy(entry.InputPath, entry.OutputPath, true);
+                    Console.WriteLine($"File not encrypted, copied: '{entry.InputPath}' → '{entry.OutputPath}'");
+                }
+                else
+                {
+                    // Decrypt the encrypted PDF using the owner password.
+                    using var security = new PdfFileSecurity();
+                    security.BindPdf(entry.InputPath);
+                    security.DecryptFile(entry.OwnerPassword);
+                    security.Save(entry.OutputPath);
+
+                    Console.WriteLine($"Decrypted: '{entry.InputPath}' → '{entry.OutputPath}'");
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to decrypt '{inputPdf}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{entry.InputPath}': {ex.Message}");
             }
         }
     }

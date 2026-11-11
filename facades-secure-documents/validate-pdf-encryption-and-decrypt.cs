@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;               // Document class for loading/saving PDFs
+using Aspose.Pdf.Facades;      // PdfFileInfo for quick encryption check
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";
-        const string outputPath = "decrypted.pdf";
-        const string password = "user123";
+        const string inputPath      = "encrypted_input.pdf";
+        const string decryptedPath  = "decrypted_output.pdf";
+        const string userPassword   = "user123";
 
         if (!File.Exists(inputPath))
         {
@@ -17,24 +17,39 @@ class Program
             return;
         }
 
-        // Use PdfFileInfo (Facades API) to determine if the PDF is encrypted
-        PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
-        if (!fileInfo.IsEncrypted)
+        try
         {
-            // If not encrypted, simply copy the file (no decryption needed)
-            File.Copy(inputPath, outputPath, true);
-            Console.WriteLine("PDF was not encrypted; copied without decryption.");
-            return;
-        }
+            // Quick check – does the file report being encrypted?
+            PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
+            if (!fileInfo.IsEncrypted)
+            {
+                Console.WriteLine("The PDF is not encrypted – no decryption needed.");
+                File.Copy(inputPath, decryptedPath, overwrite: true);
+                return;
+            }
 
-        // Load the encrypted document with the user password and decrypt it
-        using (Document doc = new Document(inputPath, password))
+            // Load the encrypted PDF with the supplied password and re‑save it without any password.
+            // Aspose.Pdf provides a Document constructor that accepts the password directly.
+            using (Document pdfDoc = new Document(inputPath, userPassword))
+            {
+                // Saving without specifying a password writes an un‑encrypted PDF.
+                pdfDoc.Save(decryptedPath);
+            }
+
+            Console.WriteLine($"Decryption successful. Saved to '{decryptedPath}'.");
+        }
+        catch (InvalidPasswordException ex)
         {
-            // Decrypt() takes no parameters
-            doc.Decrypt();
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Incorrect password: {ex.Message}");
         }
-
-        Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
+        catch (PdfException ex)
+        {
+            // PdfException is also thrown when the file is encrypted but the password is missing/invalid.
+            Console.Error.WriteLine($"PDF processing error: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+        }
     }
 }

@@ -1,148 +1,37 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace as requested
-using Azure.Identity;
-using Azure.Security.KeyVault.Secrets;
-
-// ---------------------------------------------------------------------------
-// Minimal Azure SDK stubs – only the members used in this sample are defined.
-// In a real project you should reference the official NuGet packages:
-//   Azure.Identity
-//   Azure.Security.KeyVault.Secrets
-// ---------------------------------------------------------------------------
-namespace Azure
-{
-    namespace Identity
-    {
-        /// <summary>
-        /// Stub for Azure.Identity.DefaultAzureCredential.
-        /// </summary>
-        public class DefaultAzureCredential
-        {
-            // No implementation needed for the stub.
-        }
-    }
-
-    namespace Security.KeyVault.Secrets
-    {
-        /// <summary>
-        /// Represents a secret stored in Azure Key Vault.
-        /// </summary>
-        public class KeyVaultSecret
-        {
-            public string Name { get; }
-            public string Value { get; }
-
-            public KeyVaultSecret(string name, string value)
-            {
-                Name = name;
-                Value = value;
-            }
-        }
-
-        /// <summary>
-        /// Wrapper that mimics the Azure.Response<T> type used by the real SDK.
-        /// Only the Value property is required for this sample.
-        /// </summary>
-        public class SecretResponse
-        {
-            public KeyVaultSecret Value { get; }
-
-            public SecretResponse(KeyVaultSecret secret)
-            {
-                Value = secret;
-            }
-        }
-
-        /// <summary>
-        /// Stub for Azure.Security.KeyVault.Secrets.SecretClient.
-        /// In production this client talks to Azure Key Vault; the stub returns a placeholder.
-        /// </summary>
-        public class SecretClient
-        {
-            private readonly Uri _vaultUri;
-            private readonly Azure.Identity.DefaultAzureCredential _credential;
-
-            public SecretClient(Uri vaultUri, Azure.Identity.DefaultAzureCredential credential)
-            {
-                _vaultUri = vaultUri;
-                _credential = credential;
-            }
-
-            /// <summary>
-            /// Returns a dummy secret. Replace with real secret retrieval logic when using the real SDK.
-            /// </summary>
-            public SecretResponse GetSecret(string name)
-            {
-                // For demonstration we return the secret name as the value.
-                // In a real scenario the secret value would be fetched from Key Vault.
-                var secret = new KeyVaultSecret(name, "<owner-password-from-key-vault>");
-                return new SecretResponse(secret);
-            }
-        }
-    }
-}
 
 class Program
 {
     static void Main()
     {
-        // Paths
-        const string encryptedPdfPath = "encrypted.pdf";
-        const string decryptedPdfPath = "decrypted.pdf";
+        // Paths to the encrypted and decrypted PDFs
+        const string inputPdf = "encrypted.pdf";   // encrypted PDF to decrypt
+        const string outputPdf = "decrypted.pdf"; // destination for the decrypted PDF
 
-        // Azure Key Vault configuration (set these environment variables before running)
-        string keyVaultUrl = Environment.GetEnvironmentVariable("KEYVAULT_URL");
-        string secretName   = Environment.GetEnvironmentVariable("KEYVAULT_SECRET_NAME");
-
-        if (string.IsNullOrEmpty(keyVaultUrl) || string.IsNullOrEmpty(secretName))
+        // Retrieve the owner password from an environment variable.
+        // In production replace this with a call to Azure Key Vault.
+        string ownerPassword = Environment.GetEnvironmentVariable("PDF_OWNER_PASSWORD");
+        if (string.IsNullOrEmpty(ownerPassword))
         {
-            Console.Error.WriteLine("Key Vault URL or secret name not set in environment variables.");
+            Console.WriteLine("Error: Owner password not found. Set the PDF_OWNER_PASSWORD environment variable.");
             return;
         }
 
-        // Retrieve the owner password securely from Azure Key Vault
-        string ownerPassword;
+        // Load the encrypted PDF using the owner password.
+        Document doc;
         try
         {
-            var secretClient = new SecretClient(new Uri(keyVaultUrl), new DefaultAzureCredential());
-            // The stub returns a SecretResponse whose Value property holds the KeyVaultSecret.
-            ownerPassword = secretClient.GetSecret(secretName).Value.Value;
+            doc = new Document(inputPdf, ownerPassword);
         }
-        catch (Exception ex)
+        catch (PdfException ex)
         {
-            Console.Error.WriteLine($"Failed to retrieve secret from Key Vault: {ex.Message}");
+            Console.WriteLine($"Failed to open encrypted PDF: {ex.Message}");
             return;
         }
 
-        if (!File.Exists(encryptedPdfPath))
-        {
-            Console.Error.WriteLine($"Encrypted PDF not found: {encryptedPdfPath}");
-            return;
-        }
-
-        try
-        {
-            // Open the encrypted PDF using the owner password
-            using (Document doc = new Document(encryptedPdfPath, ownerPassword))
-            {
-                // Decrypt the document (no parameters)
-                doc.Decrypt();
-
-                // Save the decrypted PDF
-                doc.Save(decryptedPdfPath);
-            }
-
-            Console.WriteLine($"Decrypted PDF saved to '{decryptedPdfPath}'.");
-        }
-        catch (InvalidPasswordException)
-        {
-            Console.Error.WriteLine("The provided password is invalid.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during decryption: {ex.Message}");
-        }
+        // Save the document without specifying a password – this produces an unencrypted PDF.
+        doc.Save(outputPdf);
+        Console.WriteLine($"Decrypted PDF saved to '{outputPdf}'.");
     }
 }

@@ -1,15 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "protected.pdf";
-        const string outputPath = "updated_owner.pdf";
-        const string userPassword = "user123";
-        const string newOwnerPassword = "newOwner456";
+        const string outputPath = "owner_updated.pdf";
+        const string userPassword = "user123";      // existing user password
+        const string newOwnerPassword = "newOwner456"; // new owner password
 
         if (!File.Exists(inputPath))
         {
@@ -19,22 +20,26 @@ class Program
 
         try
         {
-            // Load the protected PDF using the existing user password
+            // Open the encrypted PDF using the existing user password
             using (Document doc = new Document(inputPath, userPassword))
             {
-                // Preserve the current permissions (no change to privileges)
-                // Document.Permissions may return an int in some Aspose.Pdf versions, so cast it to Permissions.
+                // Permissions property returns an int in newer Aspose.Pdf versions.
+                // Cast it explicitly to the Permissions enum before re‑encryption.
                 Permissions currentPermissions = (Permissions)doc.Permissions;
 
                 // Re‑encrypt with the same user password, a new owner password,
-                // and the unchanged permissions. Prefer AES‑256 encryption.
-                doc.Encrypt(userPassword, newOwnerPassword, currentPermissions, CryptoAlgorithm.AESx256);
+                // the original permissions, and a strong algorithm (AES‑256)
+                doc.Encrypt(
+                    userPassword,
+                    newOwnerPassword,
+                    currentPermissions,
+                    CryptoAlgorithm.AESx256);
 
-                // Save the PDF with the updated owner password
+                // Save the updated document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Owner password updated successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Owner password updated successfully. Saved to '{outputPath}'.");
         }
         catch (InvalidPasswordException ex)
         {

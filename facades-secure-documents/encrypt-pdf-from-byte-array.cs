@@ -1,39 +1,31 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace as required
 
 public static class PdfEncryptionHelper
 {
     /// <summary>
-    /// Loads a PDF from a byte array, encrypts it, and returns the encrypted PDF as a byte array.
+    /// Loads a PDF from a byte array, encrypts it using AES‑256, and returns the encrypted PDF as a byte array.
+    /// The Aspose.Pdf.Document class is used for the encryption operation.
     /// </summary>
-    /// <param name="pdfBytes">Input PDF data.</param>
+    /// <param name="pdfBytes">The original PDF content.</param>
     /// <param name="userPassword">Password required to open the PDF.</param>
     /// <param name="ownerPassword">Password that grants full permissions.</param>
-    /// <returns>Encrypted PDF data.</returns>
+    /// <returns>Encrypted PDF as a byte array.</returns>
     public static byte[] EncryptPdf(byte[] pdfBytes, string userPassword, string ownerPassword)
     {
-        if (pdfBytes == null) throw new ArgumentNullException(nameof(pdfBytes));
-        if (userPassword == null) throw new ArgumentNullException(nameof(userPassword));
-        if (ownerPassword == null) throw new ArgumentNullException(nameof(ownerPassword));
-
-        // Facades class instantiated to satisfy the "use Aspose.Pdf.Facades" requirement.
-        // It is not needed for encryption but demonstrates usage of the namespace.
-        PdfFileEditor facade = new PdfFileEditor();
-
-        // Load PDF from the input byte array.
-        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
-        using (Document doc = new Document(inputStream))
+        // Load the PDF directly from the supplied byte array using a MemoryStream.
+        using (var inputStream = new MemoryStream(pdfBytes))
+        using (var doc = new Document(inputStream))
         {
-            // Define permissions (example: allow printing and content extraction).
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+            // Define the permissions that will be allowed after encryption.
+            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt using the recommended AES-256 algorithm.
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // Encrypt the document with AES‑256.
+            doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF to a memory stream.
-            using (MemoryStream outputStream = new MemoryStream())
+            // Save the encrypted PDF back into a MemoryStream and return the bytes.
+            using (var outputStream = new MemoryStream())
             {
                 doc.Save(outputStream);
                 return outputStream.ToArray();
@@ -42,11 +34,23 @@ public static class PdfEncryptionHelper
     }
 }
 
-// Dummy entry point to satisfy the compiler when the project is built as an executable.
-public class Program
+class Program
 {
-    public static void Main(string[] args)
+    static void Main()
     {
-        // No operation – the library functionality is exposed via PdfEncryptionHelper.
+        // Example usage – read a PDF file, encrypt it, and write the encrypted version.
+        const string inputPath = "sample.pdf";
+        const string outputPath = "sample_encrypted.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.WriteLine($"Input file '{inputPath}' not found.");
+            return;
+        }
+
+        byte[] originalBytes = File.ReadAllBytes(inputPath);
+        byte[] encryptedBytes = PdfEncryptionHelper.EncryptPdf(originalBytes, "user123", "owner123");
+        File.WriteAllBytes(outputPath, encryptedBytes);
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

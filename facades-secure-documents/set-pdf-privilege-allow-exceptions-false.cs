@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "privileged.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -16,21 +17,19 @@ class Program
             return;
         }
 
-        // Load the PDF document using the Document class (PdfFileEditor does not expose the needed API).
-        Document pdfDoc = new Document(inputPath);
+        // Load the PDF using Document (the recommended way for modern Aspose.Pdf versions).
+        using (Document doc = new Document(inputPath))
+        {
+            // Define desired permissions.
+            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        // Define the permissions using only members that exist in the current Aspose.Pdf version.
-        Permissions permissions = Permissions.PrintDocument |
-                                   Permissions.ExtractContent |
-                                   Permissions.ModifyContent;
+            // Apply encryption / privilege modification. Exceptions will propagate naturally.
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-        // Apply the permissions. Empty passwords keep the original passwords (if any).
-        // Choose any supported CryptoAlgorithm; RC4x128 is used here as an example.
-        pdfDoc.Encrypt(string.Empty, string.Empty, permissions, CryptoAlgorithm.RC4x128);
+            // Save the modified PDF.
+            doc.Save(outputPath);
+        }
 
-        // Save the modified PDF.
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"Privileges modified and saved to '{outputPath}'.");
+        Console.WriteLine($"Privilege‑modified PDF saved to '{outputPath}'.");
     }
 }

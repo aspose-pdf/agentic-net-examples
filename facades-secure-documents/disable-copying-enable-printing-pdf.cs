@@ -7,9 +7,9 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "protected.pdf";
-        const string userPassword = "";          // No user password (openable without password)
-        const string ownerPassword = "owner123"; // Owner password to control permissions
+        const string outputPath = "output_protected.pdf";
+        const string userPassword = "";          // allow opening without password
+        const string ownerPassword = "owner123"; // owner password to control permissions
 
         if (!File.Exists(inputPath))
         {
@@ -17,18 +17,18 @@ class Program
             return;
         }
 
-        // Load the source PDF
-        Document doc = new Document(inputPath);
-
-        // Enable printing, disable copying (do NOT include ExtractContent permission)
+        // Enable printing, disable copying (content extraction)
         Permissions permissions = Permissions.PrintDocument;
 
-        // Encrypt using AES‑256 algorithm
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+
+        // Encrypt using AES‑256 with the specified permissions
         doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
 
         // Save the protected PDF
         doc.Save(outputPath);
 
-        Console.WriteLine($"PDF saved with printing enabled and copying disabled: {outputPath}");
+        Console.WriteLine($"Protected PDF saved to '{outputPath}' (printing enabled, copying disabled).");
     }
 }
