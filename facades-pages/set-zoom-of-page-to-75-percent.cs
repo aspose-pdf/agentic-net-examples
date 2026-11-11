@@ -15,17 +15,15 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor to modify page‑level settings.
-        // The Zoom factor is applied via the Zoom property together with the ProcessPages array
-        // which specifies the 1‑based page numbers to affect.
+        // Use PdfPageEditor to set the initial view zoom for page 5
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
-            editor.ProcessPages = new int[] { 5 };   // target page 5 (1‑based index)
-            editor.Zoom = 0.75f;                     // 75 % view (0.75 factor)
+            editor.ProcessPages = new[] { 5 }; // 1‑based page number
+            editor.Zoom = 0.75f;               // 75 % view
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Zoom of page 5 set to 75% and saved to '{outputPath}'.");
+        Console.WriteLine($"Page 5 zoom set to 75 % and saved to '{outputPath}'.");
     }
 }

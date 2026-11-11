@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // PdfPageEditor resides here
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,19 +16,29 @@ class Program
             return;
         }
 
-        // Load the document only to obtain the total page count
-        Document pdfDocument = new Document(inputPath);
-        int pageCount = pdfDocument.Pages.Count;
+        // Obtain the total number of pages via Document (PdfPageEditor has no GetPageCount)
+        int pageCount;
+        using (var doc = new Document(inputPath))
+        {
+            pageCount = doc.Pages.Count;
+        }
 
-        // Prepare an array with all page numbers (1‑based indexing)
-        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
-
-        // Use PdfPageEditor to set the display duration for the selected pages
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Use PdfPageEditor to set per‑page display duration
+        using (var editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
-            editor.ProcessPages = allPages;          // apply to every page
-            editor.DisplayDuration = 5;              // duration in seconds (int, not double)
+
+            for (int i = 1; i <= pageCount; i++)
+            {
+                // Select the current page
+                editor.ProcessPages = new int[] { i };
+                // Set the desired duration (seconds)
+                editor.DisplayDuration = i * 2;
+                // Apply the change to the selected page(s)
+                editor.ApplyChanges();
+            }
+
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 

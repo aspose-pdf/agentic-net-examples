@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, Page, Rotation
+using Aspose.Pdf;
 
 class Program
 {
@@ -9,33 +9,28 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document.
+        Document pdf = new Document(inputPath);
 
-        // Ensure the document has at least three pages
-        if (pdfDocument.Pages.Count < 3)
-        {
-            Console.Error.WriteLine("The PDF does not contain a third page.");
-            return;
-        }
+        // Page numbers are 1‑based. Target page 3.
+        int pageNumber = 3;
+        Page page = pdf.Pages[pageNumber];
 
-        // Get page 3 (pages are 1‑based)
-        Page page = pdfDocument.Pages[3];
-
-        // Rotate page 3 by 90 degrees clockwise and resize to Letter (612 x 792 points)
+        // Rotate the page 90 degrees clockwise.
         page.Rotate = Rotation.on90;
+
+        // Change the page size to Letter (8.5" x 11" = 612 x 792 points).
         page.SetPageSize(612, 792);
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        // Save the modified document.
+        pdf.Save(outputPath);
 
-        Console.WriteLine($"Page 3 rotated 90° and resized to Letter saved as '{outputPath}'.");
+        Console.WriteLine($"Page {pageNumber} rotated 90° and resized to Letter saved as '{outputPath}'.");
     }
 }

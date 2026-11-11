@@ -1,69 +1,68 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_transitions.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        Document doc = new Document(inputPath);
+
+        // Create a PdfPageEditor and bind the document (no using because it does not implement IDisposable)
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(doc);
+
+        // Iterate through each page (1‑based indexing)
+        for (int i = 1; i <= doc.Pages.Count; i++)
         {
-            // PdfPageEditor is the Facades class that allows setting page transitions
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            Page page = doc.Pages[i];
+
+            // Determine if the page contains images
+            bool hasImages = page.Resources.Images.Count > 0;
+
+            // Determine if the page contains text
+            TextAbsorber txtAbsorber = new TextAbsorber();
+            page.Accept(txtAbsorber);
+            bool hasText = !string.IsNullOrWhiteSpace(txtAbsorber.Text);
+
+            // Choose a transition based on content type and map it to the integer value expected by PdfPageEditor
+            int transitionTypeValue;
+            if (hasImages && !hasText)
             {
-                // Define transition type per page (page numbers are 1‑based)
-                // Transition types are integer values defined by the PDF specification.
-                // Example values:
-                // 0 – No transition
-                // 1 – Replace
-                // 2 – Split
-                // 3 – Blinds
-                // 4 – Box
-                // 5 – Wipe
-                // 6 – Dissolve
-                // 7 – Glitter
-                // 8 – Fly
-                // 9 – Push
-                // 10 – Cover
-                // 11 – Uncover
-                // 12 – Fade
-                var pageTransitions = new Dictionary<int, int>
-                {
-                    { 1, 0 },  // No transition on page 1
-                    { 2, 4 },  // Box transition on page 2
-                    { 3, 6 },  // Dissolve transition on page 3
-                    // Add more mappings as needed
-                };
-
-                foreach (var kvp in pageTransitions)
-                {
-                    int pageNumber = kvp.Key;      // 1‑based page index
-                    int transition = kvp.Value;    // integer representing the transition style
-
-                    // Apply the transition only to the specified page
-                    editor.ProcessPages = new int[] { pageNumber };
-                    editor.TransitionType = transition;
-                    editor.TransitionDuration = 1; // duration in seconds (adjust as required)
-
-                    editor.ApplyChanges();
-                }
-
-                // Persist all changes to the output file
-                editor.Save(outputPath);
+                // Image‑only pages – use a Fade (Dissolve) transition. 2 = Dissolve/Fade
+                transitionTypeValue = 2;
             }
+            else if (hasText && !hasImages)
+            {
+                // Text‑only pages – use a Split transition. 9 = Split
+                transitionTypeValue = 9;
+            }
+            else
+            {
+                // Mixed or empty pages – use a Blinds transition. 10 = Blinds
+                transitionTypeValue = 10;
+            }
+
+            // Apply the transition to the current page using PdfPageEditor
+            editor.ProcessPages = new int[] { i };          // target the current page
+            editor.TransitionType = transitionTypeValue;    // integer value representing the transition
+            editor.TransitionDuration = 1;                  // 1 second (adjust as needed)
         }
+
+        // Save the modified PDF. All per‑page changes are now persisted in the bound Document.
+        editor.Save(outputPath);
 
         Console.WriteLine($"PDF saved with page transitions to '{outputPath}'.");
     }

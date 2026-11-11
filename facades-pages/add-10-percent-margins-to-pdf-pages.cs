@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -9,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_resized.pdf";
+        const string outputPath = "resized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,17 +16,24 @@ class Program
             return;
         }
 
-        // Load the document to obtain the total page count
-        Document pdfDoc = new Document(inputPath);
-        int pageCount = pdfDoc.Pages.Count;
-        int[] allPages = Enumerable.Range(1, pageCount).ToArray(); // 1‑based page numbers
+        // Determine the number of pages in the source PDF
+        int pageCount;
+        using (Document doc = new Document(inputPath))
+        {
+            pageCount = doc.Pages.Count; // 1‑based page count
+        }
 
-        // Use PdfPageEditor to apply a uniform zoom (80%) which leaves a 10 % margin on each side
+        // Build an array containing all page numbers (1‑based)
+        int[] allPages = new int[pageCount];
+        for (int i = 0; i < pageCount; i++)
+            allPages[i] = i + 1;
+
+        // Reduce the content size to 90 % (10 % margin) for every page
         using (PdfPageEditor editor = new PdfPageEditor())
         {
             editor.BindPdf(inputPath);
-            editor.ProcessPages = allPages;   // target every page
-            editor.Zoom = 0.8f;               // 80 % of original size → 10 % margin left/right & top/bottom
+            editor.ProcessPages = allPages; // apply to all pages
+            editor.Zoom = 0.9f;              // 90 % scaling
             editor.Save(outputPath);
         }
 

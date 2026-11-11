@@ -1,71 +1,79 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files
-        const string pdf1 = "first.pdf";
-        const string pdf2 = "second.pdf";
+        // Input PDFs
+        const string pdfPath1 = "first.pdf";
+        const string pdfPath2 = "second.pdf";
 
-        // Temporary files after aligning margins and page size
+        // Temporary aligned PDFs
         const string aligned1 = "first_aligned.pdf";
         const string aligned2 = "second_aligned.pdf";
 
         // Final merged output
-        const string merged = "merged.pdf";
+        const string mergedOutput = "merged_aligned.pdf";
 
-        // Verify that both source PDFs exist
-        if (!File.Exists(pdf1) || !File.Exists(pdf2))
+        // Verify input files exist
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine("One or both input PDF files are missing.");
             return;
         }
 
-        // Desired uniform page size (A4) and margins (points)
-        double pageWidth  = PageSize.A4.Width;
-        double pageHeight = PageSize.A4.Height;
-        double marginLeft   = 50; // 0.69 inch
-        double marginBottom = 50;
-        double marginRight  = 50;
-        double marginTop    = 50;
-
-        // Align each PDF to the same size and margins
-        AlignPdf(pdf1, aligned1, pageWidth, pageHeight, marginLeft, marginBottom, marginRight, marginTop);
-        AlignPdf(pdf2, aligned2, pageWidth, pageHeight, marginLeft, marginBottom, marginRight, marginTop);
-
-        // Merge the two aligned PDFs using the Facades API
-        PdfFileEditor editor = new PdfFileEditor();
-        editor.Concatenate(new[] { aligned1, aligned2 }, merged);
-
-        Console.WriteLine($"Merged PDF saved to '{merged}'.");
-    }
-
-    // Adjusts page size and margins for all pages in a PDF
-    static void AlignPdf(string inputPath, string outputPath,
-                         double width, double height,
-                         double left, double bottom, double right, double top)
-    {
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Desired uniform page size (A4) and margins (0.5 inch = 36 points)
+        PageSize uniformSize = PageSize.A4;
+        MarginInfo uniformMargin = new MarginInfo
         {
-            // Iterate using 1‑based page indexing (Aspose.Pdf convention)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                // Resize each page to the target dimensions via PageInfo
-                Page page = doc.Pages[i];
-                page.PageInfo.Width = width;
-                page.PageInfo.Height = height;
+            Top = 36,
+            Bottom = 36,
+            Left = 36,
+            Right = 36
+        };
 
-                // Apply uniform margins using MarginInfo
-                page.PageInfo.Margin = new MarginInfo(left, right, top, bottom);
-            }
-
-            // Save the adjusted PDF; no SaveOptions needed for PDF output
-            doc.Save(outputPath);
+        // -----------------------------------------------------------------
+        // Align pages of the first PDF using Document API (Aspose.Pdf)
+        // -----------------------------------------------------------------
+        Document doc1 = new Document(pdfPath1);
+        foreach (Page page in doc1.Pages)
+        {
+            // Set uniform page dimensions
+            page.PageInfo.Width = uniformSize.Width;
+            page.PageInfo.Height = uniformSize.Height;
+            // Apply uniform margins
+            page.PageInfo.Margin = uniformMargin;
         }
+        doc1.Save(aligned1);
+
+        // -----------------------------------------------------------------
+        // Align pages of the second PDF using Document API (Aspose.Pdf)
+        // -----------------------------------------------------------------
+        Document doc2 = new Document(pdfPath2);
+        foreach (Page page in doc2.Pages)
+        {
+            page.PageInfo.Width = uniformSize.Width;
+            page.PageInfo.Height = uniformSize.Height;
+            page.PageInfo.Margin = uniformMargin;
+        }
+        doc2.Save(aligned2);
+
+        // -----------------------------------------------------------------
+        // Merge the two aligned PDFs using the documented Document pattern
+        // -----------------------------------------------------------------
+        using (Document target = new Document(aligned1))
+        using (Document source = new Document(aligned2))
+        {
+            target.Pages.Add(source.Pages); // Append all pages from source
+            target.Save(mergedOutput);      // Save the combined PDF
+        }
+
+        // Clean up temporary aligned files
+        try { File.Delete(aligned1); } catch { /* ignore */ }
+        try { File.Delete(aligned2); } catch { /* ignore */ }
+
+        Console.WriteLine($"Merged PDF with aligned pages saved to '{mergedOutput}'.");
     }
 }

@@ -1,54 +1,55 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        // Input and output PDF file paths
+        const string inputPath  = "input.pdf";
         const string outputPath = "rotated.pdf";
 
+        // Desired rotation angle (must be 0, 90, 180, or 270)
+        int rotationAngle = 90; // example value; replace as needed
+
+        // Verify that the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Rotation values for each page (1‑based index). Adjust the array length as needed.
-        int[] rotations = new int[] { 0, 90, 180, 270 };
-
-        // Validate that every rotation value is allowed.
-        foreach (int angle in rotations)
+        // Validate the rotation angle against the allowed set
+        int[] allowedAngles = { 0, 90, 180, 270 };
+        if (Array.IndexOf(allowedAngles, rotationAngle) < 0)
         {
-            if (!IsValidRotation(angle))
-            {
-                Console.Error.WriteLine($"Invalid rotation angle: {angle}. Allowed values are 0, 90, 180, 270.");
-                return;
-            }
+            Console.Error.WriteLine($"Invalid rotation angle: {rotationAngle}. Allowed values are 0, 90, 180, 270.");
+            return;
         }
 
-        // Use PdfPageEditor to apply per‑page rotations.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Map the integer angle to Aspose.Pdf.Rotation enum
+        Rotation rotationEnum = rotationAngle switch
         {
-            editor.BindPdf(inputPath);
+            0   => Rotation.None,   // 0° – no rotation
+            90  => Rotation.on90,
+            180 => Rotation.on180,
+            270 => Rotation.on270,
+            _   => Rotation.None   // This line is never reached because of validation
+        };
 
-            // Build a dictionary where key = page number (1‑based) and value = rotation angle.
-            var pageRotations = new Dictionary<int, int>();
-            for (int i = 1; i <= rotations.Length; i++)
-            {
-                pageRotations[i] = rotations[i - 1];
-            }
-            editor.PageRotations = pageRotations;
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+        int pageCount = pdfDocument.Pages.Count; // 1‑based page indexing
 
-            // Save the modified PDF.
-            editor.Save(outputPath);
+        // Apply the rotation to each page
+        for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+        {
+            pdfDocument.Pages[pageNumber].Rotate = rotationEnum;
         }
 
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        // Save the rotated PDF
+        pdfDocument.Save(outputPath);
+        Console.WriteLine($"Successfully rotated pages by {rotationAngle} degrees and saved to '{outputPath}'.");
     }
-
-    // Helper to ensure only permitted rotation angles are used.
-    static bool IsValidRotation(int angle) => angle == 0 || angle == 90 || angle == 180 || angle == 270;
 }

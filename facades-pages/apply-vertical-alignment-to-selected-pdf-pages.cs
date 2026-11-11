@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf; // for VerticalAlignment enum
 
 class Program
 {
@@ -10,8 +10,8 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "aligned_output.pdf";
 
-        // 1‑based page numbers that should be aligned to the top
-        int[] pagesToAlign = { 1, 3, 5 };
+        // Pages to which vertical alignment will be applied (1‑based indexing)
+        int[] selectedPages = new int[] { 1, 3, 5 };
 
         if (!File.Exists(inputPath))
         {
@@ -19,29 +19,22 @@ class Program
             return;
         }
 
-        try
+        // PdfPageEditor implements IDisposable in recent versions, so use a using block
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Use PdfPageEditor within a using block to ensure resources are released
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                // Load the source PDF
-                editor.BindPdf(inputPath);
+            // Load the source PDF
+            editor.BindPdf(inputPath);
 
-                // Set vertical alignment to the top of the page (new API)
-                editor.VerticalAlignmentType = VerticalAlignment.Top;
+            // Set vertical alignment to Top for consistent top positioning
+            editor.VerticalAlignmentType = Aspose.Pdf.VerticalAlignment.Top;
 
-                // Specify the pages that the alignment should be applied to
-                editor.ProcessPages = pagesToAlign;
+            // Specify the pages that should receive the alignment
+            editor.ProcessPages = selectedPages;
 
-                // Save the resulting PDF
-                editor.Save(outputPath);
-            }
-
-            Console.WriteLine($"Vertical alignment applied. Saved to '{outputPath}'.");
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Aligned PDF saved to '{outputPath}'.");
     }
 }

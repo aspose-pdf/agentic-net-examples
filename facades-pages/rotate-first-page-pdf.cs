@@ -1,13 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "edited.pdf";
+        const string inputPath = "input.pdf";
 
         // Verify the source PDF exists
         if (!File.Exists(inputPath))
@@ -18,18 +18,22 @@ class Program
 
         // PdfPageEditor does NOT implement IDisposable, so no using block is needed
         PdfPageEditor pageEditor = new PdfPageEditor();
-
-        // Load (bind) the PDF file for editing
         pageEditor.BindPdf(inputPath);
 
-        // Prepare the editor to work on the first page (1‑based index)
-        pageEditor.ProcessPages = new int[] { 1 };
-        // Rotation is specified in degrees: 0, 90, 180, 270
-        pageEditor.Rotation = 90; // rotate first page 90° clockwise
+        // Retrieve total page count via the underlying Document object
+        int pageCount = pageEditor.Document?.Pages?.Count ?? 0;
+        Console.WriteLine($"Loaded PDF with {pageCount} pages.");
 
-        // Save the edited PDF to a new file
+        // Optional preparation: rotate the first page 90 degrees clockwise
+        if (pageCount > 0)
+        {
+            // Rotation enum values: on0, on90, on180, on270
+            pageEditor.Document.Pages[1].Rotate = Rotation.on90;
+        }
+
+        // Save the (potentially modified) PDF to a new file
+        const string outputPath = "edited.pdf";
         pageEditor.Save(outputPath);
-
-        Console.WriteLine($"PDF loaded and edited successfully. Saved to '{outputPath}'.");
+        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
     }
 }

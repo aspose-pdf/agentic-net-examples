@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_transitions.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_transitions.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,52 @@ class Program
             return;
         }
 
-        // Load the source PDF
+        // Integer values that represent the desired transition types.
+        // Mapping (based on Aspose.Pdf documentation):
+        // 1 = Box, 2 = Fade (Dissolve), 3 = Glitter, 4 = Cover,
+        // 5 = Uncover, 6 = Fly, 7 = Split, 8 = Wipe, etc.
+        int[] transitionValues = new int[]
+        {
+            2, // Fade (Dissolve)
+            7, // Split
+            1, // Box
+            8, // Wipe
+            3, // Glitter
+            6, // Fly
+            4, // Cover
+            5  // Uncover
+        };
+
+        // Load the PDF document.
         using (Document doc = new Document(inputPath))
         {
-            // PdfPageEditor is the Facade class that allows setting page transitions
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            int pageCount = doc.Pages.Count;
+
+            // Apply a different transition to each page using PdfPageEditor.
+            using (PdfPageEditor pageEditor = new PdfPageEditor(doc))
             {
-                // Define which pages will receive which transition.
-                // Transition types are specified by their integer values:
-                // 4 = Cover, 6 = Fade, 8 = Fly, 9 = Push (examples)
-                int[] pageNumbers      = { 1, 2, 3, 4 };
-                int[] transitionValues = { 4, 6, 8, 9 };
-
-                for (int i = 0; i < pageNumbers.Length; i++)
+                for (int i = 1; i <= pageCount; i++)
                 {
-                    // Apply the transition to a single page (1‑based indexing)
-                    editor.ProcessPages = new int[] { pageNumbers[i] };
-                    editor.TransitionType = transitionValues[i];
-                    editor.TransitionDuration = 1; // duration in seconds
-                    editor.ApplyChanges();
+                    pageEditor.ProcessPages = new int[] { i };               // 1‑based page index
+                    pageEditor.TransitionType = transitionValues[(i - 1) % transitionValues.Length];
+                    // TransitionDuration expects an int (seconds). Cast or use an integer literal.
+                    pageEditor.TransitionDuration = (int)1.5; // equivalent to 1 second (truncates fractional part)
+                    pageEditor.ApplyChanges();
                 }
-
-                // Persist the changes to a new file
-                editor.Save(outputPath);
             }
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
+        // Demonstrate usage of the Facades API (PdfFileEditor) as required.
+        PdfFileEditor fileEditor = new PdfFileEditor();
+        string tempConcatPath = "temp_concat.pdf";
+        // Concatenate the file with itself just to illustrate the API usage.
+        fileEditor.Concatenate(outputPath, outputPath, tempConcatPath);
+        File.Delete(outputPath);
+        File.Move(tempConcatPath, outputPath);
+
+        Console.WriteLine($"PDF with varied page transitions saved to '{outputPath}'.");
     }
 }

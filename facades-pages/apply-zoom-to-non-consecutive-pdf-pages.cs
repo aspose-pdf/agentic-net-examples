@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -8,51 +7,40 @@ class Program
 {
     static void Main()
     {
+        // Input and output file paths
         const string inputPath  = "input.pdf";
-        const string outputPath = "selected_zoomed.pdf";
+        const string outputPath = "zoomed_output.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPath}");
             return;
         }
 
-        // Non‑consecutive pages to keep (1‑based indexing)
-        int[] pagesToSelect = new int[] { 1, 3, 5, 7 };
+        // Define the pages to process (non‑consecutive, 1‑based indexing)
+        // Example: pages 2, 5 and 8
+        int[] pagesToZoom = new int[] { 2, 5, 8 };
 
-        // Common zoom factor (e.g., 150 % = 1.5)
+        // Desired zoom factor (e.g., 150% = 1.5f)
         float zoomFactor = 1.5f;
 
-        // ------------------------------------------------------------
-        // 1. Extract the required pages using the Document API.
-        // ------------------------------------------------------------
-        Document sourceDoc = new Document(inputPath);
-        Document selectedDoc = new Document();
-        foreach (int pageNumber in pagesToSelect)
+        // Use PdfPageEditor from Aspose.Pdf.Facades to apply the zoom
+        using (Aspose.Pdf.Facades.PdfPageEditor editor = new Aspose.Pdf.Facades.PdfPageEditor())
         {
-            // Add a copy of the source page to the new document.
-            selectedDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
+            // Bind the source PDF
+            editor.BindPdf(inputPath);
+
+            // Specify which pages to process
+            editor.ProcessPages = pagesToZoom;
+
+            // Apply the common zoom factor to the selected pages
+            editor.Zoom = zoomFactor;
+
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        // ------------------------------------------------------------
-        // 2. Apply the same zoom to all pages with PdfPageEditor.
-        // ------------------------------------------------------------
-        // Save the selected pages to a memory stream so that PdfPageEditor can bind to it.
-        using (MemoryStream ms = new MemoryStream())
-        {
-            selectedDoc.Save(ms);
-            ms.Position = 0; // reset stream position for reading
-
-            using (PdfPageEditor editor = new PdfPageEditor())
-            {
-                editor.BindPdf(ms);
-                // ProcessPages expects 1‑based page numbers; we want all pages in the temporary PDF.
-                editor.ProcessPages = Enumerable.Range(1, selectedDoc.Pages.Count).ToArray();
-                editor.Zoom = zoomFactor; // Apply the zoom factor
-                editor.Save(outputPath);
-            }
-        }
-
-        Console.WriteLine($"Pages {string.Join(", ", pagesToSelect)} saved to '{outputPath}' with zoom factor {zoomFactor}.");
+        Console.WriteLine($"Zoom applied to pages {string.Join(", ", pagesToZoom)}. Output saved to '{outputPath}'.");
     }
 }

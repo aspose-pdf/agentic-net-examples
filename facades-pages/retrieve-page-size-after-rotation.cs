@@ -6,10 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated.pdf";
-        const int    pageNumber = 1;          // page to rotate (1‑based)
-        const int    rotation   = 90;         // rotation angle in degrees (90, 180, 270)
+        const int pageNumber = 1; // 1‑based page index
+        const Rotation rotation = Rotation.on90; // 90° clockwise rotation
 
         if (!File.Exists(inputPath))
         {
@@ -17,44 +17,26 @@ class Program
             return;
         }
 
-        // Rotate the page using the Document API (PdfPageEditor no longer provides RotatePage)
-        Document pdf = new Document(inputPath);
-        // Map integer rotation to the Rotation enum
-        Rotation aspRotation = rotation switch
+        try
         {
-            90  => Rotation.on90,
-            180 => Rotation.on180,
-            270 => Rotation.on270,
-            _   => Rotation.None
-        };
-        pdf.Pages[pageNumber].Rotate = aspRotation;
-        pdf.Save(outputPath);
-
-        // Load the rotated PDF and retrieve the effective page size
-        using (Document doc = new Document(outputPath))
-        {
-            // Aspose.Pdf uses 1‑based indexing for pages
-            Page page = doc.Pages[pageNumber];
-
-            // Original media box dimensions (points)
-            double width  = page.PageInfo.Width;
-            double height = page.PageInfo.Height;
-
-            // Rotation stored in the page dictionary (0, 90, 180, 270)
-            int pageRotation = (int)page.Rotate;
-
-            // Effective dimensions after rotation: swap width/height for 90° or 270°
-            double effectiveWidth  = width;
-            double effectiveHeight = height;
-            if (pageRotation == 90 || pageRotation == 270)
+            // Load the PDF document
+            using (Document pdf = new Document(inputPath))
             {
-                effectiveWidth  = height;
-                effectiveHeight = width;
-            }
+                // Apply rotation to the specified page
+                pdf.Pages[pageNumber].Rotate = rotation;
 
-            Console.WriteLine($"Page {pageNumber} rotation: {pageRotation}°");
-            Console.WriteLine($"MediaBox size   : {width} x {height}");
-            Console.WriteLine($"Effective size  : {effectiveWidth} x {effectiveHeight}");
+                // Retrieve the page size after rotation
+                PageInfo pageInfo = pdf.Pages[pageNumber].PageInfo;
+                Console.WriteLine($"After rotation (page {pageNumber}): Width = {pageInfo.Width}, Height = {pageInfo.Height}");
+
+                // Save the rotated document (optional)
+                pdf.Save(outputPath);
+                Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

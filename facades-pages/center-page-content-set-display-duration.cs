@@ -16,22 +16,37 @@ class Program
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1️⃣ Align the content of page 5 to the centre and set its display duration to 4 seconds.
-        // ------------------------------------------------------------
-        // PdfPageEditor handles both alignment and display duration. We select page 5 via
-        // the ProcessPages property, then apply the required settings.
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
-            editor.ProcessPages = new int[] { 5 };               // 1‑based page number
-            editor.HorizontalAlignment = HorizontalAlignment.Center;
-            editor.VerticalAlignmentType = VerticalAlignment.Center;
-            editor.DisplayDuration = 4; // seconds
-            editor.ApplyChanges(); // ensure all changes are committed
-            editor.Save(outputPath);
+            // Ensure the document has at least five pages
+            if (doc.Pages.Count < 5)
+            {
+                Console.Error.WriteLine("The document does not contain five pages.");
+                return;
+            }
+
+            // Use PdfPageEditor to set alignment and display duration for page 5
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(doc);
+                // Specify the page(s) to edit – 1‑based indexing
+                editor.ProcessPages = new int[] { 5 };
+
+                // Center the page content horizontally and vertically
+                editor.HorizontalAlignment = HorizontalAlignment.Center;
+                // Use the non‑obsolete property for vertical alignment
+                editor.VerticalAlignmentType = VerticalAlignment.Center;
+
+                // Set the display duration (in seconds) for the selected page
+                editor.DisplayDuration = 4; // integer seconds as required
+
+                // Apply the changes and save the result
+                editor.ApplyChanges();
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Page alignment and display duration updated. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

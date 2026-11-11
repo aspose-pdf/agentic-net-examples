@@ -8,58 +8,47 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_transitions.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        Document pdfDocument = new Document(inputPath);
+
+        // Apply a different transition to each page (Fade, BoxOut, Cover)
+        for (int i = 1; i <= pdfDocument.Pages.Count; i++)
         {
-            // PdfPageEditor works on an existing Document instance
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            int transitionType;
+            switch ((i - 1) % 3)
             {
-                // -----------------------------------------------------------------
-                // Fade transition on page 1 (TransitionType = 0)
-                // -----------------------------------------------------------------
-                if (doc.Pages.Count >= 1)
-                {
-                    editor.ProcessPages = new int[] { 1 };   // 1‑based page number
-                    editor.TransitionType = 0;               // 0 = Fade
-                    editor.TransitionDuration = 2;           // seconds
-                    editor.ApplyChanges();
-                }
+                case 0: // Fade
+                    transitionType = 0; // Fade (integer value defined by Aspose.Pdf)
+                    break;
+                case 1: // BoxOut
+                    transitionType = 1; // BoxOut
+                    break;
+                default: // Cover
+                    transitionType = 4; // Cover (as documented for Aspose.Pdf)
+                    break;
+            }
 
-                // -----------------------------------------------------------------
-                // BoxOut transition on page 2 (TransitionType = 1)
-                // -----------------------------------------------------------------
-                if (doc.Pages.Count >= 2)
-                {
-                    editor.ProcessPages = new int[] { 2 };
-                    editor.TransitionType = 1;               // 1 = BoxOut
-                    editor.TransitionDuration = 2;
-                    editor.ApplyChanges();
-                }
-
-                // -----------------------------------------------------------------
-                // Cover transition on page 3 (TransitionType = 2)
-                // -----------------------------------------------------------------
-                if (doc.Pages.Count >= 3)
-                {
-                    editor.ProcessPages = new int[] { 3 };
-                    editor.TransitionType = 2;               // 2 = Cover
-                    editor.TransitionDuration = 2;
-                    editor.ApplyChanges();
-                }
-
-                // Save the modified PDF
-                editor.Save(outputPath);
+            // Use PdfPageEditor to set the transition for the current page.
+            using (PdfPageEditor editor = new PdfPageEditor(pdfDocument))
+            {
+                editor.ProcessPages = new int[] { i }; // 1‑based page index
+                editor.TransitionType = transitionType;
+                editor.TransitionDuration = 1; // seconds
+                editor.ApplyChanges();
             }
         }
 
-        Console.WriteLine($"PDF saved with transitions to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Transitions applied and saved to '{outputPath}'.");
     }
 }

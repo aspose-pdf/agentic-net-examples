@@ -1,37 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Use PdfPageEditor to set page transition (BoxOut) for page 2
-        using (PdfPageEditor editor = new PdfPageEditor(doc))
+        // Bind the PDF and apply a BoxOut transition (type = 1) with a 3‑second duration to page 2.
+        // The PdfPageEditor uses integer values for TransitionType. In Aspose.Pdf the mapping is:
+        //   0 = BoxIn, 1 = BoxOut, 2 = BlindHorizontal, 3 = BlindVertical, ...
+        // Therefore we set TransitionType = 1 for BoxOut.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            // Specify the page(s) to edit – pages are 1‑based
-            editor.ProcessPages = new int[] { 2 };
-
-            // TransitionType values are integer based in older Aspose.Pdf versions.
-            // BoxOut corresponds to the integer value 4.
-            editor.TransitionType = 4;          // BoxOut transition (zoom‑out effect)
-            editor.TransitionDuration = 3;      // Duration in seconds
-
-            // Apply the changes and save the result
-            editor.ApplyChanges();
+            editor.BindPdf(inputPath);
+            editor.ProcessPages = new int[] { 2 }; // 1‑based page number to which the settings apply
+            editor.TransitionType = 1;            // BoxOut transition
+            editor.TransitionDuration = 3;        // duration in seconds
             editor.Save(outputPath);
         }
 

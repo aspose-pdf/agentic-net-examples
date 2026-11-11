@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_resized.pdf";
+        const string outputPath = "shrinked.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,17 +17,28 @@ class Program
             return;
         }
 
-        // Determine total number of pages using Document (PdfPageEditor no longer exposes page‑count helpers)
-        var document = new Document(inputPath);
-        int pageCount = document.Pages.Count;
-        int[] allPages = Enumerable.Range(1, pageCount).ToArray(); // 1‑based page numbers
+        // Load the PDF document to obtain the total number of pages.
+        Document doc = new Document(inputPath);
+        int pageCount = doc.Pages.Count;
 
-        // Apply a uniform 5 % shrink to the page contents via Zoom
-        var editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
-        editor.ProcessPages = allPages;   // target every page
-        editor.Zoom = 0.95f;               // shrink content by 5 %
-        editor.Save(outputPath);
+        // Prepare an array with all page numbers (1‑based).
+        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
+
+        // Use PdfPageEditor for page‑level modifications.
+        using (PdfPageEditor editor = new PdfPageEditor())
+        {
+            editor.BindPdf(inputPath);
+
+            // Apply the operation to every page.
+            editor.ProcessPages = allPages;
+
+            // Shrink page contents uniformly by 5 % on each side (overall 90 % scale).
+            // The Zoom property expects a float where 1.0 = 100 %.
+            editor.Zoom = 0.90f; // 5 % margin on each side → 90 % of original size.
+
+            // Save the modified PDF.
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }

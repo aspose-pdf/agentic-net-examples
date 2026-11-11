@@ -14,13 +14,12 @@ class Program
             return;
         }
 
-        // Load the PDF with the Facade class
-        PdfPageEditor pageEditor = new PdfPageEditor();
-        pageEditor.BindPdf(pdfPath);
+        // PdfPageEditor provides GetPageRotation (page numbers are 1‑based)
+        PdfPageEditor editor = new PdfPageEditor();
+        editor.BindPdf(pdfPath);
 
-        // Aspose.Pdf uses 1‑based page indexing
         int pageNumber = 4;
-        int rotationAngle = pageEditor.GetPageRotation(pageNumber);
+        int rotationAngle = editor.GetPageRotation(pageNumber);
 
         Console.WriteLine($"Page {pageNumber} rotation angle: {rotationAngle} degrees");
     }
