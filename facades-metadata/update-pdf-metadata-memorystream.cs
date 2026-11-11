@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_modified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,22 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF into a memory stream
+        // Read the source PDF into a memory stream
         byte[] pdfBytes = File.ReadAllBytes(inputPath);
-        using (MemoryStream inputStream = new MemoryStream(pdfBytes))
+        using (MemoryStream ms = new MemoryStream(pdfBytes))
         {
-            // Bind the stream to PdfFileInfo for metadata manipulation
-            PdfFileInfo pdfInfo = new PdfFileInfo();
-            pdfInfo.BindPdf(inputStream);
+            // Bind the PDF from the memory stream to PdfFileInfo
+            using (PdfFileInfo pdfInfo = new PdfFileInfo())
+            {
+                pdfInfo.BindPdf(ms);
 
-            // Modify metadata fields
-            pdfInfo.Title = "Updated Title";
-            pdfInfo.Author = "John Doe";
-            pdfInfo.Subject = "Sample Subject";
-            pdfInfo.Keywords = "Aspose, PDF, Metadata";
+                // Modify metadata
+                pdfInfo.Title  = "New Document Title";
+                pdfInfo.Author = "John Doe";
+                pdfInfo.Subject = "Updated metadata via PdfFileInfo";
+                pdfInfo.Keywords = "Aspose.Pdf, Metadata, MemoryStream";
 
-            // Save the updated PDF to a new file
-            pdfInfo.Save(outputPath);
+                // Save the modified PDF to a new file
+                pdfInfo.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");

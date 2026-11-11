@@ -1,30 +1,32 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Document, DocumentInfo reside in this namespace
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        // Verify the input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document. The Document class implements IDisposable, so we wrap it in a using block.
-        using (Document pdfDocument = new Document(pdfPath))
+        // Load PDF file information using the Facades API (optional, kept for other info)
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+
+        // Retrieve the PDF version using the Document class, which exposes the Version property
+        string pdfVersion;
+        using (Document doc = new Document(inputPath))
         {
-            // DocumentInfo can be created from a Document instance (not directly from a file path).
-            DocumentInfo fileInfo = new DocumentInfo(pdfDocument);
-
-            // The PDF version is exposed by the Document.Version property (not by DocumentInfo).
-            string pdfVersion = pdfDocument.Version;
-
-            Console.WriteLine($"PDF version: {pdfVersion}");
-            // The pdfVersion variable can now be used elsewhere in the program.
+            pdfVersion = doc.Version; // e.g., "1.7"
         }
+
+        // Example usage of the stored version
+        Console.WriteLine($"PDF version: {pdfVersion}");
     }
 }

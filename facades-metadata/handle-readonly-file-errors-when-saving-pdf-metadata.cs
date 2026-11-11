@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
+        const string pdfPath = "document.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -14,45 +14,71 @@ class Program
             return;
         }
 
-        // Load PDF file information using Facades API
+        // Load PDF file information via Facades API
         PdfFileInfo info = new PdfFileInfo(pdfPath);
 
-        // Example modification: update the document title
-        info.Title = "Updated Title";
+        // Example modification: set a new title
+        info.Title = "Updated Document Title";
 
-        // Attempt to save the new information; handle read‑only attribute issues
+        // Save the updated information to a temporary file first
+        string tempPath = Path.Combine(Path.GetDirectoryName(pdfPath) ?? ".", Guid.NewGuid() + ".pdf");
+
         try
         {
-            // SaveNewInfo requires the output file path (can be the same file to overwrite)
-            info.SaveNewInfo(pdfPath);
-            Console.WriteLine("Metadata saved successfully.");
+            info.SaveNewInfo(tempPath); // <-- correct overload requires an output path
+            ReplaceOriginal(pdfPath, tempPath);
+            Console.WriteLine("PDF information saved successfully.");
         }
-        catch (IOException _ ) when (IsReadOnlyAttributeIssue(pdfPath))
+        catch (IOException ioEx)
         {
-            // Clear the read‑only attribute
-            FileInfo fi = new FileInfo(pdfPath);
-            fi.IsReadOnly = false;
+            // Check if the failure is due to a read‑only attribute
+            FileAttributes attrs = File.GetAttributes(pdfPath);
+            if ((attrs & FileAttributes.ReadOnly) != 0)
+            {
+                Console.WriteLine("File is read‑only. Removing read‑only attribute and retrying...");
 
-            // Retry saving after attribute change
-            try
-            {
-                info.SaveNewInfo(pdfPath);
-                Console.WriteLine("Metadata saved after clearing read‑only attribute.");
+                // Remove the read‑only flag
+                File.SetAttributes(pdfPath, attrs & ~FileAttributes.ReadOnly);
+
+                // Retry saving the information
+                try
+                {
+                    info.SaveNewInfo(tempPath);
+                    ReplaceOriginal(pdfPath, tempPath);
+                    Console.WriteLine("PDF information saved after clearing read‑only attribute.");
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Retry failed: {ex.Message}");
+                }
             }
-            catch (Exception retryEx)
+            else
             {
-                Console.Error.WriteLine($"Retry failed: {retryEx.Message}");
+                // Not a read‑only issue; report the IO error
+                Console.Error.WriteLine($"IO error: {ioEx.Message}");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error saving metadata: {ex.Message}");
+            // General exception handling
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    // Determines whether the IOException is likely caused by a read‑only file attribute
-    static bool IsReadOnlyAttributeIssue(string path)
+    /// <summary>
+    /// Replaces the original PDF with the newly saved file and cleans up the temporary file.
+    /// </summary>
+    private static void ReplaceOriginal(string originalPath, string tempPath)
     {
-        return (File.GetAttributes(path) & FileAttributes.ReadOnly) == FileAttributes.ReadOnly;
+        // Ensure the original file can be overwritten (it may still be read‑only after the previous step)
+        FileAttributes originalAttrs = File.GetAttributes(originalPath);
+        if ((originalAttrs & FileAttributes.ReadOnly) != 0)
+        {
+            File.SetAttributes(originalPath, originalAttrs & ~FileAttributes.ReadOnly);
+        }
+
+        // Overwrite the original file with the temporary one
+        File.Copy(tempPath, originalPath, overwrite: true);
+        File.Delete(tempPath);
     }
 }

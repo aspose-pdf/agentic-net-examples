@@ -15,24 +15,16 @@ class Program
             return;
         }
 
-        try
-        {
-            // Load the PDF using the Facades API (no full Document load required)
-            PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+        // Load the PDF using the Facades API
+        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
 
-            // Set a custom metadata field "LastUpdated" with the current UTC timestamp
-            string utcNow = DateTime.UtcNow.ToString("o"); // ISO 8601 format
-            pdfInfo.SetMetaInfo("LastUpdated", utcNow);
+        // Set custom metadata field "LastUpdated" to the current UTC time (ISO 8601 format)
+        string utcNow = DateTime.UtcNow.ToString("o");
+        pdfInfo.SetMetaInfo("LastUpdated", utcNow);
 
-            // Save the updated PDF to a new file
-            pdfInfo.Save(outputPath);
+        // Save the PDF with the updated metadata
+        pdfInfo.Save(outputPath);
 
-            Console.WriteLine($"Metadata updated. 'LastUpdated' = {utcNow}");
-            Console.WriteLine($"Saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Metadata updated. LastUpdated = {utcNow}");
     }
 }

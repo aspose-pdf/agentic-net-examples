@@ -16,21 +16,24 @@ class Program
             return;
         }
 
-        // Load PDF metadata using the Facade class PdfFileInfo
+        // PdfFileInfo implements IDisposable – wrap it in a using block.
         using (PdfFileInfo info = new PdfFileInfo(inputPath))
         {
-            // Update Author only if it is empty or whitespace
-            if (string.IsNullOrWhiteSpace(info.Author))
+            // Retrieve the current Author metadata.
+            string currentAuthor = info.Author;
+
+            // Update only if the Author field is empty or whitespace.
+            if (string.IsNullOrWhiteSpace(currentAuthor))
             {
                 info.Author = newAuthor;
-                // Save the modified metadata to a new file
+                // Save the modified PDF to a new file.
                 info.Save(outputPath);
-                Console.WriteLine($"Author set to '{newAuthor}' and saved to '{outputPath}'.");
+                Console.WriteLine($"Author set to '{newAuthor}' and saved as '{outputPath}'.");
             }
             else
             {
-                Console.WriteLine($"Existing Author: '{info.Author}'. No changes made.");
-                // Preserve the original file if no update is needed
+                Console.WriteLine($"Existing Author: '{currentAuthor}'. No update performed.");
+                // Optionally copy the original file to the output location.
                 File.Copy(inputPath, outputPath, true);
             }
         }

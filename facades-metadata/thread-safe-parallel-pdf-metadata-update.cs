@@ -1,46 +1,74 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Define a collection of PDFs to process.
-        // Each tuple contains: input path, output path, and a new title to set.
-        var files = new List<(string InputPath, string OutputPath, string NewTitle)>
-        {
-            ("doc1.pdf", "doc1_out.pdf", "Document One"),
-            ("doc2.pdf", "doc2_out.pdf", "Document Two"),
-            ("doc3.pdf", "doc3_out.pdf", "Document Three")
-        };
+        // Input PDF files to be processed concurrently
+        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        string outputDir = "Processed";
+        Directory.CreateDirectory(outputDir);
 
-        // Process the PDFs in parallel. Each iteration runs on its own thread.
-        Parallel.ForEach(files, fileInfo =>
+        // Parallel processing – each thread works on its own PDF file
+        Parallel.ForEach(inputFiles, inputPath =>
         {
-            // Verify that the source file exists before attempting to modify it.
-            if (!File.Exists(fileInfo.InputPath))
+            if (!File.Exists(inputPath))
             {
-                Console.Error.WriteLine($"Source file not found: {fileInfo.InputPath}");
+                Console.Error.WriteLine($"File not found: {inputPath}");
                 return;
             }
 
-            // Create a separate PdfFileInfo instance for this thread.
-            // No shared mutable state is used, guaranteeing thread‑safe operation.
-            PdfFileInfo pdfInfo = new PdfFileInfo();
+            // Load the PDF in a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Thread‑local access to PdfFileInfo (no shared state)
+                PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
 
-            // Bind the PDF file to the PdfFileInfo object.
-            pdfInfo.BindPdf(fileInfo.InputPath);
+                // Example: read existing title and log it (thread‑safe console output)
+                lock (Console.Out)
+                {
+                    Console.WriteLine($"Thread {Task.CurrentId}: Original Title = '{fileInfo.Title}'");
+                }
 
-            // Modify metadata – here we set a new Title.
-            pdfInfo.Title = fileInfo.NewTitle;
+                // Update the title metadata via the Document (this will be saved later)
+                doc.Info.Title = Path.GetFileNameWithoutExtension(inputPath) + " – Processed";
 
-            // Save the modified PDF to the designated output path.
-            pdfInfo.Save(fileInfo.OutputPath);
+                // Add a simple text stamp to each page
+                TextStamp stamp = new TextStamp("Processed");
+                stamp.HorizontalAlignment = HorizontalAlignment.Center;
+                stamp.VerticalAlignment   = VerticalAlignment.Center;
+                // Configure the TextState (read‑only property, modify its members directly)
+                stamp.TextState.FontSize = 24;
+                stamp.TextState.FontStyle = FontStyles.Bold;
+                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0, 0, 1); // Blue
 
-            Console.WriteLine($"Processed: {fileInfo.InputPath} → {fileInfo.OutputPath}");
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(stamp);
+                }
+
+                // Save the modified PDF to a new file
+                string outPath = Path.Combine(outputDir, Path.GetFileName(inputPath));
+                doc.Save(outPath);
+
+                // Re‑load PdfFileInfo for the newly saved file to verify the title
+                PdfFileInfo updatedInfo = new PdfFileInfo(outPath);
+                lock (Console.Out)
+                {
+                    Console.WriteLine($"Thread {Task.CurrentId}: Updated Title = '{updatedInfo.Title}'");
+                }
+            }
+
+            // Optional: additional thread‑safe logging
+            lock (Console.Out)
+            {
+                Console.WriteLine($"Thread {Task.CurrentId}: Finished processing {inputPath}");
+            }
         });
     }
 }
