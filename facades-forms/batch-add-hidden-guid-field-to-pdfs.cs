@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
@@ -16,32 +17,35 @@ class Program
         }
 
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
         foreach (string pdfPath in pdfFiles)
         {
             try
             {
                 // Load the PDF document
-                using (Document doc = new Document(pdfPath))
+                Document doc = new Document(pdfPath);
+
+                // Ensure the document has at least one page
+                if (doc.Pages.Count == 0)
+                    doc.Pages.Add();
+
+                // Create a hidden text field named "ProcessedDate" on the first page
+                // Use a zero‑size rectangle so the field is invisible
+                Page page = doc.Pages[1];
+                var hiddenField = new TextBoxField(page, new Rectangle(0, 0, 0, 0))
                 {
-                    // Generate a new GUID for this document
-                    string guid = Guid.NewGuid().ToString();
+                    PartialName = "ProcessedDate",
+                    Flags = AnnotationFlags.Hidden // hide the field
+                };
 
-                    // Create a hidden text field named "ProcessedDate" on page 1.
-                    // The rectangle is zero‑size so the field is not visible.
-                    var rect = new Rectangle(0, 0, 0, 0);
-                    var txtField = new TextBoxField(doc.Pages[1], rect)
-                    {
-                        PartialName = "ProcessedDate",
-                        Value = guid
-                    };
-                    // No need to set a FieldFlag; the zero‑size rectangle already hides the field.
+                // Add the field to the form (page index is 1‑based)
+                doc.Form.Add(hiddenField, 1);
 
-                    // Add the field to the form on page 1.
-                    doc.Form.Add(txtField, 1);
+                // Fill the hidden field with a generated GUID
+                hiddenField.Value = Guid.NewGuid().ToString();
 
-                    // Overwrite the original PDF with the updated version.
-                    doc.Save(pdfPath);
-                }
+                // Save the modified PDF back to the same path
+                doc.Save(pdfPath);
 
                 Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }

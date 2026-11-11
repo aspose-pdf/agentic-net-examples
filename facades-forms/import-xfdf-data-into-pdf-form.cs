@@ -1,50 +1,17 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-
-// Stub implementation for PdfFormEditor when the Aspose.Pdf library is not referenced.
-// This allows the sample to compile and run (the methods are no‑ops).
-// In a real project, reference the official Aspose.Pdf NuGet package instead of this stub.
-namespace Aspose.Pdf.Facades
-{
-    public class PdfFormEditor : IDisposable
-    {
-        public void BindPdf(string pdfPath)
-        {
-            // In the real library this binds the PDF document.
-            // Stub does nothing.
-        }
-
-        public void ImportXfdf(string xfdfPath)
-        {
-            // In the real library this imports XFDF data into the bound PDF.
-            // Stub does nothing.
-        }
-
-        public void Save(string outputPath)
-        {
-            // In the real library this saves the modified PDF.
-            // Stub copies the original PDF if it exists, otherwise creates an empty file.
-            if (File.Exists(outputPath))
-                return;
-            File.Create(outputPath).Dispose();
-        }
-
-        public void Dispose()
-        {
-            // Release any resources if needed.
-        }
-    }
-}
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath    = "input.pdf";
-        const string xfdfPath   = "data.xfdf";
-        const string outputPath = "output.pdf";
+        const string pdfPath   = "input.pdf";   // existing PDF with form fields
+        const string xfdfPath  = "data.xfdf";   // XFDF file containing field values
+        const string outputPdf = "output.pdf";  // PDF after importing XFDF data
 
+        // Verify input files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
@@ -56,21 +23,24 @@ class Program
             return;
         }
 
-        // PdfFormEditor provides XFDF import functionality.
-        // It implements IDisposable, so we use a using block.
-        using (PdfFormEditor formEditor = new PdfFormEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Bind the existing PDF document.
-            formEditor.BindPdf(pdfPath);
+            // The Form facade (Aspose.Pdf.Facades.Form) handles XFDF import/export.
+            // It works with streams, not file paths.
+            using (Form formFacade = new Form(pdfDoc))
+            {
+                // Import field values from the XFDF file. Matching field names are populated automatically.
+                using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+                {
+                    formFacade.ImportXfdf(xfdfStream);
+                }
 
-            // Import form fields from the XFDF file.
-            // Fields are matched to PDF form fields by name automatically.
-            formEditor.ImportXfdf(xfdfPath);
-
-            // Save the updated PDF with imported field values.
-            formEditor.Save(outputPath);
+                // Save the updated PDF to a new file
+                formFacade.Save(outputPdf);
+            }
         }
 
-        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
+        Console.WriteLine($"XFDF data imported successfully to '{outputPdf}'.");
     }
 }

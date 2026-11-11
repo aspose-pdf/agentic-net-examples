@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // JavascriptAction
-using Aspose.Pdf.Forms;      // ButtonField
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,38 +16,26 @@ class Program
             return;
         }
 
-        // JavaScript that resets the form and clears hidden fields
+        // JavaScript that resets the form and clears all hidden fields
         string js = @"
 this.resetForm();
-for (var i = 0; i < this.numFields; i++) {
+var n = this.numFields;
+for (var i = 0; i < n; i++) {
     var f = this.getField(this.getFieldName(i));
-    if (f.display == display.hidden) {
+    if (f && f.type == 'hidden') {
         f.value = '';
     }
-}";
+}
+";
 
-        // Load the PDF document (deterministic disposal)
-        using (Document doc = new Document(inputPath))
+        // Attach the script to the button named "ResetForm" using FormEditor (Facades API)
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Attach JavaScript to the button field named "ResetForm"
-            if (doc.Form != null && doc.Form["ResetForm"] != null)
-            {
-                var resetButton = (ButtonField)doc.Form["ResetForm"];
-                // Use the button's mouse‑press action to execute the script (OnPressMouseBtn is a valid property)
-                resetButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
-            }
-            else
-            {
-                Console.Error.WriteLine("Button field 'ResetForm' not found.");
-            }
-
-            // Add a document‑level script that runs when the PDF is opened
-            doc.OpenAction = new JavascriptAction(js);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            formEditor.BindPdf(inputPath);                     // Load the PDF
+            formEditor.AddFieldScript("ResetForm", js);       // Set button‑level JavaScript
+            formEditor.Save(outputPath);                       // Save the modified PDF
         }
 
-        Console.WriteLine($"PDF saved with JavaScript attached to 'ResetForm' at '{outputPath}'.");
+        Console.WriteLine($"JavaScript attached and saved to '{outputPath}'.");
     }
 }

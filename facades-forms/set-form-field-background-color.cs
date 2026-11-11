@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Annotations; // Required for AnnotationFlags
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,21 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // FormEditor works with form fields in the document
-            FormEditor formEditor = new FormEditor(doc);
+        // Load the PDF using the Facades API
+        FormEditor formEditor = new FormEditor();
+        formEditor.BindPdf(inputPath);
 
-            // Set the appearance of the field named "Status".
-            // The available overload takes the field name and an AnnotationFlags value.
-            // Here we use AnnotationFlags.Print to ensure the field is printed.
-            formEditor.SetFieldAppearance("Status", AnnotationFlags.Print);
+        // Set the appearance of the field named "Status".
+        // The SetFieldAppearance method in Aspose.Pdf.Facades only supports a two‑argument overload:
+        //   SetFieldAppearance(string fieldName, AnnotationFlags flags)
+        // Here we use the Print flag as an example. Background color cannot be set via this overload.
+        formEditor.SetFieldAppearance("Status", AnnotationFlags.Print);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+        // Save the modified PDF
+        formEditor.Save(outputPath);
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Field 'Status' appearance updated. Saved to '{outputPath}'.");
     }
 }

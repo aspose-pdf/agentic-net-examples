@@ -7,42 +7,35 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";
-        const string formDataXmlPath = "formdata.xml";
-        const string outputPdfPath  = "output.pdf";
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "formdata.xml";
+        const string outputPath = "output.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(formDataXmlPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Form data XML not found: {formDataXmlPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        try
+        // Load the PDF document and bind it to the Form facade.
+        using (Document doc = new Document(pdfPath))
+        using (Form form = new Form(doc))
+        using (FileStream xmlStream = File.OpenRead(xmlPath))
         {
-            // Use the Form facade to import XML data into the PDF form.
-            // The Form facade preserves the original field order defined in the PDF.
-            using (Form pdfForm = new Form(inputPdfPath, outputPdfPath))
-            {
-                using (FileStream xmlStream = new FileStream(formDataXmlPath, FileMode.Open, FileAccess.Read))
-                {
-                    pdfForm.ImportXml(xmlStream);
-                }
-                // Save the updated PDF. The Save call writes to the output path supplied in the constructor.
-                pdfForm.Save();
-            }
+            // Import form field values from the XML file.
+            // The Form facade does not expose a PreserveOriginalFieldOrder property;
+            // importing via ImportXml keeps the original field order automatically.
+            form.ImportXml(xmlStream);
 
-            Console.WriteLine($"Form fields imported and saved to '{outputPdfPath}'.");
+            // Save the updated PDF.
+            form.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form fields imported and saved to '{outputPath}'.");
     }
 }

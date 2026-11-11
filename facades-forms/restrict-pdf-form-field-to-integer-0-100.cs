@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Required for JavascriptAction
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // PDF containing the "Score" field
-        const string outputPath = "output.pdf"; // PDF after applying validation
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,27 +16,34 @@ class Program
             return;
         }
 
-        // Load the PDF document using the core Document class
-        Document pdfDocument = new Document(inputPath);
-
-        // Retrieve the field named "Score" and cast to TextBoxField
-        TextBoxField scoreField = pdfDocument.Form["Score"] as TextBoxField;
-        if (scoreField == null)
+        // Use FormEditor (Facades) to modify the form field
+        using (FormEditor formEditor = new FormEditor())
         {
-            Console.Error.WriteLine("Field \"Score\" not found or is not a text box.");
-            return;
+            // Load the PDF document
+            formEditor.BindPdf(inputPath);
+
+            // JavaScript that validates the field "Score" to be an integer between 0 and 100
+            string validationJs = @"
+if (event.value) {
+    var val = parseInt(event.value);
+    if (isNaN(val) || val < 0 || val > 100) {
+        app.alert('Score must be an integer between 0 and 100.');
+        event.rc = false; // reject the entered value
+    } else {
+        event.value = val.toString(); // ensure stored as integer string
+    }
+}";
+
+            // Attach the validation script to the field's Validate action using SetFieldScript
+            formEditor.SetFieldScript("Score", validationJs);
+
+            // Limit the field length to three characters (max 100) using SetFieldLimit
+            formEditor.SetFieldLimit("Score", 3);
+
+            // Save the modified PDF
+            formEditor.Save(outputPath);
         }
 
-        // JavaScript validation to allow only integer values between 0 and 100
-        string js = @"if (event.value < 0 || event.value > 100) {
-    app.alert('Please enter a score between 0 and 100.');
-    event.rc = false;
-}";
-        scoreField.Actions.OnValidate = new JavascriptAction(js);
-
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"Validation applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with validated 'Score' field saved to '{outputPath}'.");
     }
 }

@@ -1,66 +1,60 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for System.Drawing.Color
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // needed for FieldType enum
 
 class Program
 {
     static void Main()
     {
-        // Directory containing the PDF files to process
-        const string inputDirectory = @"C:\PdfFolder";
-        // Optional: output directory (can be same as input for in‑place update)
-        const string outputDirectory = @"C:\PdfFolder\Processed";
+        // Directory containing source PDFs
+        const string sourceDir = @"C:\PdfSource";
+        // Directory where decorated PDFs will be saved
+        const string outputDir = @"C:\PdfDecorated";
 
-        if (!Directory.Exists(inputDirectory))
+        if (!Directory.Exists(sourceDir))
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDirectory}");
+            Console.Error.WriteLine($"Source directory not found: {sourceDir}");
             return;
         }
 
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputDir);
 
-        // Enumerate all PDF files in the directory
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the source directory
+        foreach (string pdfPath in Directory.GetFiles(sourceDir, "*.pdf"))
         {
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputDir, fileName);
+
             try
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
+                // Load the PDF document via FormEditor (required for field decoration)
+                using (FormEditor editor = new FormEditor())
                 {
-                    // Bind the document to the FormEditor facade
-                    using (FormEditor editor = new FormEditor())
-                    {
-                        editor.BindPdf(doc);
+                    // Bind the source PDF
+                    editor.BindPdf(pdfPath);
 
-                        // ----- Consistent decoration for checkbox fields -----
-                        // The appearance is configured on the editor's Facade (FormFieldFacade)
-                        editor.Facade.BorderColor = System.Drawing.Color.Blue;               // fully qualified
-                        editor.Facade.BackgroundColor = System.Drawing.Color.LightGray;      // fully qualified
-                        // Optional: set border width and style for a clearer look
-                        editor.Facade.BorderWidth = FormFieldFacade.BorderWidthThin; // float constant
-                        editor.Facade.BorderStyle = FormFieldFacade.BorderStyleSolid; // int constant
+                    // Configure a consistent appearance for checkbox fields
+                    // Fully qualify System.Drawing.Color to avoid ambiguity with Aspose.Pdf.Color
+                    editor.Facade.BorderColor = System.Drawing.Color.Blue;
+                    editor.Facade.BackgroundColor = System.Drawing.Color.LightGray;
+                    editor.Facade.BorderWidth = FormFieldFacade.BorderWidthThin; // float constant (1 point)
+                    editor.Facade.BorderStyle = FormFieldFacade.BorderStyleSolid; // int constant
 
-                        // Apply the decoration to every checkbox field in the document
-                        editor.DecorateField(FieldType.CheckBox);
+                    // Apply the decoration to every checkbox field in the document
+                    editor.DecorateField(FieldType.CheckBox);
 
-                        // Save the modified PDF to the output location
-                        string outputPath = Path.Combine(outputDirectory, Path.GetFileName(pdfPath));
-                        editor.Save(outputPath);
-                    }
+                    // Save the decorated PDF to the output location
+                    editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                Console.WriteLine($"Decorated PDF saved: {outputPath}");
             }
             catch (Exception ex)
             {
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("All PDFs have been processed.");
     }
 }

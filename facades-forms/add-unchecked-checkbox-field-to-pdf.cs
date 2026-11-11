@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Facades; // included as requested
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,42 +16,24 @@ class Program
             return;
         }
 
-        try
+        // Use FormEditor (Facades API) to modify the form structure
+        using (FormEditor editor = new FormEditor())
         {
-            // Wrap Document in a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Ensure the document has at least two pages (Aspose.Pdf uses 1‑based indexing)
-                if (doc.Pages.Count < 2)
-                {
-                    Console.Error.WriteLine("The PDF has fewer than 2 pages.");
-                    return;
-                }
+            editor.BindPdf(inputPath);
 
-                // Get page 2
-                Page page2 = doc.Pages[2];
+            // Rectangle coordinates for the checkbox (llx, lly, urx, ury)
+            float llx = 100F;
+            float lly = 500F;
+            float urx = 120F;
+            float ury = 520F;
 
-                // Define the rectangle where the checkbox will appear
-                // (lower‑left X,Y, upper‑right X,Y) – fully qualified type to avoid ambiguity
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+            // Add an unchecked checkbox field named "AgreeTerms" on page 2
+            // FormEditor does not have AddCheckBoxField; the correct method is AddField
+            editor.AddField(FieldType.CheckBox, "AgreeTerms", 2, llx, lly, urx, ury);
 
-                // Create the checkbox field (class name is CheckboxField, not CheckBoxField)
-                CheckboxField checkBox = new CheckboxField(page2, rect);
-                checkBox.PartialName = "AgreeTerms";
-                checkBox.Checked = false; // default unchecked state
-
-                // Add the field to the document's form collection
-                doc.Form.Add(checkBox);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Checkbox field 'AgreeTerms' added on page 2. Saved to '{outputPath}'.");
+            editor.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Checkbox field added and saved to '{outputPath}'.");
     }
 }

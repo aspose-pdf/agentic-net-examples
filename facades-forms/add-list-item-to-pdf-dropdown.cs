@@ -6,8 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName = "Choices";
+        const string newItem = "Option A";
 
         if (!File.Exists(inputPath))
         {
@@ -15,20 +17,22 @@ class Program
             return;
         }
 
-        // Use FormEditor (Aspose.Pdf.Facades) to modify form fields.
-        using (FormEditor editor = new FormEditor())
+        // FormEditor is the correct facade class for editing form fields.
+        // It implements IDisposable, so we use a using block.
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Load the existing PDF.
-            editor.BindPdf(inputPath);
+            // Bind the existing PDF document.
+            formEditor.BindPdf(inputPath);
 
-            // Add a new list item "Option A" to the dropdown field named "Choices".
-            // The AddListItem overload accepts only the field name and the item value.
-            editor.AddListItem("Choices", "Option A");
+            // Add a new list item to the dropdown (combo box) field.
+            // The field is identified by its name ("Choices").
+            // The method works regardless of the page the field resides on.
+            formEditor.AddListItem(fieldName, newItem);
 
-            // Save the updated PDF.
-            editor.Save(outputPath);
+            // Save the modified PDF.
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Dropdown field updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Added \"{newItem}\" to dropdown \"{fieldName}\" on page 4 and saved to '{outputPath}'.");
     }
 }
