@@ -1,44 +1,35 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the edited output PDF
-        const string inputPath  = "source.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "edited.pdf";
 
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document using the Document class (the core API)
-            Document pdfDocument = new Document(inputPath);
+        // PdfPageEditor does not implement IDisposable, so we instantiate it directly.
+        PdfPageEditor pageEditor = new PdfPageEditor();
 
-            // 1. Delete the first page (if the document has at least one page)
-            if (pdfDocument.Pages.Count >= 1)
-                pdfDocument.Pages.Delete(1);
+        // Load the source PDF.
+        pageEditor.BindPdf(inputPath);
 
-            // 2. Rotate the (new) second page 90 degrees clockwise (if it exists)
-            //    After a possible deletion, the page index is still 1‑based.
-            if (pdfDocument.Pages.Count >= 2)
-                pdfDocument.Pages[2].Rotate = Rotation.on90; // clockwise 90°
+        // Specify which pages to process (1‑based indexing). Here we rotate only the first page.
+        pageEditor.ProcessPages = new int[] { 1 };
 
-            // Save the modified PDF to a new file
-            pdfDocument.Save(outputPath);
+        // Set the rotation in degrees (valid values: 0, 90, 180, 270).
+        pageEditor.Rotation = 90;
 
-            Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-        }
+        // Save the edited PDF to a new file.
+        pageEditor.Save(outputPath);
+
+        Console.WriteLine($"Edited PDF saved to '{outputPath}'.");
     }
 }

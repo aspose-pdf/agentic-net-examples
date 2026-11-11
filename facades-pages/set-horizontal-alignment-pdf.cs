@@ -1,41 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Set horizontal alignment pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.10.0/facades-pages/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "aligned.pdf";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Facade for page‑level operations
-            using (PdfPageEditor pageEditor = new PdfPageEditor())
-            {
-                // Bind the document to the editor
-                pageEditor.BindPdf(doc);
-
-                // Specify the page(s) to edit (1‑based indexing)
-                pageEditor.ProcessPages = new int[] { 1 };
-
-                // Set horizontal alignment – choose Left, Center, or Right
-                pageEditor.HorizontalAlignment = HorizontalAlignment.Center;
-
-                // Save the modified PDF
-                pageEditor.Save(outputPath);
-            }
-        }
-
-        Console.WriteLine($"Alignment applied and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

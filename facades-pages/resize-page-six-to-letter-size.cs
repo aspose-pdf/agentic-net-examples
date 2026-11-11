@@ -9,29 +9,29 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
+        // Load the PDF document.
+        var document = new Document(inputPath);
 
-        // Ensure the document has at least six pages
-        if (pdfDoc.Pages.Count < 6)
+        // Verify that page 6 exists.
+        if (document.Pages.Count < 6)
         {
-            Console.Error.WriteLine("The PDF contains fewer than 6 pages.");
+            Console.Error.WriteLine("The document has fewer than 6 pages.");
             return;
         }
 
-        // Letter size in points (1 inch = 72 points): 8.5" x 11" => 612 x 792
-        pdfDoc.Pages[6].SetPageSize(612, 792);
+        // Letter size in points (8.5" x 11" = 612 x 792 points).
+        // Set the size of page 6.
+        document.Pages[6].SetPageSize(612, 792);
 
-        // Save the modified PDF
-        pdfDoc.Save(outputPath);
+        // Save the modified PDF.
+        document.Save(outputPath);
 
-        Console.WriteLine($"Page 6 resized to Letter and saved as '{outputPath}'.");
+        Console.WriteLine($"Page 6 resized to Letter and saved to '{outputPath}'.");
     }
 }

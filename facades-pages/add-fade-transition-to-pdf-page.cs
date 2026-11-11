@@ -16,18 +16,25 @@ class Program
             return;
         }
 
-        // Load the PDF, apply a Fade transition of 2 seconds to the first page, and save.
-        Document doc = new Document(inputPath);
-        // Use PdfPageEditor to set page transitions (Transition property is not available on Page in recent versions).
-        using (PdfPageEditor editor = new PdfPageEditor(doc))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Target the first page (1‑based index).
-            editor.ProcessPages = new int[] { 1 };
-            // TransitionType uses integer values; 5 corresponds to the Fade (Dissolve) transition in the current Aspose.Pdf version.
-            editor.TransitionType = 5; // Fade transition
-            editor.TransitionDuration = 2; // 2 seconds
-            editor.ApplyChanges();
-            editor.Save(outputPath);
+            // PdfPageEditor is used to modify page‑level presentation settings
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(doc);
+
+                // Target page 1 (1‑based indexing)
+                editor.ProcessPages = new int[] { 1 };
+
+                // Fade transition – the property expects an integer value.
+                // In the Aspose.Pdf versions that expose this API, 2 corresponds to Fade.
+                editor.TransitionType = 2;          // Fade
+                editor.TransitionDuration = 2;      // duration in seconds
+
+                // Persist the changes
+                editor.Save(outputPath);
+            }
         }
 
         Console.WriteLine($"Transition applied and saved to '{outputPath}'.");

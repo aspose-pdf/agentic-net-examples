@@ -8,35 +8,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "resized_output.pdf";
 
-        // Verify the source PDF exists.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Prepare an array with all page numbers.
-            int[] pages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+            // Load the PDF document
+            using (var doc = new Document(inputPath))
+            {
+                // Prepare an array with all page numbers (1‑based)
+                int[] pages = Enumerable.Range(1, doc.Pages.Count).ToArray();
 
-            // Calculate a 10% margin based on the first page width (same margin for all sides).
-            double margin = doc.Pages[1].PageInfo.Width * 0.10;
+                // Create resize parameters with a 10% margin on each side (default behavior)
+                var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(0.1, 0.1, 0.1, 0.1);
 
-            // Create resize parameters with the calculated margin.
-            var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(margin, margin, margin, margin);
+                // Resize the contents of the selected pages
+                new PdfFileEditor().ResizeContents(doc, pages, resizeParams);
 
-            // Perform the resize operation.
-            new PdfFileEditor().ResizeContents(doc, pages, resizeParams);
+                // Save the modified document
+                doc.Save(outputPath);
+            }
 
-            // Save the modified document.
-            doc.Save(outputPath);
+            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

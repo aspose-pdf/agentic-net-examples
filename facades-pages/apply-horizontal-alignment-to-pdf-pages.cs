@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text; // Added to resolve TextFragment and HorizontalAlignment
 
 class Program
 {
@@ -17,34 +17,25 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor inside a using block for deterministic disposal
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Determine the total number of pages in the document.
+        int pageCount;
+        using (var doc = new Document(inputPath))
         {
-            // Bind the existing PDF file
-            editor.BindPdf(inputPath);
-
-            // The bound document can be accessed via the Document property
-            using (Document doc = editor.Document)
-            {
-                // Pages are 1‑based; set each page's text fragments to left alignment
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    Page page = doc.Pages[i];
-                    foreach (var paragraph in page.Paragraphs)
-                    {
-                        // Only TextFragment (and derived types) expose HorizontalAlignment
-                        if (paragraph is TextFragment tf)
-                        {
-                            tf.HorizontalAlignment = HorizontalAlignment.Left;
-                        }
-                    }
-                }
-
-                // Save the modified document through the facade
-                editor.Save(outputPath);
-            }
+            pageCount = doc.Pages.Count;
         }
 
-        Console.WriteLine($"All pages left‑justified and saved to '{outputPath}'.");
+        // Create a 1‑based array that contains every page number.
+        int[] allPages = Enumerable.Range(1, pageCount).ToArray();
+
+        // Apply left‑justified (horizontal) alignment to all pages.
+        using (var editor = new PdfPageEditor())
+        {
+            editor.BindPdf(inputPath);
+            editor.ProcessPages = allPages;                 // <-- specify target pages
+            editor.HorizontalAlignment = HorizontalAlignment.Left; // <-- new property
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"All pages left‑aligned and saved to '{outputPath}'.");
     }
 }

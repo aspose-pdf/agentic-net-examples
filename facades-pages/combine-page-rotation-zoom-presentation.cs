@@ -1,49 +1,49 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "presentation.pdf";
-        const string outputPath = "presentation_transformed.pdf";
-        const float zoomFactor = 1.5f; // 150% zoom
+        const string inputPath = "input.pdf";
+        const string outputPath = "presentation.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load source PDF to obtain page count (ensuring disposal)
-        int pageCount;
-        using (Document srcDoc = new Document(inputPath))
-        {
-            pageCount = srcDoc.Pages.Count;
-        }
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
 
-        // Bind PDF to the editor (PdfPageEditor does not implement IDisposable)
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
+        // Number of pages (1‑based indexing is handled internally by the Pages collection)
+        int pageCount = pdfDocument.Pages.Count;
 
-        // Apply a 90° clockwise rotation to every page via the PageRotations dictionary
-        var rotations = new Dictionary<int, int>();
+        // Define a zoom factor (e.g., 1.2 = 120% of original size)
+        const double zoomFactor = 1.2;
+
         for (int i = 1; i <= pageCount; i++)
         {
-            rotations[i] = 90; // 90 degrees clockwise
+            // Get the current page
+            Page page = pdfDocument.Pages[i];
+
+            // Rotate the page 90 degrees clockwise
+            page.Rotate = Rotation.on90;
+
+            // Retrieve the original page dimensions
+            double originalWidth = page.PageInfo.Width;
+            double originalHeight = page.PageInfo.Height;
+
+            // Apply zoom by adjusting the page size. This scales the page content.
+            page.PageInfo.Width = originalWidth * zoomFactor;
+            page.PageInfo.Height = originalHeight * zoomFactor;
         }
-        editor.PageRotations = rotations;
 
-        // Apply zoom to all pages. Use ProcessPages to specify the pages the zoom applies to.
-        editor.ProcessPages = Enumerable.Range(1, pageCount).ToArray();
-        editor.Zoom = zoomFactor;
+        // Save the transformed PDF to a new file
+        pdfDocument.Save(outputPath);
 
-        // Save the transformed PDF
-        editor.Save(outputPath);
-        Console.WriteLine($"Transformed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Presentation PDF with rotation and zoom saved to '{outputPath}'.");
     }
 }

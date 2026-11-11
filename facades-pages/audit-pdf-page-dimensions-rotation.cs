@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string logFilePath = "audit_log.txt";
+        const string outputPdfPath = "edited.pdf";
+        const string auditLogPath = "audit_log.txt";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -16,56 +17,59 @@ class Program
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Log page dimensions and rotation BEFORE any edits
-        // -----------------------------------------------------------------
-        using (Document srcDoc = new Document(inputPdfPath))
-        using (StreamWriter logWriter = new StreamWriter(logFilePath, false))
+        // Open audit log for writing
+        using (StreamWriter log = new StreamWriter(auditLogPath, false))
         {
-            logWriter.WriteLine("=== BEFORE EDITS ===");
-            for (int i = 1; i <= srcDoc.Pages.Count; i++) // 1‑based indexing
+            // ---------- BEFORE EDIT ----------
+            using (Document docBefore = new Document(inputPdfPath))
             {
-                Page page = srcDoc.Pages[i];
-                double width = page.PageInfo.Width;
-                double height = page.PageInfo.Height;
-                int rotation = (int)page.Rotate; // Rotation enum -> int (0,90,180,270)
+                log.WriteLine("=== BEFORE EDIT ===");
+                for (int i = 1; i <= docBefore.Pages.Count; i++)
+                {
+                    Page page = docBefore.Pages[i];
+                    double width = page.PageInfo.Width;
+                    double height = page.PageInfo.Height;
+                    Rotation rotation = page.Rotate;
+                    log.WriteLine($"Page {i}: Width={width}, Height={height}, Rotation={rotation}");
+                }
+            }
 
-                logWriter.WriteLine($"Page {i}: Width={width:F2}, Height={height:F2}, Rotation={rotation}");
+            // ---------- EDIT ----------
+            // Add a simple text stamp to each page using the Document API (PdfPageEditor.InsertText no longer exists)
+            using (Document doc = new Document(inputPdfPath))
+            {
+                // Prepare a font for the inserted text
+                Font font = FontRepository.FindFont("Arial");
+                Aspose.Pdf.Color textColor = Aspose.Pdf.Color.Black;
+
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    TextFragment tf = new TextFragment("Edited by Aspose.Pdf.Facades");
+                    tf.Position = new Position(50, 50); // X, Y coordinates (points from bottom‑left)
+                    tf.TextState.Font = font;
+                    tf.TextState.FontSize = 12;
+                    tf.TextState.ForegroundColor = textColor;
+                    doc.Pages[i].Paragraphs.Add(tf);
+                }
+
+                doc.Save(outputPdfPath);
+            }
+
+            // ---------- AFTER EDIT ----------
+            using (Document docAfter = new Document(outputPdfPath))
+            {
+                log.WriteLine("=== AFTER EDIT ===");
+                for (int i = 1; i <= docAfter.Pages.Count; i++)
+                {
+                    Page page = docAfter.Pages[i];
+                    double width = page.PageInfo.Width;
+                    double height = page.PageInfo.Height;
+                    Rotation rotation = page.Rotate;
+                    log.WriteLine($"Page {i}: Width={width}, Height={height}, Rotation={rotation}");
+                }
             }
         }
 
-        // -----------------------------------------------------------------
-        // 2. Perform edits – rotate each page 90° clockwise
-        // -----------------------------------------------------------------
-        // Using Document API (PdfPageEditor no longer provides RotatePage)
-        using (Document doc = new Document(inputPdfPath))
-        {
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                doc.Pages[i].Rotate = Rotation.on90; // rotate 90° clockwise
-            }
-            doc.Save(outputPdfPath);
-        }
-
-        // -----------------------------------------------------------------
-        // 3. Log page dimensions and rotation AFTER edits
-        // -----------------------------------------------------------------
-        using (Document editedDoc = new Document(outputPdfPath))
-        using (StreamWriter logWriter = new StreamWriter(logFilePath, true)) // append
-        {
-            logWriter.WriteLine();
-            logWriter.WriteLine("=== AFTER EDITS ===");
-            for (int i = 1; i <= editedDoc.Pages.Count; i++) // 1‑based indexing
-            {
-                Page page = editedDoc.Pages[i];
-                double width = page.PageInfo.Width;
-                double height = page.PageInfo.Height;
-                int rotation = (int)page.Rotate;
-
-                logWriter.WriteLine($"Page {i}: Width={width:F2}, Height={height:F2}, Rotation={rotation}");
-            }
-        }
-
-        Console.WriteLine($"Audit log written to '{logFilePath}'. Edited PDF saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Audit log written to '{auditLogPath}'. Edited PDF saved as '{outputPdfPath}'.");
     }
 }

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_reset_rotation.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,22 +15,16 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDocument = new Document(inputPath);
-
-        // Ensure the document has at least six pages.
-        if (pdfDocument.Pages.Count < 6)
+        // Reset rotation of page 6 using PdfPageEditor.
+        // In recent Aspose.PDF versions the rotation is set via the
+        // Rotation property together with the ProcessPages array.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            Console.Error.WriteLine("The PDF does not contain a page 6 to reset rotation.");
-            return;
+            editor.BindPdf(inputPath);
+            editor.ProcessPages = new int[] { 6 }; // 1‑based page numbers
+            editor.Rotation = 0; // allowed values: 0, 90, 180, 270
+            editor.Save(outputPath);
         }
-
-        // Reset rotation of page 6 to zero degrees.
-        // Use Rotation.None to represent 0° rotation.
-        pdfDocument.Pages[6].Rotate = Rotation.None;
-
-        // Save the modified PDF.
-        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Page 6 rotation reset. Saved to '{outputPath}'.");
     }

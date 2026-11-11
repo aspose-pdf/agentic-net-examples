@@ -1,61 +1,53 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF paths
-        const string inputPath  = "input.pdf";
-        const string outputPath = "booklet_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "booklet_resized.pdf";
 
-        // Define which pages should receive the margin resize (1‑based indexing)
-        // Example: pages 2, 4, 6
-        List<int> selectedPages = new List<int> { 2, 4, 6 };
+        // Pages to which the margin resize will be applied (1‑based indexing)
+        int[] selectedPages = { 1, 2, 3, 4, 5, 6 };
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block (lifecycle rule)
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Apply a 15 % margin on each side of the selected pages
+                // Apply a 15% margin on each side of the selected pages
                 foreach (int pageNumber in selectedPages)
                 {
                     // Ensure the page number is within the document range
                     if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-                    {
-                        Console.WriteLine($"Skipping invalid page number: {pageNumber}");
-                        continue;
-                    }
+                        continue; // skip invalid page numbers
 
-                    // Retrieve the original page dimensions (points)
-                    Page page = doc.Pages[pageNumber];
-                    double pageWidth  = page.PageInfo.Width;
-                    double pageHeight = page.PageInfo.Height;
+                    // Retrieve original page dimensions (points)
+                    double width = doc.Pages[pageNumber].PageInfo.Width;
+                    double height = doc.Pages[pageNumber].PageInfo.Height;
 
-                    // Calculate 15 % of width/height for each margin side
-                    double marginLeft   = 0.15 * pageWidth;
-                    double marginRight  = 0.15 * pageWidth;
-                    double marginTop    = 0.15 * pageHeight;
-                    double marginBottom = 0.15 * pageHeight;
+                    // Calculate 15% margins
+                    double marginX = width * 0.15;
+                    double marginY = height * 0.15;
 
-                    // Set the new margins for the current page using MarginInfo
-                    page.PageInfo.Margin = new MarginInfo(marginLeft, marginRight, marginTop, marginBottom);
+                    // Set the new margins for the page using MarginInfo (left, top, right, bottom)
+                    doc.Pages[pageNumber].PageInfo.Margin = new MarginInfo(marginX, marginY, marginX, marginY);
                 }
 
-                // Save the modified document (save rule)
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Booklet PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Booklet layout PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

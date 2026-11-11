@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string outputPath = "rotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,22 +16,28 @@ class Program
         }
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        Document pdfDoc = new Document(inputPath);
 
-        // Pages to rotate (1‑based indexes)
+        // Define the pages to rotate (1‑based indexing)
         int[] pagesToRotate = { 3, 5, 7 };
+
+        // Apply a 180° rotation to each specified page
         foreach (int pageNumber in pagesToRotate)
         {
-            // Ensure the page exists
-            if (pageNumber <= pdfDocument.Pages.Count)
+            // Ensure the page exists in the document
+            if (pageNumber <= pdfDoc.Pages.Count && pageNumber > 0)
             {
-                pdfDocument.Pages[pageNumber].Rotate = Rotation.on180; // 180° rotation
+                pdfDoc.Pages[pageNumber].Rotate = Rotation.on180;
+            }
+            else
+            {
+                Console.Error.WriteLine($"Page {pageNumber} does not exist in the document.");
             }
         }
 
         // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        pdfDoc.Save(outputPath);
 
-        Console.WriteLine($"Pages 3, 5, and 7 rotated 180° and saved to '{outputPath}'.");
+        Console.WriteLine($"Pages 3, 5, and 7 have been rotated 180° and saved to '{outputPath}'.");
     }
 }
