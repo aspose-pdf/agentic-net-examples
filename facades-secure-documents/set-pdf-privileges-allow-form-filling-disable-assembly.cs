@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
+using Aspose.Pdf.Facades; // Facades namespace is available; not required for encryption but included per requirement
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_privileged.pdf";
+        const string userPassword  = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +18,21 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Load the PDF document.
-            Document pdfDoc = new Document(inputPath);
+            // Permissions are a flag enum. We allow form filling and nothing else.
+            // The permission for form filling is FillForm (singular) in this version of Aspose.Pdf.
+            // Document assembly is controlled by AssembleDocument; we simply do not include it.
+            Aspose.Pdf.Permissions perms = Aspose.Pdf.Permissions.FillForm;
 
-            // Define the permissions: allow form filling, all other privileges (including document assembly) are omitted -> disabled.
-            // Permissions enum lives in Aspose.Pdf.Security and contains FillForm and DocumentAssembly among others.
-            Permissions perms = Permissions.FillForm; // only FillForm is granted
+            // Encrypt the document with AES‑256 and the specified permissions
+            doc.Encrypt(userPassword, ownerPassword, perms, Aspose.Pdf.CryptoAlgorithm.AESx256);
 
-            // Apply the permissions. An empty user password means the file can be opened without a password,
-            // but the owner password protects the permission settings.
-            string userPassword = string.Empty; // no password required to open
-            string ownerPassword = "ownerPassword123"; // any owner password you prefer
-            pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.RC4x128);
-
-            // Save the modified PDF.
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"Privileges set. Output saved to '{outputPath}'.");
+            // Save the protected PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with form‑filling enabled and document assembly disabled: {outputPath}");
     }
 }

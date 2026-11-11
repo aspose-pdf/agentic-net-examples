@@ -11,24 +11,33 @@ class Program
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        Document doc = new Document(inputPath);
+        try
+        {
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Define permissions to allow printing and content extraction
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-        // Define desired permissions (e.g., allow printing and content extraction).
-        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                // Encrypt with 256‑bit AES using the CryptoAlgorithm enum
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-        // Encrypt using 256‑bit AES.
-        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Save the encrypted PDF
+                doc.Save(outputPath);
+            }
 
-        // Save the encrypted PDF.
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

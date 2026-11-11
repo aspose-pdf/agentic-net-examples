@@ -6,13 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Paths and passwords
         const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -22,23 +20,21 @@ class Program
         try
         {
             // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
+            Document doc = new Document(inputPath);
 
-            // Define permissions
+            // Define permissions for the encrypted PDF
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt using AES‑256
-            pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+            // Encrypt the PDF using AES‑256
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
             // Save the encrypted PDF
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"Encryption succeeded. Output saved to '{outputPath}'.");
+            doc.Save(outputPath);
         }
         catch (Exception ex)
         {
             // Log detailed exception information
-            Console.Error.WriteLine("Encryption failed.");
+            Console.Error.WriteLine("Encryption operation failed.");
             Console.Error.WriteLine($"Message: {ex.Message}");
             Console.Error.WriteLine($"StackTrace: {ex.StackTrace}");
             if (ex.InnerException != null)

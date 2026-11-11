@@ -6,48 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_no_usage_rights.pdf";
+        const string inputPath = "protected.pdf";
+        const string outputPath = "unprotected.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // -----------------------------------------------------------------
-            // Usage‑rights operations are performed via PdfFileSignature, not via
-            // PdfFileEditor. The signature object must be bound to a PDF before the
-            // ContainsUsageRights / RemoveUsageRights methods can be used.
-            // -----------------------------------------------------------------
-            bool hasRightsBefore;
-            using (PdfFileSignature signature = new PdfFileSignature())
+            // PdfFileSignature is the class that owns usage‑rights members.
+            using (PdfFileSignature sig = new PdfFileSignature())
             {
-                signature.BindPdf(inputPath);
-                hasRightsBefore = signature.ContainsUsageRights();
+                sig.BindPdf(inputPath);
+                bool hasRightsBefore = sig.ContainsUsageRights();
                 Console.WriteLine($"Contains usage rights before removal: {hasRightsBefore}");
 
-                // Remove the rights (if any) and save the result.
                 if (hasRightsBefore)
                 {
-                    signature.RemoveUsageRights();
+                    sig.RemoveUsageRights();
                 }
-                // Save creates a new file; if there were no rights we still copy the
-                // original content to the output path so the rest of the program works
-                // uniformly.
-                signature.Save(outputPath);
+
+                // Save the (potentially) modified PDF.
+                sig.Save(outputPath);
+                Console.WriteLine($"Usage rights removed (if any), output saved to '{outputPath}'.");
             }
 
-            // Verify that the output PDF no longer contains usage rights.
-            bool hasRightsAfter;
-            using (PdfFileSignature signature = new PdfFileSignature())
+            // Verify removal by loading the output file again.
+            using (PdfFileSignature verifySig = new PdfFileSignature())
             {
-                signature.BindPdf(outputPath);
-                hasRightsAfter = signature.ContainsUsageRights();
+                verifySig.BindPdf(outputPath);
+                bool hasRightsAfter = verifySig.ContainsUsageRights();
+                Console.WriteLine($"Contains usage rights after removal: {hasRightsAfter}");
+
+                if (!hasRightsAfter)
+                    Console.WriteLine("Verification succeeded: usage rights have been removed.");
+                else
+                    Console.WriteLine("Verification failed: usage rights are still present.");
             }
-            Console.WriteLine($"Contains usage rights after removal: {hasRightsAfter}");
         }
         catch (Exception ex)
         {
