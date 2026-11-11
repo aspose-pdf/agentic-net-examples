@@ -4,73 +4,54 @@ using System.IO;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
 
-namespace PdfSignatureVerification
+// Input PDF containing digital signatures
+const string inputPdfPath = "signed_document.pdf";
+// Output JSON file that will store verification results
+const string outputJsonPath = "signature_verification_results.json";
+
+if (!File.Exists(inputPdfPath))
 {
-    // Simple DTO for JSON output
-    public class SignatureResult
-    {
-        public string SignatureName { get; set; }
-        public bool IsValid { get; set; }
-
-        // Parameter‑less constructor ensures non‑nullable property is initialized
-        public SignatureResult()
-        {
-            SignatureName = string.Empty;
-        }
-    }
-
-    class Program
-    {
-        static void Main()
-        {
-            const string inputPdfPath = "signed_document.pdf";
-            const string jsonOutputPath = "signature_verification.json";
-
-            if (!File.Exists(inputPdfPath))
-            {
-                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-                return;
-            }
-
-            try
-            {
-                // Bind the PDF to the signature facade
-                PdfFileSignature pdfSignature = new PdfFileSignature();
-                pdfSignature.BindPdf(inputPdfPath);
-
-                // Retrieve all signature names present in the document (compatible with all Aspose.Pdf versions)
-                IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames();
-
-                var results = new List<SignatureResult>();
-
-                foreach (SignatureName sigName in signatureNames)
-                {
-                    // Verify each signature; returns true if the signature is valid
-                    bool isValid = pdfSignature.VerifySignature(sigName);
-                    results.Add(new SignatureResult
-                    {
-                        SignatureName = sigName.Name,
-                        IsValid = isValid
-                    });
-                }
-
-                // Serialize results to formatted JSON
-                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(results, jsonOptions);
-
-                // Write JSON to file
-                using (FileStream fs = new FileStream(jsonOutputPath, FileMode.Create, FileAccess.Write, FileShare.None))
-                using (StreamWriter writer = new StreamWriter(fs))
-                {
-                    writer.Write(json);
-                }
-
-                Console.WriteLine($"Signature verification completed. Results saved to '{jsonOutputPath}'.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error during verification: {ex.Message}");
-            }
-        }
-    }
+    Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+    return;
 }
+
+// Prepare a list to hold the verification results
+var verificationResults = new List<object>();
+
+// PdfFileSignature does not implement IDisposable, so no using block is required
+PdfFileSignature pdfSignature = new PdfFileSignature();
+pdfSignature.BindPdf(inputPdfPath);
+
+// Retrieve all signature names present in the PDF
+IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames(true);
+
+foreach (SignatureName sigName in signatureNames)
+{
+    // Get signer name; fall back to the raw signature name if the signer name is empty
+    string signer = pdfSignature.GetSignerName(sigName);
+    if (string.IsNullOrEmpty(signer))
+    {
+        signer = sigName.Name;
+    }
+
+    // Verify the signature
+    bool isValid = pdfSignature.VerifySignature(sigName);
+
+    var result = new
+    {
+        SignatureName = signer,
+        IsValid = isValid
+    };
+    verificationResults.Add(result);
+}
+
+// Serialize the results to a formatted JSON string
+string json = JsonSerializer.Serialize(verificationResults, new JsonSerializerOptions
+{
+    WriteIndented = true
+});
+
+// Write the JSON to the output file
+File.WriteAllText(outputJsonPath, json);
+
+Console.WriteLine($"Signature verification results saved to '{outputJsonPath}'.");

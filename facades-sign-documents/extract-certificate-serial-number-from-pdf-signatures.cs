@@ -1,52 +1,67 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
-using System.Linq;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF that contains a digital signature
-        const string pdfPath = "signed_document.pdf";
+        const string inputPath = "signed.pdf";
 
-        if (!File.Exists(pdfPath))
+        // Verify the PDF file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(pdfPath);
+        // Bind the PDF to the signature handler (PdfFileSignature is not IDisposable)
+        PdfFileSignature signatureHandler = new PdfFileSignature();
+        signatureHandler.BindPdf(inputPath);
 
-        // Ensure the document has a form with fields
-        if (pdfDocument?.Form?.Fields == null || !pdfDocument.Form.Fields.Any())
+        // Retrieve all signature names present in the document
+        IList<SignatureName> signatureNames = signatureHandler.GetSignatureNames(true);
+
+        if (signatureNames == null || signatureNames.Count == 0)
         {
-            Console.WriteLine("No form fields (including signatures) found in the PDF.");
+            Console.WriteLine("No digital signatures found in the PDF.");
             return;
         }
 
-        // Iterate over each form field and process signature fields
-        foreach (Field field in pdfDocument.Form.Fields)
+        // Iterate over each signature and extract the certificate's serial number
+        foreach (SignatureName sigName in signatureNames)
         {
-            if (field is SignatureField signatureField)
+            // Extract the certificate associated with the signature
+            using (Stream certStream = signatureHandler.ExtractCertificate(sigName))
             {
-                // Extract the signing certificate from the signature field
-                X509Certificate2 certificate = signatureField.ExtractCertificateObject();
-
-                string fieldName = signatureField.PartialName ?? "<unknown>";
-
-                if (certificate != null)
+                if (certStream != null && certStream.Length > 0)
                 {
-                    // SerialNumber is a hexadecimal string representation of the certificate's serial number
-                    string serialNumber = certificate.SerialNumber;
-                    Console.WriteLine($"Signature field '{fieldName}' serial number: {serialNumber}");
+                    // Load the certificate into X509Certificate2 to read the serial number
+                    byte[] certBytes;
+                    using (var ms = new MemoryStream())
+                    {
+                        certStream.CopyTo(ms);
+                        certBytes = ms.ToArray();
+                    }
+
+                    var cert = new X509Certificate2(certBytes);
+                    string serialNumber = cert.SerialNumber;
+
+                    if (!string.IsNullOrEmpty(serialNumber))
+                    {
+                        Console.WriteLine($"Signature '{sigName}' certificate serial number: {serialNumber}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Signature '{sigName}' does not contain a certificate serial number.");
+                    }
                 }
                 else
                 {
-                    Console.WriteLine($"Signature field '{fieldName}' does not contain a certificate.");
+                    Console.WriteLine($"Signature '{sigName}' does not contain a certificate.");
                 }
             }
         }

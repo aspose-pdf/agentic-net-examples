@@ -12,26 +12,23 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // PdfFileSignature implements IDisposable; ensure deterministic disposal
-            using (PdfFileSignature pdfSignature = new PdfFileSignature())
-            {
-                // Load the PDF document
-                pdfSignature.BindPdf(inputPath);
+            // Bind the PDF file to the PdfFileSignature facade
+            PdfFileSignature pdfSignature = new PdfFileSignature();
+            pdfSignature.BindPdf(inputPath);
 
-                // Remove the signature with the specified name
-                pdfSignature.RemoveSignature(signatureName);
+            // Remove the signature with the specified name
+            pdfSignature.RemoveSignature(signatureName);
 
-                // Save the updated PDF
-                pdfSignature.Save(outputPath);
-            }
+            // Save the modified PDF
+            pdfSignature.Save(outputPath);
 
-            Console.WriteLine($"Signature '{signatureName}' removed. Saved to '{outputPath}'.");
+            Console.WriteLine($"Signature '{signatureName}' removed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

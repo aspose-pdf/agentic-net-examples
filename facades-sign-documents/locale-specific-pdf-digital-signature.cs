@@ -1,99 +1,116 @@
 using System;
 using System.IO;
+using System.Globalization;
+using System.Drawing; // Needed for System.Drawing.Rectangle
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // required for PKCS7 and SignatureCustomAppearance
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing;
 
-class LocaleSignatureDemo
+class Program
 {
+    // Path to a digital certificate (PFX) used for signing. Replace with a real certificate if needed.
+    private const string CertificatePath = "cert.pfx";
+    private const string CertificatePassword = "password";
+
     static void Main()
     {
-        // Input PDF to be signed
-        const string inputPdf = "document.pdf";
-        // Output signed PDF
-        const string outputPdf = "document_signed.pdf";
-        // Path to the signing certificate (PFX)
-        const string certPath = "certificate.pfx";
-        // Certificate password
-        const string certPassword = "certPassword";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
 
-        // Choose language: "de" for German, "es" for Spanish, "ja" for Japanese
-        string languageCode = "de";
-
-        // Validate files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate not found: {certPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create a PdfFileSignature instance (no using – it does not implement IDisposable)
-        PdfFileSignature pdfSignature = new PdfFileSignature();
-        pdfSignature.BindPdf(inputPdf);
-
-        // Prepare locale‑specific data
-        string contactInfo = "support@example.com";
-        string location = GetLocationForLanguage(languageCode);
-        string reason = GetReasonForLanguage(languageCode);
-
-        // Create PKCS7 object and assign basic signature properties
-        PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            ContactInfo = contactInfo,
-            Location = location,          // Fixed: use Location property
-            Reason = reason               // Fixed: use Reason property
-        };
+            // ---------------------------------------------------------------------
+            // Helper that signs a given page with locale‑specific appearance settings
+            // ---------------------------------------------------------------------
+            void SignPage(int pageNumber, string imagePath, string contactInfo, string locationInfo,
+                          string reason, string signatureLabel, string culture)
+            {
+                // Ensure the requested page exists
+                if (doc.Pages.Count < pageNumber) return;
 
-        // Optional: customise visual appearance of the signature
-        SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
-        {
-            ShowContactInfo = true,
-            ShowLocation = true,
-            ShowReason = true,
-            // You can also set background/foreground images or colors here if needed
-        };
-        pkcs7.CustomAppearance = customAppearance;
+                // Create the PKCS7 object that carries the digital signature data
+                PKCS7 pkcs7 = new PKCS7(CertificatePath, CertificatePassword)
+                {
+                    Reason = reason,
+                    Location = locationInfo,
+                    ContactInfo = contactInfo,
+                    // Configure the visual appearance of the signature
+                    CustomAppearance = new SignatureCustomAppearance
+                    {
+                        // The label that appears next to the signature graphic (e.g., "Unterschrift")
+                        ReasonLabel = signatureLabel,
+                        // Show the standard fields – they will be filled with the values above
+                        ShowContactInfo = true,
+                        ShowLocation = true,
+                        ShowReason = true,
+                        // Use a font that can render German, Spanish and Japanese characters
+                        FontFamilyName = "Arial Unicode MS",
+                        FontSize = 12,
+                        // Culture influences date formatting and default label localisation
+                        Culture = new CultureInfo(culture),
+                        // Draw the image (if any) in the foreground of the signature rectangle
+                        IsForegroundImage = true
+                    }
+                };
 
-        // Sign the document using the PKCS7 object (the overload that accepts PKCS7)
-        pdfSignature.Sign(outputPdf, pkcs7);
+                // The image that represents the handwritten signature (optional)
+                PdfFileSignature pdfSignature = new PdfFileSignature(doc);
+                pdfSignature.SignatureAppearance = imagePath; // path to PNG/JPG of the handwritten signature
 
-        Console.WriteLine($"PDF signed successfully for language '{languageCode}'. Output: {outputPdf}");
-    }
+                // Define where on the page the signature will be placed.
+                // System.Drawing.Rectangle uses (x, y, width, height).
+                // Here we place the signature at (100,100) with a size of 150x50 points.
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 150, 50);
 
-    // Returns a locale‑specific reason text for the digital signature
-    private static string GetReasonForLanguage(string lang)
-    {
-        switch (lang.ToLower())
-        {
-            case "de": // German
-                return "Unterschrift des Dokuments";
-            case "es": // Spanish
-                return "Firma del documento";
-            case "ja": // Japanese
-                return "文書への署名";
-            default:
-                return "Document signature";
+                // Sign the page. The overload with (pageNumber, true, rect, pkcs7) creates a visible signature.
+                pdfSignature.Sign(pageNumber, true, rect, pkcs7);
+            }
+
+            // German appearance (de‑DE)
+            SignPage(
+                pageNumber: 1,
+                imagePath: "signature_german.png",
+                contactInfo: "Kontakt: Max Mustermann",
+                locationInfo: "Berlin, Deutschland",
+                reason: "Dokument unterschrieben",
+                signatureLabel: "Unterschrift",
+                culture: "de-DE"
+            );
+
+            // Spanish appearance (es‑ES)
+            SignPage(
+                pageNumber: 2,
+                imagePath: "signature_spanish.png",
+                contactInfo: "Contacto: Juan Pérez",
+                locationInfo: "Madrid, España",
+                reason: "Documento firmado",
+                signatureLabel: "Firma",
+                culture: "es-ES"
+            );
+
+            // Japanese appearance (ja‑JP)
+            SignPage(
+                pageNumber: 3,
+                imagePath: "signature_japanese.png",
+                contactInfo: "連絡先: 山田太郎",
+                locationInfo: "東京、日本",
+                reason: "文書に署名しました",
+                signatureLabel: "署名",
+                culture: "ja-JP"
+            );
+
+            // Save the signed PDF
+            doc.Save(outputPath);
         }
-    }
 
-    // Returns a locale‑specific location text for the digital signature
-    private static string GetLocationForLanguage(string lang)
-    {
-        switch (lang.ToLower())
-        {
-            case "de":
-                return "Berlin, Deutschland";
-            case "es":
-                return "Madrid, España";
-            case "ja":
-                return "東京、日本";
-            default:
-                return "Unknown Location";
-        }
+        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,56 +1,64 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(pdfPath);
-
-        // Verify that the document contains a form
-        if (pdfDoc.Form == null)
+        // Facade for working with digital signatures
+        using (PdfFileSignature signatureFacade = new PdfFileSignature())
         {
-            Console.WriteLine("The PDF does not contain any form.");
-            return;
-        }
+            // Load the PDF into the facade
+            signatureFacade.BindPdf(inputPdf);
 
-        // Verify that the form contains fields
-        if (pdfDoc.Form.Fields == null || !pdfDoc.Form.Fields.Any())
-        {
-            Console.WriteLine("No form fields (including signature fields) found in the PDF.");
-            return;
-        }
+            // Retrieve all signature names present in the document
+            IList<SignatureName> signatureNames = signatureFacade.GetSignatureNames(true);
 
-        // Iterate over each form field and process signature fields
-        foreach (var field in pdfDoc.Form.Fields)
-        {
-            if (field is SignatureField sigField)
+            if (signatureNames == null || signatureNames.Count == 0)
             {
-                // Extract the certificate associated with the signature field
-                X509Certificate2 cert = sigField.ExtractCertificateObject();
+                Console.WriteLine("No signature fields found in the PDF.");
+                return;
+            }
 
-                Console.WriteLine($"Signature Field: {sigField.PartialName}");
-                if (cert != null)
+            foreach (SignatureName sigName in signatureNames)
+            {
+                // Extract the certificate associated with the signature
+                using (Stream certStream = signatureFacade.ExtractCertificate(sigName))
                 {
-                    Console.WriteLine($"  Issuer          : {cert.Issuer}");
-                    Console.WriteLine($"  Expiration Date: {cert.NotAfter}");
-                }
-                else
-                {
-                    Console.WriteLine("  No certificate associated with this signature.");
+                    if (certStream != null && certStream.Length > 0)
+                    {
+                        byte[] certBytes;
+                        using (MemoryStream ms = new MemoryStream())
+                        {
+                            certStream.CopyTo(ms);
+                            certBytes = ms.ToArray();
+                        }
+
+                        X509Certificate2 cert = new X509Certificate2(certBytes);
+
+                        Console.WriteLine($"Signature Field: {sigName}");
+                        Console.WriteLine($"  Issuer          : {cert.Issuer}");
+                        Console.WriteLine($"  Subject         : {cert.Subject}");
+                        Console.WriteLine($"  Expiration Date : {cert.NotAfter}");
+                        Console.WriteLine($"  Valid From      : {cert.NotBefore}");
+                        Console.WriteLine();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Signature Field: {sigName} has no associated certificate.");
+                    }
                 }
             }
         }
