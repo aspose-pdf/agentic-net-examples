@@ -1,31 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades;   // PdfFileInfo resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string projectCode = "ABC123";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_metadata.pdf";
+        const string metaKey    = "ProjectCode";
+        const string metaValue  = "ABC-1234";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF file information (metadata handling) via Facades API
-        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+        try
+        {
+            // Load the PDF file using PdfFileInfo (Facades API)
+            PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
 
-        // Add or update a custom metadata entry named "ProjectCode"
-        pdfInfo.SetMetaInfo("ProjectCode", projectCode);
+            // Set a custom metadata entry
+            pdfInfo.SetMetaInfo(metaKey, metaValue);
 
-        // Save the PDF with the updated metadata to a new file
-        pdfInfo.Save(outputPath);
+            // Save the modified PDF to a new file
+            pdfInfo.Save(outputPath);
 
-        Console.WriteLine($"Custom metadata 'ProjectCode' added and saved to '{outputPath}'.");
+            Console.WriteLine($"Metadata \"{metaKey}\" added and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

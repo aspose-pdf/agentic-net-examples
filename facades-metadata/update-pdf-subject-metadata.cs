@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string newSubject = "This PDF contains the quarterly financial report";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_updated.pdf";
+        const string newSubject = "Document purpose: Accessibility demonstration";
 
         if (!File.Exists(inputPath))
         {
@@ -17,15 +16,17 @@ class Program
             return;
         }
 
-        // Load PDF metadata using the Facades API
-        using (PdfFileInfo info = new PdfFileInfo(inputPath))
-        {
-            // Update the Subject field
-            info.Subject = newSubject;
+        // PdfFileInfo works with the Facades API; it does not implement IDisposable.
+        PdfFileInfo pdfInfo = new PdfFileInfo();
 
-            // Save the modified PDF
-            info.Save(outputPath);
-        }
+        // Load the existing PDF.
+        pdfInfo.BindPdf(inputPath);
+
+        // Update the Subject metadata field.
+        pdfInfo.Subject = newSubject;
+
+        // Save the modified PDF to a new file.
+        pdfInfo.Save(outputPath);
 
         Console.WriteLine($"Subject updated and saved to '{outputPath}'.");
     }

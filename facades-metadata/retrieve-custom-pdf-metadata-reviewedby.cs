@@ -15,19 +15,12 @@ class Program
         }
 
         // PdfFileInfo provides access to document metadata without loading the full PDF.
-        PdfFileInfo info = new PdfFileInfo(pdfPath);
+        PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath);
 
-        // Retrieve the custom metadata entry named "ReviewedBy".
-        string reviewedBy = info.GetMetaInfo("ReviewedBy");
+        // Retrieve the custom metadata entry "ReviewedBy".
+        string reviewedBy = pdfInfo.GetMetaInfo("ReviewedBy");
 
-        // Log the result for audit purposes.
-        if (!string.IsNullOrEmpty(reviewedBy))
-        {
-            Console.WriteLine($"ReviewedBy: {reviewedBy}");
-        }
-        else
-        {
-            Console.WriteLine("ReviewedBy metadata not found.");
-        }
+        // Log the value for audit purposes.
+        Console.WriteLine($"ReviewedBy: {reviewedBy ?? "(not set)"}");
     }
 }

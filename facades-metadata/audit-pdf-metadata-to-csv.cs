@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -7,71 +8,80 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string csvPath   = "metadata_audit.csv";
+        // Input PDF, output PDF (with updated metadata) and audit CSV file paths
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string auditCsvPath  = "metadata_audit.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // ----- Read original metadata using the Facade -----
-        PdfFileInfo originalInfo = new PdfFileInfo(inputPdf);
-        string origTitle    = originalInfo.Title;
-        string origAuthor   = originalInfo.Author;
-        string origSubject  = originalInfo.Subject;
-        string origKeywords = originalInfo.Keywords;
-        string origCreator  = originalInfo.Creator;
-        string origProducer = originalInfo.Producer;
+        // -----------------------------------------------------------------
+        // Step 1 – Capture original metadata using PdfFileInfo (Facades API)
+        // -----------------------------------------------------------------
+        PdfFileInfo originalInfo = new PdfFileInfo();
+        originalInfo.BindPdf(inputPdfPath);
 
-        // ----- Load the PDF, modify metadata, and save -----
-        using (Document doc = new Document(inputPdf))
+        string originalTitle   = originalInfo.Title   ?? string.Empty;
+        string originalAuthor  = originalInfo.Author  ?? string.Empty;
+        string originalSubject = originalInfo.Subject ?? string.Empty;
+        string originalKeywords= originalInfo.Keywords?? string.Empty;
+
+        // ---------------------------------------------------------------
+        // Step 2 – Load the document, modify metadata, and save the result
+        // ---------------------------------------------------------------
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Set new metadata values
-            doc.Info.Title    = "New Title";
-            doc.Info.Author   = "New Author";
-            doc.Info.Subject  = "New Subject";
-            doc.Info.Keywords = "new,keywords";
-            doc.Info.Creator  = "MyApp";
-            doc.Info.Producer = "Aspose.Pdf";
+            // Update metadata (example values – replace with real data as needed)
+            doc.Info.Title   = "New Document Title";
+            doc.Info.Author  = "New Author Name";
+            doc.Info.Subject = "Updated Subject";
+            doc.Info.Keywords= "new,keywords,example";
 
-            // Save the updated document
-            doc.Save(outputPdf);
+            // Save the modified PDF (standard PDF save – no SaveOptions needed)
+            doc.Save(outputPdfPath);
         }
 
-        // ----- Read new metadata after saving -----
-        PdfFileInfo newInfo = new PdfFileInfo(outputPdf);
-        string newTitle    = newInfo.Title;
-        string newAuthor   = newInfo.Author;
-        string newSubject  = newInfo.Subject;
-        string newKeywords = newInfo.Keywords;
-        string newCreator  = newInfo.Creator;
-        string newProducer = newInfo.Producer;
+        // ---------------------------------------------------------------
+        // Step 3 – Capture new metadata after the update
+        // ---------------------------------------------------------------
+        PdfFileInfo newInfo = new PdfFileInfo();
+        newInfo.BindPdf(outputPdfPath);
 
-        // ----- Write audit information to CSV -----
-        using (StreamWriter writer = new StreamWriter(csvPath, false, System.Text.Encoding.UTF8))
+        string newTitle   = newInfo.Title   ?? string.Empty;
+        string newAuthor  = newInfo.Author  ?? string.Empty;
+        string newSubject = newInfo.Subject ?? string.Empty;
+        string newKeywords= newInfo.Keywords?? string.Empty;
+
+        // ---------------------------------------------------------------
+        // Step 4 – Write audit information to CSV
+        // ---------------------------------------------------------------
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("Property,OriginalValue,NewValue");
+        sb.AppendLine($"Title,\"{EscapeCsv(originalTitle)}\",\"{EscapeCsv(newTitle)}\"");
+        sb.AppendLine($"Author,\"{EscapeCsv(originalAuthor)}\",\"{EscapeCsv(newAuthor)}\"");
+        sb.AppendLine($"Subject,\"{EscapeCsv(originalSubject)}\",\"{EscapeCsv(newSubject)}\"");
+        sb.AppendLine($"Keywords,\"{EscapeCsv(originalKeywords)}\",\"{EscapeCsv(newKeywords)}\"");
+
+        try
         {
-            // CSV header
-            writer.WriteLine("Property,Original,New");
-
-            // Each metadata field
-            writer.WriteLine($"Title,\"{Escape(origTitle)}\",\"{Escape(newTitle)}\"");
-            writer.WriteLine($"Author,\"{Escape(origAuthor)}\",\"{Escape(newAuthor)}\"");
-            writer.WriteLine($"Subject,\"{Escape(origSubject)}\",\"{Escape(newSubject)}\"");
-            writer.WriteLine($"Keywords,\"{Escape(origKeywords)}\",\"{Escape(newKeywords)}\"");
-            writer.WriteLine($"Creator,\"{Escape(origCreator)}\",\"{Escape(newCreator)}\"");
-            writer.WriteLine($"Producer,\"{Escape(origProducer)}\",\"{Escape(newProducer)}\"");
+            File.WriteAllText(auditCsvPath, sb.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Metadata audit saved to '{auditCsvPath}'.");
         }
-
-        Console.WriteLine($"Metadata audit written to {csvPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to write CSV: {ex.Message}");
+        }
     }
 
-    // Helper to escape double quotes for CSV compliance
-    static string Escape(string value)
+    // Helper to escape double quotes in CSV fields
+    static string EscapeCsv(string field)
     {
-        if (value == null) return string.Empty;
-        return value.Replace("\"", "\"\"");
+        if (field.Contains("\""))
+            field = field.Replace("\"", "\"\"");
+        return field;
     }
 }

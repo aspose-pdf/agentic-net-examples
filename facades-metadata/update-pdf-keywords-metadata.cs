@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string newKeywords = "Accessible; Example";
+        const string newKeywords = "Confidential; Sample";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +16,17 @@ class Program
             return;
         }
 
-        // Open the PDF file as a stream and initialize PdfFileInfo with it
-        using (FileStream pdfStream = File.OpenRead(inputPath))
+        // Open the PDF file as a read‑only stream
+        using (FileStream pdfStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
         {
-            PdfFileInfo pdfInfo = new PdfFileInfo(pdfStream);
+            // Initialize PdfFileInfo with the stream containing PDF data
+            PdfFileInfo fileInfo = new PdfFileInfo(pdfStream);
 
-            // Update the Keywords metadata
-            pdfInfo.Keywords = newKeywords;
+            // Update the Keywords metadata field
+            fileInfo.Keywords = newKeywords;
 
-            // Save the PDF with the updated metadata
-            pdfInfo.Save(outputPath);
+            // Save the PDF with the updated metadata to a new file
+            fileInfo.Save(outputPath);
         }
 
         Console.WriteLine($"Keywords updated and saved to '{outputPath}'.");
