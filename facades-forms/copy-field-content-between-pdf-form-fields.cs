@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,41 +15,21 @@ class Program
             return;
         }
 
-        try
+        // Use the Form facade for reading and writing field values.
+        using (Form form = new Form())
         {
-            // Load the PDF document
-            Document doc = new Document(inputPath);
+            form.BindPdf(inputPath);
 
-            // Access the form fields collection
-            var form = doc.Form;
+            // Read the value from the source field.
+            string sourceValue = form.GetField("SourceNotes");
 
-            // Get the source field (assumed to be a text box)
-            TextBoxField sourceField = form["SourceNotes"] as TextBoxField;
-            if (sourceField == null)
-            {
-                Console.Error.WriteLine("Source field 'SourceNotes' not found or is not a text box field.");
-                return;
-            }
+            // Write the same value into the target field.
+            form.FillField("TargetNotes", sourceValue);
 
-            // Get the target field (assumed to be a text box)
-            TextBoxField targetField = form["TargetNotes"] as TextBoxField;
-            if (targetField == null)
-            {
-                Console.Error.WriteLine("Target field 'TargetNotes' not found or is not a text box field.");
-                return;
-            }
-
-            // Copy the inner content/value
-            targetField.Value = sourceField.Value;
-
-            // Save the updated PDF
-            doc.Save(outputPath);
-
-            Console.WriteLine($"Content copied from 'SourceNotes' to 'TargetNotes'. Saved as '{outputPath}'.");
+            // Save the modified PDF.
+            form.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Copied content from 'SourceNotes' to 'TargetNotes' and saved as '{outputPath}'.");
     }
 }

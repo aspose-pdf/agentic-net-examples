@@ -2,13 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for AnnotationFlags
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,28 +17,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Create a zero‑size rectangle for the hidden field (page 1 is used as a container)
-        Rectangle fieldRect = new Rectangle(0, 0, 0, 0);
+        // Zero‑size rectangle – position does not matter for a hidden field
+        Rectangle rect = new Rectangle(0, 0, 0, 0);
 
-        // Create a numeric (textbox) field named "Version" with value "2"
-        TextBoxField versionField = new TextBoxField(pdfDocument.Pages[1], fieldRect)
+        // Create a numeric field named "Version" with value 2
+        NumberField versionField = new NumberField(doc.Pages[1], rect)
         {
             PartialName = "Version",
             Value = "2"
         };
 
-        // Mark the field as hidden by setting the widget annotation flag directly
-        versionField.Flags = AnnotationFlags.Hidden;
+        // Mark the field as hidden using AnnotationFlags
+        versionField.Flags = versionField.Flags | AnnotationFlags.Hidden;
 
-        // Add the field to the PDF form
-        pdfDocument.Form.Add(versionField);
+        // Add the field to the form (first page)
+        doc.Form.Add(versionField, 1);
 
-        // Save the updated PDF
-        pdfDocument.Save(outputPath);
+        // Save the modified PDF
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Hidden numeric field 'Version' added. Saved to '{outputPath}'.");
+        Console.WriteLine($"Hidden numeric field \"Version\" added to '{outputPath}'.");
     }
 }

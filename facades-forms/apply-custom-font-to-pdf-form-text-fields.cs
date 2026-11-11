@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;          // <-- required for TextBoxField
-using Aspose.Pdf.Annotations;   // <-- required for DefaultAppearance
+using Aspose.Pdf.Forms;          // Form field types and Field collection
+using Aspose.Pdf.Annotations;   // DefaultAppearance
 
 class Program
 {
@@ -19,23 +18,22 @@ class Program
         }
 
         // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
+        Document doc = new Document(inputPath);
 
-        // Iterate over all form fields in the document
-        foreach (var field in pdfDoc.Form)
+        // Iterate over all form fields and apply the custom font to text fields only
+        foreach (Field field in doc.Form.Fields)
         {
-            // Process only text box fields (TextBoxField)
-            if (field is TextBoxField textBox)
+            if (field is TextBoxField textField)
             {
-                // Set the default appearance: Arial Bold, size 12, black color
-                // DefaultAppearance expects System.Drawing.Color, so fully qualify to avoid ambiguity with Aspose.Pdf.Color
-                textBox.DefaultAppearance = new DefaultAppearance("Arial,Bold", 12, System.Drawing.Color.Black);
+                // Set the default appearance: font name (Arial Bold), size 12, black colour
+                // The PDF font naming convention – "Arial,Bold" works for Arial Bold.
+                textField.DefaultAppearance = new DefaultAppearance("Arial,Bold", 12, System.Drawing.Color.Black);
             }
         }
 
         // Save the updated PDF
-        pdfDoc.Save(outputPath);
+        doc.Save(outputPath);
 
-        Console.WriteLine($"All text fields updated with Arial Bold and saved to '{outputPath}'.");
+        Console.WriteLine($"Custom font applied and saved to '{outputPath}'.");
     }
 }

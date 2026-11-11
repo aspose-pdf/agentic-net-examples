@@ -1,36 +1,30 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Forms; // needed for form field classes
-
-// Define a class that matches the JSON structure for a form field
-public class FieldDefinition
-{
-    public string? Name { get; set; }          // field name (nullable to satisfy non‑nullable warnings)
-    public string? Type { get; set; }          // e.g., "TextBox", "CheckBox", "RadioButton"
-    public int Page { get; set; }              // 1‑based page index
-    public RectangleDto? Rect { get; set; }    // rectangle coordinates (nullable)
-    public JsonElement Value { get; set; }     // value can be string, bool, number, etc.
-}
-
-// Helper DTO for rectangle coordinates (matches JSON)
-public class RectangleDto
-{
-    public double LLX { get; set; }
-    public double LLY { get; set; }
-    public double URX { get; set; }
-    public double URY { get; set; }
-}
+using Aspose.Pdf.Forms;
 
 class Program
 {
+    // Model representing a field definition from the JSON file
+    private class FieldDefinition
+    {
+        public string Name { get; set; } = null!;          // field identifier
+        public string Type { get; set; } = null!;          // e.g., "TextBox", "CheckBox", "RadioButton", "ComboBox"
+        public int Page { get; set; } = 1;                 // 1‑based page number
+        public double Llx { get; set; }                    // lower‑left X
+        public double Lly { get; set; }                    // lower‑left Y
+        public double Urx { get; set; }                    // upper‑right X
+        public double Ury { get; set; }                    // upper‑right Y
+        public string? Value { get; set; }                 // default value or selected option
+        public string[]? Options { get; set; }             // for list/combobox items
+    }
+
     static void Main()
     {
-        const string jsonPath   = "fields.json";      // input JSON file
+        const string jsonPath   = "fields.json";      // input JSON with field definitions
         const string outputPath = "output.pdf";       // generated PDF
 
         if (!File.Exists(jsonPath))
@@ -43,9 +37,10 @@ class Program
         List<FieldDefinition> fields;
         try
         {
-            string jsonContent = File.ReadAllText(jsonPath);
-            fields = JsonSerializer.Deserialize<List<FieldDefinition>>(jsonContent,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? new List<FieldDefinition>();
+            string json = File.ReadAllText(jsonPath);
+            fields = JsonSerializer.Deserialize<List<FieldDefinition>>(json,
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+                ?? new List<FieldDefinition>();
         }
         catch (Exception ex)
         {
@@ -53,147 +48,154 @@ class Program
             return;
         }
 
-        // Create a new PDF document with a single blank page (more pages can be added later)
-        using (Document pdfDoc = new Document())
+        if (fields.Count == 0)
         {
-            // Ensure at least one page exists; Aspose.Pdf creates a default page when saved,
-            // but we add it explicitly to have a known page count for field placement.
-            pdfDoc.Pages.Add();
+            Console.WriteLine("No field definitions found in JSON.");
+            return;
+        }
 
-            // Iterate over each field definition and create the appropriate form field
-            foreach (var field in fields)
+        // Create a new PDF document
+        using (Document doc = new Document())
+        {
+            // Ensure the document has enough pages for the highest page index used
+            int maxPage = fields.Max(f => f.Page);
+            for (int i = doc.Pages.Count + 1; i <= maxPage; i++)
+                doc.Pages.Add();
+
+            // Helper dictionary for radio‑button groups (group name -> field)
+            var radioGroups = new Dictionary<string, RadioButtonField>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var f in fields)
             {
-                // Basic validation
-                if (field.Name == null)
+                // Validate page number
+                if (f.Page < 1 || f.Page > doc.Pages.Count)
                 {
-                    Console.Error.WriteLine("Field definition missing 'Name'. Skipping.");
-                    continue;
-                }
-                if (field.Rect == null)
-                {
-                    Console.Error.WriteLine($"Field '{field.Name}' missing rectangle definition. Skipping.");
+                    Console.Error.WriteLine($"Invalid page number for field '{f.Name}'. Skipping.");
                     continue;
                 }
 
-                // Convert the rectangle DTO to Aspose.Pdf.Rectangle (1‑based page indexing)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    field.Rect.LLX,
-                    field.Rect.LLY,
-                    field.Rect.URX,
-                    field.Rect.URY);
+                // Build the rectangle for the field location
+                Rectangle rect = new Rectangle(f.Llx, f.Lly, f.Urx, f.Ury);
 
-                // Guard against invalid page numbers
-                if (field.Page < 1 || field.Page > pdfDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {field.Page} for field '{field.Name}'. Skipping.");
-                    continue;
-                }
-
-                // Create field based on its type
-                switch (field.Type?.Trim().ToLowerInvariant())
+                // Dispatch based on field type (case‑insensitive)
+                switch (f.Type?.Trim().ToLowerInvariant())
                 {
                     case "textbox":
+                    case "text":
+                        var txt = new TextBoxField(doc.Pages[f.Page], rect)
                         {
-                            string txtValue = field.Value.ValueKind == JsonValueKind.String
-                                ? field.Value.GetString()!
-                                : string.Empty;
-                            var txtField = new TextBoxField(pdfDoc.Pages[field.Page], rect)
-                            {
-                                PartialName = field.Name,
-                                Value = txtValue
-                            };
-                            pdfDoc.Form.Add(txtField, field.Page);
-                        }
+                            PartialName = f.Name,
+                            Value = f.Value ?? string.Empty
+                        };
+                        doc.Form.Add(txt, f.Page);
                         break;
 
                     case "checkbox":
+                        bool isChecked = string.Equals(f.Value, "On", StringComparison.OrdinalIgnoreCase) ||
+                                         string.Equals(f.Value, "true", StringComparison.OrdinalIgnoreCase);
+                        var chk = new CheckboxField(doc.Pages[f.Page], rect)
                         {
-                            bool chkValue = field.Value.ValueKind == JsonValueKind.True;
-                            var chkField = new CheckboxField(pdfDoc.Pages[field.Page], rect)
-                            {
-                                PartialName = field.Name,
-                                // Aspose expects "On" for checked, empty string for unchecked
-                                Value = chkValue ? "On" : string.Empty
-                            };
-                            pdfDoc.Form.Add(chkField, field.Page);
-                        }
+                            PartialName = f.Name,
+                            Checked = isChecked
+                        };
+                        doc.Form.Add(chk, f.Page);
                         break;
 
                     case "radiobutton":
+                        // RadioButtonField represents a *group*. We create (or reuse) a group per field name.
+                        if (!radioGroups.TryGetValue(f.Name, out var radioGroup))
                         {
-                            // Use RadioButtonOptionField for a single option
-                            string exportValue = field.Value.ValueKind == JsonValueKind.String
-                                ? field.Value.GetString()!
-                                : "On";
-                            var radioField = new RadioButtonOptionField(pdfDoc.Pages[field.Page], rect)
+                            radioGroup = new RadioButtonField(doc.Pages[f.Page])
                             {
-                                PartialName = field.Name,
-                                Value = exportValue
+                                PartialName = f.Name
                             };
-                            pdfDoc.Form.Add(radioField, field.Page);
+                            doc.Form.Add(radioGroup, f.Page);
+                            radioGroups[f.Name] = radioGroup;
                         }
-                        break;
-
-                    case "listbox":
+                        // Add an option – the option name is taken from the Value if supplied, otherwise a generated name.
+                        string optionName = f.Value ?? $"Option{radioGroup.Options.Count + 1}";
+                        radioGroup.AddOption(optionName, rect);
+                        // If the supplied value indicates the option should be selected, set Selected to the newly added index.
+                        if (string.Equals(f.Value, "On", StringComparison.OrdinalIgnoreCase) ||
+                            string.Equals(f.Value, optionName, StringComparison.OrdinalIgnoreCase))
                         {
-                            var listBox = new ListBoxField(pdfDoc.Pages[field.Page], rect)
-                            {
-                                PartialName = field.Name
-                            };
-                            List<string> items = new List<string>();
-                            if (field.Value.ValueKind == JsonValueKind.Array)
-                            {
-                                foreach (var item in field.Value.EnumerateArray())
-                                {
-                                    if (item.ValueKind == JsonValueKind.String)
-                                        items.Add(item.GetString()!);
-                                }
-                            }
-                            // Add options to the list box
-                            foreach (var itm in items)
-                                listBox.AddOption(itm);
-                            // Select the first item if any
-                            if (items.Count > 0)
-                                listBox.SelectedItems = new int[] { 0 };
-                            pdfDoc.Form.Add(listBox, field.Page);
+                            // Options are 1‑based; the newly added option is the last one.
+                            radioGroup.Selected = radioGroup.Options.Count; // 1‑based index
                         }
                         break;
 
                     case "combobox":
+                        var combo = new ComboBoxField(doc.Pages[f.Page], rect)
                         {
-                            var comboBox = new ComboBoxField(pdfDoc.Pages[field.Page], rect)
+                            PartialName = f.Name
+                        };
+                        if (f.Options != null && f.Options.Length > 0)
+                        {
+                            foreach (var opt in f.Options)
+                                combo.AddOption(opt);
+
+                            // Pre‑select if a matching value is supplied
+                            if (!string.IsNullOrEmpty(f.Value))
                             {
-                                PartialName = field.Name
-                            };
-                            List<string> items = new List<string>();
-                            if (field.Value.ValueKind == JsonValueKind.Array)
-                            {
-                                foreach (var item in field.Value.EnumerateArray())
-                                {
-                                    if (item.ValueKind == JsonValueKind.String)
-                                        items.Add(item.GetString()!);
-                                }
+                                int idx = Array.FindIndex(f.Options, o => o == f.Value);
+                                if (idx >= 0)
+                                    combo.Selected = idx + 1; // 1‑based
                             }
-                            // Add options to the combo box
-                            foreach (var itm in items)
-                                comboBox.AddOption(itm);
-                            // Pre‑select the first option if any (use Value, not SelectedItem)
-                            if (items.Count > 0)
-                                comboBox.Value = items[0];
-                            pdfDoc.Form.Add(comboBox, field.Page);
                         }
+                        else if (!string.IsNullOrEmpty(f.Value))
+                        {
+                            // No explicit options list – add the single value as the only option and select it
+                            combo.AddOption(f.Value);
+                            combo.Selected = 1;
+                        }
+                        doc.Form.Add(combo, f.Page);
+                        break;
+
+                    case "listbox":
+                        var list = new ListBoxField(doc.Pages[f.Page], rect)
+                        {
+                            PartialName = f.Name
+                        };
+                        if (f.Options != null && f.Options.Length > 0)
+                        {
+                            foreach (var opt in f.Options)
+                                list.AddOption(opt);
+
+                            // Pre‑select if a matching value is supplied (single‑select list box)
+                            if (!string.IsNullOrEmpty(f.Value))
+                            {
+                                int idx = Array.FindIndex(f.Options, o => o == f.Value);
+                                if (idx >= 0)
+                                    list.SelectedItems = new[] { idx + 1 }; // 1‑based array
+                            }
+                        }
+                        else if (!string.IsNullOrEmpty(f.Value))
+                        {
+                            // No explicit options – add the value as the only option and select it
+                            list.AddOption(f.Value);
+                            list.SelectedItems = new[] { 1 };
+                        }
+                        doc.Form.Add(list, f.Page);
+                        break;
+
+                    case "signature":
+                        var sig = new SignatureField(doc.Pages[f.Page], rect)
+                        {
+                            PartialName = f.Name
+                        };
+                        doc.Form.Add(sig, f.Page);
                         break;
 
                     default:
-                        Console.Error.WriteLine($"Unsupported field type '{field.Type}' for field '{field.Name}'. Skipping.");
+                        Console.Error.WriteLine($"Unsupported field type '{f.Type}' for field '{f.Name}'. Skipping.");
                         break;
                 }
             }
 
             // Save the resulting PDF
-            pdfDoc.Save(outputPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with form fields created: {outputPath}");
+        Console.WriteLine($"PDF with imported fields saved to '{outputPath}'.");
     }
 }

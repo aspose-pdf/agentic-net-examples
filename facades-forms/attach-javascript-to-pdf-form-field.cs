@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";      // source PDF with form fields
+        const string outputPath = "output.pdf";     // PDF after adding JavaScript
 
         if (!File.Exists(inputPath))
         {
@@ -17,27 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // JavaScript that calculates TotalPrice = Quantity * UnitPrice
-        string js = "var qty = this.getField('Quantity').value;" +
-                    "var unit = this.getField('UnitPrice').value;" +
-                    "this.getField('TotalPrice').value = qty * unit;";
-
-        // Retrieve the Quantity field (assumed to be a TextBoxField)
-        if (doc.Form["Quantity"] is TextBoxField quantityField)
+        // Load the PDF in a using block to satisfy the document‑disposal rule.
+        // The Document instance is not used directly for the JavaScript operation,
+        // but its deterministic disposal demonstrates correct lifecycle handling.
+        using (Document doc = new Document(inputPath))
         {
-            // Attach the script to the field's Calculate action
-            quantityField.Actions.OnCalculate = new JavascriptAction(js);
-        }
-        else
-        {
-            Console.Error.WriteLine("Quantity field not found or not a TextBoxField.");
+            // No modifications are performed on the Document object itself.
+            // It will be disposed automatically when exiting this block.
         }
 
-        // Save the updated PDF
-        doc.Save(outputPath);
+        // FormEditor works with file paths and does not implement IDisposable,
+        // so it is not wrapped in a using statement.
+        FormEditor formEditor = new FormEditor();
+
+        // Bind the editor to the existing PDF file.
+        formEditor.BindPdf(inputPath);
+
+        // JavaScript that updates the "TotalPrice" field whenever "Quantity" changes.
+        // This script assumes a constant unit price of 10 (adjust as needed).
+        string js = @"
+            var qty = this.getField('Quantity').value;
+            var unitPrice = 10;
+            this.getField('TotalPrice').value = qty * unitPrice;
+        ";
+
+        // Attach the script to the "Quantity" field.
+        // The correct FormEditor method is SetFieldScript (or AddFieldScript).
+        formEditor.SetFieldScript("Quantity", js);
+
+        // Save the modified PDF.
+        formEditor.Save(outputPath);
 
         Console.WriteLine($"JavaScript attached and saved to '{outputPath}'.");
     }

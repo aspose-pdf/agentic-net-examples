@@ -1,75 +1,89 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
-// Stub for missing FdfDocument class (if the Aspose.Pdf library version does not contain it).
-// In a real project, reference the proper Aspose.Pdf NuGet package that includes Aspose.Pdf.Facades.FdfDocument.
-namespace Aspose.Pdf.Facades
-{
-    public class FdfDocument
-    {
-        private readonly System.Collections.Generic.List<(string Name, string Value)> _fields = new();
-
-        /// <summary>
-        /// Adds a field definition to the FDF document.
-        /// </summary>
-        public void AddField(string name, string value)
-        {
-            _fields.Add((name, value));
-        }
-
-        /// <summary>
-        /// Saves the FDF document to the specified path.
-        /// This stub writes a simple "name=value" text file for demonstration purposes.
-        /// </summary>
-        public void Save(string path)
-        {
-            using var writer = new StreamWriter(path);
-            foreach (var field in _fields)
-            {
-                writer.WriteLine($"{field.Name}={field.Value}");
-            }
-        }
-    }
-}
-
-class ExportCheckboxesToFdf
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFdfPath = "checkboxes.fdf";
+        const string pdfPath = "input.pdf";
+        const string fdfPath = "checkboxes.fdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Create a new FDF document to hold the checkbox definitions
-            FdfDocument fdfDoc = new FdfDocument();
+            // Create a simple FDF writer (the Aspose.FdfDocument class is not available in the referenced version)
+            SimpleFdfWriter fdfWriter = new SimpleFdfWriter();
 
             // Iterate over all form fields in the PDF
-            foreach (var field in pdfDoc.Form.Fields)
+            foreach (Field field in pdfDoc.Form)
             {
                 // Process only checkbox fields
                 if (field is CheckboxField checkBox)
                 {
-                    // Add the checkbox field definition to the FDF.
-                    // The value is left empty because we only need the definition.
-                    fdfDoc.AddField(checkBox.FullName, string.Empty);
+                    // Add the checkbox field definition to the FDF (no value assigned)
+                    fdfWriter.AddField(checkBox.FullName, string.Empty);
                 }
             }
 
             // Save the FDF file containing only checkbox definitions
-            fdfDoc.Save(outputFdfPath);
+            fdfWriter.Save(fdfPath);
         }
 
-        Console.WriteLine($"Checkbox field definitions exported to '{outputFdfPath}'.");
+        Console.WriteLine($"Checkbox definitions exported to '{fdfPath}'.");
+    }
+}
+
+/// <summary>
+/// Minimal FDF writer that creates a valid FDF file containing field definitions.
+/// This replaces the missing Aspose.Pdf.Facades.FdfDocument class.
+/// </summary>
+public class SimpleFdfWriter
+{
+    private readonly List<(string Name, string Value)> _fields = new();
+
+    /// <summary>
+    /// Adds a field definition to the FDF.
+    /// </summary>
+    /// <param name="name">The fully‑qualified field name.</param>
+    /// <param name="value">The field value (empty string for definition only).</param>
+    public void AddField(string name, string value)
+    {
+        _fields.Add((name, value));
+    }
+
+    /// <summary>
+    /// Writes the accumulated fields to an FDF file.
+    /// </summary>
+    /// <param name="path">The output file path.</param>
+    public void Save(string path)
+    {
+        using var writer = new StreamWriter(path, false, System.Text.Encoding.ASCII);
+        writer.WriteLine("%FDF-1.2");
+        writer.WriteLine("1 0 obj");
+        writer.WriteLine("<< /FDF << /Fields [");
+        foreach (var (name, value) in _fields)
+        {
+            writer.WriteLine($"<< /T ({Escape(name)}) /V ({Escape(value)}) >>");
+        }
+        writer.WriteLine("] >> >>");
+        writer.WriteLine("endobj");
+        writer.WriteLine("trailer");
+        writer.WriteLine("<< /Root 1 0 R >>");
+        writer.WriteLine("%%EOF");
+    }
+
+    private static string Escape(string s)
+    {
+        // Escape backslashes and parentheses as required by the PDF syntax
+        return s.Replace("\\", "\\\\").Replace("(", "\\(").Replace(")", "\\)");
     }
 }

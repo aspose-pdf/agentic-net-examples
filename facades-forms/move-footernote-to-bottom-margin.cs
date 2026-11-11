@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
@@ -9,7 +9,6 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName  = "FooterNote";
 
         if (!File.Exists(inputPath))
         {
@@ -17,45 +16,45 @@ class Program
             return;
         }
 
-        // Load the PDF to obtain page dimensions.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // FormEditor works on the PDF document directly.
-            FormEditor formEditor = new FormEditor();
-            formEditor.BindPdf(doc); // bind the loaded document
-
-            // Iterate over all pages and reposition the field.
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Page size (points)
+                // Page dimensions
                 double pageWidth  = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Bottom‑margin rectangle for the field.
-                double margin      = 20.0;   // 20 points from left/right and bottom
-                double fieldHeight = 30.0;   // desired field height
+                // Desired margins (points)
+                double leftMargin   = 20;
+                double rightMargin  = 20;
+                double bottomMargin = 20;
+                double fieldHeight  = 15; // height of the FooterNote field
 
-                double llx = margin;                     // lower‑left X
-                double lly = margin;                     // lower‑left Y (from bottom)
-                double urx = pageWidth - margin;         // upper‑right X
-                double ury = margin + fieldHeight;       // upper‑right Y
+                // Calculate rectangle coordinates for the footer field
+                double llx = leftMargin;
+                double lly = bottomMargin;
+                double urx = pageWidth - rightMargin;
+                double ury = bottomMargin + fieldHeight;
 
-                // MoveField(name, llx, lly, urx, ury) repositions the field.
-                // The method applies to the current page context; because we iterate
-                // through each page, the field will be placed on every page.
-                formEditor.MoveField(fieldName,
-                                     (float)llx,
-                                     (float)lly,
-                                     (float)urx,
-                                     (float)ury);
+                // Ensure the form and the specific field exist
+                if (doc.Form != null && doc.Form["FooterNote"] != null)
+                {
+                    // Access the field (could be TextBoxField, CheckBoxField, etc.)
+                    var field = doc.Form["FooterNote"];
+
+                    // Set the field rectangle using a fully qualified Rectangle
+                    field.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                }
             }
 
-            // Save the modified PDF.
-            formEditor.Save(outputPath);
+            // Save the modified PDF (no PreSave needed)
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field '{fieldName}' moved to bottom margin on each page and saved to '{outputPath}'.");
+        Console.WriteLine($"FooterNote repositioned and saved to '{outputPath}'.");
     }
 }

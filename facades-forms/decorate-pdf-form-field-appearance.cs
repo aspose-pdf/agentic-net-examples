@@ -1,13 +1,15 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Only one import needed
+using System.Drawing;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "decorated.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,30 +17,28 @@ class Program
             return;
         }
 
-        // Bind the PDF to the FormEditor (Facades API)
-        using (FormEditor editor = new FormEditor())
+        // Load the PDF with FormEditor (Facades API)
+        var editor = new FormEditor();
+        editor.BindPdf(inputPath);
+
+        // Define the appearance that will be applied to the field "CustomerName"
+        editor.Facade = new FormFieldFacade
         {
-            editor.BindPdf(inputPath);
+            BorderColor = System.Drawing.Color.LightGray,
+            BackgroundColor = System.Drawing.Color.LightYellow,
+            BorderWidth = 1,
+            BorderStyle = FormFieldFacade.BorderStyleSolid,
+            Alignment = FormFieldFacade.AlignLeft,
+            FontSize = 12,
+            TextColor = System.Drawing.Color.FromArgb(0, 0, 128), // dark blue
+            Font = Aspose.Pdf.Facades.FontStyle.Helvetica // fully‑qualified to avoid ambiguity
+        };
 
-            // ----- Configure field appearance via the Facade -----
-            // Custom border color (dark blue)
-            editor.Facade.BorderColor = System.Drawing.Color.FromArgb(0, 51, 204);
-            // Custom background shade (light yellow‑gray)
-            editor.Facade.BackgroundColor = System.Drawing.Color.FromArgb(230, 230, 179);
+        // Apply the appearance to the existing field
+        editor.DecorateField("CustomerName");
 
-            // Optional: set border width and style (thin solid line)
-            editor.Facade.BorderWidth = FormFieldFacade.BorderWidthThin; // float constant
-            editor.Facade.BorderStyle = FormFieldFacade.BorderStyleSolid; // int constant
-
-            // Set font style to bold (using a built‑in Facade font style)
-            editor.Facade.Font = FontStyle.TimesBold; // Aspose.Pdf.Facades.FontStyle enum
-            editor.Facade.FontSize = 12F;
-
-            // Apply the configured appearance to the specific field
-            editor.DecorateField("CustomerName");
-
-            // Save the modified PDF
-            editor.Save(outputPath);
-        }
+        // Save the modified PDF
+        editor.Save(outputPath);
+        editor.Close();
     }
 }

@@ -9,7 +9,7 @@ class Program
     {
         // Folder containing source PDFs
         const string inputFolder = "InputPdfs";
-        // Folder where modified PDFs will be saved
+        // Folder where modified PDFs will be written
         const string outputFolder = "OutputPdfs";
 
         if (!Directory.Exists(inputFolder))
@@ -18,41 +18,47 @@ class Program
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+
+        foreach (string pdfPath in pdfFiles)
         {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_SelectAll.pdf");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileNameWithoutExt + "_SelectAll.pdf");
 
             try
             {
-                // Load the PDF document
-                Document doc = new Document(inputPath);
-
-                // Define the checkbox rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-                Rectangle rect = new Rectangle(100, 700, 120, 720);
-
-                // Create a checkbox field on the first page (pages are 1‑based)
-                CheckboxField checkBox = new CheckboxField(doc.Pages[1], rect)
+                // Load the PDF document (Document implements IDisposable)
+                using (Document doc = new Document(pdfPath))
                 {
-                    PartialName = "SelectAll",
-                    // Optional: set the default state (checked/unchecked)
-                    Checked = false
-                };
+                    // Aspose.Pdf uses 1‑based page indexing
+                    Page firstPage = doc.Pages[1];
 
-                // Add the field to the document's form (page index is 1‑based)
-                doc.Form.Add(checkBox, 1);
+                    // Define the rectangle for the checkbox (lower‑left X/Y, upper‑right X/Y)
+                    Rectangle checkboxRect = new Rectangle(100, 700, 120, 720);
 
-                // Save the updated PDF
-                doc.Save(outputPath);
+                    // Create the checkbox field on the first page
+                    CheckboxField selectAllCheckbox = new CheckboxField(firstPage, checkboxRect)
+                    {
+                        PartialName = "SelectAll",
+                        Checked = false // optional default state
+                    };
 
-                Console.WriteLine($"Processed: {inputPath} → {outputPath}");
+                    // Add the checkbox to the document's form collection
+                    doc.Form.Add(selectAllCheckbox);
+
+                    // Save the modified PDF
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Processed: {pdfPath} → {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
     }

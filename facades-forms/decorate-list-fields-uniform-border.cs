@@ -1,8 +1,11 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // needed for Border
+// System.Drawing is kept for Color, but all ambiguous types are fully qualified where needed.
+using System.Drawing; // only for System.Drawing.Color
 
 class Program
 {
@@ -11,40 +14,49 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load PDF document using the high‑level API (no external exe required)
-        Document pdfDocument = new Document(inputPath);
-
-        // If the PDF does not contain a form, just save a copy and exit
-        if (pdfDocument.Form == null || pdfDocument.Form.Count == 0)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            Console.WriteLine("No form fields found in the PDF.");
-            pdfDocument.Save(outputPath);
-            return;
-        }
+            // Bind FormEditor to the document
+            var editor = new FormEditor();
+            editor.BindPdf(doc);
 
-        // Iterate over all form fields and style ListBox (list) fields uniformly
-        foreach (Field field in pdfDocument.Form)
-        {
-            if (field is ListBoxField listBox)
+            // Retrieve all field names from the document's Form collection
+            var fieldNames = doc.Form?.Fields?
+                .Where(f => f is ListBoxField)
+                .Select(f => f.Name)
+                .ToArray() ?? Array.Empty<string>();
+
+            // Define a uniform appearance for list fields via FormFieldFacade
+            editor.Facade = new FormFieldFacade
             {
-                // Set a uniform border (width only – Border has no Color property)
-                listBox.Border = new Border(listBox) { Width = 1 };
+                BorderColor = System.Drawing.Color.Black,
+                BackgroundColor = System.Drawing.Color.FromArgb(230, 230, 230), // light gray background
+                BorderWidth = 1,
+                BorderStyle = FormFieldFacade.BorderStyleSolid,
+                FontSize = 12,
+                // Fully qualify FontStyle to the one in Aspose.Pdf.Facades
+                Font = Aspose.Pdf.Facades.FontStyle.Helvetica,
+                TextColor = System.Drawing.Color.Black,
+                Alignment = FormFieldFacade.AlignLeft
+            };
 
-                // Set a background‑like color (ListBoxField does not expose a separate
-                // BackgroundColor property, the Color property is used for appearance)
-                listBox.Color = Aspose.Pdf.Color.LightGray;
+            // Apply the appearance to every ListBox field
+            foreach (string name in fieldNames)
+            {
+                editor.DecorateField(name);
             }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
-        Console.WriteLine($"All list fields have been styled and saved to '{outputPath}'.");
+        Console.WriteLine($"All list fields have been decorated and saved to '{outputPath}'.");
     }
 }

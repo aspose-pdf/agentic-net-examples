@@ -1,13 +1,15 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName = "Address";
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +17,19 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // FormEditor is the correct facade for editing form fields.
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Create a FormEditor and bind it to the loaded document
-            Aspose.Pdf.Facades.FormEditor formEditor = new Aspose.Pdf.Facades.FormEditor();
-            formEditor.BindPdf(doc);
+            // Load the PDF document.
+            formEditor.BindPdf(inputPath);
 
-            // Set the alignment of the field named "Address" to center.
-            // SetFieldAlignment expects an int; cast the HorizontalAlignment enum to int.
-            formEditor.SetFieldAlignment("Address", (int)Aspose.Pdf.HorizontalAlignment.Center);
+            // Set the alignment of the "Address" field to center.
+            formEditor.SetFieldAlignment(fieldName, (int)HorizontalAlignment.Center);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the updated PDF.
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Field alignment set and saved to '{outputPath}'.");
+        Console.WriteLine($"Field \"{fieldName}\" alignment set to center. Saved to '{outputPath}'.");
     }
 }

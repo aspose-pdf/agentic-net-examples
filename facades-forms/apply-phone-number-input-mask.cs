@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Reflection;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,50 +15,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        var document = new Document(inputPath);
+        // Load the PDF into the FormEditor facade
+        using var formEditor = new FormEditor();
+        formEditor.BindPdf(inputPath);
 
-        // Retrieve the field named "PhoneNumber"
-        if (document.Form["PhoneNumber"] is TextBoxField phoneField)
-        {
-            // Aspose.Pdf's TextBoxField does not expose a public SetOption method in recent versions.
-            // Use reflection to invoke the internal SetOption(string, object) method, which allows us to
-            // add custom attributes such as an input mask.
-            SetCustomOption(phoneField, "InputMask", "(###) ###-####");
-        }
-        else
-        {
-            Console.Error.WriteLine("Field 'PhoneNumber' not found or is not a text box field.");
-        }
+        // Apply an input mask to the "PhoneNumber" field.
+        // FormEditor does not expose a SetFieldCustomAttribute method.
+        // The usual way to add custom behaviour is to attach a JavaScript
+        // snippet to the field via SetFieldScript. The script below creates a
+        // custom attribute called "inputMask" that can be read by other
+        // JavaScript in the PDF (or by a PDF viewer that respects it).
+        string js = "this.getField('PhoneNumber').setAttribute('inputMask', '(###) ###-####');";
+        formEditor.SetFieldScript("PhoneNumber", js);
 
-        // Save the modified PDF
-        document.Save(outputPath);
-
-        Console.WriteLine($"PhoneNumber field updated with input mask. Saved to '{outputPath}'.");
-    }
-
-    /// <summary>
-    /// Invokes the internal SetOption method on a form field via reflection.
-    /// This works for all field types that inherit from Aspose.Pdf.Forms.Field.
-    /// </summary>
-    /// <param name="field">The form field instance.</param>
-    /// <param name="optionName">The name of the option (e.g., "InputMask").</param>
-    /// <param name="optionValue">The value to assign to the option.</param>
-    private static void SetCustomOption(Field field, string optionName, object optionValue)
-    {
-        // Look for a method named "SetOption" that takes (string, object).
-        const BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-        MethodInfo? setOptionMethod = field.GetType().GetMethod("SetOption", flags, null, new[] { typeof(string), typeof(object) }, null);
-
-        if (setOptionMethod != null)
-        {
-            setOptionMethod.Invoke(field, new[] { optionName, optionValue });
-        }
-        else
-        {
-            // If the method does not exist (unlikely in supported versions), fall back to the
-            // field's "CustomData" dictionary if available, or simply log a warning.
-            Console.Error.WriteLine($"Unable to set custom option '{optionName}'. The SetOption method is not available on type {field.GetType().FullName}.");
-        }
+        // Save the updated PDF
+        formEditor.Save(outputPath);
+        Console.WriteLine($"PhoneNumber field mask applied and saved to '{outputPath}'.");
     }
 }

@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for JavascriptAction
+using Aspose.Pdf.Forms;      // for ButtonField and DefaultAppearance
 
 class Program
 {
@@ -17,27 +17,28 @@ class Program
             return;
         }
 
-        // Load the existing PDF
+        // Load the PDF document
         Document doc = new Document(inputPath);
 
-        // Define the button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-        Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 700, 200, 730);
+        // Define button position (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+        Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-        // Create a button field named "ResetForm"
+        // Create a push button field named "ResetForm"
         ButtonField resetButton = new ButtonField(doc.Pages[1], buttonRect)
         {
             PartialName = "ResetForm",
-            Value = "Reset"
+            // Appearance must be set before setting the caption
+            DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black),
+            NormalCaption = "Reset"
         };
 
-        // Attach JavaScript that clears all form fields when the button is clicked
-        // Use a valid action property (OnPressMouseBtn or OnReleaseMouseBtn) instead of the non‑existent OnMouseUp
-        resetButton.Actions.OnPressMouseBtn = new JavascriptAction("this.resetForm();");
-
-        // Add the button to the form (page index is 1‑based)
+        // Add the button to the form on page 1
         doc.Form.Add(resetButton, 1);
 
-        // Save the modified PDF
+        // Assign JavaScript that clears all form fields when the button is clicked
+        resetButton.OnActivated = new JavascriptAction("this.resetForm();");
+
+        // Save the updated PDF
         doc.Save(outputPath);
 
         Console.WriteLine($"PDF with ResetForm button saved to '{outputPath}'.");

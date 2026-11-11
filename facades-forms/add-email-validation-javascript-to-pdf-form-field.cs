@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,35 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF using the FormEditor facade
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Retrieve the TextBox field named "Email"
-            TextBoxField emailField = doc.Form["Email"] as TextBoxField;
-            if (emailField == null)
-            {
-                Console.Error.WriteLine("Field 'Email' not found or is not a TextBoxField.");
-                return;
-            }
+            formEditor.BindPdf(inputPath);
 
-            // JavaScript that validates the email format on blur (OnLostFocus)
-            string js = @"
-var f = this.getField('Email');
-var val = f.value;
-var pattern = /^[\w\-\.+]+@([\w\-]+\.)+[\w\-]{2,4}$/;
-if (!pattern.test(val)) {
+            // JavaScript that validates the email format on blur event
+            // It checks the field value against a simple regex and shows an alert if invalid.
+            string emailJs = @"
+if (event.value != null && !event.value.match(/^\S+@\S+\.\S+$/)) {
     app.alert('Invalid email address');
-    f.setFocus();
+    event.rc = false; // prevent the field from losing focus
 }
 ";
 
-            // Assign the JavaScript action to the OnLostFocus event
-            emailField.Actions.OnLostFocus = new JavascriptAction(js);
+            // Attach the JavaScript to the field named "Email"
+            // FormEditor uses AddFieldScript for this purpose.
+            formEditor.AddFieldScript("Email", emailJs);
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            formEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript validation to '{outputPath}'.");
+        Console.WriteLine($"JavaScript added and saved to '{outputPath}'.");
     }
 }
