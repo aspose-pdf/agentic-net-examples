@@ -7,64 +7,53 @@ class Program
 {
     static void Main()
     {
-        // Network share containing the PDFs
-        const string networkFolder = @"\\server\share\pdfs";
+        // Network share containing source PDFs
+        const string sourceFolder = @"\\networkshare\pdfs";
+        // Folder where stamped PDFs will be written
+        const string outputFolder = @"\\networkshare\pdfs\Stamped";
 
-        // Verify the folder exists
-        if (!Directory.Exists(networkFolder))
+        if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {networkFolder}");
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
             return;
         }
 
-        // Get all PDF files in the folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(networkFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found.");
-            return;
-        }
+        Directory.CreateDirectory(outputFolder);
 
-        foreach (string inputPath in pdfFiles)
+        // Enumerate all PDF files in the share (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string pdfPath in pdfFiles)
         {
-            try
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath = Path.Combine(outputFolder, fileName);
+
+            // Load the source PDF
+            using (var document = new Document(pdfPath))
             {
-                // Load the source PDF
-                using (Document doc = new Document(inputPath))
+                // Create a TextStamp (core API) – this is the correct way to add a rotated text watermark.
+                var stamp = new TextStamp("CONFIDENTIAL")
                 {
-                    // Create a text stamp that will be reused for every page
-                    TextStamp stamp = new TextStamp("CONFIDENTIAL");
-                    stamp.TextState.Font = FontRepository.FindFont("Helvetica");
-                    stamp.TextState.FontSize = 24;
-                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+                    Background = false,               // draw on top of page content
+                    RotateAngle = 45,                 // rotate stamp 45 degrees
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                stamp.TextState.FontSize = 48;
+                stamp.TextState.FontStyle = FontStyles.Bold;
+                stamp.TextState.ForegroundColor = Color.Red;
 
-                    // Rotate the stamp 45 degrees
-                    stamp.RotateAngle = 45; // degrees
-
-                    // Center the stamp on each page
-                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                    stamp.VerticalAlignment   = VerticalAlignment.Center;
-
-                    // Apply the stamp to every page in the document
-                    foreach (Page page in doc.Pages)
-                    {
-                        page.AddStamp(stamp);
-                    }
-
-                    // Build output file name (original name + "_stamped")
-                    string directory = Path.GetDirectoryName(inputPath);
-                    string fileName  = Path.GetFileNameWithoutExtension(inputPath);
-                    string outputPath = Path.Combine(directory, $"{fileName}_stamped.pdf");
-
-                    // Save the modified PDF
-                    doc.Save(outputPath);
-                    Console.WriteLine($"Stamped PDF saved: {outputPath}");
+                // Apply the stamp to every page in the document
+                foreach (Page page in document.Pages)
+                {
+                    page.AddStamp(stamp);
                 }
+
+                // Save the stamped PDF to the output location
+                document.Save(outPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Stamped PDF saved: {outPath}");
         }
     }
 }

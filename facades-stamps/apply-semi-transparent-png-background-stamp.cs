@@ -7,44 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string pngPath   = "background.png";
+        const string bgImage = "background.png";
 
-        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(pngPath))
+
+        if (!File.Exists(bgImage))
         {
-            Console.Error.WriteLine($"Background PNG not found: {pngPath}");
+            Console.Error.WriteLine($"Background image not found: {bgImage}");
             return;
         }
 
         // Load the PDF document
         Document pdfDocument = new Document(inputPdf);
 
-        // Apply the semi‑transparent background image to every page
+        // Iterate through each page and add a background image stamp
         foreach (Page page in pdfDocument.Pages)
         {
-            ImageStamp stamp = new ImageStamp(pngPath)
+            // Create an ImageStamp from the PNG file
+            ImageStamp stamp = new ImageStamp(bgImage)
             {
-                // Place the image behind existing page content
+                // Place the stamp behind existing page content
                 Background = true,
-                // Semi‑transparent (0.0 = fully transparent, 1.0 = opaque)
+                // 50 % transparency
                 Opacity = 0.5,
-                // Stretch the image to cover the whole page
-                Width  = page.PageInfo.Width,
-                Height = page.PageInfo.Height,
-                // Align to the lower‑left corner (origin) of the page
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Size the stamp to the page dimensions
+                Width = page.Rect.Width,
+                Height = page.Rect.Height,
+                // Position at the lower‑left corner of the page
                 XIndent = 0,
                 YIndent = 0
             };
 
+            // Add the stamp to the current page
             page.AddStamp(stamp);
         }
 

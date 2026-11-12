@@ -7,49 +7,49 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "header_stamped.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Define header lines and their corresponding colors (Aspose.Pdf.Color to avoid ambiguity)
-        string[] headerLines = { "Company Confidential", "Prepared for: John Doe", "Date: 2024‑10‑05" };
-        Aspose.Pdf.Color[] lineColors = { Aspose.Pdf.Color.Red, Aspose.Pdf.Color.Green, Aspose.Pdf.Color.Blue };
+        // Load the PDF document.
+        Document pdf = new Document(inputPath);
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPdf);
-
-        // Apply each line as a separate TextStamp with its own color
-        for (int i = 0; i < headerLines.Length; i++)
+        // ----- First header line (red) -----
+        TextStamp line1 = new TextStamp("First Header Line")
         {
-            // Create a TextStamp for the current line
-            TextStamp stamp = new TextStamp(headerLines[i])
-            {
-                // Center the stamp horizontally at the top of the page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Top,
-                // Offset each line vertically (TopMargin is measured from the top edge)
-                TopMargin = 20 + i * 20
-            };
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Top,
+            YIndent = 20 // distance from the top edge
+        };
+        line1.TextState.Font = FontRepository.FindFont("Arial");
+        line1.TextState.FontSize = 14;
+        line1.TextState.ForegroundColor = Color.FromRgb(255, 0, 0); // Red
 
-            // Configure the visual appearance of the stamp
-            stamp.TextState.FontSize = 14;
-            stamp.TextState.ForegroundColor = lineColors[i];
+        // ----- Second header line (green) -----
+        TextStamp line2 = new TextStamp("Second Header Line")
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Top,
+            YIndent = 40 // placed below the first line
+        };
+        line2.TextState.Font = FontRepository.FindFont("Arial");
+        line2.TextState.FontSize = 14;
+        line2.TextState.ForegroundColor = Color.FromRgb(0, 153, 0); // Green
 
-            // Add the stamp to every page of the document
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.AddStamp(stamp);
-            }
+        // Add both stamps to every page of the document.
+        foreach (Page page in pdf.Pages)
+        {
+            page.AddStamp(line1);
+            page.AddStamp(line2);
         }
 
-        // Save the modified PDF
-        pdfDoc.Save(outputPdf);
-
-        Console.WriteLine($"Header stamp applied successfully. Output saved to '{outputPdf}'.");
+        // Save the stamped PDF.
+        pdf.Save(outputPath);
+        Console.WriteLine($"Multi‑line header stamp applied and saved to '{outputPath}'.");
     }
 }

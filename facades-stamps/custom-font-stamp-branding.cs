@@ -1,58 +1,59 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // FontRepository, Font, Color
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "branded_output.pdf";
-        const string fontFilePath = "CustomBrandFont.ttf"; // TrueType font file
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "branded_output.pdf";
+        const string fontPath  = "MyBrandFont.ttf";   // path to custom TrueType font
+        const string stampText = "My Brand";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(fontFilePath))
+
+        if (!File.Exists(fontPath))
         {
-            Console.Error.WriteLine($"Font file not found: {fontFilePath}");
+            Console.Error.WriteLine($"Font file not found: {fontPath}");
             return;
         }
 
         try
         {
-            // Load the custom TrueType font
-            Font customFont = FontRepository.OpenFont(fontFilePath);
+            // Locate the custom font and obtain its internal font name
+            var fontInfo = FontRepository.FindFont(fontPath);
+            if (fontInfo == null)
+                throw new InvalidOperationException($"Unable to load font from '{fontPath}'.");
+            string fontName = fontInfo.FontName;
 
-            // Create a text stamp with branding text
-            TextStamp brandStamp = new TextStamp("My Brand");
-            brandStamp.TextState.Font = customFont;                 // apply custom font
-            brandStamp.TextState.FontSize = 36;                     // size of the text
-            brandStamp.TextState.ForegroundColor = Color.FromRgb(0, 0.5, 1); // brand color
-            brandStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            brandStamp.VerticalAlignment = VerticalAlignment.Bottom;
-            // Position 20 points above the bottom edge
-            brandStamp.YIndent = 20; // for Bottom alignment this is distance from bottom
-            // XIndent is not needed when using Center alignment
+            // Create formatted text that uses the custom font
+            var formatted = new FormattedText(
+                stampText,
+                System.Drawing.Color.Blue,   // fully qualified to avoid ambiguity
+                fontName,
+                EncodingType.Winansi,
+                false,
+                36); // font size
 
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
-            {
-                // Apply the stamp to every page
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    page.AddStamp(brandStamp);
-                }
+            // Build a stamp that contains the formatted text
+            var stamp = new Aspose.Pdf.Facades.Stamp();
+            stamp.BindLogo(formatted);
 
-                // Save the stamped PDF
-                pdfDoc.Save(outputPdfPath);
-            }
+            // Load the source PDF and apply the stamp to every page
+            var pdfStamp = new PdfFileStamp();
+            pdfStamp.BindPdf(inputPdf);
+            pdfStamp.AddStamp(stamp);
+            pdfStamp.Save(outputPdf);
 
-            Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {

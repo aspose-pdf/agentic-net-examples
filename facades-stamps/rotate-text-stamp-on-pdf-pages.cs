@@ -1,58 +1,64 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPdfPath = "stamped_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(stampImagePath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create an ImageStamp (concrete class) and configure it
-        ImageStamp stamp = new ImageStamp(stampImagePath);
-        stamp.Background = false;          // appear on top of page content
-        stamp.RotateAngle = 90;            // rotate 90 degrees clockwise
-        stamp.XIndent = 0;                 // lower‑left corner X offset
-        stamp.YIndent = 0;                 // lower‑left corner Y offset
-
-        // Load the source PDF, apply the stamp to every page, and save
-        using (Document doc = new Document(inputPdfPath))
+        // Extract original text for later verification
+        string originalText;
+        using (Document srcDoc = new Document(inputPath))
         {
+            TextAbsorber absorber = new TextAbsorber();
+            srcDoc.Pages.Accept(absorber);
+            originalText = absorber.Text;
+        }
+
+        // Apply a 90‑degree rotated text stamp
+        using (Document doc = new Document(inputPath))
+        {
+            // Create the stamp
+            TextStamp stamp = new TextStamp("Sample Stamp");
+            stamp.RotateAngle = 90f;                         // rotate 90 degrees
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            stamp.VerticalAlignment   = VerticalAlignment.Center;
+            stamp.TextState.FontSize = 24;
+            stamp.TextState.FontStyle = FontStyles.Bold;
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+            // Add the stamp to every page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(stamp);
             }
-            doc.Save(outputPdfPath);
+
+            // Save the stamped PDF
+            doc.Save(outputPath);
         }
 
-        // Verify that the text in the stamped PDF is still readable
-        using (Document doc = new Document(outputPdfPath))
+        // Verify that the original text is still readable after stamping
+        string postStampText;
+        using (Document resultDoc = new Document(outputPath))
         {
-            var absorber = new TextAbsorber();
-            doc.Pages.Accept(absorber);
-            string extractedText = absorber.Text ?? string.Empty;
-
-            Console.WriteLine($"Extracted text length after stamping: {extractedText.Length}");
-            if (extractedText.Length > 0)
-                Console.WriteLine("Text remains readable.");
-            else
-                Console.WriteLine("No text extracted – verification failed.");
+            TextAbsorber verifier = new TextAbsorber();
+            resultDoc.Pages.Accept(verifier);
+            postStampText = verifier.Text;
         }
+
+        bool textUnchanged = string.Equals(originalText, postStampText, StringComparison.Ordinal);
+        Console.WriteLine($"Stamp applied with 90° rotation. Text unchanged: {textUnchanged}");
+        Console.WriteLine($"Output saved to '{outputPath}'.");
     }
 }
