@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -8,6 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_rotated_stamp.pdf";
+        const string stampText = "Rotated Stamp";
 
         if (!File.Exists(inputPath))
         {
@@ -15,30 +18,46 @@ class Program
             return;
         }
 
-        // Load the PDF document using the high‑level API
-        Document pdfDocument = new Document(inputPath);
-
-        // Create a text stamp
-        TextStamp stamp = new TextStamp("Rotated Text")
+        try
         {
-            XIndent = 200,
-            YIndent = 400,
-            RotateAngle = 45f // rotates 45 degrees around the stamp's centre
-        };
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Create a text stamp using the Facades API
+                TextStamp stamp = new TextStamp(stampText)
+                {
+                    // Rotate 45 degrees around the stamp's center
+                    RotateAngle = 45f,
 
-        // Set visual appearance
-        stamp.TextState.FontSize = 20;
-        stamp.TextState.ForegroundColor = Color.Blue;
+                    // Center the stamp on each page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
 
-        // Apply the stamp to every page
-        foreach (Page page in pdfDocument.Pages)
-        {
-            page.AddStamp(stamp);
+                    // Optional: adjust margins if needed
+                    XIndent = 0,
+                    YIndent = 0
+                };
+
+                // Configure visual appearance of the stamp text
+                stamp.TextState.FontSize = 14;
+                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+                stamp.TextState.Font = FontRepository.FindFont("Arial");
+
+                // Apply the stamp to every page (AddStamp is a Page method)
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(stamp);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with rotated text stamp: '{outputPath}'.");
         }
-
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"PDF saved with rotated text stamp: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

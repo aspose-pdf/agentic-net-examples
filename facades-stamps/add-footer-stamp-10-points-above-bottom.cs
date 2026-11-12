@@ -1,52 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string stampImagePath = "footer.png";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string stampImg = "footer.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF document using the Document class (PdfFileEditor has no BindPdf).
-        Document pdfDoc = new Document(inputPath);
+        // Load the PDF document using the Document class (PdfFileEditor has no BindPdf)
+        Document pdfDoc = new Document(inputPdf);
 
-        // Create an image stamp positioned as a footer 10 points above the bottom edge.
-        ImageStamp footerStamp = new ImageStamp(stampImagePath)
+        // Create an ImageStamp from Aspose.Pdf.Drawing namespace
+        ImageStamp stamp = new ImageStamp(stampImg)
         {
-            // Align to the bottom of each page.
-            VerticalAlignment = VerticalAlignment.Bottom,
-            // Center horizontally.
+            // Center horizontally
             HorizontalAlignment = HorizontalAlignment.Center,
-            // Set bottom margin to 10 points.
-            BottomMargin = 10,
-            // Place the stamp over page content (false = foreground).
-            Background = false
+            // Align to the bottom of the page; YIndent is the distance from the bottom edge
+            VerticalAlignment = VerticalAlignment.Bottom,
+            YIndent = 10,               // 10 points above the bottom edge
+            Background = false         // place stamp in the foreground (over content)
         };
 
-        // Apply the stamp to every page by iterating over Document.Pages.
+        // Apply the stamp to every page by iterating over Document.Pages
         foreach (Page page in pdfDoc.Pages)
         {
-            page.AddStamp(footerStamp);
+            page.AddStamp(stamp);
         }
 
-        // Save the resulting PDF.
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"Footer stamp applied and saved to '{outputPath}'.");
+        // Save the stamped PDF
+        pdfDoc.Save(outputPdf);
     }
 }

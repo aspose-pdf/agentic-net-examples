@@ -1,17 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // FontRepository, Font, Color, TextStamp, HorizontalAlignment, VerticalAlignment
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "confidential_output.pdf";
-
-        // Pages on which the stamp should appear (1‑based indexing)
-        int[] pagesToStamp = new int[] { 1, 3, 5 };
+        const string outputPath = "output.pdf";
+        const string stampText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -19,35 +17,38 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-        int pageCount = doc.Pages.Count;
+        // Pages to which the stamp will be applied (1‑based indexing)
+        int[] pagesToStamp = { 1, 2, 3 }; // adjust as needed
+
+        // Load the source PDF document
+        Document pdfDocument = new Document(inputPath);
 
         // Configure the text stamp
-        TextStamp stamp = new TextStamp("CONFIDENTIAL")
+        TextStamp textStamp = new TextStamp(stampText)
         {
+            TextState =
+            {
+                Font = FontRepository.FindFont("Arial"),
+                FontSize = 48,
+                ForegroundColor = Color.FromRgb(1, 0, 0) // red color
+            },
+            Opacity = 0.7, // 70% opacity
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment   = VerticalAlignment.Center,
-            RotateAngle = 0f,               // no rotation
-            Opacity = 0.7f                  // 70 % opacity
+            VerticalAlignment = VerticalAlignment.Center
         };
-        stamp.TextState.Font = FontRepository.FindFont("Arial");
-        stamp.TextState.FontSize = 72;
-        stamp.TextState.ForegroundColor = Color.Red; // use ForegroundColor, not FontColor
-        stamp.TextState.BackgroundColor = Color.Transparent;
 
-        // Apply the stamp to each valid page number using Document.Pages[i].AddStamp
+        // Apply the stamp to each selected page
         foreach (int pageNumber in pagesToStamp)
         {
-            if (pageNumber < 1 || pageNumber > pageCount)
-                continue; // skip invalid page numbers
+            // Validate page number against the document page count
+            if (pageNumber < 1 || pageNumber > pdfDocument.Pages.Count)
+                continue;
 
-            doc.Pages[pageNumber].AddStamp(stamp);
+            pdfDocument.Pages[pageNumber].AddStamp(textStamp);
         }
 
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Confidential stamp applied. Output saved to '{outputPath}'.");
+        // Save the stamped PDF
+        pdfDocument.Save(outputPath);
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

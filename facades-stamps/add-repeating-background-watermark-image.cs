@@ -7,45 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath     = "input.pdf";
-        const string outputPath    = "watermarked.pdf";
-        const string watermarkPath = "watermark.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "watermarked.pdf";
+        const string watermarkImagePath = "watermark.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(watermarkPath))
+        if (!File.Exists(watermarkImagePath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
             return;
         }
 
-        // Load the source PDF using the Document class (PdfFileMend does not support AddStamp)
-        Document pdfDocument = new Document(inputPath);
-
-        // Create a single ImageStamp instance – the same instance will be reused for every page
-        ImageStamp stamp = new ImageStamp(watermarkPath)
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Background = true,   // place behind existing page content
-            Opacity    = 0.3,    // semi‑transparent watermark
-            Zoom       = 0.5     // scale the image to 50 % of its original size
-        };
-        // Optional: centre the stamp on each page (you can adjust alignment/indents as needed)
-        stamp.HorizontalAlignment = HorizontalAlignment.Center;
-        stamp.VerticalAlignment   = VerticalAlignment.Center;
+            // Create a single ImageStamp instance (Aspose.Pdf.Drawing namespace)
+            var stamp = new ImageStamp(watermarkImagePath)
+            {
+                Background = true,                     // draw behind page content
+                Opacity = 0.3,                         // semi‑transparent
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+                XIndent = 0,
+                YIndent = 0
+            };
 
-        // Apply the same stamp instance to every page
-        foreach (Page page in pdfDocument.Pages)
-        {
-            page.AddStamp(stamp);
+            // Apply the same stamp to every page
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(stamp);
+            }
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // Save the watermarked PDF
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
     }
 }

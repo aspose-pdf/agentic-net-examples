@@ -1,18 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for TextState, FontRepository
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string logoPath  = "logo.png";
+        const string logoPath = "logo.png";
         const string customText = "Confidential";
 
-        // Validate input files
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -25,42 +24,41 @@ class Program
         }
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
+        var document = new Document(inputPdf);
 
-        // Create an ImageStamp for the logo
-        ImageStamp imgStamp = new ImageStamp(logoPath)
+        // Iterate over each page and add both an image stamp and a text stamp
+        foreach (Page page in document.Pages)
         {
-            Background = false,
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment   = VerticalAlignment.Top,
-            XIndent = 20, // distance from left edge
-            YIndent = 20  // distance from top edge
-        };
+            // ---------- Image stamp (logo) ----------
+            var imageStamp = new ImageStamp(logoPath)
+            {
+                // Optional: set a custom size for the logo
+                Width = 80,
+                Height = 40,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                YIndent = 10 // distance from the bottom edge
+            };
+            page.AddStamp(imageStamp);
 
-        // Create a TextStamp for the custom text
-        TextStamp txtStamp = new TextStamp(customText)
-        {
-            Background = false,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment   = VerticalAlignment.Bottom,
-            XIndent = 20, // distance from right edge
-            YIndent = 20  // distance from bottom edge
-        };
-        // Configure text appearance
-        txtStamp.TextState.FontSize = 14;
-        txtStamp.TextState.Font = FontRepository.FindFont("Arial");
-        txtStamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(1, 0, 0); // red
+            // ---------- Text stamp (custom text) ----------
+            var textStamp = new TextStamp(customText)
+            {
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                YIndent = 30 // place the text a bit above the logo
+            };
+            // Configure the appearance of the text
+            textStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            textStamp.TextState.FontSize = 24;
+            textStamp.TextState.FontStyle = FontStyles.Regular;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
 
-        // Apply both stamps to every page
-        foreach (Page page in pdfDocument.Pages)
-        {
-            page.AddStamp(imgStamp);
-            page.AddStamp(txtStamp);
+            page.AddStamp(textStamp);
         }
 
-        // Save the result
-        pdfDocument.Save(outputPdf);
-
+        // Save the stamped PDF
+        document.Save(outputPdf);
         Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

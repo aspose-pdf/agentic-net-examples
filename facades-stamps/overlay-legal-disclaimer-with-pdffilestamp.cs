@@ -6,46 +6,72 @@ class Program
 {
     static void Main()
     {
-        // Paths for the target PDF, the disclaimer PDF, and the output PDF
-        const string targetPdfPath = "target.pdf";
-        const string disclaimerPdfPath = "disclaimer.pdf";
-        const string outputPdfPath = "target_with_disclaimer.pdf";
+        // Path to the legal disclaimer PDF that will be used as a stamp
+        const string disclaimerPath = "disclaimer.pdf";
 
-        // Verify that the input files exist
-        if (!File.Exists(targetPdfPath))
+        // List of target PDF files to which the disclaimer will be applied
+        string[] targetPdfs = { "document1.pdf", "document2.pdf", "document3.pdf" };
+
+        // Output directory for stamped PDFs
+        const string outputDir = "StampedOutputs";
+
+        // Verify disclaimer PDF exists
+        if (!File.Exists(disclaimerPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
+            Console.Error.WriteLine($"Disclaimer PDF not found: {disclaimerPath}");
             return;
         }
-        if (!File.Exists(disclaimerPdfPath))
+
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        foreach (string srcPath in targetPdfs)
         {
-            Console.Error.WriteLine($"Disclaimer PDF not found: {disclaimerPdfPath}");
-            return;
+            // Verify each source PDF exists before processing
+            if (!File.Exists(srcPath))
+            {
+                Console.Error.WriteLine($"Source PDF not found: {srcPath}");
+                continue;
+            }
+
+            // Construct output file name (original name + "_stamped.pdf")
+            string outPath = Path.Combine(outputDir,
+                Path.GetFileNameWithoutExtension(srcPath) + "_stamped.pdf");
+
+            try
+            {
+                // Create a PdfFileStamp instance (does NOT implement IDisposable)
+                PdfFileStamp fileStamp = new PdfFileStamp();
+
+                // Bind the source PDF document that will receive the stamp
+                fileStamp.BindPdf(srcPath);
+
+                // Prepare the stamp that contains the disclaimer PDF page
+                Aspose.Pdf.Facades.Stamp disclaimerStamp = new Aspose.Pdf.Facades.Stamp();
+                // Bind the disclaimer PDF and specify which page of the disclaimer to use (1‑based)
+                disclaimerStamp.BindPdf(disclaimerPath, 1);
+                // Apply the stamp only to the first page of the target document
+                disclaimerStamp.Pages = new int[] { 1 };
+                // Place the stamp in front of existing content (false = overlay, true = background)
+                disclaimerStamp.IsBackground = false;
+                // Optional: set the origin (lower‑left corner) of the stamp on the page
+                // disclaimerStamp.SetOrigin(0, 0);
+
+                // Add the prepared stamp to the PdfFileStamp instance
+                fileStamp.AddStamp(disclaimerStamp);
+
+                // Save the stamped document to the output path
+                fileStamp.Save(outPath);
+
+                // Release any resources held by the stamp object
+                fileStamp.Close();
+
+                Console.WriteLine($"Stamped PDF saved: {outPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{srcPath}': {ex.Message}");
+            }
         }
-
-        // ------------------------------------------------------------
-        // Build a Stamp that represents the first page of the disclaimer
-        // ------------------------------------------------------------
-        Aspose.Pdf.Facades.Stamp disclaimerStamp = new Aspose.Pdf.Facades.Stamp();
-        // Bind the source PDF page that will be used as the stamp
-        disclaimerStamp.BindPdf(disclaimerPdfPath, 1);
-        // Apply the stamp to the first page of the target document
-        disclaimerStamp.Pages = new[] { 1 };
-        // Overlay (false = on top of existing content, true = behind)
-        disclaimerStamp.IsBackground = false;
-        // Optional: position, opacity, rotation, etc.
-        // disclaimerStamp.SetOrigin(0, 0);
-        // disclaimerStamp.Opacity = 1.0F;
-
-        // ------------------------------------------------------------
-        // Apply the stamp to the target PDF using PdfFileStamp
-        // ------------------------------------------------------------
-        PdfFileStamp fileStamp = new PdfFileStamp(); // does NOT implement IDisposable
-        fileStamp.BindPdf(targetPdfPath);
-        fileStamp.AddStamp(disclaimerStamp); // the only method that applies a stamp
-        fileStamp.Save(outputPdfPath);
-        fileStamp.Close();
-
-        Console.WriteLine($"Disclaimer stamped onto first page. Output saved to '{outputPdfPath}'.");
     }
 }
