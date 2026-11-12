@@ -1,60 +1,39 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string metadataSourcePath = "metadata_source.pdf"; // PDF containing the desired XMP metadata
-        const string targetPdfPath      = "target.pdf";          // PDF that will receive the metadata
-        const string pagesSourcePath    = "pages_source.pdf";    // PDF whose pages will be merged into the target
-        const string tempTargetPath     = "temp_target.pdf";     // Intermediate file after metadata copy
-        const string outputPath         = "merged_output.pdf";   // Final merged PDF
+        const string sourcePath = "source.pdf";
+        const string targetPath = "target.pdf";
+        const string outputPath = "merged.pdf";
 
-        // Ensure all input files exist
-        if (!File.Exists(metadataSourcePath) ||
-            !File.Exists(targetPdfPath) ||
-            !File.Exists(pagesSourcePath))
+        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
         {
-            Console.Error.WriteLine("One or more input files are missing.");
+            Console.Error.WriteLine("Source or target PDF not found.");
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1. Load source PDF (metadata) and target PDF, copy XMP metadata
-        // ------------------------------------------------------------
-        using (Document sourceMeta = new Document(metadataSourcePath))
-        using (Document targetDoc = new Document(targetPdfPath))
+        // Load both PDFs
+        using (Document sourceDoc = new Document(sourcePath))
+        using (Document targetDoc = new Document(targetPath))
         {
-            // Aspose.Pdf does not expose an XmpMetadata property.
-            // The XMP packet is stored in the Document.Metadata dictionary.
-            // Clear any existing metadata on the target and copy all entries from the source.
-            targetDoc.Metadata.Clear();
-            foreach (var kvp in sourceMeta.Metadata)
+            // Copy XMP metadata (stored in the Metadata dictionary) from source to target
+            foreach (var entry in sourceDoc.Metadata)
             {
-                targetDoc.Metadata.Add(kvp.Key, kvp.Value);
+                // Overwrite or add the metadata entry in the target document
+                targetDoc.Metadata[entry.Key] = entry.Value;
             }
 
-            // Save the target with the new metadata to a temporary file.
-            targetDoc.Save(tempTargetPath);
+            // Merge all pages from the source into the target
+            targetDoc.Pages.Add(sourceDoc.Pages);
+
+            // Save the merged PDF
+            targetDoc.Save(outputPath);
         }
 
-        // ------------------------------------------------------------
-        // 2. Merge pages from the pages source PDF into the target (now with metadata)
-        //    using the PdfFileEditor facade.
-        // ------------------------------------------------------------
-        PdfFileEditor editor = new PdfFileEditor();
-
-        // Concatenate the temporary target (with metadata) and the pages source PDF.
-        // The order determines that pages from pagesSourcePath follow the target's pages.
-        editor.Concatenate(new[] { tempTargetPath, pagesSourcePath }, outputPath);
-
-        // Clean up the intermediate file.
-        try { File.Delete(tempTargetPath); } catch { /* ignore cleanup errors */ }
-
-        Console.WriteLine($"Merged PDF created at '{outputPath}'.");
+        Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
     }
 }

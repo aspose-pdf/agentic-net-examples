@@ -1,63 +1,80 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades; // Facades API for metadata manipulation
+using System.Text.Json;
+using Aspose.Pdf;
 
-// Configuration class to hold the default Creator value
-public static class PdfConfiguration
-{
-    // Set this to the desired default Creator string
-    public static string DefaultCreator { get; set; } = "MyApp PDF Generator";
-}
-
-// Helper class that updates the Creator metadata using the Facades API
-public static class PdfCreatorHelper
-{
-    /// <summary>
-    /// Sets the Creator metadata of a PDF file.
-    /// If <paramref name="creator"/> is null or empty, the default value from <see cref="PdfConfiguration.DefaultCreator"/> is used.
-    /// </summary>
-    /// <param name="pdfPath">Path to the PDF file to modify.</param>
-    /// <param name="creator">Optional Creator value; when omitted the default is applied.</param>
-    public static void SetCreator(string pdfPath, string? creator = null)
-    {
-        if (string.IsNullOrWhiteSpace(pdfPath))
-            throw new ArgumentException("PDF path must be provided.", nameof(pdfPath));
-
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException($"PDF file not found: {pdfPath}");
-
-        // Determine the value to write
-        string valueToSet = string.IsNullOrWhiteSpace(creator)
-            ? PdfConfiguration.DefaultCreator
-            : creator;
-
-        // Use PdfFileInfo (Facades) to modify document info without loading the full Document
-        PdfFileInfo info = new PdfFileInfo(pdfPath);
-        info.Creator = valueToSet;   // Set the Creator metadata (CreatorTool does not exist)
-        info.Save(pdfPath);          // Persist changes back to the same file
-    }
-}
-
-// Example usage
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "sample.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string defaultCreatorToolFallback = "MyApplication";
 
-        // Ensure the file exists for the demo
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Option 1: Use an explicit Creator value
-        PdfCreatorHelper.SetCreator(inputPdf, "CustomTool v1.2");
+        // Determine the default CreatorTool value.
+        // 1. Try to read from appsettings.json (if present).
+        // 2. Override with an environment variable named "DefaultCreatorTool" if it exists.
+        // 3. Fallback to the hard‑coded default.
+        string defaultCreatorTool = GetDefaultCreatorTool(defaultCreatorToolFallback);
 
-        // Option 2: Omit the value to apply the configured default
-        PdfCreatorHelper.SetCreator(inputPdf);
-        
-        Console.WriteLine("Creator metadata updated successfully.");
+        // Load the PDF document. Aspose.Pdf.Document provides access to metadata via the Info property.
+        using (var doc = new Document(inputPath))
+        {
+            // If the Creator metadata is missing or empty, set the default value.
+            if (string.IsNullOrWhiteSpace(doc.Info.Creator))
+            {
+                doc.Info.Creator = defaultCreatorTool;
+            }
+
+            // Save the updated PDF to a new file.
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved with Creator set to '{defaultCreatorTool}' at '{outputPath}'.");
+    }
+
+    private static string GetDefaultCreatorTool(string fallback)
+    {
+        // Start with the fallback value.
+        string result = fallback;
+
+        // 1. Attempt to read from appsettings.json.
+        const string configFile = "appsettings.json";
+        if (File.Exists(configFile))
+        {
+            try
+            {
+                string json = File.ReadAllText(configFile);
+                using JsonDocument doc = JsonDocument.Parse(json);
+                if (doc.RootElement.TryGetProperty("DefaultCreatorTool", out JsonElement element))
+                {
+                    string? value = element.GetString();
+                    if (!string.IsNullOrWhiteSpace(value))
+                    {
+                        result = value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // If the JSON is malformed or another error occurs, ignore it and keep the current result.
+                Console.Error.WriteLine($"Warning: could not read '{configFile}': {ex.Message}");
+            }
+        }
+
+        // 2. Override with environment variable if it exists.
+        string? env = Environment.GetEnvironmentVariable("DefaultCreatorTool");
+        if (!string.IsNullOrWhiteSpace(env))
+        {
+            result = env;
+        }
+
+        return result;
     }
 }

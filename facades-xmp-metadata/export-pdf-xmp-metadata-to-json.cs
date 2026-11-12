@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
@@ -9,39 +8,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string jsonOutputPath = "metadata.json";
+        const string inputPdfPath  = "input.pdf";
+        const string outputJsonPath = "metadata.json";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        try
         {
-            // Use the PdfXmpMetadata facade to obtain XMP metadata as an XML string
-            using (Aspose.Pdf.Facades.PdfXmpMetadata xmpFacade = new Aspose.Pdf.Facades.PdfXmpMetadata(doc))
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
             {
-                // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string
-                byte[] xmpBytes = xmpFacade.GetXmpMetadata();
-                string xmpXml = Encoding.UTF8.GetString(xmpBytes);
+                // The Metadata property returns a dictionary of XMP key/value pairs.
+                // It replaces the obsolete PdfFileInfo.XmpMetadata member.
+                var xmpMetadata = pdfDoc.Metadata; // IDictionary<string,string>
 
-                if (string.IsNullOrEmpty(xmpXml))
-                {
-                    Console.WriteLine("No XMP metadata found in the document.");
-                    return;
-                }
+                // Serialize the metadata dictionary to formatted JSON.
+                string json = JsonSerializer.Serialize(
+                    xmpMetadata,
+                    new JsonSerializerOptions { WriteIndented = true });
 
-                // Wrap the raw XML string into a JSON object for non‑XML systems
-                // The XML is stored as a JSON string value to preserve its structure
-                string json = $"{{\"XmpMetadata\": {JsonSerializer.Serialize(xmpXml)}}}";
-
-                // Write the JSON to the output file
-                File.WriteAllText(jsonOutputPath, json);
-                Console.WriteLine($"XMP metadata exported to JSON file: {jsonOutputPath}");
+                // Write the JSON to the output file.
+                File.WriteAllText(outputJsonPath, json);
+                Console.WriteLine($"XMP metadata exported to JSON: {outputJsonPath}");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

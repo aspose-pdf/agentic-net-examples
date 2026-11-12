@@ -1,58 +1,78 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input files
-        const string basePdfPath   = "base.pdf";      // PDF to receive new pages
-        const string insertPdfPath = "insert.pdf";    // PDF whose pages will be inserted
-        const string outputPdfPath = "combined.pdf"; // Final output
+        // Paths – adjust as needed
+        const string sourcePdfPath = "source.pdf";   // PDF whose pages and metadata will be used
+        const string targetPdfPath = "target.pdf";   // PDF into which pages will be inserted
+        const string outputPdfPath = "output.pdf";   // Final result
 
         // Verify files exist
-        if (!File.Exists(basePdfPath) || !File.Exists(insertPdfPath))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine("One or more input files are missing.");
+            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            return;
+        }
+        if (!File.Exists(targetPdfPath))
+        {
+            Console.Error.WriteLine($"Target file not found: {targetPdfPath}");
             return;
         }
 
-        try
+        // Load both documents inside using blocks for deterministic disposal
+        using (Document sourceDoc = new Document(sourcePdfPath))
+        using (Document targetDoc = new Document(targetPdfPath))
         {
-            // Load the base document
-            using (Document baseDoc = new Document(basePdfPath))
+            // ------------------------------------------------------------
+            // 1. Copy XMP metadata from source to target.
+            //    Document.Metadata is a dictionary of string keys/values.
+            // ------------------------------------------------------------
+            foreach (var kvp in sourceDoc.Metadata)
             {
-                // Load the document whose pages will be inserted
-                using (Document srcDoc = new Document(insertPdfPath))
-                {
-                    // Insert each page from srcDoc after the first page of baseDoc
-                    int insertPos = 2; // 1‑based index – after page 1
-                    for (int i = 1; i <= srcDoc.Pages.Count; i++)
-                    {
-                        // Insert a copy of the source page at the desired position
-                        baseDoc.Pages.Insert(insertPos, srcDoc.Pages[i]);
-                        insertPos++;
-                    }
-                }
-
-                // -----------------------------------------------------------------
-                // Step 2: Update XMP‑like metadata using the Document.Metadata indexer
-                // -----------------------------------------------------------------
-                baseDoc.Metadata["Title"]   = "Combined Document";
-                baseDoc.Metadata["Author"]  = "John Doe";
-                baseDoc.Metadata["Subject"] = "Demo of page insertion + XMP update";
-                baseDoc.Metadata["Keywords"] = "Aspose.Pdf, XMP, Page Insertion";
-
-                // Save the final PDF
-                baseDoc.Save(outputPdfPath);
+                // Overwrite or add each metadata entry in the target document
+                targetDoc.Metadata[kvp.Key] = kvp.Value;
             }
 
-            Console.WriteLine($"Successfully created '{outputPdfPath}'.");
+            // ------------------------------------------------------------
+            // 2. Insert pages from source into target.
+            //    Aspose.Pdf.Facades.PdfFileEditor works with file paths,
+            //    so we first save the modified target to a temporary file.
+            // ------------------------------------------------------------
+            string tempTargetPath = Path.Combine(Path.GetTempPath(),
+                                                 Guid.NewGuid().ToString() + ".pdf");
+            targetDoc.Save(tempTargetPath);
+
+            // Create the editor (no using – PdfFileEditor does not implement IDisposable)
+            PdfFileEditor editor = new PdfFileEditor();
+
+            // Insert all pages of the source PDF after the last page of the target.
+            // PdfFileEditor does not have a bulk‑insert method, so we concatenate
+            // the two PDFs in the desired order (target first, then source).
+            editor.Concatenate(tempTargetPath, sourcePdfPath, outputPdfPath);
+
+            // ------------------------------------------------------------
+            // 3. Ensure the metadata copied earlier is present in the final file.
+            //    Concatenation may lose the metadata, so reload the output and
+            //    re‑apply the metadata dictionary.
+            // ------------------------------------------------------------
+            using (Document finalDoc = new Document(outputPdfPath))
+            {
+                foreach (var kvp in targetDoc.Metadata)
+                {
+                    finalDoc.Metadata[kvp.Key] = kvp.Value;
+                }
+                finalDoc.Save(outputPdfPath);
+            }
+
+            // Clean up the temporary file
+            try { File.Delete(tempTargetPath); } catch { /* ignore cleanup errors */ }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDFs: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF created: {outputPdfPath}");
     }
 }

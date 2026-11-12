@@ -2,66 +2,80 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
+using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Flag updated by the validation callback
+    private static bool _isValid = true;
+
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        const string xsdPath = "xmp_schema.xsd";
+        const string xmpSchemaPath = "xmp_schema.xsd"; // official XMP XSD file
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(xsdPath))
+
+        if (!File.Exists(xmpSchemaPath))
         {
-            Console.Error.WriteLine($"XSD not found: {xsdPath}");
+            Console.Error.WriteLine($"XMP schema not found: {xmpSchemaPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
+        // Load XMP metadata from the PDF using the PdfXmpMetadata facade
+        byte[] xmpBytes;
+        using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata())
         {
-            // Example usage of a Facades class (not required for validation)
-            Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
+            xmpFacade.BindPdf(pdfPath);
+            xmpBytes = xmpFacade.GetXmpMetadata();
+        }
 
-            // Retrieve XMP metadata as an XML string
-            string xmpXml = doc.Metadata.ToString();
+        if (xmpBytes == null || xmpBytes.Length == 0)
+        {
+            Console.WriteLine("No XMP metadata present in the PDF.");
+            return;
+        }
 
-            // Prepare the XML schema set
-            XmlSchemaSet schemaSet = new XmlSchemaSet();
-            schemaSet.Add(null, xsdPath);
+        // Prepare the XML schema set with the official XMP schema
+        XmlSchemaSet schemas = new XmlSchemaSet();
+        schemas.Add(null, xmpSchemaPath);
 
-            // Configure XML reader settings for schema validation
-            XmlReaderSettings settings = new XmlReaderSettings
+        // Configure XML reader for schema validation
+        XmlReaderSettings settings = new XmlReaderSettings
+        {
+            ValidationType = ValidationType.Schema,
+            Schemas = schemas,
+            ValidationFlags = XmlSchemaValidationFlags.ReportValidationWarnings
+        };
+        settings.ValidationEventHandler += ValidationCallback;
+
+        // Validate the XMP metadata
+        using (MemoryStream ms = new MemoryStream(xmpBytes))
+        using (XmlReader reader = XmlReader.Create(ms, settings))
+        {
+            try
             {
-                ValidationType = ValidationType.Schema,
-                Schemas = schemaSet
-            };
-            settings.ValidationEventHandler += ValidationEventHandler;
-
-            // Validate the XMP metadata against the schema
-            using (StringReader sr = new StringReader(xmpXml))
-            using (XmlReader reader = XmlReader.Create(sr, settings))
+                while (reader.Read()) { /* reading triggers validation */ }
+            }
+            catch (XmlException ex)
             {
-                try
-                {
-                    while (reader.Read()) { }
-                    Console.WriteLine("XMP metadata is valid according to the schema.");
-                }
-                catch (XmlSchemaValidationException ex)
-                {
-                    Console.Error.WriteLine($"Schema validation exception: {ex.Message}");
-                }
+                Console.Error.WriteLine($"XML parsing error: {ex.Message}");
+                _isValid = false;
             }
         }
+
+        Console.WriteLine(_isValid ? "XMP metadata is valid." : "XMP metadata is invalid.");
     }
 
-    // Callback for validation warnings and errors
-    static void ValidationEventHandler(object sender, ValidationEventArgs e)
+    // Called for each validation warning or error
+    private static void ValidationCallback(object sender, ValidationEventArgs e)
     {
-        Console.Error.WriteLine($"Validation {e.Severity}: {e.Message}");
+        // Treat any warning or error as a failure
+        Console.Error.WriteLine($"{e.Severity}: {e.Message}");
+        _isValid = false;
     }
 }

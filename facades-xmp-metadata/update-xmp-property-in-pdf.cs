@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class UpdateXmpProperty
+class Program
 {
     static void Main(string[] args)
     {
-        // Expected arguments: inputPdf outputPdf propertyName propertyValue
-        if (args.Length < 4)
+        // Expected arguments: <input.pdf> <output.pdf> <propertyName> <propertyValue>
+        if (args.Length != 4)
         {
-            Console.Error.WriteLine("Usage: UpdateXmpProperty <input.pdf> <output.pdf> <propertyName> <propertyValue>");
+            Console.Error.WriteLine("Usage: <input.pdf> <output.pdf> <propertyName> <propertyValue>");
             return;
         }
 
@@ -24,20 +24,23 @@ class UpdateXmpProperty
             return;
         }
 
-        // Copy the original PDF to the output location (modifications will be written here)
-        File.Copy(inputPath, outputPath, true);
+        try
+        {
+            // Load the PDF document.
+            Document pdf = new Document(inputPath);
 
-        // Load the PDF document
-        Document pdfDoc = new Document(outputPath);
+            // Aspose.Pdf exposes XMP metadata through the Metadata dictionary.
+            // Add or update the requested property.
+            pdf.Metadata[propertyName] = propertyValue;
 
-        // Update (or add) the XMP property using the Document.Metadata indexer.
-        // If a custom namespace is required, register it before setting the value.
-        // Example: pdfDoc.Metadata.RegisterNamespaceUri("my", "http://example.com/custom");
-        pdfDoc.Metadata[propertyName] = propertyValue;
+            // Save the updated PDF.
+            pdf.Save(outputPath);
 
-        // Save the PDF with the new metadata
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"Property '{propertyName}' updated to '{propertyValue}' in '{outputPath}'.");
+            Console.WriteLine($"XMP property '{propertyName}' updated and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -6,34 +6,27 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string baseUrl = "https://www.example.com";
+        const string inputPdf  = "input.pdf";          // source PDF
+        const string outputPdf = "output.pdf";         // destination PDF
+        const string baseUrl   = "https://www.example.com"; // URL to set in XMP
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Set the BaseURL property in the XMP metadata via the Metadata dictionary
-                // The key follows the XMP namespace prefix "xmp".
-                doc.Metadata["xmp:BaseURL"] = baseUrl;
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
+        // Set the BaseUrl property in the XMP metadata.
+        // Aspose.Pdf exposes XMP metadata through the Metadata dictionary.
+        // The key "BaseURL" follows the XMP specification for the base URL.
+        pdfDocument.Metadata["BaseURL"] = baseUrl;
 
-            Console.WriteLine($"BaseUrl set and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save the updated PDF
+        pdfDocument.Save(outputPdf);
+
+        Console.WriteLine($"BaseUrl set to '{baseUrl}' and saved as '{outputPdf}'.");
     }
 }

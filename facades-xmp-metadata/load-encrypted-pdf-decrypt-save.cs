@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "encrypted.pdf";
-        const string outputPath = "output.pdf";
-        const string password   = "user123"; // replace with actual password if known
+        const string inputPath  = "input.pdf";   // source PDF (may be encrypted)
+        const string outputPath = "output.pdf";  // destination PDF
+        const string password   = "owner123";   // password for encrypted PDFs (if known)
 
         if (!File.Exists(inputPath))
         {
@@ -16,60 +17,58 @@ class Program
             return;
         }
 
-        Document pdfDoc = null;
-        try
-        {
-            // Try to load the PDF without a password.
-            pdfDoc = new Document(inputPath);
-        }
-        catch (InvalidPasswordException)
-        {
-            // The PDF is encrypted – attempt to open it with the supplied password.
-            Console.WriteLine("PDF is encrypted – attempting decryption with provided password.");
-            try
-            {
-                pdfDoc = new Document(inputPath, password);
-            }
-            catch (InvalidPasswordException)
-            {
-                Console.Error.WriteLine("Unable to open the PDF – the password is incorrect or not provided.");
-                return;
-            }
-        }
-        catch (PdfException ex)
-        {
-            Console.Error.WriteLine($"PDF processing error while loading: {ex.Message}");
-            return;
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Unexpected error while loading PDF: {ex.Message}");
-            return;
-        }
+        // PdfFileMend provides BindPdf and Save without loading the whole document into memory
+        PdfFileMend mend = new PdfFileMend();
 
         try
         {
-            // Extract the first page to a new PDF.
-            if (pdfDoc.Pages.Count > 0)
-            {
-                Document firstPageDoc = new Document();
-                // Add a copy of the first page.
-                firstPageDoc.Pages.Add(pdfDoc.Pages[1]);
-                firstPageDoc.Save(outputPath);
-                Console.WriteLine($"First page extracted to: {outputPath}");
-            }
-            else
-            {
-                Console.Error.WriteLine("The source PDF contains no pages.");
-            }
+            // Attempt to bind the PDF directly
+            mend.BindPdf(inputPath);
         }
-        catch (PdfException ex)
+        catch (InvalidPasswordException)
         {
-            Console.Error.WriteLine($"PDF processing error during extraction: {ex.Message}");
+            // The PDF is encrypted – try to open it with the supplied password, decrypt, and re‑bind
+            Console.WriteLine("PDF is encrypted. Attempting decryption with provided password.");
+
+            try
+            {
+                // Document implements IDisposable; wrap in using for deterministic disposal
+                using (Document doc = new Document(inputPath, password))
+                {
+                    // Decrypt the document (Decrypt takes no parameters)
+                    doc.Decrypt();
+
+                    // Save the decrypted version to a temporary file
+                    string tempPath = Path.GetTempFileName();
+                    doc.Save(tempPath);
+
+                    // Bind the temporary unencrypted PDF
+                    mend.BindPdf(tempPath);
+
+                    // Save the final result
+                    mend.Save(outputPath);
+                    Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
+
+                    // Clean up the temporary file
+                    File.Delete(tempPath);
+                }
+                return;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to decrypt PDF: {ex.Message}");
+                return;
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error during extraction: {ex.Message}");
+            // Any other binding error (e.g., file corruption) is reported here
+            Console.Error.WriteLine($"Failed to bind PDF: {ex.Message}");
+            return;
         }
+
+        // Binding succeeded without encryption issues; simply save the result
+        mend.Save(outputPath);
+        Console.WriteLine($"PDF bound and saved to '{outputPath}'.");
     }
 }

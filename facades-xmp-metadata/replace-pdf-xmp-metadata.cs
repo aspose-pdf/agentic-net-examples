@@ -1,50 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;   // Facades namespace is required by the task
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string xmpFilePath   = "metadata.xmp";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath      = "input.pdf";
+        const string xmpPath      = "metadata.xmp";
+        const string outputPath   = "output.pdf";
 
-        // Verify that source files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(xmpFilePath))
+        if (!File.Exists(xmpPath))
         {
-            Console.Error.WriteLine($"XMP file not found: {xmpFilePath}");
+            Console.Error.WriteLine($"XMP file not found: {xmpPath}");
             return;
         }
+
+        // Read the external XMP metadata as a raw string
+        string xmpContent = File.ReadAllText(xmpPath);
 
         try
         {
-            // Load the PDF using the Document API (supports XMP metadata)
-            Document pdfDocument = new Document(inputPdfPath);
+            // Load the PDF document (detect encryption via PdfException)
+            using (Document pdfDoc = new Document(pdfPath))
+            {
+                // Replace (or add) the XMP block.
+                // The XMP metadata is stored under the key "xmp" in the Metadata dictionary.
+                pdfDoc.Metadata["xmp"] = xmpContent;
 
-            // Read the external XMP metadata as a string (XMP is XML text)
-            string xmpContent = File.ReadAllText(xmpFilePath);
+                // Save the updated PDF
+                pdfDoc.Save(outputPath);
+            }
 
-            // Replace the existing XMP block using the Metadata dictionary
-            // The key "XMP" is the reserved entry for the full XMP packet.
-            if (pdfDocument.Metadata.ContainsKey("XMP"))
-                pdfDocument.Metadata["XMP"] = xmpContent;
-            else
-                pdfDocument.Metadata.Add("XMP", xmpContent);
-
-            // Save the modified PDF
-            pdfDocument.Save(outputPdfPath);
-
-            Console.WriteLine($"XMP metadata replaced and saved to '{outputPdfPath}'.");
+            Console.WriteLine($"XMP metadata successfully replaced. Output saved to '{outputPath}'.");
+        }
+        catch (PdfException ex)
+        {
+            // Handles encrypted PDFs or other PDF‑specific errors
+            Console.Error.WriteLine($"PDF processing error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // General error handling
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }
