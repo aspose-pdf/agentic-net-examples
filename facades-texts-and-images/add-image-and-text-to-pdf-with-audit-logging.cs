@@ -1,70 +1,109 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "image.jpg";
-        const string textToAdd = "Sample text added.";
-        const string auditLog  = "audit.log";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string auditLogPath  = "audit.log";
 
-        if (!File.Exists(inputPdf))
+        // Example data: images and texts to add
+        var imagesToAdd = new (string ImagePath, int PageNumber)[]
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            ("logo.png", 1),
+            ("chart.jpg", 2)
+        };
+
+        var textsToAdd = new (string Text, int PageNumber, double X, double Y)[]
+        {
+            ("Confidential", 1, 100, 700),
+            ("Draft", 2, 150, 650)
+        };
+
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(imagePath))
+        // Ensure audit log file exists
+        using (var logWriter = new StreamWriter(auditLogPath, append: true))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
-            return;
-        }
-
-        // Create or overwrite the audit log
-        using (var logWriter = new StreamWriter(auditLog, false))
-        {
-            // Load the source PDF using the high‑level Document API
-            var pdfDocument = new Document(inputPdf);
-
-            // Page numbers are 1‑based
-            int pageNumber = 1;
-
-            // ------------------------------------------------------------
-            // Insert an image (coordinates: lower‑left x,y and upper‑right x,y)
-            // ------------------------------------------------------------
-            double llx = 100, lly = 500, urx = 300, ury = 700;
-            var imageStamp = new ImageStamp(imagePath)
+            try
             {
-                // Position – lower‑left corner
-                XIndent = llx,
-                YIndent = lly,
-                // Size – width/height derived from the rectangle
-                Width  = urx - llx,
-                Height = ury - lly
-            };
-            pdfDocument.Pages[pageNumber].AddStamp(imageStamp);
-            logWriter.WriteLine($"{DateTime.UtcNow:u} | Page {pageNumber} | AddImage | {Path.GetFileName(imagePath)}");
+                using (Document pdfDoc = new Document(inputPdfPath))
+                {
+                    // Add images
+                    foreach (var (imagePath, pageNumber) in imagesToAdd)
+                    {
+                        if (!File.Exists(imagePath))
+                        {
+                            Console.Error.WriteLine($"Image not found: {imagePath}");
+                            continue;
+                        }
 
-            // ------------------------------------------------------------
-            // Insert text (coordinates: lower‑left x,y)
-            // ------------------------------------------------------------
-            double txtX = 100, txtY = 450;
-            var textFragment = new TextFragment(textToAdd)
+                        // Create an ImageStamp and add it to the specified page
+                        ImageStamp imgStamp = new ImageStamp(imagePath)
+                        {
+                            // Example positioning – adjust as needed
+                            XIndent = 50,
+                            YIndent = 50,
+                            // Keep original size
+                            Width  = 0,
+                            Height = 0,
+                            // Place on top of page content
+                            Background = false
+                        };
+
+                        // Pages are 1‑based
+                        pdfDoc.Pages[pageNumber].AddStamp(imgStamp);
+
+                        // Log the operation
+                        string logEntry = $"{DateTime.UtcNow:u} | AddImage | Page {pageNumber} | File \"{Path.GetFileName(imagePath)}\"";
+                        logWriter.WriteLine(logEntry);
+                        Console.WriteLine(logEntry);
+                    }
+
+                    // Add texts
+                    foreach (var (text, pageNumber, x, y) in textsToAdd)
+                    {
+                        // Create a TextFragment with the desired content
+                        TextFragment tf = new TextFragment(text)
+                        {
+                            Position = new Position(x, y)
+                        };
+
+                        // Optional styling
+                        tf.TextState.Font = FontRepository.FindFont("Helvetica");
+                        tf.TextState.FontSize = 12;
+                        tf.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+
+                        // Add to the specified page
+                        pdfDoc.Pages[pageNumber].Paragraphs.Add(tf);
+
+                        // Log the operation
+                        string logEntry = $"{DateTime.UtcNow:u} | AddText | Page {pageNumber} | Text \"{text}\"";
+                        logWriter.WriteLine(logEntry);
+                        Console.WriteLine(logEntry);
+                    }
+
+                    // Save the modified PDF
+                    pdfDoc.Save(outputPdfPath);
+                }
+
+                Console.WriteLine($"PDF saved to \"{outputPdfPath}\". Audit log written to \"{auditLogPath}\".");
+            }
+            catch (Exception ex)
             {
-                Position = new Position(txtX, txtY)
-            };
-            pdfDocument.Pages[pageNumber].Paragraphs.Add(textFragment);
-            logWriter.WriteLine($"{DateTime.UtcNow:u} | Page {pageNumber} | AddText | \"{textToAdd}\"");
-
-            // Save the modified PDF
-            pdfDocument.Save(outputPdf);
+                string err = $"Error: {ex.Message}";
+                logWriter.WriteLine($"{DateTime.UtcNow:u} | ERROR | {err}");
+                Console.Error.WriteLine(err);
+            }
         }
-
-        Console.WriteLine($"PDF saved to '{outputPdf}'. Audit log written to '{auditLog}'.");
     }
 }

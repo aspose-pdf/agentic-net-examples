@@ -7,58 +7,45 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, the PNG image, and the output PDF
-        const string inputPdfPath  = "input.pdf";
-        const string imagePath     = "image.png";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "image.png";
 
-        // Coordinates where the image will be placed on page 2
-        // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-        const float llx = 100f; // left X
-        const float lly = 200f; // lower Y
-        const float urx = 300f; // right X
-        const float ury = 400f; // upper Y
+        // Desired rectangle for the image on page 2 (lower‑left and upper‑right coordinates)
+        // Aspose.Pdf.Facades.PdfFileMend.AddImage expects float values, so use float literals.
+        float llx = 100f; // lower‑left X
+        float lly = 200f; // lower‑left Y
+        float urx = 300f; // upper‑right X (llx + width)
+        float ury = 350f; // upper‑right Y (lly + height)
 
-        // ------------------------------------------------------------
-        // Ensure a source PDF exists – create a minimal two‑page PDF
-        // if the file is missing. This makes the example self‑contained.
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            using var placeholderDoc = new Document();
-            placeholderDoc.Pages.Add(); // page 1
-            placeholderDoc.Pages.Add(); // page 2 (target page)
-            placeholderDoc.Save(inputPdfPath);
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // Ensure a PNG image exists – write a 1×1 pixel PNG from a
-        // Base64 string if the file is missing.
-        // ------------------------------------------------------------
         if (!File.Exists(imagePath))
         {
-            // Minimal transparent 1x1 PNG (Base64 encoded)
-            const string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII=";
-            byte[] pngBytes = Convert.FromBase64String(base64Png);
-            File.WriteAllBytes(imagePath, pngBytes);
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            return;
         }
 
-        // Create a PdfFileMend instance (does NOT implement IDisposable)
-        var pdfMend = new PdfFileMend();
+        // PdfFileMend does not implement IDisposable, so a using block is not required.
+        PdfFileMend mend = new PdfFileMend();
 
-        // Bind the existing PDF document (expects a Stream)
-        using (FileStream pdfStream = File.OpenRead(inputPdfPath))
-        {
-            pdfMend.BindPdf(pdfStream);
-        }
+        // Load (bind) the existing PDF.
+        mend.BindPdf(inputPdf);
 
-        // Add the PNG image to page 2 at the specified rectangle (expects a Stream and float values)
+        // Add the PNG image to page 2 at the specified rectangle.
+        // The AddImage overload expects float parameters, which we provide above.
         using (FileStream imgStream = File.OpenRead(imagePath))
         {
-            pdfMend.AddImage(imgStream, 2, llx, lly, urx, ury);
+            mend.AddImage(imgStream, 2, llx, lly, urx, ury);
         }
 
-        // Save the modified PDF
-        pdfMend.Save(outputPdfPath);
+        // Save the modified PDF.
+        mend.Save(outputPdf);
+
+        Console.WriteLine($"Image added to page 2 and saved as '{outputPdf}'.");
     }
 }
