@@ -1,62 +1,58 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Document, Page collection, etc.
-using Aspose.Pdf.Facades;            // PdfFileMend
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string imagePath = "image.tif";
+        const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
+        const string tiffImage = "image.tif";
 
-        // Verify files exist
+        // Verify that source files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(imagePath))
+        if (!File.Exists(tiffImage))
         {
-            Console.Error.WriteLine($"TIFF image not found: {imagePath}");
+            Console.Error.WriteLine($"TIFF image not found: {tiffImage}");
             return;
         }
 
-        try
+        // Get the total number of pages using PdfFileInfo (PdfFileMend has no GetPageCount)
+        int lastPage;
+        using (PdfFileInfo info = new PdfFileInfo(inputPdf))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdf))
+            lastPage = info.NumberOfPages; // last page index (1‑based)
+        }
+
+        // PdfFileMend implements IDisposable – wrap it in a using block
+        using (PdfFileMend mend = new PdfFileMend())
+        {
+            // Bind the existing PDF document
+            mend.BindPdf(inputPdf);
+
+            // Define the rectangle where the image will be placed
+            // (lower‑left x/y and upper‑right x/y in points). PdfFileMend.AddImage expects float values.
+            float llx = 100f; // lower‑left X
+            float lly = 100f; // lower‑left Y
+            float urx = 300f; // upper‑right X
+            float ury = 300f; // upper‑right Y
+
+            // Add the TIFF image to the last page without altering existing content
+            // AddImage expects a Stream, so open the image file as a FileStream
+            using (FileStream imgStream = File.OpenRead(tiffImage))
             {
-                // Determine the last page number (Aspose.Pdf uses 1‑based indexing)
-                int lastPageNumber = doc.Pages.Count;
-
-                // Prepare the PdfFileMend helper (does NOT implement IDisposable)
-                Aspose.Pdf.Facades.PdfFileMend mend = new Aspose.Pdf.Facades.PdfFileMend();
-
-                // Bind the Document to the Mend object
-                mend.BindPdf(doc);
-
-                // Add the TIFF image to the last page.
-                // The overload expects an int[] of page numbers.
-                // Coordinates are given in points (1/72 inch). Adjust as needed.
-                int[] targetPages = new int[] { lastPageNumber };
-                float llx = 100f; // lower‑left X
-                float lly = 500f; // lower‑left Y
-                float urx = 300f; // upper‑right X
-                float ury = 650f; // upper‑right Y
-
-                mend.AddImage(imagePath, targetPages, llx, lly, urx, ury);
-
-                // Save the modified PDF to the output path
-                mend.Save(outputPdf);
+                mend.AddImage(imgStream, lastPage, llx, lly, urx, ury);
             }
 
-            Console.WriteLine($"TIFF image added to last page. Output saved as '{outputPdf}'.");
+            // Save the modified PDF to a new file
+            mend.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"TIFF image added to the last page. Output saved as '{outputPdf}'.");
     }
 }
