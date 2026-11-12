@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // UNC path to the PDF file on a network share
-        const string pdfPath = @"\\server\share\folder\document.pdf";
+        // UNC path to the PDF on a network share
+        const string pdfPath = @"\\server\share\documents\sample.pdf";
 
+        // Verify that the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
@@ -19,32 +19,32 @@ class Program
 
         try
         {
-            // Load the PDF document first – PdfXmpMetadata expects a Document instance.
-            using (Document pdfDoc = new Document(pdfPath))
+            // Use the PdfXmpMetadata facade to read XMP metadata.
+            // PdfFileInfo does not expose an XmpMetadata property.
+            using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata())
             {
-                // Pass the Document to the PdfXmpMetadata facade.
-                using (PdfXmpMetadata xmp = new PdfXmpMetadata(pdfDoc))
-                {
-                    // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string for display.
-                    byte[] xmpBytes = xmp.GetXmpMetadata();
-                    string xmpMetadata = xmpBytes != null && xmpBytes.Length > 0
-                        ? Encoding.UTF8.GetString(xmpBytes)
-                        : string.Empty;
+                xmpFacade.BindPdf(pdfPath); // Load the PDF from the UNC location
 
-                    if (string.IsNullOrEmpty(xmpMetadata))
-                    {
-                        Console.WriteLine("No XMP metadata found in the PDF.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("XMP Metadata:");
-                        Console.WriteLine(xmpMetadata);
-                    }
+                // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string.
+                byte[] xmpBytes = xmpFacade.GetXmpMetadata();
+                string xmpMetadata = xmpBytes != null && xmpBytes.Length > 0
+                    ? Encoding.UTF8.GetString(xmpBytes)
+                    : null;
+
+                if (string.IsNullOrEmpty(xmpMetadata))
+                {
+                    Console.WriteLine("No XMP metadata found in the PDF.");
+                }
+                else
+                {
+                    Console.WriteLine("XMP Metadata:");
+                    Console.WriteLine(xmpMetadata);
                 }
             }
         }
         catch (Exception ex)
         {
+            // Handle any errors (e.g., network access issues, permission problems)
             Console.Error.WriteLine($"Error reading XMP metadata: {ex.Message}");
         }
     }

@@ -8,9 +8,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string auditLogPath = "xmp_audit.xml";
+        const string logPath    = "xmp_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -18,46 +18,46 @@ class Program
             return;
         }
 
-        // Retrieve original XMP metadata using the PdfXmpMetadata facade
+        // ---------------------------------------------------------------------
+        // 1. Retrieve the original XMP metadata using the PdfXmpMetadata facade.
+        //    PdfFileInfo does not expose XMP data, so we must use the dedicated
+        //    facade which provides GetXmpMetadata() / SetXmpMetadata(string).
+        // ---------------------------------------------------------------------
         string originalXmp = null;
-        try
+        using (var xmpFacade = new PdfXmpMetadata())
         {
-            byte[] xmpBytes;
-            using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata())
+            xmpFacade.BindPdf(inputPath);
+            // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string for logging.
+            byte[] xmpBytes = xmpFacade.GetXmpMetadata();
+            if (xmpBytes != null && xmpBytes.Length > 0)
             {
-                xmpBytes = xmpFacade.GetXmpMetadata(inputPath);
+                originalXmp = Encoding.UTF8.GetString(xmpBytes);
             }
-            // Convert the byte[] to a UTF‑8 string (XMP is XML text)
-            originalXmp = xmpBytes != null ? Encoding.UTF8.GetString(xmpBytes) : null;
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read XMP metadata: {ex.Message}");
-            originalXmp = null;
         }
 
-        // Log XMP metadata to console
-        Console.WriteLine("Original XMP Metadata:");
-        Console.WriteLine(originalXmp ?? "(none)");
-
-        // Persist XMP metadata to an audit file
-        try
+        // 2. Log the XMP XML for audit purposes.
+        if (!string.IsNullOrEmpty(originalXmp))
         {
-            File.WriteAllText(auditLogPath, originalXmp ?? string.Empty);
+            File.WriteAllText(logPath, originalXmp);
+            Console.WriteLine($"Original XMP metadata logged to '{logPath}'.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Failed to write audit log: {ex.Message}");
+            Console.WriteLine("No XMP metadata found in the source PDF.");
         }
 
-        // Example modification: add a blank page (optional)
+        // ---------------------------------------------------------------------
+        // 3. Load the PDF for any further processing. Wrap in using for deterministic disposal.
+        // ---------------------------------------------------------------------
         using (Document doc = new Document(inputPath))
         {
-            doc.Pages.Add(); // add a new blank page at the end
-            doc.Save(outputPath); // save the modified PDF
+            // Placeholder for modifications (if any)
+            // ...
+
+            // Save the (potentially modified) PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
-        Console.WriteLine($"XMP audit log saved to '{auditLogPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,17 +1,16 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class Program
+class XmpNamespaceLister
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Path to the PDF file (first argument or default)
-        string pdfPath = args.Length > 0 ? args[0] : "input.pdf";
+        const string pdfPath = "input.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -21,43 +20,52 @@ class Program
 
         try
         {
-            // Load the PDF document first – PdfXmpMetadata expects a Document instance
-            using (Document pdfDoc = new Document(pdfPath))
+            // Bind the PDF to the XMP facade – this is the correct way to access XMP metadata.
+            using (var xmp = new PdfXmpMetadata())
             {
-                // Use the PdfXmpMetadata facade to retrieve the raw XMP packet
-                using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata(pdfDoc))
+                xmp.BindPdf(pdfPath);
+
+                // Retrieve the raw XMP packet as a byte array.
+                byte[] packet = xmp.GetXmpMetadata();
+
+                if (packet == null || packet.Length == 0)
                 {
-                    // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string
-                    byte[] xmpBytes = xmpFacade.GetXmpMetadata();
-                    if (xmpBytes == null || xmpBytes.Length == 0)
-                    {
-                        Console.WriteLine("No XMP metadata found in the PDF.");
-                        return;
-                    }
+                    Console.WriteLine("No XMP metadata found in the PDF.");
+                    return;
+                }
 
-                    string xmpXml = Encoding.UTF8.GetString(xmpBytes);
+                // Convert the packet to a clean XML string.
+                string xmpXml = Encoding.UTF8.GetString(packet)
+                                            .Trim('\0', '\uFEFF', ' ', '\r', '\n');
 
-                    // Parse the XMP XML and collect declared namespaces
-                    XDocument doc = XDocument.Parse(xmpXml);
-                    var namespaces = doc.Root?
-                                       .Attributes()
-                                       .Where(a => a.IsNamespaceDeclaration)
-                                       .Select(a => a.Value)
-                                       .Distinct()
-                                       .ToArray();
+                // Parse the XML.
+                XDocument xdoc = XDocument.Parse(xmpXml);
 
-                    if (namespaces == null || namespaces.Length == 0)
+                // Collect all namespace URIs declared in the document.
+                var namespaces = new HashSet<string>();
+
+                // Root element namespaces.
+                foreach (XAttribute attr in xdoc.Root.Attributes())
+                {
+                    if (attr.IsNamespaceDeclaration)
+                        namespaces.Add(attr.Value);
+                }
+
+                // Recursively check all elements for additional namespace declarations.
+                foreach (XElement elem in xdoc.Descendants())
+                {
+                    foreach (XAttribute attr in elem.Attributes())
                     {
-                        Console.WriteLine("No XMP namespaces found in the PDF.");
+                        if (attr.IsNamespaceDeclaration)
+                            namespaces.Add(attr.Value);
                     }
-                    else
-                    {
-                        Console.WriteLine("XMP namespaces present in the PDF:");
-                        foreach (var ns in namespaces)
-                        {
-                            Console.WriteLine(ns);
-                        }
-                    }
+                }
+
+                // Output the list of namespaces.
+                Console.WriteLine("XMP namespaces present in the PDF:");
+                foreach (string ns in namespaces.OrderBy(n => n))
+                {
+                    Console.WriteLine(ns);
                 }
             }
         }

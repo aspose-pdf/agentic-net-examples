@@ -1,31 +1,39 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "output_with_xmp.pdf";
+        const string pdfPath = "newDocument.pdf";
 
-        // Create a new PDF document, add a simple page with text
+        // Create a new PDF document.
         using (Document doc = new Document())
         {
-            Page page = doc.Pages.Add();
-            page.Paragraphs.Add(new TextFragment("Hello, Aspose.Pdf!"));
+            // Add a single blank page.
+            doc.Pages.Add();
 
-            // Register the Dublin Core namespace used in the XMP packet
-            doc.Metadata.RegisterNamespaceUri("dc", "http://purl.org/dc/elements/1.1/");
+            // Build a fresh XMP metadata block using the PdfXmpMetadata facade.
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
+            {
+                // Register common namespaces (optional but recommended).
+                xmp.RegisterNamespaceURI("dc", "http://purl.org/dc/elements/1.1/");
+                xmp.RegisterNamespaceURI("xmp", "http://ns.adobe.com/xap/1.0/");
+                xmp.RegisterNamespaceURI("pdf", "http://ns.adobe.com/pdf/1.3/");
 
-            // Add XMP properties – each value must be wrapped in an XmpValue instance
-            doc.Metadata["dc:title"] = new XmpValue("Sample PDF with XMP");
-            doc.Metadata["dc:creator"] = new XmpValue("John Doe");
-            doc.Metadata["dc:description"] = new XmpValue("Demonstrates XMP metadata binding.");
+                // Add XMP properties.
+                xmp.Add("dc:creator", "John Doe");
+                xmp.Add("dc:title", "Sample PDF with XMP");
+                xmp.Add("xmp:CreateDate", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+                xmp.Add("xmp:ModifyDate", DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"));
+                xmp.Add("pdf:Producer", "Aspose.Pdf for .NET");
 
-            // Save the PDF – the XMP block is generated automatically from the dictionary
-            doc.Save(outputPath);
+                // Save the PDF together with the XMP metadata.
+                xmp.Save(pdfPath);
+            }
         }
 
-        Console.WriteLine($"PDF with XMP metadata saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with XMP metadata saved to '{pdfPath}'.");
     }
 }

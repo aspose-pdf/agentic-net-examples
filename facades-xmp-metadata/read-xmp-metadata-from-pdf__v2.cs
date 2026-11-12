@@ -1,61 +1,68 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document – this gives access to the Metadata dictionary where XMP is stored
-        Document doc = new Document(pdfPath);
-
-        // XMP metadata is stored under the key "XmpMetadata" in the Metadata dictionary.
-        // The dictionary returns an Aspose.Pdf.XmpValue, which must be converted to a string.
-        string xmpXml = null;
-        if (doc.Metadata != null && doc.Metadata.TryGetValue("XmpMetadata", out var xmpValue) && xmpValue != null)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            xmpXml = xmpValue.ToString(); // explicit conversion from XmpValue to string
+            // Retrieve XMP metadata via the PdfXmpMetadata facade
+            byte[] xmpBytes;
+            using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata(doc))
+            {
+                // GetXmpMetadata returns the raw XMP packet as a byte array
+                xmpBytes = xmpFacade.GetXmpMetadata();
+            }
+
+            if (xmpBytes == null || xmpBytes.Length == 0)
+            {
+                Console.WriteLine("No XMP metadata found in the PDF.");
+                return;
+            }
+
+            // Convert the byte[] to a UTF‑8 string
+            string xmpXml = Encoding.UTF8.GetString(xmpBytes);
+
+            // Parse the XML
+            XDocument xDoc;
+            try
+            {
+                xDoc = XDocument.Parse(xmpXml);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to parse XMP XML: {ex.Message}");
+                return;
+            }
+
+            // Example: read Dublin Core (dc) schema properties
+            XNamespace dc = "http://purl.org/dc/elements/1.1/";
+
+            string title = xDoc.Root?
+                .Descendants(dc + "title")
+                .FirstOrDefault()? .Value ?? "(no title)";
+
+            string creator = xDoc.Root?
+                .Descendants(dc + "creator")
+                .FirstOrDefault()? .Value ?? "(no creator)";
+
+            Console.WriteLine($"XMP Title  : {title}");
+            Console.WriteLine($"XMP Creator: {creator}");
         }
-
-        if (string.IsNullOrEmpty(xmpXml))
-        {
-            Console.WriteLine("No XMP metadata found in the PDF.");
-            return;
-        }
-
-        // Parse the XMP XML string
-        XDocument xdoc = XDocument.Parse(xmpXml);
-        var root = xdoc.Root;
-        if (root == null)
-        {
-            Console.WriteLine("Invalid XMP XML: missing root element.");
-            return;
-        }
-
-        // Common XMP namespaces (adjust as needed for your schema)
-        XNamespace dc  = "http://purl.org/dc/elements/1.1/";
-        XNamespace pdf = "http://ns.adobe.com/pdf/1.3/";
-        XNamespace xmp = "http://ns.adobe.com/xap/1.0/";
-
-        // Extract specific property values; use null‑coalescing to handle missing elements
-        string title      = root.Element(dc + "title")?.Value      ?? "(no title)";
-        string creator    = root.Element(dc + "creator")?.Value    ?? "(no creator)";
-        string pdfVersion = root.Element(pdf + "PDFVersion")?.Value ?? "(no PDF version)";
-        string modifyDate = root.Element(xmp + "ModifyDate")?.Value ?? "(no modify date)";
-
-        // Output the extracted values
-        Console.WriteLine($"Title: {title}");
-        Console.WriteLine($"Creator: {creator}");
-        Console.WriteLine($"PDF Version: {pdfVersion}");
-        Console.WriteLine($"Modify Date: {modifyDate}");
     }
 }

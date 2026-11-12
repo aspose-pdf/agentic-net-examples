@@ -1,30 +1,47 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // required for TextFragment
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "generated.pdf";
+        // Paths
+        const string outputPath = "output_with_timestamp.pdf";
 
-        // Create a simple PDF with one blank page
-        Document doc = new Document();
-        doc.Pages.Add(); // ensure the PDF has at least one page
+        // Create a new PDF document and add a simple page with visible text
+        using (Document doc = new Document())
+        {
+            // Add a blank page
+            doc.Pages.Add();
 
-        // Prepare XMP metadata and add a timestamp property
-        string timestamp = DateTime.UtcNow.ToString("o"); // ISO‑8601 format
+            // Add a visible text fragment to demonstrate that the PDF is not empty
+            TextFragment tf = new TextFragment("Sample PDF generated with XMP timestamp.");
+            // Optional: set some basic text properties
+            tf.TextState.FontSize = 12;
+            tf.TextState.Font = FontRepository.FindFont("Arial");
+            doc.Pages[1].Paragraphs.Add(tf);
 
-        // Register a custom namespace (optional, you can use any prefix you like)
-        doc.Metadata.RegisterNamespaceUri("my", "http://example.com/custom");
+            // Create XMP metadata and bind it to the document
+            using (PdfXmpMetadata xmp = new PdfXmpMetadata(doc))
+            {
+                // Register a custom namespace (optional, can use standard XMP namespaces)
+                xmp.RegisterNamespaceURI("my", "http://example.com/ns");
 
-        // Standard XMP property
-        doc.Metadata["xmp:CreateDate"] = timestamp;
-        // Custom property in our namespace
-        doc.Metadata["my:Timestamp"] = timestamp;
+                // Add a standard XMP creation date (ISO 8601 format)
+                string timestamp = DateTime.UtcNow.ToString("o"); // e.g., 2023-08-15T12:34:56.789Z
+                xmp.Add("xmp:CreateDate", timestamp);
 
-        // Save the PDF – the XMP metadata is embedded automatically
-        doc.Save(pdfPath);
+                // Add a custom property under the custom namespace (optional)
+                xmp.Add("my:Timestamp", timestamp);
 
-        Console.WriteLine($"PDF generated with timestamp metadata at '{pdfPath}'.");
+                // Save the PDF with the attached XMP metadata
+                xmp.Save(outputPath);
+            }
+        }
+
+        Console.WriteLine($"PDF saved to '{outputPath}' with XMP timestamp.");
     }
 }
