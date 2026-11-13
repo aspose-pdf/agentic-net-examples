@@ -6,34 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXfdfPath = "output.xfdf";
+        const string inputPdf = "input.pdf";
+        const string outputXfdf = "fields.xfdf";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document; using ensures deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Check that the document contains an AcroForm with fields
-            if (pdfDoc.Form == null || pdfDoc.Form.Count == 0)
+            // Verify that the document contains an AcroForm with fields
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                Console.WriteLine("The PDF does not contain any AcroForm fields to export.");
+                Console.WriteLine("No AcroForm fields found in the document.");
                 return;
             }
 
-            // Create a FileStream for the XFDF output file and export the form fields
-            using (FileStream xfdfStream = new FileStream(outputXfdfPath, FileMode.Create, FileAccess.Write))
+            // Create a FileStream for the XFDF output; using ensures the stream is closed
+            using (FileStream xfdfStream = new FileStream(outputXfdf, FileMode.Create, FileAccess.Write))
             {
-                // Export form fields (and related annotations) to XFDF using the Document API
-                pdfDoc.ExportAnnotationsToXfdf(xfdfStream);
+                // Export form fields (widget annotations) to XFDF format
+                doc.ExportAnnotationsToXfdf(xfdfStream);
             }
 
-            Console.WriteLine($"AcroForm fields successfully exported to '{outputXfdfPath}'.");
+            Console.WriteLine($"AcroForm fields exported to '{outputXfdf}'.");
         }
     }
 }

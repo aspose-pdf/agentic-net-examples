@@ -7,21 +7,20 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath = "input.pdf";
         const string fieldName = "myCheckBox";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Retrieve the checkbox field from the form collection and cast it
+            // Retrieve the checkbox field by name
             CheckboxField checkBox = doc.Form[fieldName] as CheckboxField;
-
             if (checkBox == null)
             {
                 Console.Error.WriteLine($"Checkbox field '{fieldName}' not found.");
@@ -31,10 +30,9 @@ class Program
             // The Value property is a string (e.g., "On" when checked, "Off" otherwise)
             string rawValue = checkBox.Value;
 
-            // Convert the string value to a Boolean
+            // Convert to Boolean: true if value equals "On" (case‑insensitive)
             bool isChecked = string.Equals(rawValue, "On", StringComparison.OrdinalIgnoreCase);
 
-            // Example usage of the Boolean variable
             Console.WriteLine($"Checkbox '{fieldName}' is checked: {isChecked}");
         }
     }

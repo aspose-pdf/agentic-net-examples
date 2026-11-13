@@ -2,55 +2,58 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ExtractVectorGraphics
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";   // Encrypted PDF file
-        const string password  = "user123";        // Password for opening the PDF
-        const string outputDir = "ExtractedVectors"; // Folder for SVG files
+        // Paths and password – adjust as needed
+        const string encryptedPdfPath = "encrypted_input.pdf";
+        const string password = "userPassword";
+        const string outputFolder = "VectorGraphics";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
         try
         {
             // Open the encrypted PDF by providing the password
-            using (Document doc = new Document(inputPath, password))
+            using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(encryptedPdfPath, password))
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Iterate using 1‑based page indexing
+                for (int i = 1; i <= sourceDoc.Pages.Count; i++)
                 {
-                    string svgPath = Path.Combine(outputDir, $"Page_{i}.svg");
-
-                    // Create a temporary document containing only the current page
-                    using (Document singlePageDoc = new Document())
+                    // Create a new document containing only the current page
+                    using (Aspose.Pdf.Document singlePageDoc = new Aspose.Pdf.Document())
                     {
-                        // Add the page reference; this does not copy the whole source document
-                        singlePageDoc.Pages.Add(doc.Pages[i]);
+                        // Add the page from the source document
+                        singlePageDoc.Pages.Add(sourceDoc.Pages[i]);
 
-                        // Save the single page as SVG to capture vector graphics
-                        SvgSaveOptions svgOptions = new SvgSaveOptions();
-                        singlePageDoc.Save(svgPath, svgOptions);
+                        // Define SVG save options (default options are sufficient for vector extraction)
+                        Aspose.Pdf.SvgSaveOptions svgOptions = new Aspose.Pdf.SvgSaveOptions();
+
+                        // Build output file name
+                        string outputPath = Path.Combine(outputFolder, $"Page_{i}.svg");
+
+                        // Save the single‑page document as SVG (vector graphics)
+                        singlePageDoc.Save(outputPath, svgOptions);
+
+                        Console.WriteLine($"Extracted vector graphics for page {i} to '{outputPath}'.");
                     }
                 }
             }
 
-            Console.WriteLine("Vector graphics extracted to SVG files successfully.");
-        }
-        catch (InvalidPasswordException ex)
-        {
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+            Console.WriteLine("Vector graphics extraction completed successfully.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

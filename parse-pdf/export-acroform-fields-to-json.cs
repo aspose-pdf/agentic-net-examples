@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // Added for form field types
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "form_data.json";
+        const string outputJsonPath = "fields.json";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -19,44 +18,39 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdfPath))
+            // Prepare a dictionary to hold field name/value pairs
+            var fieldData = new Dictionary<string, object>();
+
+            // Ensure the document contains an AcroForm
+            if (doc.Form != null && doc.Form.Fields != null)
             {
-                // Ensure the document contains a form with at least one field
-                if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
-                {
-                    Console.WriteLine("No AcroForm fields found in the document.");
-                    return;
-                }
-
-                // Collect field names and their string values
-                var fieldData = new Dictionary<string, string>();
-
                 foreach (Field field in doc.Form.Fields)
                 {
-                    // PartialName is the field's identifier (fallback to empty string if null)
-                    string name = field.PartialName ?? string.Empty;
+                    // PartialName is the field's name; Value holds its current value
+                    string name = field.PartialName;
+                    object value = field.Value;
 
-                    // Value may be null; convert to string safely
-                    string value = field.Value?.ToString() ?? string.Empty;
+                    // Some field types (e.g., Checkbox) may return null for unchecked state;
+                    // store a boolean representation for clarity
+                    if (field is CheckboxField checkBox)
+                    {
+                        value = checkBox.Checked;
+                    }
 
-                    fieldData[name] = value;
+                    fieldData[name] = value ?? string.Empty;
                 }
-
-                // Serialize the dictionary to JSON with indentation
-                var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(fieldData, jsonOptions);
-
-                // Write JSON to the output file
-                File.WriteAllText(outputJsonPath, json);
-                Console.WriteLine($"Form data extracted to '{outputJsonPath}'.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+
+            // Serialize the dictionary to JSON (indented for readability)
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(fieldData, jsonOptions);
+
+            // Write JSON to the output file
+            File.WriteAllText(outputJsonPath, json);
+            Console.WriteLine($"AcroForm data extracted to '{outputJsonPath}'.");
         }
     }
 }

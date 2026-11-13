@@ -1,75 +1,62 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-namespace PdfFormBatchProcessor
+class Program
 {
-    // Simple DTO to hold form data for each PDF
-    public class FormData
+    static void Main()
     {
-        public string FileName { get; set; }
-        public Dictionary<string, string> Fields { get; set; }
+        // Paths to the PDF files to process
+        string[] pdfFiles = { "form1.pdf", "form2.pdf", "form3.pdf" };
+        // Output JSON file
+        const string jsonOutputPath = "combined_form_data.json";
 
-        // Constructor ensures non‑null properties for C# 8+ nullable reference types
-        public FormData(string fileName, Dictionary<string, string> fields)
+        // List that will hold each PDF's form data as a dictionary
+        var allFormsData = new List<Dictionary<string, string>>();
+
+        foreach (string pdfPath in pdfFiles)
         {
-            FileName = fileName ?? throw new ArgumentNullException(nameof(fileName));
-            Fields = fields ?? throw new ArgumentNullException(nameof(fields));
-        }
-    }
-
-    class Program
-    {
-        static void Main()
-        {
-            // Folder containing the source PDFs
-            const string inputFolder = @"C:\InputPdfs";
-            // Path for the resulting JSON file
-            const string outputJsonPath = @"C:\Output\combinedFormData.json";
-
-            // Collect all PDF files in the folder
-            string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-
-            // List that will become the JSON array
-            List<FormData> batchData = new List<FormData>();
-
-            foreach (string pdfPath in pdfFiles)
+            if (!File.Exists(pdfPath))
             {
-                // Ensure each Document is disposed promptly
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Prepare a dictionary for the current PDF's form fields
-                    Dictionary<string, string> fieldValues = new Dictionary<string, string>();
-
-                    // Iterate over all form fields in the document using the correct Field type
-                    foreach (Field field in doc.Form.Fields)
-                    {
-                        // PartialName uniquely identifies the field; Value may be null
-                        string name = field.PartialName;
-                        string value = field.Value?.ToString() ?? string.Empty;
-                        fieldValues[name] = value;
-                    }
-
-                    // Add the extracted data to the batch list
-                    batchData.Add(new FormData(
-                        Path.GetFileName(pdfPath),
-                        fieldValues
-                    ));
-                }
+                Console.Error.WriteLine($"File not found: {pdfPath}");
+                continue;
             }
 
-            // Serialize the batch list to a pretty‑printed JSON string
-            string json = JsonSerializer.Serialize(
-                batchData,
-                new JsonSerializerOptions { WriteIndented = true });
+            // Load each PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
+            {
+                // Dictionary to hold field name/value pairs for the current PDF
+                var formData = new Dictionary<string, string>();
 
-            // Write the JSON to the output file
-            File.WriteAllText(outputJsonPath, json);
+                // Access the AcroForm attached to the document
+                Form form = doc.Form;
+                if (form?.Fields != null)
+                {
+                    // Iterate over all form fields
+                    foreach (Field field in form.Fields)
+                    {
+                        // Field name (PartialName) and its value as string
+                        string name = field?.PartialName ?? string.Empty;
+                        string value = field?.Value?.ToString() ?? string.Empty;
+                        formData[name] = value;
+                    }
+                }
 
-            Console.WriteLine($"Combined form data saved to '{outputJsonPath}'.");
+                // Add the current PDF's form data to the collection
+                allFormsData.Add(formData);
+            }
         }
+
+        // Serialize the list of dictionaries to a JSON array
+        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(allFormsData, jsonOptions);
+
+        // Write JSON to the output file
+        File.WriteAllText(jsonOutputPath, json);
+
+        Console.WriteLine($"Combined form data saved to '{jsonOutputPath}'.");
     }
 }
