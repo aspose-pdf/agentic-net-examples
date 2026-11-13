@@ -1,61 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Operators;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string qrImagePath = "qr.png";
-        const string outputPdf = "output.pdf";
+        const string outputPdf = "output_qr.pdf";
+        const string qrText = "https://example.com";
 
-        // Desired position (lower‑left corner) and size of the QR code on the page
-        const double posX = 100;   // X coordinate in points
-        const double posY = 200;   // Y coordinate in points
-        const double imgWidth = 150;  // Width in points
-        const double imgHeight = 150; // Height in points
+        // Desired placement rectangle (lower‑left and upper‑right corners)
+        const double llx = 100; // X of lower‑left
+        const double lly = 500; // Y of lower‑left
+        const double urx = 200; // X of upper‑right
+        const double ury = 600; // Y of upper‑right
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(qrImagePath))
-        {
-            Console.Error.WriteLine($"QR image not found: {qrImagePath}");
-            return;
-        }
-
-        // Load the PDF inside a using block (document‑disposal‑with‑using rule)
+        // Open the PDF and embed the QR code using a form field (no Barcode namespace required)
         using (Document doc = new Document(inputPdf))
         {
-            // Access the first page (1‑based indexing rule)
+            // 1‑based page indexing (first page)
             Page page = doc.Pages[1];
 
-            // Add the QR code image to the page resources and obtain its name
-            string imageName;
-            using (FileStream imgStream = File.OpenRead(qrImagePath))
+            // Create a TextBoxField that will hold the QR code
+            var qrField = new TextBoxField(page, new Aspose.Pdf.Rectangle(llx, lly, urx, ury))
             {
-                imageName = page.Resources.Images.Add(imgStream);
-            }
+                PartialName = "qrCodeField"
+            };
 
-            // Retrieve the XImage object to read its original dimensions
-            XImage qrImage = page.Resources.Images[imageName];
+            // Add the field to the document's form (page number is 1‑based)
+            doc.Form.Add(qrField, 1);
 
-            // Compute scaling factors to fit the desired width/height
-            double scaleX = imgWidth / qrImage.Width;
-            double scaleY = imgHeight / qrImage.Height;
+            // Draw the QR code into the field. AddBarcode automatically chooses the appropriate symbology (QR).
+            qrField.AddBarcode(qrText);
 
-            // Insert low‑level PDF operators to draw the image at the specified location
-            page.Contents.Add(new GSave()); // q – Save graphics state
-            page.Contents.Add(new ConcatenateMatrix(scaleX, 0, 0, scaleY, posX, posY)); // cm – Position & scale
-            page.Contents.Add(new Do(imageName)); // Do – Draw the image
-            page.Contents.Add(new GRestore()); // Q – Restore graphics state
-
-            // Save the modified PDF (PDF format, so no special SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 

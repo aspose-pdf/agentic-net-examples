@@ -3,39 +3,34 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // required for Form field types
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "form_template.pdf";
-        const string jsonDataPath = "data.json";
-        const string outputPdfPath = "filled_flattened.pdf";
+        const string pdfPath = "input_form.pdf";
+        const string jsonPath = "data.json";
+        const string outputPdf = "filled_flattened.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(jsonDataPath))
+        if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON data file not found: {jsonDataPath}");
+            Console.Error.WriteLine($"JSON data file not found: {jsonPath}");
             return;
         }
 
-        // Load JSON data into a dictionary (field name -> value)
-        Dictionary<string, string>? fieldValues;
+        // Load JSON key/value pairs (field name -> value)
+        Dictionary<string, string> fieldData;
         try
         {
-            string json = File.ReadAllText(jsonDataPath);
-            fieldValues = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
-            if (fieldValues == null)
-            {
-                Console.Error.WriteLine("JSON deserialization returned null.");
-                return;
-            }
+            string jsonContent = File.ReadAllText(jsonPath);
+            fieldData = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
         }
         catch (Exception ex)
         {
@@ -43,38 +38,46 @@ class Program
             return;
         }
 
-        // Load the PDF form, populate fields, then flatten
+        // Open the PDF, populate fields, then flatten the form
         try
         {
-            using (Document pdfDoc = new Document(inputPdfPath))
+            using (Document pdfDoc = new Document(pdfPath))
             {
                 // Populate each form field that exists in the PDF
-                foreach (var kvp in fieldValues)
+                foreach (var kvp in fieldData)
                 {
                     string fieldName = kvp.Key;
-                    string fieldValue = kvp.Value ?? string.Empty;
+                    string fieldValue = kvp.Value;
 
-                    // Retrieve the field from the document's form collection as a Field object
-                    Field? field = pdfDoc.Form[fieldName] as Field;
-                    if (field != null)
+                    // Verify the field exists
+                    if (pdfDoc.Form.HasField(fieldName))
                     {
-                        // Set the field value using the Field.Value property
-                        field.Value = fieldValue;
+                        // Retrieve the field as a Form.Field (not WidgetAnnotation)
+                        Field field = pdfDoc.Form[fieldName] as Field;
+                        if (field != null)
+                        {
+                            // Set the value – the Value property is defined on Aspose.Pdf.Forms.Field
+                            field.Value = fieldValue;
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Warning: Field '{fieldName}' could not be cast to a Form.Field.");
+                        }
                     }
                     else
                     {
-                        Console.WriteLine($"Warning: Field '{fieldName}' not found in the PDF form.");
+                        Console.WriteLine($"Warning: Field '{fieldName}' not found in the PDF.");
                     }
                 }
 
                 // Flatten the form to make fields non‑editable
-                pdfDoc.Flatten();
+                pdfDoc.Form.Flatten();
 
                 // Save the resulting PDF
-                pdfDoc.Save(outputPdfPath);
+                pdfDoc.Save(outputPdf);
             }
 
-            Console.WriteLine($"Form populated and flattened successfully: {outputPdfPath}");
+            Console.WriteLine($"Form fields populated and flattened. Output saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {

@@ -1,15 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Microsoft.CSharp.RuntimeBinder;
+using Aspose.Pdf.Annotations; // Actions live in the Annotations namespace
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -20,29 +19,18 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Attempt to set viewer preferences (HideToolbar, HideMenubar).
-            // The ViewerPreferences property is available only in newer Aspose.Pdf versions.
-            // Use dynamic access with a try/catch to keep the code compatible with older versions.
-            dynamic dynDoc = doc;
-            try
-            {
-                dynDoc.ViewerPreferences.HideToolbar = true;
-                dynDoc.ViewerPreferences.HideMenubar = true;
-            }
-            catch (RuntimeBinderException)
-            {
-                // ViewerPreferences not supported – silently ignore or log if needed.
-                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf version.");
-            }
+            // JavaScript that runs when the document is opened.
+            // app.toolbar = 0  hides the toolbar.
+            // app.menuBar = 0 hides the menu bar.
+            string js = "app.toolbar = 0; app.menuBar = 0;";
 
-            // Embed JavaScript that runs when the document is opened.
-            // This works on viewers that support JavaScript (e.g., Adobe Acrobat).
-            doc.OpenAction = new JavascriptAction("app.toolbar = false; app.menu = false;");
+            // Assign the JavaScript as the document's OpenAction
+            doc.OpenAction = new JavascriptAction(js); // Note the lowercase 's' in JavascriptAction
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with hidden toolbar and menu bar: {outputPath}");
+        Console.WriteLine($"PDF saved with viewer‑preference JavaScript to '{outputPath}'.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
@@ -17,51 +18,48 @@ class Program
 
         try
         {
-            // Load PDF inside a using block for deterministic disposal
+            // Open the PDF document inside a using block for deterministic disposal.
             using (Document doc = new Document(pdfPath))
             {
-                // Open the log file for appending audit entries
-                using (StreamWriter log = new StreamWriter(logPath, append: true))
+                // Prepare the log file (overwrites if it exists).
+                using (StreamWriter logWriter = new StreamWriter(logPath, false))
                 {
-                    log.WriteLine($"Audit Timestamp: {DateTime.UtcNow:u}");
-                    log.WriteLine($"File: {pdfPath}");
+                    logWriter.WriteLine($"Metadata audit for '{Path.GetFileName(pdfPath)}' - {DateTime.UtcNow:u}");
+                    logWriter.WriteLine(new string('-', 60));
 
-                    // Write standard metadata fields
-                    log.WriteLine($"Title: {doc.Info.Title}");
-                    log.WriteLine($"Author: {doc.Info.Author}");
-                    log.WriteLine($"Subject: {doc.Info.Subject}");
-                    log.WriteLine($"Keywords: {doc.Info.Keywords}");
+                    // Write standard document info (optional, useful for auditing).
+                    logWriter.WriteLine($"Title   : {doc.Info.Title}");
+                    logWriter.WriteLine($"Author  : {doc.Info.Author}");
+                    logWriter.WriteLine($"Subject : {doc.Info.Subject}");
+                    logWriter.WriteLine($"Keywords: {doc.Info.Keywords}");
+                    logWriter.WriteLine();
 
-                    // Iterate over all metadata entries and log custom ones
-                    foreach (var key in doc.Info.Keys)
+                    // Iterate over custom metadata entries using the DocumentInfo indexer.
+                    // Custom metadata is stored in the DocumentInfo dictionary accessible via the Keys collection.
+                    ICollection<string> customKeys = doc.Info.Keys;
+                    if (customKeys != null && customKeys.Count > 0)
                     {
-                        if (IsStandardKey(key)) continue; // skip already logged standard keys
-                        string value = doc.Info[key];
-                        log.WriteLine($"Custom Metadata - {key}: {value}");
+                        logWriter.WriteLine("Custom Metadata:");
+                        foreach (string key in customKeys)
+                        {
+                            string value = doc.Info[key];
+                            logWriter.WriteLine($"- {key} = {value}");
+                        }
+                    }
+                    else
+                    {
+                        logWriter.WriteLine("No custom metadata found.");
                     }
 
-                    log.WriteLine(new string('-', 40));
+                    logWriter.WriteLine(new string('-', 60));
                 }
             }
 
-            Console.WriteLine($"Metadata audit written to '{logPath}'.");
+            Console.WriteLine($"Metadata audit completed. Log saved to '{logPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
         }
-    }
-
-    // Determines whether a metadata key is one of the standard PDF Info entries
-    static bool IsStandardKey(string key)
-    {
-        return string.Equals(key, "Title", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "Author", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "Subject", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "Keywords", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "Creator", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "Producer", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "CreationDate", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(key, "ModDate", StringComparison.OrdinalIgnoreCase);
     }
 }

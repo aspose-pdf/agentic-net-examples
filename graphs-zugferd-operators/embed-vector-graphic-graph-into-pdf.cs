@@ -1,6 +1,7 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using System.IO;
 
 class Program
 {
@@ -8,51 +9,46 @@ class Program
     {
         const string outputPath = "graph.pdf";
 
-        // Document lifecycle must be wrapped in a using block
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a new page to host the vector graphic
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container that spans the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-            // Define the points of the simple line graph
-            var points = new (float x, float y)[]
+            // Create a Graph object (vector graphic) with double‑precision dimensions
+            Graph vectorGraph = new Graph(500.0, 400.0)
             {
-                (50, 750),   // Point 1
-                (150, 650),  // Point 2
-                (250, 700),  // Point 3
-                (350, 600),  // Point 4
-                (450, 720)   // Point 5
+                Left = 0.0,
+                Top = 0.0
             };
 
-            // Add a line segment between each consecutive pair of points
-            for (int i = 0; i < points.Length - 1; i++)
+            // Helper to create a line shape with a given set of points
+            Line CreateLine(float[] points)
             {
-                Line line = new Line(new float[]
+                var line = new Line(points);
+                line.GraphInfo = new GraphInfo
                 {
-                    points[i].x, points[i].y,
-                    points[i + 1].x, points[i + 1].y
-                })
-                {
-                    GraphInfo = new GraphInfo
-                    {
-                        Color = Color.Black,
-                        LineWidth = 1
-                    }
+                    Color = Color.Black,
+                    FillColor = Color.Transparent
                 };
-
-                graph.Shapes.Add(line);
+                return line;
             }
 
-            // Embed the vector graphic into the page
-            page.Paragraphs.Add(graph);
+            // X‑axis
+            vectorGraph.Shapes.Add(CreateLine(new float[] { 50, 350, 450, 350 }));
+            // Y‑axis
+            vectorGraph.Shapes.Add(CreateLine(new float[] { 50, 50, 50, 350 }));
+            // Simple data series (poly‑line)
+            vectorGraph.Shapes.Add(CreateLine(new float[] { 50, 350, 100, 300, 150, 320, 200, 280, 250, 310, 300, 260 }));
 
-            // Save the PDF (no SaveOptions needed for PDF output)
+            // Embed the graph directly into the page
+            page.Paragraphs.Add(vectorGraph);
+
+            // Save the PDF; no SaveOptions needed for PDF output
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with embedded vector graphic saved to '{outputPath}'.");
+        // Use fully‑qualified System.IO.Path to avoid ambiguity with Aspose.Pdf.Drawing.Path
+        Console.WriteLine($"PDF with embedded vector graphic saved to '{System.IO.Path.GetFullPath(outputPath)}'.");
     }
 }

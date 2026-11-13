@@ -1,9 +1,9 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations; // Needed for JavascriptAction
 
 class Program
 {
@@ -18,50 +18,55 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript that sums the values of the price fields and writes the result to the total field
-            string js = @"
-var total = 0;
-var fields = ['price1','price2','price3'];
-for (var i = 0; i < fields.length; i++) {
-    var f = this.getField(fields[i]);
-    if (f != null && f.value != null) {
-        var v = parseFloat(f.value);
-        if (!isNaN(v)) total += v;
-    }
-}
-var totalField = this.getField('total');
-if (totalField != null) totalField.value = total.toFixed(2);
-";
+            // Access the form (AcroForm) of the document
+            var form = doc.Form;
 
-            // Names of the line‑item fields that participate in the calculation
-            string[] priceFieldNames = new string[] { "price1", "price2", "price3" };
+            // Names of the line‑item fields that contain numeric values
+            string[] lineItemNames = new[] { "price1", "price2", "price3" };
 
-            // Attach the JavaScript action to each price field (triggered on calculate)
-            foreach (string fieldName in priceFieldNames)
+            // Name of the summary field that will display the total
+            const string summaryFieldName = "total";
+
+            // Retrieve the summary field if it exists; otherwise create it
+            TextBoxField totalField;
+            if (form[summaryFieldName] is TextBoxField existingField)
+                totalField = existingField;
+            else
             {
-                TextBoxField field = doc.Form[fieldName] as TextBoxField;
-                if (field != null)
+                // Create a new textbox field on the first page
+                totalField = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 700, 200, 720))
                 {
-                    // Use the correct class name (lower‑case 's') and assign to a valid action property
-                    field.Actions.OnCalculate = new JavascriptAction(js);
-                }
+                    PartialName = summaryFieldName
+                };
+                form.Add(totalField);
             }
 
-            // Ensure the summary field exists; create it if it does not
-            if (doc.Form["total"] == null)
+            // Build JavaScript that sums the values of the line‑item fields
+            StringBuilder js = new StringBuilder();
+            js.AppendLine("var sum = 0;");
+            js.AppendLine("var fields = [");
+            for (int i = 0; i < lineItemNames.Length; i++)
             {
-                TextBoxField totalField = new TextBoxField(
-                    doc.Pages[1],
-                    new Rectangle(100, 500, 200, 520));
-                totalField.PartialName = "total";
-                totalField.Value = "0.00";
-                doc.Form.Add(totalField);
+                js.Append($"\"{lineItemNames[i]}\"");
+                if (i < lineItemNames.Length - 1) js.Append(", ");
             }
+            js.AppendLine("];");
+            js.AppendLine("for (var i = 0; i < fields.length; i++) {");
+            js.AppendLine("  var f = this.getField(fields[i]);");
+            js.AppendLine("  if (f && f.value) {");
+            js.AppendLine("    var v = parseFloat(f.value);");
+            js.AppendLine("    if (!isNaN(v)) sum += v;");
+            js.AppendLine("  }");
+            js.AppendLine("}");
+            js.AppendLine($"this.getField(\"{summaryFieldName}\").value = sum;");
 
-            // Save the modified PDF
+            // Assign the JavaScript to the summary field's calculate action
+            totalField.Actions.OnCalculate = new JavascriptAction(js.ToString());
+
+            // Save the modified PDF (no PreSave needed)
             doc.Save(outputPath);
         }
 

@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_js.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,16 +16,16 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // JavaScript open action: jump to page 5 (zero‑based index 4)
+            // JavaScript that sets the current page to page 5 (zero‑based index = 4)
             doc.OpenAction = new JavascriptAction("this.pageNum = 4;");
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with open action saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript open action to '{outputPath}'.");
     }
 }

@@ -6,27 +6,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "updated_attachments.pdf";
-        const string attachmentName = "Report.pdf"; // name of the attachment to update
-        const string newDescription = "Report – latest version (v2.3)";
+        const string inputPdf = "input.pdf";          // PDF containing the attachment
+        const string outputPdf = "output.pdf";        // PDF to write after updating
+        const string attachmentName = "report.docx"; // Name of the attachment to update
+        const string newDescription = "Report – version 2.1 (latest)";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Locate the embedded file (attachment) by its name
-            FileSpecification target = null;
-            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+            // Verify that the PDF actually contains embedded files
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
-                if (fileSpec.Name == attachmentName)
+                Console.Error.WriteLine("No embedded files found in the PDF.");
+                return;
+            }
+
+            // Locate the embedded file (FileSpecification) with the requested name
+            FileSpecification target = null;
+            foreach (FileSpecification fs in doc.EmbeddedFiles)
+            {
+                if (string.Equals(fs.Name, attachmentName, StringComparison.OrdinalIgnoreCase))
                 {
-                    target = fileSpec;
+                    target = fs;
                     break;
                 }
             }
@@ -37,13 +44,13 @@ class Program
                 return;
             }
 
-            // Update the description property
+            // Update the description property of the found attachment
             target.Description = newDescription;
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF (extension determines format; SaveOptions not required)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Attachment description updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Attachment description updated and saved to \"{outputPdf}\".");
     }
 }

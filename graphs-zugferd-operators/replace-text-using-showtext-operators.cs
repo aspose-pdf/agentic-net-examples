@@ -7,11 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        const string searchText = "Old String";
-        const string replaceText = "New String";
+        const string inputPath   = "input.pdf";
+        const string outputPath  = "output.pdf";
+        const string searchText  = "OldString";
+        const string replaceText = "NewString";
 
         if (!File.Exists(inputPath))
         {
@@ -21,17 +20,11 @@ class Program
 
         try
         {
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Locate the text fragments to replace
+                // Locate text‑show operators that contain the target string
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
-
-                // In recent Aspose.Pdf versions TextSearchOptions requires a constructor argument.
-                // The boolean argument enables searching in annotations; adjust as needed.
-                TextSearchOptions searchOpts = new TextSearchOptions(true);
-                absorber.TextSearchOptions = searchOpts;
-
-                // Apply the absorber to all pages
                 doc.Pages.Accept(absorber);
 
                 // Replace each found fragment with the new string
@@ -40,11 +33,11 @@ class Program
                     fragment.Text = replaceText;
                 }
 
-                // Save the modified PDF
+                // Save the modified PDF (PDF format is the default)
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Text replacement completed. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

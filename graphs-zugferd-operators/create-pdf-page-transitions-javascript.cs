@@ -1,7 +1,7 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // JavascriptAction lives here
+using Aspose.Pdf.Text; // TextFragment lives here
 
 class Program
 {
@@ -9,34 +9,48 @@ class Program
     {
         const string outputPath = "PageTransitions.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document())
         {
-            // Add three pages with simple identifying text
+            // Add three pages to demonstrate different transitions.
             for (int i = 1; i <= 3; i++)
             {
+                // Add a new blank page.
                 Page page = doc.Pages.Add();
+
+                // Add simple text to identify the page.
                 page.Paragraphs.Add(new TextFragment($"Page {i}"));
+
+                // Define transition style and duration per page.
+                // Transition styles: Fade, Dissolve, Split, Blinds, Box, Wipe, etc.
+                // Duration is in seconds.
+                string style;
+                double duration;
+
+                switch (i)
+                {
+                    case 1:
+                        style = "Fade";
+                        duration = 2.0;
+                        break;
+                    case 2:
+                        style = "Wipe";
+                        duration = 3.0;
+                        break;
+                    default:
+                        style = "Box";
+                        duration = 1.5;
+                        break;
+                }
+
+                // Attach a JavaScript action that runs when the page is opened.
+                // The PDF JavaScript method this.setPageTransition(style, duration) sets the transition.
+                string js = $"this.setPageTransition('{style}', {duration});";
+                // Correct property name (OnOpen) and class name (JavascriptAction).
+                page.Actions.OnOpen = new JavascriptAction(js);
             }
 
-            // JavaScript that defines a transition for each page.
-            // The method setPageTransition(pageIndex, style, duration) uses
-            // zero‑based page indexes, style names like "Dissolve", "Wipe", "Split",
-            // and duration in seconds.
-            string js = @"
-function setTransitions()
-{
-    this.setPageTransition(0, 'Dissolve', 2); // Page 1: dissolve, 2 seconds
-    this.setPageTransition(1, 'Wipe', 3);    // Page 2: wipe, 3 seconds
-    this.setPageTransition(2, 'Split', 1);   // Page 3: split, 1 second
-}
-setTransitions();
-";
-
-            // Attach the JavaScript to the document; it runs when the PDF is opened
-            doc.OpenAction = new JavascriptAction(js);
-
-            // Save the PDF (no SaveOptions needed for PDF output)
+            // Save the PDF. The document is saved inside the using block so the object stays alive until Save completes.
             doc.Save(outputPath);
         }
 
