@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -15,33 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDocument = new Document(inputPath))
             {
-                // Create a TextStamp with the current page number
-                TextStamp pageNumberStamp = new TextStamp(i.ToString())
+                // Iterate using 1‑based page indexing
+                for (int i = 1; i <= pdfDocument.Pages.Count; i++)
                 {
-                    // Center horizontally on the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    // Position near the bottom (you can adjust VerticalAlignment as needed)
-                    VerticalAlignment   = VerticalAlignment.Bottom,
-                    // Optional: set margin from the bottom edge
-                    BottomMargin        = 20,
-                    // Optional: set font size and color for better visibility
-                    TextState = { FontSize = 12, ForegroundColor = Color.Black }
-                };
+                    // Create a text stamp containing the page number
+                    TextStamp pageNumberStamp = new TextStamp(i.ToString())
+                    {
+                        // Center the stamp horizontally and vertically
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment   = VerticalAlignment.Center,
+                        // Optional appearance settings
+                        TextState = { FontSize = 12, ForegroundColor = Color.Black }
+                    };
 
-                // Add the stamp to the current page (must be called per page)
-                doc.Pages[i].AddStamp(pageNumberStamp);
+                    // Add the stamp to the current page (per‑page call, not on the collection)
+                    pdfDocument.Pages[i].AddStamp(pageNumberStamp);
+                }
+
+                // Save the modified PDF
+                pdfDocument.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

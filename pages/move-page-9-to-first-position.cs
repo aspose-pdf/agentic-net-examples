@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "reordered.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,19 +15,13 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Wrap the Document in a using block for deterministic disposal (see document-disposal-with-using rule)
         using (Document doc = new Document(inputPath))
         {
-            // Verify the document has at least 9 pages
-            if (doc.Pages.Count < 9)
-            {
-                Console.Error.WriteLine("Document contains fewer than 9 pages; cannot perform move operation.");
-                return;
-            }
-
-            // Move page 9 to the first position using Insert/Delete (PageCollection has no Move method)
-            const int sourceIndex = 9; // 1‑based index of the page to move
-            const int targetIndex = 1; // 1‑based index where the page should be placed
+            // Aspose.Pdf uses 1‑based page indexing (see page-indexing-one-based rule)
+            // Move page 9 to position 1 using Insert/Delete (see move-page-using-insert-delete rule)
+            int sourceIndex = 9;   // original page number (1‑based)
+            int targetIndex = 1;   // desired new position (1‑based)
 
             // Keep a reference to the page that will be moved
             Page pageToMove = doc.Pages[sourceIndex];
@@ -35,16 +29,14 @@ class Program
             // Insert the page at the target position
             doc.Pages.Insert(targetIndex, pageToMove);
 
-            // After insertion the original page shifts; calculate its new index for deletion
+            // Delete the original occurrence of the page (adjusted after insertion)
             int deleteIndex = sourceIndex >= targetIndex ? sourceIndex + 1 : sourceIndex;
-
-            // Delete the original occurrence of the page
             doc.Pages.Delete(deleteIndex);
 
-            // Save the modified PDF
+            // Save the modified PDF (Document.Save without extra options writes PDF)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page 9 moved to first position. Saved as '{outputPath}'.");
+        Console.WriteLine($"Page 9 moved to first position and saved as '{outputPath}'.");
     }
 }

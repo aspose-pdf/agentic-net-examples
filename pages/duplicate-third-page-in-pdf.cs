@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
@@ -11,30 +11,43 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            // Ensure the document has at least three pages.
-            if (doc.Pages.Count < 3)
+            // Load the source PDF
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("Document has fewer than 3 pages; cannot duplicate page 3.");
-                return;
+                // Ensure the document has at least three pages (1‑based indexing)
+                if (doc.Pages.Count < 3)
+                {
+                    Console.Error.WriteLine("The PDF contains fewer than 3 pages.");
+                    return;
+                }
+
+                // Duplicate page 3 and insert the copy immediately after it.
+                // Aspose.Pdf no longer provides Page.Clone, so we copy the page via a temporary document.
+                using (Document tempDoc = new Document())
+                {
+                    // Add a copy of page 3 to the temporary document. This creates a deep copy.
+                    tempDoc.Pages.Add(doc.Pages[3]);
+
+                    // Insert the copied page (which is now at index 1 in tempDoc) into the original document
+                    // at position 4 (i.e., after the original page 3). Insert inserts *before* the given index.
+                    doc.Pages.Insert(4, tempDoc.Pages[1]);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Duplicate page 3 and insert the copy immediately after it.
-            // Insert position is 4 because we want the copy right after the original page 3.
-            // The Insert method creates a copy of the source page.
-            doc.Pages.Insert(4, doc.Pages[3]);
-
-            // Save the modified PDF. Document.Save(string) writes PDF regardless of extension.
-            doc.Save(outputPath);
+            Console.WriteLine($"Page 3 duplicated and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Page 3 duplicated and inserted. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -16,30 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Create a text stamp that includes the current year
-            string watermarkText = $"Confidential © {DateTime.Now.Year}";
-            TextStamp stamp = new TextStamp(watermarkText)
+            string year = DateTime.Now.Year.ToString();
+            TextStamp stamp = new TextStamp($"Watermark {year}")
             {
-                // Position the stamp in the center of the page
+                // Styling options (optional)
+                TextState = { FontSize = 72, FontStyle = FontStyles.Bold, ForegroundColor = Aspose.Pdf.Color.Gray },
+                Opacity = 0.3,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Make the stamp semi‑transparent and place it behind page content
-                Background          = true,
-                Opacity             = 0.3f
+                VerticalAlignment = VerticalAlignment.Center
             };
 
-            // Configure text appearance via the existing TextState instance
-            stamp.TextState.FontSize = 48;
-            stamp.TextState.FontStyle = FontStyles.Bold;
-            stamp.TextState.ForegroundColor = Color.Gray;
-
-            // Apply the stamp to every page (Page.AddStamp, not PageCollection)
-            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            // Apply the stamp to every page in the document
+            foreach (Page page in doc.Pages)
             {
-                doc.Pages[i].AddStamp(stamp);
+                page.AddStamp(stamp);
             }
 
             // Save the modified PDF

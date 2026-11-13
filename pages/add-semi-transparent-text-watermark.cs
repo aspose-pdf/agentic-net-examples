@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
-        const string watermark  = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -17,44 +16,37 @@ class Program
             return;
         }
 
-        try
+        // Open the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Create a TextStamp that will serve as the watermark
+            TextStamp watermark = new TextStamp("CONFIDENTIAL")
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    Page page = doc.Pages[i];
+                // Center the stamp on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
 
-                    // Create a text fragment for the watermark
-                    TextFragment tf = new TextFragment(watermark);
+                // Semi‑transparent fill (30% opacity)
+                Opacity = 0.3f
+                // RotateAngle = 45f   // optional rotation
+            };
 
-                    // Center the watermark on the page
-                    tf.Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height / 2);
-                    tf.HorizontalAlignment = HorizontalAlignment.Center;
-                    tf.VerticalAlignment   = VerticalAlignment.Center;
+            // TextState is read‑only – modify the existing instance instead of assigning a new one
+            watermark.TextState.Font = FontRepository.FindFont("Helvetica-Bold"); // bold font simulates outline
+            watermark.TextState.FontSize = 72;
+            watermark.TextState.ForegroundColor = Color.FromRgb(0.6, 0.6, 0.6);
+            // Aspose.Pdf does not expose StrokeColor/IsStroke for TextStamp; using a bold font provides a visual outline effect.
 
-                    // Configure appearance: semi‑transparent fill and simulated outline
-                    tf.TextState.FontSize = 72;
-                    // Use a bold font to give the impression of an outline
-                    tf.TextState.Font = FontRepository.FindFont("Arial-BoldMT");
-                    // Semi‑transparent fill (alpha 80 out of 255 ≈ 0.31 opacity)
-                    tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromArgb(80, 204, 204, 204);
-
-                    // Add the watermark to the current page
-                    page.Paragraphs.Add(tf);
-                }
-
-                // Save the modified document as PDF (default Save writes PDF)
-                doc.Save(outputPath);
+            // Apply the watermark to every page (1‑based indexing is handled by the foreach)
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(watermark);
             }
 
-            Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

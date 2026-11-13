@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,28 +15,21 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            int pageCount = doc.Pages.Count;
-
-            // Delete the last three pages, starting from the highest index
-            if (pageCount >= 3)
+            // Delete the last three pages, one at a time.
+            // PageCollection.Delete uses 1‑based indexing, so we delete the current last page repeatedly.
+            for (int i = 0; i < 3; i++)
             {
-                for (int i = pageCount; i > pageCount - 3; i--)
-                {
-                    doc.Pages.Delete(i); // PageCollection.Delete uses 1‑based indexing
-                }
-            }
-            else
-            {
-                Console.WriteLine("Document has fewer than three pages; no pages deleted.");
+                if (doc.Pages.Count == 0) break; // safety check
+                doc.Pages.Delete(doc.Pages.Count);
             }
 
-            // Save the modified document
+            // Save the modified document (PDF format by default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Last three pages removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"Deleted last three pages. Saved to '{outputPath}'.");
     }
 }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_footnote_numbers.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_footnotes.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +16,38 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            // Iterate using 1‑based page indexing (Aspose.Pdf rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a TextFragment containing the page number
-                TextFragment pageNumber = new TextFragment(i.ToString());
+                // Create a footnote reference with the page number
+                TextFragment footnote = new TextFragment(i.ToString());
 
-                // Superscript‑like formatting: smaller font size and raised Y position
-                pageNumber.TextState.FontSize = 8; // smaller than normal body text
+                // Superscript formatting: smaller font size
+                footnote.TextState.FontSize = 8;               // smaller than body text
+                footnote.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-                // Position the fragment near the bottom left of the page.
-                // Raise the Y coordinate to simulate superscript (no Rise property exists).
-                double x = 50;   // 50 points from the left edge
-                double y = 24;   // raised 4 points above a typical footnote baseline (20 pts)
-                pageNumber.Position = new Position(x, y);
+                // Position near the bottom‑right corner (adjust margins as needed)
+                double marginRight = 30;   // distance from right edge
+                double marginBottom = 20;  // distance from bottom edge
+                double x = page.PageInfo.Width - marginRight;
+                // Raise the baseline by increasing the Y coordinate (no TextRise property)
+                double y = marginBottom + 5; // raise 5 points for superscript effect
+
+                footnote.Position = new Position(x, y);
 
                 // Add the fragment to the page's paragraph collection
-                page.Paragraphs.Add(pageNumber);
+                page.Paragraphs.Add(footnote);
             }
 
-            // Save the modified PDF (no extra SaveOptions needed for PDF output)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with superscript footnote page numbers: '{outputPath}'");
+        Console.WriteLine($"PDF saved with superscript footnote page numbers to '{outputPath}'.");
     }
 }

@@ -15,23 +15,19 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Insert a new blank page at the beginning (Aspose.Pdf uses 1‑based indexing)
-            doc.Pages.Insert(1);
-
-            // Get the newly inserted page
-            Page emptyPage = doc.Pages[1];
-
-            // Set custom dimensions (200 × 300 points)
-            emptyPage.PageInfo.Width  = 200;
+            // Insert a new empty page at the beginning (Aspose.Pdf uses 1‑based indexing)
+            Page emptyPage = doc.Pages.Insert(1);
+            // Set custom dimensions: 200 × 300 points
+            emptyPage.PageInfo.Width = 200;
             emptyPage.PageInfo.Height = 300;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Empty page inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"Inserted empty page and saved to '{outputPath}'.");
     }
 }
