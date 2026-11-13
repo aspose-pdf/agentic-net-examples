@@ -1,9 +1,9 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Collections.Generic;
+using System.Drawing.Text; // Access system installed fonts
 using Aspose.Pdf;
-using System.Drawing.Text;   // Used to enumerate installed system fonts
+using Aspose.Pdf.Text; // For Font type
 
 class Program
 {
@@ -21,70 +21,73 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // -------------------------------------------------------------------
-            // 1. Collect font names that are referenced by the PDF.
-            //    Fonts are stored per‑page in the page resources (Page.Resources.Fonts).
+            // 1. Extract unique font names used in the PDF.
+            //    Document does not expose a Fonts collection; fonts are stored per page
+            //    in the page's Resources.Fonts collection.
             // -------------------------------------------------------------------
-            HashSet<string> usedFontNamesSet = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
+            var pdfFonts = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             foreach (Page page in doc.Pages)
             {
-                // Resources or the Fonts collection can be null for some pages.
-                if (page.Resources?.Fonts != null)
+                // Resources may be null for some pages (e.g., blank pages)
+                var fonts = page.Resources?.Fonts;
+                if (fonts == null) continue;
+
+                foreach (var fontObj in fonts)
                 {
-                    // Use dynamic to avoid compile‑time dependency on the FontInfo type.
-                    foreach (dynamic fi in page.Resources.Fonts)
+                    // The collection stores objects of type Aspose.Pdf.Text.Font.
+                    // Use a safe cast; if the cast fails we fall back to dynamic access.
+                    string name = null;
+                    if (fontObj is Font font)
                     {
-                        try
-                        {
-                            string fontName = fi.FontName as string;
-                            if (!string.IsNullOrWhiteSpace(fontName))
-                            {
-                                usedFontNamesSet.Add(fontName);
-                            }
-                        }
-                        catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
-                        {
-                            // If the object does not expose FontName, skip it.
-                        }
+                        // Aspose.Pdf.Text.Font exposes FontName (the font's full name).
+                        // FontFamily is not available, so we rely on FontName.
+                        name = font.FontName;
                     }
+                    else
+                    {
+                        // Defensive fallback – some older versions expose a dynamic object.
+                        dynamic dyn = fontObj;
+                        name = dyn.FontName as string;
+                    }
+
+                    if (!string.IsNullOrEmpty(name))
+                        pdfFonts.Add(name);
                 }
             }
 
-            List<string> usedFontNames = usedFontNamesSet.ToList();
+            // -------------------------------------------------------------------
+            // 2. Retrieve system‑installed font family names.
+            // -------------------------------------------------------------------
+            var installed = new InstalledFontCollection();
+            var installedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var family in installed.Families)
+            {
+                installedNames.Add(family.Name);
+            }
 
             // -------------------------------------------------------------------
-            // 2. Enumerate fonts installed on the operating system.
+            // 3. Identify fonts that are used in the PDF but not installed on the system.
             // -------------------------------------------------------------------
-            InstalledFontCollection installedFonts = new InstalledFontCollection();
-            HashSet<string> systemFontNames = installedFonts.Families
-                .Select(f => f.Name)
-                .Where(name => !string.IsNullOrWhiteSpace(name))
-                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            var missingFonts = new List<string>();
+            foreach (string fontName in pdfFonts)
+            {
+                if (!installedNames.Contains(fontName))
+                    missingFonts.Add(fontName);
+            }
 
             // -------------------------------------------------------------------
-            // 3. Determine which PDF fonts are missing from the system.
+            // 4. Report the validation result.
             // -------------------------------------------------------------------
-            List<string> missingFonts = usedFontNames
-                .Where(pdfFont => !systemFontNames.Contains(pdfFont))
-                .ToList();
-
-            // -------------------------------------------------------------------
-            // 4. Report results.
-            // -------------------------------------------------------------------
-            Console.WriteLine($"Total fonts referenced in PDF: {usedFontNames.Count}");
-            Console.WriteLine($"System installed fonts: {systemFontNames.Count}");
-            Console.WriteLine();
-
             if (missingFonts.Count == 0)
             {
-                Console.WriteLine("All referenced fonts are available on the system.");
+                Console.WriteLine("All fonts used in the PDF are installed on the system.");
             }
             else
             {
                 Console.WriteLine("Missing fonts:");
-                foreach (string font in missingFonts)
+                foreach (string missing in missingFonts)
                 {
-                    Console.WriteLine($" - {font}");
+                    Console.WriteLine($"- {missing}");
                 }
             }
         }

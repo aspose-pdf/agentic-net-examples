@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms; // Required for form field types
 
 class Program
 {
@@ -16,34 +15,47 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Wrap Document in a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            // Ensure the document actually contains a form
+            if (pdfDoc.Form == null || pdfDoc.Form.Fields == null || pdfDoc.Form.Fields.Length == 0)
             {
-                Page page = doc.Pages[pageNumber];
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
 
-                // Form fields are represented as WidgetAnnotation objects on a page.
-                var widgetAnnotations = page.Annotations
-                                            .OfType<WidgetAnnotation>()
-                                            .ToList();
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            {
+                Page page = pdfDoc.Pages[i];
+                Console.WriteLine($"Page {page.Number}:");
 
-                if (widgetAnnotations.Any())
+                // Iterate all form fields and select those that belong to the current page
+                foreach (Field field in pdfDoc.Form.Fields)
                 {
-                    Console.WriteLine($"Page {pageNumber} contains {widgetAnnotations.Count} form field(s):");
-                    foreach (WidgetAnnotation widget in widgetAnnotations)
+                    // Field.PageIndex is zero‑based; convert to 1‑based for comparison
+                    if (field.PageIndex + 1 == page.Number)
                     {
-                        // The field name is stored in the Name property of the widget.
-                        string name = widget.Name;
-                        string typeName = widget.GetType().Name;
-                        Console.WriteLine($"  - {name} ({typeName})");
+                        Console.WriteLine($"  Field Name : {field.FullName}");
+                        Console.WriteLine($"  Field Type : {field.GetType().Name}");
+
+                        // Retrieve field‑specific values using pattern matching
+                        switch (field)
+                        {
+                            case TextBoxField txt:
+                                Console.WriteLine($"  Value      : {txt.Value}");
+                                break;
+                            case CheckboxField chk:
+                                Console.WriteLine($"  Checked    : {chk.Checked}");
+                                break;
+                            case RadioButtonField rad:
+                                // Selected is a 1‑based index of the chosen option
+                                Console.WriteLine($"  Selected   : {rad.Selected}");
+                                break;
+                            // Add handling for other field types as needed
+                        }
                     }
-                }
-                else
-                {
-                    // No form fields on this page
-                    Console.WriteLine($"Page {pageNumber} contains no form fields.");
                 }
             }
         }

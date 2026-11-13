@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,7 +11,6 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputDir = "TablesCsv";
 
         if (!File.Exists(inputPath))
         {
@@ -17,53 +18,42 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // TableAbsorber extracts tables from the document pages
-            TableAbsorber tableAbsorber = new TableAbsorber();
+            // TableAbsorber extracts tables from the document
+            TableAbsorber absorber = new TableAbsorber();
 
-            // Visit each page – the newer API uses Visit(page) instead of Page.Accept(...)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
-            {
-                tableAbsorber.Visit(doc.Pages[pageIndex]);
-            }
+            // Visit the whole document (all pages) to populate TableList
+            absorber.Visit(doc);
 
             int tableIndex = 1;
 
-            // Iterate over each extracted table
-            foreach (var table in tableAbsorber.TableList)
+            // Iterate over each detected table
+            foreach (AbsorbedTable table in absorber.TableList)
             {
-                string csvPath = Path.Combine(outputDir, $"Table_{tableIndex}.csv");
+                string csvPath = $"Table_{tableIndex}.csv";
 
-                using (StreamWriter writer = new StreamWriter(csvPath))
+                // Write the table to a CSV file
+                using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
                 {
-                    // RowList and CellList are the correct collections
-                    foreach (var row in table.RowList)
+                    foreach (AbsorbedRow row in table.RowList)
                     {
-                        List<string> csvCells = new List<string>();
+                        List<string> cellValues = new List<string>();
 
-                        foreach (var cell in row.CellList)
+                        foreach (AbsorbedCell cell in row.CellList)
                         {
                             // Concatenate all text fragments inside the cell
-                            string cellText = string.Empty;
-                            foreach (var fragment in cell.TextFragments)
-                            {
-                                cellText += fragment.Text;
-                            }
-                            // Escape double quotes and wrap the cell text in quotes
-                            cellText = cellText?.Replace("\"", "\"\"") ?? string.Empty;
-                            csvCells.Add($"\"{cellText}\"");
+                            string cellText = string.Concat(cell.TextFragments.Select(tf => tf.Text));
+                            cellValues.Add(EscapeCsv(cellText));
                         }
 
-                        writer.WriteLine(string.Join(",", csvCells));
+                        // Join cells with commas and write the line
+                        writer.WriteLine(string.Join(",", cellValues));
                     }
                 }
 
-                Console.WriteLine($"Table {tableIndex} saved to '{csvPath}'.");
+                Console.WriteLine($"Extracted Table {tableIndex} to '{csvPath}'.");
                 tableIndex++;
             }
 
@@ -71,6 +61,25 @@ class Program
             {
                 Console.WriteLine("No tables were found in the PDF.");
             }
+        }
+    }
+
+    // Helper method to escape CSV fields according to RFC 4180
+    static string EscapeCsv(string field)
+    {
+        if (field == null)
+            return string.Empty;
+
+        bool mustQuote = field.Contains(",") || field.Contains("\"") || field.Contains("\r") || field.Contains("\n");
+        if (mustQuote)
+        {
+            // Escape double quotes by doubling them
+            string escaped = field.Replace("\"", "\"\"");
+            return $"\"{escaped}\"";
+        }
+        else
+        {
+            return field;
         }
     }
 }

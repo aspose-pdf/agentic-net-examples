@@ -14,11 +14,11 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for proper disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Document.Form holds the AcroForm fields; Count gives the total number
-            int fieldCount = doc.Form.Count;
+            // Document.Form may be null if there are no AcroForm fields
+            int fieldCount = doc.Form?.Count ?? 0;
             Console.WriteLine($"Total AcroForm fields: {fieldCount}");
         }
     }

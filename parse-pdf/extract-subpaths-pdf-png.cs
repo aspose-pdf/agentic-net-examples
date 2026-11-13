@@ -1,89 +1,78 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;          // Subpath, Graphics, GraphicsAbsorber (used via reflection/dynamic)
-using Aspose.Pdf.Devices;          // ImageSaveOptions (used via reflection/dynamic)
+using Aspose.Pdf.Devices;
+using Aspose.Pdf.Vector;
+using Aspose.Pdf.Operators;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputDir = "GraphicsOutput";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "GraphicsImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output folder exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF inside a using block (lifecycle rule)
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate pages using 1‑based indexing (global rule)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate over all pages (1‑based indexing rule)
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageNum];
+                Page page = pdfDoc.Pages[pageIndex];
+                int subPathCounter = 1;
+                bool anyGraphicsFound = false;
 
-                // ------------------------------------------------------------
-                // The GraphicsAbsorber, Graphics, Subpath and ImageSaveOptions
-                // types may not be present in older Aspose.Pdf versions.
-                // To keep the code compiling against any version we create the
-                // required objects via reflection and work with them through
-                // the dynamic keyword. This satisfies the hard namespace rule
-                // while still providing the intended functionality when the
-                // types are available at runtime.
-                // ------------------------------------------------------------
-
-                // Create GraphicsAbsorber dynamically
-                Type absorberType = Type.GetType("Aspose.Pdf.Drawing.GraphicsAbsorber, Aspose.Pdf");
-                if (absorberType == null)
+                // Use GraphicsAbsorber to collect vector graphic elements on the page
+                using (var absorber = new GraphicsAbsorber())
                 {
-                    Console.Error.WriteLine("GraphicsAbsorber type not found in the loaded Aspose.Pdf assembly. Skipping page extraction.");
-                    continue;
-                }
-                dynamic graphicsAbsorber = Activator.CreateInstance(absorberType);
-                graphicsAbsorber.Visit(page);
-
-                int graphicIndex = 0;
-                foreach (dynamic graphic in graphicsAbsorber.Graphics)
-                {
-                    int subpathIndex = 0;
-                    foreach (dynamic subpath in graphic.Subpaths)
+                    absorber.Visit(page);
+                    foreach (GraphicElement element in absorber.Elements)
                     {
-                        // Build a unique file name for each subpath
-                        string fileName = $"page{pageNum}_graphic{graphicIndex}_subpath{subpathIndex}.png";
-                        string outPath  = System.IO.Path.Combine(outputDir, fileName); // Fully qualified to avoid ambiguity
+                        if (element is SubPath subPath)
+                        {
+                            anyGraphicsFound = true;
 
-                        // Create ImageSaveOptions dynamically
-                        Type imgSaveOptType = Type.GetType("Aspose.Pdf.Devices.ImageSaveOptions, Aspose.Pdf");
-                        if (imgSaveOptType == null)
-                        {
-                            Console.Error.WriteLine("ImageSaveOptions type not found. Using default options.");
-                            // Fallback: call Save without options if overload exists
-                            subpath.Save(outPath);
-                        }
-                        else
-                        {
-                            dynamic pngOptions = Activator.CreateInstance(imgSaveOptType);
-                            // Set ImageFormat = ImageFormat.Png (enum lives in Aspose.Pdf.Devices.ImageFormat)
-                            Type imgFormatType = Type.GetType("Aspose.Pdf.Devices.ImageFormat, Aspose.Pdf");
-                            if (imgFormatType != null)
+                            // Create a temporary PDF that contains only this sub‑path
+                            using (Document tempDoc = new Document())
                             {
-                                // ImageFormat.Png is a static field
-                                var pngEnumValue = imgFormatType.GetField("Png").GetValue(null);
-                                pngOptions.ImageFormat = pngEnumValue;
-                            }
-                            subpath.Save(outPath, pngOptions);
-                        }
+                                Page tempPage = tempDoc.Pages.Add();
 
-                        Console.WriteLine($"Saved: {outPath}");
-                        subpathIndex++;
+                                // Copy the operators that make up the sub‑path onto the temporary page
+                                foreach (Operator op in subPath.Operators)
+                                {
+                                    tempPage.Contents.Add(op);
+                                }
+
+                                string outputPngPath = Path.Combine(
+                                    outputFolder,
+                                    $"Page{pageIndex}_SubPath{subPathCounter}.png");
+
+                                // Rasterize the temporary page to PNG
+                                new PngDevice().Process(tempPage, outputPngPath);
+                            }
+
+                            subPathCounter++;
+                        }
                     }
-                    graphicIndex++;
+                }
+
+                // If no graphics were found on the page, inform the user
+                if (!anyGraphicsFound)
+                {
+                    Console.WriteLine($"No vector graphics found on page {pageIndex}.");
+                }
+                else
+                {
+                    Console.WriteLine($"Extracted {subPathCounter - 1} subpaths from page {pageIndex}.");
                 }
             }
         }

@@ -7,33 +7,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTxtPath = "page1.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "page1.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Prepare a TextAbsorber to extract text
-            TextAbsorber absorber = new TextAbsorber
+            // Verify that the document has at least one page (pages are 1‑based)
+            if (doc.Pages.Count < 1)
             {
-                // Use pure text formatting (no layout information)
-                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-            };
+                Console.Error.WriteLine("The PDF contains no pages.");
+                return;
+            }
 
-            // Page indexing in Aspose.Pdf is 1‑based; extract from the first page
+            // Use TextAbsorber to extract text from the first page
+            TextAbsorber absorber = new TextAbsorber();
             doc.Pages[1].Accept(absorber);
-            string extractedText = absorber.Text ?? string.Empty;
+            string pageText = absorber.Text ?? string.Empty;
 
             // Write the extracted text to a UTF‑8 encoded file
-            File.WriteAllText(outputTxtPath, extractedText, System.Text.Encoding.UTF8);
+            File.WriteAllText(outputTxt, pageText, System.Text.Encoding.UTF8);
         }
 
-        Console.WriteLine($"First page text saved to '{outputTxtPath}'.");
+        Console.WriteLine($"First page text saved to '{outputTxt}'.");
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -16,26 +15,26 @@ class Program
             return;
         }
 
-        // Wrap the Document in a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the PDF contains a form
-            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
+            // Verify that the document contains a form with fields
+            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Length == 0)
             {
-                Console.WriteLine("No form fields found in the document.");
+                Console.WriteLine("No form fields found.");
                 return;
             }
 
-            Console.WriteLine("Form fields and their runtime types:");
-
-            // Iterate over each form field and retrieve its runtime type via GetType()
+            // Iterate over each form field and output its concrete type
             foreach (Field field in doc.Form.Fields)
             {
-                // field.Name gives the field's name; field.GetType() returns the concrete field class
+                // GetType() returns the specific field class (e.g., TextBoxField, CheckBoxField)
                 Type fieldType = field.GetType();
 
-                // Output the field name and its type name for classification
-                Console.WriteLine($"- Name: {field.Name}, Type: {fieldType.Name}");
+                // Field.Name may be null; provide a fallback name
+                string fieldName = field.Name ?? "(unnamed)";
+
+                Console.WriteLine($"Field '{fieldName}' is of type '{fieldType.FullName}'.");
             }
         }
     }

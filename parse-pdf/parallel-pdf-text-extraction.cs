@@ -9,53 +9,48 @@ class Program
 {
     static void Main()
     {
-        // Directory containing PDF files to process
-        const string inputFolder = @"C:\PdfFiles";
+        // Directory containing the PDF files to process
+        string inputDir = "InputPdfs";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Directory not found: {inputDir}");
             return;
         }
 
-        // Collect all PDF file paths
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found.");
-            return;
-        }
+        // Get all PDF file paths in the directory
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        // Thread‑safe collection to store extracted text per file
-        var results = new ConcurrentDictionary<string, string>();
+        // Thread‑safe dictionary to hold extracted text keyed by file name
+        var extractedTexts = new ConcurrentDictionary<string, string>();
 
-        // Parallel extraction using TPL
+        // Parallel extraction using Task Parallel Library
         Parallel.ForEach(pdfFiles, pdfPath =>
         {
             try
             {
-                // Ensure deterministic disposal of the Document
+                // Load each PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // TextAbsorber extracts text from the whole document
+                    // Use TextAbsorber to extract all text from the document
                     TextAbsorber absorber = new TextAbsorber();
-
-                    // Accept the absorber on all pages (pages are 1‑based)
                     doc.Pages.Accept(absorber);
+                    string text = absorber.Text;
 
-                    // Store the extracted text keyed by file name
-                    results[Path.GetFileName(pdfPath)] = absorber.Text;
+                    // Store the result
+                    extractedTexts[Path.GetFileName(pdfPath)] = text;
                 }
             }
             catch (Exception ex)
             {
+                // Record an empty string on error and log the issue
+                extractedTexts[Path.GetFileName(pdfPath)] = string.Empty;
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-                results[Path.GetFileName(pdfPath)] = string.Empty;
             }
         });
 
-        // Output results
-        foreach (var kvp in results)
+        // Output the extracted text for each file
+        foreach (var kvp in extractedTexts)
         {
             Console.WriteLine($"--- {kvp.Key} ---");
             Console.WriteLine(kvp.Value);

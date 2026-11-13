@@ -1,59 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
-class ExtractVectorGraphics
+class Program
 {
     static void Main()
     {
-        // Input PDF and the page number to extract (1‑based indexing)
-        const string inputPdfPath = "input.pdf";
-        const int pageNumber = 2;                     // change as needed
+        // Path to the source PDF
+        const string inputPath = "input.pdf";
 
-        // Folder where the SVG files will be written
-        const string outputFolder = "ExtractedSvgs";
+        // Page number to extract vector graphics from (1‑based indexing)
+        const int pageNumber = 2;
 
-        if (!File.Exists(inputPdfPath))
+        // Directory where the SVG files will be saved
+        const string outputDir = "VectorGraphics";
+
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Load the source PDF inside a using block for deterministic disposal
-            using (Document srcDoc = new Document(inputPdfPath))
+            // Load the source PDF
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
             {
-                // Validate the requested page number
-                if (pageNumber < 1 || pageNumber > srcDoc.Pages.Count)
+                // Validate requested page number
+                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Page number {pageNumber} is out of range. Document has {srcDoc.Pages.Count} pages.");
+                    Console.Error.WriteLine("Invalid page number.");
                     return;
                 }
 
-                // Create a temporary document that contains only the desired page.
-                using (Document singlePageDoc = new Document())
+                // Create a new temporary document that will contain only the target page
+                using (Aspose.Pdf.Document singlePageDoc = new Aspose.Pdf.Document())
                 {
-                    // Add the selected page to the new document.
-                    singlePageDoc.Pages.Add(srcDoc.Pages[pageNumber]);
+                    // Add (clone) the selected page to the temporary document
+                    singlePageDoc.Pages.Add(doc.Pages[pageNumber]);
 
-                    // Configure SVG save options.
-                    SvgSaveOptions svgOptions = new SvgSaveOptions();
-                    // Enable CSS style embedding (recommended for clean SVG output)
-                    svgOptions.ScaleToPixels = true;
+                    // Prepare SVG save options (all vector graphics are preserved by default)
+                    Aspose.Pdf.SvgSaveOptions svgOptions = new Aspose.Pdf.SvgSaveOptions();
 
-                    // Build the output file name – only one SVG will be produced because the document has a single page.
-                    string svgPath = Path.Combine(outputFolder, $"Page_{pageNumber}.svg");
+                    // Build output file name
+                    string svgPath = Path.Combine(outputDir, $"Page_{pageNumber}_vector.svg");
 
-                    // Save the document as SVG.
+                    // Save the single‑page document as SVG
                     singlePageDoc.Save(svgPath, svgOptions);
+
+                    Console.WriteLine($"Vector graphics extracted to: {svgPath}");
                 }
             }
-
-            Console.WriteLine($"Vector graphics from page {pageNumber} have been saved as an SVG file in '{outputFolder}'.");
         }
         catch (Exception ex)
         {

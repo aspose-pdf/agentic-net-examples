@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using Aspose.Pdf;
@@ -9,53 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Store parsed decimal values keyed by field name
-        var numericValues = new Dictionary<string, decimal>();
-
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF document inside a using block (ensures proper disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all form fields in the PDF
-            foreach (Field field in doc.Form.Fields)
+            decimal total = 0m;
+
+            // Iterate over all form fields in the document
+            foreach (Field field in doc.Form)
             {
-                // Process only text box fields (numeric input expected)
+                // Process only text box fields that contain numeric values
                 if (field is TextBoxField textBox)
                 {
-                    string rawValue = textBox.Value?.Trim() ?? string.Empty;
+                    string rawValue = textBox.Value?.Trim();
 
-                    // Try to parse the text as a decimal using invariant culture
-                    if (decimal.TryParse(
-                            rawValue,
-                            NumberStyles.Number,
-                            CultureInfo.InvariantCulture,
-                            out decimal parsed))
+                    if (!string.IsNullOrEmpty(rawValue) &&
+                        decimal.TryParse(rawValue, NumberStyles.Any, CultureInfo.InvariantCulture, out decimal number))
                     {
-                        numericValues[textBox.PartialName] = parsed;
-                        Console.WriteLine($"Field '{textBox.PartialName}' parsed as {parsed}");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Field '{textBox.PartialName}' contains non-numeric value: '{rawValue}'");
+                        total += number; // accumulate for further calculations
                     }
                 }
             }
+
+            // Example calculation: write the sum back to a field named "Total" (if it exists)
+            if (doc.Form["Total"] is TextBoxField totalField)
+            {
+                totalField.Value = total.ToString(CultureInfo.InvariantCulture);
+            }
+
+            // Save the modified PDF (using the standard Save method)
+            doc.Save(outputPath);
         }
 
-        // Example calculation: sum of all parsed numeric fields
-        decimal total = 0m;
-        foreach (decimal value in numericValues.Values)
-        {
-            total += value;
-        }
-
-        Console.WriteLine($"Total of numeric fields: {total}");
+        Console.WriteLine($"Processing complete. Result saved to '{outputPath}'.");
     }
 }

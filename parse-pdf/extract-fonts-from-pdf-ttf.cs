@@ -1,8 +1,5 @@
 using System;
 using System.IO;
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -11,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputDir = "ExtractedFonts";
+        const string outputDirectory = "ExtractedFonts";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -19,96 +16,50 @@ class Program
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDirectory);
 
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Try the modern FontsInfo property via reflection (available in newer versions).
-            PropertyInfo fontsInfoProp = typeof(Document).GetProperty("FontsInfo");
-            if (fontsInfoProp != null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (var doc = new Document(inputPdfPath))
             {
-                // The property returns a collection of FontInfo objects.
-                IEnumerable fontsInfo = fontsInfoProp.GetValue(pdfDoc) as IEnumerable;
-                if (fontsInfo != null)
+                // Retrieve all fonts used in the document via FontUtilities
+                Font[] fonts = doc.FontUtilities.GetAllFonts();
+
+                foreach (var font in fonts)
                 {
-                    foreach (object fontInfoObj in fontsInfo)
+                    // Process only embedded fonts – they contain the actual font data
+                    if (!font.IsEmbedded)
+                        continue;
+
+                    // Build a safe file name from the font name
+                    string safeFontName = MakeSafeFileName(font.FontName);
+                    string outputPath = Path.Combine(outputDirectory, safeFontName + ".ttf");
+
+                    // Save the embedded font bytes to a .ttf file
+                    using (var fs = File.Create(outputPath))
                     {
-                        // Use dynamic to avoid compile‑time dependency on the FontInfo type.
-                        dynamic fontInfo = fontInfoObj;
-                        byte[] fontData = fontInfo.FontFile as byte[];
-                        if (fontData == null || fontData.Length == 0)
-                            continue; // Skip non‑embedded fonts.
-
-                        string fontName = (fontInfo.FontName as string) ?? "UnnamedFont";
-                        string fontType = (fontInfo.FontType as string) ?? string.Empty;
-
-                        string extension = ".ttf"; // default
-                        if (!string.IsNullOrEmpty(fontType) &&
-                            fontType.Equals("OpenType", StringComparison.OrdinalIgnoreCase))
-                        {
-                            extension = ".otf";
-                        }
-
-                        string safeFontName = string.Join("_",
-                            fontName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
-
-                        string outputPath = Path.Combine(outputDir, safeFontName + extension);
-                        File.WriteAllBytes(outputPath, fontData);
-                        Console.WriteLine($"Extracted font: {fontName} -> {outputPath}");
+                        font.Save(fs);
                     }
-                }
-            }
-            else
-            {
-                // Fallback for older versions – iterate over page resources.
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    // page.Resources.Fonts is a collection of Font objects.
-                    foreach (Font font in page.Resources.Fonts)
-                    {
-                        // FontFile may be null for non‑embedded fonts.
-                        byte[] fontData = null;
-                        // Use reflection because the exact Font subclass (TrueTypeFont, Type1Font, etc.)
-                        // may expose the FontFile property differently.
-                        PropertyInfo fontFileProp = font.GetType().GetProperty("FontFile");
-                        if (fontFileProp != null)
-                        {
-                            fontData = fontFileProp.GetValue(font) as byte[];
-                        }
-                        if (fontData == null || fontData.Length == 0)
-                            continue;
 
-                        // Try to obtain a readable name.
-                        string fontName = "UnnamedFont";
-                        PropertyInfo nameProp = font.GetType().GetProperty("FontName");
-                        if (nameProp != null)
-                        {
-                            fontName = nameProp.GetValue(font) as string ?? fontName;
-                        }
-
-                        // Determine extension – most embedded fonts are TrueType (ttf) or OpenType (otf).
-                        string extension = ".ttf";
-                        PropertyInfo typeProp = font.GetType().GetProperty("FontType");
-                        if (typeProp != null)
-                        {
-                            string typeVal = typeProp.GetValue(font) as string;
-                            if (!string.IsNullOrEmpty(typeVal) &&
-                                typeVal.Equals("OpenType", StringComparison.OrdinalIgnoreCase))
-                            {
-                                extension = ".otf";
-                            }
-                        }
-
-                        string safeFontName = string.Join("_",
-                            fontName.Split(Path.GetInvalidFileNameChars(), StringSplitOptions.RemoveEmptyEntries));
-                        string outputPath = Path.Combine(outputDir, safeFontName + extension);
-                        File.WriteAllBytes(outputPath, fontData);
-                        Console.WriteLine($"Extracted font (fallback): {fontName} -> {outputPath}");
-                    }
+                    Console.WriteLine($"Extracted font: {outputPath}");
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
+    }
 
-        Console.WriteLine("Font extraction completed.");
+    // Helper method to replace invalid filename characters
+    static string MakeSafeFileName(string name)
+    {
+        foreach (char invalidChar in Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(invalidChar, '_');
+        }
+        return string.IsNullOrWhiteSpace(name) ? "font" : name;
     }
 }

@@ -6,52 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedSvg";
+        // Input PDF file
+        const string inputPath = "input.pdf";
+        // Directory where individual SVG files will be saved
+        const string outputDir = "ExtractedSVG";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify that the input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
         try
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the source PDF document
+            using (Document srcDoc = new Document(inputPath))
             {
-                // Iterate through each page (1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
+                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= srcDoc.Pages.Count; i++)
                 {
-                    // Create a temporary document that contains only the current page
-                    Document singlePageDoc = new Document();
-                    // Import the page – this copies the page into the new document without removing it from the source
-                    singlePageDoc.Pages.Add(pdfDoc.Pages[pageIndex]);
-
-                    // Build a unique file name for the SVG output of this page
-                    string svgFilePath = Path.Combine(outputFolder, $"Page_{pageIndex}.svg");
-
-                    // Configure SVG save options – enable CSS style embedding via ScaleToPixels
-                    SvgSaveOptions svgOptions = new SvgSaveOptions
+                    // Create a new temporary document that will contain only the current page
+                    using (Document pageDoc = new Document())
                     {
-                        ScaleToPixels = true
-                    };
+                        // Add the current page into the temporary document (CopyTo is obsolete)
+                        pageDoc.Pages.Add(srcDoc.Pages[i]);
 
-                    // Save the single‑page document as an SVG file
-                    singlePageDoc.Save(svgFilePath, svgOptions);
+                        // Define the SVG save options (default saves each page as a separate SVG)
+                        SvgSaveOptions svgOptions = new SvgSaveOptions();
 
-                    Console.WriteLine($"Extracted SVG for page {pageIndex} -> {svgFilePath}");
+                        // Build the output file name for this page
+                        string outPath = Path.Combine(outputDir, $"Page_{i}.svg");
+
+                        // Save the single‑page document as SVG
+                        pageDoc.Save(outPath, svgOptions);
+
+                        Console.WriteLine($"Saved SVG: {outPath}");
+                    }
                 }
             }
-
-            Console.WriteLine("Vector graphic extraction completed.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

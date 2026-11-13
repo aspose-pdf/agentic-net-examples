@@ -7,32 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "formdata.json";
+        const string inputPath = "input.pdf";
+        const string outputJsonPath = "formData.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document with deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Verify that the PDF contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // Export the form data directly to a JSON file stream
-                using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
-                {
-                    pdfDoc.Form.ExportToJson(jsonStream);
-                }
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
             }
 
-            Console.WriteLine($"Form data successfully exported to '{outputJsonPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during export: {ex.Message}");
+            // Create a FileStream for the JSON output
+            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+            {
+                // Export the form data directly to the stream as JSON using the correct API
+                doc.Form.ExportToJson(jsonStream);
+            }
+
+            Console.WriteLine($"Form data exported to JSON file: {outputJsonPath}");
         }
     }
 }
