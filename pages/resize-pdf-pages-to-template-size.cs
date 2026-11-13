@@ -6,18 +6,18 @@ class Program
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";
         const string templatePath = "template.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath    = "input.pdf";
+        const string outputPath   = "output_resized.pdf";
 
-        if (!File.Exists(sourcePath))
-        {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
-            return;
-        }
         if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Template file not found: {templatePath}");
+            Console.Error.WriteLine($"Template not found: {templatePath}");
+            return;
+        }
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
@@ -30,25 +30,26 @@ class Program
                 return;
             }
 
-            // Aspose.Pdf uses 1‑based page indexing
-            Page tmplPage = templateDoc.Pages[1];
-            double targetWidth = tmplPage.PageInfo.Width;
-            double targetHeight = tmplPage.PageInfo.Height;
+            // Page indexing in Aspose.Pdf is 1‑based
+            Page templatePage = templateDoc.Pages[1];
+            double targetWidth  = templatePage.PageInfo.Width;
+            double targetHeight = templatePage.PageInfo.Height;
 
-            // Load the source PDF and resize each page to match the template size
-            using (Document sourceDoc = new Document(sourcePath))
+            // Load the document whose pages will be resized
+            using (Document sourceDoc = new Document(inputPath))
             {
+                // Apply the template size to every page
                 for (int i = 1; i <= sourceDoc.Pages.Count; i++)
                 {
-                    Page srcPage = sourceDoc.Pages[i];
-                    srcPage.SetPageSize(targetWidth, targetHeight);
+                    Page page = sourceDoc.Pages[i];
+                    page.PageInfo.Width  = targetWidth;
+                    page.PageInfo.Height = targetHeight;
                 }
 
-                // Save the modified document
+                // Save the resized PDF
                 sourceDoc.Save(outputPath);
+                Console.WriteLine($"All pages resized and saved to '{outputPath}'.");
             }
         }
-
-        Console.WriteLine($"All pages resized and saved to '{outputPath}'.");
     }
 }

@@ -15,17 +15,16 @@ class Program
             return;
         }
 
-        // Open the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Define a CMYK color (values are in the range 0.0 – 1.0)
-            // Example: 0% cyan, 100% magenta, 0% yellow, 0% black
-            Aspose.Pdf.Color cmykColor = Aspose.Pdf.Color.FromCmyk(0.0, 1.0, 0.0, 0.0);
+            // Define a CMYK color (Cyan, Magenta, Yellow, Black) with values in the 0‑1 range
+            // Example: 100% Cyan, 0% Magenta, 0% Yellow, 0% Black
+            Color cmykColor = Color.FromCmyk(1.0, 0.0, 0.0, 0.0);
 
-            // Apply the background color to each page (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Set the background color for each page via the Page.Background property
+            foreach (Page page in doc.Pages)
             {
-                Aspose.Pdf.Page page = doc.Pages[i];
                 page.Background = cmykColor;
             }
 
@@ -33,6 +32,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with background color to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with CMYK background to '{outputPath}'.");
     }
 }

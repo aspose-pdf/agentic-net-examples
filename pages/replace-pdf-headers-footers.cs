@@ -16,56 +16,42 @@ class Program
             return;
         }
 
+        // Load the PDF with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // ------------------------------------------------------------
-            // Remove any existing headers and footers from all pages
-            // ------------------------------------------------------------
-            foreach (Page page in doc.Pages)
+            // Iterate using 1‑based page indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                Page page = doc.Pages[i];
+
+                // Remove any existing header/footer
                 page.Header = null;
                 page.Footer = null;
+
+                // ----- Header -----
+                HeaderFooter header = new HeaderFooter();
+                TextFragment headerTf = new TextFragment("New Header Text");
+                headerTf.TextState.FontSize = 12;
+                headerTf.TextState.Font = FontRepository.FindFont("Arial");
+                header.Paragraphs.Add(headerTf);
+                page.Header = header;
+
+                // ----- Footer -----
+                HeaderFooter footer = new HeaderFooter();
+                TextFragment footerTf = new TextFragment($"Page {i}");
+                footerTf.TextState.FontSize = 10;
+                footerTf.TextState.Font = FontRepository.FindFont("Arial");
+                footer.Paragraphs.Add(footerTf);
+                page.Footer = footer;
             }
 
-            // ------------------------------------------------------------
-            // Create a new header
-            // ------------------------------------------------------------
-            HeaderFooter newHeader = new HeaderFooter();
-            TextFragment headerTf = new TextFragment("My New Header");
-            headerTf.TextState.FontSize = 12;
-            headerTf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-            newHeader.Paragraphs.Add(headerTf);
-            // Optional margin for the header
-            newHeader.Margin = new MarginInfo { Top = 10 };
-
-            // ------------------------------------------------------------
-            // Create a new footer (with page number placeholders)
-            // ------------------------------------------------------------
-            HeaderFooter newFooter = new HeaderFooter();
-            // $p = current page number, $P = total pages
-            TextFragment footerTf = new TextFragment("Page $p of $P");
-            footerTf.TextState.FontSize = 10;
-            footerTf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-            newFooter.Paragraphs.Add(footerTf);
-            // Optional margin for the footer
-            newFooter.Margin = new MarginInfo { Bottom = 10 };
-
-            // ------------------------------------------------------------
-            // Assign the new header and footer to each page
-            // ------------------------------------------------------------
-            foreach (Page page in doc.Pages)
-            {
-                page.Header = newHeader;
-                page.Footer = newFooter;
-            }
-
-            // Update pagination placeholders ($p, $P)
-            doc.Pages.UpdatePagination();
+            // If you use placeholders like $p/$P in footers, call UpdatePagination()
+            // doc.Pages.UpdatePagination();
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Headers and footers updated and saved to '{outputPath}'.");
     }
 }

@@ -6,52 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string logoImagePath = "logo.png";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string logoPath   = "logo.png";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
-        if (!File.Exists(logoImagePath))
+        if (!File.Exists(logoPath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Create an ImageStamp for the logo
-            ImageStamp logoStamp = new ImageStamp(logoImagePath)
+            // Prepare an ImageStamp for the logo
+            ImageStamp logoStamp = new ImageStamp(logoPath)
             {
-                // Align the stamp to the left side of the page
+                // Align left and top to act as a header
                 HorizontalAlignment = HorizontalAlignment.Left,
-                // Align the stamp to the top of the page (header area)
                 VerticalAlignment   = VerticalAlignment.Top,
-                // Ensure the stamp does not obscure existing content
-                Background = false,
-                // Adjust opacity if desired (1.0 = fully opaque)
-                Opacity = 1.0
+                // Use individual margin properties (ImageStamp has no Margin object)
+                LeftMargin = 10,
+                TopMargin  = 10,
+                // Keep original size (no Scale property exists)
+                Background = false
             };
 
-            // Position the stamp 10 points from the left and 10 points from the top
-            logoStamp.XIndent = 10f; // left offset in points
-            logoStamp.YIndent = 10f; // top offset in points
-
-            // Apply the stamp to every page in the document
+            // Add the stamp to every page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(logoStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Header with logo added to each page. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Header with logo added to each page. Saved as '{outputPath}'.");
     }
 }

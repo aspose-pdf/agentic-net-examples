@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_numbered.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,38 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate using 1‑based page indexing
+            // Pages are 1‑based; iterate through all pages
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Process only odd pages
+                // Apply page number only on odd pages
                 if (i % 2 == 1)
                 {
-                    Page page = doc.Pages[i];
-
                     // Create a text fragment with the page number
-                    TextFragment tf = new TextFragment(i.ToString())
-                    {
-                        // Position near the bottom center of the page
-                        // X = half of page width, Y = 20 points from bottom
-                        Position = new Position(page.PageInfo.Width / 2, 20),
-                        // Center align the text
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        // Use a cross‑platform color
-                        TextState = { ForegroundColor = Aspose.Pdf.Color.Black }
-                    };
+                    TextFragment tf = new TextFragment(i.ToString());
 
-                    // Add the fragment to the page's paragraphs collection
-                    page.Paragraphs.Add(tf);
+                    // Position the number (example: bottom center)
+                    tf.Position = new Position(300, 20); // adjust X/Y as needed
+                    tf.TextState.FontSize = 12;
+                    tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                    // Add the fragment to the page's paragraph collection
+                    doc.Pages[i].Paragraphs.Add(tf);
                 }
             }
 
-            // Save the modified PDF (save inside the using block as per lifecycle rule)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers added to odd pages. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Page numbers added to odd pages. Saved as '{outputPath}'.");
     }
 }

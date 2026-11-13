@@ -1,19 +1,20 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string configPath = "pages_to_delete.txt"; // one page number per line
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string configPath = "pages_to_delete.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(configPath))
@@ -22,45 +23,43 @@ class Program
             return;
         }
 
-        // Read and parse page numbers from the configuration file
+        // Read page numbers from the configuration file.
+        // The file may contain one number per line or comma‑separated values.
         List<int> pagesToDelete = new List<int>();
         foreach (string line in File.ReadAllLines(configPath))
         {
-            if (int.TryParse(line.Trim(), out int pageNum) && pageNum > 0)
-                pagesToDelete.Add(pageNum);
+            foreach (string part in line.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (int.TryParse(part.Trim(), out int pageNum) && pageNum > 0)
+                    pagesToDelete.Add(pageNum);
+            }
         }
 
-        if (pagesToDelete.Count == 0)
+        // Remove duplicates and sort descending to avoid index shift while deleting.
+        pagesToDelete = pagesToDelete.Distinct().OrderByDescending(p => p).ToList();
+
+        // Load the PDF inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdf))
         {
-            Console.WriteLine("No valid page numbers found in configuration.");
-            return;
-        }
+            int pageCount = doc.Pages.Count;
 
-        // Delete from highest to lowest to avoid index shifting
-        pagesToDelete.Sort((a, b) => b.CompareTo(a));
-
-        // Load PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            int totalPages = doc.Pages.Count; // 1‑based page count
-
+            // Delete each specified page (1‑based indexing).
             foreach (int pageNum in pagesToDelete)
             {
-                if (pageNum <= totalPages)
+                if (pageNum <= pageCount)
                 {
-                    // Aspose.Pdf uses 1‑based indexing; delete the specified page
                     doc.Pages.Delete(pageNum);
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNum} is out of range (1‑{totalPages}), skipped.");
+                    Console.WriteLine($"Warning: page {pageNum} does not exist (max {pageCount}).");
                 }
             }
 
-            // Save the modified document as PDF
-            doc.Save(outputPath);
+            // Save the modified document.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Pages deleted. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Pages deleted. Result saved to '{outputPdf}'.");
     }
 }

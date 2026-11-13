@@ -15,26 +15,30 @@ class Program
             return;
         }
 
-        // Load source document and create a target document inside using blocks
-        using (Document src = new Document(inputPath))
-        using (Document dst = new Document())
+        // Load the source PDF
+        using (Document source = new Document(inputPath))
         {
-            // Append odd‑numbered pages first (1‑based indexing)
-            for (int i = 1; i <= src.Pages.Count; i += 2)
+            // Create an empty target PDF
+            using (Document target = new Document())
             {
-                dst.Pages.Add(src.Pages[i]);
-            }
+                // Append odd‑numbered pages first (1‑based indexing)
+                for (int i = 1; i <= source.Pages.Count; i += 2)
+                {
+                    // Add copies of the pages to the target document
+                    target.Pages.Add(source.Pages[i]);
+                }
 
-            // Then append even‑numbered pages preserving their original order
-            for (int i = 2; i <= src.Pages.Count; i += 2)
-            {
-                dst.Pages.Add(src.Pages[i]);
-            }
+                // Append even‑numbered pages preserving their original order
+                for (int i = 2; i <= source.Pages.Count; i += 2)
+                {
+                    target.Pages.Add(source.Pages[i]);
+                }
 
-            // Save the reordered document
-            dst.Save(outputPath);
+                // Save the reordered document
+                target.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages reordered and saved to '{outputPath}'.");
     }
 }

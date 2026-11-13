@@ -15,14 +15,14 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            // Insert a new blank page at position 3 (before the original page 3).
-            doc.Pages.Insert(3); // overload creates a blank page automatically
+            // Insert a new blank page at index 3 (1‑based indexing).
+            // The overload without a Page argument creates an empty page automatically.
+            doc.Pages.Insert(3);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "sorted_desc.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "reordered_descending.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +17,25 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document srcDoc = new Document(inputPath))
+        // Target document must stay alive until Save() completes.
+        using (Document target = new Document())
+        // Source document containing the original pages.
+        using (Document source = new Document(inputPath))
         {
-            // Collect each page together with its original 1‑based index
-            List<(int Index, Page Page)> pages = new List<(int, Page)>();
-            for (int i = 1; i <= srcDoc.Pages.Count; i++) // page-indexing-one-based rule
+            // Build a list of page numbers (1‑based) and sort it descending
+            // using a custom comparer (lambda) – this is the custom sorting algorithm.
+            List<int> pageIndices = Enumerable.Range(1, source.Pages.Count).ToList();
+            pageIndices.Sort((a, b) => b.CompareTo(a)); // descending order
+
+            // Add pages to the target document following the sorted order.
+            foreach (int idx in pageIndices)
             {
-                pages.Add((i, srcDoc.Pages[i]));
+                // Pages are 1‑based; source.Pages[idx] returns the original page.
+                target.Pages.Add(source.Pages[idx]);
             }
 
-            // Custom sort: descending numeric order based on the original index
-            pages.Sort((a, b) => b.Index.CompareTo(a.Index));
-
-            // Create a new empty document to hold the reordered pages
-            using (Document targetDoc = new Document())
-            {
-                // Append pages to the target document in the sorted order
-                foreach (var entry in pages)
-                {
-                    // Adding a page copies it into the target document
-                    targetDoc.Pages.Add(entry.Page);
-                }
-
-                // Save the reordered PDF (PDF format, no special SaveOptions needed)
-                targetDoc.Save(outputPath);
-            }
+            // Save the reordered PDF.
+            target.Save(outputPath);
         }
 
         Console.WriteLine($"Pages reordered in descending order and saved to '{outputPath}'.");

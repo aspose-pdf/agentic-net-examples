@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "reordered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,36 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Temporary document to hold copies of pages 3‑6
-            using (Document temp = new Document())
+            // Aspose.Pdf uses 1‑based page indexing.
+            // Move pages 3‑6 to the end while preserving their original order.
+            int firstPageToMove = 3;          // inclusive, 1‑based
+            int pagesToMove = 4;              // pages 3,4,5,6
+
+            for (int i = 0; i < pagesToMove; i++)
             {
-                // Copy pages 3‑6 from the original document into the temporary document
-                for (int i = 3; i <= 6; i++)
-                {
-                    // Pages.Add copies the page into the target document (deep copy)
-                    temp.Pages.Add(doc.Pages[i]);
-                }
+                // The page currently at index 'firstPageToMove' is the next one to relocate.
+                Page page = doc.Pages[firstPageToMove];
 
-                // Remove the original pages 3‑6 from the source document (delete from highest index downwards)
-                for (int i = 6; i >= 3; i--)
-                {
-                    doc.Pages.Delete(i);
-                }
+                // Insert the page just after the current last page (Count + 1 means "append").
+                doc.Pages.Insert(doc.Pages.Count + 1, page);
 
-                // Append the copied pages to the end of the original document
-                foreach (Page copiedPage in temp.Pages)
-                {
-                    doc.Pages.Add(copiedPage);
-                }
+                // Delete the original occurrence of the page.
+                // After insertion the original page is still at 'firstPageToMove'.
+                doc.Pages.Delete(firstPageToMove);
             }
 
             // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages 3‑6 have been moved to the end. Saved as '{outputPath}'.");
+        Console.WriteLine($"Pages 3‑6 moved to the end. Saved as '{outputPath}'.");
     }
 }

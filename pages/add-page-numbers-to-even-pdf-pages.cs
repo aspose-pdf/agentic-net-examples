@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_even_page_numbers.pdf";
+        const string outputPath = "even_pages_numbered.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -22,30 +22,30 @@ class Program
             // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply page number only on even pages
+                // Process only even pages
                 if (i % 2 == 0)
                 {
-                    // Create a text fragment with the page number
-                    TextFragment tf = new TextFragment(i.ToString());
-
-                    // Styling: font size, color, centered alignment
-                    tf.TextState.FontSize = 12;
-                    tf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                    tf.TextState.HorizontalAlignment = HorizontalAlignment.Center;
-
-                    // Position near the bottom of the page (y = 20 points from bottom)
-                    tf.Position = new Position(0, 20); // X = 0 works with Center alignment
-
-                    // Add the fragment to the current page
                     Page page = doc.Pages[i];
+
+                    // Create a text fragment with the page number
+                    TextFragment tf = new TextFragment(i.ToString())
+                    {
+                        // Position the fragment at the bottom‑right corner
+                        // (adjust coordinates as needed for your PDF layout)
+                        Position = new Position(page.PageInfo.Width - 50, 20),
+                        // Set appearance
+                        TextState = { FontSize = 12, ForegroundColor = Aspose.Pdf.Color.Black }
+                    };
+
+                    // Add the fragment to the page's paragraph collection
                     page.Paragraphs.Add(tf);
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF (output format is PDF by default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with page numbers on even pages to '{outputPath}'.");
+        Console.WriteLine($"Even‑page numbers added. Output saved to '{outputPath}'.");
     }
 }
