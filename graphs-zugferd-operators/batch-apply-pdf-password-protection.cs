@@ -6,42 +6,53 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string sourceFolder = @"C:\PdfSource";
+        // Folder containing the source PDFs
+        string inputFolder = "InputPdfs";
         // Folder where encrypted PDFs will be written
-        const string outputFolder = @"C:\PdfEncrypted";
+        string outputFolder = "ProtectedPdfs";
+
+        // Define the passwords to apply to every PDF
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
+
+        // Verify input folder exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
 
         // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
-        // Passwords to apply to every PDF
-        const string userPassword  = "UserPass123";
-        const string ownerPassword = "OwnerPass123";
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        // Permissions to grant after encryption (example: allow printing and content extraction)
-        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-        // Process each PDF file in the source folder
-        foreach (string pdfPath in Directory.GetFiles(sourceFolder, "*.pdf"))
+        foreach (string pdfPath in pdfFiles)
         {
             string fileName = Path.GetFileName(pdfPath);
-            string encryptedPath = Path.Combine(outputFolder, fileName);
+            string outPath = Path.Combine(outputFolder, fileName);
 
             try
             {
-                // Load the PDF, encrypt it, and save the encrypted version
+                // Load each PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Apply encryption using AES-256 (recommended)
+                    // Set desired permissions (example: allow printing and content extraction)
+                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                    // Encrypt using AES‑256 (preferred algorithm)
                     doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-                    doc.Save(encryptedPath); // Save writes PDF regardless of extension
+
+                    // Save the encrypted PDF; extension remains .pdf
+                    doc.Save(outPath);
                 }
 
                 Console.WriteLine($"Encrypted: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to encrypt '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to process {fileName}: {ex.Message}");
             }
         }
 

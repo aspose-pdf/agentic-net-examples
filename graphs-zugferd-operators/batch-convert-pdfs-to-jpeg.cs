@@ -7,44 +7,66 @@ class Program
 {
     static void Main()
     {
-        // Directory containing PDF files – change as needed or read from args
-        string sourceDirectory = @"C:\PdfFiles";
-        // Directory where JPEG images will be saved
-        string outputDirectory = Path.Combine(sourceDirectory, "JpegImages");
+        // Directory containing the source PDFs
+        const string sourceDir = @"C:\PdfFolder";
+        // Output directory for JPEG images
+        const string outputDir = @"C:\PdfFolder\JpegOutput";
 
-        if (!Directory.Exists(sourceDirectory))
+        if (!Directory.Exists(sourceDir))
         {
-            Console.Error.WriteLine($"Source directory does not exist: {sourceDirectory}");
+            Console.Error.WriteLine($"Source directory does not exist: {sourceDir}");
             return;
         }
 
-        Directory.CreateDirectory(outputDirectory);
+        Directory.CreateDirectory(outputDir);
 
-        // Process each PDF file in the source directory
-        foreach (string pdfPath in Directory.GetFiles(sourceDirectory, "*.pdf"))
+        // Get all PDF files in the source directory (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(sourceDir, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
         {
-            string baseFileName = Path.GetFileNameWithoutExtension(pdfPath);
+            Console.WriteLine("No PDF files found.");
+            return;
+        }
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDocument = new Document(pdfPath))
+        foreach (string pdfPath in pdfFiles)
+        {
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+
+            try
             {
-                // Create a JPEG device once (it does not implement IDisposable, so no using)
-                JpegDevice jpegDevice = new JpegDevice(new Resolution(300));
-
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-                for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+                // Load the PDF inside a using block for deterministic disposal
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    // Build output file name: <source>_page<pageNumber>.jpg
-                    string jpegPath = Path.Combine(
-                        outputDirectory,
-                        $"{baseFileName}_page{pageNumber}.jpg");
+                    // Iterate pages (Aspose.Pdf uses 1‑based indexing)
+                    for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                    {
+                        // Prepare the JPEG device – 300 DPI gives good quality
+                        JpegDevice jpegDevice = new JpegDevice(new Resolution(300));
 
-                    // Convert the specific page to JPEG and save
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], jpegPath);
+                        // Build output file name: <source>_page<pageNum>.jpg
+                        string jpegPath = Path.Combine(
+                            outputDir,
+                            $"{fileNameWithoutExt}_page{pageNum}.jpg");
+
+                        // Save each page as a JPEG image
+                        using (FileStream imageStream = new FileStream(jpegPath, FileMode.Create))
+                        {
+                            jpegDevice.Process(pdfDoc.Pages[pageNum], imageStream);
+                        }
+
+                        Console.WriteLine($"Saved: {jpegPath}");
+                    }
                 }
             }
-
-            Console.WriteLine($"Converted '{pdfPath}' to JPEG images.");
+            catch (TypeInitializationException)
+            {
+                // JPEG conversion may require GDI+ (Windows only)
+                Console.WriteLine($"Skipping '{pdfPath}' – JPEG conversion requires Windows (GDI+).");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
 
         Console.WriteLine("Batch conversion completed.");

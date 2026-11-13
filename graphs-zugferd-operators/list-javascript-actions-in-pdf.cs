@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -15,81 +15,52 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            Console.WriteLine("=== Document‑level JavaScript actions ===");
+
+            // 1. OpenAction (executed when the document is opened)
+            if (doc.OpenAction is JavascriptAction openJs)
             {
-                // ----- Document‑level JavaScript actions -----
-                Console.WriteLine("Document‑level JavaScript actions:");
-                bool docHasJs = false;
+                Console.WriteLine("[Document] OpenAction script:");
+                Console.WriteLine(openJs.Script);
+                Console.WriteLine(new string('-', 40));
+            }
 
-                // 1. OpenAction (executed when the document is opened)
-                if (doc.OpenAction is JavascriptAction docOpenJs)
+            // 2. Named JavaScript entries stored in the JavaScript collection.
+            //    The collection is not enumerable, so we iterate via its Keys property.
+            if (doc.JavaScript != null && doc.JavaScript.Keys.Count > 0)
+            {
+                foreach (string key in doc.JavaScript.Keys)
                 {
-                    docHasJs = true;
-                    Console.WriteLine("- OpenAction:");
-                    Console.WriteLine(docOpenJs.Script);
-                    Console.WriteLine();
-                }
-
-                // 2. Named JavaScript entries (doc.JavaScript collection)
-                if (doc.JavaScript != null && doc.JavaScript.Keys.Count > 0)
-                {
-                    foreach (string key in doc.JavaScript.Keys)
-                    {
-                        string script = doc.JavaScript[key];
-                        docHasJs = true;
-                        Console.WriteLine($"- Named script '{key}':");
-                        Console.WriteLine(script);
-                        Console.WriteLine();
-                    }
-                }
-
-                if (!docHasJs)
-                {
-                    Console.WriteLine("  None.");
-                }
-
-                // ----- Page‑level JavaScript actions -----
-                foreach (Page page in doc.Pages)
-                {
-                    bool pageHasJs = false;
-
-                    // OnOpen action
-                    if (page.Actions.OnOpen is JavascriptAction onOpenJs)
-                    {
-                        if (!pageHasJs)
-                        {
-                            Console.WriteLine($"Page {page.Number} JavaScript actions:");
-                            pageHasJs = true;
-                        }
-                        Console.WriteLine("- OnOpen:");
-                        Console.WriteLine(onOpenJs.Script);
-                        Console.WriteLine();
-                    }
-
-                    // OnClose action
-                    if (page.Actions.OnClose is JavascriptAction onCloseJs)
-                    {
-                        if (!pageHasJs)
-                        {
-                            Console.WriteLine($"Page {page.Number} JavaScript actions:");
-                            pageHasJs = true;
-                        }
-                        Console.WriteLine("- OnClose:");
-                        Console.WriteLine(onCloseJs.Script);
-                        Console.WriteLine();
-                    }
-
-                    // Uncomment the following line if you want to list pages without scripts
-                    // if (!pageHasJs) Console.WriteLine($"Page {page.Number} has no JavaScript actions.");
+                    string script = doc.JavaScript[key];
+                    Console.WriteLine($"[Document] Named script '{key}':");
+                    Console.WriteLine(script);
+                    Console.WriteLine(new string('-', 40));
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+
+            Console.WriteLine("=== Page‑level JavaScript actions ===");
+            // Pages are 1‑based in Aspose.Pdf.
+            foreach (Page page in doc.Pages)
+            {
+                // OnOpen action
+                if (page.Actions.OnOpen is JavascriptAction onOpenJs)
+                {
+                    Console.WriteLine($"[Page {page.Number}] OnOpen script:");
+                    Console.WriteLine(onOpenJs.Script);
+                    Console.WriteLine(new string('-', 40));
+                }
+
+                // OnClose action
+                if (page.Actions.OnClose is JavascriptAction onCloseJs)
+                {
+                    Console.WriteLine($"[Page {page.Number}] OnClose script:");
+                    Console.WriteLine(onCloseJs.Script);
+                    Console.WriteLine(new string('-', 40));
+                }
+            }
         }
     }
 }

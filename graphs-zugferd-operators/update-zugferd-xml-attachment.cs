@@ -1,67 +1,60 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 
-class UpdateZugferdAttachment
+class Program
 {
     static void Main()
     {
         // Paths – adjust as needed
-        const string inputPdfPath = "invoice_original.pdf";
-        const string newXmlPath = "invoice_updated.xml";
+        const string pdfPath = "invoice.pdf";
+        const string newXmlPath = "new_invoice.xml";
         const string outputPdfPath = "invoice_updated.pdf";
+        const string attachmentName = "ZUGFeRD-invoice.xml"; // typical ZUGFeRD attachment name
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify input files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
         if (!File.Exists(newXmlPath))
         {
-            Console.Error.WriteLine($"New ZUGFeRD XML not found: {newXmlPath}");
+            Console.Error.WriteLine($"XML not found: {newXmlPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the new ZUGFeRD XML content
+        string newXmlContent = File.ReadAllText(newXmlPath, Encoding.UTF8);
+        byte[] xmlBytes = Encoding.UTF8.GetBytes(newXmlContent);
+
+        // Open the PDF, replace (or add) the ZUGFeRD attachment, and save
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // ------------------------------------------------------------
-            // Remove any existing ZUGFeRD XML attachment
-            // ------------------------------------------------------------
-            var namesToDelete = new List<string>();
-            foreach (FileSpecification fileSpec in pdfDocument.EmbeddedFiles)
+            // Remove existing attachment with the same name, if present
+            // EmbeddedFiles collection is accessed by name (string) – use Delete(string)
+            try
             {
-                if (!string.IsNullOrEmpty(fileSpec.Name) &&
-                    (fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) ||
-                     fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0))
-                {
-                    namesToDelete.Add(fileSpec.Name);
-                }
+                // Attempt to delete; if the name does not exist an exception is thrown which we ignore
+                pdfDoc.EmbeddedFiles.Delete(attachmentName);
             }
-            foreach (string name in namesToDelete)
+            catch { /* attachment not present – nothing to delete */ }
+
+            // Add the new attachment
+            using (MemoryStream xmlStream = new MemoryStream(xmlBytes))
             {
-                pdfDocument.EmbeddedFiles.Delete(name);
+                // Create a FileSpecification using the constructor that takes a file name and description
+                var fileSpec = new FileSpecification(attachmentName, attachmentName);
+                // Assign the XML content via the Contents stream property
+                fileSpec.Contents = xmlStream;
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // ------------------------------------------------------------
-            // Add the new ZUGFeRD XML attachment
-            // ------------------------------------------------------------
-            // FileSpecification constructor (string filePath, string description)
-            var newSpec = new FileSpecification(newXmlPath, "ZUGFeRD invoice data")
-            {
-                // MimeType property does not exist in Aspose.Pdf.FileSpecification; it is omitted.
-            };
-            // Optional: set modification date for completeness
-            newSpec.Params.ModDate = DateTime.UtcNow;
-
-            pdfDocument.EmbeddedFiles.Add(newSpec);
-
-            // Save the modified PDF
-            pdfDocument.Save(outputPdfPath);
+            // Save the updated PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with updated ZUGFeRD attachment saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF saved with updated ZUGFeRD attachment: {outputPdfPath}");
     }
 }

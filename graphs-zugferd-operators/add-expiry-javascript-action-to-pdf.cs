@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // Required for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_expiry.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "expiry.pdf";
+        const string expiryDate = "2025-12-31"; // YYYY-MM-DD format
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF, add a document‑level JavaScript that enforces an expiry date,
-        // and save the modified document.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // JavaScript to be executed when the PDF is opened.
-            // It checks the current date against the expiry date and, if expired,
-            // shows an alert and closes the document.
-            string expiryScript = @"
-Date expiry = new Date('2025-12-31');
-if (new Date() > expiry) {
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // JavaScript that runs when the document is opened.
+                // It compares the current date with the expiry date and
+                // shows an alert and closes the document if the expiry has passed.
+                string js = $@"
+Date expiry = new Date('{expiryDate}');
+Date now = new Date();
+if (now > expiry) {{
     app.alert('This document has expired.');
-    this.closeDoc(true);
-}";
+    this.closeDoc();
+}}";
 
-            // Assign the script as the document's OpenAction.
-            doc.OpenAction = new JavascriptAction(expiryScript);
+                // Assign the JavaScript as the document's OpenAction
+                doc.OpenAction = new JavascriptAction(js);
 
-            // Save the updated PDF.
-            doc.Save(outputPath);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with expiry JavaScript saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with expiry JavaScript saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

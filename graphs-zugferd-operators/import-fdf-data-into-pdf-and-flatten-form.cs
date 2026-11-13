@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string pdfPath = "template.pdf";
         const string fdfPath = "data.fdf";
         const string outputPath = "filled_flattened.pdf";
 
@@ -25,17 +26,20 @@ class Program
 
         try
         {
-            var doc = new Document(pdfPath);
+            // Load the PDF document
+            using (Document doc = new Document(pdfPath))
+            {
+                // Import FDF data manually (Aspose.Pdf core API does not expose ImportFdf)
+                FillFormFromFdf(doc, fdfPath);
 
-            // Populate form fields from FDF
-            PopulateFromFdf(doc, fdfPath);
+                // Flatten the form to make fields read‑only
+                doc.Form?.Flatten();
 
-            // Flatten the form so fields become static content
-            doc.Form?.Flatten();
+                // Save the updated PDF
+                doc.Save(outputPath);
+            }
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
-            Console.WriteLine($"Form filled and flattened PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Form populated and flattened. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
@@ -43,29 +47,29 @@ class Program
         }
     }
 
-    private static void PopulateFromFdf(Document doc, string fdfPath)
+    /// <summary>
+    /// Parses a simple FDF file and assigns the extracted values to matching form fields.
+    /// This implementation handles the most common FDF syntax: /T (fieldName) /V (value).
+    /// </summary>
+    private static void FillFormFromFdf(Document doc, string fdfPath)
     {
-        // Very simple FDF parser – expects lines like: FieldName=Value
-        foreach (var line in File.ReadLines(fdfPath))
+        string fdfContent = File.ReadAllText(fdfPath);
+        // Regex captures field name and value inside parentheses after /T and /V tokens.
+        var matches = Regex.Matches(fdfContent, @"/T\s*\(([^)]+)\)\s*/V\s*\(([^)]+)\)", RegexOptions.Singleline);
+        foreach (Match match in matches)
         {
-            // Skip empty lines and comment lines
-            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("%") || line.TrimStart().StartsWith("#"))
-                continue;
+            string fieldName = match.Groups[1].Value;
+            string fieldValue = match.Groups[2].Value;
 
-            // Split on the first '=' character
-            var parts = line.Split(new[] { '=' }, 2);
-            if (parts.Length != 2)
-                continue;
-
-            var name = parts[0].Trim();
-            var value = parts[1].Trim();
-
+            // Find the field in the document (match by FullName or Name)
             var field = doc.Form?.Fields?.FirstOrDefault(f =>
-                string.Equals(f.Name, name, StringComparison.Ordinal) ||
-                string.Equals(f.FullName, name, StringComparison.Ordinal));
+                string.Equals(f.FullName, fieldName, StringComparison.Ordinal) ||
+                string.Equals(f.Name, fieldName, StringComparison.Ordinal));
 
             if (field != null)
-                field.Value = value;
+            {
+                field.Value = fieldValue;
+            }
         }
     }
 }

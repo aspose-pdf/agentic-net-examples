@@ -6,37 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPath     = "input.pdf";
-        const string outputPath    = "encrypted.pdf";
-        const string userPassword  = "user123";
+        // Paths for input and encrypted output PDFs
+        const string inputPath = "input.pdf";
+        const string encryptedPath = "encrypted.pdf";
+
+        // Passwords for user (open) and owner (full control)
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Open the source PDF inside a using block for deterministic disposal
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Define desired permissions (e.g., allow printing and content extraction)
+                // Define permissions: allow printing and content extraction
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Apply AES‑256 encryption with both user and owner passwords
+                // Apply AES‑256 encryption with the specified passwords and permissions
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
-                doc.Save(outputPath);
+                doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Encryption successful. Encrypted file saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during encryption: {ex.Message}");
         }
     }
 }

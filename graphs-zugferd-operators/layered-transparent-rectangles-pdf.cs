@@ -6,42 +6,37 @@ class Program
 {
     static void Main()
     {
+        const string outputPath = "layered_graphics.pdf";
+
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a single page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a Graph container that covers the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Create a Graph that covers the whole page
+            Graph graph = new Graph(page.Rect.Width, page.Rect.Height);
 
-            // ------------------------------------------------------------
-            // First layer: semi‑transparent blue rectangle
-            // ------------------------------------------------------------
-            // Rectangle constructor: (left, bottom, width, height)
-            Aspose.Pdf.Drawing.Rectangle blueRect = new Aspose.Pdf.Drawing.Rectangle(100, 400, 200, 100);
-            // 50 % opacity blue (alpha = 128)
-            blueRect.GraphInfo.FillColor = Color.FromArgb(128, 0, 0, 255);
-            // Optional border (set to transparent to hide it)
-            blueRect.GraphInfo.Color = Color.Transparent;
-            graph.Shapes.Add(blueRect);
+            // ---------- First shape (semi‑transparent red circle) ----------
+            Ellipse redEllipse = new Ellipse(100, 300, 300, 500);
+            // Use alpha channel (128 = 50 % opacity) for transparency
+            redEllipse.GraphInfo.FillColor = Color.FromArgb(128, 255, 0, 0); // red fill
+            redEllipse.GraphInfo.Color = Color.FromArgb(128, 255, 0, 0);     // red stroke (optional)
+            graph.Shapes.Add(redEllipse);
 
-            // ------------------------------------------------------------
-            // Second layer: semi‑transparent red rectangle overlapping the first
-            // ------------------------------------------------------------
-            Aspose.Pdf.Drawing.Rectangle redRect = new Aspose.Pdf.Drawing.Rectangle(200, 350, 200, 100);
-            // 50 % opacity red (alpha = 128)
-            redRect.GraphInfo.FillColor = Color.FromArgb(128, 255, 0, 0);
-            redRect.GraphInfo.Color = Color.Transparent;
-            graph.Shapes.Add(redRect);
+            // ---------- Second shape (semi‑transparent blue circle) ----------
+            Ellipse blueEllipse = new Ellipse(200, 300, 400, 500);
+            blueEllipse.GraphInfo.FillColor = Color.FromArgb(128, 0, 0, 255); // blue fill
+            blueEllipse.GraphInfo.Color = Color.FromArgb(128, 0, 0, 255);     // blue stroke (optional)
+            graph.Shapes.Add(blueEllipse);
 
-            // Add the graph (containing both rectangles) to the page
+            // Add the graph (containing both ellipses) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the resulting PDF; Document.Save(string) writes a PDF regardless of extension
-            doc.Save("layered_graphics.pdf");
+            // Save the PDF. Document.Save(string) always writes PDF regardless of extension.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with layered graphics created: layered_graphics.pdf");
+        Console.WriteLine($"PDF with layered graphics saved to '{outputPath}'.");
     }
 }

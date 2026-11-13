@@ -1,80 +1,75 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using System.Xml;
 using System.Xml.Schema;
-using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "invoice.pdf";               // input PDF containing ZUGFeRD data
-        const string xsdPath = "ZUGFeRD1p0.xsd";            // official ZUGFeRD XSD schema file
+        const string pdfPath = "invoice.pdf";
+        const string xsdPath = "ZUGFeRD-invoice.xsd";
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(xsdPath))
         {
             Console.Error.WriteLine($"XSD not found: {xsdPath}");
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // ZUGFeRD XML is stored as an embedded file, usually named "ZUGFeRD-invoice.xml"
-            FileSpecification zugferdSpec = null;
+            // Locate the ZUGFeRD XML attachment using FileSpecification (EmbeddedFile does not exist)
+            FileSpecification zugFerdSpec = null;
             foreach (FileSpecification fs in pdfDoc.EmbeddedFiles)
             {
-                // Look for a file with .xml extension and containing "ZUGFeRD" in its name
-                if (!string.IsNullOrEmpty(fs.Name) &&
+                if (fs.Name != null &&
                     fs.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
                     fs.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    zugferdSpec = fs;
+                    zugFerdSpec = fs;
                     break;
                 }
             }
 
-            if (zugferdSpec == null)
+            if (zugFerdSpec == null)
             {
-                Console.Error.WriteLine("No ZUGFeRD XML attachment found in the PDF.");
+                Console.Error.WriteLine("ZUGFeRD XML attachment not found in PDF.");
                 return;
             }
 
-            // Extract the XML content into a memory stream
+            // Extract the XML content to a memory stream
             using (MemoryStream xmlStream = new MemoryStream())
             {
-                using (Stream content = zugferdSpec.Contents)
-                {
-                    content.CopyTo(xmlStream);
-                }
-                xmlStream.Position = 0; // reset for reading
+                // The Contents property returns a Stream with the embedded file data
+                zugFerdSpec.Contents.CopyTo(xmlStream);
+                xmlStream.Position = 0;
 
-                // Prepare XML schema set
+                // Prepare XML schema validation settings
                 XmlSchemaSet schemas = new XmlSchemaSet();
                 schemas.Add(null, xsdPath);
 
-                // Configure XML reader for validation
                 XmlReaderSettings settings = new XmlReaderSettings
                 {
-                    ValidationType = ValidationType.Schema,
                     Schemas = schemas,
-                    DtdProcessing = DtdProcessing.Prohibit
+                    ValidationType = ValidationType.Schema,
+                    ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints
                 };
                 settings.ValidationEventHandler += ValidationCallback;
 
-                // Perform validation
+                // Validate the XML against the ZUGFeRD XSD
                 using (XmlReader reader = XmlReader.Create(xmlStream, settings))
                 {
                     try
                     {
-                        while (reader.Read()) { } // read through the document to trigger validation
-                        Console.WriteLine("ZUGFeRD XML is valid against the provided XSD schema.");
+                        while (reader.Read()) { }
+                        Console.WriteLine("ZUGFeRD XML is valid against the XSD schema.");
                     }
                     catch (XmlSchemaValidationException ex)
                     {
@@ -86,11 +81,11 @@ class Program
     }
 
     // Callback to capture validation warnings and errors
-    private static void ValidationCallback(object? sender, ValidationEventArgs args)
+    private static void ValidationCallback(object sender, ValidationEventArgs e)
     {
-        if (args.Severity == XmlSeverityType.Error)
-            Console.Error.WriteLine($"Error: {args.Message}");
+        if (e.Severity == XmlSeverityType.Error)
+            Console.Error.WriteLine($"Error: {e.Message}");
         else
-            Console.WriteLine($"Warning: {args.Message}");
+            Console.WriteLine($"Warning: {e.Message}");
     }
 }

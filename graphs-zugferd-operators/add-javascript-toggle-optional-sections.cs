@@ -1,84 +1,78 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input_form.pdf";
-        const string outputPath = "output_form.pdf";
+        const string inputPath = "template.pdf";   // optional existing PDF, can be empty
+        const string outputPath = "form_with_js.pdf";
 
+        // Ensure the input file exists; if not, create a blank PDF with one page
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using (Document blank = new Document())
+            {
+                blank.Pages.Add();
+                blank.Save(inputPath);
+            }
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF, add form fields and JavaScript, then save
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document contains form fields
-            if (doc.Form == null || doc.Form.Count == 0)
-            {
-                Console.WriteLine("No form fields found in the document.");
-                doc.Save(outputPath);
-                return;
-            }
+            // Ensure there is at least one page to place the fields on
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
 
-            // ------------------------------------------------------------
-            // Example: a CheckBox field named "ShowDetails" controls the
-            // visibility of two other fields: "Detail1" and "Detail2".
-            // ------------------------------------------------------------
-            var showDetails = doc.Form["ShowDetails"];
-            if (showDetails != null)
-            {
-                // JavaScript that toggles the display state of the target fields
-                string js = @"
-var show = this.getField('ShowDetails').value == 'Yes';
-var fields = ['Detail1','Detail2'];
-for (var i = 0; i < fields.length; i++) {
-    var f = this.getField(fields[i]);
-    if (f) f.display = show ? display.visible : display.hidden;
-}
-";
-                // Assign the script to the OnPressMouseBtn action (supported action) of the field
-                showDetails.Actions.OnPressMouseBtn = new JavascriptAction(js);
-            }
+            // ----- Create a combo box that controls visibility -----
+            Aspose.Pdf.Rectangle comboRect = new Aspose.Pdf.Rectangle(100, 700, 250, 730);
+            ComboBoxField combo = new ComboBoxField(doc.Pages[1], comboRect);
+            combo.PartialName = "optionSelector";
+            // Add options (export value first, display name second). Order matters for default selection.
+            combo.AddOption("Show");
+            combo.AddOption("Hide");
+            // Default selection: "Hide" (second option, 1‑based index)
+            combo.Selected = 2;
+            doc.Form.Add(combo);
 
-            // ------------------------------------------------------------
-            // Additional example: a RadioButton group named "OptionGroup"
-            // that shows different sections based on the selected option.
-            // ------------------------------------------------------------
-            var optionGroup = doc.Form["OptionGroup"];
-            if (optionGroup != null)
-            {
-                string js = @"
-var selected = this.getField('OptionGroup').value;
-var sections = {
-    'A': ['SectionA1','SectionA2'],
-    'B': ['SectionB1','SectionB2']
-};
+            // ----- Create optional section fields (initially hidden) -----
+            Aspose.Pdf.Rectangle txtRect1 = new Aspose.Pdf.Rectangle(100, 650, 300, 680);
+            TextBoxField txt1 = new TextBoxField(doc.Pages[1], txtRect1);
+            txt1.PartialName = "section1_field1";
+            txt1.Value = "Optional Field 1";
+            doc.Form.Add(txt1);
 
-for (var key in sections) {
-    var visible = (key == selected);
-    var fields = sections[key];
-    for (var i = 0; i < fields.length; i++) {
-        var f = this.getField(fields[i]);
-        if (f) f.display = visible ? display.visible : display.hidden;
-    }
-}
-";
-                // Use the same supported action property for radio buttons
-                optionGroup.Actions.OnPressMouseBtn = new JavascriptAction(js);
-            }
+            Aspose.Pdf.Rectangle txtRect2 = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
+            TextBoxField txt2 = new TextBoxField(doc.Pages[1], txtRect2);
+            txt2.PartialName = "section1_field2";
+            txt2.Value = "Optional Field 2";
+            doc.Form.Add(txt2);
 
-            // Save the modified PDF (no PreSave call required)
+            // Hide the optional fields initially using the correct action property
+            txt1.Actions.OnOpenPage = new JavascriptAction("this.getField('section1_field1').display = display.hidden;");
+            txt2.Actions.OnOpenPage = new JavascriptAction("this.getField('section1_field2').display = display.hidden;");
+
+            // ----- JavaScript to toggle visibility based on combo selection -----
+            string js = @"
+var sel = this.getField('optionSelector').value;
+if (sel == 'Show') {
+    this.getField('section1_field1').display = display.visible;
+    this.getField('section1_field2').display = display.visible;
+} else {
+    this.getField('section1_field1').display = display.hidden;
+    this.getField('section1_field2').display = display.hidden;
+}";
+            // Use a supported action property for value change
+            combo.Actions.OnCalculate = new JavascriptAction(js);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with JavaScript saved to '{outputPath}'.");
     }
 }

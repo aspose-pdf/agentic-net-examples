@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputXmlPath = "ZUGFeRD.xml";
+        const string pdfPath = "invoice.pdf";          // Input PDF containing ZUGFeRD
+        const string outputXmlPath = "ZUGFeRD.xml";    // Destination for extracted XML
 
         if (!File.Exists(pdfPath))
         {
@@ -17,36 +17,36 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load PDF inside a using block for deterministic disposal
             using (Document doc = new Document(pdfPath))
             {
-                bool extracted = false;
-
-                // Iterate over all embedded files in the PDF using FileSpecification
-                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                // Locate the embedded ZUGFeRD XML file (name usually contains "ZUGFeRD" and ends with .xml)
+                FileSpecification zugFileSpec = null;
+                foreach (FileSpecification fs in doc.EmbeddedFiles)
                 {
-                    // ZUGFeRD XML files are typically named with .xml extension and contain "ZUGFeRD"
-                    if (!string.IsNullOrEmpty(fileSpec.Name) &&
-                        fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase) &&
-                        fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0)
+                    if (!string.IsNullOrEmpty(fs.Name) &&
+                        fs.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                        fs.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
                     {
-                        // Save the embedded XML to the specified path via its Contents stream
-                        using (FileStream outStream = File.Create(outputXmlPath))
-                        using (Stream content = fileSpec.Contents)
-                        {
-                            content.CopyTo(outStream);
-                        }
-
-                        Console.WriteLine($"ZUGFeRD XML extracted to '{outputXmlPath}'.");
-                        extracted = true;
-                        break; // stop after the first match
+                        zugFileSpec = fs;
+                        break;
                     }
                 }
 
-                if (!extracted)
+                if (zugFileSpec == null)
                 {
-                    Console.WriteLine("No ZUGFeRD XML embedded file found in the PDF.");
+                    Console.Error.WriteLine("No ZUGFeRD XML attachment found in the PDF.");
+                    return;
                 }
+
+                // Save the embedded XML to the specified file path using the Contents stream
+                using (FileStream outStream = File.Create(outputXmlPath))
+                using (Stream content = zugFileSpec.Contents)
+                {
+                    content.CopyTo(outStream);
+                }
+
+                Console.WriteLine($"ZUGFeRD XML extracted to '{outputXmlPath}'.");
             }
         }
         catch (Exception ex)

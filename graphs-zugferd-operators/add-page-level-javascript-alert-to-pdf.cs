@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // JavascriptAction resides here
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -19,17 +19,26 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
+            // Page numbers are 1‑based in Aspose.Pdf
+            int pageNumber = 1; // change as needed
 
-                // Create a JavaScript action that shows an alert when the page is opened
-                string script = $"app.alert('You have opened page {i}');";
-                page.Actions.OnOpen = new JavascriptAction(script); // note: "JavascriptAction" (lowercase 's')
+            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+            {
+                Console.Error.WriteLine("Invalid page number.");
+                return;
             }
 
-            // Save the modified PDF (PDF format, no special SaveOptions needed)
+            // JavaScript to display an alert when the user navigates to this page
+            string js = $"app.alert('You have reached page {pageNumber}.');";
+
+            // Create a JavaScript action (class name is case‑sensitive)
+            JavascriptAction jsAction = new JavascriptAction(js);
+
+            // Attach the script to the specified page using the page's Actions collection
+            // OnOpen runs when the page becomes the current page (i.e., when the user reaches it)
+            doc.Pages[pageNumber].Actions.OnOpen = jsAction;
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

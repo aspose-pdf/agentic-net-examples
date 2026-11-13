@@ -1,61 +1,71 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using System.Text.Json;
 
-class BatchPdfTextIndexer
+class PdfBatchIndexer
 {
-    // Path to the folder containing PDF files
-    private const string InputFolder = @"C:\PdfBatch";
+    // Path to the folder containing PDFs to process
+    private const string InputFolder = @"C:\PdfInput";
 
-    // Path to the output index file (JSON format)
-    private const string IndexFilePath = @"C:\PdfBatch\search_index.json";
+    // Path to the file where the searchable index will be stored (JSON format)
+    private const string IndexFilePath = @"C:\PdfIndex\index.json";
 
     static void Main()
     {
-        // Validate input folder
+        // Ensure the input folder exists
         if (!Directory.Exists(InputFolder))
         {
             Console.Error.WriteLine($"Input folder not found: {InputFolder}");
             return;
         }
 
-        // Dictionary to hold file name (or full path) -> extracted text
+        // Prepare a dictionary to hold file name -> extracted text
         var index = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Process each PDF file in the folder
-        foreach (string pdfPath in Directory.EnumerateFiles(InputFolder, "*.pdf", SearchOption.TopDirectoryOnly))
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.EnumerateFiles(InputFolder, "*.pdf"))
         {
             try
             {
-                // Load PDF inside a using block for deterministic disposal
+                // Load the PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Extract all text using TextAbsorber (rule: text-extraction-use-textabsorber-not-page-extracttext)
+                    // Use TextAbsorber to extract all text from the document
                     TextAbsorber absorber = new TextAbsorber();
-                    // Optional: preserve formatting (pure text mode)
-                    absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+
+                    // The absorber extracts text from all pages when applied to the Pages collection
                     doc.Pages.Accept(absorber);
 
-                    // Store extracted text in the index
-                    index[pdfPath] = absorber.Text ?? string.Empty;
-                    Console.WriteLine($"Extracted text from: {Path.GetFileName(pdfPath)}");
+                    // Store the extracted text in the index (key = file name without path)
+                    string fileName = Path.GetFileName(pdfPath);
+                    index[fileName] = absorber.Text ?? string.Empty;
                 }
+
+                Console.WriteLine($"Extracted text from: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Failed to process '{pdfPath}': {ex.Message}");
+                // Log any errors but continue processing other files
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
 
-        // Serialize the index to JSON for quick retrieval later
+        // Ensure the directory for the index file exists
+        string indexDir = Path.GetDirectoryName(IndexFilePath);
+        if (!Directory.Exists(indexDir))
+        {
+            Directory.CreateDirectory(indexDir);
+        }
+
+        // Serialize the index dictionary to JSON and write to disk
         try
         {
             string json = JsonSerializer.Serialize(index, new JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(IndexFilePath, json);
-            Console.WriteLine($"Search index written to: {IndexFilePath}");
+            Console.WriteLine($"Searchable index saved to: {IndexFilePath}");
         }
         catch (Exception ex)
         {

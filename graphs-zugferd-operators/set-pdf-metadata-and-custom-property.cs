@@ -8,7 +8,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string invoiceNumber = "INV-20231001";
 
         if (!File.Exists(inputPath))
         {
@@ -17,20 +16,20 @@ class Program
         }
 
         // Load the PDF, modify its metadata, and save it.
-        // Document is wrapped in a using block to ensure proper disposal.
+        // Document is wrapped in a using block for deterministic disposal (lifecycle rule).
         using (Document doc = new Document(inputPath))
         {
             // Set standard document properties.
-            doc.Info.Title = "Invoice Document";
+            doc.Info.Title = "Invoice 2023-07";
             doc.Info.Author = "Acme Corp";
 
-            // Add a custom property for the invoice number using the indexer.
-            doc.Info["InvoiceNumber"] = invoiceNumber;
+            // Add a custom property to store the invoice number using the DocumentInfo indexer.
+            doc.Info["InvoiceNumber"] = "INV-202307-001";
 
             // Save the updated PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated metadata to '{outputPath}'.");
     }
 }

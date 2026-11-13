@@ -1,72 +1,67 @@
 using System;
 using System.IO;
+using System.Drawing; // needed for System.Drawing.Color used in DefaultAppearance
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "DynamicHeaderFooter.pdf";
+        const string outputPath = "dynamic_header_footer.pdf";
 
         // Ensure the output directory exists
-        string outputDir = Path.GetDirectoryName(outputPath);
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
+        string outDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Number of pages to generate
-            const int pageCount = 3;
+            // Add three sample pages
+            for (int i = 0; i < 3; i++)
+                doc.Pages.Add();
 
-            for (int i = 1; i <= pageCount; i++)
-            {
-                // Add a new page
-                Page page = doc.Pages.Add();
+            // Define header and footer rectangles (left, bottom, width, height)
+            // Note: Aspose.Pdf.Rectangle constructor uses (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle headerRect = new Aspose.Pdf.Rectangle(0, 800, 595, 820);
+            Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(0, 20, 595, 40);
 
-                // ----- Header field -----
-                // Create a text box form field for the header
-                TextBoxField headerField = new TextBoxField(
-                    page,
-                    new Aspose.Pdf.Rectangle(
-                        50,
-                        page.PageInfo.Height - 50,
-                        page.PageInfo.Width - 50,
-                        page.PageInfo.Height - 30));
-                headerField.PartialName = $"header{i}";
-                headerField.ReadOnly = true; // make the field read‑only so users cannot edit it
-                // Add the field to the document's AcroForm (not directly to page annotations)
-                doc.Form.Add(headerField);
-
-                // ----- Footer field -----
-                TextBoxField footerField = new TextBoxField(
-                    page,
-                    new Aspose.Pdf.Rectangle(50, 30, page.PageInfo.Width - 50, 50));
-                footerField.PartialName = $"footer{i}";
-                footerField.ReadOnly = true;
-                doc.Form.Add(footerField);
-            }
-
-            // JavaScript that runs when the document is opened.
-            // It iterates over all pages and sets the header/footer field values
-            // based on the current page number.
+            // JavaScript that updates header and footer on each page open
             string js = @"
-var numPages = this.numPages;
-for (var i = 0; i < numPages; i++) {
-    var pageNum = i + 1;
-    var hdr = this.getField('header' + pageNum);
-    var ftr = this.getField('footer' + pageNum);
-    if (hdr) hdr.value = 'Header - Page ' + pageNum;
-    if (ftr) ftr.value = 'Footer - Page ' + pageNum;
-}
+var hdr = this.getField('header');
+var ftr = this.getField('footer');
+hdr.value = 'Header - Page ' + this.pageNum + ' of ' + this.numPages;
+ftr.value = 'Footer - Page ' + this.pageNum + ' of ' + this.numPages;
 ";
 
-            // Assign the JavaScript to the document's OpenAction
-            doc.OpenAction = new JavascriptAction(js);
+            // Create header/footer fields on every page
+            for (int p = 1; p <= doc.Pages.Count; p++)
+            {
+                // Header field – use the constructor that takes a Rectangle, then set the field name via PartialName
+                TextBoxField headerField = new TextBoxField(doc.Pages[p], headerRect);
+                headerField.PartialName = "header";
+                headerField.ReadOnly = true;
+                headerField.Border = new Border(headerField) { Width = 0 };
+                headerField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+                headerField.TextHorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
+                doc.Form.Add(headerField, p);
 
-            // Save the PDF. The Document.Save(string) overload always writes PDF.
+                // Footer field – same approach as header
+                TextBoxField footerField = new TextBoxField(doc.Pages[p], footerRect);
+                footerField.PartialName = "footer";
+                footerField.ReadOnly = true;
+                footerField.Border = new Border(footerField) { Width = 0 };
+                footerField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+                footerField.TextHorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
+                doc.Form.Add(footerField, p);
+
+                // Attach JavaScript to the Open action of the page
+                doc.Pages[p].Actions.OnOpen = new JavascriptAction(js);
+            }
+
+            // Save the PDF
             doc.Save(outputPath);
         }
 
