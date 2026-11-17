@@ -1,49 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // PKCS7, PKCS7Detached, SignatureField, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "certPassword";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        try
+        // Load the PDF from a file stream (deterministic disposal)
+        using (FileStream pdfStream = File.OpenRead(inputPdfPath))
         {
-            // Load the PDF from a file stream using the core Document API
-            using (FileStream inputStream = File.OpenRead(inputPath))
-            using (FileStream outputStream = File.Create(outputPath))
+            Document pdfDoc = new Document(pdfStream);
+
+            // Create an invisible signature field – a zero‑size rectangle makes the field non‑visible
+            var rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            SignatureField sigField = new SignatureField(pdfDoc, rect)
             {
-                Document pdfDocument = new Document(inputStream);
+                PartialName = "DetachedSignature"
+            };
 
-                // Create a signature field on the first page (position can be adjusted as needed)
-                var signatureRect = new Rectangle(100, 100, 200, 150);
-                SignatureField signatureField = new SignatureField(pdfDocument.Pages[1], signatureRect)
-                {
-                    PartialName = "Signature1"
-                };
-                pdfDocument.Form.Add(signatureField);
+            // Add the field to the first page (pages are 1‑based)
+            pdfDoc.Form.Add(sigField, 1);
 
-                // NOTE: Actual PKCS#7 detached signing requires the Aspose.Pdf.Signatures package.
-                // The example creates an empty signature field to keep the code compilable without that optional assembly.
+            // Prepare a PKCS#7 **detached** signature. Use PKCS7Detached instead of PKCS7 and do not set SignatureType.
+            PKCS7Detached pkcs7 = new PKCS7Detached(certificatePath, certificatePassword)
+            {
+                Reason = "Document signed",
+                Location = "My Company",
+                ContactInfo = "contact@mycompany.com"
+                // No SignatureType property – the class itself represents a detached signature.
+            };
 
-                // Save the PDF (the signature field is now part of the document)
-                pdfDocument.Save(outputStream);
-            }
+            // Sign the field (the field is invisible because its rectangle is zero‑size)
+            sigField.Sign(pkcs7);
 
-            Console.WriteLine($"PDF processed successfully: {outputPath}");
+            // Save the signed PDF
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
-        const string outputPath = "signed_privileges.pdf";
+        const string inputPath = "signed_input.pdf";
+        const string outputPath = "privileged_output.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
@@ -23,17 +22,17 @@ class Program
             // Open the signed PDF
             using (Document doc = new Document(inputPath))
             {
-                // Allow printing and annotation editing, but disable content extraction and form filling
-                Permissions allowed = Permissions.PrintDocument | Permissions.ModifyContent;
+                // Set permissions: allow printing, but do NOT allow content extraction or form filling
+                Permissions perms = Permissions.PrintDocument; // only printing is permitted
 
-                // Apply encryption with the specified permissions
-                doc.Encrypt(userPassword, ownerPassword, allowed, CryptoAlgorithm.AESx256);
+                // Encrypt with AES‑256 and apply the permissions
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the PDF with the new privileges
+                // Save the protected PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Privileges set and saved to '{outputPath}'.");
+            Console.WriteLine($"Privileges applied and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

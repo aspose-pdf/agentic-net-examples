@@ -8,100 +8,46 @@ class Program
 {
     static void Main()
     {
-        // Paths to the original PDF (or any data file) and the detached PKCS#7 signature
-        const string dataPath = "document.pdf";
+        const string pdfPath = "document.pdf";
         const string signaturePath = "signature.p7s";
 
-        if (!File.Exists(dataPath))
+        if (!File.Exists(pdfPath) || !File.Exists(signaturePath))
         {
-            Console.Error.WriteLine($"Data file not found: {dataPath}");
-            return;
-        }
-
-        if (!File.Exists(signaturePath))
-        {
-            Console.Error.WriteLine($"Signature file not found: {signaturePath}");
+            Console.Error.WriteLine("Required files not found.");
             return;
         }
 
         try
         {
-            // Read the original data and the detached signature
-            byte[] dataBytes;
-            byte[] signatureBytes;
+            // Read the PDF (signed data) and the detached PKCS#7 signature.
+            byte[] pdfBytes = File.ReadAllBytes(pdfPath);
+            byte[] sigBytes = File.ReadAllBytes(signaturePath);
 
-            using (FileStream dataStream = File.OpenRead(dataPath))
-            using (MemoryStream ms = new MemoryStream())
+            // Create a SignedCms object for detached content.
+            ContentInfo contentInfo = new ContentInfo(pdfBytes);
+            SignedCms signedCms = new SignedCms(contentInfo, true); // true => detached
+            signedCms.Decode(sigBytes);
+
+            // Validate the signature and the certificate chain.
+            // The 'true' argument forces chain verification.
+            signedCms.CheckSignature(true);
+            Console.WriteLine("Signature is valid and the certificate chain is trusted.");
+
+            // Optional: detailed chain inspection for each signer.
+            foreach (SignerInfo signer in signedCms.SignerInfos)
             {
-                dataStream.CopyTo(ms);
-                dataBytes = ms.ToArray();
-            }
-
-            using (FileStream sigStream = File.OpenRead(signaturePath))
-            using (MemoryStream ms = new MemoryStream())
-            {
-                sigStream.CopyTo(ms);
-                signatureBytes = ms.ToArray();
-            }
-
-            // Prepare a SignedCms object for a detached signature
-            ContentInfo contentInfo = new ContentInfo(dataBytes);
-            SignedCms signedCms = new SignedCms(contentInfo, detached: true);
-
-            // Decode the PKCS#7 signature
-            signedCms.Decode(signatureBytes);
-
-            // Verify the signature (throws if invalid)
-            signedCms.CheckSignature(verifySignatureOnly: true);
-            Console.WriteLine("Signature is cryptographically valid.");
-
-            // Retrieve the signing certificate (first signer)
-            if (signedCms.SignerInfos.Count == 0)
-            {
-                Console.Error.WriteLine("No signer information found in the signature.");
-                return;
-            }
-
-            SignerInfo signerInfo = signedCms.SignerInfos[0];
-            X509Certificate2 signerCert = signerInfo.Certificate;
-
-            if (signerCert == null)
-            {
-                Console.Error.WriteLine("Signer certificate could not be extracted.");
-                return;
-            }
-
-            Console.WriteLine($"Signer Subject: {signerCert.Subject}");
-            Console.WriteLine($"Signer Issuer : {signerCert.Issuer}");
-
-            // Build and validate the certificate chain
-            using (X509Chain chain = new X509Chain())
-            {
-                // Configure chain policy as needed (e.g., revocation checking)
-                chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
-                chain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot;
-                chain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
-                chain.ChainPolicy.VerificationTime = DateTime.UtcNow;
-
-                bool isChainValid = chain.Build(signerCert);
-
-                Console.WriteLine($"Certificate chain valid: {isChainValid}");
-
-                if (!isChainValid)
+                X509Certificate2 cert = signer.Certificate;
+                using (X509Chain chain = new X509Chain())
                 {
-                    Console.WriteLine("Chain errors:");
+                    chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;
+                    chain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot;
+                    chain.Build(cert);
+
+                    Console.WriteLine($"Signer: {cert.Subject}");
+                    Console.WriteLine($"Chain status count: {chain.ChainStatus.Length}");
                     foreach (X509ChainStatus status in chain.ChainStatus)
                     {
                         Console.WriteLine($" - {status.StatusInformation.Trim()}");
-                    }
-                }
-                else
-                {
-                    // Optionally list each element in the chain
-                    Console.WriteLine("Certificate chain:");
-                    foreach (X509ChainElement element in chain.ChainElements)
-                    {
-                        Console.WriteLine($" * {element.Certificate.Subject}");
                     }
                 }
             }
@@ -112,7 +58,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

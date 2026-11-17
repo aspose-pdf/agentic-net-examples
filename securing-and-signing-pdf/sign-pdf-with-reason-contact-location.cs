@@ -2,26 +2,20 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed.pdf";
         const string certificatePath = "certificate.pfx";
-        const string certificatePwd = "certPassword";
-        const string signatureImg = "signature.png";
-
-        const string reason = "Approved for release";
-        const string location = "New York, USA";
-        const string contactInfo = "john.doe@example.com";
+        const string certificatePassword = "certPassword";
 
         // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
         if (!File.Exists(certificatePath))
@@ -29,54 +23,45 @@ class Program
             Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
-        if (!File.Exists(signatureImg))
+
+        try
         {
-            Console.Error.WriteLine($"Signature image not found: {signatureImg}");
-            return;
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Define the rectangle where the visible signature will be placed
+                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
+
+                // Create a signature field on the first page
+                Page page = doc.Pages[1];
+                SignatureField sigField = new SignatureField(page, sigRect)
+                {
+                    PartialName = "Signature1"
+                };
+
+                // Add the signature field to the document's form collection
+                doc.Form.Add(sigField, page.Number);
+
+                // Prepare PKCS7 signature object with reason, contact info and location
+                PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+                {
+                    Reason = "Document approved",
+                    ContactInfo = "john.doe@example.com",
+                    Location = "New York, USA"
+                };
+
+                // Sign the field
+                sigField.Sign(pkcs7);
+
+                // Save the signed PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
         }
-
-        // Load the PDF document
-        Document doc = new Document(inputPdf);
-
-        // Define the rectangle where the signature will be placed (first page)
-        // Use the PDF‑specific Rectangle type (Aspose.Pdf.Rectangle) – not the drawing one.
-        Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
-
-        // Create a signature field on the first page
-        SignatureField sigField = new SignatureField(doc.Pages[1], sigRect)
+        catch (Exception ex)
         {
-            Name = "Signature1"
-        };
-        doc.Form.Add(sigField);
-
-        // Prepare PKCS#7 signature and assign reason, location, contact info
-        PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePwd)
-        {
-            Reason = reason,
-            Location = location,
-            ContactInfo = contactInfo
-        };
-
-        // Sign the field
-        sigField.Sign(pkcs7);
-
-        // Add visual appearance (signature image) over the signature field
-        ImageStamp imgStamp = new ImageStamp(signatureImg)
-        {
-            HorizontalAlignment = HorizontalAlignment.Left,
-            VerticalAlignment = VerticalAlignment.Bottom,
-            XIndent = sigRect.LLX,
-            YIndent = sigRect.LLY,
-            Width = sigRect.URX - sigRect.LLX,
-            Height = sigRect.URY - sigRect.LLY,
-            Background = false // draw in foreground
-        };
-        // Place the stamp on the same page that contains the signature field (page 1)
-        doc.Pages[1].AddStamp(imgStamp);
-
-        // Save the signed PDF to a new file
-        doc.Save(outputPdf);
-
-        Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

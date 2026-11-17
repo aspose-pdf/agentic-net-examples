@@ -6,15 +6,11 @@ class Program
 {
     static void Main()
     {
-        // Paths for input and output PDFs
         const string inputPath = "input.pdf";
-        const string encryptedPath = "encrypted_aes256.pdf";
+        const string encryptedPath = "encrypted.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
-        // Passwords for user and owner
-        const string userPassword = "UserPass123";
-        const string ownerPassword = "OwnerPass456";
-
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -23,20 +19,20 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF, apply AES‑256 encryption, and save
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions (example: allow printing and content extraction)
+                // Set desired permissions (example: allow printing and content extraction)
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Encrypt using AES‑256 algorithm
+                // Encrypt with AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
+                // Save the encrypted document
                 doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"PDF encrypted successfully and saved to '{encryptedPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
         catch (InvalidPasswordException ex)
         {
@@ -44,7 +40,7 @@ class Program
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

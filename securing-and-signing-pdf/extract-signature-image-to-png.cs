@@ -1,68 +1,75 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Devices;          // for PngDevice
+using Aspose.Pdf.Forms;            // for SignatureField, AppearanceDictionary, XForm
+using Aspose.Pdf.Operators;        // for Do operator
 
-class Program
+class ExtractSignatureImage
 {
     static void Main()
     {
-        const string inputPdf = "signed_document.pdf";
-        const string outputPng = "extracted_signature.png";
+        const string inputPdfPath = "signed_document.pdf";
+        const string outputPngPath = "signature.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Locate the first signature field in the form collection
+            SignatureField sigField = null;
+            foreach (var field in pdfDoc.Form.Fields)
             {
-                // Ensure the document contains at least one signature field
-                if (doc?.Form?.Fields == null)
+                if (field is SignatureField s)
                 {
-                    Console.Error.WriteLine("No form fields found in the PDF.");
-                    return;
+                    sigField = s;
+                    break;
                 }
+            }
 
-                // Retrieve the first signature field (signature fields are stored in the generic Fields collection)
-                SignatureField sigField = doc.Form.Fields
-                                            .OfType<SignatureField>()
-                                            .FirstOrDefault();
+            if (sigField == null)
+            {
+                Console.Error.WriteLine("No signature field found in the document.");
+                return;
+            }
 
-                if (sigField == null)
+            // Get the normal appearance XForm from the field's appearance dictionary
+            AppearanceDictionary appearances = sigField.Appearance;
+            if (!appearances.TryGetValue("N", out XForm normalForm) || normalForm == null)
+            {
+                Console.Error.WriteLine("Signature field does not contain a normal appearance.");
+                return;
+            }
+
+            // Create a temporary one‑page PDF that contains only the appearance XForm
+            using (Document tempDoc = new Document())
+            {
+                Page tempPage = tempDoc.Pages.Add();
+
+                // The Forms collection accepts a single XForm argument. Set the name on the XForm first.
+                const string formName = "SigForm";
+                normalForm.Name = formName;
+                tempPage.Resources.Forms.Add(normalForm);
+
+                // Draw the XForm with a Do operator referencing the name we set above.
+                tempPage.Contents.Add(new Do(formName));
+
+                // Render the temporary page to PNG using PngDevice
+                Resolution resolution = new Resolution(300);
+                PngDevice pngDevice = new PngDevice(resolution);
+                using (FileStream fs = new FileStream(outputPngPath, FileMode.Create, FileAccess.Write))
                 {
-                    Console.Error.WriteLine("No signature fields found in the PDF.");
-                    return;
+                    pngDevice.Process(tempDoc.Pages[1], fs);
                 }
-
-                // Extract the appearance image as a stream. The stream already contains the image data (usually PNG).
-                using (Stream imgStream = sigField.ExtractImage())
-                {
-                    if (imgStream == null)
-                    {
-                        Console.Error.WriteLine("Signature appearance does not contain an image.");
-                        return;
-                    }
-
-                    // Write the stream to the output file
-                    using (FileStream fs = new FileStream(outputPng, FileMode.Create, FileAccess.Write))
-                    {
-                        imgStream.CopyTo(fs);
-                    }
-                }
-
-                Console.WriteLine($"Signature image extracted to '{outputPng}'.");
             }
         }
-        // GDI+ related exceptions are no longer relevant because we avoid System.Drawing.
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Signature image extracted to: {outputPngPath}");
     }
 }

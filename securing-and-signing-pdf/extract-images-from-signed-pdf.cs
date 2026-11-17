@@ -1,58 +1,52 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 
-class Program
+class ExtractImages
 {
     static void Main()
     {
-        const string inputPdfPath = "signed_input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string inputPdf = "signed_input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF inside a using block (document-disposal-with-using rule)
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                Page page = doc.Pages[pageNum];
+
+                // Iterate over all images on the page
+                int imgIndex = 1;
+                foreach (XImage img in page.Resources.Images)
                 {
-                    Page page = pdfDoc.Pages[pageNum];
-                    int imageIndex = 1;
+                    // Build a file name: Page{page}_Img{index}.png
+                    string fileName = $"Page{pageNum}_Img{imgIndex}.png";
+                    string outPath = Path.Combine(outputDir, fileName);
 
-                    // XImageCollection is not a dictionary; iterate directly (ximage-collection-foreach-only-no-keys rule)
-                    foreach (XImage img in page.Resources.Images)
+                    // Save the image to a file stream. XImage.Save expects a Stream, not a file path.
+                    using (FileStream fs = File.Create(outPath))
                     {
-                        // Build a unique file name per page and image
-                        string fileName = $"page_{pageNum}_img_{imageIndex}.png";
-                        string outputPath = Path.Combine(outputFolder, fileName);
-
-                        // Save the image using a FileStream (use-stream-with-ximage-save rule)
-                        using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                        {
-                            img.Save(fs);
-                        }
-
-                        Console.WriteLine($"Saved image: {outputPath}");
-                        imageIndex++;
+                        img.Save(fs, ImageFormat.Png);
                     }
+
+                    Console.WriteLine($"Saved image to {outPath}");
+                    imgIndex++;
                 }
             }
+        }
 
-            Console.WriteLine("Image extraction completed.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
-        }
+        Console.WriteLine("Image extraction completed.");
     }
 }

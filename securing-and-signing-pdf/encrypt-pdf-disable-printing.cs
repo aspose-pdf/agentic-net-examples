@@ -21,13 +21,13 @@ class Program
             // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions – omit PrintDocument to disable printing
+                // Define permissions: exclude any printing permission to disable printing
                 Permissions perms = Permissions.ExtractContent; // allow content extraction, no printing
 
                 // Owner password can be empty or set to a strong value
                 string ownerPassword = "";
 
-                // Encrypt using AES‑256 algorithm
+                // Encrypt using AES-256 algorithm (recommended)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

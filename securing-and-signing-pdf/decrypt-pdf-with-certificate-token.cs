@@ -8,55 +8,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "encrypted.pdf";
-        const string outputPath = "decrypted.pdf";
-        const string certThumbprint = "YOUR_CERT_THUMBPRINT"; // replace with actual thumbprint
+        const string encryptedPdfPath = "encrypted_cert.pdf";
+        const string decryptedPdfPath = "decrypted.pdf";
+        const string certThumbprint   = "YOUR_CERT_THUMBPRINT"; // replace with actual thumbprint
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
-        // Load the certificate (with private key) from the hardware token / smart card
-        X509Certificate2 cert = GetCertificateFromStore(certThumbprint);
+        // Locate the certificate stored on the hardware token (e.g., in the CurrentUser "My" store)
+        X509Certificate2 cert = FindCertificateByThumbprint(certThumbprint);
         if (cert == null)
         {
-            Console.Error.WriteLine("Certificate not found or does not contain a private key.");
+            Console.Error.WriteLine("Certificate not found on the token.");
             return;
         }
 
-        try
+        // Create encryption options that use the certificate (Aspose.Pdf.Security.CertificateEncryptionOptions)
+        var certOptions = new CertificateEncryptionOptions(cert, StoreName.My, StoreLocation.CurrentUser);
+
+        // Open the encrypted PDF using the certificate and save it unencrypted
+        using (FileStream fs = new FileStream(encryptedPdfPath, FileMode.Open, FileAccess.Read))
+        using (Document doc = new Document(fs, certOptions))
         {
-            // Prepare options that tell Aspose.Pdf how to use the certificate for decryption
-            var certOptions = new CertificateEncryptionOptions(cert, StoreName.My, StoreLocation.CurrentUser);
-
-            // Open the encrypted PDF using a stream and the certificate options
-            using (FileStream fs = new FileStream(inputPath, FileMode.Open, FileAccess.Read))
-            using (Document doc = new Document(fs, certOptions))
-            {
-                // Remove encryption
-                doc.Decrypt();
-
-                // Save the decrypted PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Decrypted PDF saved to '{outputPath}'.");
+            // The document is already opened with the private key, just save it without encryption
+            doc.Save(decryptedPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Decrypted PDF saved to '{decryptedPdfPath}'.");
     }
 
-    // Retrieves a certificate with a private key from the current user's personal store
-    static X509Certificate2 GetCertificateFromStore(string thumbprint)
+    // Helper: locate a certificate in the CurrentUser "My" store by thumbprint
+    private static X509Certificate2 FindCertificateByThumbprint(string thumbprint)
     {
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
             store.Open(OpenFlags.ReadOnly);
-            foreach (X509Certificate2 cert in store.Certificates)
+            foreach (var cert in store.Certificates)
             {
                 if (string.Equals(cert.Thumbprint, thumbprint, StringComparison.OrdinalIgnoreCase) && cert.HasPrivateKey)
                 {

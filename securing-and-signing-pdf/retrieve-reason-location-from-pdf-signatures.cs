@@ -8,36 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string inputPath = "signed_document.pdf";
 
-        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve all form fields and filter for signature fields
-            var signatureFields = doc?.Form?.Fields?.OfType<SignatureField>();
+            // Retrieve all signature fields via the generic Fields collection
+            var signatureFields = doc.Form?.Fields?.OfType<SignatureField>();
+
             if (signatureFields == null || !signatureFields.Any())
             {
-                Console.WriteLine("No digital signatures found in the PDF.");
+                Console.WriteLine("No digital signatures found in the document.");
                 return;
             }
 
-            int sigIndex = 1;
+            // Iterate over each signature field and output its Reason and Location
             foreach (SignatureField sigField in signatureFields)
             {
-                // The PKCS7 object attached to the signature field holds Reason and Location
-                var pkcs7 = sigField.Signature;
-                string reason   = pkcs7?.Reason   ?? "(none)";
-                string location = pkcs7?.Location ?? "(none)";
+                Console.WriteLine($"Signature Field: {sigField.PartialName}");
 
-                Console.WriteLine($"Signature {sigIndex}: Reason = \"{reason}\", Location = \"{location}\"");
-                sigIndex++;
+                // The Signature property holds the signed data after the field is signed.
+                var signature = sigField.Signature;
+                if (signature != null)
+                {
+                    // Reason, Location and ContactInfo are stored on the underlying PKCS7 object.
+                    // They are exposed through the Signature object's properties.
+                    Console.WriteLine($"  Reason  : {signature.Reason ?? "(none)"}");
+                    Console.WriteLine($"  Location: {signature.Location ?? "(none)"}");
+                }
+                else
+                {
+                    Console.WriteLine("  (field not signed)");
+                }
+
+                Console.WriteLine();
             }
         }
     }

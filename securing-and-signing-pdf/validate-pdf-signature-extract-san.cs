@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
@@ -10,114 +9,67 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string pdfPath = "signed.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document.
+        Document doc = new Document(pdfPath);
+
+        // Find the first signature field in the document.
+        SignatureField sigField = null;
+        foreach (Field field in doc.Form.Fields)
         {
-            // Ensure the document contains a form with fields
-            if (doc.Form == null || doc.Form.Fields == null)
+            if (field is SignatureField sf)
             {
-                Console.WriteLine("No form fields found in the document.");
-                return;
-            }
-
-            bool signatureFound = false;
-
-            // Iterate over all form fields to locate signature fields
-            foreach (Field field in doc.Form.Fields)
-            {
-                if (field is SignatureField sigField)
-                {
-                    signatureFound = true;
-
-                    // Validate the digital signature (method name may vary by version)
-                    bool isValid = false;
-                    try
-                    {
-                        // Prefer ValidateSignature if available, otherwise fall back to VerifySignature via reflection
-                        var validateMethod = sigField.GetType().GetMethod("ValidateSignature");
-                        if (validateMethod != null)
-                        {
-                            isValid = (bool)validateMethod.Invoke(sigField, null);
-                        }
-                        else
-                        {
-                            var verifyMethod = sigField.GetType().GetMethod("VerifySignature");
-                            if (verifyMethod != null)
-                            {
-                                isValid = (bool)verifyMethod.Invoke(sigField, null);
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Signature validation failed with exception: {ex.Message}");
-                    }
-                    Console.WriteLine($"Signature field '{sigField.PartialName}' validation result: {isValid}");
-
-                    // Retrieve the signing certificate
-                    X509Certificate2 cert = null;
-                    try
-                    {
-                        // ExtractCertificateObject is the supported way to obtain the certificate
-                        cert = sigField.ExtractCertificateObject();
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Failed to extract certificate: {ex.Message}");
-                    }
-
-                    if (cert == null)
-                    {
-                        Console.WriteLine("No certificate associated with the signature.");
-                        continue;
-                    }
-
-                    // Extract Subject Alternative Name (SAN) entries
-                    List<string> sanEntries = new List<string>();
-                    foreach (X509Extension ext in cert.Extensions)
-                    {
-                        // OID for Subject Alternative Name is 2.5.29.17
-                        if (ext.Oid?.Value == "2.5.29.17")
-                        {
-                            // Decode the extension data to a readable string
-                            AsnEncodedData asnData = new AsnEncodedData(ext.Oid, ext.RawData);
-                            string formatted = asnData.Format(true);
-                            // The formatted string may contain multiple entries separated by line breaks
-                            foreach (string line in formatted.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
-                            {
-                                sanEntries.Add(line.Trim());
-                            }
-                        }
-                    }
-
-                    // Output SAN entries
-                    if (sanEntries.Count > 0)
-                    {
-                        Console.WriteLine("Subject Alternative Name entries:");
-                        foreach (string san in sanEntries)
-                        {
-                            Console.WriteLine($"  {san}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("No Subject Alternative Name entries found in the certificate.");
-                    }
-                }
-            }
-
-            if (!signatureFound)
-            {
-                Console.WriteLine("No signature fields were found in the document.");
+                sigField = sf;
+                break;
             }
         }
+
+        if (sigField == null)
+        {
+            Console.WriteLine("No signature field found in the PDF.");
+            return;
+        }
+
+        // Verify the signature.
+        bool isSignatureValid = sigField.Signature.Verify();
+        Console.WriteLine($"Signature valid: {isSignatureValid}");
+
+        if (!isSignatureValid)
+        {
+            Console.WriteLine("Signature verification failed.");
+            return;
+        }
+
+        // Extract the signing certificate using the correct Aspose.Pdf API.
+        X509Certificate2 signerCert = sigField.ExtractCertificateObject();
+        if (signerCert == null)
+        {
+            Console.WriteLine("Signer certificate not available.");
+            return;
+        }
+
+        Console.WriteLine($"Signer: {signerCert.Subject}");
+
+        // Subject Alternative Name (SAN) extension OID.
+        const string sanOid = "2.5.29.17";
+
+        X509Extension sanExtension = signerCert.Extensions[sanOid];
+        if (sanExtension == null)
+        {
+            Console.WriteLine("Subject Alternative Name extension not present.");
+            return;
+        }
+
+        // Decode the SAN extension. The raw data is ASN.1 encoded; we output the formatted string.
+        AsnEncodedData asnData = new AsnEncodedData(sanExtension.Oid, sanExtension.RawData);
+        Console.WriteLine("Subject Alternative Name (raw ASN.1):");
+        Console.WriteLine(asnData.Format(true));
     }
 }

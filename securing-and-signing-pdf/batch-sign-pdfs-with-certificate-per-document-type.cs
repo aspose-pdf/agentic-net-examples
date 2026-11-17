@@ -1,129 +1,93 @@
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
-class BatchSigner
+class BatchPdfSigner
 {
+    // Placeholder for certificate retrieval based on document type metadata.
+    // In a real scenario this would query a database.
+    private static (string certPath, string certPassword) GetCertificateInfo(string documentType)
+    {
+        // Example mapping – replace with actual DB lookup.
+        if (documentType == "Invoice")
+            return (@"C:\Certificates\invoice_cert.pfx", "invoicePwd");
+        if (documentType == "Report")
+            return (@"C:\Certificates\report_cert.pfx", "reportPwd");
+        // Default certificate.
+        return (@"C:\Certificates\default_cert.pfx", "defaultPwd");
+    }
+
+    // Adds a visible signature field to the first page and signs the document.
+    private static void SignPdf(string inputPdfPath, string outputPdfPath)
+    {
+        // Open the PDF document.
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath))
+        {
+            // Retrieve a document type identifier from metadata (e.g., Title).
+            string docType = doc.Info.Title ?? "Default";
+
+            // Obtain the certificate path and password for this document type.
+            (string certPath, string certPassword) = GetCertificateInfo(docType);
+
+            // Ensure the document has at least one page.
+            if (doc.Pages.Count == 0)
+                throw new InvalidOperationException("PDF contains no pages.");
+
+            // Create a signature field on the first page.
+            // Position rectangle: lower-left (100,100), upper-right (200,150).
+            Aspose.Pdf.Forms.SignatureField signatureField = new Aspose.Pdf.Forms.SignatureField(
+                doc.Pages[1],
+                new Aspose.Pdf.Rectangle(100, 100, 200, 150));
+
+            // Add the signature field to the page's annotations collection.
+            doc.Pages[1].Annotations.Add(signatureField);
+
+            // Sign the field using the PKCS#7 certificate.
+            Aspose.Pdf.Forms.PKCS7 pkcs7 = new Aspose.Pdf.Forms.PKCS7(certPath, certPassword);
+            signatureField.Sign(pkcs7);
+
+            // Save the signed PDF.
+            doc.Save(outputPdfPath);
+        }
+    }
+
     static void Main()
     {
-        // Folder where signed PDFs will be written
-        string outputFolder = "SignedPdfs";
-        Directory.CreateDirectory(outputFolder);
+        // Folder containing PDFs to be signed.
+        string sourceFolder = @"C:\PdfToSign";
+        // Folder where signed PDFs will be saved.
+        string destinationFolder = @"C:\SignedPdfs";
 
-        // Get the list of PDF files that need to be signed (sample in‑memory data)
-        List<string> pdfFiles = GetPdfFilePaths();
+        if (!Directory.Exists(sourceFolder))
+        {
+            Console.Error.WriteLine($"Source folder does not exist: {sourceFolder}");
+            return;
+        }
+
+        Directory.CreateDirectory(destinationFolder);
+
+        // Collect all PDF files in the source folder.
+        List<string> pdfFiles = new List<string>(Directory.GetFiles(sourceFolder, "*.pdf"));
 
         foreach (string pdfPath in pdfFiles)
         {
-            if (!File.Exists(pdfPath))
-            {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
-
-            // Read the document type metadata from the PDF (custom key "DocType")
-            string docType;
-            using (Document doc = new Document(pdfPath))
-            {
-                docType = doc.Info["DocType"] ?? string.Empty;
-            }
-
-            // Retrieve the appropriate certificate for this document type (sample stub)
-            X509Certificate2 cert = GetCertificateForDocType(docType);
-            if (cert == null)
-            {
-                Console.Error.WriteLine($"No certificate found for document type '{docType}'. Skipping {pdfPath}.");
-                continue;
-            }
-
-            // Build the output file name
-            string signedPath = Path.Combine(
-                outputFolder,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_signed.pdf");
-
-            // Sign the PDF using core Aspose.Pdf APIs (SignatureField + PKCS7)
-            Document signedDoc = new Document(pdfPath);
-
-            // Create a signature field on the first page
-            var signatureRect = new Aspose.Pdf.Rectangle(100, 100, 200, 150);
-            var signatureField = new SignatureField(signedDoc.Pages[1], signatureRect)
-            {
-                PartialName = "Signature"
-            };
-            signedDoc.Form.Add(signatureField, 1);
-
-            // Prepare PKCS7 object from the X509Certificate2 instance
-            // Aspose.Pdf.Forms.PKCS7 in this version expects a file path, so we write the cert to a temporary PFX file.
-            string tempPfxPath = Path.GetTempFileName();
             try
             {
-                byte[] certBytes = cert.Export(X509ContentType.Pfx);
-                File.WriteAllBytes(tempPfxPath, certBytes);
+                string fileName = Path.GetFileName(pdfPath);
+                string signedPath = Path.Combine(destinationFolder, fileName);
 
-                var pkcs7 = new PKCS7(tempPfxPath, string.Empty)
-                {
-                    Reason = $"Signed for document type {docType}",
-                    Location = "Head Office",
-                    ContactInfo = "Support"
-                };
-
-                // Optional custom visual appearance
-                pkcs7.CustomAppearance = new SignatureCustomAppearance
-                {
-                    ShowContactInfo = true,
-                    ShowLocation = true,
-                    ContactInfoLabel = "Contact:",
-                    LocationLabel = "Location:"
-                };
-
-                // Attach the PKCS7 signature to the field using the Sign method
-                signatureField.Sign(pkcs7);
+                SignPdf(pdfPath, signedPath);
+                Console.WriteLine($"Signed: {fileName}");
             }
-            finally
+            catch (Exception ex)
             {
-                // Clean up the temporary file
-                if (File.Exists(tempPfxPath))
-                {
-                    try { File.Delete(tempPfxPath); } catch { /* ignore cleanup errors */ }
-                }
+                Console.Error.WriteLine($"Failed to sign '{pdfPath}': {ex.Message}");
             }
-
-            // Save the signed PDF
-            signedDoc.Save(signedPath);
-            Console.WriteLine($"Signed PDF saved to '{signedPath}'.");
         }
-    }
 
-    // Retrieves a sample list of PDF file paths (in‑memory placeholder)
-    static List<string> GetPdfFilePaths()
-    {
-        var list = new List<string>();
-        // In a real scenario this would come from a database. Here we use a stub.
-        // Add sample paths (adjust as needed for testing).
-        list.Add("sample1.pdf");
-        list.Add("sample2.pdf");
-        return list;
-    }
-
-    // Retrieves a stub X509Certificate2 for a given document type.
-    // In a real implementation this would query a database or certificate store.
-    static X509Certificate2 GetCertificateForDocType(string docType)
-    {
-        // For demonstration we return a newly generated self‑signed certificate if needed.
-        // Here we simply return an empty certificate object to keep the example compile‑ready.
-        try
-        {
-            // If you have a PFX file you could load it like:
-            // return new X509Certificate2("path_to_cert.pfx", "password");
-            return new X509Certificate2();
-        }
-        catch
-        {
-            return null;
-        }
+        Console.WriteLine("Batch signing completed.");
     }
 }

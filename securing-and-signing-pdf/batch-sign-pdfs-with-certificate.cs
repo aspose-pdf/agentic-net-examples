@@ -2,78 +2,81 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Drawing; // for Color, Border, etc.
+using IOPath = System.IO.Path; // alias to disambiguate System.IO.Path from Aspose.Pdf.Drawing.Path
 
-class Program
+class BatchPdfSigner
 {
     static void Main()
     {
-        // Directory containing PDFs to be signed
-        const string inputDirectory = "pdfs";
+        // Input directory containing PDFs to be signed
+        const string inputDir = @"C:\PdfInput";
+        // Output directory where signed PDFs will be saved
+        const string outputDir = @"C:\PdfSigned";
 
-        // Path to the PFX certificate and its password
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
+        // Path to the certificate (PFX) and its password
+        const string certPath = @"C:\certificates\mycert.pfx";
+        const string certPassword = "certPassword";
 
-        // Timestamp Authority (TSA) URL
-        const string timestampUrl = "http://timestamp.authority/url";
+        // Timestamp Authority (TSA) URL (optional username/password if required)
+        const string tsaUrl = "https://tsa.example.com";
 
-        // Validate inputs
-        if (!Directory.Exists(inputDirectory))
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Iterate over all PDF files in the input directory
+        foreach (string pdfFilePath in Directory.GetFiles(inputDir, "*.pdf"))
         {
-            Console.Error.WriteLine($"Directory not found: {inputDirectory}");
-            return;
-        }
+            // Use the alias to avoid the ambiguous Path reference
+            string outputFilePath = IOPath.Combine(outputDir, IOPath.GetFileName(pdfFilePath));
 
-        if (!File.Exists(certificatePath))
-        {
-            Console.Error.WriteLine($"Certificate not found: {certificatePath}");
-            return;
-        }
-
-        // Iterate over all PDF files in the directory
-        foreach (string pdfFilePath in Directory.GetFiles(inputDirectory, "*.pdf"))
-        {
-            // Create output file name with a suffix
-            string signedFilePath = Path.Combine(
-                Path.GetDirectoryName(pdfFilePath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(pdfFilePath) + "_signed.pdf");
-
-            try
+            // Load the PDF into an expandable memory stream (required for core signing API)
+            byte[] pdfBytes = File.ReadAllBytes(pdfFilePath);
+            using (var expandableStream = new MemoryStream())
             {
-                // Load the PDF document
-                Document doc = new Document(pdfFilePath);
+                // Copy bytes into a stream that can grow (MemoryStream without a fixed buffer)
+                expandableStream.Write(pdfBytes, 0, pdfBytes.Length);
+                expandableStream.Position = 0;
 
-                // Define the rectangle where the visible signature will appear (optional)
-                // Adjust coordinates as needed: lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
-                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 150);
-
-                // Create a signature field and add it to the first page
-                SignatureField sigField = new SignatureField(doc, sigRect);
-                doc.Form.Add(sigField, 1); // page numbers are 1‑based
-
-                // Prepare the PKCS7 signature object (core API, no Facades)
-                PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+                // Load document from the expandable stream
+                using (var doc = new Document(expandableStream))
                 {
-                    Reason = "Document approved",
-                    ContactInfo = "contact@example.com",
-                    Location = "Company"
-                };
+                    // Define the rectangle where the visible signature will appear
+                    var sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
 
-                // Set timestamp settings (PKCS7.TimestampServerUrl does not exist)
-                pkcs7.TimestampSettings = new TimestampSettings(timestampUrl, string.Empty);
+                    // Create a signature field on the first page (Pages collection is 1‑based)
+                    var signatureField = new SignatureField(doc.Pages[1], sigRect)
+                    {
+                        PartialName = "Signature1"
+                    };
+                    doc.Form.Add(signatureField, 1);
 
-                // Sign the field
-                sigField.Sign(pkcs7);
+                    // Prepare PKCS#7 signature object with certificate and appearance settings
+                    var pkcs7 = new PKCS7(certPath, certPassword)
+                    {
+                        Reason = "Document approved",
+                        Location = "Company HQ",
+                        ContactInfo = "contact@example.com",
+                        CustomAppearance = new SignatureCustomAppearance
+                        {
+                            FontSize = 8,
+                            ShowContactInfo = true
+                        },
+                        TimestampSettings = new TimestampSettings(tsaUrl, string.Empty, DigestHashAlgorithm.Sha256)
+                    };
 
-                // Save the signed PDF
-                doc.Save(signedFilePath);
+                    // Sign the document – this writes the signed PDF back into the same stream
+                    signatureField.Sign(pkcs7);
+                }
 
-                Console.WriteLine($"Signed: {signedFilePath}");
+                // After signing, the stream now contains the signed PDF bytes
+                expandableStream.Position = 0;
+                File.WriteAllBytes(outputFilePath, expandableStream.ToArray());
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to sign '{pdfFilePath}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Signed PDF saved to: {outputFilePath}");
         }
+
+        Console.WriteLine("Batch signing completed.");
     }
 }

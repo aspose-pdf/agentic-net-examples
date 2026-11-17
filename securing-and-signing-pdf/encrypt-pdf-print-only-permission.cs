@@ -13,26 +13,26 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the source PDF inside a using block for deterministic disposal
+            // Load the source PDF and encrypt it with printing permission only
             using (Document doc = new Document(inputPath))
             {
-                // Set permissions: allow printing only
+                // Allow only printing (no other permissions)
                 Permissions perms = Permissions.PrintDocument;
 
-                // Encrypt with AES-256 algorithm
+                // Encrypt using AES-256 (preferred algorithm)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
                 doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"PDF encrypted and saved to '{encryptedPath}'.");
+            Console.WriteLine($"PDF encrypted successfully. Output: {encryptedPath}");
         }
         catch (Exception ex)
         {

@@ -7,14 +7,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed_sha384.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_sha384.pdf";
         const string certPath = "certificate.pfx";
-        const string certPassword = "password";
+        const string certPass = "certPassword";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
         if (!File.Exists(certPath))
@@ -23,32 +23,36 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an invisible signature field on the first page
-            var rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-            var sigField = new SignatureField(doc.Pages[1], rect)
-            {
-                PartialName = "Signature1"
-            };
+            // Define the rectangle where the visible signature will appear
+            Rectangle rect = new Rectangle(100, 100, 300, 150);
+
+            // Create a signature field on the first page and add it to the form
+            SignatureField sigField = new SignatureField(doc.Pages[1], rect);
             doc.Form.Add(sigField);
 
-            // Prepare PKCS7 signature
-            var pkcs = new PKCS7(certPath, certPassword);
+            // Create PKCS7 credentials (concrete implementation of the abstract Signature class)
+            PKCS7 pkcs = new PKCS7(certPath, certPass);
+            // pkcs.Name property does not exist – it is omitted.
+            pkcs.Location = "New York, USA";
+            pkcs.Reason = "Document approval";
+            pkcs.ContactInfo = "john.doe@example.com";
 
-            // Set SHA‑384 as the digest algorithm via TimestampSettings
-            pkcs.TimestampSettings = new TimestampSettings(
-                "http://example.com",          // TSA server URL (dummy)
-                null,                         // no authentication
-                DigestHashAlgorithm.Sha384);  // digest algorithm
+            // Configure SHA‑384 as the digest algorithm via TimestampSettings
+            pkcs.TimestampSettings = new Aspose.Pdf.TimestampSettings(
+                string.Empty,               // No TSA server URL (optional)
+                null,                       // No basic‑auth credentials
+                Aspose.Pdf.DigestHashAlgorithm.Sha384);
 
-            // Sign the field
+            // Sign the field with the PKCS7 credentials
             sigField.Sign(pkcs);
 
             // Save the signed PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Document signed with SHA‑384 saved to '{outputPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}' using SHA‑384 digest.");
     }
 }

@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "restricted.pdf";
+        const string outputPath = "secured.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
@@ -20,18 +20,22 @@ class Program
 
         try
         {
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Allow printing but do NOT allow content extraction (copy‑paste).
-                Permissions perms = Permissions.PrintDocument;
+                // Define permissions: allow printing and content modification,
+                // but do NOT include ExtractContent (copy‑paste) permission.
+                Permissions perms = Permissions.PrintDocument | Permissions.ModifyContent;
 
-                // Apply AES‑256 encryption with the specified permissions.
+                // Apply encryption with AES‑256 algorithm.
+                // This creates a security handler that enforces the specified permissions.
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
+                // Save the encrypted PDF.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved with copy‑paste disabled: {outputPath}");
+            Console.WriteLine($"Secured PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

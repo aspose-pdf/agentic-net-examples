@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -8,84 +9,75 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "signed.pdf";
+        const string inputPdf = "signed_document.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            // Retrieve all signature fields via the generic Fields collection
+            var signatureFields = doc.Form?.Fields?.OfType<SignatureField>()?.ToList();
+
+            if (signatureFields == null || signatureFields.Count == 0)
             {
-                var form = doc.Form;
+                Console.WriteLine("No digital signatures found in the document.");
+                return;
+            }
 
-                if (form?.Fields == null)
-                {
-                    Console.WriteLine("No form fields found in the document.");
-                    return;
-                }
+            // Iterate over each signature field
+            foreach (SignatureField sigField in signatureFields)
+            {
+                // The core API does not expose a direct ValidateSignature method.
+                // A simple integrity check is to see whether a signature object exists.
+                bool isSigned = sigField.Signature != null;
 
-                // Iterate over all fields and process only signature fields
-                foreach (var field in form.Fields)
+                Console.WriteLine($"Signature Name: {sigField.PartialName}");
+                Console.WriteLine($"Signed (signature object present): {isSigned}");
+
+                // Attempt to extract the signing certificate, if any
+                X509Certificate2 cert = null;
+                try
                 {
-                    if (field is SignatureField sigField)
+                    using (Stream certStream = sigField.ExtractCertificate())
                     {
-                        // Verify the digital signature using the simple overload (no extra validation options)
-                        bool isValid = false;
-                        try
+                        if (certStream != null && certStream.Length > 0)
                         {
-                            if (sigField.Signature != null)
+                            // Load the certificate from the extracted stream
+                            using (var ms = new MemoryStream())
                             {
-                                isValid = sigField.Signature.Verify();
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Signature object not present for field '{sigField.PartialName}'.");
+                                certStream.CopyTo(ms);
+                                cert = new X509Certificate2(ms.ToArray());
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Verification error for field '{sigField.PartialName}': {ex.Message}");
-                        }
-
-                        // Retrieve the signing certificate (X509Certificate2) if present
-                        X509Certificate2 cert = null;
-                        try
-                        {
-                            cert = sigField.ExtractCertificateObject();
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.WriteLine($"Certificate extraction error for field '{sigField.PartialName}': {ex.Message}");
-                        }
-
-                        // Output validation result and certificate details
-                        Console.WriteLine($"Signature Field: {sigField.PartialName ?? "<unnamed>"}");
-                        Console.WriteLine($"  Valid: {isValid}");
-                        if (cert != null)
-                        {
-                            Console.WriteLine($"  Subject: {cert.Subject}");
-                            Console.WriteLine($"  Issuer : {cert.Issuer}");
-                            Console.WriteLine($"  Valid From: {cert.NotBefore}");
-                            Console.WriteLine($"  Valid To  : {cert.NotAfter}");
-                            Console.WriteLine($"  Thumbprint: {cert.Thumbprint}");
-                        }
-                        else
-                        {
-                            Console.WriteLine("  No signing certificate found.");
-                        }
-                        Console.WriteLine();
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error extracting certificate: {ex.Message}");
+                }
+
+                if (cert != null)
+                {
+                    Console.WriteLine("Certificate Details:");
+                    Console.WriteLine($"  Subject: {cert.Subject}");
+                    Console.WriteLine($"  Issuer: {cert.Issuer}");
+                    Console.WriteLine($"  Valid From: {cert.NotBefore}");
+                    Console.WriteLine($"  Valid To: {cert.NotAfter}");
+                    Console.WriteLine($"  Thumbprint: {cert.Thumbprint}");
+                    Console.WriteLine($"  Serial Number: {cert.SerialNumber}");
+                }
+                else
+                {
+                    Console.WriteLine("  No certificate information available.");
+                }
+
+                Console.WriteLine(new string('-', 40));
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

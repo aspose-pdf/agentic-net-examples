@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,53 +9,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "signed.pdf";
-        const string outputPath = "unsigned.pdf";
+        const string inputPath = "signed_input.pdf";
+        const string outputPath = "unsigned_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Ensure the document contains a form with fields
-                if (doc.Form != null && doc.Form.Count > 0)
+                var form = doc.Form;
+                // Use LINQ Count() because Fields is an IEnumerable, not a property with Count
+                if (form == null || form.Fields == null || form.Fields.Count() == 0)
                 {
-                    // Gather the names of all signature fields
-                    List<string> signatureFieldNames = new List<string>();
-                    foreach (Field field in doc.Form)
-                    {
-                        if (field is SignatureField)
-                        {
-                            signatureFieldNames.Add(field.FullName);
-                        }
-                    }
-
-                    // Attempt to delete each signature field
-                    foreach (string fieldName in signatureFieldNames)
-                    {
-                        try
-                        {
-                            doc.Form.Delete(fieldName);
-                            Console.WriteLine($"Removed signature field: {fieldName}");
-                        }
-                        catch (Exception ex)
-                        {
-                            Console.Error.WriteLine($"Failed to remove field '{fieldName}': {ex.Message}");
-                        }
-                    }
+                    Console.WriteLine("No form fields found; nothing to remove.");
                 }
                 else
                 {
-                    Console.WriteLine("No form fields found in the document.");
+                    var signatureFieldNames = new List<string>();
+                    foreach (var field in form.Fields)
+                    {
+                        if (field is SignatureField sigField)
+                        {
+                            // FullName may be null; fall back to Name
+                            string name = sigField.FullName ?? sigField.Name;
+                            signatureFieldNames.Add(name);
+                        }
+                    }
+
+                    foreach (var name in signatureFieldNames)
+                    {
+                        try
+                        {
+                            // Correct way to delete a field from the AcroForm
+                            form.Delete(name);
+                            Console.WriteLine($"Removed signature field: {name}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine($"Could not remove field '{name}': {ex.Message}");
+                        }
+                    }
                 }
 
-                // Save the modified PDF
                 doc.Save(outputPath);
                 Console.WriteLine($"Unsigned PDF saved to '{outputPath}'.");
             }
