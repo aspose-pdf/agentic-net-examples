@@ -1,13 +1,13 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 
-class Program
+class ReorderPortfolio
 {
     static void Main()
     {
-        const string inputPath = "portfolio.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "reordered_portfolio.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,43 +16,80 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Desired order of portfolio items (file names as they appear in the PDF)
+        string[] desiredOrder = new string[]
         {
-            // Verify that the document actually contains a portfolio (collection of embedded files)
-            if (doc.Collection == null || doc.Collection.Count == 0)
+            "Attachment2.pdf",
+            "Attachment1.pdf",
+            "Attachment3.pdf"
+        };
+
+        try
+        {
+            using (Document doc = new Document(inputPath))
             {
-                Console.WriteLine("No portfolio items found. Saving original document.");
-                doc.Save(outputPath);
-                return;
-            }
-
-            // Capture current portfolio items in a list
-            List<FileSpecification> currentItems = new List<FileSpecification>();
-            foreach (FileSpecification spec in doc.Collection)
-                currentItems.Add(spec);
-
-            // Define the desired order. Example: reverse the existing order.
-            currentItems.Reverse();
-
-            // Remove all existing items from the portfolio collection using Delete (Clear is not available)
-            for (int i = doc.Collection.Count; i >= 1; i--)
-            {
-                var spec = doc.Collection[i];
-                if (spec != null && !string.IsNullOrEmpty(spec.Name))
+                // Ensure the PDF actually contains a portfolio collection
+                if (doc.Collection == null)
                 {
-                    doc.Collection.Delete(spec.Name);
+                    Console.WriteLine("The PDF does not contain a portfolio collection.");
+                    return;
                 }
+
+                // Build a lookup of existing portfolio items (FileSpecification) by their name
+                var existing = new Dictionary<string, FileSpecification>(StringComparer.OrdinalIgnoreCase);
+                foreach (FileSpecification spec in doc.Collection)
+                {
+                    // Clone the specification so we can safely clear the original collection later
+                    var clone = new FileSpecification(spec.Name, spec.Description);
+                    clone.MIMEType = spec.MIMEType;
+                    clone.AFRelationship = spec.AFRelationship;
+
+                    if (spec.Contents != null)
+                    {
+                        var ms = new MemoryStream();
+                        spec.Contents.Position = 0;
+                        spec.Contents.CopyTo(ms);
+                        ms.Position = 0;
+                        clone.Contents = ms;
+                    }
+
+                    existing[spec.Name] = clone;
+                }
+
+                // Replace the current collection with a new empty one
+                doc.Collection = new Collection();
+
+                // Re‑add items following the desired sequence
+                foreach (string name in desiredOrder)
+                {
+                    if (existing.TryGetValue(name, out var spec))
+                    {
+                        doc.Collection.Add(spec);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Warning: portfolio item \"{name}\" not found in source PDF.");
+                    }
+                }
+
+                // Optionally keep any items that were not mentioned in desiredOrder
+                foreach (var kvp in existing)
+                {
+                    if (Array.IndexOf(desiredOrder, kvp.Key) < 0)
+                    {
+                        doc.Collection.Add(kvp.Value);
+                    }
+                }
+
+                // Save the reordered PDF portfolio
+                doc.Save(outputPath);
             }
 
-            // Re‑add items in the new sequence
-            foreach (FileSpecification spec in currentItems)
-                doc.Collection.Add(spec);
-
-            // Save the reordered PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Portfolio reordered and saved to \"{outputPath}\".");
         }
-
-        Console.WriteLine($"Portfolio reordered and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

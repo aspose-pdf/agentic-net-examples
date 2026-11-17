@@ -1,56 +1,59 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_attachments.pdf";
+        // Input PDF to which attachments will be added
+        const string inputPdfPath = "source.pdf";
+        // Output PDF with the added attachments
+        const string outputPdfPath = "source_with_attachments.pdf";
 
         // Collection of file paths to be attached
-        List<string> attachmentPaths = new List<string>
+        string[] attachmentFiles = new string[]
         {
             "doc1.txt",
-            "image1.jpg",
+            "image1.png",
             "report.pdf"
         };
 
         // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Verify each attachment file exists before processing
-        foreach (string path in attachmentPaths)
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            if (!File.Exists(path))
+            // Iterate over each file path and add it as an embedded file
+            foreach (string filePath in attachmentFiles)
             {
-                Console.Error.WriteLine($"Attachment file not found: {path}");
-                return;
+                if (!File.Exists(filePath))
+                {
+                    Console.WriteLine($"Attachment file not found, skipping: {filePath}");
+                    continue;
+                }
+
+                // Create a FileSpecification with the display name
+                var fileSpec = new FileSpecification(Path.GetFileName(filePath))
+                {
+                    Description = "Attached file",
+                    // Set the file contents via a memory stream (required constructor overload)
+                    Contents = new MemoryStream(File.ReadAllBytes(filePath))
+                };
+
+                // Add the file specification to the document's EmbeddedFiles collection
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
             }
+
+            // Save the modified PDF (still PDF format)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // Load the PDF, add attachments, and save – all within a using block for proper disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            foreach (string path in attachmentPaths)
-            {
-                // Create a FileSpecification for the file and add it to the EmbeddedFiles collection
-                var fileSpec = new FileSpecification(Path.GetFileName(path));
-                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(path));
-                fileSpec.Description = $"Embedded file: {Path.GetFileName(path)}";
-                doc.EmbeddedFiles.Add(fileSpec);
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
-        }
-
-        Console.WriteLine($"Attachments added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachments added and saved to '{outputPdfPath}'.");
     }
 }

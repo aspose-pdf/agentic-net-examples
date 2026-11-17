@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string encryptedPdfPath = "encrypted.pdf";
-        const string password = "userPassword";
+        const string password = "user123";
         const string outputFolder = "Attachments";
 
         if (!File.Exists(encryptedPdfPath))
@@ -24,38 +24,47 @@ class Program
             // Open the encrypted PDF supplying the user password
             using (Document doc = new Document(encryptedPdfPath, password))
             {
-                // Decrypt the document (no parameters required)
+                // Optional: remove encryption for further operations
                 doc.Decrypt();
 
-                // Check if there are any embedded files (attachments)
+                // Use the EmbeddedFiles collection – Attachments property does not exist
                 if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
                 {
-                    // Iterate through the EmbeddedFiles collection
                     foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                     {
-                        string safeFileName = Path.GetFileName(fileSpec.Name);
-                        string outputPath = Path.Combine(outputFolder, safeFileName);
+                        // Determine a safe file name for the extracted attachment
+                        string safeName = Path.GetFileName(fileSpec.Name);
+                        if (string.IsNullOrEmpty(safeName))
+                            safeName = Guid.NewGuid().ToString();
 
-                        // Write the attachment's content stream to disk
-                        using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                        string outputPath = Path.Combine(outputFolder, safeName);
+
+                        // Write the file specification's content stream to disk
+                        if (fileSpec.Contents != null)
                         {
                             if (fileSpec.Contents.CanSeek)
                                 fileSpec.Contents.Position = 0;
-                            fileSpec.Contents.CopyTo(outStream);
-                        }
 
-                        Console.WriteLine($"Saved attachment: {outputPath}");
+                            using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                            {
+                                fileSpec.Contents.CopyTo(outStream);
+                            }
+
+                            Console.WriteLine($"Extracted: {outputPath}");
+                        }
                     }
                 }
                 else
                 {
-                    Console.WriteLine("No attachments found in the PDF.");
+                    Console.WriteLine("No embedded files found in the PDF.");
                 }
             }
+
+            Console.WriteLine("Attachment extraction completed.");
         }
         catch (InvalidPasswordException)
         {
-            Console.Error.WriteLine("Incorrect password provided for the encrypted PDF.");
+            Console.Error.WriteLine("Incorrect password supplied for the encrypted PDF.");
         }
         catch (Exception ex)
         {

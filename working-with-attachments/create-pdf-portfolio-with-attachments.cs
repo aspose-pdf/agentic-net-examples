@@ -1,46 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the output portfolio PDF and a sample file to embed
-        const string outputPdfPath = "portfolio.pdf";
-        const string sampleFilePath = "sample.txt";
+        // Paths to files that will be included in the portfolio
+        const string file1 = "sample1.pdf";
+        const string file2 = "sample2.pdf";
+        const string outputPortfolio = "portfolio.pdf";
 
-        // Ensure the sample file exists (create a simple placeholder if missing)
-        if (!File.Exists(sampleFilePath))
+        // Verify source files exist
+        if (!File.Exists(file1) || !File.Exists(file2))
         {
-            File.WriteAllText(sampleFilePath, "This is a sample file embedded in the PDF Portfolio.");
+            Console.Error.WriteLine("One or more source files are missing.");
+            return;
         }
 
-        // Create a new PDF document using the Document constructor.
-        // Wrap the Document in a using block for deterministic disposal (lifecycle rule).
-        using (Document doc = new Document())
+        // Create a new (empty) PDF document that will become a portfolio
+        using (Document portfolioDoc = new Document())
         {
-            // Initialise the collection that represents a PDF Portfolio.
-            if (doc.Collection == null)
-                doc.Collection = new Collection();
+            // Initialise the collection that holds embedded files (portfolio entries)
+            if (portfolioDoc.Collection == null)
+                portfolioDoc.Collection = new Collection();
 
-            // Create a FileSpecification for the file we want to embed.
-            var fileSpec = new FileSpecification(sampleFilePath, Path.GetFileName(sampleFilePath))
+            // Helper to add a file to the portfolio
+            void AddFileToPortfolio(string path)
             {
-                // Load the file contents into a memory stream.
-                Contents = new MemoryStream(File.ReadAllBytes(sampleFilePath))
-            };
+                // Create a FileSpecification for the file. The second argument is a description –
+                // we use the file name for simplicity.
+                var fileSpec = new FileSpecification(path, Path.GetFileName(path))
+                {
+                    // Load the file contents into a memory stream; this is required for the
+                    // embedded file representation.
+                    Contents = new MemoryStream(File.ReadAllBytes(path))
+                };
+                portfolioDoc.Collection.Add(fileSpec);
+            }
 
-            // Add the file specification to the portfolio collection.
-            doc.Collection.Add(fileSpec);
+            AddFileToPortfolio(file1);
+            AddFileToPortfolio(file2);
 
-            // Optionally set a title for the portfolio (metadata).
-            doc.Info.Title = "Sample PDF Portfolio";
+            // Optional: set a title for the portfolio document
+            portfolioDoc.Info.Title = "PDF Portfolio";
 
-            // Save the portfolio PDF.
-            doc.Save(outputPdfPath);
+            // Save the portfolio as a PDF file
+            portfolioDoc.Save(outputPortfolio);
         }
 
-        Console.WriteLine($"PDF Portfolio created at '{outputPdfPath}'.");
+        Console.WriteLine($"PDF Portfolio created at '{outputPortfolio}'.");
     }
 }

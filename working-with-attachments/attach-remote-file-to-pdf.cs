@@ -1,31 +1,32 @@
 using System;
 using System.IO;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
-    static void Main()
+    static async Task Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_with_attachment.pdf";
-        const string fileUrl = "https://example.com/sample.docx"; // remote file URL
-        const string attachmentName = "sample.docx"; // name to show in the PDF
+        const string inputPath = "input.pdf";          // source PDF
+        const string outputPath = "output.pdf";        // result PDF
+        const string fileUrl = "https://example.com/file.txt"; // remote file to attach
 
-        if (!File.Exists(inputPdfPath))
+        // Verify source PDF exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        // Download the remote file into memory
+        // Download remote file into memory
         byte[] fileBytes;
-        using (HttpClient httpClient = new HttpClient())
+        using (HttpClient client = new HttpClient())
         {
             try
             {
-                fileBytes = httpClient.GetByteArrayAsync(fileUrl).Result;
+                fileBytes = await client.GetByteArrayAsync(fileUrl);
             }
             catch (Exception ex)
             {
@@ -34,42 +35,43 @@ class Program
             }
         }
 
-        // Open the PDF, add the attachment, and save
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open PDF and attach the downloaded file
+        using (Document doc = new Document(inputPath))
         {
-            // Choose the first page (or any other page) to host the annotation
-            Page page = pdfDoc.Pages[1];
-
-            // Create a rectangle where the attachment icon will appear
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 120, 520);
-
-            // Create the attachment from the in‑memory stream
-            using (MemoryStream ms = new MemoryStream(fileBytes))
+            // Ensure the PDF has at least one page
+            if (doc.Pages.Count == 0)
             {
-                // Note: In the current Aspose.Pdf version the FileSpecification constructor expects
-                // the stream as the first argument, followed by the name and description.
-                FileSpecification fileSpec = new FileSpecification(ms, attachmentName, attachmentName);
-                // Optional: set modification date metadata
-                fileSpec.Params.ModDate = DateTime.UtcNow;
-
-                // Add the file specification to the document's embedded files collection
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
-
-                // Create the file attachment annotation
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(page, rect, fileSpec)
-                {
-                    Title = "Attached Document",
-                    Contents = $"File: {attachmentName}"
-                };
-
-                // Add the annotation to the page
-                page.Annotations.Add(attachment);
+                Console.Error.WriteLine("PDF contains no pages.");
+                return;
             }
 
+            // Define annotation rectangle (position on the page)
+            // Rectangle(left, bottom, right, top)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 150, 750);
+
+            // Create a FileSpecification from the in‑memory bytes
+            string fileName = Path.GetFileName(fileUrl);
+            var fileSpec = new FileSpecification(fileName)
+            {
+                Description = "File downloaded from remote URL",
+                Contents = new MemoryStream(fileBytes)
+            };
+
+            // Create file attachment annotation on the first page, passing the FileSpecification
+            var attachment = new FileAttachmentAnnotation(doc.Pages[1], rect, fileSpec)
+            {
+                Icon = FileIcon.PushPin,          // visual icon
+                Title = "Attached File",
+                Contents = "File downloaded from remote URL"
+            };
+
+            // Add the annotation to the page
+            doc.Pages[1].Annotations.Add(attachment);
+
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with attachment: {outputPdfPath}");
+        Console.WriteLine($"Remote file attached and PDF saved to '{outputPath}'.");
     }
 }

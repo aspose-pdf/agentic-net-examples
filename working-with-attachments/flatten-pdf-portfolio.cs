@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "portfolio.pdf";
+        const string inputPath = "portfolio.pdf";
         const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
@@ -20,20 +20,31 @@ class Program
             // Load the PDF portfolio
             using (Document doc = new Document(inputPath))
             {
-                // Remove the collection (portfolio) if it exists
+                // Remove the interactive collection (portfolio) if it exists
                 if (doc.Collection != null)
                 {
                     doc.Collection = null;
                 }
 
-                // Flatten interactive elements (forms, annotations, etc.)
-                doc.Flatten();
+                // Remove any embedded files that were part of the portfolio
+                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                {
+                    // EmbeddedFileCollection uses 1‑based indexing; delete each file by name
+                    for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                    {
+                        var fileSpec = doc.EmbeddedFiles[i];
+                        if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                        {
+                            doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        }
+                    }
+                }
 
-                // Save as a regular PDF (no portfolio)
+                // Save as a regular PDF (no portfolio features)
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Portfolio flattened and saved to '{outputPath}'.");
+            Console.WriteLine($"Portfolio flattened to '{outputPath}'.");
         }
         catch (Exception ex)
         {

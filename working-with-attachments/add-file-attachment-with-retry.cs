@@ -5,19 +5,19 @@ using Aspose.Pdf;
 
 class Program
 {
-    // Configuration for retry logic
-    private const int MaxRetryAttempts = 5;          // maximum number of attempts
-    private const int RetryDelayMilliseconds = 2000; // wait time between attempts
+    // Maximum number of retry attempts when a network error occurs
+    private const int MaxRetryAttempts = 3;
+    // Base delay in milliseconds for exponential back‑off
+    private const int BaseDelayMs = 500;
 
     static void Main()
     {
-        const string networkPdfPath = @"\\fileserver\share\documents\report.pdf";
-        const string attachmentPath = @"C:\Temp\attachment.txt";
-        const string attachmentName = "Attachment.txt";
+        const string pdfPath = @"\\networkshare\documents\sample.pdf";
+        const string attachmentPath = @"C:\Files\attachment.txt";
 
-        if (!File.Exists(networkPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {networkPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
@@ -27,55 +27,88 @@ class Program
             return;
         }
 
-        int attempt = 0;
-        bool success = false;
+        bool success = AddAttachmentWithRetry(pdfPath, attachmentPath);
+        Console.WriteLine(success ? "Attachment added successfully." : "Failed to add attachment after retries.");
+    }
 
-        while (attempt < MaxRetryAttempts && !success)
+    /// <summary>
+    /// Adds an attachment to a PDF stored on a network share.
+    /// Retries the operation on transient I/O errors.
+    /// </summary>
+    /// <param name="pdfPath">Full path to the PDF file.</param>
+    /// <param name="attachmentPath">Full path to the file to attach.</param>
+    /// <returns>True if the attachment was added; otherwise false.</returns>
+    private static bool AddAttachmentWithRetry(string pdfPath, string attachmentPath)
+    {
+        for (int attempt = 0; attempt <= MaxRetryAttempts; attempt++)
         {
-            attempt++;
             try
             {
-                // Open the PDF from the network share inside a using block (rule: document-disposal-with-using)
-                using (Document pdfDoc = new Document(networkPdfPath))
+                // Open the PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Create a FileSpecification for the attachment
-                    var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath));
-                    // Load the file bytes into a MemoryStream and assign to Contents
-                    fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
-                    // Optionally set a description or MIME type
-                    fileSpec.Description = attachmentName;
+                    // Create a FileSpecification for the attachment.
+                    // The Name property (first argument) is the file name that will appear in the PDF.
+                    var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
+                    {
+                        // Load the file bytes into a MemoryStream and assign it to Contents.
+                        Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
+                    };
 
-                    // Add the file specification to the EmbeddedFiles collection
-                    pdfDoc.EmbeddedFiles.Add(fileSpec);
+                    // Add the specification to the EmbeddedFiles collection.
+                    doc.EmbeddedFiles.Add(fileSpec);
 
-                    // Save back to the same network location
-                    pdfDoc.Save(networkPdfPath);
+                    // Overwrite the original PDF with the updated version.
+                    doc.Save(pdfPath);
                 }
 
                 // If we reach this point, the operation succeeded
-                success = true;
-                Console.WriteLine($"Attachment added successfully on attempt {attempt}.");
+                return true;
             }
-            catch (IOException ioEx)
+            catch (IOException ex) when (IsTransientNetworkError(ex))
             {
-                // Network-related I/O errors are common on UNC paths; retry after a delay
-                Console.Error.WriteLine($"I/O error on attempt {attempt}: {ioEx.Message}");
-                if (attempt < MaxRetryAttempts)
+                // Transient network I/O error – decide whether to retry
+                if (attempt == MaxRetryAttempts)
                 {
-                    Console.WriteLine($"Waiting {RetryDelayMilliseconds} ms before retrying...");
-                    Thread.Sleep(RetryDelayMilliseconds);
+                    Console.Error.WriteLine($"Final attempt failed: {ex.Message}");
+                    return false;
                 }
-                else
-                {
-                    Console.Error.WriteLine("Maximum retry attempts reached. Operation failed.");
-                }
+
+                // Exponential back‑off before the next retry
+                int delay = BaseDelayMs * (int)Math.Pow(2, attempt);
+                Console.WriteLine($"I/O error on attempt {attempt + 1}: {ex.Message}. Retrying in {delay} ms...");
+                Thread.Sleep(delay);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                // Permission issues are not transient – abort immediately
+                Console.Error.WriteLine($"Access denied: {ex.Message}");
+                return false;
             }
             catch (Exception ex)
             {
-                // Non-recoverable errors – abort immediately
+                // Any other unexpected exception – abort
                 Console.Error.WriteLine($"Unexpected error: {ex.Message}");
-                break;
+                return false;
             }
         }
+
+        // Should never reach here
+        return false;
+    }
+
+    /// <summary>
+    /// Determines whether an IOException is likely caused by a transient network problem.
+    /// </summary>
+    private static bool IsTransientNetworkError(IOException ex)
+    {
+        // Simple heuristic: check for common network‑related HResult codes
+        // 0x80070035 – network path not found
+        // 0x80070020 – sharing violation (file locked)
+        // 0x8007000E – insufficient memory (could be network latency)
+        int hresult = System.Runtime.InteropServices.Marshal.GetHRForException(ex);
+        return hresult == unchecked((int)0x80070035) ||
+               hresult == unchecked((int)0x80070020) ||
+               hresult == unchecked((int)0x8007000E);
     }
 }

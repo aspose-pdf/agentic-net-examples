@@ -3,96 +3,75 @@ using System.IO;
 using System.IO.Compression;
 using Aspose.Pdf;
 
-class Program
+class BatchAttachmentExtractor
 {
     static void Main()
     {
-        // Resolve the input directory. If the expected folder does not exist, fall back to the current working directory.
-        string inputDirectory = ResolveInputDirectory("InputPdfs");
+        // Folder containing PDF files to process
+        const string inputFolder = "PdfFiles";
+        // Path for the consolidated ZIP archive
+        const string outputZipPath = "AllAttachments.zip";
 
-        // Path for the consolidated ZIP archive that will hold all extracted attachments
-        string zipArchivePath = Path.Combine(Directory.GetCurrentDirectory(), "AttachmentsArchive.zip");
-
-        // Retrieve all PDF files from the input directory (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(inputDirectory, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
+        if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"No PDF files found in directory: {inputDirectory}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        try
+        // Create (or overwrite) the ZIP archive
+        using (FileStream zipFileStream = new FileStream(outputZipPath, FileMode.Create))
+        using (ZipArchive zipArchive = new ZipArchive(zipFileStream, ZipArchiveMode.Create))
         {
-            // Create (or overwrite) the ZIP archive and keep it open for the duration of the extraction
-            using (FileStream zipFileStream = new FileStream(zipArchivePath, FileMode.Create))
-            using (ZipArchive zipArchive = new ZipArchive(zipFileStream, ZipArchiveMode.Update))
+            // Process each PDF file in the input folder
+            foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
             {
-                // Process each PDF file individually
-                foreach (string pdfPath in pdfFiles)
-                {
-                    if (!File.Exists(pdfPath))
-                    {
-                        Console.WriteLine($"File not found: {pdfPath}");
-                        continue;
-                    }
+                string pdfFileName = Path.GetFileNameWithoutExtension(pdfPath);
 
-                    // Load the PDF document inside a using block to ensure deterministic disposal
-                    using (Document pdfDocument = new Document(pdfPath))
+                try
+                {
+                    // Open the PDF document inside a using block for deterministic disposal
+                    using (Document doc = new Document(pdfPath))
                     {
-                        // If the document has no embedded files, skip it
-                        if (pdfDocument.EmbeddedFiles == null || pdfDocument.EmbeddedFiles.Count == 0)
+                        // If the document has no embedded files, continue to next file
+                        if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
                         {
-                            Console.WriteLine($"No attachments in: {Path.GetFileName(pdfPath)}");
+                            Console.WriteLine($"No attachments found in: {pdfPath}");
                             continue;
                         }
 
-                        // Aspose collections are 1‑based; iterate accordingly
-                        for (int i = 1; i <= pdfDocument.EmbeddedFiles.Count; i++)
+                        // Iterate over all embedded files in the current PDF
+                        foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                         {
-                            var embeddedFile = pdfDocument.EmbeddedFiles[i];
-
-                            // Construct a unique entry name: original PDF name + embedded file name
-                            string entryName = $"{Path.GetFileNameWithoutExtension(pdfPath)}_{embeddedFile.Name}";
+                            // Build a unique entry name inside the ZIP: <pdfFileName>/<embeddedFileName>
+                            string entryName = $"{pdfFileName}/{fileSpec.Name}";
 
                             // Create a new entry in the ZIP archive
                             ZipArchiveEntry zipEntry = zipArchive.CreateEntry(entryName, CompressionLevel.Optimal);
 
-                            // Copy the embedded file's content into the ZIP entry
+                            // Write the embedded file data into the ZIP entry
                             using (Stream entryStream = zipEntry.Open())
-                            using (Stream embeddedStream = embeddedFile.Contents)
                             {
-                                if (embeddedStream.CanSeek)
-                                    embeddedStream.Position = 0;
-                                embeddedStream.CopyTo(entryStream);
+                                Stream content = fileSpec.Contents;
+                                if (content == null)
+                                    continue; // skip if there is no data
+
+                                if (content.CanSeek)
+                                    content.Position = 0;
+
+                                content.CopyTo(entryStream);
                             }
 
                             Console.WriteLine($"Extracted: {entryName}");
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                }
             }
+        }
 
-            Console.WriteLine($"All attachments have been saved to '{zipArchivePath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"[Error] {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Returns a valid directory path for the given relative folder name.
-    /// If the folder does not exist, it is created under the current working directory.
-    /// </summary>
-    private static string ResolveInputDirectory(string relativeFolderName)
-    {
-        string baseDir = Directory.GetCurrentDirectory();
-        string fullPath = Path.Combine(baseDir, relativeFolderName);
-        if (!Directory.Exists(fullPath))
-        {
-            Console.WriteLine($"Input directory '{fullPath}' not found. Creating it.");
-            Directory.CreateDirectory(fullPath);
-        }
-        return fullPath;
+        Console.WriteLine($"All attachments have been consolidated into: {outputZipPath}");
     }
 }

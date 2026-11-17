@@ -6,81 +6,46 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the output PDF, and the file to embed
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string embedFilePath = "data.bin";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string attachmentName = "data.bin";
 
-        // ------------------------------------------------------------
-        // 1. Ensure the source PDF exists – create a minimal placeholder
-        //    if it is missing (only on Windows, because Aspose.Pdf may need
-        //    GDI+ for rendering). On non‑Windows platforms we simply abort
-        //    with a clear message.
-        // ------------------------------------------------------------
-        if (!File.Exists(inputPdfPath))
+        // Load the file to be attached as a byte array.
+        if (!File.Exists(attachmentName))
         {
-            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
-            {
-                var placeholder = new Document();
-                placeholder.Pages.Add();
-                placeholder.Save(inputPdfPath);
-                Console.WriteLine($"Placeholder PDF created at '{inputPdfPath}'.");
-            }
-            else
-            {
-                Console.WriteLine($"Input PDF '{inputPdfPath}' not found and cannot create a placeholder on this OS.");
-                return;
-            }
+            Console.Error.WriteLine($"Attachment file not found: {attachmentName}");
+            return;
+        }
+        byte[] fileData = File.ReadAllBytes(attachmentName);
+
+        // Ensure the source PDF exists.
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 2. Load the source PDF.
-        // ------------------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdf))
         {
-            // --------------------------------------------------------
-            // 3. Prepare the byte array to embed.
-            //    If the file does not exist we fall back to a small
-            //    in‑memory dummy payload so the example still runs.
-            // --------------------------------------------------------
-            byte[] fileBytes;
-            if (File.Exists(embedFilePath))
+            // Create a FileSpecification from the byte array.
+            // The constructor (Stream, name, description) is the correct way to embed a file.
+            using (MemoryStream ms = new MemoryStream(fileData))
             {
-                fileBytes = File.ReadAllBytes(embedFilePath);
-            }
-            else
-            {
-                Console.WriteLine($"Embed file '{embedFilePath}' not found – using dummy data.");
-                fileBytes = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
+                FileSpecification fileSpec = new FileSpecification(ms, attachmentName, "Embedded binary data")
+                {
+                    // Optional: set the modification date of the attachment.
+                    Params = { ModDate = DateTime.UtcNow }
+                };
+
+                // Attach the file to the PDF.
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // --------------------------------------------------------
-            // 4. Create a FileSpecification from the byte array.
-            //    The Name property defines how the attachment appears
-            //    in PDF viewers. The Contents stream must stay alive
-            //    until the document is saved, therefore we keep the
-            //    MemoryStream instance in a local variable.
-            // --------------------------------------------------------
-            using var contentStream = new MemoryStream(fileBytes);
-            var fileSpec = new FileSpecification
-            {
-                Name = Path.GetFileName(embedFilePath), // display name
-                Description = "Embedded binary data",
-                // Assign the stream that holds the file bytes
-                Contents = contentStream
-            };
-
-            // --------------------------------------------------------
-            // 5. Add the attachment to the document.
-            // --------------------------------------------------------
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
-
-            // --------------------------------------------------------
-            // 6. Save the modified PDF.
-            // --------------------------------------------------------
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"File '{embedFilePath}' embedded into '{outputPdfPath}'.");
+        Console.WriteLine($"FileSpecification attached and PDF saved to '{outputPdf}'.");
     }
 }

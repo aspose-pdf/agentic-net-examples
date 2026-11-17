@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int attachmentZeroIndex = 0; // zero‑based index of the attachment to remove
+        const int attachmentIndex = 0; // zero‑based index of the attachment to remove
 
         if (!File.Exists(inputPath))
         {
@@ -16,36 +16,40 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the PDF actually contains embedded files
-            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine("No embedded files found in the PDF.");
-                return;
+                // Verify the index is valid and the document contains embedded files
+                if (doc.EmbeddedFiles != null && attachmentIndex >= 0 && attachmentIndex < doc.EmbeddedFiles.Count)
+                {
+                    // Convert zero‑based index to Aspose.Pdf's 1‑based indexing
+                    int oneBasedIndex = attachmentIndex + 1;
+
+                    // Retrieve the file specification at the calculated position
+                    FileSpecification fileSpec = doc.EmbeddedFiles[oneBasedIndex];
+
+                    // Remove the attachment by its name (the Delete method works with the name)
+                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                    {
+                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Attachment index {attachmentIndex} is out of range (0‑{(doc.EmbeddedFiles?.Count ?? 0) - 1}).");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Validate the supplied zero‑based index
-            if (attachmentZeroIndex < 0 || attachmentZeroIndex >= doc.EmbeddedFiles.Count)
-            {
-                Console.Error.WriteLine("Invalid attachment index.");
-                return;
-            }
-
-            // Aspose collections are 1‑based; convert the zero‑based index
-            int aspIndex = attachmentZeroIndex + 1;
-
-            // Retrieve the FileSpecification at the calculated index
-            FileSpecification fileSpec = doc.EmbeddedFiles[aspIndex];
-
-            // Delete the attachment by its name (Delete expects a string)
-            doc.EmbeddedFiles.Delete(fileSpec.Name);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Attachment removed and PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Attachment at zero‑based index {attachmentZeroIndex} removed. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }
