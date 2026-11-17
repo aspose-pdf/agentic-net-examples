@@ -7,45 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_sound.pdf";
-        const string mp3Path    = "sound.mp3";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_sound.pdf";
+        // Aspose.Pdf supports only WAV/AIFF for sound annotations. Use a WAV file.
+        const string wavFile   = "sound.wav";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(mp3Path))
+        if (!File.Exists(wavFile))
         {
-            Console.Error.WriteLine($"MP3 file not found: {mp3Path}");
+            Console.Error.WriteLine($"WAV file not found: {wavFile}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Aspose.Pdf uses 1‑based page indexing.
+            // Use the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (lower‑left X/Y, upper‑right X/Y).
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Define the annotation rectangle (llx, lly, urx, ury)
+            Rectangle rect = new Rectangle(100, 500, 200, 550);
 
-            // Create a SoundAnnotation that references the MP3 file.
-            // The constructor (Page, Rectangle, string) attaches the annotation to the page.
-            SoundAnnotation soundAnno = new SoundAnnotation(page, rect, mp3Path);
+            // Create the sound annotation – constructor expects the sound file path (WAV/AIFF).
+            SoundAnnotation soundAnnot = new SoundAnnotation(page, rect, wavFile)
+            {
+                // Choose an icon that will be shown on the page.
+                Icon = SoundIcon.Speaker,
+                // Optional tooltip text.
+                Contents = "Play sound"
+            };
 
-            // Optional: set a visible icon and a title for the annotation.
-            soundAnno.Icon  = SoundIcon.Speaker;   // uses a built‑in speaker icon
-            soundAnno.Title = "Play Audio";
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(soundAnnot);
 
-            // Add the annotation to the page's annotation collection.
-            page.Annotations.Add(soundAnno);
-
-            // Save the modified PDF.
-            doc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with sound annotation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with sound annotation saved to '{outputPdf}'.");
     }
 }

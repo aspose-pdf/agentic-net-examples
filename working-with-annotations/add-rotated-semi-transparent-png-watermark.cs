@@ -1,56 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string logoPng = "logo.png";
-        const string outputPdf = "watermarked.pdf";
+        const string inputPath = "input.pdf";
+        const string logoPath = "logo.png";
+        const string outputPath = "watermarked.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(logoPng))
+        if (!File.Exists(logoPath))
         {
-            Console.Error.WriteLine($"Logo PNG not found: {logoPng}");
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(inputPath))
         {
-            // Use the first page for the watermark
+            // Choose the page where the watermark will be placed (first page in this example)
             Page page = doc.Pages[1];
 
-            // Create an ImageStamp for the PNG logo
-            ImageStamp stamp = new ImageStamp(logoPng)
+            // Create an ImageStamp from the PNG logo
+            ImageStamp logoStamp = new ImageStamp(logoPath)
             {
-                // Desired size of the watermark (200x200 points)
-                Width = 200,
-                Height = 200,
-                // Center the stamp on the page
+                // Set the desired size of the logo (optional – adjust as needed)
+                Width = 150,
+                Height = 150,
+
+                // Position the stamp – here we centre it on the page
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,
-                // Semi‑transparent
+
+                // Make the logo semi‑transparent
                 Opacity = 0.5,
+
                 // Rotate 30 degrees clockwise
                 RotateAngle = 30
             };
 
             // Add the stamp to the page
-            page.AddStamp(stamp);
+            page.AddStamp(logoStamp);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the result
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

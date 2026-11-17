@@ -7,89 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_with_sound.pdf";
-        const string soundFilePath = "background.wav";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_sound.pdf";
+        const string soundFile = "background.wav"; // WAV/AIFF is required for SoundAnnotation
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(soundFile))
+        {
+            Console.Error.WriteLine($"Sound file not found: {soundFile}");
             return;
         }
 
-        if (!File.Exists(soundFilePath))
+        try
         {
-            Console.Error.WriteLine($"Sound file not found: {soundFilePath}");
-            return;
-        }
-
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Choose the page where the annotation will be placed (first page in this example)
-            Page page = doc.Pages[1];
-
-            // Define the rectangle area for the annotation (coordinates are in points)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-            // ---------------------------------------------------------------------
-            // Create a SoundAnnotation in a version‑agnostic way using reflection.
-            // This avoids compile‑time errors when the library version does not expose
-            // the expected constructors or members.
-            // ---------------------------------------------------------------------
-            Type soundAnnotType = Type.GetType("Aspose.Pdf.Annotations.SoundAnnotation, Aspose.Pdf");
-            if (soundAnnotType == null)
+            // Load the existing PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Console.Error.WriteLine("SoundAnnotation type not found in the loaded Aspose.Pdf assembly.");
-                doc.Save(outputPdfPath);
-                return;
-            }
+                // Select the page where the annotation will be placed (first page)
+                Page page = doc.Pages[1];
 
-            object soundAnnot = null;
-            // Prefer the (Page, Rectangle) constructor if it exists.
-            var ctorWithPageRect = soundAnnotType.GetConstructor(new[] { typeof(Page), typeof(Rectangle) });
-            if (ctorWithPageRect != null)
-            {
-                soundAnnot = ctorWithPageRect.Invoke(new object[] { page, rect });
-            }
-            else
-            {
-                // Fallback to the parameterless constructor and set the Rect property manually.
-                var defaultCtor = soundAnnotType.GetConstructor(Type.EmptyTypes);
-                soundAnnot = defaultCtor.Invoke(null);
-                var rectProp = soundAnnotType.GetProperty("Rect");
-                rectProp?.SetValue(soundAnnot, rect);
-            }
+                // Define the annotation rectangle (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 600);
 
-            // Load the audio file into a Sound object (also via reflection).
-            using (FileStream soundStream = File.OpenRead(soundFilePath))
-            {
-                Type soundType = Type.GetType("Aspose.Pdf.Annotations.Sound, Aspose.Pdf");
-                if (soundType != null)
+                // Create a SoundAnnotation. The constructor that includes the sound file path is required.
+                // The annotation is played on click; automatic playback on page visibility is not supported.
+                SoundAnnotation soundAnno = new SoundAnnotation(page, rect, soundFile)
                 {
-                    var soundCtor = soundType.GetConstructor(new[] { typeof(Stream) });
-                    var soundObj = soundCtor?.Invoke(new object[] { soundStream });
+                    Icon = SoundIcon.Speaker,          // Choose an icon to display
+                    Contents = "Background music",   // Tooltip text
+                    Color = Color.LightGray           // Border colour (optional)
+                };
 
-                    // Assign the Sound object to the annotation if the property exists.
-                    var soundProp = soundAnnotType.GetProperty("Sound");
-                    soundProp?.SetValue(soundAnnot, soundObj);
-                }
+                // Add the annotation to the page's annotation collection
+                page.Annotations.Add(soundAnno);
+
+                // Save the modified PDF (still inside the using block)
+                doc.Save(outputPdf);
             }
 
-            // Enable automatic playback when the page becomes visible, if the property is present.
-            var playProp = soundAnnotType.GetProperty("PlayOnPageOpen");
-            if (playProp != null && playProp.CanWrite)
-            {
-                playProp.SetValue(soundAnnot, true);
-            }
-
-            // Add the annotation to the page's annotation collection.
-            page.Annotations.Add((Annotation)soundAnnot);
-
-            // Save the modified PDF.
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"PDF saved with sound annotation: {outputPdf}");
         }
-
-        Console.WriteLine($"PDF with sound annotation saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

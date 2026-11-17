@@ -7,73 +7,68 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output_with_video.pdf";
-        const string videoFilePath  = "sample.mp4";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_video.pdf";
+        const string videoFile = "sample_video.mp4";
 
-        // Define the video aspect ratio (width : height). Example: 16:9
-        const double videoWidthRatio  = 16.0;
-        const double videoHeightRatio = 9.0;
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(videoFilePath))
+        if (!File.Exists(videoFile))
         {
-            Console.Error.WriteLine($"Video file not found: {videoFilePath}");
+            Console.Error.WriteLine($"Video file not found: {videoFile}");
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate using 1‑based page indexing (Aspose.Pdf rule)
+            // Iterate using 1‑based page indexing (Aspose.Pdf uses 1‑based indexes)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Page dimensions (points)
+                // Get page dimensions (points)
                 double pageWidth  = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Desired rectangle size: 80% of page width, maintain aspect ratio
-                double rectWidth  = pageWidth * 0.8;
-                double rectHeight = rectWidth * (videoHeightRatio / videoWidthRatio);
+                // Desired width: 80% of page width
+                double rectWidth = pageWidth * 0.8;
 
-                // If height exceeds 80% of page height, scale down based on height instead
-                if (rectHeight > pageHeight * 0.8)
-                {
-                    rectHeight = pageHeight * 0.8;
-                    rectWidth  = rectHeight * (videoWidthRatio / videoHeightRatio);
-                }
+                // Video aspect ratio (e.g., 16:9)
+                const double videoAspect = 16.0 / 9.0;
+
+                // Compute height to preserve aspect ratio
+                double rectHeight = rectWidth / videoAspect;
 
                 // Center the rectangle on the page
-                double llx = (pageWidth  - rectWidth)  / 2.0; // lower‑left X
-                double lly = (pageHeight - rectHeight) / 2.0; // lower‑left Y
-                double urx = llx + rectWidth;                // upper‑right X
-                double ury = lly + rectHeight;               // upper‑right Y
+                double llx = (pageWidth  - rectWidth) / 2; // lower‑left X
+                double lly = (pageHeight - rectHeight) / 2; // lower‑left Y
+                double urx = llx + rectWidth; // upper‑right X
+                double ury = lly + rectHeight; // upper‑right Y
 
-                // Fully qualified Rectangle to avoid ambiguity
+                // Fully qualified rectangle to avoid ambiguity
                 Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-                // Create the ScreenAnnotation and attach the video file via the constructor that accepts the media file path
-                ScreenAnnotation screenAnn = new ScreenAnnotation(page, rect, videoFilePath)
+                // Create a ScreenAnnotation for the current page – media file is passed via constructor
+                ScreenAnnotation screenAnno = new ScreenAnnotation(page, rect, videoFile)
                 {
-                    // Optional: set a tooltip or description
-                    Contents = "Embedded video"
+                    // Optional title shown in the annotation UI
+                    Title = $"Page {i} Video"
+                    // MediaType property does not exist in current Aspose.Pdf versions and is therefore omitted.
                 };
 
-                // Add the annotation to the page
-                page.Annotations.Add(screenAnn);
+                // Add the annotation to the page's annotation collection
+                page.Annotations.Add(screenAnno);
             }
 
             // Save the modified PDF (Document.Save writes PDF regardless of extension)
-            doc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Video annotations added. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Video annotations added. Output saved to '{outputPdf}'.");
     }
 }

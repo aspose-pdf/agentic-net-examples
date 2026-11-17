@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,26 +15,26 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing; page 3 is at index 3
-            if (doc.Pages.Count >= 3)
+            // Verify the document has at least three pages (pages are 1‑based)
+            if (doc.Pages.Count < 3)
             {
-                Page page = doc.Pages[3];
+                Console.Error.WriteLine("The document contains fewer than 3 pages.");
+                return;
+            }
 
-                // Remove all annotations from the page
-                page.Annotations.Clear();
-            }
-            else
-            {
-                Console.Error.WriteLine("The document has fewer than 3 pages.");
-            }
+            // Access the third page
+            Page page = doc.Pages[3];
+
+            // Remove all annotations from this page
+            page.Annotations.Clear();
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations removed from page 3. Saved to '{outputPath}'.");
+        Console.WriteLine($"All annotations removed from page 3. Saved to '{outputPath}'.");
     }
 }

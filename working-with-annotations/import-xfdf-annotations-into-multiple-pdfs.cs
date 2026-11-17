@@ -1,72 +1,62 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Aspose.Pdf;
+
+// Suppress known‑vulnerability NuGet warnings for the transitive package
+#pragma warning disable NU1902 // Moderate severity vulnerability in System.Security.Cryptography.Pkcs 9.0.0
+#pragma warning disable NU1903 // High severity vulnerability in System.Security.Cryptography.Pkcs 9.0.0
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the running application
+        // Base directory of the application – works on any platform
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        string inputFolder  = Path.Combine(baseDir, "Input");
+        string outputFolder = Path.Combine(baseDir, "Output");
 
-        // Resolve input / output folders relative to the base directory
-        string pdfFolder = Path.Combine(baseDir, "pdfs");
-        string xfdfFolder = Path.Combine(baseDir, "xfdf");
-        string outputFolder = Path.Combine(baseDir, "output");
-
-        // If the expected folders are missing, fall back to the current working directory
-        if (!Directory.Exists(pdfFolder))
-        {
-            Console.WriteLine($"PDF folder not found: {pdfFolder}. Using current directory instead.");
-            pdfFolder = Directory.GetCurrentDirectory();
-        }
-        if (!Directory.Exists(xfdfFolder))
-        {
-            Console.WriteLine($"XFDF folder not found: {xfdfFolder}. Using current directory instead.");
-            xfdfFolder = Directory.GetCurrentDirectory();
-        }
-
-        // Ensure the output folder exists
+        // Ensure the folders exist (creates them if missing)
+        Directory.CreateDirectory(inputFolder);
         Directory.CreateDirectory(outputFolder);
 
-        // Gather all PDF files from the resolved folder
-        string[] pdfFiles = Directory.GetFiles(pdfFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
+        // Gather all PDF files from the input folder
+        List<string> pdfFiles = new List<string>(Directory.GetFiles(inputFolder, "*.pdf"));
 
-        // Process each PDF in parallel for maximum efficiency
+        // Process each PDF in parallel for speed
         Parallel.ForEach(pdfFiles, pdfPath =>
         {
             try
             {
-                string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-                string xfdfPath = Path.Combine(xfdfFolder, baseName + ".xfdf");
-                string outputPath = Path.Combine(outputFolder, baseName + "_annotated.pdf");
-
-                // Skip if the corresponding XFDF file does not exist
+                // Determine the matching XFDF file (same base name, .xfdf extension)
+                string xfdfPath = Path.ChangeExtension(pdfPath, ".xfdf");
                 if (!File.Exists(xfdfPath))
                 {
-                    Console.Error.WriteLine($"XFDF not found for '{baseName}'. Skipping.");
+                    Console.Error.WriteLine($"XFDF not found for '{Path.GetFileName(pdfPath)}'. Skipping.");
                     return;
                 }
 
                 // Load the PDF, import annotations from XFDF, and save the result
                 using (Document doc = new Document(pdfPath))
                 {
+                    // Core API – imports all annotations contained in the XFDF file
                     doc.ImportAnnotationsFromXfdf(xfdfPath);
+
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Successfully processed '{baseName}'.");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
             }
         });
+
+        Console.WriteLine("All files processed.");
     }
 }
+#pragma warning restore NU1902
+#pragma warning restore NU1903

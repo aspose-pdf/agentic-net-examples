@@ -1,19 +1,21 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the FDF file and the output PDF
-        string pdfPath = "input.pdf";
-        string fdfPath = Path.Combine("Resources", "annotations.fdf");
-        string outputPath = "output.pdf";
+        // Paths to resources
+        string resourcesFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "resources");
+        string pdfPath = Path.Combine(resourcesFolder, "input.pdf");
+        string fdfPath = Path.Combine(resourcesFolder, "annotations.fdf");
+        string outputPath = Path.Combine(resourcesFolder, "output.pdf");
 
-        // Verify that the required files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
@@ -25,62 +27,66 @@ class Program
             return;
         }
 
-        try
+        // Load PDF document with deterministic disposal
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            // Import annotations / form data from the FDF file manually (Form.ImportFdf does not exist)
+            FillFormFromFdf(pdfDoc, fdfPath);
+
+            // Example processing: enumerate imported annotations (form fields are also annotations)
+            foreach (Page page in pdfDoc.Pages)
             {
-                // ------------------------------------------------------------
-                // Import annotations (form field values) from the FDF file.
-                // Aspose.Pdf's core API does not expose an ImportFdf method, so
-                // we read the FDF file manually and assign values to matching
-                // fields in the document's Form.Fields collection.
-                // ------------------------------------------------------------
-                foreach (var line in File.ReadLines(fdfPath))
+                foreach (Annotation annot in page.Annotations)
                 {
-                    // Skip empty lines and comments (lines starting with '#')
-                    if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
-                        continue;
+                    // Use AnnotationType (base API) instead of the non‑existent Subtype property
+                    var type = annot.AnnotationType;
 
-                    // FDF entries are typically "fieldName=value"
-                    var parts = line.Split(new[] { '=' }, 2);
-                    if (parts.Length != 2)
-                        continue; // malformed line – ignore
-
-                    string fieldName = parts[0].Trim();
-                    string fieldValue = parts[1].Trim();
-
-                    // Find the field by Name or FullName (covers hierarchical names)
-                    var field = doc.Form?.Fields?.FirstOrDefault(f =>
-                        string.Equals(f.Name, fieldName, StringComparison.Ordinal) ||
-                        string.Equals(f.FullName, fieldName, StringComparison.Ordinal));
-
-                    if (field != null)
+                    // Title exists only on markup‑type annotations; cast safely
+                    string title = string.Empty;
+                    if (annot is MarkupAnnotation markup && !string.IsNullOrEmpty(markup.Title))
                     {
-                        field.Value = fieldValue;
+                        title = markup.Title;
                     }
-                }
 
-                // Example processing: enumerate annotations on each page
-                for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based page indexing
-                {
-                    Page page = doc.Pages[i];
-                    Console.WriteLine($"Page {i} contains {page.Annotations.Count} annotation(s).");
-                    foreach (var annotation in page.Annotations)
-                    {
-                        Console.WriteLine($"  - {annotation.GetType().Name}");
-                    }
+                    Console.WriteLine($"Page {page.Number}, Type {type}, Title {title}, Contents {annot.Contents}");
                 }
-
-                // Save the modified PDF with the imported annotations
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPath}'.");
+            // Save the PDF with imported annotations
+            pdfDoc.Save(outputPath);
         }
-        catch (Exception ex)
+
+        Console.WriteLine($"Processed PDF saved to: {outputPath}");
+    }
+
+    /// <summary>
+    /// Parses a simple FDF file and assigns the extracted values to matching form fields.
+    /// This replaces the non‑existent Form.ImportFdf method.
+    /// </summary>
+    /// <param name="doc">The PDF document whose form fields will be populated.</param>
+    /// <param name="fdfPath">Path to the FDF file.</param>
+    private static void FillFormFromFdf(Document doc, string fdfPath)
+    {
+        if (doc?.Form?.Fields == null)
+            return;
+
+        string fdfContent = File.ReadAllText(fdfPath);
+        // Very simple regex to capture /T (field name) and /V (field value) pairs.
+        // This works for basic FDF files; for complex structures a full parser would be required.
+        var matches = Regex.Matches(fdfContent, @"/T\s*\(([^)]+)\)\s*/V\s*\(([^)]+)\)", RegexOptions.Singleline);
+        foreach (Match match in matches)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            string fieldName = match.Groups[1].Value;
+            string fieldValue = match.Groups[2].Value;
+
+            var field = doc.Form.Fields.FirstOrDefault(f =>
+                string.Equals(f.Name, fieldName, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(f.FullName, fieldName, StringComparison.OrdinalIgnoreCase));
+
+            if (field != null)
+            {
+                field.Value = fieldValue;
+            }
         }
     }
 }

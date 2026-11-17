@@ -1,8 +1,9 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // needed for TextState
 
 class Program
 {
@@ -17,43 +18,50 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // New watermark text that includes the current date
-            string newText = $"Confidential - {DateTime.Now:yyyy-MM-dd}";
-
-            // Define a TextState that will be applied to every replaced watermark
-            TextState watermarkState = new TextState
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Font = FontRepository.FindFont("Arial"),
-                FontSize = 36,
-                ForegroundColor = Color.LightGray,
-                // Optional: make the watermark semi‑transparent
-                // Opacity = 0.5f // not available on TextState, handled by annotation appearance if needed
-            };
+                // Prepare the new watermark text with the current date
+                string newWatermark = $"Watermark - {DateTime.Now:yyyy-MM-dd}";
 
-            // Iterate over all pages (Aspose.Pdf uses 1‑based page indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
-
-                // Iterate over annotations; replace each WatermarkAnnotation's text
-                for (int j = 0; j < page.Annotations.Count; j++)
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Annotation annot = page.Annotations[j];
-                    if (annot is WatermarkAnnotation watermark)
+                    Page page = doc.Pages[i];
+
+                    // Collect existing WatermarkAnnotations to avoid modifying the collection while iterating
+                    List<WatermarkAnnotation> watermarks = new List<WatermarkAnnotation>();
+                    foreach (Annotation annot in page.Annotations)
                     {
-                        // Replace the existing watermark text with the new string and apply the TextState
-                        watermark.SetTextAndState(new[] { newText }, watermarkState);
+                        if (annot is WatermarkAnnotation wm)
+                            watermarks.Add(wm);
+                    }
+
+                    // Replace the text of each found WatermarkAnnotation
+                    foreach (WatermarkAnnotation wm in watermarks)
+                    {
+                        // Create a TextState (optional: customize appearance)
+                        TextState ts = new TextState();
+                        // Example customisation – you can adjust as needed
+                        ts.FontSize = 36;
+                        ts.ForegroundColor = Color.FromRgb(150, 150, 150);
+
+                        // Set the new text using the correct API
+                        wm.SetTextAndState(new string[] { newWatermark }, ts);
                     }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Watermarks updated and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Watermarks updated and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -17,47 +17,37 @@ class Program
             return;
         }
 
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has a form object (created lazily when needed)
-            Form pdfForm = doc.Form;
-
-            // Target the first page
+            // Use the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            // Define the button's position using Aspose.Pdf.Rectangle (avoid System.Drawing)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
 
-            // Create a button field (acts as a button annotation)
-            ButtonField button = new ButtonField(page, rect)
-            {
-                PartialName = "CalcTotalButton",
-                Color = Color.LightGray,
-                Value = "Calculate"
-            };
+            // Create a button field (interactive button) on the page
+            ButtonField button = new ButtonField(page, rect);
+            button.PartialName = "CalculateTotal"; // internal name of the field
+            button.Value = "Calculate Total";      // caption shown on the button
 
-            // Border must be created with the parent annotation instance
-            button.Border = new Border(button) { Width = 1 };
-
-            // JavaScript that sums fields named Field1, Field2, Field3 and writes to Total
+            // JavaScript that sums numeric fields "field1" and "field2" and writes to "total"
             string js = @"
-var f1 = this.getField('Field1').value;
-var f2 = this.getField('Field2').value;
-var f3 = this.getField('Field3').value;
-var total = (parseFloat(f1) || 0) + (parseFloat(f2) || 0) + (parseFloat(f3) || 0);
-this.getField('Total').value = total;
+var f1 = this.getField('field1').value;
+var f2 = this.getField('field2').value;
+var total = parseFloat(f1) + parseFloat(f2);
+this.getField('total').value = total;
 ";
-
-            // Assign the script to the button's press‑mouse‑button action (executed when the button is clicked)
+            // Assign the JavaScript to the PressMouseBtn action (executed when the button is clicked)
             button.Actions.OnPressMouseBtn = new JavascriptAction(js);
 
-            // Add the button to the document's form (this also adds the annotation to the page)
-            pdfForm.Add(button);
+            // Add the button field to the document's form collection (page 1)
+            doc.Form.Add(button, 1);
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with button annotation: {outputPath}");
+        Console.WriteLine($"PDF saved with button annotation to '{outputPath}'.");
     }
 }

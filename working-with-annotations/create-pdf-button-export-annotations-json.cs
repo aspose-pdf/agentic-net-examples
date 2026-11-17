@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // JavascriptAction, AnnotationFlags
 using Aspose.Pdf.Forms;
 
 class Program
@@ -17,48 +17,46 @@ class Program
             return;
         }
 
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the rectangle for the button (lower‑left X,Y, upper‑right X,Y)
-            Rectangle rect = new Rectangle(100, 700, 200, 750);
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Create a button form field (acts as a button annotation)
-            ButtonField button = new ButtonField(doc.Pages[1], rect)
+            // Define the button rectangle (lower‑left X/Y, upper‑right X/Y)
+            Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 500, 250, 550);
+
+            // Create a push‑button form field
+            ButtonField exportButton = new ButtonField(page, btnRect)
             {
-                PartialName = "ExportAnnotationsBtn",
-                Value = "Export Annotations"
+                PartialName    = "ExportAnnotationsBtn",
+                AlternateName  = "Export",
+                NormalCaption  = "Export Annotations"
             };
 
-            // Simple border
-            button.Border = new Border(button) { Width = 1 };
-
-            // JavaScript that gathers all annotations on the page and shows them as JSON
-            string js = @"
+            // Assign JavaScript to the button's click action (OnActivated)
+            exportButton.OnActivated = new JavascriptAction(@"
                 var annots = this.getAnnots();
                 var data = [];
                 for (var i = 0; i < annots.length; i++) {
                     var a = annots[i];
                     data.push({
                         type: a.type,
-                        rect: a.rect,
-                        contents: a.contents
+                        contents: a.contents,
+                        rect: a.rect
                     });
                 }
                 var json = JSON.stringify(data);
-                app.alert(json);
-            ";
+                console.println(json);
+            ");
 
-            // Assign the JavaScript to the button's mouse‑press action (valid property)
-            button.Actions.OnPressMouseBtn = new JavascriptAction(js);
-
-            // Add the button to the AcroForm and to the page annotations
-            doc.Form.Add(button);
-            doc.Pages[1].Annotations.Add(button);
+            // Add the button to the document's form collection (page already supplied in constructor)
+            doc.Form.Add(exportButton, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with button annotation: '{outputPath}'");
+        Console.WriteLine($"PDF with export button saved to '{outputPath}'.");
     }
 }

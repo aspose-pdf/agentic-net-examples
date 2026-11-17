@@ -17,31 +17,30 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Load the PDF; the using block guarantees deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
+            // Work with the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+            // Define the annotation rectangle (llx, lly, urx, ury)
+            var rect = new Aspose.Pdf.Rectangle(100, 200, 400, 500);
 
-            // The ScreenAnnotation constructor requires the media file (or URL) as the third argument.
-            // No need to set MediaClipData or PlayOnPageOpen separately – the constructor handles the media reference.
-            ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoUrl)
+            // ScreenAnnotation takes the media (URL or file path) in its constructor.
+            // Automatic playback for external media is the default behavior.
+            var screen = new ScreenAnnotation(page, rect, videoUrl)
             {
-                Name = "VideoAnnotation",
-                Title = "Demo Video",
-                Contents = "External video playback"
+                // Optional: ensure the annotation is printable/visible if needed.
+                Flags = AnnotationFlags.Print
             };
 
-            // Add the annotation to the page's annotation collection
+            // Attach the annotation to the page
             page.Annotations.Add(screen);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with video annotation to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with video ScreenAnnotation to '{outputPath}'.");
     }
 }

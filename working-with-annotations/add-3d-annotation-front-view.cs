@@ -1,74 +1,72 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing; // required for Matrix3D and Color
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_3d.pdf";
-        const string u3dFile = "model.u3d";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_3d.pdf";
+        const string threeDFilePath = "model.u3d"; // U3D file that already contains textures
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(u3dFile))
-        {
-            Console.Error.WriteLine($"3D model file not found: {u3dFile}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
+        if (!File.Exists(threeDFilePath))
         {
-            using (Document doc = new Document(inputPdf))
-            {
-                // Define the rectangle area for the 3D annotation (fully‑qualified type as per rule)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
-
-                // Try to create a ThreeDAnnotation via reflection – this avoids a direct compile‑time dependency
-                Type threeDAnnotationType = Type.GetType("Aspose.Pdf.Annotations.ThreeDAnnotation, Aspose.Pdf");
-                Type threeDStreamType = Type.GetType("Aspose.Pdf.Annotations.ThreeDStream, Aspose.Pdf");
-
-                if (threeDAnnotationType != null && threeDStreamType != null)
-                {
-                    // Instantiate ThreeDAnnotation(rect)
-                    object threeDAnnotation = Activator.CreateInstance(threeDAnnotationType, rect);
-
-                    // Load the 3D stream (U3D) and assign it to the annotation
-                    using (FileStream u3dStream = File.OpenRead(u3dFile))
-                    {
-                        object threeDStream = Activator.CreateInstance(threeDStreamType, u3dStream);
-                        threeDAnnotationType.GetProperty("ThreeDStream").SetValue(threeDAnnotation, threeDStream);
-                    }
-
-                    // Set initial view parameters – rotation 0° shows the front face
-                    threeDAnnotationType.GetProperty("Rotation").SetValue(threeDAnnotation, 0);
-
-                    // Optional: set background color for the annotation (fully‑qualified Color)
-                    threeDAnnotationType.GetProperty("BackgroundColor").SetValue(threeDAnnotation, Aspose.Pdf.Color.White);
-
-                    // Add the annotation to the first page
-                    var annotations = doc.Pages[1].Annotations;
-                    var addMethod = annotations.GetType().GetMethod("Add");
-                    addMethod.Invoke(annotations, new[] { threeDAnnotation });
-                }
-                else
-                {
-                    Console.WriteLine("ThreeDAnnotation types are not available in the referenced Aspose.Pdf version. Skipping 3D annotation creation.");
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPdf);
-            }
-
-            Console.WriteLine($"3D annotation processing completed and saved to '{outputPdf}'.");
+            Console.Error.WriteLine($"3D model file not found: {threeDFilePath}");
+            return;
         }
-        catch (Exception ex)
+
+        // Load the existing PDF inside a using block (document‑disposal‑with‑using rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            // Create a rectangle where the annotation will appear (use Aspose.Pdf.Rectangle for annotation bounds)
+            Aspose.Pdf.Rectangle annotRect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
+
+            // ------------------------------------------------------------
+            // 1. Load the U3D content
+            // ------------------------------------------------------------
+            PDF3DContent content = new PDF3DContent();
+            content.LoadAsU3D(threeDFilePath);
+
+            // 2. Define lighting and render mode (optional but recommended)
+            PDF3DLightingScheme lighting = new PDF3DLightingScheme(LightingSchemeType.CAD);
+            PDF3DRenderMode render = new PDF3DRenderMode(RenderModeType.Solid);
+            render.SetFaceColor(Color.Silver); // example colour
+
+            // 3. Create the artwork that ties content, lighting and render mode together
+            PDF3DArtwork artwork = new PDF3DArtwork(pdfDoc, content, lighting, render);
+
+            // 4. Define a default view – front view (identity matrix gives a straight front view)
+            //    The constructor is: PDF3DView(Document, Matrix3D, double distance, string name)
+            Matrix3D identity = new Matrix3D(); // no rotation, no translation
+            PDF3DView frontView = new PDF3DView(pdfDoc, identity, 0.0, "Front");
+            artwork.ViewArray.Add(frontView);
+
+            // 5. Create the 3D annotation. Activation is an enum value.
+            PDF3DAnnotation threeDAnnot = new PDF3DAnnotation(
+                pdfDoc.Pages[1],
+                annotRect,
+                artwork,
+                PDF3DActivation.activeWhenOpen);
+
+            // Set the default view index to the view we just added (index 0)
+            threeDAnnot.SetDefaultViewIndex(0);
+
+            // Add the annotation to the page
+            pdfDoc.Pages[1].Annotations.Add(threeDAnnot);
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"3D annotation added and saved to '{outputPdfPath}'.");
     }
 }

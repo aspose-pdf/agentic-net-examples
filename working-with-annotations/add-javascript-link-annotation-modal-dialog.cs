@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // JavascriptAction lives here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_link.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Use the first page (change index if needed)
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
+            {
+                Console.Error.WriteLine("The PDF has no pages.");
+                return;
+            }
+
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the clickable rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the clickable area for the link annotation
+            // Fully qualified Rectangle to avoid ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
 
-            // Create a link annotation on the specified rectangle
-            LinkAnnotation link = new LinkAnnotation(page, rect);
+            // Create a LinkAnnotation and assign a JavaScript action
+            LinkAnnotation link = new LinkAnnotation(page, linkRect)
+            {
+                // JavaScript that shows a modal alert dialog
+                Action = new JavascriptAction("app.alert('This is a custom modal dialog box.');")
+            };
 
-            // Create a JavaScript action that shows a modal dialog
-            // JavascriptAction does not have a parameter‑less constructor; pass the script string directly.
-            JavascriptAction jsAction = new JavascriptAction(
-                "app.alert({cMsg: 'Custom modal dialog', nIcon: 3, cTitle: 'Info'});"
-            );
-
-            // Assign the JavaScript action to the link annotation
-            link.Action = jsAction;
-
-            // Optional: make the annotation invisible (no border, no background)
-            link.Border = new Border(link) { Width = 0 };
-            link.Color = Aspose.Pdf.Color.Transparent;
+            // Use Contents for the tooltip (LinkAnnotation has no Title property)
+            link.Contents = "Show Modal Dialog";
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
@@ -48,6 +50,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript link annotation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with link annotation to '{outputPath}'.");
     }
 }

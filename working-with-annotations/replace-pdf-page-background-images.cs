@@ -1,68 +1,59 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // ImageStamp resides here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string newImagePath = "newImage.jpg";
+        const string inputPdfPath  = "input.pdf";          // source PDF
+        const string outputPdfPath = "output.pdf";         // result PDF
+        const string newImagePath  = "newImage.jpg";       // image to replace backgrounds
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
+
         if (!File.Exists(newImagePath))
         {
-            Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
+            Console.Error.WriteLine($"Image file not found: {newImagePath}");
             return;
         }
 
-        using (Document doc = new Document(inputPdf))
+        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
+        using (Document doc = new Document(inputPdfPath))
         {
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages (pages are 1‑based, but foreach abstracts that)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Collect background artifacts first because we will modify the collection while iterating
-                List<BackgroundArtifact> bgArtifacts = new List<BackgroundArtifact>();
-                foreach (Artifact art in page.Artifacts)
+                // Iterate over the artifacts collection of the page
+                // Use a for‑loop because we may need the index for replacement
+                for (int i = 0; i < page.Artifacts.Count; i++)
                 {
-                    if (art is BackgroundArtifact bg)
-                        bgArtifacts.Add(bg);
-                }
+                    Artifact artifact = page.Artifacts[i];
 
-                foreach (BackgroundArtifact bg in bgArtifacts)
-                {
-                    // Preserve the original rectangle (position and size)
-                    Aspose.Pdf.Rectangle rect = bg.Rectangle;
-
-                    // Remove the original background artifact using Delete (no out parameter needed)
-                    page.Artifacts.Delete(bg);
-
-                    // Create an ImageStamp that occupies the same rectangle
-                    ImageStamp stamp = new ImageStamp(newImagePath)
+                    // Identify BackgroundArtifact instances
+                    if (artifact is BackgroundArtifact bgArtifact)
                     {
-                        XIndent = rect.LLX,
-                        YIndent = rect.LLY,
-                        Width = rect.Width,
-                        Height = rect.Height,
-                        Background = true // place it on the page background
-                    };
+                        // Preserve the original position (the Position property is a Rectangle)
+                        // No need to change it – we only replace the image.
 
-                    // Add the new image stamp to the page
-                    page.AddStamp(stamp);
+                        // Replace the background image. BackgroundImage is writable, unlike Artifact.Image.
+                        // The stream is opened just for the assignment; Aspose reads the data immediately.
+                        using (FileStream fs = File.OpenRead(newImagePath))
+                        {
+                            bgArtifact.BackgroundImage = fs;
+                        }
+                    }
                 }
             }
 
-            doc.Save(outputPdf);
+            // Save the modified document (save inside the using block so the Document stays alive)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Background artifacts replaced and saved to '{outputPdf}'.");
+        Console.WriteLine($"Background artifacts replaced and saved to '{outputPdfPath}'.");
     }
 }

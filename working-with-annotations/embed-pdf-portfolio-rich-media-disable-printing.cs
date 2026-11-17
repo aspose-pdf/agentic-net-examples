@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,89 +9,96 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF
-        const string portfolioPdfPath = "portfolio.pdf";  // PDF portfolio to embed
-        const string outputPdfPath = "output_secure.pdf"; // result PDF
+        const string inputPdfPath = "source.pdf";          // PDF to which the annotation will be added
+        const string portfolioPdfPath = "portfolio.pdf";   // PDF portfolio to embed
+        const string outputPdfPath = "output.pdf";          // Resulting PDF
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
-        if (!File.Exists(inputPdfPath) || !File.Exists(portfolioPdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Required files not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(portfolioPdfPath))
+        {
+            Console.Error.WriteLine($"Portfolio PDF not found: {portfolioPdfPath}");
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the document to be annotated
         using (Document doc = new Document(inputPdfPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Add a RichMediaAnnotation that embeds the PDF portfolio
-            // -----------------------------------------------------------------
-            // Choose the first page (1‑based indexing) and define the annotation rectangle
+            // Create a RichMediaAnnotation on the first page
             Page page = doc.Pages[1];
-            var rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create the annotation
-            var richMedia = new RichMediaAnnotation(page, rect);
+            // Define the annotation rectangle (llx, lly, urx, ury)
+            Rectangle rect = new Rectangle(100, 500, 400, 800);
 
-            // -----------------------------------------------------------------
-            // 2. Attach the embedded portfolio (using reflection for compatibility)
-            // -----------------------------------------------------------------
-            try
+            // Create the RichMediaAnnotation
+            RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
+
+            // Try to build RichMediaContent via reflection – it may not exist in older Aspose.Pdf versions
+            Type richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+            if (richMediaContentType != null)
             {
-                // Types that may be missing in older Aspose.Pdf versions
-                var fileSpecType = Type.GetType("Aspose.Pdf.FileSpec, Aspose.Pdf");
-                var fileSpecBehaviorEnum = Type.GetType("Aspose.Pdf.FileSpecBehavior, Aspose.Pdf");
-                var richMediaInstanceType = Type.GetType("Aspose.Pdf.Annotations.RichMediaInstance, Aspose.Pdf");
-                var richMediaConfigType = Type.GetType("Aspose.Pdf.Annotations.RichMediaConfiguration, Aspose.Pdf");
-                var richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+                // Types needed for the content hierarchy
+                Type configType = Type.GetType("Aspose.Pdf.Annotations.RichMediaConfiguration, Aspose.Pdf");
+                Type instanceType = Type.GetType("Aspose.Pdf.Annotations.RichMediaInstance, Aspose.Pdf");
+                Type fileType = Type.GetType("Aspose.Pdf.Annotations.RichMediaFile, Aspose.Pdf");
 
-                if (fileSpecType != null && fileSpecBehaviorEnum != null && richMediaInstanceType != null &&
-                    richMediaConfigType != null && richMediaContentType != null)
+                if (configType != null && instanceType != null && fileType != null)
                 {
-                    // FileSpec constructor: (string filePath, FileSpecBehavior behavior)
-                    object behaviorValue = Enum.Parse(fileSpecBehaviorEnum, "EmbeddedFile");
-                    var fileSpec = Activator.CreateInstance(fileSpecType, portfolioPdfPath, behaviorValue);
+                    // Create instances
+                    object content = Activator.CreateInstance(richMediaContentType);
+                    object config = Activator.CreateInstance(configType);
+                    object instance = Activator.CreateInstance(instanceType);
 
-                    // RichMediaInstance constructor: (FileSpec fileSpec)
-                    var instance = Activator.CreateInstance(richMediaInstanceType, fileSpec);
+                    // Set the file (constructor takes the file path)
+                    object file = Activator.CreateInstance(fileType, portfolioPdfPath);
+                    PropertyInfo fileProp = instanceType.GetProperty("File");
+                    fileProp?.SetValue(instance, file);
 
-                    // RichMediaConfiguration.Instances (IList) – add the instance
-                    var config = Activator.CreateInstance(richMediaConfigType);
-                    var instancesProp = richMediaConfigType.GetProperty("Instances");
-                    var instancesList = instancesProp?.GetValue(config) as System.Collections.IList;
-                    instancesList?.Add(instance);
+                    // Set MIME type
+                    PropertyInfo mimeProp = instanceType.GetProperty("MimeType");
+                    mimeProp?.SetValue(instance, "application/pdf");
 
-                    // RichMediaContent.Configurations (IList) – add the configuration
-                    var content = Activator.CreateInstance(richMediaContentType);
-                    var configsProp = richMediaContentType.GetProperty("Configurations");
-                    var configsList = configsProp?.GetValue(content) as System.Collections.IList;
-                    configsList?.Add(config);
+                    // Add the instance to the configuration
+                    PropertyInfo instancesProp = configType.GetProperty("Instances");
+                    if (instancesProp?.GetValue(config) is IList instancesList)
+                    {
+                        instancesList.Add(instance);
+                    }
 
-                    // Assign the content to the annotation
-                    var richMediaContentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                    // Add the configuration to the content
+                    PropertyInfo configsProp = richMediaContentType.GetProperty("Configurations");
+                    if (configsProp?.GetValue(content) is IList configsList)
+                    {
+                        configsList.Add(config);
+                    }
+
+                    // Assign the built content to the annotation
+                    PropertyInfo richMediaContentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
                     richMediaContentProp?.SetValue(richMedia, content);
                 }
             }
-            catch (Exception ex)
-            {
-                // If any step fails, we simply continue without the embedded media.
-                Console.Error.WriteLine($"Rich media setup failed: {ex.Message}");
-            }
+            // If the RichMediaContent type is unavailable, the annotation will be added without embedded media.
 
-            // Attach the annotation to the page
+            // Disable printing for this annotation. Aspose.Pdf does not expose a NoPrint flag; the absence of the Print flag disables printing.
+            // Setting the flag to Default ensures no Print flag is set.
+            richMedia.Flags = AnnotationFlags.Default;
+
+            // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
-            // -----------------------------------------------------------------
-            // 3. Apply security: disable printing by omitting the Print permission
-            // -----------------------------------------------------------------
-            Permissions perms = Permissions.ExtractContent; // no printing permission
-            doc.Encrypt(userPassword: "", ownerPassword: "", permissions: perms, cryptoAlgorithm: CryptoAlgorithm.AESx256);
+            // Disable printing for the whole document via encryption permissions
+            Permissions perms = Permissions.ExtractContent; // omit Permissions.PrintDocument
+            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // -----------------------------------------------------------------
-            // 4. Save the modified PDF
-            // -----------------------------------------------------------------
+            // Save the modified PDF
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Secure PDF with embedded portfolio saved to '{outputPdfPath}'.");
+        Console.WriteLine($"RichMedia annotation added and printing disabled. Saved to '{outputPdfPath}'.");
     }
 }

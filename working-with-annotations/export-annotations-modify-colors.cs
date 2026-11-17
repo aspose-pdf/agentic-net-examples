@@ -8,9 +8,10 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string xfdfPath = "annotations.xfdf";
-        const string modifiedXfdfPath = "annotations_modified.xfdf";
+        const string xfdfExportPath = "annotations.xfdf";
+        const string xfdfModifiedPath = "annotations_modified.xfdf";
         const string outputPdfPath = "output.pdf";
+        const string newColorHex = "#00FF00"; // desired annotation color (green)
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,31 +19,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // 1. Load the PDF and export its annotations to XFDF
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Export existing annotations to XFDF
-            using (FileStream exportStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+            // Export only annotations to XFDF file
+            pdfDoc.ExportAnnotationsToXfdf(xfdfExportPath);
+        }
+
+        // 2. Load the exported XFDF XML, change all <color> values
+        XDocument xfdfXml = XDocument.Load(xfdfExportPath);
+        foreach (XElement colorElem in xfdfXml.Descendants("color"))
+        {
+            colorElem.Value = newColorHex;
+        }
+        xfdfXml.Save(xfdfModifiedPath);
+
+        // 3. Re‑import the modified XFDF back into the PDF
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            using (FileStream xfdfStream = new FileStream(xfdfModifiedPath, FileMode.Open, FileAccess.Read))
             {
-                pdfDoc.ExportAnnotationsToXfdf(exportStream);
+                pdfDoc.ImportAnnotationsFromXfdf(xfdfStream);
             }
-
-            // Load the XFDF XML, change all annotation colors to red (RGB 1 0 0)
-            XDocument xfdfXml = XDocument.Load(xfdfPath);
-            foreach (XElement colorElem in xfdfXml.Descendants("color"))
-            {
-                // XFDF stores color as three space‑separated numbers (0‑1 range)
-                colorElem.Value = "1 0 0";
-            }
-            xfdfXml.Save(modifiedXfdfPath);
-
-            // Import the modified XFDF back into the PDF
-            pdfDoc.ImportAnnotationsFromXfdf(modifiedXfdfPath);
-
-            // Save the updated PDF
             pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Annotations exported, colors changed, and PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Annotations exported, colors changed to {newColorHex}, and PDF saved as '{outputPdfPath}'.");
     }
 }

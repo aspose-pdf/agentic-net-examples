@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_polyline.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,40 +19,56 @@ class Program
         // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Work with the first page (1‑based indexing)
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
+            {
+                Console.Error.WriteLine("The PDF does not contain any pages.");
+                return;
+            }
+
+            // Work with the first page (you can choose any page index, 1‑based)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (llx, lly, urx, ury)
-            // Note: lower‑left Y must be less than upper‑right Y
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 200, 400, 500);
+            // Define the bounding rectangle for the annotation (lower‑left X/Y, upper‑right X/Y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
+                llx: 80,   // lower‑left X
+                lly: 480,  // lower‑left Y
+                urx: 320,  // upper‑right X
+                ury: 720   // upper‑right Y
+            );
 
-            // Prepare vertices for the polyline annotation
-            Aspose.Pdf.Point[] vertices = new Aspose.Pdf.Point[]
+            // Define the vertices of the custom shape (a simple triangle, closed)
+            Point[] vertices = new Point[]
             {
-                new Aspose.Pdf.Point(120, 480),
-                new Aspose.Pdf.Point(200, 420),
-                new Aspose.Pdf.Point(280, 460),
-                new Aspose.Pdf.Point(360, 380)
+                new Point(100, 500),
+                new Point(200, 700),
+                new Point(300, 500),
+                new Point(100, 500) // close the shape
             };
 
-            // Create the PolylineAnnotation with the required vertices array
+            // Create a polyline annotation with the required vertices parameter
             PolylineAnnotation polyline = new PolylineAnnotation(page, rect, vertices);
 
-            // Visual styling
-            polyline.Color = Aspose.Pdf.Color.FromRgb(0, 128, 0); // dark green line
-            polyline.Border = new Border(polyline) { Width = 2 };
+            // Set visual appearance
+            polyline.Color = Color.Blue; // line color
+            // Border requires the parent annotation in its constructor
+            polyline.Border = new Border(polyline)
+            {
+                Style = BorderStyle.Solid,
+                Width = 2
+            };
 
-            // Alternative text for accessibility (figure description)
-            polyline.Title = "Custom Diagram Figure";
-            polyline.Contents = "A polyline illustrating the process flow.";
+            // Optional title and contents (tooltip)
+            polyline.Title = "Diagram Shape";
+            polyline.Contents = "Custom polyline illustrating a diagram.";
 
-            // Attach the annotation to the page
+            // Add the annotation to the page
             page.Annotations.Add(polyline);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Figure annotation with custom polyline saved to '{outputPath}'.");
+        Console.WriteLine($"PolyLine annotation added and saved to '{outputPath}'.");
     }
 }

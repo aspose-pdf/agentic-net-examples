@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -7,85 +8,107 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "RichMediaFlash.pdf";
-        const string flashPath = "sample.swf"; // path to the Flash video file
+        const string swfPath = "video.swf";
+        const string outputPath = "richmedia_output.pdf";
 
-        if (!File.Exists(flashPath))
+        if (!File.Exists(swfPath))
         {
-            Console.Error.WriteLine($"Flash file not found: {flashPath}");
+            Console.Error.WriteLine($"SWF file not found: {swfPath}");
             return;
         }
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document with a single page.
         using (Document doc = new Document())
         {
-            // Add a page (page 1) to the document
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the RichMedia annotation will appear
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
-
-            // Create the RichMedia annotation on page 1
+            // Define the annotation rectangle (lower-left X, lower-left Y, upper-right X, upper-right Y).
+            Rectangle rect = new Rectangle(100, 500, 400, 800);
             RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
 
-            // ----- Build RichMedia content (embed the Flash file) using reflection -----
+            // ---------------------------------------------------------------------
+            // 1. Attach RichMediaContent (if the type exists in the loaded Aspose.Pdf).
+            // ---------------------------------------------------------------------
             Type contentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
-            Type instanceType = Type.GetType("Aspose.Pdf.Annotations.RichMediaInstance, Aspose.Pdf");
-
-            if (contentType != null && instanceType != null)
+            if (contentType != null)
             {
-                // Create RichMediaContent instance
-                object richMediaContent = Activator.CreateInstance(contentType);
+                // Create RichMediaContent instance.
+                object content = Activator.CreateInstance(contentType);
 
-                // Create RichMediaInstance and set its properties
-                object richMediaInstance = Activator.CreateInstance(instanceType);
-                var mimeProp = instanceType.GetProperty("MimeType");
-                mimeProp?.SetValue(richMediaInstance, "application/x-shockwave-flash");
-                var fileProp = instanceType.GetProperty("File");
-                fileProp?.SetValue(richMediaInstance, new FileSpecification(flashPath));
+                // Load the SWF file and create a RichMediaAsset.
+                using (FileStream swfStream = File.OpenRead(swfPath))
+                {
+                    Type assetType = Type.GetType("Aspose.Pdf.Annotations.RichMediaAsset, Aspose.Pdf");
+                    object asset = Activator.CreateInstance(assetType, Path.GetFileName(swfPath), swfStream);
 
-                // Add the instance to the content collection
-                var addInstanceMethod = contentType.GetMethod("AddInstance", new[] { instanceType });
-                addInstanceMethod?.Invoke(richMediaContent, new[] { richMediaInstance });
+                    // content.Assets.Add(asset)
+                    PropertyInfo assetsProp = contentType.GetProperty("Assets");
+                    var assetsCollection = assetsProp.GetValue(content);
+                    assetsCollection.GetType().GetMethod("Add").Invoke(assetsCollection, new[] { asset });
 
-                // Assign the content to the annotation (if the property exists)
-                var contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
-                contentProp?.SetValue(richMedia, richMediaContent);
+                    // Create configuration and instance linking to the asset.
+                    Type configType = Type.GetType("Aspose.Pdf.Annotations.RichMediaConfiguration, Aspose.Pdf");
+                    object config = Activator.CreateInstance(configType);
+
+                    Type instanceType = Type.GetType("Aspose.Pdf.Annotations.RichMediaInstance, Aspose.Pdf");
+                    object instance = Activator.CreateInstance(instanceType);
+                    instanceType.GetProperty("Asset")?.SetValue(instance, asset);
+                    instanceType.GetProperty("MimeType")?.SetValue(instance, "application/x-shockwave-flash");
+
+                    // config.Instances.Add(instance)
+                    PropertyInfo instancesProp = configType.GetProperty("Instances");
+                    var instancesColl = instancesProp.GetValue(config);
+                    instancesColl.GetType().GetMethod("Add").Invoke(instancesColl, new[] { instance });
+
+                    // content.Configurations.Add(config)
+                    PropertyInfo configsProp = contentType.GetProperty("Configurations");
+                    var configsColl = configsProp.GetValue(content);
+                    configsColl.GetType().GetMethod("Add").Invoke(configsColl, new[] { config });
+                }
+
+                // Assign the prepared content to the annotation.
+                PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                contentProp?.SetValue(richMedia, content);
+            }
+            else
+            {
+                Console.WriteLine("RichMediaContent type not available in this Aspose.Pdf version – media will not be embedded.");
             }
 
-            // ----- Configure playback controls (if RichMediaSettings type is available) -----
+            // ---------------------------------------------------------------------
+            // 2. Configure playback controls and activation behavior (if RichMediaSettings exists).
+            // ---------------------------------------------------------------------
             Type settingsType = Type.GetType("Aspose.Pdf.Annotations.RichMediaSettings, Aspose.Pdf");
             if (settingsType != null)
             {
                 object settings = Activator.CreateInstance(settingsType);
 
-                var activationProp = settingsType.GetProperty("Activation");
-                var toolbarProp = settingsType.GetProperty("Toolbar");
-                var presentationProp = settingsType.GetProperty("Presentation");
-
+                // Activation = OnPageOpen
                 Type activationEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaActivation, Aspose.Pdf");
-                Type toolbarEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaToolbar, Aspose.Pdf");
-                Type presentationEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaPresentation, Aspose.Pdf");
+                object activationVal = Enum.Parse(activationEnum, "OnPageOpen");
+                settingsType.GetProperty("Activation")?.SetValue(settings, activationVal);
 
-                if (activationEnum != null && toolbarEnum != null && presentationEnum != null)
-                {
-                    activationProp?.SetValue(settings, Enum.Parse(activationEnum, "OnPageOpen"));
-                    toolbarProp?.SetValue(settings, Enum.Parse(toolbarEnum, "Visible"));
-                    presentationProp?.SetValue(settings, Enum.Parse(presentationEnum, "Fit"));
-                }
+                // Deactivation = OnPageClose
+                Type deactivationEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaDeactivation, Aspose.Pdf");
+                object deactivationVal = Enum.Parse(deactivationEnum, "OnPageClose");
+                settingsType.GetProperty("Deactivation")?.SetValue(settings, deactivationVal);
 
-                var settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+                // Presentation with controls visible.
+                Type presentationType = Type.GetType("Aspose.Pdf.Annotations.RichMediaPresentation, Aspose.Pdf");
+                object presentation = Activator.CreateInstance(presentationType);
+                presentationType.GetProperty("ShowControls")?.SetValue(presentation, true);
+                settingsType.GetProperty("Presentation")?.SetValue(settings, presentation);
+
+                // Assign settings to the annotation.
+                PropertyInfo settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
                 settingsProp?.SetValue(richMedia, settings);
             }
 
-            // Add the annotation to the page's annotation collection
+            // Add the annotation to the page and save.
             page.Annotations.Add(richMedia);
-
-            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"RichMedia PDF with embedded Flash saved to '{outputPath}'.");
+        Console.WriteLine($"RichMedia PDF saved to '{outputPath}'.");
     }
 }

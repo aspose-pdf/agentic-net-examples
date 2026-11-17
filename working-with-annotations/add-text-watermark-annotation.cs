@@ -16,26 +16,32 @@ class Program
             return;
         }
 
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextStamp that will act as the watermark
-            TextStamp stamp = new TextStamp("Confidential")
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Top,
-                TopMargin           = 20,
-                Opacity             = 0.5
-            };
+                Page page = doc.Pages[i];
 
-            // Configure the visual appearance via the existing TextState instance
-            stamp.TextState.Font       = FontRepository.FindFont("Arial");
-            stamp.TextState.FontSize   = 48;
-            stamp.TextState.FontStyle  = FontStyles.Bold;
-            stamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // pure red
+                // Create a text stamp that will act as a watermark
+                TextStamp stamp = new TextStamp("Confidential")
+                {
+                    // Center horizontally, align to the top of the page
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Top,
+                    // Use XIndent/YIndent instead of the non‑existent Margin property
+                    XIndent = 0,               // no horizontal offset (centered)
+                    YIndent = 10               // small offset from the top edge
+                };
 
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
-            {
+                // Configure the appearance: bold font, suitable size
+                stamp.TextState.Font      = FontRepository.FindFont("Arial");
+                stamp.TextState.FontSize  = 24;
+                stamp.TextState.FontStyle = FontStyles.Bold;
+                stamp.TextState.ForegroundColor = Color.FromRgb(0.8, 0.0, 0.0); // optional red color
+
+                // Apply the stamp to the current page
                 page.AddStamp(stamp);
             }
 

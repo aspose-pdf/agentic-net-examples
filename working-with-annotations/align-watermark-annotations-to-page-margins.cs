@@ -8,8 +8,13 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const double margin = 50; // points from each edge
+        const string outputPath = "watermarked_aligned.pdf";
+
+        // Define uniform margins (in points)
+        const double marginLeft   = 50;
+        const double marginRight  = 50;
+        const double marginTop    = 50;
+        const double marginBottom = 50;
 
         if (!File.Exists(inputPath))
         {
@@ -25,28 +30,26 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Annotations collection is also 1‑based
-                for (int j = 1; j <= page.Annotations.Count; j++)
+                // Iterate over all annotations on the page
+                foreach (Annotation ann in page.Annotations)
                 {
-                    // Retrieve the annotation
-                    var annotation = page.Annotations[j];
-
-                    // Process only WatermarkAnnotations
-                    if (annotation is WatermarkAnnotation watermark)
+                    // Process only WatermarkAnnotation instances
+                    if (ann is WatermarkAnnotation watermark)
                     {
-                        // Compute new rectangle respecting the desired margins
-                        double llx = margin;                                 // lower‑left X
-                        double lly = margin;                                 // lower‑left Y
-                        double urx = page.PageInfo.Width  - margin;          // upper‑right X
-                        double ury = page.PageInfo.Height - margin;          // upper‑right Y
+                        // Compute new rectangle aligned to the defined margins
+                        double left   = marginLeft;
+                        double bottom = marginBottom;
+                        double right  = page.PageInfo.Width  - marginRight;
+                        double top    = page.PageInfo.Height - marginTop;
 
-                        // Set the bounds of the watermark using the correct property
-                        watermark.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                        // Set the rectangle (bounds) of the watermark annotation
+                        // The correct property name for WatermarkAnnotation is 'Rect'
+                        watermark.Rect = new Aspose.Pdf.Rectangle(left, bottom, right, top);
                     }
                 }
             }
 
-            // Save the modified PDF (extension determines format; no SaveOptions needed for PDF)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

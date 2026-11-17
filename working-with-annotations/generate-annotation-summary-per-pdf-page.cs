@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using System.Text.Json;
 
 class Program
 {
@@ -14,52 +14,43 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal.
-        using (Document pdf = new Document(inputPdfPath))
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // List that will hold per‑page annotation summaries.
-            var pagesSummary = new List<PageAnnotationInfo>();
+            // Dictionary to hold page number (1‑based) and list of annotation type names
+            var summary = new Dictionary<int, List<string>>();
 
-            // Aspose.Pdf uses 1‑based page indexing.
-            for (int i = 1; i <= pdf.Pages.Count; i++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page indexes)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = pdf.Pages[i];
-                var typeCounts = new Dictionary<string, int>(StringComparer.Ordinal);
+                Page page = doc.Pages[i];
+                var types = new List<string>();
 
-                // Each page has an Annotations collection.
-                foreach (Annotation annotation in page.Annotations)
+                // Each page has an Annotations collection; iterate if it contains any items
+                if (page.Annotations != null && page.Annotations.Count > 0)
                 {
-                    string typeName = annotation.GetType().Name;
-                    if (typeCounts.ContainsKey(typeName))
-                        typeCounts[typeName]++;
-                    else
-                        typeCounts[typeName] = 1;
+                    foreach (Annotation annotation in page.Annotations)
+                    {
+                        // Use the concrete .NET type name as the annotation type identifier
+                        types.Add(annotation.GetType().Name);
+                    }
                 }
 
-                pagesSummary.Add(new PageAnnotationInfo
-                {
-                    PageNumber = i,
-                    Annotations = typeCounts
-                });
+                summary[i] = types;
             }
 
-            // Serialize the summary to JSON with indentation for readability.
+            // Serialize the dictionary to JSON (indented for readability)
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(pagesSummary, jsonOptions);
+            string json = JsonSerializer.Serialize(summary, jsonOptions);
+
+            // Write JSON to the output file
             File.WriteAllText(outputJsonPath, json);
         }
 
         Console.WriteLine($"Annotation summary saved to '{outputJsonPath}'.");
-    }
-
-    // Helper class that represents the JSON structure for a single page.
-    private class PageAnnotationInfo
-    {
-        public int PageNumber { get; set; }
-        public Dictionary<string, int> Annotations { get; set; }
     }
 }

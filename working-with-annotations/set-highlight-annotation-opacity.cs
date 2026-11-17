@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_highlights.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,40 +16,30 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    Page page = doc.Pages[i];
+                Page page = doc.Pages[i];
 
-                    // Annotations collection may be null if the page has none
-                    if (page.Annotations != null)
+                // Iterate all annotations on the page
+                foreach (Annotation annot in page.Annotations)
+                {
+                    // Process only highlight annotations
+                    if (annot is HighlightAnnotation highlight)
                     {
-                        foreach (Annotation annotation in page.Annotations)
-                        {
-                            // Process only highlight annotations
-                            if (annotation is HighlightAnnotation highlight)
-                            {
-                                // Set opacity to 60% (0.6)
-                                highlight.Opacity = 0.6f;
-                            }
-                        }
+                        // Set opacity to 60% (0.6). Value range is 0.0‑1.0
+                        highlight.Opacity = 0.6f;
                     }
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"All highlight annotations set to 60% opacity. Saved as '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Highlight opacity updated and saved to '{outputPath}'.");
     }
 }

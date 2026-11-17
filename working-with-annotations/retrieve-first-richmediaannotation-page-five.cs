@@ -17,22 +17,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Page indexing in Aspose.Pdf is 1‑based
+            // Verify that page 5 exists (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine("The document has fewer than 5 pages.");
+                Console.WriteLine("The document contains fewer than 5 pages.");
                 return;
             }
 
             Page page = doc.Pages[5];
 
-            // LINQ query to get the first RichMediaAnnotation on page 5
-            RichMediaAnnotation richMedia = (from ann in page.Annotations
-                                             where ann is RichMediaAnnotation
-                                             select (RichMediaAnnotation)ann).FirstOrDefault();
+            // LINQ query: filter annotations to RichMediaAnnotation and take the first one
+            RichMediaAnnotation richMedia = page.Annotations
+                .OfType<RichMediaAnnotation>()
+                .FirstOrDefault();
 
             if (richMedia == null)
             {
@@ -40,22 +40,44 @@ class Program
                 return;
             }
 
-            // Display selected properties of the RichMediaAnnotation
-            Console.WriteLine("RichMediaAnnotation found:");
-            Console.WriteLine($"  Name               : {richMedia.Name}");
-            Console.WriteLine($"  AnnotationType     : {richMedia.AnnotationType}");
-            Console.WriteLine($"  Rect               : {richMedia.Rect}");
+            // Display selected properties of the annotation
+            Console.WriteLine($"Name: {richMedia.Name}");
+            // Use AnnotationType instead of the non‑existent Subtype property
+            Console.WriteLine($"Annotation Type: {richMedia.AnnotationType}");
 
-            // RichMediaContent and RichMediaSettings may not exist in older library versions.
-            // Use reflection to safely access them if they are present.
+            // RichMediaContent may not be present in older Aspose.Pdf versions.
+            // Access it via reflection to keep the code compilable across versions.
             PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
-            PropertyInfo settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
+            if (contentProp != null)
+            {
+                object content = contentProp.GetValue(richMedia);
+                if (content != null)
+                {
+                    // Try to read the "Type" property of the content
+                    PropertyInfo typeProp = content.GetType().GetProperty("Type");
+                    object typeValue = typeProp?.GetValue(content);
+                    Console.WriteLine($"Content Type: {typeValue ?? "<unknown>"}");
 
-            bool hasContent = contentProp != null && contentProp.GetValue(richMedia) != null;
-            bool hasSettings = settingsProp != null && settingsProp.GetValue(richMedia) != null;
-
-            Console.WriteLine($"  RichMediaContent   : {(hasContent ? "Present" : "None")}");
-            Console.WriteLine($"  RichMediaSettings  : {(hasSettings ? "Present" : "None")}");
+                    // Try to read the asset name (if any)
+                    PropertyInfo assetProp = content.GetType().GetProperty("Asset");
+                    object asset = assetProp?.GetValue(content);
+                    string assetName = "<none>";
+                    if (asset != null)
+                    {
+                        PropertyInfo nameProp = asset.GetType().GetProperty("Name");
+                        assetName = nameProp?.GetValue(asset) as string ?? "<none>";
+                    }
+                    Console.WriteLine($"Asset Name: {assetName}");
+                }
+                else
+                {
+                    Console.WriteLine("RichMediaContent is null.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("RichMediaContent property is not available in this Aspose.Pdf version.");
+            }
         }
     }
 }

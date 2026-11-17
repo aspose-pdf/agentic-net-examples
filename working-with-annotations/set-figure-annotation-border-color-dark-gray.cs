@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,42 +16,33 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Define dark gray color using Aspose.Pdf.Color (cross‑platform)
+            Aspose.Pdf.Color darkGray = Aspose.Pdf.Color.FromRgb(0.33, 0.33, 0.33);
+
+            // Iterate over all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Define dark gray color (RGB values are 0‑255 range)
-                Aspose.Pdf.Color darkGray = Aspose.Pdf.Color.FromRgb(51, 51, 51); // approx 0.2 * 255
+                Page page = doc.Pages[i];
 
-                // Iterate through all pages and their annotations
-                foreach (Page page in doc.Pages)
+                // Iterate over each annotation on the page
+                foreach (Annotation annot in page.Annotations)
                 {
-                    foreach (Annotation ann in page.Annotations)
+                    // Figure annotations (Square, Circle, Polygon, etc.) inherit from MarkupAnnotation.
+                    // The border colour is set via the Color property, not BorderColor.
+                    if (annot is MarkupAnnotation markup)
                     {
-                        // StampAnnotation is the Aspose.Pdf core type that represents a figure/image annotation.
-                        if (ann is StampAnnotation stampAnn)
-                        {
-                            // Set the border colour – the Color property controls the border colour
-                            stampAnn.Color = darkGray;
-
-                            // Ensure a visible border width (default may be 0)
-                            if (stampAnn.Border == null)
-                                stampAnn.Border = new Border(stampAnn) { Width = 1 };
-                            else
-                                stampAnn.Border.Width = 1;
-                        }
+                        markup.Color = darkGray;
                     }
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"All figure annotation borders updated and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All figure annotation borders set to dark gray. Saved to '{outputPath}'.");
     }
 }

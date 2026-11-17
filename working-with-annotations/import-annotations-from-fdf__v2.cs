@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "annotations.fdf";
-        const string outputPath = "output.pdf";
+        const string pdfPath = "input.pdf";          // source PDF
+        const string fdfPath = "annotations.fdf";    // FDF containing annotations
+        const string outputPath = "output.pdf";      // PDF with imported annotations
 
         if (!File.Exists(pdfPath))
         {
@@ -22,85 +22,45 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Simple FDF parser – expects lines in the form:
-            // Page=1;Text=Sample annotation;X=100;Y=500;Width=200;Height=50
-            foreach (string rawLine in File.ReadAllLines(fdfPath))
+            // Load the original PDF document.
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                if (string.IsNullOrWhiteSpace(rawLine))
-                    continue;
-
-                // Split the line into key/value pairs
-                var parts = rawLine.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                int pageNumber = 0;
-                string text = string.Empty;
-                double x = 100, y = 500, width = 200, height = 50; // defaults
-
-                foreach (string part in parts)
+                // Load the FDF file. Aspose.Pdf can load an FDF directly as a Document
+                // without requiring the separate Aspose.Pdf.Fdf assembly.
+                using (Document fdfDoc = new Document(fdfPath))
                 {
-                    var kv = part.Split(new[] { '=' }, 2);
-                    if (kv.Length != 2)
-                        continue;
+                    // Ensure both documents have the same page count or handle missing pages gracefully.
+                    int pageCount = Math.Min(pdfDoc.Pages.Count, fdfDoc.Pages.Count);
 
-                    string key = kv[0].Trim().ToLowerInvariant();
-                    string value = kv[1].Trim();
-
-                    switch (key)
+                    // Pages are 1‑based in Aspose.Pdf.
+                    for (int i = 1; i <= pageCount; i++)
                     {
-                        case "page":
-                            int.TryParse(value, out pageNumber);
-                            break;
-                        case "text":
-                            text = value;
-                            break;
-                        case "x":
-                            double.TryParse(value, out x);
-                            break;
-                        case "y":
-                            double.TryParse(value, out y);
-                            break;
-                        case "width":
-                            double.TryParse(value, out width);
-                            break;
-                        case "height":
-                            double.TryParse(value, out height);
-                            break;
+                        Page targetPage = pdfDoc.Pages[i];
+                        Page fdfPage = fdfDoc.Pages[i];
+
+                        // Transfer each annotation from the FDF page to the corresponding PDF page.
+                        foreach (Annotation srcAnn in fdfPage.Annotations)
+                        {
+                            // Clone the annotation to avoid reference issues.
+                            Annotation clonedAnn = (Annotation)srcAnn.Clone();
+
+                            // Add the cloned annotation to the target page.
+                            targetPage.Annotations.Add(clonedAnn);
+                        }
                     }
                 }
 
-                // Validate page number
-                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber} in FDF line: {rawLine}");
-                    continue;
-                }
-
-                // Create a rectangle for the annotation (lower‑left X,Y, upper‑right X+W,Y+H)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    x,
-                    y,
-                    x + width,
-                    y + height);
-
-                // Create a text annotation and set its properties
-                TextAnnotation annotation = new TextAnnotation(doc.Pages[pageNumber], rect)
-                {
-                    Title = "FDF Import",
-                    Contents = text,
-                    Open = true,
-                    Icon = TextIcon.Note
-                };
-
-                // Add the annotation to the appropriate page
-                doc.Pages[pageNumber].Annotations.Add(annotation);
+                // Save the updated PDF.
+                pdfDoc.Save(outputPath);
             }
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Annotations imported successfully. Output saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Annotations imported from '{fdfPath}' and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

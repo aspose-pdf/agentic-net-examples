@@ -16,39 +16,42 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
         using (Document doc = new Document(inputPath))
         {
-            // Dictionary mapping annotation identifier -> page number (1‑based)
-            // Aspose.Pdf.Annotation does not expose an "Id" property. The closest
-            // built‑in identifier is the "Name" property. If an annotation does not
-            // have a Name we generate a temporary GUID so that every entry in the
-            // dictionary has a unique key.
-            Dictionary<string, int> annotationMap = new Dictionary<string, int>();
+            // Dictionary to map annotation identifier -> page number
+            // The base Annotation class does not expose an Id property; use the Name property instead (rule: avoid-annotation-id-property)
+            var annotationPageMap = new Dictionary<string, int>();
 
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Pages are 1‑based (rule: page-indexing-one-based)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[i];
+                Page page = doc.Pages[pageNum];
 
-                // Enumerate all annotations on the current page
-                foreach (Annotation annot in page.Annotations)
+                // Iterate over all annotations on the current page
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Use the Name property as the identifier; fall back to a GUID when Name is null or empty
-                    string id = string.IsNullOrEmpty(annot.Name) ? Guid.NewGuid().ToString() : annot.Name;
+                    // Use Name as the unique identifier; fall back to empty string if not set
+                    string id = annotation.Name ?? string.Empty;
 
-                    // Store the mapping; later duplicates (same Name) will overwrite earlier ones
-                    annotationMap[id] = i;
+                    // Optionally skip annotations without a name (they cannot be looked up reliably)
+                    if (string.IsNullOrEmpty(id))
+                        continue;
+
+                    // Add to the dictionary; if duplicate names exist, keep the first occurrence
+                    if (!annotationPageMap.ContainsKey(id))
+                    {
+                        annotationPageMap[id] = pageNum;
+                    }
                 }
             }
 
-            // Example: output the collected mappings
-            foreach (var kvp in annotationMap)
+            // Example: output the mapping for verification
+            Console.WriteLine("Annotation Name -> Page Number mapping:");
+            foreach (var kvp in annotationPageMap)
             {
-                Console.WriteLine($"Annotation Id: {kvp.Key} -> Page: {kvp.Value}");
+                Console.WriteLine($"{kvp.Key} -> {kvp.Value}");
             }
-
-            // The dictionary 'annotationMap' can now be used for quick lookup of page numbers by annotation Id.
         }
     }
 }

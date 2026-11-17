@@ -7,77 +7,50 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and output PDF paths
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output_tagged.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_sound.pdf";
+        const string audioFolder = "Audio"; // folder containing audio1.wav, audio2.wav, ...
 
-        // Audio files – one per page (ensure the array length matches the number of pages)
-        string[] audioFiles = new string[]
+        if (!File.Exists(inputPdf))
         {
-            "page1.wav",
-            "page2.wav",
-            "page3.wav",
-            // add more entries as needed
-        };
-
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Verify that all audio files exist before processing
-        for (int i = 0; i < audioFiles.Length; i++)
+        // Load PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            if (!File.Exists(audioFiles[i]))
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Console.Error.WriteLine($"Audio file not found: {audioFiles[i]} (page {i + 1})");
-                return;
-            }
-        }
+                Page page = doc.Pages[pageIndex];
 
-        try
-        {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdfPath))
-            {
-                // Ensure we have at least as many audio files as pages
-                int pageCount = doc.Pages.Count;
-                if (audioFiles.Length < pageCount)
+                // Build expected audio file name for this page
+                string audioPath = Path.Combine(audioFolder, $"audio{pageIndex}.wav");
+                if (!File.Exists(audioPath))
                 {
-                    Console.Error.WriteLine($"Not enough audio files ({audioFiles.Length}) for {pageCount} pages.");
-                    return;
+                    Console.WriteLine($"Audio file not found for page {pageIndex}: {audioPath}. Skipping annotation.");
+                    continue;
                 }
 
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-                for (int i = 1; i <= pageCount; i++)
-                {
-                    Page page = doc.Pages[i];
+                // Define a rectangle where the annotation icon will appear (lower‑left x,y, upper‑right x,y)
+                // Here we place it near the bottom‑left corner of the page.
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 50, 70, 70);
 
-                    // Define a rectangle where the annotation icon will appear
-                    // (llx, lly, urx, ury) – adjust coordinates as needed
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 150, 550);
+                // Create the sound annotation using the overload that accepts a file path.
+                SoundAnnotation sound = new SoundAnnotation(page, rect, audioPath);
+                sound.Title = $"Audio for page {pageIndex}";
+                // Optional: set an icon (Speaker, Mic, etc.). Default is Speaker.
+                // sound.Icon = SoundIcon.Speaker; // uncomment if needed
 
-                    // Create the sound annotation for the current page
-                    // Constructor: SoundAnnotation(Page page, Rectangle rect, string filePath)
-                    SoundAnnotation soundAnno = new SoundAnnotation(page, rect, audioFiles[i - 1]);
-
-                    // Optional: set a title that appears in the annotation popup
-                    soundAnno.Title = $"Audio for page {i}";
-
-                    // Add the annotation to the page's annotation collection
-                    page.Annotations.Add(soundAnno);
-                }
-
-                // Save the modified PDF (PDF format by default)
-                doc.Save(outputPdfPath);
+                // Add the annotation to the page's annotation collection
+                page.Annotations.Add(sound);
             }
 
-            Console.WriteLine($"Sound annotations added. Output saved to '{outputPdfPath}'.");
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF with sound annotations saved to '{outputPdf}'.");
     }
 }

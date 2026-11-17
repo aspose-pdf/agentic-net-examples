@@ -6,54 +6,60 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where watermarked PDFs will be written
-        const string outputFolder = "OutputPdfs";
-        // Path to the image that will be used as the watermark
+        // Input PDF files to be watermarked
+        string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // Path to the watermark image (PNG, JPG, etc.)
         const string watermarkImagePath = "watermark.png";
+        // Directory where watermarked PDFs will be saved
+        const string outputDirectory = "Watermarked";
 
-        if (!Directory.Exists(inputFolder))
+        if (!File.Exists(watermarkImagePath))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
             return;
         }
 
         // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDirectory);
 
-        // Create a single ImageStamp instance to reuse for all documents.
-        // Reusing the same instance avoids reloading the image file repeatedly.
-        ImageStamp watermarkStamp = new ImageStamp(watermarkImagePath)
+        // Create a single ImageStamp instance that will be reused for all PDFs.
+        // Reusing the same stamp keeps the image data embedded only once per document,
+        // reducing the overall file size compared to loading a new stamp each time.
+        Aspose.Pdf.ImageStamp sharedStamp = new Aspose.Pdf.ImageStamp(watermarkImagePath)
         {
-            Opacity = 0.5,                     // 50% transparent
-            Background = false,                // place on top of page content
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment   = VerticalAlignment.Center,
-            // Optional: Scale = 0.5, // 50% of original size
-            // Optional: Rotate = 45   // degrees
+            // Place the stamp behind the page content
+            Background = true,
+            // Semi‑transparent watermark
+            Opacity = 0.5,
+            // Center the image on each page
+            HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center,
+            VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Center
         };
 
-        // Iterate over every PDF file in the input folder.
-        foreach (string sourcePdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in pdfFiles)
         {
-            string fileName   = Path.GetFileName(sourcePdfPath);
-            string targetPath = Path.Combine(outputFolder, fileName);
-
-            // Load the PDF, add the watermark to each page, and save.
-            using (Document doc = new Document(sourcePdfPath))
+            if (!File.Exists(pdfPath))
             {
-                foreach (Page page in doc.Pages)
-                {
-                    // Add the same ImageStamp instance to each page.
-                    page.AddStamp(watermarkStamp);
-                }
-
-                // Save the modified PDF.
-                doc.Save(targetPath);
+                Console.Error.WriteLine($"PDF not found: {pdfPath}");
+                continue;
             }
 
-            Console.WriteLine($"Watermarked PDF saved: {targetPath}");
+            // Load the source PDF inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
+            {
+                // Apply the shared watermark to every page of the document
+                foreach (Aspose.Pdf.Page page in doc.Pages)
+                {
+                    page.AddStamp(sharedStamp);
+                }
+
+                // Build the output file path
+                string outputPath = Path.Combine(outputDirectory, Path.GetFileName(pdfPath));
+
+                // Save the watermarked PDF
+                doc.Save(outputPath);
+                Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+            }
         }
     }
 }
