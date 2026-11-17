@@ -8,64 +8,74 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed.pdf";
-        const string thumbprint = "YOUR_CERT_THUMBPRINT"; // replace with the actual thumbprint
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string thumbprint = "YOUR_CERTIFICATE_THUMBPRINT"; // replace with actual thumbprint (no spaces, case‑insensitive)
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the certificate from the current user's Personal store using its thumbprint
-        X509Certificate2? cert = GetCertificateFromStore(thumbprint, StoreName.My, StoreLocation.CurrentUser);
-        if (cert == null)
+        // Load the certificate from the current user's personal store
+        X509Certificate2 certificate = FindCertificateByThumbprint(thumbprint);
+        if (certificate == null)
         {
-            Console.Error.WriteLine($"Certificate with thumbprint {thumbprint} not found in the store.");
+            Console.Error.WriteLine($"Certificate with thumbprint '{thumbprint}' not found in the store.");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Define the rectangle where the visual signature will appear (coordinates are in points)
-        var signatureRect = new Rectangle(100, 100, 200, 150);
-
-        // Create a signature field on the first page
-        var signatureField = new SignatureField(pdfDocument.Pages[1], signatureRect)
+        // Open the PDF document
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            PartialName = "Signature1"
-        };
+            // ------------------------------------------------------------
+            // 1️⃣ Create a (invisible) signature field on the first page.
+            // ------------------------------------------------------------
+            Page page = pdfDocument.Pages[1];
+            // An invisible rectangle – width/height = 0. Change if a visible appearance is required.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+            var signatureField = new SignatureField(page, rect)
+            {
+                PartialName = "Signature1"
+            };
+            // Add the field to the document's form collection.
+            pdfDocument.Form.Add(signatureField, 1);
 
-        // Add the signature field to the document's form collection
-        pdfDocument.Form.Add(signatureField, 1);
+            // ------------------------------------------------------------
+            // 2️⃣ Prepare the PKCS#7 signature object using the X509 cert.
+            // ------------------------------------------------------------
+            // Export the X509Certificate2 to a PFX (no password needed).
+            byte[] pfxBytes = certificate.Export(X509ContentType.Pfx);
+            using var pfxStream = new MemoryStream(pfxBytes);
+            var pkcs7 = new PKCS7(pfxStream, string.Empty)
+            {
+                Reason = "Document approval",
+                Location = "Office",
+                ContactInfo = "contact@example.com"
+            };
 
-        // NOTE:
-        // The PKCS#7 digital signature functionality resides in the optional
-        // Aspose.Pdf.Signatures assembly. The core Aspose.Pdf library does not
-        // expose a writable Signature property on SignatureField, therefore the
-        // example creates only an empty signature field that compiles without the
-        // extra package. To apply a real digital signature, reference the
-        // Aspose.Pdf.Signatures NuGet package and use the PKCS7Signature class as
-        // demonstrated in the official documentation.
+            // ------------------------------------------------------------
+            // 3️⃣ Sign the field.
+            // ------------------------------------------------------------
+            signatureField.Sign(pkcs7);
 
-        // Save the PDF (with the empty signature field)
-        pdfDocument.Save(outputPdf);
+            // Save the signed PDF.
+            pdfDocument.Save(outputPdfPath);
+        }
 
-        Console.WriteLine($"PDF processed successfully: {outputPdf}");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 
-    /// <summary>
-    /// Retrieves an X509Certificate2 from the specified store by thumbprint.
-    /// </summary>
-    private static X509Certificate2? GetCertificateFromStore(string thumbprint, StoreName storeName, StoreLocation storeLocation)
+    // Helper method to locate a certificate by thumbprint in the CurrentUser\My store
+    private static X509Certificate2 FindCertificateByThumbprint(string thumbprint)
     {
-        using (var store = new X509Store(storeName, storeLocation))
-        {
-            store.Open(OpenFlags.ReadOnly);
-            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, validOnly: false);
-            return certs.Count > 0 ? certs[0] : null;
-        }
+        using var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+        store.Open(OpenFlags.ReadOnly);
+        X509Certificate2Collection found = store.Certificates.Find(
+            X509FindType.FindByThumbprint,
+            thumbprint,
+            validOnly: false);
+        return found.Count > 0 ? found[0] : null;
     }
 }

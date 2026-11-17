@@ -4,22 +4,25 @@ using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Optimization;
 
-class Program
+class BatchSignAndCompress
 {
-    // Adjust these paths as needed
-    const string InputFolder   = @"C:\Pdf\Input";
-    const string OutputFolder  = @"C:\Pdf\SignedCompressed";
-    const string CertPath      = @"C:\Certificates\mycert.pfx";
-    const string CertPassword  = "certPassword";
-
     static void Main()
     {
-        // Ensure output directory exists
-        Directory.CreateDirectory(OutputFolder);
+        // Paths – adjust as needed
+        const string inputFolder = @"C:\InputPdfs";
+        const string outputFolder = @"C:\SignedCompressedPdfs";
+        const string certificatePath = @"C:\certificates\mycert.pfx";
+        const string certificatePwd = "certPassword";
+
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string pdfFile in Directory.GetFiles(InputFolder, "*.pdf"))
+        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
         {
+            string fileName = Path.GetFileName(pdfFile);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
             try
             {
                 // Load the PDF document
@@ -29,43 +32,39 @@ class Program
                     // Add a digital signature field on the first page
                     // -------------------------------------------------
                     // Define the rectangle where the signature will appear
-                    Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+                    Rectangle sigRect = new Rectangle(100, 100, 250, 150);
 
-                    // Create the signature field and add it to the form
+                    // Create the signature field on page 1
                     SignatureField sigField = new SignatureField(doc.Pages[1], sigRect);
+
+                    // Add the field to the document's form collection (page number = 1)
                     doc.Form.Add(sigField, 1);
 
-                    // Configure the signature properties
-                    Signature signature = sigField.Signature; // read‑only property, but its members are writable
-                    signature.ContactInfo = "contact@example.com";
-                    signature.Location    = "Office";
-                    signature.Reason      = "Document approval";
-                    // Attach the certificate (PKCS#7) using the Forms API
-                    PKCS1 pkcs = new PKCS1(CertPath, CertPassword);
-                    sigField.Sign(pkcs);
+                    // -------------------------------------------------
+                    // Sign the field using a PKCS#7 certificate
+                    // -------------------------------------------------
+                    PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePwd);
+                    sigField.Sign(pkcs7);
 
                     // -------------------------------------------------
-                    // Optimize (compress) the signed document
+                    // Compress the signed document to reduce size
                     // -------------------------------------------------
-                    OptimizationOptions optOptions = new OptimizationOptions
-                    {
-                        // Example: enable object stream compression
-                        CompressObjects = true
-                    };
-                    doc.OptimizeResources(optOptions);
+                    OptimizationOptions opt = OptimizationOptions.All();
+                    opt.CompressImages = true;
+                    opt.ImageQuality = 50; // adjust as needed
+                    opt.RemoveUnusedObjects = true;
+                    opt.RemoveUnusedStreams = true;
+                    doc.OptimizeResources(opt);
 
-                    // -------------------------------------------------
-                    // Save the processed PDF
-                    // -------------------------------------------------
-                    string outputPath = Path.Combine(OutputFolder, Path.GetFileName(pdfFile));
+                    // Save the signed and compressed PDF
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
+                Console.WriteLine($"Processed: {fileName}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
 

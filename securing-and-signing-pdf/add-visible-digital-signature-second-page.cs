@@ -7,74 +7,73 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed.pdf";
-        const string certPath = "cert.pfx";
-        const string certPassword = "password";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "certPassword";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(certPath))
         {
             Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Verify that the document has at least two pages
-            if (doc.Pages.Count < 2)
+            // Determine the rectangle for the visible signature on page 2 (bottom‑right corner)
+            const float margin = 10f;          // margin from page edges
+            const float sigWidth = 150f;       // width of signature appearance
+            const float sigHeight = 50f;       // height of signature appearance
+
+            // Aspose.Pdf uses 1‑based page indexing
+            Page targetPage = pdfDoc.Pages[2];
+            // PageInfo.Width/Height return double – cast to float for rectangle calculations
+            float pageWidth = (float)targetPage.PageInfo.Width;
+            float pageHeight = (float)targetPage.PageInfo.Height;
+
+            // Lower‑left (llx,lly) and upper‑right (urx,ury) coordinates
+            float llx = pageWidth - sigWidth - margin;
+            float lly = margin;
+            float urx = pageWidth - margin;
+            float ury = sigHeight + margin;
+
+            // Create the signature appearance rectangle
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+            // Create a visible signature field on page 2 and add it to the form
+            SignatureField signatureField = new SignatureField(targetPage, sigRect);
+            signatureField.PartialName = "Signature1";
+            pdfDoc.Form.Add(signatureField, targetPage.Number);
+
+            // Prepare PKCS7 credentials (the concrete Signature implementation)
+            PKCS7 pkcs = new PKCS7(certPath, certPassword);
+            pkcs.Reason = "Document approved";
+            pkcs.Location = "Head Office";
+            pkcs.ContactInfo = "contact@example.com";
+
+            // Configure a simple visual appearance (background color and font)
+            pkcs.CustomAppearance = new SignatureCustomAppearance
             {
-                Console.Error.WriteLine("Document has less than two pages.");
-                return;
-            }
-
-            // Get dimensions of the second page
-            Page page = doc.Pages[2];
-            double pageWidth = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
-
-            // Define signature appearance size and margin (points)
-            double sigWidth = 150;   // width of the visible signature
-            double sigHeight = 50;   // height of the visible signature
-            double margin = 20;      // distance from page edges
-
-            // Calculate rectangle positioned at bottom‑right corner
-            double llx = pageWidth - sigWidth - margin; // lower‑left X
-            double lly = margin;                         // lower‑left Y
-            double urx = pageWidth - margin;             // upper‑right X
-            double ury = margin + sigHeight;             // upper‑right Y
-
-            // Fully qualified rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-            // Create a signature field on the second page (the constructor places it on the page)
-            SignatureField sigField = new SignatureField(doc, rect);
-            doc.Form.Add(sigField);
-
-            // NOTE: In the Aspose.Pdf version used, the visible appearance is automatically
-            // derived from the rectangle supplied to the SignatureField constructor.
-            // Therefore we omit the SignatureAppearance block that caused compilation errors.
-
-            // Create PKCS#1 signature handler using the certificate file (LocationInfo is not supported in this class)
-            PKCS1 pkcs = new PKCS1(certPath, certPassword)
-            {
-                ContactInfo = "contact@example.com",
-                Reason = "Document approval"
+                BackgroundColor = Aspose.Pdf.Color.FromArgb(80, 240, 240, 255), // semi‑transparent
+                FontFamilyName = "Arial",
+                FontSize = 9,
+                ShowLocation = true,
+                ShowReason = true
             };
 
-            // Apply the digital signature to the field
-            sigField.Sign(pkcs);
+            // Sign the field (the field's Signature property becomes read‑only after this call)
+            signatureField.Sign(pkcs);
 
             // Save the signed PDF
-            doc.Save(outputPath);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
     }
 }

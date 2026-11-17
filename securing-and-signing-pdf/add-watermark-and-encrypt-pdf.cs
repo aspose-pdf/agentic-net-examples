@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -10,43 +11,45 @@ class Program
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Create a new PDF document inside a using block for deterministic disposal.
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single blank page (pages are 1‑based).
+            // Add a sample page with some content
             Page page = doc.Pages.Add();
+            page.Paragraphs.Add(new TextFragment("Sample PDF content."));
 
-            // Create a text stamp that will serve as the watermark.
-            TextStamp watermark = new TextStamp("CONFIDENTIAL")
+            // Add a watermark overlay to every page using TextStamp
+            foreach (Page p in doc.Pages)
             {
-                // Position the stamp at the center of the page.
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
+                // Prepare TextState for the stamp (use font name overload to avoid type mismatch)
+                TextState textState = new TextState("Arial", 72);
+                textState.FontStyle = FontStyles.Bold;
 
-                // Rotate the watermark for a typical overlay effect.
-                RotateAngle = 45f,
+                // Create the stamp with the prepared TextState
+                TextStamp watermark = new TextStamp("CONFIDENTIAL", textState)
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center,
+                    // RotateAngle replaces the non‑existent Rotation property
+                    RotateAngle = 45f,
+                    // Semi‑transparent watermark
+                    Opacity = 0.3,
+                    // Place the watermark behind existing content
+                    Background = true
+                };
+                p.AddStamp(watermark);
+            }
 
-                // Make the watermark semi‑transparent.
-                Opacity = 0.3f,
-
-                // Enable background rectangle (default background color is used).
-                Background = true
-                // Note: TextStamp does not expose a BackgroundColor property; the default background is sufficient.
-            };
-
-            // Apply the watermark to the page.
-            page.AddStamp(watermark);
-
-            // Define permissions for the encrypted PDF.
+            // Define permissions: allow printing and content extraction, but disallow modifications
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt the document using the recommended AES‑256 algorithm.
+            // Encrypt the document with a strong algorithm
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the secured PDF. The Document is still alive until Save completes.
+            // Save the secured PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF created with watermark and encryption: {outputPath}");
+        Console.WriteLine($"PDF saved to '{outputPath}' with encryption and watermark.");
     }
 }

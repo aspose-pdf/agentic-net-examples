@@ -7,62 +7,58 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_timestamped.pdf";
-        const string certificate = "certificate.pfx";
-        const string certPassword = "certPassword";
-        const string tsaUrl = "http://timestamp.digicert.com";
+        // Paths to the source PDF, output PDF, and signing certificate (PKCS#12)
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed.pdf";
+        const string certificatePath = "certificate.pfx";
+        const string certificatePassword = "certPassword";
 
-        if (!File.Exists(inputPdf))
+        // URL of the trusted Time‑Stamp Authority (TSA) server
+        const string tsaUrl = "http://timestamp.example.com";
+
+        // Verify that required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(certificatePath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        if (!File.Exists(certificate))
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPdfPath);
+
+        // Define the rectangle where the signature appearance will be placed
+        // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+        Rectangle signatureRect = new Rectangle(100, 100, 250, 150);
+
+        // Create a signature field on the first page
+        SignatureField signatureField = new SignatureField(pdfDoc.Pages[1], signatureRect)
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificate}");
-            return;
-        }
+            PartialName = "Signature1"
+        };
 
-        try
+        // Add the signature field to the document's form collection
+        pdfDoc.Form.Add(signatureField, 1);
+
+        // Prepare the PKCS7 object with certificate and timestamp settings
+        PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
         {
-            // Load the PDF document
-            Document doc = new Document(inputPdf);
+            Reason = "Approved for release",
+            Location = "New York, USA",
+            ContactInfo = "contact@example.com",
+            TimestampSettings = new TimestampSettings(tsaUrl, null, DigestHashAlgorithm.Sha256)
+        };
 
-            // Define the rectangle where the signature will appear (coordinates are in points)
-            // Here we place it on the first page at (100,100) with width 200 and height 100
-            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+        // Sign the PDF using the PKCS7 object (timestamp will be applied automatically)
+        signatureField.Sign(pkcs7);
 
-            // Create a signature field and add it to the document's form collection
-            SignatureField sigField = new SignatureField(doc, sigRect)
-            {
-                Name = "Signature1"
-            };
-            doc.Form.Add(sigField);
+        // Save the signed PDF
+        pdfDoc.Save(outputPdfPath);
 
-            // Prepare the PKCS#7 signature using the provided certificate
-            PKCS7 pkcs7 = new PKCS7(certificate, certPassword)
-            {
-                Reason = "Document signed",
-                Location = "MyCompany"
-                // SigningTime is automatically set; no explicit property exists.
-            };
-
-            // Apply a timestamp from a trusted TSA server using TimestampSettings
-            pkcs7.TimestampSettings = new TimestampSettings(tsaUrl, string.Empty);
-
-            // Sign the field with the prepared PKCS#7 object
-            sigField.Sign(pkcs7);
-
-            // Save the signed and timestamped PDF
-            doc.Save(outputPdf);
-
-            Console.WriteLine($"Signed PDF with timestamp saved to '{outputPdf}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
     }
 }

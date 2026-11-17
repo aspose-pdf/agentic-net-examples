@@ -1,100 +1,103 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class PdfSignatureValidator
 {
     static void Main()
     {
-        const string pdfPath = "signed.pdf";
-        const string caPath = "rootCA.cer";
+        const string pdfPath = "signed_document.pdf";
+        const string rootCaPath = "trusted_root_ca.cer";
 
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(caPath))
+
+        if (!File.Exists(rootCaPath))
         {
-            Console.Error.WriteLine($"Root CA file not found: {caPath}");
+            Console.Error.WriteLine($"Root CA certificate not found: {rootCaPath}");
             return;
         }
 
-        // Load the trusted root certificate using the recommended loader to avoid the obsolete constructor warning
-        X509Certificate2 rootCert = X509CertificateLoader.LoadCertificateFromFile(caPath);
-        X509Certificate2Collection trustedRoots = new X509Certificate2Collection { rootCert };
+        // Load the trusted root CA certificate using the byte[] overload (avoids the obsolete string ctor)
+        X509Certificate2 rootCa = new X509Certificate2(File.ReadAllBytes(rootCaPath));
+        // Prepare a custom trust store that contains only the supplied root CA
+        var trustedRootStore = new X509Chain();
+        trustedRootStore.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+        trustedRootStore.ChainPolicy.CustomTrustStore.Add(rootCa);
+        trustedRootStore.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
 
-        // Load the PDF document
-        Document doc = new Document(pdfPath);
-
-        bool anySignature = false;
-        foreach (var field in doc.Form.Fields)
+        // Open the PDF document
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            if (field is SignatureField sigField)
+            // Retrieve all signature fields from the form (Form.SignatureFields does not exist)
+            var signatureFields = pdfDoc.Form?.Fields?.OfType<SignatureField>()?.ToList();
+
+            if (signatureFields == null || signatureFields.Count == 0)
             {
-                anySignature = true;
-                Console.WriteLine($"Processing signature field: '{sigField.PartialName}'");
+                Console.WriteLine("No digital signatures found in the PDF.");
+                return;
+            }
 
-                // Extract the certificate embedded in the signature (if any)
-                X509Certificate2? embeddedCert = null;
-                try
-                {
-                    using (Stream certStream = sigField.ExtractCertificate())
-                    {
-                        if (certStream != null && certStream.Length > 0)
-                        {
-                            // Load the certificate from the extracted stream
-                            byte[] raw = new byte[certStream.Length];
-                            certStream.Read(raw, 0, raw.Length);
-                            embeddedCert = new X509Certificate2(raw);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"- Unable to extract certificate from signature: {ex.Message}");
-                }
+            foreach (SignatureField sigField in signatureFields)
+            {
+                Console.WriteLine($"Signature Name: {sigField.PartialName}");
 
-                if (embeddedCert == null)
+                // If the field has not been signed yet, Signature will be null
+                if (sigField.Signature == null)
                 {
-                    Console.WriteLine("- No certificate found in the signature; cannot validate trust chain.");
+                    Console.WriteLine("  Not signed.");
                     continue;
                 }
 
-                // Build a chain using the trusted root collection
-                using (X509Chain chain = new X509Chain())
+                // Extract the signing certificate from the signature field
+                using (Stream certStream = sigField.ExtractCertificate())
                 {
-                    // Add the trusted root(s) to the extra store
-                    foreach (var root in trustedRoots)
-                        chain.ChainPolicy.ExtraStore.Add(root);
-
-                    // Configure chain policy – we want to trust only the supplied roots
-                    chain.ChainPolicy.VerificationFlags = X509VerificationFlags.AllowUnknownCertificateAuthority;
-                    chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck; // optional: skip OCSP/CRL checks for this example
-                    chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
-
-                    bool chainIsValid = chain.Build(embeddedCert);
-                    if (chainIsValid)
+                    if (certStream == null || certStream.Length == 0)
                     {
-                        Console.WriteLine($"Signature '{sigField.PartialName}' is cryptographically valid and chains to a trusted root.");
+                        Console.WriteLine("  Unable to extract certificate from signature.");
+                        continue;
                     }
-                    else
+
+                    // Load the certificate (byte[] overload – not obsolete)
+                    byte[] certBytes;
+                    using (var ms = new MemoryStream())
                     {
-                        Console.WriteLine($"Signature '{sigField.PartialName}' validation failed. Chain status:");
-                        foreach (X509ChainStatus status in chain.ChainStatus)
+                        certStream.CopyTo(ms);
+                        certBytes = ms.ToArray();
+                    }
+                    X509Certificate2 signingCert = new X509Certificate2(certBytes);
+
+                    // Build a chain using the custom trust store (only the supplied root CA)
+                    using (var chain = new X509Chain())
+                    {
+                        chain.ChainPolicy.TrustMode = X509ChainTrustMode.CustomRootTrust;
+                        chain.ChainPolicy.CustomTrustStore.Add(rootCa);
+                        chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+
+                        bool isValid = chain.Build(signingCert);
+                        Console.WriteLine($"  Valid: {isValid}");
+
+                        if (!isValid)
                         {
-                            Console.WriteLine($"- {status.StatusInformation.Trim()} (Status: {status.Status})");
+                            foreach (X509ChainStatus status in chain.ChainStatus)
+                            {
+                                Console.WriteLine($"  Error: {status.StatusInformation.Trim()} (Status: {status.Status})");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("  Signature is trusted and has a valid certificate chain.");
                         }
                     }
                 }
             }
-        }
-
-        if (!anySignature)
-        {
-            Console.WriteLine("No signature fields found in the PDF.");
         }
     }
 }

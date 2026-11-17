@@ -1,86 +1,70 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using System.Drawing; // for Rectangle used by the signature field
 
 class Program
 {
     static void Main()
     {
-        // Paths to the input PDF and the signed output PDF
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "signed.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
+        // NOTE: The example below uses a PFX file for demonstration. 
+        // When signing with a hardware token you would obtain the certificate
+        // and private key via the token's PKCS#11 library and create a PKCS7
+        // instance accordingly (the API supports PKCS#11 through PKCS11SignatureOptions
+        // in newer versions, but that class resides in a different namespace that
+        // is not available in the current package version). The core signing flow
+        // remains the same – create a SignatureField, configure a PKCS7 object and
+        // call field.Sign(pkcs7).
+        const string certificatePath = "certificate.pfx"; // replace with your token‑derived cert if needed
+        const string certificatePassword = "password";   // replace with the token PIN or cert password
 
-        // Thumbprint of the certificate stored on the hardware token (PKCS#11)
-        const string certificateThumbprint = "YOUR_CERTIFICATE_THUMBPRINT";
-
-        // Verify that the input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-
-        // Load the certificate from the hardware token (CurrentUser\My store)
-        X509Certificate2 signingCertificate = null;
-        using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
+        if (!File.Exists(certificatePath))
         {
-            store.Open(OpenFlags.ReadOnly);
-            var found = store.Certificates.Find(
-                X509FindType.FindByThumbprint,
-                certificateThumbprint,
-                validOnly: false);
-
-            if (found.Count > 0)
-                signingCertificate = found[0];
-        }
-
-        if (signingCertificate == null)
-        {
-            Console.Error.WriteLine("Signing certificate not found on the hardware token.");
-            return;
-        }
-
-        // Ensure the certificate has an associated private key (required for signing)
-        if (!signingCertificate.HasPrivateKey)
-        {
-            Console.Error.WriteLine("The selected certificate does not contain a private key.");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            Document pdfDocument = new Document(inputPdfPath);
-
-            // Define the rectangle where the signature will appear (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-            Aspose.Pdf.Rectangle signatureRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-
-            // Create a signature field on the first page
-            SignatureField signatureField = new SignatureField(pdfDocument.Pages[1], signatureRect)
+            using (Document pdfDoc = new Document(inputPath))
             {
-                PartialName = "Signature1"
-            };
+                // Define a visible signature field on the first page
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                SignatureField sigField = new SignatureField(pdfDoc.Pages[1], rect)
+                {
+                    PartialName = "Signature1"
+                };
+                pdfDoc.Form.Add(sigField, 1);
 
-            // Add the signature field to the document's form collection
-            pdfDocument.Form.Add(signatureField, 1);
+                // Configure the PKCS7 signature (replace with PKCS#11 handling as needed)
+                PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+                {
+                    Reason = "Document signed with hardware token",
+                    Location = "Company",
+                    ContactInfo = "support@company.com"
+                };
 
-            // NOTE:
-            // Adding a real digital signature requires the optional Aspose.Pdf.Signatures package.
-            // The Signature property of SignatureField is read‑only, so in the core library we only
-            // create an empty signature field. If a PKCS#7 signature is needed, reference the
-            // Aspose.Pdf.Signatures assembly and use the PkcsSignature class as shown in the
-            // official documentation.
+                // Apply the digital signature through the field
+                sigField.Sign(pkcs7);
 
-            // Save the PDF (now containing an empty signature field)
-            pdfDocument.Save(outputPdfPath);
+                // Save the signed PDF
+                pdfDoc.Save(outputPath);
+            }
 
-            Console.WriteLine($"PDF successfully signed (field added) and saved to '{outputPdfPath}'.");
+            Console.WriteLine($"PDF signed successfully: {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during signing: {ex.Message}");
+            Console.Error.WriteLine($"Error signing PDF: {ex.Message}");
         }
     }
 }

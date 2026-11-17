@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
@@ -9,77 +8,69 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        const string pdfPath = "signed.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure the document contains a form with fields
-            if (doc?.Form?.Fields == null)
+            // Load the PDF document using the core Aspose.Pdf API (no Facades).
+            using (var document = new Document(pdfPath))
             {
-                Console.WriteLine("No form fields found in the document.");
-                return;
-            }
+                bool signatureFound = false;
 
-            // Collect only the signature fields from the form
-            var signatureFields = new List<SignatureField>();
-            foreach (var field in doc.Form.Fields)
-            {
-                if (field is SignatureField sig)
-                    signatureFields.Add(sig);
-            }
-
-            if (signatureFields.Count == 0)
-            {
-                Console.WriteLine("No signature fields found in the document.");
-                return;
-            }
-
-            // Iterate over each signature field
-            foreach (SignatureField sigField in signatureFields)
-            {
-                Console.WriteLine($"Signature field name: {sigField.PartialName}");
-
-                // Extract the signer's certificate from the signature field
-                X509Certificate2 signerCert = sigField.ExtractCertificateObject();
-                if (signerCert != null)
+                // Iterate over all form fields and look for SignatureField objects.
+                foreach (Field field in document.Form.Fields)
                 {
-                    Console.WriteLine($"  Signer: {signerCert.Subject}");
-                    Console.WriteLine($"  Certificate expires on: {signerCert.NotAfter:u}");
-
-                    // Build the certificate chain using X509Chain
-                    var chain = new X509Chain();
-                    // Optional: configure chain policy if needed (e.g., revocation checking)
-                    chain.Build(signerCert);
-
-                    if (chain.ChainElements != null && chain.ChainElements.Count > 0)
+                    if (field is SignatureField signatureField)
                     {
-                        Console.WriteLine("  Certificate chain:");
-                        foreach (X509ChainElement element in chain.ChainElements)
+                        signatureFound = true;
+
+                        // Extract the signing certificate from the signature field.
+                        X509Certificate2 signingCert = signatureField.ExtractCertificateObject();
+                        if (signingCert == null)
                         {
-                            X509Certificate2 chainCert = element.Certificate;
-                            Console.WriteLine($"    Subject: {chainCert.Subject}");
-                            Console.WriteLine($"    Expires : {chainCert.NotAfter:u}");
+                            Console.WriteLine("Signature field does not contain a certificate.");
+                            continue;
+                        }
+
+                        // Build the certificate chain for the extracted certificate.
+                        var chain = new X509Chain();
+                        chain.Build(signingCert);
+                        var elements = chain.ChainElements;
+
+                        Console.WriteLine($"Certificate chain contains {elements.Count} certificate(s):");
+                        int index = 1;
+                        foreach (X509ChainElement element in elements)
+                        {
+                            X509Certificate2 cert = element.Certificate;
+                            Console.WriteLine($"Certificate {index}:");
+                            Console.WriteLine($"  Subject   : {cert.Subject}");
+                            Console.WriteLine($"  Issuer    : {cert.Issuer}");
+                            Console.WriteLine($"  NotBefore : {cert.NotBefore}");
+                            Console.WriteLine($"  NotAfter  : {cert.NotAfter}");
+
+                            // Verify expiration.
+                            string status = cert.NotAfter < DateTime.UtcNow ? "EXPIRED" : "VALID (not expired)";
+                            Console.WriteLine($"  Status    : {status}\n");
+                            index++;
                         }
                     }
-                    else
-                    {
-                        Console.WriteLine("  No certificate chain could be built.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("  No certificate could be extracted from the signature.");
                 }
 
-                Console.WriteLine(); // Blank line between signatures
+                if (!signatureFound)
+                {
+                    Console.WriteLine("No signature fields with certificates found in the PDF.");
+                }
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

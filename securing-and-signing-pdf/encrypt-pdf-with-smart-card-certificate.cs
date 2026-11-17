@@ -1,46 +1,39 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "encrypted.pdf";
+        const string outputPath = "encrypted_cert.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // ------------------------------------------------------------
-        // Load the certificate from a hardware security module (smart card)
-        // ------------------------------------------------------------
-        X509Certificate2? cert = null;
+        // Load a certificate from the smart card (hardware security module)
+        X509Certificate2 cert = null;
         try
         {
-            // Open the personal store of the current user
+            // Open the current user's personal store (My)
             using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
             {
                 store.Open(OpenFlags.ReadOnly);
-                // Find a certificate that has a private key and is stored on a smart card
+
+                // Find the first valid certificate that has a private key
                 foreach (X509Certificate2 c in store.Certificates)
                 {
-                    if (c.HasPrivateKey)
+                    if (c.HasPrivateKey && DateTime.Now >= c.NotBefore && DateTime.Now <= c.NotAfter)
                     {
-                        // Get the RSA private key; if it exists the certificate is usable for RSA operations
-                        using RSA? rsa = c.GetRSAPrivateKey();
-                        if (rsa != null)
-                        {
-                            // Additional checks (e.g., issuer, subject) can be added here
-                            cert = c;
-                            break;
-                        }
+                        cert = c;
+                        break;
                     }
                 }
             }
@@ -57,34 +50,22 @@ class Program
             return;
         }
 
-        // ------------------------------------------------------------
-        // Encrypt the PDF using password protection (Aspose.Pdf core API)
-        // ------------------------------------------------------------
-        // Note: Aspose.Pdf core API provides password‑based encryption via
-        // Document.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm).
-        // Certificate‑based encryption is not exposed through the core API,
-        // so we use strong password encryption and rely on the certificate for
-        // authentication elsewhere (e.g., signing or external access control).
-        // ------------------------------------------------------------
-        const string userPassword = "UserPassword123!";
-        const string ownerPassword = "OwnerPassword123!";
-
         try
         {
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Define permissions – allow printing and content extraction, deny everything else
-                Aspose.Pdf.Permissions perms = Aspose.Pdf.Permissions.PrintDocument |
-                                               Aspose.Pdf.Permissions.ExtractContent;
+                // Define permissions for the encrypted document (use only members that exist in the current Aspose.Pdf version)
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                // Use the strongest symmetric algorithm available
-                doc.Encrypt(userPassword, ownerPassword, perms, Aspose.Pdf.CryptoAlgorithm.AESx256);
+                // Encrypt the PDF using the certificate's public key, the chosen permissions and a strong algorithm
+                doc.Encrypt(perms, CryptoAlgorithm.AESx256, new List<X509Certificate2> { cert });
 
                 // Save the encrypted PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF encrypted successfully and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF encrypted with certificate and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

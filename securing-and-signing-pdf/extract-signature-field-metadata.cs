@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -16,54 +15,61 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Ensure the document contains form fields
+            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Length == 0)
             {
-                // Check if the document contains any form fields
-                if (doc.Form == null || doc.Form.Count == 0)
-                {
-                    Console.WriteLine("No form fields found in the PDF.");
-                    return;
-                }
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
 
-                bool foundSignature = false;
+            bool anySignature = false;
 
-                // Iterate over all form fields (SignatureField objects are stored in Form.Fields)
-                foreach (Field field in doc.Form.Fields)
+            // Iterate over all form fields
+            foreach (Field field in doc.Form.Fields)
+            {
+                // Identify signature fields
+                if (field is SignatureField sigField)
                 {
-                    if (field is SignatureField sigField)
+                    anySignature = true;
+
+                    // Basic field information
+                    Console.WriteLine("=== Signature Field ===");
+                    Console.WriteLine($"Field Name   : {sigField.Name}");
+                    Console.WriteLine($"Partial Name : {sigField.PartialName}");
+                    // SignatureField exposes PageIndex (0‑based). Convert to 1‑based for display.
+                    Console.WriteLine($"Page Index   : {sigField.PageIndex + 1}");
+
+                    // The associated Signature object holds metadata
+                    Signature signature = sigField.Signature;
+
+                    if (signature != null)
                     {
-                        foundSignature = true;
-                        // Use PartialName for the field identifier (Signature.Name does not exist)
-                        Console.WriteLine($"Signature Field Name: {sigField.PartialName}");
-
-                        // Extract the certificate attached to the signature, if any
-                        X509Certificate2 cert = sigField.ExtractCertificateObject();
-                        if (cert != null)
-                        {
-                            Console.WriteLine($"  Subject        : {cert.Subject}");
-                            Console.WriteLine($"  Issuer         : {cert.Issuer}");
-                            Console.WriteLine($"  Valid From     : {cert.NotBefore}");
-                            Console.WriteLine($"  Valid To       : {cert.NotAfter}");
-                        }
-                        else
-                        {
-                            Console.WriteLine("  No certificate data present.");
-                        }
+                        // Use the properties that actually exist on Signature
+                        Console.WriteLine($"Signer Name  : {sigField.PartialName}"); // field name as identifier
+                        Console.WriteLine($"Reason       : {signature.Reason}");
+                        Console.WriteLine($"Location     : {signature.Location}");
+                        Console.WriteLine($"Contact Info : {signature.ContactInfo}");
+                        Console.WriteLine($"Signing Date : {signature.Date:u}");
+                        Console.WriteLine($"Authority    : {signature.Authority}");
+                        // Verify returns a bool indicating whether the signature is valid
+                        Console.WriteLine($"Signature Valid : {signature.Verify()}");
                     }
-                }
+                    else
+                    {
+                        Console.WriteLine("No signature data attached.");
+                    }
 
-                if (!foundSignature)
-                {
-                    Console.WriteLine("No signature fields found in the PDF.");
+                    Console.WriteLine(); // Blank line for readability
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+
+            if (!anySignature)
+            {
+                Console.WriteLine("No signature fields found in the document.");
+            }
         }
     }
 }

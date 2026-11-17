@@ -13,23 +13,26 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Open the source PDF and apply RC4‑128 encryption.
-            // Permissions are set to allow printing and content extraction only,
-            // thereby restricting any editing (no ModifyDocument permission).
+            // Load the PDF, apply RC4 128‑bit encryption and restrict editing.
             using (Document doc = new Document(inputPath))
             {
+                // Allow printing and content extraction, but disallow modifications.
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Encrypt using RC4 128‑bit algorithm.
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.RC4x128);
+
+                // Save the encrypted PDF.
                 doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"PDF encrypted successfully and saved to '{encryptedPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {

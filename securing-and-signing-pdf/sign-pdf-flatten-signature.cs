@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,48 +10,62 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "signed_flattened.pdf";
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "certPassword";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(certificatePath))
+
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF into an expandable memory stream (required for signing)
+        byte[] pdfBytes = File.ReadAllBytes(inputPath);
+        using (var expandableStream = new MemoryStream())
         {
-            // Define the rectangle for the visible signature (llx, lly, urx, ury)
-            var rect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+            expandableStream.Write(pdfBytes, 0, pdfBytes.Length);
+            expandableStream.Position = 0;
 
-            // Create a signature field and add it to the form
-            var signatureField = new SignatureField(doc, rect)
+            // Load the document from the expandable stream
+            using (var doc = new Document(expandableStream))
             {
-                Name = "Signature1"
-            };
-            doc.Form.Add(signatureField);
+                // Create a signature field on the first page
+                var rect = new Rectangle(100, 600, 300, 650);
+                var signatureField = new SignatureField(doc.Pages[1], rect)
+                {
+                    PartialName = "Signature1"
+                };
+                // Add the field to the document's form collection
+                doc.Form.Add(signatureField, 1);
 
-            // Load the certificate as a PKCS7 object
-            var pkcs7 = new PKCS7(certificatePath, certificatePassword)
-            {
-                Reason = "Document approved",
-                Location = "Company"
-            };
+                // Prepare PKCS#7 signature using the provided certificate
+                var pkcs7 = new PKCS7(certPath, certPassword)
+                {
+                    Reason = "Document approved",
+                    Location = "Head Office",
+                    ContactInfo = "contact@example.com",
+                    // Optional: customize appearance (font size, etc.)
+                    CustomAppearance = new SignatureCustomAppearance { FontSize = 8, ShowContactInfo = false }
+                };
 
-            // Apply the digital signature to the field
-            signatureField.Sign(pkcs7);
+                // Sign the field – this writes the signed PDF back into the source stream
+                signatureField.Sign(pkcs7);
 
-            // Flatten the signature appearance so it cannot be altered visually after signing
-            signatureField.Flatten();
+                // Flatten the signature appearance so it cannot be edited visually
+                signatureField.Flatten();
 
-            // Save the signed and flattened PDF
-            doc.Save(outputPath);
+                // No doc.Save() – the stream already contains the signed PDF
+            }
+
+            // Write the signed, flattened PDF to the output file
+            expandableStream.Position = 0;
+            File.WriteAllBytes(outputPath, expandableStream.ToArray());
         }
 
         Console.WriteLine($"Signed and flattened PDF saved to '{outputPath}'.");

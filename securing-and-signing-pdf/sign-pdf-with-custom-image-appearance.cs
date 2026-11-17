@@ -1,27 +1,29 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class SignPdfWithImage
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed.pdf";
+        // Input PDF, output PDF, certificate (PFX) and its password
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
         const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
+        const string certificatePwd = "certPassword";
         const string signatureImagePath = "signature.png";
 
-        // Validate required files
-        if (!File.Exists(inputPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate not found: {certificatePath}");
             return;
         }
         if (!File.Exists(signatureImagePath))
@@ -30,52 +32,54 @@ class Program
             return;
         }
 
-        // Load the PDF
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Define the rectangle where the visible signature will appear
-            // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-            Rectangle signatureRect = new Rectangle(100, 100, 250, 150);
+            // Load the source PDF into an expandable stream (required because signing writes back to the same stream)
+            using var inputStream = new MemoryStream();
+            using (var fileStream = File.OpenRead(inputPdfPath))
+                fileStream.CopyTo(inputStream);
+            inputStream.Position = 0;
 
-            // Create a signature field on the first page
-            SignatureField sigField = new SignatureField(doc, signatureRect)
+            // Create Aspose.Pdf.Document from the expandable stream
+            using var document = new Document(inputStream);
+
+            // Define the rectangle where the visible signature will appear (coordinates are in points)
+            var signatureRect = new Rectangle(100, 100, 250, 150);
+
+            // Add a signature field to the first page
+            var signatureField = new SignatureField(document.Pages[1], signatureRect)
             {
-                PartialName = "Signature1"
+                PartialName = "VisibleSignature"
             };
-            doc.Form.Add(sigField, 1);
+            document.Form.Add(signatureField, 1);
 
-            // Prepare PKCS#7 signature object
-            PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
+            // Load the image that will be used as the visual appearance
+            using var imageStream = File.OpenRead(signatureImagePath);
+
+            // Create a PKCS7Detached object – it carries the image for the appearance
+            var pkcs7 = new PKCS7Detached(imageStream)
             {
                 Reason = "Document approval",
-                ContactInfo = "John Doe",
-                Location = "New York"
+                Location = "New York, USA",
+                ContactInfo = "john.doe@example.com"
+                // You can further customise the appearance via CustomAppearance if needed
             };
 
-            // Configure custom visual appearance (foreground image)
-            pkcs7.CustomAppearance = new SignatureCustomAppearance
-            {
-                IsForegroundImage = true
-                // Additional appearance settings can be added here if needed
-            };
+            // Load the certificate (PFX) into a stream – the Sign method expects the certificate stream and password
+            using var certStream = File.OpenRead(certificatePath);
 
-            // Sign the field
-            sigField.Sign(pkcs7);
+            // Sign the field. The overload writes the signed PDF back into the original stream (inputStream).
+            signatureField.Sign(pkcs7, certStream, certificatePwd);
 
-            // Add the image stamp so the signature appears visually
-            ImageStamp imgStamp = new ImageStamp(signatureImagePath)
-            {
-                BottomMargin = signatureRect.LLY,
-                LeftMargin   = signatureRect.LLX,
-                Width        = signatureRect.URX - signatureRect.LLX,
-                Height       = signatureRect.URY - signatureRect.LLY
-            };
-            doc.Pages[1].AddStamp(imgStamp);
+            // Write the signed PDF to the output file. No additional Document.Save call is required because the
+            // signing operation already updated the underlying stream.
+            File.WriteAllBytes(outputPdfPath, inputStream.ToArray());
 
-            // Save the signed PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF signed successfully. Output saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during signing: {ex.Message}");
+        }
     }
 }

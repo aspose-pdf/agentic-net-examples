@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -19,66 +19,62 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Retrieve all signature fields from the AcroForm.
-            var signatureFields = doc.Form?.Fields?.OfType<SignatureField>() ?? Enumerable.Empty<SignatureField>();
-
-            foreach (SignatureField sigField in signatureFields)
+            // Ensure the document contains a form (signature fields are stored there)
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                object validationResult = null;
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
+            }
 
-                try
+            // Iterate over all form fields and process those that are signature fields
+            foreach (Field field in doc.Form.Fields)
+            {
+                if (field is SignatureField signatureField)
                 {
-                    // Try to find an overload that accepts ValidationOptions (may not exist in older versions).
-                    var methodWithOptions = sigField.GetType().GetMethod("ValidateSignature", new[] { typeof(object) });
-                    if (methodWithOptions != null)
+                    // Extract the signing certificate from the signature field
+                    X509Certificate2 signingCert = signatureField.ExtractCertificateObject();
+
+                    if (signingCert == null)
                     {
-                        // Attempt to create ValidationOptions via reflection.
-                        var optionsType = Type.GetType("Aspose.Pdf.Signatures.ValidationOptions, Aspose.Pdf");
-                        object optionsInstance = null;
-                        if (optionsType != null)
+                        Console.WriteLine($"Signature '{signatureField.PartialName}' does not contain a certificate.");
+                        continue;
+                    }
+
+                    // Build a certificate chain with online CRL checking enabled
+                    using (X509Chain chain = new X509Chain())
+                    {
+                        chain.ChainPolicy.RevocationMode = X509RevocationMode.Online;      // Use CRL distribution points
+                        chain.ChainPolicy.RevocationFlag = X509RevocationFlag.ExcludeRoot; // Check all certificates except the root
+                        chain.ChainPolicy.UrlRetrievalTimeout = new TimeSpan(0, 0, 30);    // 30‑second timeout for CRL retrieval
+                        chain.ChainPolicy.VerificationFlags = X509VerificationFlags.NoFlag;
+
+                        bool chainBuilt = chain.Build(signingCert);
+
+                        // Evaluate the chain status for revocation information
+                        bool isRevoked = false;
+                        foreach (X509ChainStatus status in chain.ChainStatus)
                         {
-                            optionsInstance = Activator.CreateInstance(optionsType);
-                            var checkRevocationProp = optionsType.GetProperty("CheckRevocation");
-                            checkRevocationProp?.SetValue(optionsInstance, true);
+                            if (status.Status == X509ChainStatusFlags.Revoked ||
+                                status.Status == X509ChainStatusFlags.RevocationStatusUnknown)
+                            {
+                                isRevoked = true;
+                                Console.WriteLine($"Revocation check failed for '{signatureField.PartialName}': {status.StatusInformation.Trim()}");
+                            }
                         }
-                        validationResult = methodWithOptions.Invoke(sigField, new[] { optionsInstance });
-                    }
-                    else
-                    {
-                        // Fallback to parameter‑less overload (available in all supported versions).
-                        var methodNoOptions = sigField.GetType().GetMethod("ValidateSignature", Type.EmptyTypes);
-                        validationResult = methodNoOptions?.Invoke(sigField, null);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Error validating signature '{sigField.PartialName}': {ex.Message}");
-                    continue;
-                }
 
-                if (validationResult != null)
-                {
-                    // Use dynamic to access members without compile‑time type dependencies.
-                    dynamic result = validationResult;
-                    Console.WriteLine($"Signature '{sigField.PartialName}': Valid = {result.IsValid}");
-
-                    if (result.RevocationInfo != null)
-                    {
-                        Console.WriteLine($"  Revocation status: {result.RevocationInfo.Status}");
-                        Console.WriteLine($"  Revocation source: {result.RevocationInfo.Source}");
+                        if (chainBuilt && !isRevoked)
+                        {
+                            Console.WriteLine($"Signature '{signatureField.PartialName}' is valid and not revoked.");
+                        }
+                        else if (!chainBuilt)
+                        {
+                            Console.WriteLine($"Signature '{signatureField.PartialName}' failed chain building.");
+                            foreach (X509ChainStatus status in chain.ChainStatus)
+                            {
+                                Console.WriteLine($"  - {status.Status}: {status.StatusInformation.Trim()}");
+                            }
+                        }
                     }
-                    else
-                    {
-                        Console.WriteLine("  No revocation information available.");
-                    }
-
-                    Console.WriteLine($"  Signer: {result.SignerInfo?.Subject}");
-                    Console.WriteLine($"  Signing time: {result.SigningTime}");
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine($"Signature '{sigField.PartialName}' could not be validated (method not found).\n");
                 }
             }
         }

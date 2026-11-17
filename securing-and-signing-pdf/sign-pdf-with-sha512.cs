@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,66 +8,71 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string certificate = "certificate.pfx";
-        const string certPassword = "certPass";
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "signed_output.pdf";
+        const string certPath   = "certificate.pfx";
+        const string certPass   = "certPassword";
 
-        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(certificate))
+        if (!File.Exists(certPath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificate}");
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        try
+        // Load the source PDF into an expandable memory stream (required for signing)
+        byte[] sourceBytes = File.ReadAllBytes(inputPdf);
+        using (var expandableStream = new MemoryStream())
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Copy bytes into a stream that can grow – a plain MemoryStream(byte[]) is fixed‑size.
+            expandableStream.Write(sourceBytes, 0, sourceBytes.Length);
+            expandableStream.Position = 0;
+
+            // Open the document from the expandable stream
+            using (var doc = new Document(expandableStream))
             {
-                // Define the rectangle where the signature will appear (lower‑left x/y, upper‑right x/y)
-                Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-
-                // Create a signature field and add it to the form on the last page
-                SignatureField sigField = new SignatureField(doc, sigRect)
+                // Create a signature field on the first page (coordinates are in points)
+                var sigField = new SignatureField(doc.Pages[1], new Rectangle(100, 100, 300, 150))
                 {
                     PartialName = "Signature1"
                 };
-                // The page number is 1‑based; add the field to the last page
-                doc.Form.Add(sigField, doc.Pages.Count);
+                doc.Form.Add(sigField, 1);
 
-                // Prepare the PKCS7 signature provider
-                PKCS7 pkcs = new PKCS7(certificate, certPassword)
+                // Prepare PKCS7 signature object
+                var pkcs7 = new PKCS7(certPath, certPass)
                 {
-                    Reason = "Document approval",
-                    Location = "Head Office",
-                    ContactInfo = "security@example.com"
+                    Reason      = "Signed by Example Corp",
+                    Location    = "Head Office",
+                    ContactInfo = "security@example.com",
+                    // Optional visual customisation
+                    CustomAppearance = new SignatureCustomAppearance
+                    {
+                        FontSize = 9,
+                        ShowContactInfo = false
+                    }
                 };
 
-                // Set the digest algorithm to SHA‑512 via TimestampSettings (PKCS7 does not expose a direct DigestAlgorithm property)
-                // A dummy timestamp server URL is supplied; replace with a real TSA URL if needed.
-                pkcs.TimestampSettings = new TimestampSettings(
-                    "https://timestamp.example.com", // TSA server URL (can be empty if not used)
-                    null,
-                    DigestHashAlgorithm.Sha512);
+                // Configure SHA‑512 as the digest algorithm via TimestampSettings
+                // (PKCS7 itself does not expose a DigestAlgorithm property).
+                pkcs7.TimestampSettings = new TimestampSettings(
+                    "https://freetsa.org/tsr", // TSA URL – replace with your own if needed
+                    "",                         // username (empty if not required)
+                    Aspose.Pdf.DigestHashAlgorithm.Sha512);
 
-                // Sign the field
-                sigField.Sign(pkcs);
+                // Sign the field – this writes the signed PDF back into the source stream.
+                sigField.Sign(pkcs7);
 
-                // Save the signed PDF
-                doc.Save(outputPdf);
+                // Do NOT call doc.Save() after signing – the stream already contains the signed PDF.
             }
 
-            Console.WriteLine($"PDF signed successfully: {outputPdf}");
+            // Write the signed PDF bytes to the output file.
+            File.WriteAllBytes(outputPdf, expandableStream.ToArray());
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during signing: {ex.Message}");
-        }
+
+        Console.WriteLine($"Document signed successfully and saved to '{outputPdf}'.");
     }
 }
