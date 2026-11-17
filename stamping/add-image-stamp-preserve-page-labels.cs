@@ -1,52 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string stampPath  = "stamp.png";
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
         const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampPath))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
         try
         {
-            // Load the source PDF inside a using block for deterministic disposal.
-            using (Document pdfDoc = new Document(inputPath))
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Configure the image stamp (position, opacity, background).
-                ImageStamp imgStamp = new ImageStamp(stampPath)
+                // Configure the image stamp
+                ImageStamp imgStamp = new ImageStamp(stampImagePath)
                 {
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    Background = false,
                     Opacity = 0.5,
-                    Background = false
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Apply the stamp to every existing page.
-                foreach (Page page in pdfDoc.Pages)
+                // Apply the stamp to every page
+                foreach (Page page in doc.Pages)
                 {
                     page.AddStamp(imgStamp);
                 }
 
-                // Stamping does not modify the /PageLabels dictionary,
-                // so the original page labels remain unchanged automatically.
-                pdfDoc.Save(outputPath);
+                // Save the stamped PDF (page labels are preserved automatically)
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Image stamp applied. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

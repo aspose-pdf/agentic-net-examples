@@ -25,16 +25,16 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDocument = new Document(inputPath))
         {
-            // Create the image stamp once
+            // Create an ImageStamp instance and configure its appearance
             ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                Background          = false,   // place stamp on top of page content
-                Opacity             = 0.5,     // semi‑transparent
+                Background          = false,                     // place stamp on top of page content
+                Opacity             = 0.5,                       // semi‑transparent
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Apply the stamp to every page using a foreach loop
+            // Apply the stamp to each page using a foreach loop
             foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);

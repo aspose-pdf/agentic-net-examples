@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace
+using Aspose.Pdf.Text;          // For TextState if needed (optional)
 
 class Program
 {
@@ -8,48 +9,43 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string stampText  = "Confidential";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Create a TextStamp with the desired text
+            TextStamp textStamp = new TextStamp(stampText)
             {
-                // Create a text stamp with the desired content
-                TextStamp stamp = new TextStamp("Your Text Here");
+                // Align to the bottom‑left corner
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // 10‑point margins from left and bottom edges
+                LeftMargin   = 10,
+                BottomMargin = 10
+            };
 
-                // Align to bottom‑left corner
-                stamp.HorizontalAlignment = HorizontalAlignment.Left;
-                stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            // Optional styling (font size, color) – uses Aspose.Pdf.Color (cross‑platform)
+            textStamp.TextState.FontSize        = 12;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-                // Apply a 10‑point margin from the left and bottom edges
-                stamp.LeftMargin   = 10;
-                stamp.BottomMargin = 10;
-
-                // Optionally customize appearance (font size, color, etc.)
-                // stamp.TextState.FontSize = 12;
-                // stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-                // Add the stamp to every page in the document
-                foreach (Page page in doc.Pages)
-                {
-                    page.AddStamp(stamp);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+            // Pages are 1‑based; apply the stamp to each page individually
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                doc.Pages[i].AddStamp(textStamp);
             }
 
-            Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+            // Save the modified PDF (still inside the using block)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
     }
 }

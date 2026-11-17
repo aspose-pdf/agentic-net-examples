@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -21,26 +22,26 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Create an image stamp from the PNG/JPG file
+            // Create an ImageStamp from the image file (Aspose.Pdf.Drawing namespace)
             ImageStamp imgStamp = new ImageStamp(stampImage);
 
-            // Rotate the stamp 45 degrees clockwise
+            // Rotate the stamp 45 degrees using the correct property
             imgStamp.RotateAngle = 45;
 
-            // Optional: set alignment or position on the page
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Left;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Top;
+            // Center the stamp on the page using alignment properties
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
 
-            // Pages are 1‑based; add the stamp to the first page
-            doc.Pages[1].AddStamp(imgStamp);
+            // Add the stamp to the first page (Aspose.Pdf uses 1‑based page indexing)
+            Page page = doc.Pages[1];
+            page.AddStamp(imgStamp);
 
-            // Save the modified PDF (default Save writes PDF)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamp added and rotated 45°; saved to '{outputPdf}'.");
+        Console.WriteLine($"Rotated stamp added and saved to '{outputPdf}'.");
     }
 }

@@ -7,9 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string stampText = "שלום עולם"; // Hebrew example (Arabic works similarly)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_rtl.pdf";
+        // Example Hebrew text; replace with Arabic as needed
+        const string rtlText    = "שלום עולם";
 
         if (!File.Exists(inputPath))
         {
@@ -19,30 +20,37 @@ class Program
 
         try
         {
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Create a text stamp. Use a Unicode font that contains Arabic/Hebrew glyphs.
-                TextStamp textStamp = new TextStamp(stampText);
-                textStamp.TextState.Font = FontRepository.FindFont("Arial Unicode MS"); // font supporting RTL scripts
-                textStamp.TextState.FontSize = 24;
-                textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
+                // Create a TextStamp that supports right‑to‑left languages
+                TextStamp stamp = new TextStamp(rtlText)
+                {
+                    // Position the stamp near the bottom‑right corner
+                    BottomMargin = 20,
+                    RightMargin  = 20,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    // Render on top of existing page content
+                    Background = false
+                };
 
-                // Position the stamp – centered at the top of each page.
-                textStamp.HorizontalAlignment = HorizontalAlignment.Center;
-                textStamp.VerticalAlignment = VerticalAlignment.Top;
-                // Use YIndent (or XIndent) instead of the non‑existent Margin property.
-                textStamp.YIndent = 10; // distance from the top edge in points
+                // Use a Unicode font that contains Arabic/Hebrew glyphs.
+                // Aspose.Pdf will render RTL text automatically when a suitable font is used.
+                stamp.TextState.Font = FontRepository.FindFont("Arial Unicode MS");
+                stamp.TextState.FontSize = 14;
+                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-                // Apply the stamp to every page.
+                // Apply the stamp to each page (or target specific pages as needed)
                 foreach (Page page in doc.Pages)
                 {
-                    page.AddStamp(textStamp);
+                    page.AddStamp(stamp);
                 }
 
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved with RTL text stamp to '{outputPath}'.");
+            Console.WriteLine($"RTL text stamp added. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

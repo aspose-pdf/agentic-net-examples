@@ -6,47 +6,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string stampPath  = "stamp.png";
-        const string outputPath = "stamped_output.pdf";
+        const string inputPdf = "input.pdf";
+        const string stampImg = "stamp.png";
+        const string outputPdf = "stamped_output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(stampPath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPath))
+        if (!File.Exists(stampImg))
         {
-            // Create an ImageStamp – this does NOT affect existing JavaScript actions
-            ImageStamp imgStamp = new ImageStamp(stampPath)
-            {
-                // Example positioning – adjust as needed
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Make the stamp appear on top of page content
-                Background = false,
-                // Optional opacity
-                Opacity = 0.8
-            };
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            return;
+        }
 
-            // Apply the stamp to each page individually (PageCollection has no AddStamp method)
-            foreach (Page page in pdfDocument.Pages)
+        try
+        {
+            // Load the original PDF. Using block ensures deterministic disposal.
+            using (Document doc = new Document(inputPdf))
             {
-                page.AddStamp(imgStamp);
+                // Create an image stamp and configure its appearance.
+                ImageStamp imgStamp = new ImageStamp(stampImg)
+                {
+                    // Position the stamp at the bottom‑right corner of each page.
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    // Set margins instead of the non‑existent Margin property.
+                    RightMargin = 10,
+                    BottomMargin = 10,
+                    // Keep the original image dimensions (Zoom = 1.0 is the default).
+                    Zoom = 1.0
+                };
+
+                // Apply the stamp to every page. This does not affect existing JavaScript actions.
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
+
+                // Save the modified PDF. JavaScript actions embedded in the original
+                // document are preserved automatically.
+                doc.Save(outputPdf);
             }
 
-            // Save the modified PDF; existing JavaScript actions are retained automatically
-            pdfDocument.Save(outputPath);
+            Console.WriteLine($"Image stamp added successfully. Output saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Image stamp applied and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

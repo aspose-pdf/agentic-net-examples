@@ -6,49 +6,50 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string imagePath     = "stamp.png";
+        const string inputPath = "input.pdf";
+        const string outputPath = "stamped_output.pdf";
+        const string stampImagePath = "stamp.png";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify that the source PDF exists.
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(imagePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.WriteLine($"PDF file not found: {Path.GetFullPath(inputPath)}");
             return;
         }
 
-        // Load the image into a memory stream (no file path used for the stamp)
-        byte[] imageBytes = File.ReadAllBytes(imagePath);
-        using (MemoryStream imageStream = new MemoryStream(imageBytes))
+        // Verify that the stamp image exists before loading it into memory.
+        if (!File.Exists(stampImagePath))
         {
-            // Create an ImageStamp from the memory stream
-            ImageStamp stamp = new ImageStamp(imageStream)
+            Console.WriteLine($"Stamp image not found: {Path.GetFullPath(stampImagePath)}");
+            return;
+        }
+
+        // Load image data into a memory stream.
+        // In a real scenario the byte[] could come from a database, network, etc.
+        byte[] imageBytes = File.ReadAllBytes(stampImagePath);
+        using (MemoryStream imgStream = new MemoryStream(imageBytes))
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDocument = new Document(inputPath))
+        {
+            // Create an ImageStamp directly from the memory stream.
+            ImageStamp imgStamp = new ImageStamp(imgStream)
             {
-                Background          = false,                     // place stamp over content
-                Opacity             = 0.5,                       // semi‑transparent
+                Background = false,
+                Opacity = 0.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                VerticalAlignment = VerticalAlignment.Center
             };
 
-            // Open the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Apply the stamp to each page individually.
+            foreach (Page page in pdfDocument.Pages)
             {
-                // Apply the stamp to each page individually (Page.AddStamp, not PageCollection)
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    page.AddStamp(stamp);
-                }
-
-                // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
+                page.AddStamp(imgStamp);
             }
+
+            // Save the modified PDF.
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image stamp added from memory stream and saved to '{outputPath}'.");
     }
 }

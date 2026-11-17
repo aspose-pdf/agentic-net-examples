@@ -23,30 +23,32 @@ class Program
 
         try
         {
-            // Load the PDF containing form fields.
-            using (Document pdfDoc = new Document(inputPath))
+            // Load the PDF that contains form fields
+            using (Document doc = new Document(inputPath))
             {
-                // Configure the image stamp.
+                // Create an image stamp; configure its placement as needed.
+                // ImageStamp does not expose a Margin property – use the individual
+                // margin properties (TopMargin, RightMargin, etc.) or XIndent/YIndent.
                 ImageStamp imgStamp = new ImageStamp(stampImagePath)
                 {
-                    Background = false,                     // place stamp over existing content
-                    Opacity = 0.5f,                         // optional transparency
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    TopMargin = 20                          // distance from the top edge of the page
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Top,
+                    TopMargin    = 10,   // distance from the top edge of the page
+                    RightMargin  = 10    // distance from the right edge of the page
                 };
 
-                // Apply the stamp to each page individually (per‑page AddStamp).
-                foreach (Page page in pdfDoc.Pages)
+                // Apply the stamp to every page. Adding a stamp does not flatten or
+                // disable existing form fields.
+                foreach (Page page in doc.Pages)
                 {
                     page.AddStamp(imgStamp);
                 }
 
-                // Save the PDF. Form fields remain functional because we do not flatten the document.
-                pdfDoc.Save(outputPath);
+                // Save the PDF; form fields remain interactive.
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Image stamp added. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

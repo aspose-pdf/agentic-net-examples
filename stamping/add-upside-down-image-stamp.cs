@@ -1,52 +1,57 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string stampImg  = "stamp.png";
-        const string outputPdf = "output.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "stamped_output.pdf";
+        const string stampImagePath = "stamp.png";
+        const int    targetPageNumber = 1; // 1‑based page index
 
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        if (!File.Exists(stampImg))
+        try
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
-            return;
-        }
-
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Create an ImageStamp from the image file
-            ImageStamp imgStamp = new ImageStamp(stampImg)
+            // Load the PDF document (wrapped in using for deterministic disposal)
+            using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
             {
-                // Rotate the stamp 180 degrees to appear upside‑down
-                RotateAngle = 180,
+                // Create an image stamp from the PNG/JPG file
+                Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(stampImagePath);
+
+                // Rotate the stamp 180 degrees so it appears upside‑down
+                imgStamp.RotateAngle = 180;
 
                 // Optional: position the stamp (centered on the page)
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
+                imgStamp.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center;
+                imgStamp.VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Center;
 
-                // Optional: make the stamp appear on top of page content
-                Background = false
-            };
+                // Retrieve the target page (pages are 1‑based)
+                Aspose.Pdf.Page targetPage = pdfDoc.Pages[targetPageNumber];
 
-            // Apply the stamp to the first page (or any desired page)
-            Page page = doc.Pages[1];
-            page.AddStamp(imgStamp);
+                // Add the stamp to the page
+                targetPage.AddStamp(imgStamp);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+                // Save the modified PDF
+                pdfDoc.Save(outputPdfPath);
+            }
+
+            Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

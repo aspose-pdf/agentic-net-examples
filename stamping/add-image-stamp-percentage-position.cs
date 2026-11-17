@@ -6,57 +6,57 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and stamp image paths
-        const string inputPdfPath  = "input.pdf";
-        const string stampImgPath  = "stamp.png";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdfPath   = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPdfPath  = "output.pdf";
 
-        // Percentage offsets (e.g., 10% from left, 20% from bottom)
-        const double offsetPercentX = 0.10; // 10% of page width
-        const double offsetPercentY = 0.20; // 20% of page height
+        // Percentage offsets relative to page size
+        const double offsetXPercent = 10.0; // 10 % from the left edge
+        const double offsetYPercent = 5.0;  // 5 % from the bottom edge
 
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
-        if (!File.Exists(stampImgPath))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImgPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Create a single ImageStamp instance (reused for each page)
+            ImageStamp stamp = new ImageStamp(stampImagePath)
             {
-                Page page = pdfDoc.Pages[pageNum];
+                Background = false,                         // overlay the stamp
+                HorizontalAlignment = HorizontalAlignment.None, // we'll use XIndent
+                VerticalAlignment   = VerticalAlignment.None    // we'll use YIndent
+            };
 
-                // Compute absolute offsets based on page dimensions
-                double xOffset = page.PageInfo.Width  * offsetPercentX;
-                double yOffset = page.PageInfo.Height * offsetPercentY;
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
 
-                // Create the image stamp
-                ImageStamp imgStamp = new ImageStamp(stampImgPath)
-                {
-                    // Use absolute positioning; disable alignment so XIndent/YIndent are respected
-                    HorizontalAlignment = HorizontalAlignment.None,
-                    VerticalAlignment   = VerticalAlignment.None,
-                    XIndent = xOffset,
-                    YIndent = yOffset
-                };
+                // Compute absolute offsets based on page dimensions (points)
+                double xOffset = page.PageInfo.Width  * offsetXPercent / 100.0;
+                double yOffset = page.PageInfo.Height * offsetYPercent / 100.0;
 
-                // Apply the stamp to the current page
-                page.AddStamp(imgStamp);
+                // Apply the calculated offsets to the stamp
+                stamp.XIndent = xOffset;
+                stamp.YIndent = yOffset;
+
+                // Add the stamp to the current page
+                page.AddStamp(stamp);
             }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF (PDF format, no special SaveOptions needed)
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image stamp applied with percentage offsets and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }

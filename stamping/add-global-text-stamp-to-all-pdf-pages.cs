@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;   // ImageStamp resides here
 
 class Program
 {
@@ -11,7 +10,6 @@ class Program
         const string stampPath  = "stamp.png";
         const string outputPath = "stamped_output.pdf";
 
-        // Verify files exist
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
@@ -23,31 +21,28 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create the stamp once; it will be applied to each page
-            ImageStamp stamp = new ImageStamp(stampPath)
+            // Create an image stamp and configure its appearance
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                // Example positioning – center of the page
+                Background          = false, // place stamp on top of page content
+                Opacity             = 0.5,
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Make the stamp semi‑transparent
-                Opacity = 0.5,
-                // Place it in front of page content
-                Background = false
+                VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Apply the stamp to every page individually
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to every page individually (Document.AddStamp does not exist)
+            foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified document
-            pdfDoc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamp applied to all pages. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

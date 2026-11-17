@@ -1,52 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string stampPath = "stamp.png";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF with bookmarks/outlines
+        const string stampImg  = "stamp.png";      // image to use as stamp
+        const string outputPdf = "output.pdf";     // result PDF
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(stampPath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF inside a using block to ensure proper disposal.
-        using (Document doc = new Document(inputPath))
+        // Load the PDF inside a using block to ensure deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp. Settings can be adjusted as needed.
-            ImageStamp imgStamp = new ImageStamp(stampPath)
-            {
-                // Example positioning – center of the page.
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Keep the original image size (ImageStamp has no Scale property).
-                Background = false,
-                // Set opacity if a translucent effect is desired.
-                Opacity = 0.8
-            };
+            // Display existing outline (bookmark) count – outlines are preserved automatically
+            Console.WriteLine($"Bookmarks (outlines) before stamping: {doc.Outlines.Count}");
 
-            // Apply the stamp to each page individually.
+            // Apply the stamp to each page. A fresh ImageStamp instance is created per page
+            // because a stamp cannot be reused after it has been added to a page.
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(imgStamp);
+                var pageStamp = new ImageStamp(stampImg)
+                {
+                    Background          = false,                     // overlay on top of page content
+                    Opacity             = 0.5,                       // semi‑transparent
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                };
+                page.AddStamp(pageStamp);
             }
 
-            // Saving the document preserves all existing bookmarks/outlines.
-            doc.Save(outputPath);
+            // Save the modified document; outlines (bookmarks) are retained.
+            doc.Save(outputPdf);
+            Console.WriteLine($"Stamped PDF saved to '{outputPdf}'");
         }
-
-        Console.WriteLine($"Image stamp added and saved to '{outputPath}'.");
     }
 }
