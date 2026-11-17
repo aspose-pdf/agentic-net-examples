@@ -6,64 +6,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "portfolio.pdf";
+        const string inputPdfPath = "source.pdf";
+        const string outputPdfPath = "portfolio.pdf";
 
-        // Files that will be embedded into the PDF portfolio
-        string[] filesToEmbed = { "file1.txt", "image1.jpg", "data.xlsx" };
+        // Files to embed into the portfolio
+        string[] filesToEmbed = { "doc1.txt", "image1.jpg", "report.pdf" };
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        // Verify source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
         // Verify each file to embed exists
-        foreach (var f in filesToEmbed)
+        foreach (string f in filesToEmbed)
         {
             if (!File.Exists(f))
             {
-                Console.Error.WriteLine($"Embedded file not found: {f}");
+                Console.Error.WriteLine($"File to embed not found: {f}");
                 return;
             }
         }
 
-        try
+        // Load the source PDF and convert it into a portfolio
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the original PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Ensure the document has a collection (portfolio) object
+            if (pdfDoc.Collection == null)
+                pdfDoc.Collection = new Collection();
+
+            // Add each file as an embedded file (portfolio attachment)
+            foreach (string filePath in filesToEmbed)
             {
-                // Ensure the document has a Collection (required for PDF Portfolio)
-                if (doc.Collection == null)
-                    doc.Collection = new Collection();
-
-                // Add each file as an embedded file (FileSpecification) to the collection
-                foreach (string filePath in filesToEmbed)
+                // Create a FileSpecification for the file
+                var fileSpec = new FileSpecification(filePath, Path.GetFileName(filePath))
                 {
-                    // Create a FileSpecification with a display name and description
-                    var fileSpec = new FileSpecification(Path.GetFileName(filePath), $"Embedded file: {Path.GetFileName(filePath)}")
-                    {
-                        // Load the file contents into a memory stream
-                        Contents = new MemoryStream(File.ReadAllBytes(filePath))
-                    };
+                    // Optional: set the modification date of the attachment
+                    Params = { ModDate = DateTime.UtcNow }
+                };
 
-                    // Add the specification to the portfolio collection
-                    doc.Collection.Add(fileSpec);
-                }
-
-                // Optionally set some document metadata
-                doc.Info.Title = "PDF Portfolio with embedded files";
-
-                // Save the resulting PDF portfolio
-                doc.Save(outputPdf);
+                // Add the specification to the document's collection (portfolio)
+                pdfDoc.Collection.Add(fileSpec);
             }
 
-            Console.WriteLine($"Portfolio PDF saved to '{outputPdf}'.");
+            // Save the resulting PDF portfolio
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Portfolio PDF created: {outputPdfPath}");
     }
 }

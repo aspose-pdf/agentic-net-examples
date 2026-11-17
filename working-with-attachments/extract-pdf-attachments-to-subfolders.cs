@@ -6,66 +6,64 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF containing attachments (embedded files)
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputRoot = "Attachments";
 
-        // Base folder where attachment subfolders will be created
-        const string outputBaseFolder = "Attachments";
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the base output folder exists
-        Directory.CreateDirectory(outputBaseFolder);
+        // Ensure the root folder for extracted files exists
+        Directory.CreateDirectory(outputRoot);
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Use the EmbeddedFiles collection – Attachments property does not exist
-            if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine("No embedded files (attachments) found in the PDF.");
-                return;
-            }
-
-            // Iterate over each embedded file
-            for (int i = 0; i < pdfDoc.EmbeddedFiles.Count; i++)
-            {
-                FileSpecification fileSpec = pdfDoc.EmbeddedFiles[i];
-
-                // Determine a safe folder name for the attachment
-                string safeFolderName = Path.GetFileNameWithoutExtension(fileSpec.Name);
-                if (string.IsNullOrWhiteSpace(safeFolderName))
+                // If there are no embedded files, inform the user and exit
+                if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
                 {
-                    safeFolderName = $"Attachment_{i + 1}";
+                    Console.WriteLine("No attachments (embedded files) found in the PDF.");
+                    return;
                 }
 
-                // Combine base folder with the attachment‑specific subfolder
-                string attachmentFolder = Path.Combine(outputBaseFolder, safeFolderName);
-                Directory.CreateDirectory(attachmentFolder);
-
-                // Full path where the attachment file will be written
-                string attachmentFilePath = Path.Combine(attachmentFolder, fileSpec.Name);
-
-                // Write the embedded file's contents to disk – FileSpecification.Save does not exist
-                using (FileStream outStream = new FileStream(attachmentFilePath, FileMode.Create, FileAccess.Write))
+                int index = 0;
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    Stream contents = fileSpec.Contents;
-                    if (contents != null)
+                    index++;
+                    string attachmentName = fileSpec.Name ?? $"attachment_{index}";
+
+                    // Create a subfolder for this attachment (named after the file without extension)
+                    string folderName = Path.GetFileNameWithoutExtension(attachmentName);
+                    if (string.IsNullOrWhiteSpace(folderName))
+                        folderName = $"attachment_{index}";
+                    string subFolderPath = Path.Combine(outputRoot, folderName);
+                    Directory.CreateDirectory(subFolderPath);
+
+                    // Write the embedded file data to a file inside its subfolder
+                    string outputFilePath = Path.Combine(subFolderPath, attachmentName);
+                    using (FileStream outStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
                     {
-                        if (contents.CanSeek)
-                            contents.Position = 0;
-                        contents.CopyTo(outStream);
+                        Stream contentStream = fileSpec.Contents;
+                        if (contentStream == null)
+                        {
+                            Console.WriteLine($"Warning: attachment '{attachmentName}' has no content.");
+                            continue;
+                        }
+                        if (contentStream.CanSeek)
+                            contentStream.Position = 0;
+                        contentStream.CopyTo(outStream);
                     }
+                    Console.WriteLine($"Extracted: {outputFilePath}");
                 }
-
-                Console.WriteLine($"Saved attachment '{fileSpec.Name}' to '{attachmentFolder}'.");
             }
         }
-
-        Console.WriteLine("All attachments have been extracted.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -14,40 +14,31 @@ class Program
             return;
         }
 
-        // Ensure the Document is disposed properly
+        // Open the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // The Attachments collection does not exist; use EmbeddedFiles instead
-            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            // The Attachments collection does not exist – use EmbeddedFiles instead
+            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
-                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
-                {
-                    long sizeInBytes = 0;
-                    if (fileSpec.Contents != null)
-                    {
-                        if (fileSpec.Contents.CanSeek)
-                        {
-                            sizeInBytes = fileSpec.Contents.Length;
-                        }
-                        else
-                        {
-                            // Fallback: copy to a MemoryStream to determine length
-                            using (var ms = new MemoryStream())
-                            {
-                                fileSpec.Contents.CopyTo(ms);
-                                sizeInBytes = ms.Length;
-                                // Reset the original stream position if possible
-                                if (fileSpec.Contents.CanSeek)
-                                    fileSpec.Contents.Position = 0;
-                            }
-                        }
-                    }
-                    Console.WriteLine($"{fileSpec.Name} - {sizeInBytes} bytes");
-                }
+                Console.WriteLine("No embedded files found.");
+                return;
             }
-            else
+
+            // Iterate over all embedded files and display their name and size
+            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
             {
-                Console.WriteLine("No embedded files found in the PDF.");
+                string name = fileSpec.Name;
+                long size = 0;
+
+                if (fileSpec.Contents != null)
+                {
+                    // Ensure the stream is positioned at the beginning before reading Length
+                    if (fileSpec.Contents.CanSeek)
+                        fileSpec.Contents.Position = 0;
+                    size = fileSpec.Contents.Length;
+                }
+
+                Console.WriteLine($"{name} - {size} bytes");
             }
         }
     }

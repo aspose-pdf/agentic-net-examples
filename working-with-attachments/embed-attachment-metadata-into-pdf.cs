@@ -15,27 +15,26 @@ class Program
             return;
         }
 
-        // Load the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // OPTIONAL: add an attachment to demonstrate metadata embedding
-            const string attachmentPath = "sample.txt";
+            const string attachmentPath = "attachment.txt";
             if (File.Exists(attachmentPath))
             {
-                // Create a file specification for the attachment and add it to the document
-                FileSpecification fileSpec = new FileSpecification(attachmentPath);
+                // Create a file specification for the attachment and add it to the PDF
+                var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath));
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
                 doc.EmbeddedFiles.Add(fileSpec);
 
-                // Embed attachment information into the document information dictionary
-                // Use the DocumentInfo indexer for custom metadata (AdditionalInfo does not exist).
+                // Embed attachment metadata into the document information dictionary using the indexer
                 doc.Info["AttachmentFileName"] = Path.GetFileName(attachmentPath);
-                doc.Info["AttachmentDescription"] = "Sample text attachment";
+                doc.Info["AttachmentSize"] = new FileInfo(attachmentPath).Length.ToString();
             }
 
-            // Save the PDF – the custom metadata is stored in the document information dictionary.
-            doc.Save(outputPath);
+            // Save the PDF – default PdfSaveOptions are sufficient; no EmbedAttachmentMetadata property exists
+            var saveOptions = new PdfSaveOptions();
+            doc.Save(outputPath, saveOptions);
         }
 
-        Console.WriteLine($"Document saved with embedded attachment metadata to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with embedded attachment metadata to '{outputPath}'.");
     }
 }

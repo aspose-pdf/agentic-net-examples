@@ -6,37 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string imagePath = "picture.jpg";
-        const string outputPdf = "portfolio.pdf";
+        const string inputPdfPath = "input.pdf";      // existing PDF to turn into a portfolio
+        const string imagePath = "picture.jpg";      // image to embed
+        const string outputPdfPath = "portfolio_output.pdf";
 
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
+        {
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document and turn it into a portfolio by using the Collection API
-        using (Document doc = new Document())
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Ensure the document has a Collection object (required for portfolios)
-            if (doc.Collection == null)
-                doc.Collection = new Collection();
+            // Ensure the document has a collection (portfolio) initialized
+            doc.Collection ??= new Collection();
 
-            // Build a FileSpecification for the image file
-            var fileSpec = new FileSpecification(imagePath, "SampleImage.jpg")
+            // Create a file specification for the image and embed its contents
+            var fileSpec = new FileSpecification(imagePath, "Image attachment")
             {
-                Description = "An example image embedded in the PDF portfolio",
-                // Provide the file bytes – this is what will be stored in the portfolio
-                Contents = new MemoryStream(File.ReadAllBytes(imagePath))
+                Contents = new MemoryStream(File.ReadAllBytes(imagePath)),
+                Description = "Sample Image"
             };
+            // Set a custom display name (the name shown in the portfolio)
+            fileSpec.Name = "Sample Image.jpg";
 
-            // Add the file specification to the portfolio collection
+            // Add the file specification to the document's collection (portfolio)
             doc.Collection.Add(fileSpec);
 
             // Save the resulting PDF portfolio
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF portfolio created: {outputPdf}");
+        Console.WriteLine($"PDF portfolio created: {outputPdfPath}");
     }
 }

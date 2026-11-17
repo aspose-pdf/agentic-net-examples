@@ -6,50 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF containing portfolio (embedded) files
-        const string inputPdfPath = "portfolio.pdf";
+        // Path to the PDF portfolio containing embedded files
+        const string inputPdf = "portfolio.pdf";
 
-        // Zero‑based index of the portfolio item to extract (e.g., 0 for the first item)
-        int itemIndexZeroBased = 0;
+        // Index of the portfolio item to extract (1‑based, as Aspose collections are 1‑based)
+        const int itemIndex = 1;
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdfPath))
+            // Open the PDF document
+            using (Document doc = new Document(inputPdf))
             {
-                // Aspose.Pdf collections are 1‑based; convert the zero‑based index
-                int itemIndex = itemIndexZeroBased + 1;
-
                 // Verify that the requested index exists
-                if (itemIndex < 1 || itemIndex > doc.EmbeddedFiles.Count)
+                if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count < itemIndex)
                 {
-                    Console.Error.WriteLine($"Invalid index. PDF contains {doc.EmbeddedFiles.Count} portfolio items.");
+                    Console.Error.WriteLine("Embedded file index out of range.");
                     return;
                 }
 
-                // Retrieve the embedded file specification (Aspose.Pdf uses FileSpecification)
-                FileSpecification fileSpec = doc.EmbeddedFiles[itemIndex];
+                // Retrieve the embedded file (Aspose collections are 1‑based)
+                FileSpecification spec = doc.EmbeddedFiles[itemIndex];
 
                 // The original file name (including extension) is stored in the Name property
-                string originalFileName = fileSpec.Name;
+                string originalFileName = spec.Name;
 
-                // Determine an output path – here we save to the current directory
-                string outputPath = Path.Combine(Directory.GetCurrentDirectory(), originalFileName);
-
-                // Write the raw bytes to disk preserving the original extension
-                using (FileStream outStream = File.Create(outputPath))
+                // Ensure the stream is positioned at the beginning before copying
+                if (spec.Contents.CanSeek)
                 {
-                    // fileSpec.Contents returns a Stream containing the embedded data
-                    fileSpec.Contents.CopyTo(outStream);
+                    spec.Contents.Position = 0;
                 }
 
-                Console.WriteLine($"Extracted portfolio item saved as: {outputPath}");
+                // Save the embedded file's data to disk using its original name
+                using (FileStream outStream = File.Create(originalFileName))
+                {
+                    spec.Contents.CopyTo(outStream);
+                }
+
+                Console.WriteLine($"Extracted '{originalFileName}' from the portfolio.");
             }
         }
         catch (Exception ex)

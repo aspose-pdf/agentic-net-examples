@@ -15,60 +15,44 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Ensure the PDF actually contains embedded files
-            if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                Console.WriteLine("No embedded files found in the PDF.");
-                return;
-            }
+                // Access the collection of embedded files (attachments)
+                var attachments = doc.EmbeddedFiles;
 
-            // Create (or overwrite) the CSV file
-            using (StreamWriter writer = new StreamWriter(csvPath, false))
-            {
-                // CSV header
-                writer.WriteLine("Name,Size (bytes),Description");
-
-                // Iterate over all embedded files in the PDF
-                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                // Create the CSV file; StreamWriter is also wrapped in a using block
+                using (StreamWriter writer = new StreamWriter(csvPath))
                 {
-                    string name = fileSpec.Name ?? string.Empty;
-                    string description = fileSpec.Description ?? string.Empty;
+                    // Write CSV header
+                    writer.WriteLine("Name,Size,Description");
 
-                    // Determine the size of the embedded file in bytes
-                    long size = 0;
-                    if (fileSpec.Contents != null)
+                    // Iterate over each attachment and write its details
+                    foreach (FileSpecification fileSpec in attachments)
                     {
-                        Stream content = fileSpec.Contents;
-                        if (content.CanSeek)
+                        // Size in bytes – obtain from the underlying stream if available
+                        long size = 0;
+                        if (fileSpec.Contents != null && fileSpec.Contents.CanSeek)
                         {
-                            long originalPos = content.Position;
-                            size = content.Length;
-                            content.Position = originalPos; // restore position
+                            size = fileSpec.Contents.Length;
                         }
-                        else
-                        {
-                            // Fallback: copy to a MemoryStream to get length
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                content.CopyTo(ms);
-                                size = ms.Length;
-                            }
-                        }
+
+                        // Description may contain commas or quotes; escape them for CSV compliance
+                        string description = fileSpec.Description?.Replace("\"", "\"\"") ?? string.Empty;
+
+                        // Enclose fields that may contain commas in double quotes
+                        writer.WriteLine($"\"{fileSpec.Name}\",{size},\"{description}\"");
                     }
-
-                    // Escape commas in fields by surrounding with quotes if needed
-                    string escapedName = name.Contains(",") ? $"\"{name}\"" : name;
-                    string escapedDesc = description.Contains(",") ? $"\"{description}\"" : description;
-
-                    // Write a CSV line for the current embedded file
-                    writer.WriteLine($"{escapedName},{size},{escapedDesc}");
                 }
             }
-        }
 
-        Console.WriteLine($"Attachment report saved to '{csvPath}'.");
+            Console.WriteLine($"Attachment report saved to '{csvPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

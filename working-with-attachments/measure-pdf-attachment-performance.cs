@@ -1,87 +1,93 @@
 using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using Aspose.Pdf;
 
-class AttachmentPerformance
+class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputPdfAdd = "output_add.pdf";
-        const string outputPdfRemove = "output_remove.pdf";
         const string attachmentFile = "sample.txt";
-        const string extractFolder = "ExtractedAttachments";
+        const string addedPdf = "added_attachment.pdf";
+        const string extractedFolder = "extracted";
+        const string removedPdf = "removed_attachment.pdf";
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
-        // Ensure the attachment file exists
         if (!File.Exists(attachmentFile))
         {
-            File.WriteAllText(attachmentFile, "This is a sample attachment.");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
+            return;
         }
 
-        // ---------------- Add attachment ----------------
-        Stopwatch swAdd = Stopwatch.StartNew();
+        // Ensure output folder exists
+        Directory.CreateDirectory(extractedFolder);
+
+        // -------------------------------------------------
+        // Add attachment and measure time
+        // -------------------------------------------------
+        var swAdd = Stopwatch.StartNew();
         using (Document doc = new Document(inputPdf))
         {
-            // Create a FileSpecification for the attachment
-            var fileSpec = new FileSpecification(Path.GetFileName(attachmentFile))
-            {
-                // Set the file contents via a MemoryStream
-                Contents = new MemoryStream(File.ReadAllBytes(attachmentFile))
-            };
-            // Add to the EmbeddedFiles collection
+            // Create a FileSpecification for the file to embed
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentFile));
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFile));
+            // Add the specification to the EmbeddedFiles collection
             doc.EmbeddedFiles.Add(fileSpec);
-            doc.Save(outputPdfAdd);
+
+            // Save the PDF with the new embedded file
+            doc.Save(addedPdf);
         }
         swAdd.Stop();
         Console.WriteLine($"Add attachment time: {swAdd.ElapsedMilliseconds} ms");
 
-        // ---------------- Extract attachments ----------------
-        Stopwatch swExtract = Stopwatch.StartNew();
-        Directory.CreateDirectory(extractFolder);
-        using (Document doc = new Document(outputPdfAdd))
+        // -------------------------------------------------
+        // Extract attachment and measure time
+        // -------------------------------------------------
+        var swExtract = Stopwatch.StartNew();
+        using (Document doc = new Document(addedPdf))
         {
-            // Iterate using 1‑based indexing (the collection implements IEnumerable, but 1‑based is the official API contract)
-            for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
-            {
-                FileSpecification fileSpec = doc.EmbeddedFiles[i];
-                string outPath = Path.Combine(extractFolder, fileSpec.Name);
-                // Ensure the stream is at the beginning before copying
-                if (fileSpec.Contents.CanSeek)
-                    fileSpec.Contents.Position = 0;
-                using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                {
-                    fileSpec.Contents.CopyTo(outStream);
-                }
-                Console.WriteLine($"Extracted: {fileSpec.Name}");
-            }
-        }
-        swExtract.Stop();
-        Console.WriteLine($"Extract attachments time: {swExtract.ElapsedMilliseconds} ms");
-
-        // ---------------- Remove attachment ----------------
-        Stopwatch swRemove = Stopwatch.StartNew();
-        using (Document doc = new Document(outputPdfAdd))
-        {
-            // Delete each embedded file individually – EmbeddedFileCollection has no Clear() method.
             if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                // EmbeddedFileCollection uses 1‑based indexing
+                for (int i = 1; i <= doc.EmbeddedFiles.Count; i++)
                 {
-                    var fileSpec = doc.EmbeddedFiles[i];
-                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                    FileSpecification fs = doc.EmbeddedFiles[i];
+                    string outputPath = Path.Combine(extractedFolder, fs.Name);
+                    using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                     {
-                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        // Ensure the stream is at the beginning
+                        if (fs.Contents.CanSeek)
+                            fs.Contents.Position = 0;
+                        fs.Contents.CopyTo(outStream);
                     }
                 }
             }
-            doc.Save(outputPdfRemove);
+        }
+        swExtract.Stop();
+        Console.WriteLine($"Extract attachment time: {swExtract.ElapsedMilliseconds} ms");
+
+        // -------------------------------------------------
+        // Remove attachment and measure time
+        // -------------------------------------------------
+        var swRemove = Stopwatch.StartNew();
+        using (Document doc = new Document(addedPdf))
+        {
+            // Remove all embedded files (if any)
+            while (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            {
+                // Retrieve the first embedded file (1‑based index)
+                FileSpecification firstSpec = doc.EmbeddedFiles[1];
+                // Delete by name – Delete expects a string, not an index
+                doc.EmbeddedFiles.Delete(firstSpec.Name);
+            }
+
+            // Save the PDF without embedded files
+            doc.Save(removedPdf);
         }
         swRemove.Stop();
         Console.WriteLine($"Remove attachment time: {swRemove.ElapsedMilliseconds} ms");

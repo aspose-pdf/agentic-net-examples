@@ -6,43 +6,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";      // existing PDF (can be empty)
-        const string excelPath = "workbook.xlsx";    // Excel workbook to embed
-        const string outputPdfPath = "portfolio.pdf"; // result PDF Portfolio
-        const string customDesc = "Quarterly financial report – Excel workbook";
+        const string pdfPath = "portfolio.pdf";
+        const string excelPath = "data.xlsx";
+        const string outputPath = "portfolio_with_excel.pdf";
+        const string embeddedFileName = "DataWorkbook.xlsx";
+        const string description = "Quarterly financial data";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(excelPath))
         {
             Console.Error.WriteLine($"Excel file not found: {excelPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the existing PDF portfolio
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Ensure the document has a collection – this makes it a PDF Portfolio
-            if (pdfDoc.Collection == null)
-                pdfDoc.Collection = new Collection();
-
-            // Create a file specification for the Excel workbook with a custom description
-            var fileSpec = new FileSpecification(Path.GetFileName(excelPath), customDesc)
+            // Open the Excel workbook stream
+            using (FileStream excelStream = File.OpenRead(excelPath))
             {
-                Contents = new MemoryStream(File.ReadAllBytes(excelPath))
-            };
+                // Create a FileSpecification for the Excel workbook with a custom description
+                FileSpecification fileSpec = new FileSpecification(excelStream, embeddedFileName, description)
+                {
+                    // Optional: set MIME type and relationship for better PDF/A‑3 compliance
+                    MIMEType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    AFRelationship = AFRelationship.Data
+                };
 
-            // Add the file specification to the portfolio collection
-            pdfDoc.Collection.Add(fileSpec);
+                // Add the file specification to the document's embedded files collection
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
+            }
 
-            // Save the resulting PDF Portfolio
-            pdfDoc.Save(outputPdfPath);
+            // Save the updated PDF portfolio
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF Portfolio created: {outputPdfPath}");
+        Console.WriteLine($"Excel workbook embedded and saved to '{outputPath}'.");
     }
 }

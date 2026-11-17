@@ -13,96 +13,80 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF (it may already contain attachments – a PDF "portfolio")
+        // Load the existing PDF Portfolio (or any PDF that will become a portfolio)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the PDF has a collection (portfolio) – if not, create one so we can add attachments later if needed
+            // Insert a new cover page as the first page of the document
+            Page coverPage = doc.Pages.Insert(1);
+
+            // Set page size (A4) – dimensions are in points (1 point = 1/72 inch)
+            coverPage.PageInfo.Width = 595;   // A4 width
+            coverPage.PageInfo.Height = 842;  // A4 height
+
+            // ------------------------------------------------------------
+            // 1. Draw a background rectangle that fills the whole page.
+            //    Shapes must be placed inside a Graph object, which is a
+            //    paragraph that can be added to the page.
+            // ------------------------------------------------------------
+            Graph graph = new Graph(coverPage.PageInfo.Width, coverPage.PageInfo.Height);
+
+            // Rectangle constructor expects float values (left, bottom, width, height)
+            var bgRect = new Aspose.Pdf.Drawing.Rectangle(
+                0f,
+                0f,
+                (float)coverPage.PageInfo.Width,
+                (float)coverPage.PageInfo.Height);
+
+            // Styling is done through the GraphInfo property
+            bgRect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;
+            bgRect.GraphInfo.Color = Aspose.Pdf.Color.Transparent; // no border
+
+            graph.Shapes.Add(bgRect);
+            coverPage.Paragraphs.Add(graph);
+
+            // ------------------------------------------------------------
+            // 2. Add title text fragment
+            // ------------------------------------------------------------
+            TextFragment title = new TextFragment("My Portfolio");
+            title.Position = new Position(50, coverPage.PageInfo.Height - 100);
+            title.TextState.FontSize = 36;
+            title.TextState.FontStyle = FontStyles.Bold;
+            title.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
+            coverPage.Paragraphs.Add(title);
+
+            // ------------------------------------------------------------
+            // 3. Add subtitle text fragment
+            // ------------------------------------------------------------
+            TextFragment subtitle = new TextFragment("Generated with Aspose.PDF");
+            subtitle.Position = new Position(50, coverPage.PageInfo.Height - 150);
+            subtitle.TextState.FontSize = 18;
+            subtitle.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            coverPage.Paragraphs.Add(subtitle);
+
+            // ------------------------------------------------------------
+            // 4. (Optional) If you want the document to be recognized as a
+            //    portfolio, ensure a Collection exists and add at least one
+            //    embedded file. The cover page itself does not need a special
+            //    Portfolio.CoverPage property – that member does not exist.
+            // ------------------------------------------------------------
             if (doc.Collection == null)
                 doc.Collection = new Collection();
 
-            // -----------------------------------------------------------------
-            // 1. Add a background rectangle (full‑page size) with a light gray fill
-            // -----------------------------------------------------------------
-            foreach (Page page in doc.Pages)
+            // Example: embed the original PDF as an attachment inside the portfolio
+            var fileSpec = new FileSpecification(inputPath, System.IO.Path.GetFileName(inputPath))
             {
-                // Create a Graph container that spans the whole page
-                Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+                Contents = new MemoryStream(File.ReadAllBytes(inputPath))
+            };
+            doc.Collection.Add(fileSpec);
 
-                // Rectangle constructor: left, bottom, width, height (float values)
-                Aspose.Pdf.Drawing.Rectangle bgRect = new Aspose.Pdf.Drawing.Rectangle(
-                    0f,
-                    0f,
-                    (float)page.PageInfo.Width,
-                    (float)page.PageInfo.Height);
-
-                // Styling via GraphInfo
-                bgRect.GraphInfo.FillColor = Color.LightGray;
-                bgRect.GraphInfo.Color = Color.Transparent; // no border
-
-                graph.Shapes.Add(bgRect);
-                page.Paragraphs.Add(graph);
-            }
-
-            // -----------------------------------------------------------------
-            // 2. Add a title text fragment centered near the top of each page
-            // -----------------------------------------------------------------
-            foreach (Page page in doc.Pages)
-            {
-                TextFragment title = new TextFragment("My PDF Portfolio");
-                title.Position = new Position(page.PageInfo.Width / 2, page.PageInfo.Height - 100);
-                title.TextState.FontSize = 24;
-                title.TextState.ForegroundColor = Color.DarkBlue;
-                title.TextState.HorizontalAlignment = HorizontalAlignment.Center;
-                page.Paragraphs.Add(title);
-            }
-
-            // -----------------------------------------------------------------
-            // 3. Optionally add a background image (if a file exists) – stretched to page size
-            // -----------------------------------------------------------------
-            const string bgImagePath = "portfolio_bg.png";
-            if (File.Exists(bgImagePath))
-            {
-                foreach (Page page in doc.Pages)
-                {
-                    // Use ImageStamp to place an image on the page
-                    ImageStamp imgStamp = new ImageStamp(bgImagePath)
-                    {
-                        // Stretch to cover the whole page
-                        Width = page.PageInfo.Width,
-                        Height = page.PageInfo.Height,
-                        // Position at lower‑left corner using alignment properties
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment = VerticalAlignment.Bottom,
-                        XIndent = 0,
-                        YIndent = 0,
-                        // Place the image behind other content
-                        Background = true
-                    };
-                    page.AddStamp(imgStamp);
-                }
-            }
-
-            // -----------------------------------------------------------------
-            // 4. (Optional) Add a new file to the portfolio collection as an example
-            // -----------------------------------------------------------------
-            const string extraFile = "extra_document.pdf";
-            if (File.Exists(extraFile))
-            {
-                var fileSpec = new FileSpecification(extraFile, "Extra document attached")
-                {
-                    Contents = new MemoryStream(File.ReadAllBytes(extraFile))
-                };
-                doc.Collection.Add(fileSpec);
-            }
-
-            // Save the modified PDF (still a regular PDF – the collection makes it a portfolio)
+            // Save the modified document (now with a custom cover page)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Custom visual template applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Portfolio saved with custom template to '{outputPath}'.");
     }
 }

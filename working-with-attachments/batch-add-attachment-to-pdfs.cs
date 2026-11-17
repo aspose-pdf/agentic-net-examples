@@ -2,30 +2,30 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class BatchAttach
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
-        const string inputFolder = "InputPdfs";
-        // Folder where the processed PDFs will be saved
-        const string outputFolder = "OutputPdfs";
-        // Path to the file that will be attached to each PDF
-        const string attachmentPath = "attachment.pdf";
+        // Folder containing PDFs to process
+        const string inputFolder = @"C:\PdfFolder";
+        // Folder where processed PDFs will be saved (can be the same as inputFolder)
+        const string outputFolder = @"C:\PdfFolder\Processed";
+        // Path to the attachment file that will be added to each PDF
+        const string attachmentPath = @"C:\Attachments\sample.txt";
 
+        // Validate paths
         if (!Directory.Exists(inputFolder))
         {
             Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
-
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
         // Read the attachment once – reuse the byte array for every PDF
@@ -33,34 +33,37 @@ class Program
         string attachmentFileName = Path.GetFileName(attachmentPath);
 
         // Process each PDF file in the input folder
-        foreach (string pdfFilePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(pdfFilePath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
             try
             {
-                // Open the PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfFilePath))
+                using (Document doc = new Document(pdfFile))
                 {
-                    // Create a FileSpecification for the attachment and add it to the PDF
-                    var attachmentSpec = new FileSpecification(attachmentFileName)
+                    // Create a FileSpecification for the attachment
+                    var fileSpec = new FileSpecification(attachmentFileName)
                     {
-                        // Provide the file data via a MemoryStream
+                        // The file data is supplied via a MemoryStream
                         Contents = new MemoryStream(attachmentBytes)
                     };
-                    doc.EmbeddedFiles.Add(attachmentSpec);
 
-                    // Save the modified PDF to the output folder (overwrites if exists)
+                    // Add the file specification to the EmbeddedFiles collection
+                    doc.EmbeddedFiles.Add(fileSpec);
+
+                    // Build output file path (preserve original file name)
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
+
+                    // Save the modified PDF
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {fileName}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch attachment completed.");
     }
 }

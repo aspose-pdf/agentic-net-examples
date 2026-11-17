@@ -18,21 +18,16 @@ class Program
         using (Document doc = new Document(pdfPath))
         {
             // Standard document metadata (fallback to "(none)" if missing)
-            string title   = doc.Info.Title ?? "(none)";
-            string author  = doc.Info.Author ?? "(none)";
-            string subject = doc.Info.Subject ?? "(none)";
-            string keywords = doc.Info.Keywords ?? "(none)";
-            string creator = doc.Info.Creator ?? "(none)";
-            string producer = doc.Info.Producer ?? "(none)";
+            string title            = doc.Info.Title ?? "(none)";
+            string author           = doc.Info.Author ?? "(none)";
+            string subject          = doc.Info.Subject ?? "(none)";
+            string keywords         = doc.Info.Keywords ?? "(none)";
+            string creator          = doc.Info.Creator ?? "(none)";
+            string producer         = doc.Info.Producer ?? "(none)";
 
-            // Creation and modification dates are non‑nullable DateTime values.
-            // Aspose.Pdf returns DateTime.MinValue when the value is not set.
-            string creationDate = doc.Info.CreationDate != DateTime.MinValue
-                ? doc.Info.CreationDate.ToString("u")
-                : "(none)";
-            string modificationDate = doc.Info.ModDate != DateTime.MinValue
-                ? doc.Info.ModDate.ToString("u")
-                : "(none)";
+            // Creation and modification dates are DateTime values. Convert them to a friendly string.
+            string creationDate     = DateTimeToStringOrDefault(doc.Info.CreationDate);
+            string modificationDate = DateTimeToStringOrDefault(doc.Info.ModDate);
 
             // Count embedded file attachments (if any)
             int attachmentCount = doc.EmbeddedFiles?.Count ?? 0;
@@ -49,8 +44,14 @@ class Program
             Console.WriteLine($"Producer: {producer}");
             Console.WriteLine($"Creation Date: {creationDate}");
             Console.WriteLine($"Modification Date: {modificationDate}");
-            Console.WriteLine($"Page Count: {doc.Pages.Count}");
             Console.WriteLine($"Attachment Count: {attachmentCount}");
         }
+    }
+
+    // Convert a DateTime to a readable string, falling back to "(none)" when the value is not set.
+    private static string DateTimeToStringOrDefault(DateTime dt)
+    {
+        // Aspose.Pdf uses DateTime.MinValue to represent an unset date.
+        return dt == DateTime.MinValue ? "(none)" : dt.ToString("o"); // ISO 8601 format
     }
 }
