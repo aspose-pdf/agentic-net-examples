@@ -1,69 +1,51 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string stampImage = "stamp.png";
-        const string outputPdf  = "stamped_output.pdf";
+        const string inputPdf  = "input.pdf";      // source PDF with AcroForm fields
+        const string stampImg  = "stamp.png";      // image to stamp on each page
+        const string outputPdf = "output.pdf";     // result PDF (fields preserved)
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImage))
+
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document pdfDocument = new Document(inputPdf))
+            // Create an ImageStamp; configure it as needed (position, opacity, etc.)
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Optional: display existing AcroForm field values before stamping
-                var form = pdfDocument.Form;
-                if (form != null && form.Fields != null && form.Fields.Count() > 0)
-                {
-                    foreach (Field field in form.Fields)
-                    {
-                        string name  = field.FullName ?? field.Name ?? string.Empty;
-                        string value = field.Value?.ToString() ?? string.Empty;
-                        Console.WriteLine($"Field '{name}' value before stamp: {value}");
-                    }
-                }
+                // Example positioning – center of the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Do not flatten the form; keep AcroForm fields editable
+                Background = false,
+                Opacity    = 0.5
+            };
 
-                // Create an ImageStamp; default behavior does NOT flatten the page,
-                // so AcroForm fields remain intact.
-                ImageStamp imgStamp = new ImageStamp(stampImage)
-                {
-                    // Example positioning: bottom‑right corner of each page
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment   = VerticalAlignment.Bottom
-                };
-
-                // Apply the stamp to each page individually (per‑page AddStamp)
-                foreach (Page page in pdfDocument.Pages)
-                {
-                    page.AddStamp(imgStamp);
-                }
-
-                // Save the modified PDF; AcroForm fields are preserved.
-                pdfDocument.Save(outputPdf);
+            // Apply the stamp to every page individually (PageCollection has no AddStamp method)
+            foreach (Page page in pdfDocument.Pages)
+            {
+                page.AddStamp(imgStamp);
             }
 
-            Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+            // Save the modified PDF; AcroForm fields remain intact
+            pdfDocument.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'. AcroForm fields are preserved.");
     }
 }

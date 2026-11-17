@@ -1,61 +1,61 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for annotation handling (flattening)
+using Aspose.Pdf.Facades; // Required for flattening annotations
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string stampPath  = "stamp.png";
-        const string outputPath = "readOnlyStamped.pdf";
+        const string inputPdf = "input.pdf";
+        const string stampImg = "stamp.png";
+        const string outputPdf = "readOnlyStamped.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(stampPath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        if (!File.Exists(stampImg))
         {
-            // Create an image stamp and configure its appearance
-            ImageStamp imgStamp = new ImageStamp(stampPath)
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdf))
+        {
+            // Create an ImageStamp instance.
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                Background          = false,
-                Opacity             = 0.5,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                // Position the stamp at the bottom‑right corner of each page.
+                // Coordinates are in points (1/72 inch). Adjust as needed.
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                // Optional visual settings.
+                Opacity = 0.5,
+                Background = false
             };
 
-            // Apply the stamp to every page (AddStamp is a Page method, not a collection method)
-            foreach (Page page in pdfDoc.Pages)
+            // Apply the stamp to every page individually.
+            foreach (Page page in doc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Flatten all annotations so they become part of the page content and cannot be edited
-            foreach (Page page in pdfDoc.Pages)
+            // Flatten all annotations so they become part of the page content.
+            // Use PdfAnnotationEditor from Aspose.Pdf.Facades.
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                // Copy annotations to a list to avoid modifying the collection while iterating
-                var annotations = new List<Annotation>(page.Annotations);
-                foreach (var annotation in annotations)
-                {
-                    annotation.Flatten();
-                }
+                editor.BindPdf(doc);
+                editor.FlatteningAnnotations();
             }
 
-            // Save the modified PDF as a read‑only document
-            pdfDoc.Save(outputPath);
+            // Save the resulting PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamped and read‑only PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Read‑only PDF with image stamp saved to '{outputPdf}'.");
     }
 }

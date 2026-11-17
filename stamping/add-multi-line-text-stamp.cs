@@ -2,17 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Multi‑line disclaimer text (use \n for line breaks)
-        const string disclaimer = "Disclaimer:\nThis document is confidential.\nDo not distribute without permission.";
+        const string outputPath = "output_with_disclaimer.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -23,37 +19,30 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextStamp with the disclaimer text
-            TextStamp textStamp = new TextStamp(disclaimer)
-            {
-                // Position the stamp at the bottom‑center of each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Enable a semi‑transparent background rectangle
-                Background = true,
-                Opacity = 0.8f
-            };
+            // Create a TextStamp with multi‑line disclaimer text
+            TextStamp disclaimerStamp = new TextStamp("Disclaimer:\nAll information is confidential.\nDo not distribute.");
 
-            // TextState is read‑only – modify the existing instance instead of assigning a new one
-            textStamp.TextState.Font = FontRepository.FindFont("Arial");
-            textStamp.TextState.FontSize = 12;
-            textStamp.TextState.ForegroundColor = Color.Black;
-            // Custom line spacing (e.g., 1.5 times the font size)
-            textStamp.TextState.LineSpacing = 1.5f;
+            // Configure appearance and layout
+            disclaimerStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            disclaimerStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            // Use YIndent instead of the non‑existent Margin property to set distance from the bottom edge
+            disclaimerStamp.YIndent = 20; // distance from bottom edge in points
 
-            // Optional: set a background colour if the property exists in the used version
-            // textStamp.BackgroundColor = Color.FromRgb(0.9, 0.9, 0.9);
+            // Set font and custom line spacing (e.g., 1.5 times the default)
+            disclaimerStamp.TextState.Font      = FontRepository.FindFont("Arial");
+            disclaimerStamp.TextState.FontSize  = 10;
+            disclaimerStamp.TextState.LineSpacing = 1.5f;   // custom line spacing
 
-            // Apply the stamp to every page (AddStamp is a Page method)
+            // Apply the same stamp to every page
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(textStamp);
+                page.AddStamp(disclaimerStamp);
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with disclaimer stamp to '{outputPath}'.");
     }
 }

@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // Added for FontStyles enum
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "confidential_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +17,27 @@ class Program
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Create a text stamp with the desired label
-            TextStamp stamp = new TextStamp("Confidential")
+            // Create a text stamp with desired appearance
+            TextStamp textStamp = new TextStamp("Confidential");
+            textStamp.Opacity = 0.6; // subtle opacity
+            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            textStamp.VerticalAlignment = VerticalAlignment.Center;
+            textStamp.TextState.FontSize = 72;
+            textStamp.TextState.FontStyle = FontStyles.Bold; // Fixed: FontStyles now resolved
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(1, 0, 0); // optional red color
+
+            // Apply the stamp to each page individually
+            foreach (Page page in pdfDocument.Pages)
             {
-                // Set opacity to 0.6 for a subtle appearance
-                Opacity = 0.6,
-
-                // Optional: position the stamp (centered both horizontally and vertically)
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-
-                // Optional: make the stamp non‑background so it appears on top of content
-                Background = false
-            };
-
-            // Add the stamp to each page individually (Page.AddStamp, not PageCollection)
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(stamp);
+                page.AddStamp(textStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Text stamp added and saved to '{outputPath}'.");
     }
 }

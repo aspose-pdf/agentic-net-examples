@@ -1,62 +1,52 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing; // ImageStamp lives here
+using Aspose.Pdf.Annotations; // HorizontalAlignment, VerticalAlignment enums
+
+// Alias to disambiguate the two Rectangle types
+using PdfRect = Aspose.Pdf.Rectangle;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string stampImagePath = "stamp.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string stampImg = "stamp.png";
 
-        // Define the rectangle where the stamp should fit (coordinates in points)
-        // Lower‑left (llx, lly) and upper‑right (urx, ury) corners.
-        const double llx = 100;   // left X
-        const double lly = 500;   // lower Y
-        const double urx = 300;   // right X
-        const double ury = 700;   // upper Y
+        if (!File.Exists(inputPdf)) { Console.Error.WriteLine($"Input PDF not found: {inputPdf}"); return; }
+        if (!File.Exists(stampImg)) { Console.Error.WriteLine($"Stamp image not found: {stampImg}"); return; }
 
-        if (!File.Exists(inputPdfPath))
+        // Define the rectangle where the stamp should be placed (coordinates in points)
+        PdfRect targetRect = new PdfRect(100, 100, 300, 250);
+
+        using (Document doc = new Document(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(stampImagePath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
-            return;
-        }
-
-        // Use a using block for deterministic disposal of the Document.
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Create a fully qualified Rectangle to avoid ambiguity.
-            Aspose.Pdf.Rectangle targetRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-            // Create the image stamp.
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Create an ImageStamp from the image file
+            ImageStamp stamp = new ImageStamp(stampImg)
             {
-                // Position the stamp at the rectangle's lower‑left corner.
-                LeftMargin   = targetRect.LLX,
-                BottomMargin = targetRect.LLY,
+                // Size the stamp to exactly match the rectangle dimensions
+                Width = targetRect.URX - targetRect.LLX,
+                Height = targetRect.URY - targetRect.LLY,
 
-                // Explicitly set the stamp size to match the rectangle.
-                Width  = targetRect.Width,
-                Height = targetRect.Height,
+                // Position the stamp inside the rectangle
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Bottom,
+                XIndent = targetRect.LLX,
+                YIndent = targetRect.LLY,
 
-                // Optional: ensure the stamp is placed on top of page content.
+                // Ensure the stamp is drawn over the page content (foreground)
                 Background = false
             };
 
-            // Apply the stamp to the first page (or any page you need).
-            Page page = pdfDoc.Pages[1];
-            page.AddStamp(imgStamp);
+            // Apply the stamp to the first page (adjust index if needed)
+            doc.Pages[1].AddStamp(stamp);
 
-            // Save the modified PDF.
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamp applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
     }
 }

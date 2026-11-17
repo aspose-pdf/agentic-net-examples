@@ -1,73 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string targetPdfPath = "target.pdf";      // PDF to receive the background
-        const string sourcePdfPath = "background.pdf"; // PDF containing the background page
-        const string outputPdfPath = "stamped_output.pdf";
-        const int backgroundPageNum = 1;                // 1‑based page number in source PDF
+        const string targetPdfPath = "target.pdf";   // PDF to receive the background
+        const string sourcePdfPath = "background.pdf"; // PDF page used as background image
+        const string outputPdfPath = "result.pdf";
 
-        if (!File.Exists(targetPdfPath) || !File.Exists(sourcePdfPath))
+        if (!File.Exists(targetPdfPath))
         {
-            Console.Error.WriteLine("One or both input files are missing.");
+            Console.Error.WriteLine($"Target file not found: {targetPdfPath}");
+            return;
+        }
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Background file not found: {sourcePdfPath}");
             return;
         }
 
-        try
+        // Load both documents inside using blocks for deterministic disposal
+        using (Document targetDoc = new Document(targetPdfPath))
+        using (Document sourceDoc = new Document(sourcePdfPath))
         {
-            // Load the source PDF.
-            using (Document sourceDoc = new Document(sourcePdfPath))
+            // Render the first page of the source PDF to an image in memory.
+            // The image will be used as a stamp (background) for each page of the target PDF.
+            using (MemoryStream imageStream = new MemoryStream())
             {
-                if (backgroundPageNum < 1 || backgroundPageNum > sourceDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine("Background page number is out of range.");
-                    return;
-                }
+                // You can adjust the resolution as needed (e.g., 150, 300 DPI).
+                var resolution = new Resolution(150);
+                var pngDevice = new PngDevice(resolution);
+                pngDevice.Process(sourceDoc.Pages[1], imageStream);
+                imageStream.Position = 0; // Reset stream position before using it.
 
-                // Convert the selected page to a PNG image using a device class.
-                using (MemoryStream pngStream = new MemoryStream())
+                // Apply the background stamp to every page of the target document.
+                foreach (Page page in targetDoc.Pages)
                 {
-                    // The device writes the PNG bytes into the stream.
-                    PngDevice pngDevice = new PngDevice();
-                    pngDevice.Process(sourceDoc.Pages[backgroundPageNum], pngStream);
-                    pngStream.Position = 0; // reset for reading
+                    // Reset the stream position for each stamp creation.
+                    imageStream.Position = 0;
 
-                    // Load the target document that will receive the background.
-                    using (Document targetDoc = new Document(targetPdfPath))
+                    ImageStamp bgStamp = new ImageStamp(imageStream)
                     {
-                        // Apply the rendered image as a background stamp to every page.
-                        foreach (Page page in targetDoc.Pages)
-                        {
-                            // ImageStamp can be created from a stream.
-                            ImageStamp stamp = new ImageStamp(pngStream)
-                            {
-                                Width = page.PageInfo.Width,
-                                Height = page.PageInfo.Height,
-                                Background = true, // place behind existing content
-                                TopMargin = 0,
-                                LeftMargin = 0
-                            };
+                        Background = true,               // Place stamp behind existing content.
+                        Width = page.PageInfo.Width,    // Stretch to page width.
+                        Height = page.PageInfo.Height   // Stretch to page height.
+                    };
 
-                            page.AddStamp(stamp);
-                        }
-
-                        // Save the modified document.
-                        targetDoc.Save(outputPdfPath);
-                    }
+                    page.AddStamp(bgStamp);
                 }
             }
 
-            Console.WriteLine($"Background applied successfully. Output saved to '{outputPdfPath}'.");
+            // Save the modified document.
+            targetDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Background applied and saved to '{outputPdfPath}'.");
     }
 }

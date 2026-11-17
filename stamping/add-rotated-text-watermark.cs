@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // required for FontRepository and TextState
 
 class Program
 {
@@ -16,30 +16,32 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a text stamp that will serve as the watermark
-            TextStamp stamp = new TextStamp("CONFIDENTIAL");
+            // Create a text stamp that will act as a slanted watermark
+            TextStamp textStamp = new TextStamp("CONFIDENTIAL");
+            // Configure the TextState (TextState is read‑only, so we modify the instance it returns)
+            textStamp.TextState.Font = FontRepository.FindFont("Arial");
+            textStamp.TextState.FontSize = 72;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+            // Make the stamp semi‑transparent
+            textStamp.Opacity = 0.3;
+            // Rotate 30 degrees to achieve the slanted effect
+            textStamp.RotateAngle = 30;
+            // Center the stamp on each page
+            textStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            textStamp.VerticalAlignment = VerticalAlignment.Center;
+            // Place the stamp in front of page content (Background = false)
+            textStamp.Background = false;
 
-            // Configure appearance
-            stamp.HorizontalAlignment = HorizontalAlignment.Center;
-            stamp.VerticalAlignment   = VerticalAlignment.Center;
-            stamp.RotateAngle = 30f;               // rotate 30 degrees for slanted effect
-            stamp.Opacity = 0.3f;                  // make it semi‑transparent
-
-            // Configure text style via the existing TextState instance
-            stamp.TextState.FontSize = 72;
-            stamp.TextState.FontStyle = FontStyles.Bold;
-            stamp.TextState.ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray
-
-            // Apply the stamp to every page in the document
+            // Apply the stamp to every page individually (Page.AddStamp, not PageCollection)
             foreach (Page page in doc.Pages)
             {
-                page.AddStamp(stamp);
+                page.AddStamp(textStamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF; the Document is still alive until Save completes
             doc.Save(outputPath);
         }
 

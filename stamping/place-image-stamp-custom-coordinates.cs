@@ -6,46 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "stamped_output.pdf";
+        const string stampImg  = "stamp.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp and set absolute X/Y coordinates
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Create an ImageStamp and set precise X/Y coordinates (points)
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Disable alignment to use absolute positioning
+                // Position measured from the lower‑left corner of the page
+                XIndent = 150,                     // 150 points from the left edge
+                YIndent = 300,                     // 300 points from the bottom edge
                 HorizontalAlignment = HorizontalAlignment.None,
                 VerticalAlignment   = VerticalAlignment.None,
-                // Exact position in points from the bottom‑left corner of the page
-                XIndent = 150, // X coordinate
-                YIndent = 300, // Y coordinate
-                // Optional visual settings
-                Background = false,
-                Opacity    = 0.8
+                Opacity = 0.8,                     // optional transparency
+                Background = false                 // draw on top of page content
             };
 
-            // Apply the stamp to the first page (change index for other pages)
-            Page page = pdfDoc.Pages[1];
-            page.AddStamp(imgStamp);
+            // Apply the stamp to each page (or target specific pages)
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(imgStamp);
+            }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPath);
+            // Save while the Document is still alive
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp placed and saved to '{outputPath}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
     }
 }

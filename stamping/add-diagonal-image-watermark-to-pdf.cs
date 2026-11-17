@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string stampPath  = "watermark.png";
+        const string inputPath = "input.pdf";
+        const string stampImagePath = "watermark.png";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,27 +16,24 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampPath))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document pdfDocument = new Document(inputPath))
         {
-            // Create an image stamp
-            ImageStamp imgStamp = new ImageStamp(stampPath)
+            // Create an ImageStamp from the watermark image
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                // Center the stamp on each page
+                Background = false,                     // place on top of page content
+                Opacity = 0.3,                          // semi‑transparent (optional)
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                // Make the watermark semi‑transparent
-                Opacity = 0.3,
-                // Rotate 90 degrees to achieve a diagonal effect
-                RotateAngle = 90,
-                // Place the stamp over the page content
-                Background = false
+                VerticalAlignment = VerticalAlignment.Center,
+                // Rotate the stamp 90 degrees to obtain a diagonal watermark
+                Rotate = Rotation.on90
             };
 
             // Apply the stamp to each page individually
@@ -44,7 +42,7 @@ class Program
                 page.AddStamp(imgStamp);
             }
 
-            // Save the watermarked PDF
+            // Save the modified PDF while the document is still alive
             pdfDocument.Save(outputPath);
         }
 

@@ -1,49 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // for annotation types if needed
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // source PDF with existing annotations
-        const string stampPath  = "stamp.png";      // image to use as stamp
-        const string outputPath = "output.pdf";     // result PDF
+        const string inputPath      = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPath     = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
-        if (!File.Exists(stampPath))
+        if (!File.Exists(stampImagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF, add an image stamp to each page, and preserve existing annotations
         using (Document pdfDocument = new Document(inputPath))
         {
-            // Create the image stamp and configure its appearance
-            ImageStamp imgStamp = new ImageStamp(stampPath)
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
             {
-                // false = stamp appears on top of page content (preserves annotations underneath)
-                Background = false,
-                // Adjust opacity if needed (1.0 = fully opaque)
-                Opacity = 0.8,
-                // Position the stamp (centered on the page)
+                Background          = false, // place stamp over page content
+                Opacity             = 0.5,   // semi‑transparent
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Apply the stamp to each page individually; this preserves existing annotations
+            // Apply the stamp to every page individually (per‑page AddStamp)
             foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF; the original annotations remain intact
+            // Save the modified PDF; annotations remain intact
             pdfDocument.Save(outputPath);
         }
 

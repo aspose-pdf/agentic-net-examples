@@ -6,42 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPath = "stamped_output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(stampImagePath))
-        {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(stampImg))
         {
-            // Create an ImageStamp and set it to appear behind page content
-            ImageStamp stamp = new ImageStamp(stampImagePath)
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Get the first page to obtain its dimensions
+            Page page = doc.Pages[1];
+
+            // Create an ImageStamp from the image file
+            ImageStamp stamp = new ImageStamp(stampImg)
             {
-                Background = true, // true => stamp is rendered behind existing content
+                // Appear behind existing page content
+                Background = true,
+                // Center the stamp on the page
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Resize the stamp to cover the whole page (optional)
+                Width  = page.PageInfo.Width,
+                Height = page.PageInfo.Height
             };
 
-            // Apply the stamp to each page (or target specific pages as needed)
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(stamp);
-            }
+            // Apply the stamp to the first page (or iterate over all pages as needed)
+            page.AddStamp(stamp);
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

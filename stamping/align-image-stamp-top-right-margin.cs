@@ -6,50 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string stampImg  = "stamp.png";
-        const string outputPdf = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "output.pdf";
 
         // Verify files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampImg))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdf = new Document(inputPdf))
+        using (Document pdfDocument = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int i = 1; i <= pdf.Pages.Count; i++)
+            // Create an ImageStamp and configure alignment to top‑right with margins
+            ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                Page page = pdf.Pages[i];
+                // Align to the right edge and top edge of the page
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Top,
+                // Use individual margin properties (ImageStamp has no Margin object)
+                RightMargin = 10,   // offset from the right edge (points)
+                TopMargin   = 10    // offset from the top edge (points)
+            };
 
-                // Create an ImageStamp and configure alignment to top‑right
-                ImageStamp stamp = new ImageStamp(stampImg)
-                {
-                    // Align to the right edge and top edge of the page
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment   = VerticalAlignment.Top,
-
-                    // Margin offsets from the top and right edges (in points)
-                    TopMargin  = 30, // distance from the top edge
-                    RightMargin = 20  // distance from the right edge
-                };
-
-                // Apply the stamp to the current page
-                page.AddStamp(stamp);
+            // Apply the stamp to each page individually
+            foreach (Page page in pdfDocument.Pages)
+            {
+                page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF; Save() is called while the Document is still alive
-            pdf.Save(outputPdf);
+            // Save the modified PDF while the Document is still alive
+            pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied to top‑right corner and saved as '{outputPath}'.");
     }
 }

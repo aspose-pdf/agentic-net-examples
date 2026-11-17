@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // TextStamp, TextState, FontStyles
+using Aspose.Pdf.Text;   // for TextState, FontStyles, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,40 +16,48 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Iterate over each page (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a TextStamp that will serve as a full‑page watermark
+                Page page = doc.Pages[i];
+
+                // Create a text stamp that will act as a watermark
                 TextStamp stamp = new TextStamp("CONFIDENTIAL")
                 {
-                    Background = true,                     // place behind existing content
-                    Opacity = 0.2,                         // semi‑transparent
+                    // Make the stamp appear behind existing content
+                    Background = true,
+
+                    // Set opacity for a subtle watermark effect
+                    Opacity = 0.2,
+
+                    // Rotate to give a typical diagonal watermark look
+                    RotateAngle = 45,
+
+                    // Align to the center of the page
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
+                    VerticalAlignment   = VerticalAlignment.Center,
+
+                    // Size the stamp to cover the whole page
+                    Width  = page.PageInfo.Width,
+                    Height = page.PageInfo.Height
                 };
 
-                // Configure the TextState (read‑only property, modify its members directly)
-                stamp.TextState.FontSize = 120;
-                stamp.TextState.FontStyle = FontStyles.Bold;
+                // Configure the visual appearance of the text via the read‑only TextState object
+                stamp.TextState.FontSize      = 72;
+                stamp.TextState.FontStyle     = FontStyles.Bold;
                 stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
-                // Apply the stamp to each page, resizing it to cover the whole page
-                foreach (Page page in doc.Pages)
-                {
-                    stamp.Width = page.PageInfo.Width;
-                    stamp.Height = page.PageInfo.Height;
-                    page.AddStamp(stamp);
-                }
-
-                doc.Save(outputPath);
+                // Apply the stamp to the current page
+                page.AddStamp(stamp);
             }
 
-            Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

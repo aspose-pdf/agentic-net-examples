@@ -1,7 +1,8 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Annotations;        // For annotation types if needed (not used here)
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;   // for ImageStamp (inherits from Stamp)
+using Aspose.Pdf.Text;          // for Position if needed (not required for ImageStamp)
 
 class Program
 {
@@ -11,7 +12,6 @@ class Program
         const string stampImg  = "stamp.png";
         const string outputPdf = "output_accessible.pdf";
 
-        // Verify files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -23,37 +23,30 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
             // Create an ImageStamp from the PNG file
             ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Position the stamp (example: bottom‑right corner)
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Optional scaling – use Width/Height or omit to keep original size
-                // ImageScale property is not available in the current Aspose.Pdf version.
-                // Alternative: set Width/Height manually if scaling is required.
-                // Set Unicode alternative text for multilingual accessibility
-                // This text will be embedded in the PDF's /Alt entry for the image
-                AlternativeText = "示例图像 – Example Image – مثال صورة"
+                // Position the stamp (optional – here centered on the page)
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Set the alternative text with Unicode characters for multilingual accessibility
+                AlternativeText = "图像说明 – صورة توضيحية – Image description"
             };
 
-            // If you need to specify an explicit rectangle, use the fully qualified type
-            // Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 300);
-            // imgStamp.Rectangle = rect;
-
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Apply the stamp to every page (pages are 1‑based)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                Page page = doc.Pages[i];
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF (no special SaveOptions needed for PDF output)
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with image stamp and Unicode alt text: {outputPdf}");
+        Console.WriteLine($"Accessible PDF saved to '{outputPdf}'.");
     }
 }
