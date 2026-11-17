@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -16,49 +17,56 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least six pages
+            // Verify that the document has at least six pages (1‑based indexing)
             if (doc.Pages.Count < 6)
             {
-                Console.Error.WriteLine("Document does not contain page 6.");
+                Console.Error.WriteLine("Document contains fewer than 6 pages.");
                 return;
             }
 
-            // Get page six (Aspose.Pdf uses 1‑based indexing)
+            // Retrieve page six
             Page page = doc.Pages[6];
 
-            // Retrieve page dimensions
+            // Get page dimensions
             double pageWidth = page.PageInfo.Width;
             double pageHeight = page.PageInfo.Height;
 
-            // Define watermark size (50% of page size) and compute centered rectangle
-            double wmWidth = pageWidth * 0.5;
-            double wmHeight = pageHeight * 0.5;
-            double llx = (pageWidth - wmWidth) / 2; // lower‑left X
+            // Define desired watermark size (example: 200 × 100 points)
+            double wmWidth = 200;
+            double wmHeight = 100;
+
+            // Compute rectangle coordinates so the watermark is centered
+            double llx = (pageWidth - wmWidth) / 2;   // lower‑left X
             double lly = (pageHeight - wmHeight) / 2; // lower‑left Y
             double urx = llx + wmWidth;               // upper‑right X
             double ury = lly + wmHeight;              // upper‑right Y
 
-            // Fully qualified Rectangle to avoid ambiguity with System.Drawing
+            // Fully qualified rectangle to avoid ambiguity with System.Drawing
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Create the watermark annotation
+            // Create the watermark annotation (30 % opacity)
             WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
             {
-                // The text of the watermark
-                Contents = "CONFIDENTIAL",
-                // Set opacity to 30% (0.3)
-                Opacity = 0.3,
-                // Set the text colour (red in this example)
-                Color = Aspose.Pdf.Color.FromRgb(1.0, 0.0, 0.0)
+                Opacity = 0.3f
             };
 
-            // Add the annotation to the page
+            // Define the visual appearance of the watermark text
+            TextState textState = new TextState
+            {
+                FontSize = 48,
+                ForegroundColor = Color.Gray
+            };
+
+            // Set the watermark text (using the API that exists in current versions)
+            watermark.SetTextAndState(new string[] { "CONFIDENTIAL" }, textState);
+
+            // Attach the annotation to the page
             page.Annotations.Add(watermark);
 
-            // Save the modified document (inside the using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

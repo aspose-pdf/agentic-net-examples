@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_highlight_modified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block (document‑disposal‑with‑using rule)
+        // Load the PDF document inside a using block (deterministic disposal)
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based (page-indexing-one-based rule)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
                 // Iterate all annotations on the page
-                foreach (Annotation annot in page.Annotations)
+                for (int j = 0; j < page.Annotations.Count; j++)
                 {
+                    Annotation annot = page.Annotations[j];
+
                     // Process only Highlight annotations
                     if (annot is HighlightAnnotation highlight)
                     {
-                        // Define a custom shade (e.g., orange) using Aspose.Pdf.Color
-                        Aspose.Pdf.Color customColor = Aspose.Pdf.Color.FromRgb(1.0, 0.5, 0.0);
+                        // Retrieve the appearance dictionary (keyed by state name "N", "R", "D")
+                        AppearanceDictionary appearances = highlight.Appearance;
 
-                        // Replace the annotation's color – this updates its appearance stream
-                        highlight.Color = customColor;
+                        // Example: access the normal appearance XForm if it exists.
+                        // The dictionary does NOT expose a NormalAppearance property – use the "N" key.
+                        if (appearances != null && appearances.TryGetValue("N", out var normalForm))
+                        {
+                            // normalForm is an XForm representing the appearance stream.
+                            // Custom modifications could be performed here.
+                        }
 
-                        // No further manipulation of the appearance dictionary is required.
-                        // Setting the Color property forces Aspose.Pdf to regenerate the
-                        // appearance stream automatically.
+                        // Replace the annotation color with a custom shade (e.g., light orange).
+                        // Aspose.Pdf.Color uses 0‑1 range for RGB components.
+                        highlight.Color = Color.FromRgb(1.0, 0.6, 0.0);
                     }
                 }
             }

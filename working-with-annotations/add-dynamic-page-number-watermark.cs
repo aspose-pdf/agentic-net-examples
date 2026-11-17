@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -16,46 +17,41 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
+            // Loop through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                int pageCount = doc.Pages.Count;
+                Page page = doc.Pages[i];
+                // Define the rectangle where the watermark will appear
+                Rectangle rect = new Rectangle(100, 500, 400, 550);
 
-                // Iterate pages (1‑based indexing)
-                for (int i = 1; i <= pageCount; i++)
+                // Create a WatermarkAnnotation. The "#" placeholder is replaced by the current page number.
+                WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
                 {
-                    Page page = doc.Pages[i];
+                    Opacity = 0.5
+                };
 
-                    // Define the area for the watermark (full page size)
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, page.PageInfo.Width, page.PageInfo.Height);
+                // Define the visual style of the watermark text
+                TextState textState = new TextState
+                {
+                    Font = FontRepository.FindFont("Arial"),
+                    FontSize = 24,
+                    ForegroundColor = Color.Gray
+                };
 
-                    // Create a watermark annotation with dynamic placeholders
-                    WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
-                    {
-                        // Placeholder text – will be replaced automatically per page
-                        Contents = "Page #pageNumber# of #pageCount#",
-                        // Visual appearance
-                        Opacity = 0.5,
-                        Color = Aspose.Pdf.Color.Gray,
-                        // Alignment (HorizontalAlignment is obsolete – use TextHorizontalAlignment)
-                        TextHorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Bottom
-                    };
+                // Set the watermark text using the placeholder for page number
+                watermark.SetTextAndState(new[] { "Page #" }, textState);
 
-                    // Add the annotation to the current page
-                    page.Annotations.Add(watermark);
-                }
-
-                // Save the modified document
-                doc.Save(outputPath);
+                // Add the annotation to the current page
+                page.Annotations.Add(watermark);
             }
 
-            Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

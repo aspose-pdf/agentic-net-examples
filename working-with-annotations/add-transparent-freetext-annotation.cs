@@ -3,7 +3,6 @@ using System.IO;
 using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -18,30 +17,27 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Select the page to annotate (first page in this example)
+            // Choose the page to annotate (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (lower‑left X,Y and upper‑right X,Y)
+            // Define the annotation rectangle (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Build the default appearance required by FreeTextAnnotation
+            // Free‑text annotations require a DefaultAppearance object
             DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Create a free‑text annotation with transparent background
+            // Create a free‑text annotation with a transparent background
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                // Text displayed inside the annotation
-                Contents = "Note: Review this section.",
-
-                // Make the background fully transparent
-                Color = Aspose.Pdf.Color.Transparent,
-                Opacity = 0.0
+                Contents = "Overlay note",
+                // Transparent background (Annotation.Color is the background colour)
+                Color = Aspose.Pdf.Color.Transparent
             };
 
-            // Hide the border (optional) – Border requires the owning annotation instance
+            // Border must be created with the parent annotation and set after construction
+            // Border.Width expects an integer, so use an integer value (e.g., 0 for no visible border)
             freeText.Border = new Border(freeText) { Width = 0 };
 
             // Add the annotation to the page's annotation collection

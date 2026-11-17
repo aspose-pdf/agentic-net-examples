@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // JavascriptAction, AnnotationFlags
+using Aspose.Pdf.Forms;      // ButtonField
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string endpoint = "https://example.com/submit";
+        const string submitUrl  = "https://example.com/endpoint";
 
         if (!File.Exists(inputPath))
         {
@@ -18,30 +18,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Define the button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 200, 540);
+            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Create a push‑button form field on page 1
-            ButtonField submitButton = new ButtonField(doc.Pages[1], buttonRect)
+            // Define the button rectangle (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+
+            // Create a button field (form button) and assign JavaScript that submits the form
+            ButtonField submitButton = new ButtonField(page, rect)
             {
-                PartialName = "SubmitButton",
-                Value = "Submit"
+                PartialName   = "SubmitButton",
+                NormalCaption = "Submit"
             };
+            // JavaScript that submits the form data to the specified endpoint
+            submitButton.OnActivated = new JavascriptAction($"this.submitForm('{submitUrl}');");
 
-            // Attach JavaScript that submits the form data to the specified HTTP endpoint
-            // Use a valid action property from AnnotationActionCollection (OnPressMouseBtn)
-            submitButton.Actions.OnPressMouseBtn = new JavascriptAction($"this.submitForm('{endpoint}');");
-
-            // Add the button to the document's form collection on page 1
+            // Add the button field to the document's form collection (page number = 1)
             doc.Form.Add(submitButton, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with submit button saved to '{outputPath}'.");
+        Console.WriteLine($"Button annotation added and saved to '{outputPath}'.");
     }
 }

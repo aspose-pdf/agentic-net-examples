@@ -17,29 +17,34 @@ class Program
             return;
         }
 
-        // Load PDF and ensure deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Use the first page (change index if needed)
+            // Choose the page to place the annotation (first page)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+            // Define the rectangle where the free‑text annotation will appear
+            // Coordinates: lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
 
-            // Create a DefaultAppearance that defines font, size and color (System.Drawing.Color required)
-            var appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.Black);
+            // Create the default appearance (font, size, colour) required by FreeTextAnnotation
+            // DefaultAppearance expects a System.Drawing.Color, so we fully qualify it to avoid ambiguity.
+            DefaultAppearance appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.Black);
 
-            // Create a free‑text annotation on the page using the correct constructor order
+            // Create the free‑text annotation using the constructor that accepts Page, Rectangle and DefaultAppearance
             FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
             {
-                // Text displayed inside the annotation
+                // The visible text of the annotation
                 Contents = "This is a free‑text annotation."
             };
 
-            // Attach the annotation to the page
+            // Set the annotation border (no border). Border requires the parent annotation in its constructor.
+            freeText.Border = new Border(freeText) { Width = 0 };
+
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(freeText);
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

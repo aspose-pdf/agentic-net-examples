@@ -17,10 +17,29 @@ class Program
             return;
         }
 
-        // JavaScript that highlights all text fields on the current page
-        string js = @"
-var pageNum = this.pageNum;
-var annots = this.getAnnots(pageNum);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Choose the page where the button will be placed (first page in this example)
+            Page page = doc.Pages[1]; // 1‑based indexing
+
+            // Define the button's rectangular area (llx, lly, urx, ury)
+            Rectangle buttonRect = new Rectangle(100, 700, 200, 750);
+
+            // Create a form button field
+            ButtonField button = new ButtonField(page, buttonRect)
+            {
+                PartialName = "HighlightBtn",
+                // Use AlternateCaption (or NormalCaption) instead of the non‑existent Caption property
+                AlternateCaption = "Highlight Text Fields"
+            };
+
+            // Set a simple border for visual clarity
+            button.Border = new Border(button) { Width = 1 };
+
+            // JavaScript that highlights all text fields on the current page
+            string js = @"
+var annots = this.getAnnots();
 if (annots != null) {
     for (var i = 0; i < annots.length; i++) {
         var a = annots[i];
@@ -28,31 +47,18 @@ if (annots != null) {
             a.fillColor = color.yellow;
         }
     }
-}
-";
+}";
 
-        using (Document doc = new Document(inputPath))
-        {
-            // Define button rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 200, 750);
-
-            // Create a button form field on the first page
-            ButtonField button = new ButtonField(doc.Pages[1], rect)
-            {
-                PartialName = "HighlightAllTextFields",
-                Value = "Highlight"
-            };
-
-            // Assign JavaScript to be executed when the button is pressed
+            // Assign the JavaScript action to the button's mouse‑press event
             button.Actions.OnPressMouseBtn = new JavascriptAction(js);
 
-            // Add the button to the document's form (AcroForm)
-            doc.Form.Add(button, 1);
+            // Add the button to the document's form collection (not to page.Annotations)
+            doc.Form.Add(button, page.Number);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with button annotation to '{outputPath}'.");
+        Console.WriteLine($"PDF with button annotation saved to '{outputPath}'.");
     }
 }

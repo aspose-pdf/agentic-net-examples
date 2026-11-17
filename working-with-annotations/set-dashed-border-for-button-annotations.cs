@@ -20,22 +20,20 @@ class Program
         // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over all pages
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[i];
-
-                // Examine each annotation on the page
+                // Iterate over all annotations on the page
                 foreach (Annotation annot in page.Annotations)
                 {
-                    // Process only button annotations (form button fields)
+                    // Process only button form fields (push button annotations)
                     if (annot is ButtonField button)
                     {
-                        // Border must be created with the parent annotation instance
+                        // Set a dashed border with a thickness of 2 points
                         button.Border = new Border(button)
                         {
-                            Style = BorderStyle.Dashed,
-                            Width = 2
+                            Width = 2,
+                            Style = BorderStyle.Dashed
                         };
                     }
                 }

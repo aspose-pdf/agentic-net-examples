@@ -1,12 +1,11 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // core API
 
 class Program
 {
     static void Main()
     {
-        // Path to the source PDF
         const string pdfPath = "input.pdf";
 
         if (!File.Exists(pdfPath))
@@ -15,32 +14,54 @@ class Program
             return;
         }
 
-        // Determine the XFDF file name (same folder, same base name, .xfdf extension)
-        string pdfDirectory = Path.GetDirectoryName(pdfPath) ?? string.Empty; // Guard against null
-        string pdfBaseName  = Path.GetFileNameWithoutExtension(pdfPath);
-        string xfdfPath     = Path.Combine(pdfDirectory, pdfBaseName + ".xfdf");
+        // Build the XFDF file name (same folder, same base name, .xfdf extension)
+        string xfdfPath = Path.Combine(
+            Path.GetDirectoryName(pdfPath) ?? string.Empty,
+            Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf");
 
-        // Index of the page whose annotations we want to export (1‑based for user, 0‑based for API)
-        int currentPageNumber = 1;   // change as needed
-        int pageIndexZeroBased = currentPageNumber - 1;
-
-        // Load the PDF
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // NOTE: Exporting annotations to XFDF requires the optional
-            // Aspose.Pdf.Xfdf assembly (contains XfdfSaveOptions, XfdfWriter, etc.).
-            // If that assembly is referenced, the code below can be uncommented
-            // to perform the export. The current project compiles without the
-            // additional dependency, so we simply skip the export step.
-            /*
-            var xfdfOptions = new Aspose.Pdf.Xfdf.XfdfSaveOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                PageIndex = pageIndexZeroBased
-            };
-            doc.Save(xfdfPath, xfdfOptions);
-            */
-        }
+                // 1‑based page number whose annotations we want to export
+                int pageNumber = 1; // change as needed
 
-        Console.WriteLine($"(Placeholder) Annotations from page {currentPageNumber} would be saved to '{xfdfPath}' if the Aspose.Pdf.Xfdf assembly were referenced.");
+                if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                {
+                    Console.Error.WriteLine("Invalid page number.");
+                    return;
+                }
+
+                // ------------------------------------------------------------
+                // The XFDF support lives in the separate assembly Aspose.Pdf.Xfdf.
+                // To avoid a compile‑time dependency (and the missing‑namespace
+                // error) we create the XfdfSaveOptions instance via reflection.
+                // This keeps the code pure‑core and still provides the required
+                // functionality when the optional assembly is present at runtime.
+                // ------------------------------------------------------------
+                const string xfdfAssemblyName = "Aspose.Pdf.Xfdf"; // NuGet package name
+                const string xfdfOptionsTypeName = "Aspose.Pdf.Xfdf.XfdfSaveOptions";
+
+                // Load the assembly (will throw if not found – let the catch handle it)
+                var xfdfAssembly = AppDomain.CurrentDomain.Load(xfdfAssemblyName);
+                var xfdfOptionsType = xfdfAssembly.GetType(xfdfOptionsTypeName, throwOnError: true);
+
+                // Create an instance of XfdfSaveOptions
+                dynamic xfdfOptions = Activator.CreateInstance(xfdfOptionsType);
+                // PageIndex is zero‑based, so subtract 1 from the 1‑based pageNumber
+                xfdfOptions.PageIndex = pageNumber - 1;
+
+                // Save only the annotations of the selected page to XFDF
+                // The XfdfSaveOptions class derives from Aspose.Pdf.SaveOptions, so we can cast.
+                doc.Save(xfdfPath, (SaveOptions)xfdfOptions);
+            }
+
+            Console.WriteLine($"Annotations from page saved to: {xfdfPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

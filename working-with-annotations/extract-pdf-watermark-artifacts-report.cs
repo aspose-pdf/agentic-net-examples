@@ -3,60 +3,53 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Program
+class WatermarkExtractor
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdfPath = "input.pdf";
         const string reportPath = "watermark_report.csv";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Prepare CSV report header
+            using (StreamWriter writer = new StreamWriter(reportPath, false))
             {
-                // Create or overwrite the CSV report file
-                using (StreamWriter writer = new StreamWriter(reportPath, false))
+                writer.WriteLine("PageNumber,X1,Y1,X2,Y2,Opacity");
+
+                // Pages are 1‑based in Aspose.Pdf
+                for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
                 {
-                    // CSV header
-                    writer.WriteLine("Page,Left,Bottom,Right,Top,Opacity");
+                    Page page = pdfDoc.Pages[pageIndex];
 
-                    // Pages are 1‑based in Aspose.Pdf
-                    for (int i = 1; i <= doc.Pages.Count; i++)
+                    // Iterate all annotations on the page
+                    foreach (Annotation annot in page.Annotations)
                     {
-                        Page page = doc.Pages[i];
-
-                        // Iterate all annotations on the page
-                        foreach (Annotation annot in page.Annotations)
+                        // Identify watermark annotations
+                        if (annot is WatermarkAnnotation watermark)
                         {
-                            // Watermarks are represented by WatermarkAnnotation
-                            if (annot is WatermarkAnnotation watermark)
-                            {
-                                // Position rectangle (lower‑left X/Y, upper‑right X/Y)
-                                Aspose.Pdf.Rectangle rect = watermark.Rect;
+                            // Position is defined by the rectangle (lower‑left and upper‑right corners)
+                            // The correct property for the bounds of a WatermarkAnnotation is 'Rect'
+                            Aspose.Pdf.Rectangle rect = watermark.Rect;
 
-                                // Opacity value (0.0 = fully transparent, 1.0 = fully opaque)
-                                double opacity = watermark.Opacity;
+                            // Opacity is a value between 0 (transparent) and 1 (opaque)
+                            double opacity = watermark.Opacity;
 
-                                // Write a line to the CSV report
-                                writer.WriteLine($"{i},{rect.LLX},{rect.LLY},{rect.URX},{rect.URY},{opacity}");
-                            }
+                            // Write details to CSV
+                            writer.WriteLine($"{pageIndex},{rect.LLX},{rect.LLY},{rect.URX},{rect.URY},{opacity}");
                         }
                     }
                 }
-
-                Console.WriteLine($"Watermark report generated: {reportPath}");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+
+            Console.WriteLine($"Watermark report generated: {reportPath}");
         }
     }
 }

@@ -8,8 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const int pageNumber = 1;          // 1‑based page index
-        const int annotationIndex = 0;     // zero‑based index within the page's Annotations collection
+        const int pageNumber = 1;      // 1‑based page index (Aspose.Pdf uses 1‑based indexing)
+        const int annotationIndex = 0; // zero‑based index within the page's Annotations collection
 
         if (!File.Exists(inputPath))
         {
@@ -20,40 +20,40 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Validate page number (Aspose.Pdf uses 1‑based indexing)
+            // Ensure the requested page exists
             if (pageNumber < 1 || pageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
             Page page = doc.Pages[pageNumber];
 
-            // Validate annotation index
+            // Ensure the requested annotation exists
             if (annotationIndex < 0 || annotationIndex >= page.Annotations.Count)
             {
-                Console.Error.WriteLine("Annotation index out of range.");
+                Console.Error.WriteLine($"Annotation index {annotationIndex} is out of range. Page has {page.Annotations.Count} annotations.");
                 return;
             }
 
-            // Retrieve the specific annotation
-            Annotation annot = page.Annotations[annotationIndex];
+            // Retrieve the annotation
+            Annotation annotation = page.Annotations[annotationIndex];
 
-            // Get its bounding rectangle using the correct property (Rect)
-            Aspose.Pdf.Rectangle rect = annot.Rect;
+            // Get the bounding rectangle (use fully qualified type to avoid ambiguity)
+            Aspose.Pdf.Rectangle rect = annotation.Rect; // corrected property name
 
-            // Compute width and height
+            // Calculate dimensions
             double width  = rect.URX - rect.LLX;
             double height = rect.URY - rect.LLY;
 
-            // Log rectangle coordinates and dimensions
-            Console.WriteLine($"Annotation on page {pageNumber}:");
+            // Log the rectangle coordinates and its size
+            Console.WriteLine($"Annotation Rectangle:");
             Console.WriteLine($"  Lower‑Left X : {rect.LLX}");
             Console.WriteLine($"  Lower‑Left Y : {rect.LLY}");
             Console.WriteLine($"  Upper‑Right X: {rect.URX}");
             Console.WriteLine($"  Upper‑Right Y: {rect.URY}");
-            Console.WriteLine($"  Width        : {width}");
-            Console.WriteLine($"  Height       : {height}");
+            Console.WriteLine($"  Width  : {width}");
+            Console.WriteLine($"  Height : {height}");
         }
     }
 }

@@ -1,62 +1,63 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
-class Program
+class AnnotationExporter
 {
-    // Placeholder for cloud storage upload logic.
-    // Replace with actual SDK calls (e.g., AWS S3, Azure Blob, Google Cloud Storage) as needed.
-    static void UploadToBucket(string localFilePath, string bucketPath)
-    {
-        // Example: copy to a local "bucket" folder for demonstration.
-        string destination = Path.Combine(bucketPath, Path.GetFileName(localFilePath));
-        Directory.CreateDirectory(bucketPath);
-        File.Copy(localFilePath, destination, overwrite: true);
-        Console.WriteLine($"Uploaded '{localFilePath}' to bucket path '{destination}'.");
-    }
-
     static void Main()
     {
-        // Folder containing source PDF files.
-        const string pdfFolder = "InputPdfs";
-        // Folder representing the cloud storage bucket.
-        const string bucketFolder = "CloudBucket";
+        // List of PDF files to process
+        string[] pdfFiles = { "doc1.pdf", "doc2.pdf" };
+        // Target cloud storage bucket name
+        string bucketName = "my-annotations-bucket";
 
-        if (!Directory.Exists(pdfFolder))
+        foreach (var pdfPath in pdfFiles)
         {
-            Console.Error.WriteLine($"Source folder not found: {pdfFolder}");
-            return;
-        }
+            if (!File.Exists(pdfPath))
+            {
+                Console.Error.WriteLine($"PDF not found: {pdfPath}");
+                continue;
+            }
 
-        // Process each PDF file in the source folder.
-        foreach (string pdfPath in Directory.GetFiles(pdfFolder, "*.pdf"))
-        {
+            // Destination XFDF file path (same name, .xfdf extension)
+            string xfdfPath = Path.ChangeExtension(pdfPath, ".xfdf");
+
+            // Load the PDF and export its annotations to XFDF
+            using (Document pdfDoc = new Document(pdfPath))
+            {
+                // The overload that takes only the file name infers the format from the extension.
+                // This works even when SaveFormat.Xfdf is not present in the referenced Aspose.Pdf version.
+                pdfDoc.Save(xfdfPath);
+            }
+
+            // Upload the generated XFDF file to the cloud storage bucket
             try
             {
-                // Load the PDF document.
-                using (Document pdfDoc = new Document(pdfPath))
-                {
-                    // Determine output XFDF file name (same base name, .xfdf extension).
-                    string xfdfFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf";
-                    string xfdfTempPath = Path.Combine(Path.GetTempPath(), xfdfFileName);
-
-                    // Export all annotations to XFDF.
-                    // Use the overload that infers format from the file extension.
-                    pdfDoc.Save(xfdfTempPath);
-
-                    // Upload the generated XFDF file to the cloud bucket.
-                    UploadToBucket(xfdfTempPath, bucketFolder);
-
-                    // Optionally delete the temporary XFDF file.
-                    File.Delete(xfdfTempPath);
-                }
-
-                Console.WriteLine($"Successfully exported annotations from '{pdfPath}'.");
+                UploadToBucket(xfdfPath, bucketName);
+                Console.WriteLine($"Uploaded {xfdfPath} to bucket '{bucketName}'.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to upload {xfdfPath}: {ex.Message}");
             }
+
+            // Optional: delete the local XFDF after successful upload
+            // File.Delete(xfdfPath);
         }
+    }
+
+    // Placeholder method – replace with actual SDK calls for your cloud provider
+    static void UploadToBucket(string filePath, string bucketName)
+    {
+        // Example pseudo‑code for a cloud SDK:
+        // CloudStorageClient client = new CloudStorageClient(...);
+        // using (var stream = File.OpenRead(filePath))
+        // {
+        //     client.UploadObject(bucketName, Path.GetFileName(filePath), stream);
+        // }
+
+        // For demonstration, just verify the file exists
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException("File to upload not found.", filePath);
     }
 }

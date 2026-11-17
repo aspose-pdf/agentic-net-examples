@@ -1,72 +1,71 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Required for JavascriptAction
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "template.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "sum_form.pdf";
 
-        if (!File.Exists(inputPath))
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure there is at least one page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
+            // Define rectangles for the fields and the button
+            Rectangle fieldRect1 = new Rectangle(100, 700, 250, 730);
+            Rectangle fieldRect2 = new Rectangle(300, 700, 450, 730);
+            Rectangle buttonRect = new Rectangle(100, 600, 250, 630);
+            Rectangle resultRect = new Rectangle(100, 500, 250, 530);
 
-            // First numeric text box
-            TextBoxField field1 = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 700, 200, 730));
-            field1.PartialName = "Field1";
-            field1.Value = "0";
-            doc.Form.Add(field1);
+            // First input text box (field1)
+            TextBoxField field1 = new TextBoxField(page, fieldRect1)
+            {
+                PartialName = "field1",
+                Value = "0"
+            };
+            doc.Form.Add(field1, 1);
 
-            // Second numeric text box
-            TextBoxField field2 = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 650, 200, 680));
-            field2.PartialName = "Field2";
-            field2.Value = "0";
-            doc.Form.Add(field2);
+            // Second input text box (field2)
+            TextBoxField field2 = new TextBoxField(page, fieldRect2)
+            {
+                PartialName = "field2",
+                Value = "0"
+            };
+            doc.Form.Add(field2, 1);
 
             // Result text box (read‑only)
-            TextBoxField result = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 600, 200, 630));
-            result.PartialName = "Result";
-            result.Value = "";
-            result.ReadOnly = true;
-            doc.Form.Add(result);
+            TextBoxField resultField = new TextBoxField(page, resultRect)
+            {
+                PartialName = "result",
+                Value = "0",
+                ReadOnly = true
+            };
+            doc.Form.Add(resultField, 1);
 
             // Button that triggers JavaScript to calculate the sum
-            ButtonField sumButton = new ButtonField(page, new Aspose.Pdf.Rectangle(100, 550, 200, 580));
-            sumButton.PartialName = "SumButton";
-            // Use AlternateCaption (or NormalCaption) instead of the non‑existent Caption property
-            sumButton.AlternateCaption = "Calculate Sum";
+            ButtonField sumButton = new ButtonField(page, buttonRect)
+            {
+                PartialName = "sumButton",
+                // Appearance must be defined before setting the caption
+                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black),
+                OnActivated = new JavascriptAction(@"
+                    var f1 = this.getField('field1').value;
+                    var f2 = this.getField('field2').value;
+                    var sum = Number(f1) + Number(f2);
+                    this.getField('result').value = sum;
+                ")
+            };
+            // Set the visible label of the button
+            sumButton.NormalCaption = "Calculate Sum";
 
-            // JavaScript code executed when the button is pressed
-            string js = @"
-                var f1 = this.getField('Field1').value;
-                var f2 = this.getField('Field2').value;
-                var n1 = parseFloat(f1);
-                var n2 = parseFloat(f2);
-                if (isNaN(n1)) n1 = 0;
-                if (isNaN(n2)) n2 = 0;
-                this.getField('Result').value = (n1 + n2).toString();
-            ";
+            doc.Form.Add(sumButton, 1);
 
-            // Assign the JavaScript action to the button's OnActivated event
-            sumButton.OnActivated = new JavascriptAction(js);
-            doc.Form.Add(sumButton);
-
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript button saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with sum button saved to '{outputPath}'.");
     }
 }

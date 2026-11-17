@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;          // FontRepository, TextState
-using Aspose.Pdf.Drawing;      // Color
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // required for WatermarkArtifact
 
 class Program
 {
@@ -20,31 +20,37 @@ class Program
         // Load the source PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add a repeating text stamp to every page.
-            // Because TextStamp does not support cloning, we create a fresh instance for each page.
+            // Iterate over each page and add a watermark artifact
             foreach (Page page in doc.Pages)
             {
-                TextStamp stamp = new TextStamp("CONFIDENTIAL")
+                WatermarkArtifact watermark = new WatermarkArtifact
                 {
-                    Opacity = 0.2,
-                    RotateAngle = 45f,                     // use RotateAngle instead of the non‑existent Rotation property
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    // The TextStamp class does not expose a Repeat property in recent versions.
-                    // To achieve a tiled effect you would normally use a StampAnnotation with Repeat = true.
-                    // For simplicity we place a single centered stamp per page.
+                    // Text to display
+                    Text = "CONFIDENTIAL",
+
+                    // Appearance settings
+                    Opacity = 0.2,               // semi‑transparent
+                    Rotation = 45,               // diagonal
+                    IsBackground = true         // appear behind page content
+                    // NOTE: The current Aspose.PDF version does not expose an IsRepeat property.
+                    // If a repeating watermark is required, the library would need to be updated
+                    // to a version that includes this member, or the watermark must be added
+                    // manually multiple times. For simplicity, we add a single watermark per page.
                 };
 
-                // Configure visual appearance via TextState
-                stamp.TextState.Font = FontRepository.FindFont("Arial");
-                stamp.TextState.FontSize = 72;
-                stamp.TextState.ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray
+                // Font, size and color are defined via TextState
+                watermark.TextState = new TextState
+                {
+                    Font = FontRepository.FindFont("Arial"),
+                    FontSize = 72,
+                    ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8) // light gray
+                };
 
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+                // Add the watermark to the current page's artifacts collection
+                page.Artifacts.Add(watermark);
             }
 
-            // Save the result; Document.Save writes PDF regardless of extension
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

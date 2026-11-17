@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
@@ -9,7 +10,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_button.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,39 +18,44 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document has at least four pages (1‑based indexing)
+            // Ensure the document has at least four pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 4)
             {
-                Console.Error.WriteLine("The document contains fewer than 4 pages.");
+                Console.Error.WriteLine("The document does not contain a page 4.");
                 return;
             }
 
-            // Get page four
+            // Get page 4
             Page page = doc.Pages[4];
 
-            // Define the button rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            // Use fully qualified Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
+            // Define the button rectangle (coordinates are in points; lower‑left to upper‑right)
+            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 250, 550);
 
-            // Create a button field on the specified page and rectangle
-            ButtonField button = new ButtonField(page, rect);
-            // Set the internal name of the field
+            // Create a button form field
+            ButtonField button = new ButtonField(page, buttonRect);
             button.PartialName = "AlertButton";
-            // Set the visible caption of the button
-            button.AlternateCaption = "Show Alert";
-            // Assign a JavaScript action that displays an alert when the button is clicked
-            button.Actions.OnPressMouseBtn = new JavascriptAction("app.alert('Button clicked!');");
+            // Set appearance (font, size, color) – required for the caption to render correctly
+            button.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            // Set the visible label on the button
+            button.NormalCaption = "Click Me";
+            // Set background and border colours via Characteristics
+            button.Characteristics.Background = System.Drawing.Color.LightGray;
+            button.Characteristics.Border = System.Drawing.Color.Black;
+            // Set border width and style – Border needs the parent annotation
+            button.Border = new Border(button) { Width = 1, Style = BorderStyle.Solid };
+            // Attach JavaScript that shows an alert when the button is activated
+            button.OnActivated = new JavascriptAction("app.alert('Button clicked!');");
 
-            // Add the button to the document's form (this also registers the annotation on the page)
-            doc.Form.Add(button);
+            // Add the button to the page's annotation collection
+            page.Annotations.Add(button);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Button annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with button annotation: {outputPath}");
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text; // for any text handling if needed
 
 class Program
 {
@@ -16,57 +17,46 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
+        // Load the source PDF inside a using block (document-disposal-with-using rule)
         using (Document doc = new Document(inputPath))
         {
             // Create a new blank page that will serve as the summary page
+            // Page indexing is 1‑based (page-indexing-one-based rule)
             Page summaryPage = doc.Pages.Add();
 
-            // Position where the first cloned annotation will be placed
-            // (adjust as needed; here we start near the top-left corner)
-            double startX = 50;
-            double startY = summaryPage.PageInfo.Height - 50;
-            double offsetY = 150; // vertical spacing between cloned annotations
-
-            // Iterate over all existing pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Optional: set a reasonable size for the summary page (same as first page)
+            if (doc.Pages.Count > 1)
             {
-                Page srcPage = doc.Pages[i];
+                Page firstPage = doc.Pages[1];
+                summaryPage.PageInfo.Width  = firstPage.PageInfo.Width;
+                summaryPage.PageInfo.Height = firstPage.PageInfo.Height;
+            }
 
-                // Examine each annotation on the current page
-                foreach (Annotation annot in srcPage.Annotations)
+            // Iterate over all existing pages and collect RichMediaAnnotations
+            foreach (Page page in doc.Pages)
+            {
+                // The Annotations collection may be empty; iterate safely
+                for (int i = 0; i < page.Annotations.Count; i++)
                 {
-                    // Process only RichMediaAnnotations
-                    if (annot is RichMediaAnnotation richMedia)
+                    Annotation ann = page.Annotations[i];
+                    if (ann is RichMediaAnnotation richMediaAnn)
                     {
-                        // Clone the annotation.
-                        // RichMediaAnnotation implements ICloneable, so we can use Clone().
-                        RichMediaAnnotation clone = (RichMediaAnnotation)richMedia.Clone();
+                        // Clone the annotation (free‑form code – no specific rule exists)
+                        // RichMediaAnnotation implements ICloneable, so Clone() returns object
+                        RichMediaAnnotation clonedAnn = (RichMediaAnnotation)richMediaAnn.Clone();
 
-                        // Place the clone on the summary page.
-                        // Adjust the rectangle so that annotations are stacked vertically.
-                        // Original rectangle is preserved relative to its size.
-                        double width  = clone.Rect.URX - clone.Rect.LLX;
-                        double height = clone.Rect.URY - clone.Rect.LLY;
-
-                        // Define a new rectangle for the clone on the summary page
-                        clone.Rect = new Rectangle(
-                            startX,
-                            startY - height,
-                            startX + width,
-                            startY
-                        );
+                        // Adjust the rectangle if needed – here we keep the original position
+                        // Ensure we use the fully qualified Rectangle type to avoid ambiguity
+                        Aspose.Pdf.Rectangle rect = clonedAnn.Rect;
+                        clonedAnn.Rect = rect; // no change, just explicit
 
                         // Add the cloned annotation to the summary page
-                        summaryPage.Annotations.Add(clone);
-
-                        // Update the Y position for the next annotation
-                        startY -= (height + offsetY);
+                        summaryPage.Annotations.Add(clonedAnn);
                     }
                 }
             }
 
-            // Save the modified document (PDF format) inside the using block
+            // Save the modified document (PDF format, no special SaveOptions needed)
             doc.Save(outputPath);
         }
 

@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_no_popups.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,26 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Collect popup annotations first to avoid modifying the collection while iterating
-                List<PopupAnnotation> popups = new List<PopupAnnotation>();
+                Page page = doc.Pages[pageNum];
+
+                // Collect all PopupAnnotation instances on the current page
+                List<Annotation> popups = new List<Annotation>();
                 foreach (Annotation annot in page.Annotations)
                 {
-                    if (annot is PopupAnnotation popup)
-                        popups.Add(popup);
+                    // PopupAnnotation derives from Annotation; check its exact type
+                    if (annot is PopupAnnotation)
+                        popups.Add(annot);
                 }
 
-                // Remove each popup annotation and clear its reference from the parent markup annotation
-                foreach (PopupAnnotation popup in popups)
+                // Remove the collected popup annotations from the page
+                foreach (Annotation popup in popups)
                 {
-                    // Detach from parent markup annotation, if any
-                    if (popup.Parent is MarkupAnnotation parentMarkup)
-                    {
-                        // The parent markup annotation holds a reference to its popup via the Popup property
-                        parentMarkup.Popup = null;
-                    }
-
-                    // Delete the popup annotation from the page's annotation collection
                     page.Annotations.Delete(popup);
                 }
             }
@@ -50,6 +45,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All popup annotations removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Popup annotations removed. Saved to '{outputPath}'.");
     }
 }

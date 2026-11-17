@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string annotationName = "unique-id-to-delete"; // the identifier stored in the Name property
+        const string annotationName = "YOUR_ANNOTATION_NAME"; // replace with the actual Name of the annotation
 
         if (!File.Exists(inputPath))
         {
@@ -20,22 +20,20 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that page two exists (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based; ensure page 2 exists
             if (doc.Pages.Count < 2)
             {
-                Console.Error.WriteLine("Document has less than two pages.");
+                Console.Error.WriteLine("The document has fewer than two pages.");
                 return;
             }
 
-            // Retrieve page two
             Page pageTwo = doc.Pages[2];
 
             // Locate the annotation with the specified Name (unique identifier)
-            Annotation? target = null;
+            Annotation target = null;
             foreach (Annotation annot in pageTwo.Annotations)
             {
-                if (!string.IsNullOrEmpty(annot.Name) &&
-                    annot.Name.Equals(annotationName, StringComparison.Ordinal))
+                if (!string.IsNullOrEmpty(annot.Name) && annot.Name.Equals(annotationName, StringComparison.Ordinal))
                 {
                     target = annot;
                     break;
@@ -44,8 +42,8 @@ class Program
 
             if (target != null)
             {
-                // Remove the annotation from the page's annotation collection
-                pageTwo.Annotations.Remove(target);
+                // Remove the annotation from the page
+                pageTwo.Annotations.Delete(target);
                 Console.WriteLine($"Annotation with Name '{annotationName}' removed from page 2.");
             }
             else
@@ -57,6 +55,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
     }
 }

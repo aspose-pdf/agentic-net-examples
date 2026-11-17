@@ -1,8 +1,8 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;          // Form field types (ButtonField, etc.)
-using Aspose.Pdf.Annotations;   // Annotation base class
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -17,22 +17,17 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over form fields and change button background to blue
+            if (doc.Form != null && doc.Form.Fields != null)
             {
-                Page page = doc.Pages[i];
-
-                // Iterate over each annotation on the page
-                foreach (Annotation annot in page.Annotations)
+                foreach (Field field in doc.Form.Fields)
                 {
-                    // Check if the annotation is a button field (push button)
-                    if (annot is ButtonField button)
+                    if (field is ButtonField button)
                     {
-                        // Set the button's border colour to blue (use the Color property)
-                        button.Color = Color.Blue;
+                        // ButtonField characteristics use System.Drawing.Color
+                        button.Characteristics.Background = System.Drawing.Color.Blue;
                     }
                 }
             }
@@ -41,6 +36,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotations updated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with button colors changed to blue: {outputPath}");
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -18,45 +17,64 @@ class ExportPopupAnnotations
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Prepare an empty XFDF structure
+            // Create the root XFDF structure.
             XDocument xfdfDoc = new XDocument(
                 new XElement("xfdf",
-                    new XElement("annots")
+                    new XAttribute("xml:space", "preserve"),
+                    new XElement("annots") // container for annotation elements
                 )
             );
 
             XElement annotsElement = xfdfDoc.Root.Element("annots");
 
-            // Iterate through all pages and collect only Popup annotations
-            foreach (Page page in pdfDoc.Pages)
+            // Iterate over all pages (1‑based indexing).
+            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
             {
+                Page page = pdfDoc.Pages[pageIndex];
+
+                // Iterate over annotations on the current page.
                 foreach (Annotation annotation in page.Annotations)
                 {
+                    // Process only Popup annotations.
                     if (annotation is PopupAnnotation popup)
                     {
-                        // Build a minimal XFDF representation for the popup annotation
-                        // The XFDF spec allows attributes such as page, rect, contents, etc.
-                        var rect = popup.Rect; // Rectangle: LLX, LLY, URX, URY
-                        string rectValue = $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}";
+                        // Build a <popup> element with relevant attributes.
+                        // Rectangle coordinates are space‑separated as per XFDF spec.
+                        Aspose.Pdf.Rectangle rect = popup.Rect;
+                        string rectValue = $"{rect.LLX} {rect.LLY} {rect.URX} {rect.URY}";
 
                         XElement popupElement = new XElement("popup",
-                            new XAttribute("page", page.Number),
-                            new XAttribute("rect", rectValue),
-                            new XAttribute("contents", popup.Contents ?? string.Empty)
+                            new XAttribute("page", pageIndex),
+                            new XAttribute("rect", rectValue)
                         );
 
+                        // Optional properties: Title, Contents, Open state.
+                        // The Title is stored on the parent markup annotation (if any).
+                        if (popup.Parent is MarkupAnnotation parentMarkup && !string.IsNullOrEmpty(parentMarkup.Title))
+                        {
+                            popupElement.Add(new XAttribute("title", parentMarkup.Title));
+                        }
+
+                        if (!string.IsNullOrEmpty(popup.Contents))
+                        {
+                            popupElement.Add(new XAttribute("contents", popup.Contents));
+                        }
+
+                        // The Open property indicates whether the popup is displayed.
+                        popupElement.Add(new XAttribute("open", popup.Open ? "true" : "false"));
+
+                        // Append the popup element to the XFDF document.
                         annotsElement.Add(popupElement);
                     }
                 }
             }
 
-            // Save the filtered XFDF containing only popup annotations
+            // Save the constructed XFDF XML to the specified file.
             xfdfDoc.Save(outputXfdfPath);
+            Console.WriteLine($"Popup annotations exported to '{outputXfdfPath}'.");
         }
-
-        Console.WriteLine($"Popup annotations exported to: {outputXfdfPath}");
     }
 }

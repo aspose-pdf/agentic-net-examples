@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core PDF API (Document, Page, Artifact, WatermarkArtifact)
 
 class Program
 {
@@ -15,26 +15,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Examine each artifact on the page
+                // The Artifacts collection holds all page artifacts (including watermarks)
                 foreach (Artifact artifact in page.Artifacts)
                 {
-                    // Identify Watermark artifacts and set their opacity to 50%
-                    if (artifact is WatermarkArtifact watermark)
+                    // Identify watermark artifacts via type checking (avoids missing enum)
+                    if (artifact is WatermarkArtifact)
                     {
-                        watermark.Opacity = 0.5f; // 0.0 (transparent) to 1.0 (opaque)
+                        // Set opacity to 50% (value range 0.0 – 1.0)
+                        artifact.Opacity = 0.5f;
                     }
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

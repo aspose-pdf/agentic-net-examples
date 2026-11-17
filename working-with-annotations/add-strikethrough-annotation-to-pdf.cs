@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_strikethrough.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +17,32 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page that contains the paragraph (example: first page)
+            // Work with the first page
             Page page = doc.Pages[1];
 
-            // Define the rectangle that covers the paragraph.
-            // Coordinates are in points (1/72 inch) with origin at lower‑left.
-            // Adjust llx, lly, urx, ury to match the actual paragraph location.
-            double llx = 100; // lower‑left X
-            double lly = 500; // lower‑left Y
-            double urx = 400; // upper‑right X
-            double ury = 520; // upper‑right Y
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+            // Use a TextFragmentAbsorber to locate the first piece of text (approximate first paragraph)
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            page.Accept(absorber);
+            var fragments = absorber.TextFragments;
 
-            // Create a strike‑out annotation over the rectangle
+            if (fragments == null || fragments.Count == 0)
+            {
+                Console.WriteLine("No text found on the first page.");
+                doc.Save(outputPath);
+                return;
+            }
+
+            // Get the rectangle that bounds the first text fragment
+            Aspose.Pdf.Rectangle rect = fragments[0].Rectangle;
+
+            // Create a strike‑out annotation over the identified rectangle
             StrikeOutAnnotation strikeOut = new StrikeOutAnnotation(page, rect)
             {
-                // Set the author of the annotation (PDF uses the Title field for author)
-                Title = "reviewer",
-                // Optional: set the color of the strike‑out line
-                Color = Aspose.Pdf.Color.Red,
-                // Optional: add a comment that appears in the annotation popup
-                Contents = "Paragraph marked for review"
+                // Set the author of the annotation
+                Title = "reviewer"
             };
 
             // Add the annotation to the page's annotation collection

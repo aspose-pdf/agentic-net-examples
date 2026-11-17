@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -16,37 +17,56 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Generate a dynamic date string for this page
-                string dateString = DateTime.Now.ToString("yyyy-MM-dd");
-
-                double pageWidth = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(
-                    pageWidth - 150, // lower‑left X
-                    30,              // lower‑left Y
-                    pageWidth - 30,  // upper‑right X
-                    80);             // upper‑right Y
-
-                // Create the watermark annotation using the correct properties
-                WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
+                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Contents = dateString,                                   // text of the watermark
-                    Opacity = 0.5,
-                    Color = Aspose.Pdf.Color.FromRgb(0.9, 0.9, 0.9) // text color (no BackgroundColor property)
-                };
+                    Page page = doc.Pages[i];
 
-                page.Annotations.Add(watermark);
+                    // Create a rectangle covering the centre of the page
+                    Rectangle rect = new Rectangle(
+                        page.PageInfo.Width / 2 - 150,   // llx
+                        page.PageInfo.Height / 2 - 25,   // lly
+                        page.PageInfo.Width / 2 + 150,   // urx
+                        page.PageInfo.Height / 2 + 25);  // ury
+
+                    // Generate a dynamic date string for this page
+                    string dateText = DateTime.Now.ToString("yyyy-MM-dd");
+
+                    // Create the watermark annotation (no rotation property on WatermarkAnnotation)
+                    WatermarkAnnotation watermark = new WatermarkAnnotation(page, rect)
+                    {
+                        Opacity = 0.5
+                        // Rotation is not supported on WatermarkAnnotation; omit it.
+                    };
+
+                    // Define the visual appearance of the text watermark
+                    TextState textState = new TextState
+                    {
+                        FontSize = 12,
+                        ForegroundColor = Color.Gray
+                    };
+
+                    // Apply the text and its appearance to the annotation
+                    watermark.SetTextAndState(new[] { dateText }, textState);
+
+                    // Add the annotation to the page
+                    page.Annotations.Add(watermark);
+                }
+
+                // Save the modified PDF (still inside the using block)
+                doc.Save(outputPath);
             }
 
-            doc.Save(outputPath);
+            Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

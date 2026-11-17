@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using System.Drawing; // Required for System.Drawing.Color in DefaultAppearance
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -21,34 +20,23 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the first page (pages are 1‑based)
+            // Work with the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
             // Define the annotation rectangle (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 650);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 700);
 
-            // Create the required DefaultAppearance (font name, size, color)
-            DefaultAppearance appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.DarkBlue);
+            // Create a DefaultAppearance (font, size, color) required by FreeTextAnnotation
+            var defaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Construct the FreeTextAnnotation with page, rectangle and appearance
-            FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance)
-            {
-                // Multiline content using newline characters (fallback plain text)
-                Contents = "First line of text.\nSecond line of text.\nThird line of text."
-            };
+            // Create a free‑text annotation with the rectangle and appearance
+            FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, defaultAppearance);
 
-            // Set background (fill) color – use the Annotation.Color property
-            freeText.Color = Aspose.Pdf.Color.LightGray;
+            // Multiline content – use HTML‑style rich text to control line spacing (1.5 = 150%)
+            freeText.RichText = "<body style='line-height:150%'>First line<br/>Second line<br/>Third line</body>";
 
-            // Set border – Border constructor takes only the owning annotation
-            freeText.Border = new Border(freeText) { Width = 1 }; // Width expects an int
-
-            // Configure rich‑text appearance to control line spacing (1.5)
-            // Using simple HTML with CSS line‑height
-            freeText.RichText = "<body style='font-family:Arial; font-size:12pt; color:#00008B; line-height:1.5'>" +
-                               "First line of text.<br/>" +
-                               "Second line of text.<br/>" +
-                               "Third line of text.</body>";
+            // Optional: set the annotation border color (or any other visual properties)
+            freeText.Color = Aspose.Pdf.Color.LightGray; // background color of the annotation
 
             // Add the annotation to the page
             page.Annotations.Add(freeText);

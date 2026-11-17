@@ -7,45 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_screen_annotation.pdf";
-        const string swfPath = "movie.swf"; // external SWF file
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string swfPath = "animation.swf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
         if (!File.Exists(swfPath))
         {
             Console.Error.WriteLine($"SWF file not found: {swfPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (coordinates are in points; lower‑left to upper‑right)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+            // Define the annotation rectangle (lower‑left x,y and upper‑right x,y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 100, 300, 300);
 
-            // Create the ScreenAnnotation that references the external SWF file
-            // The constructor requires the page, rectangle, and the media file path.
-            ScreenAnnotation screenAnno = new ScreenAnnotation(page, rect, swfPath);
-
-            // Disable user interaction (make the annotation read‑only)
-            screenAnno.Flags = AnnotationFlags.ReadOnly;
+            // Create a ScreenAnnotation that references an external SWF file.
+            // The constructor requires the media file path as the third argument.
+            ScreenAnnotation screen = new ScreenAnnotation(page, rect, swfPath);
+            // Disable user interaction (prevent editing) by marking the annotation as read‑only.
+            screen.Flags = AnnotationFlags.ReadOnly;
 
             // Add the annotation to the page
-            page.Annotations.Add(screenAnno);
+            page.Annotations.Add(screen);
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with ScreenAnnotation: {outputPdf}");
+        Console.WriteLine($"Screen annotation added and saved to '{outputPath}'.");
     }
 }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_arrow.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,46 +16,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("The document has no pages.");
-                return;
-            }
+            // Choose the page where the annotation will be placed.
+            Page page = doc.Pages[1]; // 1‑based indexing
 
-            // Get the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Define the rectangle that bounds the line annotation.
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 400);
 
-            // Define the line coordinates
-            Point start = new Point(100, 500);
-            Point end   = new Point(300, 500);
-
-            // Create a line annotation using the constructor that accepts page, rectangle, start and end points
+            // Create a line annotation with explicit start and end points.
+            // The constructor that matches the modern API is:
+            // LineAnnotation(Page page, Rectangle rect, Point start, Point end)
             LineAnnotation line = new LineAnnotation(
                 page,
-                new Rectangle(100, 500, 300, 500),
-                start,
-                end);
+                rect,
+                new Aspose.Pdf.Point(100, 500), // start point (absolute coordinates)
+                new Aspose.Pdf.Point(300, 400)  // end point (absolute coordinates)
+            )
+            {
+                // Arrow at the end to indicate direction.
+                EndingStyle = LineEnding.ClosedArrow,
+                // No arrow at the start.
+                StartingStyle = LineEnding.None,
+                // Line colour.
+                Color = Color.Black
+            };
 
-            // Set the line geometry (Starting/Ending are the actual points)
-            line.Starting = start;
-            line.Ending   = end;
+            // Set line width via the Border property (the modern API uses Border for line thickness).
+            line.Border = new Border(line) { Width = 2 };
 
-            // Set the line ending style – no marker at the start, an open arrow at the end
-            line.StartingStyle = LineEnding.None;
-            line.EndingStyle   = LineEnding.OpenArrow;
-
-            // Optional visual styling
-            line.Color   = Color.Blue;
-            line.Opacity = 0.8;
-
-            // Add the annotation to the page
+            // Add the annotation to the page.
             page.Annotations.Add(line);
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

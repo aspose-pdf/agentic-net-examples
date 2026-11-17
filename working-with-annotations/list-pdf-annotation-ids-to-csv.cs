@@ -7,40 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputCsv = "annotations.csv";
+        const string pdfPath = "input.pdf";
+        const string csvPath = "annotations.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(pdfPath))
+        // Open the CSV file for writing inside a using block.
+        using (StreamWriter writer = new StreamWriter(csvPath, false))
         {
-            // Create (or overwrite) the CSV file
-            using (StreamWriter writer = new StreamWriter(outputCsv, false))
+            // Write CSV header.
+            writer.WriteLine("PageNumber,AnnotationName");
+
+            // Aspose.Pdf uses 1‑based page indexing.
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Write CSV header
-                writer.WriteLine("PageNumber,AnnotationName");
+                Page page = doc.Pages[pageNum];
 
-                // Pages are 1‑based in Aspose.Pdf
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Iterate over all annotations on the current page.
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    Page page = doc.Pages[pageIndex];
+                    // Use the Name property (or empty string if not set) as the identifier.
+                    string name = annotation.Name ?? string.Empty;
 
-                    // Iterate over all annotations on the current page
-                    foreach (Annotation annotation in page.Annotations)
-                    {
-                        // Use the Name property as the identifier (Id does not exist)
-                        string name = annotation.Name ?? string.Empty;
-                        writer.WriteLine($"{pageIndex},{name}");
-                    }
+                    // Write a CSV line: page number and annotation name.
+                    writer.WriteLine($"{pageNum},{name}");
                 }
             }
         }
 
-        Console.WriteLine($"Annotation names have been written to '{outputCsv}'.");
+        Console.WriteLine($"Annotation names have been written to '{csvPath}'.");
     }
 }

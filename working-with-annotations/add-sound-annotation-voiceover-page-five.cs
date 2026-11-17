@@ -1,20 +1,19 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // allowed, may be needed for other operations
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_sound.pdf";
-        const string soundFile = "voiceover.wav";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_sound.pdf";
+        const string soundFile = "narration.wav";
 
-        // Verify input files exist
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(soundFile))
@@ -23,36 +22,38 @@ class Program
             return;
         }
 
-        // Open the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Open the PDF in a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Ensure the document has at least five pages
+            // Verify the document has at least five pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 5)
             {
                 Console.Error.WriteLine("The document contains fewer than 5 pages.");
                 return;
             }
 
-            // Get page five
-            Aspose.Pdf.Page page = doc.Pages[5];
+            // Retrieve page five
+            Page page = doc.Pages[5];
 
-            // Define the clickable region (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the clickable region (lower‑left x,y and upper‑right x,y)
+            Rectangle rect = new Rectangle(100, 500, 300, 550);
 
-            // Create a SoundAnnotation that plays the specified audio file
-            Aspose.Pdf.Annotations.SoundAnnotation soundAnnot =
-                new Aspose.Pdf.Annotations.SoundAnnotation(page, rect, soundFile);
-
-            // Optional: give the annotation a name
-            soundAnnot.Name = "VoiceOver";
+            // Create the sound annotation on the specified region, providing the sound file path
+            SoundAnnotation soundAnnot = new SoundAnnotation(page, rect, soundFile)
+            {
+                // Optional: set an icon that will be displayed on the page
+                Icon = SoundIcon.Speaker,
+                // Optional: tooltip text shown when hovering
+                Contents = "Play narration"
+            };
 
             // Add the annotation to the page
             page.Annotations.Add(soundAnnot);
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with sound annotation to '{outputPath}'.");
+        Console.WriteLine($"PDF with sound annotation saved to '{outputPdf}'.");
     }
 }

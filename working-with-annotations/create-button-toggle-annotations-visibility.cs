@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
@@ -9,7 +10,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_toggle_button.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,49 +18,52 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the button will be placed (first page in this example)
+            // Work with the first page (change index as needed)
             Page page = doc.Pages[1];
 
             // Define the button rectangle (llx, lly, urx, ury)
             Aspose.Pdf.Rectangle btnRect = new Aspose.Pdf.Rectangle(100, 700, 200, 750);
 
-            // Create a button form field (the PDF annotation that behaves like a button)
+            // Create a button form field (widget annotation) on the page
             ButtonField btn = new ButtonField(page, btnRect)
             {
-                // The name used in the form hierarchy (must be unique within the document)
-                PartialName = "ToggleAnnotationsButton",
-                // Text displayed on the button (use NormalCaption for visual label)
-                NormalCaption = "Toggle Annotations"
+                PartialName = "toggleBtn"
             };
 
-            // Set visual border for the button (Border requires the parent annotation in the ctor)
-            btn.Border = new Border(btn) { Width = 1 };
-            // Set border colour – use the Color property (BorderColor does not exist)
-            btn.Color = Color.Black;
+            // Required appearance settings before setting the caption
+            btn.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            btn.AlternateCaption = "Toggle Annotations"; // button label
 
-            // JavaScript that toggles the visibility of all annotations on the current page
+            // Visual appearance – background colour and border colour
+            btn.Characteristics.Background = System.Drawing.Color.LightGray;
+            btn.Color = Aspose.Pdf.Color.Black; // border colour
+
+            // Border must be created after the button instance because it requires the parent annotation
+            btn.Border = new Border(btn) { Width = 1, Style = BorderStyle.Solid };
+
+            // JavaScript that toggles the hidden flag of every annotation on the current page
             string js = @"
 var annots = this.getAnnots();
 if (annots != null) {
     for (var i = 0; i < annots.length; i++) {
-        annots[i].hidden = !annots[i].hidden;
+        var a = annots[i];
+        a.hidden = !a.hidden;
     }
-}";
+}
+";
 
-            // Assign the JavaScript to the button's mouse‑press action (OnPressMouseBtn is the valid property)
-            btn.Actions.OnPressMouseBtn = new JavascriptAction(js);
+            // Assign the JavaScript action to the button – use OnActivated (or Actions.OnPressMouseBtn)
+            btn.OnActivated = new JavascriptAction(js);
 
-            // Add the button to the document's form (or directly to the page annotations)
+            // Add the button to the document's AcroForm (page number 1)
             doc.Form.Add(btn, 1);
-            // Alternatively: page.Annotations.Add(btn);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with toggle button: '{outputPath}'");
+        Console.WriteLine($"PDF with toggle button saved to '{outputPath}'.");
     }
 }
