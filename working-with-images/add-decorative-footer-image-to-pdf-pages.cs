@@ -1,61 +1,70 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // required for ImageStamp, alignment enums
+using Aspose.Pdf.Text;
 
-// The class name matches the executable name expected by the test harness.
-class AsposePdfApi_2f71103e
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
         const string footerImagePath = "footer.png";
-        const string outputPdfPath = "output_with_footer.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
         if (!File.Exists(footerImagePath))
         {
             Console.Error.WriteLine($"Footer image not found: {footerImagePath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the image with System.Drawing to obtain its original pixel dimensions and DPI.
+        using (System.Drawing.Image img = System.Drawing.Image.FromFile(footerImagePath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            double imgPixelWidth = img.Width;   // pixels
+            double imgPixelHeight = img.Height; // pixels
+            double imgDpiX = img.HorizontalResolution; // typically 72 or 96
+
+            // Convert pixel dimensions to points (1 point = 1/72 inch).
+            double imgWidthPoints = imgPixelWidth * 72.0 / imgDpiX;
+            double imgHeightPoints = imgPixelHeight * 72.0 / imgDpiX;
+
+            using (Document doc = new Document(inputPath))
             {
-                Page page = pdfDoc.Pages[i];
-
-                // Create a new ImageStamp for each page
-                ImageStamp footerStamp = new ImageStamp(footerImagePath)
+                // Iterate pages (1‑based indexing required by Aspose.Pdf)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Scale the image to match the page width; height is adjusted automatically
-                    Width = page.PageInfo.Width,
-                    // Height = 0 lets Aspose.Pdf preserve the original aspect ratio
-                    Height = 0,
+                    Page page = doc.Pages[i];
+                    double pageWidth = page.PageInfo.Width; // page width in points
 
-                    // Align the stamp to the bottom centre of the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Bottom,
+                    // Scale the image so its width matches the page width while preserving aspect ratio.
+                    double scale = pageWidth / imgWidthPoints;
+                    double scaledHeight = imgHeightPoints * scale;
 
-                    // Optional margin from the bottom edge (in points)
-                    BottomMargin = 10
-                };
+                    // Create an ImageStamp for the footer.
+                    ImageStamp stamp = new ImageStamp(footerImagePath)
+                    {
+                        Width = pageWidth,          // stretch to full page width
+                        Height = scaledHeight,      // maintain aspect ratio
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        BottomMargin = 0,
+                        TopMargin = 0
+                    };
 
-                // Add the stamp to the current page
-                page.AddStamp(footerStamp);
+                    // Add the stamp to the current page.
+                    page.AddStamp(stamp);
+                }
+
+                // Save the modified PDF.
+                doc.Save(outputPath);
             }
-
-            // Save the modified PDF (still inside the using block)
-            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Footer image added to each page. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Footer added to each page. Saved as '{outputPath}'.");
     }
 }

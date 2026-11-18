@@ -6,63 +6,47 @@ class Program
 {
     static void Main()
     {
-        // Input PDF and watermark image paths
-        const string inputPdfPath   = "input.pdf";
-        const string watermarkPath  = "watermark.png";
-        const string outputPdfPath  = "watermarked_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "watermarked.pdf";
+        const string watermarkImagePath = "watermark.png";
 
-        // Opacity for the watermark (0 = fully transparent, 1 = fully opaque)
-        // This could be read from a configuration source; here it is hard‑coded.
-        const double watermarkOpacity = 0.35;
+        // Configuration: opacity between 0 (fully transparent) and 1 (fully opaque)
+        double opacity = 0.3; // semi‑transparent watermark
 
-        // Verify that the required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(watermarkImagePath))
+        {
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImagePath}");
             return;
         }
 
-        if (!File.Exists(watermarkPath))
+        // Load PDF inside a using block (document-disposal-with-using rule)
+        using (Document doc = new Document(inputPath))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Create an ImageStamp for the watermark
+            ImageStamp stamp = new ImageStamp(watermarkImagePath)
             {
-                // Iterate over all pages (1‑based indexing is handled internally by the foreach)
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    // Create an ImageStamp for the watermark image
-                    ImageStamp watermarkStamp = new ImageStamp(watermarkPath)
-                    {
-                        // Place the watermark at the center of the page
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment   = VerticalAlignment.Center,
+                Opacity = opacity,                         // set opacity from config
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                Background = false                         // draw on top of page content
+            };
 
-                        // Ensure the stamp is drawn over page content
-                        Background = false,
-
-                        // Set the desired opacity (0‑1 range)
-                        Opacity = watermarkOpacity
-                    };
-
-                    // Add the stamp to the current page
-                    page.AddStamp(watermarkStamp);
-                }
-
-                // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
+            // Apply the stamp to every page (one‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)   // page-indexing-one-based rule
+            {
+                Page page = doc.Pages[i];
+                page.AddStamp(stamp);                     // add per page, not on collection
             }
 
-            Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
+            // Save the modified PDF (PDF format, no SaveOptions needed)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
-        }
+
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

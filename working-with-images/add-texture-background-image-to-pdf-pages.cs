@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -8,8 +9,9 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string backgroundImagePath = "texture.png";
+        const string backgroundImagePath = "background.png";
 
+        // Verify input files exist
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
@@ -21,39 +23,42 @@ class Program
             return;
         }
 
-        // Load PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Create an ImageStamp from the texture file
-                ImageStamp stamp = new ImageStamp(backgroundImagePath)
+                // Add the background image to each page
+                foreach (Page page in doc.Pages)
                 {
-                    // Place the stamp behind existing page content
-                    Background = true,
-                    // Reduce opacity so the texture is subtle
-                    Opacity = 0.3f,
-                    // Stretch the image to cover the whole page
-                    Width = page.PageInfo.Width,
-                    Height = page.PageInfo.Height,
-                    // Align to the lower‑left corner (default XIndent/YIndent = 0)
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Bottom,
-                    XIndent = 0,
-                    YIndent = 0
-                };
+                    // Create an ImageStamp for the background texture
+                    ImageStamp bgStamp = new ImageStamp(backgroundImagePath)
+                    {
+                        // Place the stamp behind existing page content
+                        Background = true,
+                        // Make the texture semi‑transparent for a subtle effect
+                        Opacity = 0.5,
+                        // Resize the stamp to cover the whole page
+                        Width = page.PageInfo.Width,
+                        Height = page.PageInfo.Height,
+                        // Ensure the stamp starts at the page origin
+                        XIndent = 0,
+                        YIndent = 0
+                    };
 
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+                    // Apply the stamp to the current page
+                    page.AddStamp(bgStamp);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Background image added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Background texture applied and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

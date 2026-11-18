@@ -1,58 +1,64 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string headerImagePath = "header.png";
+        const string inputPdf   = "input.pdf";
+        const string headerImg  = "header.png";   // decorative header image
+        const string outputPdf  = "output_with_header.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(headerImagePath))
-        {
-            Console.Error.WriteLine($"Header image not found: {headerImagePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        if (!File.Exists(headerImg))
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            Console.Error.WriteLine($"Header image not found: {headerImg}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Create a new ImageStamp for each page
-                using (FileStream imgStream = File.OpenRead(headerImagePath))
+                Page page = doc.Pages[i];
+
+                // Create an ImageStamp for the header image
+                ImageStamp headerStamp = new ImageStamp(headerImg)
                 {
-                    ImageStamp stamp = new ImageStamp(imgStream)
-                    {
-                        // Place the stamp over existing content
-                        Background = false,
+                    // Stretch the image to the full page width
+                    Width  = page.PageInfo.Width,
+                    // Desired height of the header (adjust as needed)
+                    Height = 50,
 
-                        // Center horizontally, align to the top vertically
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment   = VerticalAlignment.Top,
+                    // Position the stamp at the top of the page.
+                    // Origin is bottom‑left, so Y = page height - header height - small gap.
+                    XIndent = 0,
+                    YIndent = page.PageInfo.Height - 50 - 5,
 
-                        // Add a small indent from the top edge to avoid overlap
-                        YIndent = 10   // points from the top margin
-                    };
+                    // Ensure the stamp does not affect existing page content.
+                    // By placing it above the content area we avoid overlap.
+                    // No background or border is needed.
+                    Background = false,
+                    Opacity    = 1.0
+                };
 
-                    // Add the stamp to the current page
-                    doc.Pages[pageNum].AddStamp(stamp);
-                }
+                // Add the stamp to the current page
+                page.AddStamp(headerStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Header image added to each page. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Header image added to each page. Output saved as '{outputPdf}'.");
     }
 }

@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "accessible_images.pdf";
+        const string outputPath = "output.pdf";
         const string altText    = "Description of the image for screen readers";
 
         if (!File.Exists(inputPath))
@@ -21,21 +21,21 @@ class Program
             // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Iterate all pages and all images on each page
+                // Iterate over each page and each image resource on the page
                 foreach (Page page in doc.Pages)
                 {
                     foreach (XImage img in page.Resources.Images)
                     {
-                        // Set alternative text for the image; this links the description to the image resource
+                        // Set the alternative text for the image
                         img.TrySetAlternativeText(altText, page);
                     }
                 }
 
-                // Save the modified PDF
+                // Save the updated PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Image alternative text set and saved to '{outputPath}'.");
+            Console.WriteLine($"Alternative text applied and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

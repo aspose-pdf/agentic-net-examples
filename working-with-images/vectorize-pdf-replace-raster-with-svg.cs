@@ -3,87 +3,72 @@ using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
 
-class Program
+class ReplaceRasterWithVector
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputPdf = "output_vectorized.pdf";
-        const string vectorFolder = "vectors"; // folder containing .svg files with the same base names as raster images
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        if (!Directory.Exists(vectorFolder))
+        // Mapping of raster image identifiers (without extension) to vector SVG files.
+        var vectorMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            Console.Error.WriteLine($"Vector folder not found: {vectorFolder}");
-            return;
-        }
+            // Example entries – adjust to match the actual image names in your PDF.
+            { "image1", "vector1.svg" },
+            { "photo",   "photo.svg" }
+        };
 
-        try
+        using (Document doc = new Document(inputPdf))
         {
-            using (Document doc = new Document(inputPdf))
+            // Iterate through all pages (1‑based indexing).
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = doc.Pages[pageIndex];
+                var images = page.Resources.Images;
+
+                // XImageCollection uses 1‑based indexing for Replace().
+                for (int imgIdx = 1; imgIdx <= images.Count; imgIdx++)
                 {
-                    Page page = doc.Pages[i];
-                    var imagesToReplace = new List<XImage>();
+                    XImage img = images[imgIdx];
 
-                    // Collect raster images that have a matching SVG counterpart
-                    foreach (XImage img in page.Resources.Images)
+                    // Use the XImage.Name property to identify the image.
+                    string imgName = img.Name ?? string.Empty;
+                    if (string.IsNullOrEmpty(imgName))
+                        continue; // Cannot identify; skip.
+
+                    string baseName = Path.GetFileNameWithoutExtension(imgName);
+
+                    if (vectorMap.TryGetValue(baseName, out string vectorPath) && File.Exists(vectorPath))
                     {
-                        // Image name may be null; skip if we cannot map it
-                        if (string.IsNullOrEmpty(img.Name))
-                            continue;
-
-                        string ext = Path.GetExtension(img.Name).ToLowerInvariant();
-                        bool isRaster = ext == ".png" || ext == ".jpg" || ext == ".jpeg" ||
-                                         ext == ".bmp" || ext == ".tif" || ext == ".tiff";
-
-                        if (!isRaster)
-                            continue;
-
-                        string baseName = Path.GetFileNameWithoutExtension(img.Name);
-                        string vectorPath = Path.Combine(vectorFolder, baseName + ".svg");
-
-                        if (File.Exists(vectorPath))
-                            imagesToReplace.Add(img);
-                    }
-
-                    // Replace each raster image with its SVG version
-                    foreach (XImage rasterImg in imagesToReplace)
-                    {
-                        string rasterName = rasterImg.Name;
-                        string baseName = Path.GetFileNameWithoutExtension(rasterName);
-                        string vectorPath = Path.Combine(vectorFolder, baseName + ".svg");
-
-                        // Remove the raster image from the page resources
-                        page.Resources.Images.Delete(rasterName);
-
-                        // Add the SVG image; preserve the original name so existing references stay valid
-                        using (FileStream vecStream = File.OpenRead(vectorPath))
+                        try
                         {
-                            // Add returns the name (string) of the newly added image
-                            string addedImageName = page.Resources.Images.Add(vecStream);
-                            // Retrieve the XImage object using the returned name
-                            XImage vectorImg = page.Resources.Images[addedImageName];
-                            // Keep the original name to satisfy existing references
-                            vectorImg.Name = rasterName;
+                            // Replace the raster image with the vector file stream.
+                            using (FileStream vecStream = File.OpenRead(vectorPath))
+                            {
+                                // Replace expects a 1‑based index.
+                                images.Replace(imgIdx, vecStream);
+                            }
+
+                            Console.WriteLine($"Replaced raster image '{imgName}' with vector '{Path.GetFileName(vectorPath)}' on page {pageIndex}.");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.Error.WriteLine($"Failed to replace image '{imgName}': {ex.Message}");
                         }
                     }
                 }
-
-                doc.Save(outputPdf);
-                Console.WriteLine($"Vectorized PDF saved to '{outputPdf}'.");
             }
+
+            // Save the modified PDF.
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Vectorized PDF saved to '{outputPdf}'.");
     }
 }

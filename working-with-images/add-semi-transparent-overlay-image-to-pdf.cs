@@ -6,54 +6,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";      // source PDF
-        const string overlayImg = "overlay.png";    // semi‑transparent image to overlay
-        const string outputPdf  = "output.pdf";     // result PDF
+        const string inputPdfPath = "input.pdf";
+        const string overlayImgPath = "overlay.png";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(overlayImg))
-        {
-            Console.Error.WriteLine($"Overlay image not found: {overlayImg}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF inside a using block (document‑disposal‑with‑using rule)
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(overlayImgPath))
         {
-            // Create an ImageStamp that will be placed on every page
-            ImageStamp stamp = new ImageStamp(overlayImg)
+            Console.Error.WriteLine($"Overlay image not found: {overlayImgPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Iterate over all pages (1‑based indexing).
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Place on top of existing content
-                Background = false,
-                // Semi‑transparent (0 = fully transparent, 1 = opaque)
-                Opacity = 0.2,
-                // Center the image; we will stretch it to page size below
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
-            };
+                Page page = pdfDoc.Pages[i];
 
-            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
+                // Create an ImageStamp for the overlay image.
+                ImageStamp overlayStamp = new ImageStamp(overlayImgPath)
+                {
+                    // Place the stamp on top of existing content.
+                    Background = false,
 
-                // Stretch the stamp to cover the whole page
-                stamp.Width  = page.PageInfo.Width;
-                stamp.Height = page.PageInfo.Height;
+                    // Resize the stamp to cover the entire page.
+                    Width = page.Rect.Width,
+                    Height = page.Rect.Height,
 
-                // Apply the stamp to the current page
-                page.AddStamp(stamp);
+                    // Position at the lower‑left corner of the page.
+                    XIndent = 0,
+                    YIndent = 0
+                };
+
+                // Apply the stamp to the current page.
+                page.AddStamp(overlayStamp);
             }
 
-            // Save the modified PDF (PDF format, no special SaveOptions needed)
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Overlay applied and saved to '{outputPdfPath}'.");
     }
 }

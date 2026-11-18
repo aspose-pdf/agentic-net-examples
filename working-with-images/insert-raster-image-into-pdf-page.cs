@@ -6,60 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath    = "input.pdf";
-        const string imagePath  = "image.png";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string imagePath = "picture.png";
+        const string outputPdf = "output.pdf";
 
-        // Absolute coordinates (lower‑left corner) in points (1 point = 1/72 inch)
-        const double llx   = 100; // X position from left
-        const double lly   = 200; // Y position from bottom
-        const double width = 300; // Desired image width
-        const double height = 200; // Desired image height
-
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the existing PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
-            {
-                // Aspose.Pdf uses 1‑based page indexing
-                Page page = doc.Pages[1];
+            // Select the target page (Aspose.Pdf uses 1‑based indexing)
+            Page page = pdfDoc.Pages[1];
 
-                // Create an ImageStamp for the raster image
-                ImageStamp imgStamp = new ImageStamp(imagePath)
+            // Open the raster image as a stream
+            using (FileStream imgStream = File.OpenRead(imagePath))
+            {
+                // Use ImageStamp for absolute positioning on the page
+                ImageStamp stamp = new ImageStamp(imgStream)
                 {
-                    // Set absolute position on the page
-                    XIndent = llx,
-                    YIndent = lly,
-                    // Set the size of the image
-                    Width   = width,
-                    Height  = height,
-                    // Place the image over the page content (false = foreground)
-                    Background = false
+                    // Absolute coordinates measured from the lower‑left corner of the page
+                    XIndent = 100,   // X coordinate from the left edge
+                    YIndent = 500,   // Y coordinate from the bottom edge
+                    Width   = 200,   // Desired width of the image
+                    Height  = 150    // Desired height of the image
                 };
 
-                // Add the stamp to the selected page
-                page.AddStamp(imgStamp);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Add the stamp to the page
+                page.AddStamp(stamp);
             }
 
-            Console.WriteLine($"Image inserted and saved to '{outputPath}'.");
+            // Save the modified PDF
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Image inserted and saved to '{outputPdf}'.");
     }
 }

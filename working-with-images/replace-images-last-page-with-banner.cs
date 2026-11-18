@@ -1,69 +1,54 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string bannerImgPath = "banner.jpg";    // banner image file
-        const string outputPdfPath = "output.pdf";    // result PDF
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string bannerImagePath = "banner.jpg";
 
-        // Verify required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(bannerImgPath))
+
+        if (!File.Exists(bannerImagePath))
         {
-            Console.Error.WriteLine($"Banner image not found: {bannerImgPath}");
+            Console.Error.WriteLine($"Banner image not found: {bannerImagePath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            int lastPageNumber = pdfDoc.Pages.Count;
-            Page lastPage = pdfDoc.Pages[lastPageNumber];
+            // Get the last page (Aspose.Pdf uses 1‑based indexing)
+            int lastPageIndex = doc.Pages.Count;
+            Page lastPage = doc.Pages[lastPageIndex];
 
-            // ------------------------------------------------------------
-            // Remove all existing images from the last page
-            // ------------------------------------------------------------
-            // Collect images first to avoid modifying the collection while iterating
-            List<XImage> imagesToRemove = new List<XImage>();
-            foreach (XImage img in lastPage.Resources.Images)
-                imagesToRemove.Add(img);
+            // Remove all existing images from the page resources
+            lastPage.Resources.Images.Clear();
+            // Also clear any image paragraphs that might be present
+            lastPage.Paragraphs.Clear();
 
-            foreach (XImage img in imagesToRemove)
-                lastPage.Resources.Images.Remove(img);
-
-            // ------------------------------------------------------------
-            // Add a banner that spans the full page width
-            // ------------------------------------------------------------
-            ImageStamp bannerStamp = new ImageStamp(bannerImgPath)
+            // Add the banner image to the page resources and obtain its name
+            using (FileStream imgStream = File.OpenRead(bannerImagePath))
             {
-                // Set the banner width to match the page width
-                Width = lastPage.Rect.Width,
+                string imgName = lastPage.Resources.Images.Add(imgStream);
 
-                // Keep the original aspect ratio; height will be scaled automatically
-                // If you prefer a fixed height, set Height and set FixHeight = true
-                // Height = 100; // example fixed height
-                // FixHeight = true;
+                // Define a rectangle that spans the full width of the page and height.
+                // Use Aspose.Pdf.Rectangle (page geometry) to avoid ambiguity.
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, lastPage.PageInfo.Width, lastPage.PageInfo.Height);
 
-                // Align the banner at the top of the page (you can change as needed)
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Top
-            };
-
-            // Apply the stamp to the page
-            lastPage.AddStamp(bannerStamp);
+                // Place the image on the page using the resource name
+                lastPage.AddImage(imgName, rect);
+            }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            doc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Banner applied and saved to '{outputPdfPath}'.");

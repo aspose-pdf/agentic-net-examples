@@ -1,58 +1,70 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // HorizontalAlignment, VerticalAlignment enums
+using Aspose.Pdf.Drawing;    // ImageStamp class
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string patternImgPath = "pattern.png";
+        const string inputPdf   = "input.pdf";
+        const string outputPdf  = "output.pdf";
+        const string patternImg = "pattern.png"; // background pattern image
 
-        // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(patternImgPath))
-        {
-            Console.Error.WriteLine($"Pattern image not found: {patternImgPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (!File.Exists(patternImg))
         {
-            // Iterate over all pages (foreach respects 1‑based indexing internally)
-            foreach (Page page in pdfDoc.Pages)
+            Console.Error.WriteLine($"Pattern image not found: {patternImg}");
+            return;
+        }
+
+        try
+        {
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Create an ImageStamp for the background pattern
-                ImageStamp bgStamp = new ImageStamp(patternImgPath)
+                // Iterate pages (1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Place the stamp behind existing page content
-                    Background = true,
-                    // Set opacity to 5 percent for a subtle effect
-                    Opacity = 0.05f,
-                    // Scale the image to cover the entire page
-                    Width = page.PageInfo.Width,
-                    Height = page.PageInfo.Height,
-                    // Ensure the image starts at the page origin
-                    LeftMargin = 0,
-                    BottomMargin = 0,
-                    TopMargin = 0,
-                    RightMargin = 0
-                };
+                    Page page = doc.Pages[i];
 
-                // Apply the stamp to the current page
-                page.AddStamp(bgStamp);
+                    // Create an ImageStamp for the background pattern
+                    ImageStamp stamp = new ImageStamp(patternImg)
+                    {
+                        // Place behind existing page content
+                        Background = true,
+                        // 5 percent opacity for a subtle effect
+                        Opacity   = 0.05f,
+                        // Size to fill the whole page
+                        Width  = page.PageInfo.Width,
+                        Height = page.PageInfo.Height,
+                        // Position at the origin (lower‑left corner)
+                        XIndent = 0,
+                        YIndent = 0,
+                        // Ensure the stamp does not affect existing content layout
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment   = VerticalAlignment.Bottom
+                    };
+
+                    // Add the stamp to the current page
+                    page.AddStamp(stamp);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdf);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Background pattern applied and saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Background pattern applied and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_no_duplicate_images.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "deduped.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,60 +17,58 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal (global rule)
+        // Wrap Document in using for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Keep track of image hashes we have already seen
-            var seenHashes = new Dictionary<string, XImage>();
+            // Store hashes of images that have been seen
+            var uniqueImages = new Dictionary<string, XImage>();
 
-            // Aspose.Pdf uses 1‑based page indexing (global rule)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over each page in the PDF
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Collect images that are duplicates so we can remove them after iteration
-                var duplicates = new List<XImage>();
-
-                // Iterate over images using the correct foreach pattern (rule)
+                // Collect images into a temporary list to allow removal during iteration
+                var imagesOnPage = new List<XImage>();
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Extract raw image bytes
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        img.Save(ms);               // Save image data to a memory stream
-                        byte[] imageBytes = ms.ToArray();
-
-                        // Compute a SHA‑256 hash of the bytes for comparison
-                        string hash;
-                        using (SHA256 sha = SHA256.Create())
-                        {
-                            hash = BitConverter.ToString(sha.ComputeHash(imageBytes));
-                        }
-
-                        // If we have seen this hash before, mark the image for removal
-                        if (seenHashes.ContainsKey(hash))
-                        {
-                            duplicates.Add(img);
-                        }
-                        else
-                        {
-                            // First occurrence – store it
-                            seenHashes[hash] = img;
-                        }
-                    }
+                    imagesOnPage.Add(img);
                 }
 
-                // Remove duplicate images from the page's image collection
-                foreach (XImage dup in duplicates)
+                // Process each image
+                foreach (XImage img in imagesOnPage)
                 {
-                    page.Resources.Images.Remove(dup);
+                    // Extract raw image bytes
+                    byte[] imageData;
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        img.Save(ms);               // Save image to memory stream
+                        imageData = ms.ToArray();   // Get raw bytes
+                    }
+
+                    // Compute a SHA256 hash of the image data
+                    string hash;
+                    using (var sha = SHA256.Create())
+                    {
+                        hash = BitConverter.ToString(sha.ComputeHash(imageData));
+                    }
+
+                    // If the hash already exists, the image is a duplicate
+                    if (uniqueImages.ContainsKey(hash))
+                    {
+                        // Remove duplicate image from the page's image collection
+                        page.Resources.Images.Remove(img);
+                    }
+                    else
+                    {
+                        // First occurrence – keep it and record its hash
+                        uniqueImages[hash] = img;
+                    }
                 }
             }
 
-            // Save the modified PDF (no special SaveOptions needed for PDF)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Duplicate images removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Deduped PDF saved to '{outputPath}'.");
     }
 }

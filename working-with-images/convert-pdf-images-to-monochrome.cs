@@ -1,100 +1,54 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_monochrome.pdf";
+        const string inputPdf       = "input.pdf";
+        const string outputPdf      = "output_monochrome.pdf";
+        const string monoImagePath  = "mono.png"; // monochrome image used for replacement
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        if (!File.Exists(monoImagePath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            Console.Error.WriteLine($"Monochrome image not found: {monoImagePath}");
+            return;
+        }
+
+        // Load the PDF document
+        using (Document doc = new Document(inputPdf))
+        {
+            // Iterate over each page
+            foreach (Page page in doc.Pages)
             {
-                Aspose.Pdf.Page page = doc.Pages[pageIndex];
+                // Copy current images to a list to avoid modifying the collection while iterating
+                var images = page.Resources.Images.Cast<XImage>().ToList();
 
-                // Collect images to process because we will modify the collection while iterating
-                List<Aspose.Pdf.XImage> images = new List<Aspose.Pdf.XImage>();
-                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
+                foreach (XImage img in images)
                 {
-                    images.Add(img);
-                }
+                    // Remove the original image from the page resources
+                    page.Resources.Images.Remove(img);
 
-                foreach (Aspose.Pdf.XImage img in images)
-                {
-                    // Extract the original image into a memory stream
-                    using (MemoryStream originalStream = new MemoryStream())
+                    // Add the monochrome image in its place
+                    using (FileStream monoStream = File.OpenRead(monoImagePath))
                     {
-                        img.Save(originalStream);
-                        originalStream.Position = 0;
-
-                        // Load the image with System.Drawing for pixel manipulation
-                        using (Bitmap bitmap = new Bitmap(originalStream))
-                        {
-                            // Create a grayscale bitmap
-                            using (Bitmap grayBitmap = new Bitmap(bitmap.Width, bitmap.Height))
-                            {
-                                using (Graphics g = Graphics.FromImage(grayBitmap))
-                                {
-                                    // Standard luminance conversion matrix
-                                    ColorMatrix colorMatrix = new ColorMatrix(new float[][]
-                                    {
-                                        new float[] {0.3f, 0.3f, 0.3f, 0, 0},
-                                        new float[] {0.59f, 0.59f, 0.59f, 0, 0},
-                                        new float[] {0.11f, 0.11f, 0.11f, 0, 0},
-                                        new float[] {0, 0, 0, 1, 0},
-                                        new float[] {0, 0, 0, 0, 1}
-                                    });
-
-                                    ImageAttributes attributes = new ImageAttributes();
-                                    attributes.SetColorMatrix(colorMatrix);
-
-                                    g.DrawImage(
-                                        bitmap,
-                                        new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
-                                        0, 0, bitmap.Width, bitmap.Height,
-                                        GraphicsUnit.Pixel,
-                                        attributes);
-                                }
-
-                                // Save the grayscale image to a new memory stream (PNG format)
-                                using (MemoryStream grayStream = new MemoryStream())
-                                {
-                                    grayBitmap.Save(grayStream, ImageFormat.Png);
-                                    grayStream.Position = 0;
-
-                                    // Add the new grayscale image to the page resources
-                                    string grayImgName = page.Resources.Images.Add(grayStream);
-
-                                    // OPTIONAL: replace the original image reference in the page content.
-                                    // This simple example just removes the original image from the resources.
-                                    // More sophisticated content replacement would require parsing the page content stream.
-                                    page.Resources.Images.Remove(img);
-                                }
-                            }
-                        }
+                        page.Resources.Images.Add(monoStream);
                     }
                 }
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Monochrome PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with monochrome images to '{outputPdf}'.");
     }
 }

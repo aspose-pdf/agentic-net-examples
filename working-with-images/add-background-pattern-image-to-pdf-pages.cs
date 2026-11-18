@@ -6,51 +6,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputPdf  = "output.pdf";         // result PDF
-        const string patternImg = "pattern.png";        // background pattern image
+        const string inputPath  = "input.pdf";          // source PDF
+        const string patternPath = "pattern.png";       // background pattern image
+        const string outputPath = "output.pdf";         // result PDF
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(patternImg))
-        {
-            Console.Error.WriteLine($"Pattern image not found: {patternImg}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        if (!File.Exists(patternPath))
         {
-            // Iterate over all pages (PageCollection implements IEnumerable)
+            Console.Error.WriteLine($"Pattern image not found: {patternPath}");
+            return;
+        }
+
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             foreach (Page page in doc.Pages)
             {
-                // Create a stamp from the pattern image
-                ImageStamp stamp = new ImageStamp(patternImg)
+                // Create an ImageStamp for the background pattern
+                ImageStamp bgStamp = new ImageStamp(patternPath)
                 {
                     // Place the stamp behind existing page content
                     Background = true,
-                    // Set opacity to 10 percent for a subtle effect
+
+                    // Set opacity to 10 % (0.1)
                     Opacity = 0.1,
+
                     // Stretch the image to cover the whole page
                     Width  = page.PageInfo.Width,
                     Height = page.PageInfo.Height,
-                    // Center alignment (required when width/height are set)
+
+                    // Center the image (optional, since we stretch it)
                     HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment   = VerticalAlignment.Center
                 };
 
-                // Add the stamp to the current page
-                page.AddStamp(stamp);
+                // Apply the stamp to the current page
+                page.AddStamp(bgStamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Background pattern applied and saved to '{outputPdf}'.");
+        Console.WriteLine($"Background pattern applied and saved to '{outputPath}'.");
     }
 }

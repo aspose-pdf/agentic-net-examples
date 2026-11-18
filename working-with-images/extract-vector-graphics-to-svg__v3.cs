@@ -1,52 +1,65 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Vector; // GraphicsAbsorber lives here
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "extracted_graphics.pdf";
+        const string inputPdfPath = "input.pdf";
+        const int targetPageNumber = 2; // 1‑based page index
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF document
-        using (Document sourceDoc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Select the page to extract graphics from (1‑based index)
-            int pageNumber = 1;
-            if (pageNumber < 1 || pageNumber > sourceDoc.Pages.Count)
+            // Validate page number
+            if (targetPageNumber < 1 || targetPageNumber > pdfDoc.Pages.Count)
             {
-                Console.Error.WriteLine("Invalid page number.");
+                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {pdfDoc.Pages.Count} pages.");
                 return;
             }
 
-            Page sourcePage = sourceDoc.Pages[pageNumber];
-
-            // Create a new PDF document to hold the extracted graphics
-            using (Document targetDoc = new Document())
+            // Create a GraphicsAbsorber (core API, not Facades) and visit the desired page
+            using (GraphicsAbsorber absorber = new GraphicsAbsorber())
             {
-                // Add an empty page to the new document – copy the size of the source page
-                Page targetPage = targetDoc.Pages.Add();
-                targetPage.PageInfo = sourcePage.PageInfo; // preserve dimensions
+                Page page = pdfDoc.Pages[targetPageNumber];
+                absorber.Visit(page); // extracts vector graphic elements from the page
 
-                // Transfer each extracted vector graphic (XForm) to the new page
-                // Vector graphics are stored as form XObjects in the page resources.
-                foreach (XForm form in sourcePage.Resources.Forms)
+                // Retrieve the extracted vector graphic elements
+                // absorber.Elements returns a GraphicElementCollection, which implements IEnumerable<GraphicElement>
+                // Use var or IEnumerable<GraphicElement> instead of IList<GraphicElement>
+                var extractedGraphics = absorber.Elements;
+                Console.WriteLine($"Extracted {extractedGraphics.Count} vector graphic(s) from page {targetPageNumber}.");
+
+                // Example of further manipulation: save each graphic as a separate PDF page
+                int graphicIndex = 1;
+                foreach (GraphicElement graphic in extractedGraphics)
                 {
-                    // Add the form to the target page's resources collection.
-                    // The same XForm instance can be reused because it is immutable.
-                    targetPage.Resources.Forms.Add(form);
-                }
+                    // Create a new PDF document to host the graphic
+                    using (Document graphicDoc = new Document())
+                    {
+                        // Add a blank page
+                        Page newPage = graphicDoc.Pages.Add();
 
-                // Save the resulting PDF
-                targetDoc.Save(outputPdf);
-                Console.WriteLine($"Extracted graphics saved to '{outputPdf}'.");
+                        // Add the extracted graphic to the new page
+                        // GraphicElement provides AddOnPage for this purpose
+                        graphic.AddOnPage(newPage);
+
+                        // Save the individual graphic PDF
+                        string outputPath = $"graphic_page{targetPageNumber}_item{graphicIndex}.pdf";
+                        graphicDoc.Save(outputPath);
+                        Console.WriteLine($"Saved graphic #{graphicIndex} to '{outputPath}'.");
+                    }
+                    graphicIndex++;
+                }
             }
         }
     }

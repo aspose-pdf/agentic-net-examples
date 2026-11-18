@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -10,24 +9,24 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int targetPageNumber = 2; // 1‑based page number to modify
+        const int targetPage = 2; // 1‑based page number
 
-        // Map original image index (1‑based) to the file path of the replacement image
-        var imageReplacements = new Dictionary<int, string>
+        // Map of original image index (1‑based) -> replacement image file path
+        var replacements = new Dictionary<int, string>
         {
             { 1, "newImage1.jpg" },
             { 3, "newImage3.png" }
         };
 
-        // Verify input PDF exists
+        // Validate input PDF
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Verify each replacement image exists
-        foreach (var kvp in imageReplacements)
+        // Validate replacement images
+        foreach (var kvp in replacements)
         {
             if (!File.Exists(kvp.Value))
             {
@@ -36,36 +35,36 @@ class Program
             }
         }
 
-        // Load PDF inside a using block (ensures deterministic disposal)
+        // Load document
         using (Document doc = new Document(inputPath))
         {
-            // Validate requested page number (pages are 1‑based)
-            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
+            // Ensure the requested page exists (pages are 1‑based)
+            if (targetPage < 1 || targetPage > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {targetPageNumber} out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Invalid page number: {targetPage}");
                 return;
             }
 
-            Page page = doc.Pages[targetPageNumber];
+            Page page = doc.Pages[targetPage];
 
-            // Replace each specified image on the page
-            foreach (var kvp in imageReplacements)
+            // Replace each image on the page using the XImageCollection.Replace method
+            foreach (var kvp in replacements)
             {
-                int imgIndex = kvp.Key;          // 1‑based index within the page's image collection
-                string newImgPath = kvp.Value;
+                int imgIndex = kvp.Key;          // 1‑based index of the image to replace
+                string newImgPath = kvp.Value;   // path to the new image file
 
-                // Ensure the image index exists on this page
+                // Validate that the image index exists on the page
                 if (imgIndex < 1 || imgIndex > page.Resources.Images.Count)
                 {
-                    Console.Error.WriteLine($"Image index {imgIndex} out of range on page {targetPageNumber}.");
+                    Console.Error.WriteLine($"Image index {imgIndex} out of range on page {targetPage}.");
                     continue;
                 }
 
-                // Replace the existing image at the specified index with the new image stream
-                using (FileStream imgStream = File.OpenRead(newImgPath))
+                // Replace the image stream
+                using (FileStream fs = File.OpenRead(newImgPath))
                 {
-                    // The Replace overload expects a Stream, not an XImage
-                    page.Resources.Images.Replace(imgIndex, imgStream);
+                    // XImageCollection.Replace replaces the image at the given 1‑based index
+                    page.Resources.Images.Replace(imgIndex, fs);
                 }
             }
 
@@ -73,6 +72,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Images replaced and saved to '{outputPath}'.");
+        Console.WriteLine($"Images replaced successfully. Output saved to '{outputPath}'.");
     }
 }

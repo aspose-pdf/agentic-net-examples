@@ -1,21 +1,20 @@
 using System;
 using System.IO;
+using System.Globalization;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using System.Drawing; // Bitmap, Graphics etc. (Image will be fully qualified)
 
 class Program
 {
     static void Main()
     {
-        // Paths
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_resized.pdf";
-        const string configPath = "config.txt"; // contains a single double value, e.g., 0.5
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "resized.pdf";
+        const string configPath = "config.txt";
 
-        // Validate files
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(configPath))
@@ -24,14 +23,11 @@ class Program
             return;
         }
 
-        // Read scaling factor from configuration file
         double scaleFactor;
         try
         {
             string factorText = File.ReadAllText(configPath).Trim();
-            scaleFactor = double.Parse(factorText);
-            if (scaleFactor <= 0)
-                throw new ArgumentException("Scaling factor must be positive.");
+            scaleFactor = double.Parse(factorText, CultureInfo.InvariantCulture);
         }
         catch (Exception ex)
         {
@@ -39,47 +35,64 @@ class Program
             return;
         }
 
-        // Process PDF
-        using (Document pdfDoc = new Document(inputPdfPath))
+        if (scaleFactor <= 0)
         {
-            // Iterate through all pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= pdfDoc.Pages.Count; pageIndex++)
-            {
-                Page page = pdfDoc.Pages[pageIndex];
-
-                // Iterate over each image on the page
-                foreach (XImage img in page.Resources.Images)
-                {
-                    // Extract original image to a memory stream
-                    using (MemoryStream imgStream = new MemoryStream())
-                    {
-                        img.Save(imgStream);
-                        imgStream.Position = 0; // reset stream position
-
-                        // Create an ImageStamp from the extracted image
-                        ImageStamp stamp = new ImageStamp(imgStream)
-                        {
-                            Background = false,
-                            Width = img.Width * scaleFactor,
-                            Height = img.Height * scaleFactor,
-                            // Position the stamp at the lower‑left corner (0,0).
-                            // Adjust HorizontalAlignment / VerticalAlignment and indents as needed.
-                            HorizontalAlignment = HorizontalAlignment.Left,
-                            VerticalAlignment = VerticalAlignment.Bottom,
-                            XIndent = 0,
-                            YIndent = 0
-                        };
-
-                        // Add the scaled stamp to the page
-                        page.AddStamp(stamp);
-                    }
-                }
-            }
-
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            Console.Error.WriteLine("Scaling factor must be positive.");
+            return;
         }
 
-        Console.WriteLine($"Resized PDF saved to '{outputPdfPath}'.");
+        try
+        {
+            using (Document pdfDoc = new Document(inputPdf))
+            {
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+                {
+                    Page page = pdfDoc.Pages[i];
+                    int imgCount = page.Resources.Images.Count;
+
+                    // XImageCollection is 1‑based as well
+                    for (int j = 1; j <= imgCount; j++)
+                    {
+                        XImage xImg = page.Resources.Images[j];
+
+                        // Export the original image to a memory stream
+                        using (MemoryStream srcStream = new MemoryStream())
+                        {
+                            xImg.Save(srcStream);
+                            srcStream.Position = 0;
+
+                            // Load it with System.Drawing to resize (fully qualified to avoid ambiguity)
+                            using (System.Drawing.Image sysImg = System.Drawing.Image.FromStream(srcStream))
+                            {
+                                int newWidth = (int)(sysImg.Width * scaleFactor);
+                                int newHeight = (int)(sysImg.Height * scaleFactor);
+
+                                using (Bitmap resizedBmp = new Bitmap(sysImg, newWidth, newHeight))
+                                {
+                                    using (MemoryStream outStream = new MemoryStream())
+                                    {
+                                        // Preserve original format (PNG, JPEG, etc.)
+                                        resizedBmp.Save(outStream, sysImg.RawFormat);
+                                        outStream.Position = 0;
+
+                                        // Replace the image in the PDF resources
+                                        page.Resources.Images.Replace(j, outStream);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                pdfDoc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"Images resized by factor {scaleFactor} and saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Processing error: {ex.Message}");
+        }
     }
 }

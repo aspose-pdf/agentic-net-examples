@@ -1,64 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF and background image paths
-        const string inputPdfPath   = "input.pdf";
-        const string backgroundPath = "background.jpg";
-        const string outputPdfPath  = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string backgroundImage = "background.png";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(backgroundPath))
+        if (!File.Exists(backgroundImage))
         {
-            Console.Error.WriteLine($"Background image not found: {backgroundPath}");
+            Console.Error.WriteLine($"Background image not found: {backgroundImage}");
             return;
         }
 
         try
         {
-            // Load the source PDF
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Iterate over all pages and add the background image as a stamp
-                foreach (Page page in pdfDoc.Pages)
+                // Create an ImageStamp for the background image
+                ImageStamp imgStamp = new ImageStamp(backgroundImage)
                 {
-                    // Create an ImageStamp bound to the background image file
-                    Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(backgroundPath);
+                    Background = true,               // draw behind existing page content
+                    Opacity = 0.5,                  // subtle shading effect (BlendMode not available)
+                    Width = doc.Pages[1].PageInfo.Width,
+                    Height = doc.Pages[1].PageInfo.Height,
+                    XIndent = 0,
+                    YIndent = 0
+                };
 
-                    // Set the stamp as a background element (drawn behind page content)
-                    imgStamp.Background = true;
-
-                    // Adjust opacity for a subtle shading effect
-                    imgStamp.Opacity = 0.5; // 0 = fully transparent, 1 = fully opaque
-
-                    // Position the image – here we center it on the page.
-                    // Margins are measured from the page edges; setting all to zero lets the image fill the page.
-                    imgStamp.TopMargin    = 0;
-                    imgStamp.BottomMargin = 0;
-                    imgStamp.LeftMargin   = 0;
-                    imgStamp.RightMargin  = 0;
-
-                    // NOTE: The core Aspose.Pdf.ImageStamp class does not expose a BlendMode property.
-                    // Multiply blend mode is not available via the core API; opacity is used instead.
-
-                    // Add the stamp to the current page
+                // Apply the stamp to every page in the document
+                foreach (Page page in doc.Pages)
+                {
                     page.AddStamp(imgStamp);
                 }
 
                 // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
+                doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"Background image added and saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Background image added and saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
