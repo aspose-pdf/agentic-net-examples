@@ -6,45 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";          // source PDF
-        const string overlayPng = "overlay.png";       // transparent PNG to overlay
-        const string outputPdf = "output.pdf";         // result PDF
+        const string inputPdf   = "input.pdf";
+        const string overlayPng = "overlay.png";
+        const string outputPdf  = "output.pdf";
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(overlayPng))
         {
             Console.Error.WriteLine($"Overlay PNG not found: {overlayPng}");
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages (foreach works with 1‑based indexing internally)
-            foreach (Page page in pdfDoc.Pages)
+            // Iterate pages using 1‑based indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
+                Page page = doc.Pages[i];
+
                 // Create an ImageStamp from the transparent PNG
                 ImageStamp stamp = new ImageStamp(overlayPng)
                 {
-                    // Ensure the stamp is drawn on top of existing page content
-                    Background = false   // false = overlay (above), true = background (below)
+                    // Set Background = false so the stamp appears above existing content
+                    Background = false,
+
+                    // Optional: stretch the overlay to fill the page
+                    // Width = page.PageInfo.Width,
+                    // Height = page.PageInfo.Height,
+                    // HorizontalAlignment = HorizontalAlignment.Center,
+                    // VerticalAlignment = VerticalAlignment.Center
                 };
 
-                // Optionally stretch the overlay to cover the whole page
-                stamp.Width  = page.PageInfo.Width;
-                stamp.Height = page.PageInfo.Height;
-
-                // Add the stamp to the current page; AddStamp works per‑page (not on the collection)
+                // Add the stamp to the current page (per‑page call)
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF; Document.Save writes PDF regardless of extension
-            pdfDoc.Save(outputPdf);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
         Console.WriteLine($"Overlay applied and saved to '{outputPdf}'.");

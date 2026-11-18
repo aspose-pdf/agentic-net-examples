@@ -1,9 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -20,11 +19,9 @@ class Program
 
         using (Document doc = new Document(inputPath))
         {
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            foreach (Page page in doc.Pages)
             {
-                Page page = doc.Pages[pageIndex];
-
-                // Copy images to a temporary list to avoid modifying the collection while iterating.
+                // Collect images first to avoid modifying the collection while iterating
                 List<XImage> images = new List<XImage>();
                 foreach (XImage img in page.Resources.Images)
                 {
@@ -33,53 +30,35 @@ class Program
 
                 foreach (XImage img in images)
                 {
-                    // Build a placeholder URL for the original image.
-                    string imageName = !string.IsNullOrEmpty(img.Name) ? img.Name : Guid.NewGuid().ToString();
-                    string placeholderUrl = $"https://example.com/images/{imageName}";
+                    // Placeholder rectangle – replace with actual image bounds if needed
+                    Aspose.Pdf.Rectangle placeholderRect = new Aspose.Pdf.Rectangle(
+                        50,                                 // lower‑left X
+                        page.PageInfo.Height - 100,        // lower‑left Y
+                        250,                                // upper‑right X
+                        page.PageInfo.Height - 50);        // upper‑right Y
 
-                    // Remove the original image resource.
-                    int imgIndex = -1;
-                    for (int i = 1; i <= page.Resources.Images.Count; i++)
+                    // Create a link annotation that points to the original image URL
+                    LinkAnnotation link = new LinkAnnotation(page, placeholderRect);
+                    link.Action = new GoToURIAction("https://example.com/original-image");
+                    link.Contents = "Original image"; // annotation text (no Title property)
+                    link.Border = new Border(link) { Width = 0 }; // invisible border
+                    link.Color = Color.Transparent;
+
+                    // Visible placeholder annotation (text note)
+                    TextAnnotation placeholder = new TextAnnotation(page, placeholderRect)
                     {
-                        if (page.Resources.Images[i] == img)
-                        {
-                            imgIndex = i;
-                            break;
-                        }
-                    }
-                    if (imgIndex > 0)
-                    {
-                        page.Resources.Images.Delete(imgIndex);
-                    }
-
-                    // Create a text fragment that will act as the visual placeholder.
-                    TextFragment placeholder = new TextFragment("[Image placeholder]");
-                    placeholder.TextState.FontSize = 12;
-                    placeholder.TextState.Underline = true; // underline to indicate a link
-                    placeholder.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-
-                    // Position the placeholder. Since XImage does not expose placement information in this version,
-                    // we fall back to a default position. Adjust as needed for your PDFs.
-                    double posX = 100;
-                    double posY = 700;
-                    placeholder.Position = new Position(posX, posY);
-
-                    // Add the placeholder text to the page.
-                    page.Paragraphs.Add(placeholder);
-
-                    // Create a link annotation that covers the placeholder text and points to the original image URL.
-                    // The rectangle size is an approximation; adjust width/height as required.
-                    double rectWidth = 150; // approximate width of the placeholder text
-                    double rectHeight = 20; // approximate height of the placeholder text
-                    LinkAnnotation link = new LinkAnnotation(page, new Rectangle(posX, posY, posX + rectWidth, posY + rectHeight))
-                    {
-                        Action = new GoToURIAction(placeholderUrl)
+                        Title = "Image placeholder",
+                        Contents = "Click to view original image",
+                        Open = true,
+                        Icon = TextIcon.Note,
+                        Color = Color.LightGray
                     };
+
                     page.Annotations.Add(link);
+                    page.Annotations.Add(placeholder);
                 }
             }
 
-            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

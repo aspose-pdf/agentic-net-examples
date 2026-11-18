@@ -2,20 +2,12 @@ using System;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
 
 class ThemeConfig
 {
-    public string Theme { get; set; } = null!; // non‑nullable, initialized to suppress warning
-    public OverlayColorConfig OverlayColor { get; set; } = null!; // non‑nullable, initialized to suppress warning
-}
-
-class OverlayColorConfig
-{
-    public double R { get; set; }   // 0.0 – 1.0
-    public double G { get; set; }
-    public double B { get; set; }
-    public double A { get; set; }   // 0.0 – 1.0 (opacity)
+    public string OverlayColor { get; set; } = "#000000"; // default black
+    public double Opacity { get; set; } = 0.5;           // default 50% opacity
 }
 
 class Program
@@ -23,7 +15,7 @@ class Program
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        const string outputPdfPath = "output_overlay.pdf";
         const string themeConfigPath = "theme.json";
 
         if (!File.Exists(inputPdfPath))
@@ -43,9 +35,7 @@ class Program
         try
         {
             string json = File.ReadAllText(themeConfigPath);
-            config = JsonSerializer.Deserialize<ThemeConfig>(json) ?? throw new InvalidDataException("Invalid theme config JSON.");
-            if (config.OverlayColor == null)
-                throw new InvalidDataException("OverlayColor section missing.");
+            config = JsonSerializer.Deserialize<ThemeConfig>(json) ?? new ThemeConfig();
         }
         catch (Exception ex)
         {
@@ -53,40 +43,41 @@ class Program
             return;
         }
 
-        // Convert double (0‑1) to byte (0‑255) for Aspose.Pdf.Color
-        int a = (int)Math.Round(config.OverlayColor.A * 255);
-        int r = (int)Math.Round(config.OverlayColor.R * 255);
-        int g = (int)Math.Round(config.OverlayColor.G * 255);
-        int b = (int)Math.Round(config.OverlayColor.B * 255);
-        Aspose.Pdf.Color overlayColor = Aspose.Pdf.Color.FromArgb(a, r, g, b);
+        // Convert hex color to Aspose.Pdf.Color (values 0‑1)
+        Aspose.Pdf.Color overlayColor = ParseHexColor(config.OverlayColor);
 
-        // Open PDF and add semi‑transparent overlay to each page
+        // Ensure opacity is within 0‑1 range
+        double opacity = Math.Max(0.0, Math.Min(1.0, config.Opacity));
+
+        // Process PDF
         using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a Graph that spans the whole page (float parameters required)
-                Graph graph = new Graph((float)page.PageInfo.Width, (float)page.PageInfo.Height);
+                // Determine page size
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-                // Rectangle shape covering the entire page (left, bottom, width, height)
-                Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(
-                    0f,                     // left
-                    0f,                     // bottom
-                    (float)page.PageInfo.Width,   // width
-                    (float)page.PageInfo.Height); // height
+                // Create a rectangle that covers the whole page
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, pageWidth, pageHeight);
 
-                // Apply the semi‑transparent fill color
-                shape.GraphInfo.FillColor = overlayColor;
-                // Optional: remove border line
-                shape.GraphInfo.Color = overlayColor; // same color, line width defaults to 0
-                shape.GraphInfo.LineWidth = 0;
+                // Use SquareAnnotation (the correct class) as a full‑page overlay
+                var overlay = new SquareAnnotation(page, rect)
+                {
+                    // Fill colour (interior) – the same as the overlay colour
+                    InteriorColor = overlayColor,
+                    // No border
+                    Color = Aspose.Pdf.Color.Transparent,
+                    Opacity = opacity
+                };
+                // Border must be created with the owning annotation instance
+                overlay.Border = new Border(overlay) { Width = 0 };
 
-                // Add shape to graph and graph to page
-                graph.Shapes.Add(shape);
-                page.Paragraphs.Add(graph);
+                // Add annotation to the page
+                page.Annotations.Add(overlay);
             }
 
             // Save the modified PDF
@@ -94,5 +85,31 @@ class Program
         }
 
         Console.WriteLine($"Overlay applied and saved to '{outputPdfPath}'.");
+    }
+
+    // Helper: parse "#RRGGBB" or "RRGGBB" into Aspose.Pdf.Color
+    static Aspose.Pdf.Color ParseHexColor(string hex)
+    {
+        if (string.IsNullOrWhiteSpace(hex))
+            return Aspose.Pdf.Color.Black;
+
+        hex = hex.TrimStart('#');
+
+        if (hex.Length != 6)
+            return Aspose.Pdf.Color.Black; // fallback
+
+        try
+        {
+            byte r = Convert.ToByte(hex.Substring(0, 2), 16);
+            byte g = Convert.ToByte(hex.Substring(2, 2), 16);
+            byte b = Convert.ToByte(hex.Substring(4, 2), 16);
+
+            // FromRgb expects values in the range 0‑1
+            return Aspose.Pdf.Color.FromRgb(r / 255.0, g / 255.0, b / 255.0);
+        }
+        catch
+        {
+            return Aspose.Pdf.Color.Black; // fallback on parse error
+        }
     }
 }

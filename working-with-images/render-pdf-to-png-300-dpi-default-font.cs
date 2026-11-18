@@ -8,42 +8,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "PngPages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "PngPages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Optional: set a default fallback font for missing glyphs
-        // FontRepository.DefaultFont = FontRepository.FindFont("Arial");
+        // Register a fallback font for any missing fonts in the PDF.
+        // The asterisk ("*") matches any missing font name.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
             // Aspose.Pdf uses 1‑based page indexing
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
                 // Create a PNG device with 300 DPI resolution
-                Resolution resolution = new Resolution(300);
-                PngDevice pngDevice = new PngDevice(resolution);
+                PngDevice pngDevice = new PngDevice(new Resolution(300));
 
-                // Define the output file name for the current page
-                string outPath = Path.Combine(outputDir, $"Page_{i}.png");
+                // Prepare output file path for the current page
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNum}.png");
 
-                // Render the page to a PNG file
-                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
+                // Render the page to PNG using a FileStream
+                using (FileStream outStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    pngDevice.Process(pdfDoc.Pages[i], imageStream);
+                    pngDevice.Process(pdfDoc.Pages[pageNum], outStream);
                 }
 
-                Console.WriteLine($"Rendered page {i} to {outPath}");
+                Console.WriteLine($"Rendered page {pageNum} to {outputPath}");
             }
         }
+
+        Console.WriteLine("All pages have been rendered to PNG.");
     }
 }

@@ -1,55 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices; // PngDevice, Resolution
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";      // source PDF
-        const string pngPath = "page1.png";      // output PNG
-        const int    pageNumber = 1;               // page to render (1‑based)
-        const string fallbackFont = "fallback.ttf"; // fallback font name or file
+        const string inputPath = "input.pdf";
+        const string outputPath = "page1.png";
+        const int pageNumber = 1; // 1‑based index per Aspose.Pdf
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block – ensures deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Verify the requested page exists
+            // Validate requested page number
             if (pageNumber < 1 || pageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {doc.Pages.Count} pages.");
                 return;
             }
 
             // Configure rendering options with a fallback font
-            RenderingOptions renderOpts = new RenderingOptions
-            {
-                // In Aspose.Pdf the fallback/default font is set via DefaultFontName
-                DefaultFontName = fallbackFont
-            };
+            RenderingOptions renderOpts = new RenderingOptions();
+            // The fallback font is set via DefaultFontName (no FontFallbackSettings type exists)
+            renderOpts.DefaultFontName = "Arial";
 
-            // Define the resolution for the PNG (e.g., 300 DPI) and create the device
-            var pngDevice = new PngDevice(new Resolution(300))
-            {
-                TransparentBackground = true,
-                RenderingOptions = renderOpts
-            };
+            // Create a PNG device (resolution 300 DPI) and assign the rendering options
+            PngDevice pngDevice = new PngDevice(new Resolution(300));
+            pngDevice.RenderingOptions = renderOpts;
 
-            // Render the selected page directly to a file stream
-            using (FileStream outStream = new FileStream(pngPath, FileMode.Create, FileAccess.Write))
+            // Render the selected page to a memory stream and write to file
+            using (MemoryStream ms = new MemoryStream())
             {
-                pngDevice.Process(doc.Pages[pageNumber], outStream);
+                pngDevice.Process(doc.Pages[pageNumber], ms);
+                File.WriteAllBytes(outputPath, ms.ToArray());
             }
         }
 
-        Console.WriteLine($"Page {pageNumber} rendered to PNG: {pngPath}");
+        Console.WriteLine($"Page {pageNumber} rendered to PNG at '{outputPath}'.");
     }
 }

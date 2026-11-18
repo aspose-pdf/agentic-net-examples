@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -12,30 +11,31 @@ class Program
 
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imagePath}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a new blank page to the document
             Page page = doc.Pages.Add();
 
-            // Load the raster image from a file stream
-            using (FileStream imgStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+            // Create an Image object and load the raster image from file
+            Image img = new Image();
+            // Use a FileStream to avoid locking the file after the operation
+            using (FileStream imgStream = File.OpenRead(imagePath))
             {
-                Image img = new Image { ImageStream = imgStream };
-
-                // Optional: scale the image to fit the page
-                // img.FixWidth = page.PageInfo.Width;
-                // img.FixHeight = page.PageInfo.Height;
-
-                // Insert the image into the page via the Paragraphs collection
-                page.Paragraphs.Add(img);
+                img.ImageStream = imgStream;
+                // Optionally set dimensions (in points). 1 point = 1/72 inch.
+                img.FixWidth = 300;   // width in points
+                img.FixHeight = 200;  // height in points
             }
 
-            // Save the resulting PDF
+            // Add the image to the page's Paragraphs collection
+            page.Paragraphs.Add(img);
+
+            // Save the PDF document
             doc.Save(outputPdf);
         }
 

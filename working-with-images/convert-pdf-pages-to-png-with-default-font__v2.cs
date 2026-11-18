@@ -7,38 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "PageImages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "Images";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists.
         Directory.CreateDirectory(outputDir);
 
-        // Set DPI and default font for rendering
-        var resolution = new Resolution(300);
-        var renderOpts = new RenderingOptions { DefaultFontName = "Times New Roman" };
-
-        // PngDevice constructor takes a Resolution; assign RenderingOptions separately
-        var pngDevice = new PngDevice(resolution);
-        pngDevice.RenderingOptions = renderOpts;
-
-        // Load the PDF with deterministic disposal
-        using (var doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Create a concrete PNG device. Devices are not IDisposable, so do not wrap them in a using block.
+            var pngDevice = new PngDevice();
+
+            // Configure rendering options for the device. RenderingOptions is an instance class; set the default font here.
+            pngDevice.RenderingOptions = new RenderingOptions
+            {
+                DefaultFontName = "Times New Roman"
+            };
+
+            // Aspose.Pdf uses 1‑based page indexing.
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                string outPath = Path.Combine(outputDir, $"page_{i}.png");
+                string outPath = Path.Combine(outputDir, $"Page_{i}.png");
+                // Render the page to an image file.
                 pngDevice.Process(doc.Pages[i], outPath);
-                Console.WriteLine($"Saved page {i} as image: {outPath}");
             }
         }
 
-        Console.WriteLine("All pages have been rendered to images.");
+        Console.WriteLine("PDF pages have been converted to images.");
     }
 }

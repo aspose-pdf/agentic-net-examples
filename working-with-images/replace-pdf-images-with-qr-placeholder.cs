@@ -1,66 +1,66 @@
 using System;
 using System.IO;
+using System.Net.Http;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_placeholder.pdf";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // The URL that each QR code will encode.
+        // In a real scenario this could be the original image source URL.
+        const string placeholderUrl = "https://example.com/original-image";
+
+        // Create a single HttpClient instance for downloading QR code images.
+        using (HttpClient httpClient = new HttpClient())
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Iterate over all pages in the document.
+            foreach (Page page in pdfDocument.Pages)
             {
-                // Iterate through all pages
-                foreach (Page page in doc.Pages)
+                // Build the QR code image URL using a public QR code generation service.
+                string qrServiceUrl = $"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={Uri.EscapeDataString(placeholderUrl)}";
+
+                // Download the QR code image into a memory stream.
+                using (Stream qrStream = httpClient.GetStreamAsync(qrServiceUrl).Result)
                 {
-                    // Iterate through all images on the page
-                    foreach (XImage img in page.Resources.Images)
+                    // Add the QR code image to the page resources.
+                    // The ImageStamp constructor can accept a stream directly.
+                    ImageStamp qrStamp = new ImageStamp(qrStream)
                     {
-                        // Placeholder URL (original image source is not stored in the PDF)
-                        string placeholderUrl = "https://example.com/original-image";
+                        // Position the QR code at the top‑left corner of the page.
+                        // Adjust these values as needed for your layout.
+                        HorizontalAlignment = HorizontalAlignment.Left,
+                        VerticalAlignment   = VerticalAlignment.Top,
+                        // Optional: set explicit width/height (in points).
+                        // 1 point = 1/72 inch.
+                        Width  = 100,
+                        Height = 100,
+                        // Ensure the QR code is placed above existing content.
+                        // The default is to overlay the page.
+                        // No background to keep it transparent.
+                        Background = false
+                    };
 
-                        // Define a rectangle for the annotation (positioned near the top‑right corner)
-                        var rect = new Aspose.Pdf.Rectangle(
-                            page.PageInfo.Width - 150, // llx (left)
-                            page.PageInfo.Height - 150, // lly (bottom)
-                            page.PageInfo.Width - 20,   // urx (right)
-                            page.PageInfo.Height - 20   // ury (top)
-                        );
-
-                        // Create a TextAnnotation that will act as the QR‑code placeholder
-                        var qrPlaceholder = new TextAnnotation(page, rect)
-                        {
-                            Title = "Image Placeholder",
-                            Contents = $"QR Code linking to: {placeholderUrl}",
-                            Open = true,
-                            Icon = TextIcon.Note
-                        };
-
-                        // Add the annotation to the page
-                        page.Annotations.Add(qrPlaceholder);
-                    }
+                    // Apply the stamp to the current page.
+                    page.AddStamp(qrStamp);
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF with image placeholders saved to '{outputPath}'.");
+            // Save the modified PDF.
+            pdfDocument.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF with QR code placeholders saved to '{outputPdfPath}'.");
     }
 }

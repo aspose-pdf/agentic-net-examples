@@ -18,21 +18,20 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection uses 1‑based indexing (page-indexing-one-based rule)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                Page page = doc.Pages[pageNum];
+                Page page = doc.Pages[pageIndex];
 
-                // XImageCollection (page.Resources.Images) is also 1‑based.
-                // Remove images until the collection is empty using Delete method.
-                while (page.Resources.Images.Count > 0)
+                // Remove all images from the page.
+                // Iterate backwards because the collection is 1‑based and Delete shifts indices.
+                for (int imgIndex = page.Resources.Images.Count; imgIndex >= 1; imgIndex--)
                 {
-                    // Delete(1) removes the first image in the collection.
-                    page.Resources.Images.Delete(1);
+                    page.Resources.Images.Delete(imgIndex);
                 }
             }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
+            // Save the modified PDF (output format is PDF by default)
             doc.Save(outputPath);
         }
 

@@ -1,58 +1,57 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";          // source PDF
-        const string newImagePath  = "newImage.jpg";       // image to insert
-        const string outputPdfPath = "output.pdf";         // result PDF
+        const string inputPdf      = "input.pdf";
+        const string newImagePath  = "newImage.jpg";
+        const string outputPdf     = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(newImagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {newImagePath}");
+            Console.Error.WriteLine($"Replacement image not found: {newImagePath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Iterate over all pages and replace images
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // OPTIONAL: clear existing image resources.
-                // This removes the original images from the page's resource dictionary.
-                // If the collection does not support Clear(), this line can be omitted.
-                page.Resources.Images.Clear();
+                Page page = doc.Pages[i];
 
-                // Create an ImageStamp from the new image file
-                ImageStamp imgStamp = new ImageStamp(newImagePath)
+                // Proceed only if the page contains at least one image
+                if (page.Resources.Images.Count > 0)
                 {
-                    // Position the stamp at the lower‑left corner of the page.
-                    // Adjust XIndent/YIndent, Width, Height as needed.
-                    XIndent = 0,
-                    YIndent = 0,
-                    // Keep the original image dimensions.
-                    // Width and Height can be set explicitly if required.
-                };
+                    // Remove the first existing image (index 1 is the first image)
+                    page.Resources.Images.Delete(1);
 
-                // Add the stamp to the current page, effectively replacing the old image.
-                page.AddStamp(imgStamp);
+                    // Add the new image from a file stream
+                    using (FileStream imgStream = File.OpenRead(newImagePath))
+                    {
+                        // The Add method inserts the image and returns its index
+                        page.Resources.Images.Add(imgStream);
+                    }
+
+                    // If you only need to replace a single image in the whole document,
+                    // uncomment the following line to stop after the first replacement:
+                    // break;
+                }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            // Save the modified PDF (PDF format, no SaveOptions needed)
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image replacement completed. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image replacement completed. Output saved to '{outputPdf}'.");
     }
 }

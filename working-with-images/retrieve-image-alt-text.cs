@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Reflection;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
@@ -8,6 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
+        const string logPath   = "image_alt_log.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -17,48 +18,47 @@ class Program
 
         try
         {
-            // Load the PDF document
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Open a log file (append mode) inside a using block
+                using (StreamWriter logWriter = new StreamWriter(logPath, append: true))
                 {
-                    Page page = doc.Pages[i];
+                    int imageIndex = 0;
 
-                    // Iterate over each image resource on the page
-                    foreach (XImage img in page.Resources.Images)
+                    // Iterate over all pages (1‑based indexing)
+                    foreach (Page page in doc.Pages)
                     {
-                        // Retrieve the alternative text using reflection (property may not exist in older versions)
-                        string altText = GetAlternativeText(img) ?? "(no alt text)";
+                        // Iterate over the image collection (not a dictionary)
+                        foreach (XImage img in page.Resources.Images)
+                        {
+                            imageIndex++;
+                            // Retrieve the alternative text via the API that returns a List<string>
+                            List<string> altTexts = img.GetAlternativeText(page);
+                            string altText = (altTexts != null && altTexts.Count > 0)
+                                ? string.Join(", ", altTexts)
+                                : "(no alt text)";
 
-                        // Log the alt text for auditing
-                        Console.WriteLine($"Page {i}: Image Alt Text = '{altText}'");
+                            string logEntry = $"Page {page.Number}, Image {imageIndex}: AltText = \"{altText}\"";
+                            Console.WriteLine(logEntry);
+                            logWriter.WriteLine(logEntry);
+                        }
+                    }
+
+                    if (imageIndex == 0)
+                    {
+                        string msg = "No images found in the document.";
+                        Console.WriteLine(msg);
+                        logWriter.WriteLine(msg);
                     }
                 }
             }
+
+            Console.WriteLine($"Alt‑text extraction completed. Log saved to '{logPath}'.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Attempts to obtain the AlternativeText property from an XImage instance.
-    /// Returns null if the property does not exist or its value is null.
-    /// </summary>
-    private static string GetAlternativeText(XImage img)
-    {
-        if (img == null)
-            return null;
-
-        // Use reflection to avoid compile‑time dependency on a property that may be absent in some library versions.
-        PropertyInfo altProp = img.GetType().GetProperty("AlternativeText", BindingFlags.Public | BindingFlags.Instance);
-        if (altProp != null)
-        {
-            object value = altProp.GetValue(img);
-            return value as string;
-        }
-        return null;
     }
 }

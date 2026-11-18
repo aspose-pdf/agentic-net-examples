@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // NOTE: This line is intentionally omitted to respect the hard namespace restriction.
 
 class Program
 {
@@ -16,41 +15,38 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page and absorb its image placements
+            // Iterate over each page and collect its image placements
             foreach (Page page in doc.Pages)
             {
                 ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
                 page.Accept(absorber);
 
-                // Process each image placement on the current page
                 foreach (ImagePlacement placement in absorber.ImagePlacements)
                 {
-                    // DPI information is available via the Resolution property
+                    // DPI is available via the Resolution property (X and Y)
                     double dpiX = placement.Resolution.X;
                     double dpiY = placement.Resolution.Y;
 
-                    // Delete images whose horizontal or vertical DPI is below 72
                     if (dpiX < 72 || dpiY < 72)
                     {
-                        // The image object associated with the placement is an XImage
-                        Aspose.Pdf.XImage xImg = placement.Image;
-
-                        // Remove the image from the page's resources if it exists
-                        if (page.Resources.Images.Contains(xImg))
+                        // Remove the low‑DPI image from the current page
+                        // ImagePlacement.Image returns an Aspose.Pdf.Image (XImage) whose Name can be used for deletion
+                        var img = placement.Image;
+                        if (img != null && !string.IsNullOrEmpty(img.Name))
                         {
-                            page.Resources.Images.Remove(xImg);
+                            page.Resources.Images.Delete(img.Name);
                         }
                     }
                 }
             }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Low‑DPI images removed. Saved to '{outputPath}'.");
     }
 }

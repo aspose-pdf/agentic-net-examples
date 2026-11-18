@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Linq;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 
 namespace PdfImageResizer
 {
-    // Represents the target dimensions for images on a specific page.
+    // Represents the target dimensions for a page (in points, 1 point = 1/72 inch).
     public class PageImageSize
     {
         public double Width { get; set; }
@@ -17,11 +18,14 @@ namespace PdfImageResizer
 
     class Program
     {
+        // DPI used for converting points to pixels when resizing with System.Drawing.
+        private const float TargetDpi = 96f; // typical screen DPI; adjust if needed.
+
         static void Main()
         {
             const string inputPdfPath = "input.pdf";
             const string outputPdfPath = "output_resized.pdf";
-            const string configPath = "image_sizes.json";
+            const string configFilePath = "config.json";
 
             if (!File.Exists(inputPdfPath))
             {
@@ -29,23 +33,19 @@ namespace PdfImageResizer
                 return;
             }
 
-            if (!File.Exists(configPath))
+            if (!File.Exists(configFilePath))
             {
-                Console.Error.WriteLine($"Configuration file not found: {configPath}");
+                Console.Error.WriteLine($"Configuration file not found: {configFilePath}");
                 return;
             }
 
-            // Load configuration: a JSON object where keys are page numbers (as strings) and values are width/height.
-            // Example:
-            // {
-            //   "1": { "Width": 200, "Height": 150 },
-            //   "3": { "Width": 300, "Height": 250 }
-            // }
-            Dictionary<string, PageImageSize> config;
+            // Load configuration: a JSON object where the key is the page number (1‑based)
+            // and the value contains Width and Height (points).
+            Dictionary<int, PageImageSize> pageSizes;
             try
             {
-                string json = File.ReadAllText(configPath);
-                config = JsonSerializer.Deserialize<Dictionary<string, PageImageSize>>(json);
+                string json = File.ReadAllText(configFilePath);
+                pageSizes = JsonSerializer.Deserialize<Dictionary<int, PageImageSize>>(json);
             }
             catch (Exception ex)
             {
@@ -53,29 +53,75 @@ namespace PdfImageResizer
                 return;
             }
 
-            // Open the PDF document inside a using block for deterministic disposal.
             using (Document doc = new Document(inputPdfPath))
             {
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement).
-                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+                // Iterate pages (Aspose.Pdf uses 1‑based indexing).
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    // Check if a size is defined for this page.
-                    if (!config.TryGetValue(pageNumber.ToString(), out PageImageSize targetSize))
-                        continue; // No resizing needed for this page.
+                    if (!pageSizes.TryGetValue(pageIndex, out PageImageSize targetSize))
+                        continue; // No resizing defined for this page.
 
-                    Page page = doc.Pages[pageNumber];
+                    Page page = doc.Pages[pageIndex];
+                    var images = page.Resources.Images;
 
-                    // Resize raster images that are placed on the page via the high‑level Image class.
-                    // The Image class (Aspose.Pdf.Drawing.Image) does not expose Width/Height properties.
-                    // Use FixWidth and FixHeight to set the desired dimensions.
-                    foreach (var img in page.Paragraphs.OfType<Image>())
+                    // If the page contains no images, skip.
+                    if (images == null || images.Count == 0)
+                        continue;
+
+                    // XImageCollection is 1‑based as well.
+                    for (int imgIdx = 1; imgIdx <= images.Count; imgIdx++)
                     {
-                        img.FixWidth = targetSize.Width;
-                        img.FixHeight = targetSize.Height;
+                        XImage xImg = images[imgIdx];
+
+                        // Extract the original image into a memory stream.
+                        using (MemoryStream originalStream = new MemoryStream())
+                        {
+                            xImg.Save(originalStream);
+                            originalStream.Position = 0;
+
+                            // Load with System.Drawing for resizing.
+                            using (System.Drawing.Image original = System.Drawing.Image.FromStream(originalStream))
+                            {
+                                // Convert target size from points to pixels.
+                                int targetPixelWidth = (int)Math.Round(targetSize.Width * TargetDpi / 72.0);
+                                int targetPixelHeight = (int)Math.Round(targetSize.Height * TargetDpi / 72.0);
+
+                                // Guard against zero dimensions.
+                                if (targetPixelWidth <= 0) targetPixelWidth = original.Width;
+                                if (targetPixelHeight <= 0) targetPixelHeight = original.Height;
+
+                                using (Bitmap resized = new Bitmap(targetPixelWidth, targetPixelHeight))
+                                {
+                                    resized.SetResolution(TargetDpi, TargetDpi);
+                                    using (Graphics g = Graphics.FromImage(resized))
+                                    {
+                                        g.CompositingQuality = CompositingQuality.HighQuality;
+                                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                                        g.SmoothingMode = SmoothingMode.HighQuality;
+                                        g.DrawImage(original, 0, 0, targetPixelWidth, targetPixelHeight);
+                                    }
+
+                                    // Save the resized bitmap to a new stream (preserve PNG format for lossless result).
+                                    using (MemoryStream resizedStream = new MemoryStream())
+                                    {
+                                        // Preserve original format when possible.
+                                        ImageFormat fmt = original.RawFormat;
+                                        // Fallback to PNG if format is unknown.
+                                        if (fmt.Equals(ImageFormat.MemoryBmp) || fmt.Equals(ImageFormat.Wmf) || fmt.Equals(ImageFormat.Emf))
+                                            fmt = ImageFormat.Png;
+
+                                        resized.Save(resizedStream, fmt);
+                                        resizedStream.Position = 0;
+
+                                        // Replace the image in the PDF with the resized version.
+                                        images.Replace(imgIdx, resizedStream);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
-                // Save the modified PDF. No SaveOptions needed for PDF output.
                 doc.Save(outputPdfPath);
             }
 

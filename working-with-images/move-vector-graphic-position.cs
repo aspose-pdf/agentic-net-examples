@@ -1,8 +1,8 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf; // Core PDF API (Matrix lives here)
 
-class Program
+class MoveVectorGraphic
 {
     static void Main()
     {
@@ -18,68 +18,55 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Work on the first page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[1];
-
-            // Retrieve the XObject collection. The property name changed between
-            // Aspose.Pdf versions ("XObjects" in older releases, "XObjectResources"
-            // in newer ones). We use reflection to support both without a compile‑time
-            // dependency on a specific version.
-            var resources = page.Resources;
-            var xObjectProp = resources.GetType().GetProperty("XObjects") ??
-                               resources.GetType().GetProperty("XObjectResources");
-            if (xObjectProp == null)
+            // Choose the page that contains the vector graphic (1‑based index)
+            const int pageNumber = 1;
+            if (pageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine("No XObject collection found on the page resources.");
-                doc.Save(outputPath);
+                Console.Error.WriteLine($"Page {pageNumber} does not exist.");
                 return;
             }
 
-            var xObjectCollection = xObjectProp.GetValue(resources) as System.Collections.IEnumerable;
-            if (xObjectCollection == null)
+            Page page = doc.Pages[pageNumber];
+
+            // Vector graphics are stored as Form XObjects (XForm) in the page resources.
+            XForm targetForm = null;
+            foreach (XForm form in page.Resources.Forms)
             {
-                Console.Error.WriteLine("Unable to enumerate XObjects.");
-                doc.Save(outputPath);
+                // Simple heuristic: assume the XForm has a non‑null Matrix (most vector graphics do).
+                if (form.Matrix != null)
+                {
+                    targetForm = form;
+                    break;
+                }
+            }
+
+            if (targetForm == null)
+            {
+                Console.Error.WriteLine("No vector graphic XForm found on the specified page.");
                 return;
             }
 
-            // Define translation offsets (e.g., 50 points right, 30 points up)
-            const double dx = 50;   // horizontal shift
-            const double dy = -30;  // vertical shift (PDF origin is bottom‑left)
+            // Current transformation matrix (if any). If null, use identity matrix.
+            Aspose.Pdf.Matrix currentMatrix = targetForm.Matrix ?? new Aspose.Pdf.Matrix();
 
-            // Use reflection to manipulate FormXObject objects without referencing
-            // the Aspose.Pdf.XObjects namespace (which may be absent in some versions).
-            foreach (var obj in xObjectCollection)
-            {
-                if (obj == null) continue;
+            // Define translation offsets (e.g., move 100 points right and 50 points up)
+            double offsetX = 100.0;
+            double offsetY = 50.0;
 
-                var objType = obj.GetType();
-                // FormXObject (or any XObject that supports a Matrix) has a "Matrix" property.
-                var matrixProp = objType.GetProperty("Matrix");
-                if (matrixProp == null) continue;
+            // Create a translation matrix
+            Aspose.Pdf.Matrix translation = new Aspose.Pdf.Matrix(1, 0, 0, 1, offsetX, offsetY);
 
-                // Get or create the Matrix instance.
-                var matrix = matrixProp.GetValue(obj);
-                if (matrix == null)
-                {
-                    // Matrix class lives in Aspose.Pdf namespace.
-                    var matrixCtor = typeof(Matrix).GetConstructor(Type.EmptyTypes);
-                    matrix = matrixCtor.Invoke(null);
-                    matrixProp.SetValue(obj, matrix);
-                }
+            // Combine the existing matrix with the translation.
+            // Multiplication order matters: newMatrix = translation * currentMatrix
+            Aspose.Pdf.Matrix newMatrix = translation.Multiply(currentMatrix);
 
-                // Call Matrix.Translate(dx, dy) via reflection.
-                var translateMethod = matrix.GetType().GetMethod("Translate", new[] { typeof(double), typeof(double) });
-                if (translateMethod != null)
-                {
-                    translateMethod.Invoke(matrix, new object[] { dx, dy });
-                }
-            }
+            // Apply the new matrix to the XForm
+            targetForm.Matrix = newMatrix;
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Vector graphic(s) moved and saved to '{outputPath}'.");
+        Console.WriteLine($"Vector graphic moved and saved to '{outputPath}'.");
     }
 }
