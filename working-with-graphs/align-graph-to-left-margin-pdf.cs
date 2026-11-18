@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // Graph, Line, Rectangle, etc.
 
 class Program
 {
@@ -10,12 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-
-        // Offset from the left margin (in points)
-        const double leftOffset = 50;
-        // Desired size of the graph
-        const double graphWidth = 400;
-        const double graphHeight = 300;
+        const double offset = 20.0; // points offset from left margin
 
         if (!File.Exists(inputPath))
         {
@@ -23,31 +17,58 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
+            // Ensure there is at least one page
             Page page = doc.Pages[1];
 
-            // Create a Graph with the required size
+            // Graph dimensions (use double as required by the non‑obsolete constructor)
+            const double graphWidth = 400.0;
+            const double graphHeight = 300.0;
+
+            // Position the graph: left margin + offset, top margin + offset
+            double left = page.PageInfo.Margin.Left + offset;
+            double top = page.PageInfo.Margin.Top + offset;
+
+            // Y origin in PDF is bottom‑left, so compute lower‑left Y coordinate
+            double lly = page.PageInfo.Height - top - graphHeight;
+
+            // Create the graph with double parameters (non‑obsolete constructor)
             Graph graph = new Graph(graphWidth, graphHeight);
-            // Position the graph: left offset from the page left edge and top offset from the page top edge
-            graph.Left = leftOffset;
-            // In Aspose.Pdf the Y‑coordinate is measured from the bottom, so we subtract the offset from the page height
-            graph.Top = page.PageInfo.Height - leftOffset;
+            graph.Left = (float)left;
+            graph.Top = (float)lly;
 
-            // Optional: add a title to the graph
-            graph.Title = new TextFragment("Sample Chart");
+            // Sample data for a simple column chart
+            double[] values = { 10, 20, 30 };
+            double max = 30; // maximum value for scaling
+            int barCount = values.Length;
+            float spacing = 10f; // space between bars
+            float barWidth = (float)((graphWidth - (spacing * (barCount + 1))) / barCount);
+            float scale = (float)(graphHeight / max);
 
-            // Add a simple shape (a bar) to illustrate the graph content
-            // Use fully‑qualified type to avoid ambiguity between Aspose.Pdf.Rectangle and Aspose.Pdf.Drawing.Rectangle
-            Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle(20f, 0f, 40f, 120f);
-            bar.Text = new TextFragment("Q1");
-            bar.GraphInfo.FillColor = Color.SteelBlue;
-            bar.GraphInfo.Color = Color.Black;
-            graph.Shapes.Add(bar);
+            // Draw X‑axis line
+            Line xAxis = new Line(new float[] { 0, 0, (float)graphWidth, 0 });
+            xAxis.GraphInfo.Color = Color.Black;
+            graph.Shapes.Add(xAxis);
 
-            // Place the graph on the page
+            // Draw Y‑axis line
+            Line yAxis = new Line(new float[] { 0, 0, 0, (float)graphHeight });
+            yAxis.GraphInfo.Color = Color.Black;
+            graph.Shapes.Add(yAxis);
+
+            // Draw bars
+            for (int i = 0; i < barCount; i++)
+            {
+                float barHeight = (float)(values[i] * scale);
+                float x = spacing + i * (barWidth + spacing);
+                // Rectangle defined by lower‑left (x,0) and upper‑right (x+barWidth, barHeight)
+                Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle(x, 0, x + barWidth, barHeight);
+                bar.GraphInfo.FillColor = Color.SteelBlue;
+                bar.GraphInfo.LineWidth = 1f;
+                graph.Shapes.Add(bar);
+            }
+
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
             // Save the modified PDF

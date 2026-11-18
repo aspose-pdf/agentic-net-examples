@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // for Graph and shape types
+using Aspose.Pdf.Text; // for TextFragment if needed
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,73 +19,71 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
             for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
                 Page page = doc.Pages[pageIndex];
 
-                // Page dimensions
-                double pageWidth = page.PageInfo.Width;
-                double pageHeight = page.PageInfo.Height;
-
-                // Shapes are stored inside Graph objects that are added to the page's Paragraphs collection.
-                foreach (var paragraph in page.Paragraphs)
+                // Iterate all Rectangle shapes on the page.
+                // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle.
+                foreach (Aspose.Pdf.Rectangle shape in page.Paragraphs.OfType<Aspose.Pdf.Rectangle>())
                 {
-                    if (paragraph is Graph graph)
+                    // Retrieve the page size (media box) for boundary checks
+                    double pageWidth  = page.PageInfo.Width;
+                    double pageHeight = page.PageInfo.Height;
+
+                    // Current shape bounds
+                    double llx = shape.LLX; // lower‑left X
+                    double lly = shape.LLY; // lower‑left Y
+                    double urx = shape.URX; // upper‑right X
+                    double ury = shape.URY; // upper‑right Y
+
+                    bool moved = false;
+
+                    // If shape extends beyond the right edge, shift it left
+                    if (urx > pageWidth)
                     {
-                        // Iterate over each shape in the graph
-                        foreach (var shape in graph.Shapes)
-                        {
-                            // We only know how to adjust rectangle‑type shapes because they expose
-                            // Left, Bottom, Width and Height. Other shape types would need their own
-                            // handling logic.
-                            if (shape is Aspose.Pdf.Drawing.Rectangle rectShape)
-                            {
-                                // Current bounds of the rectangle shape
-                                double left   = rectShape.Left;
-                                double bottom = rectShape.Bottom;
-                                double right  = left + rectShape.Width;
-                                double top    = bottom + rectShape.Height;
+                        double shift = urx - pageWidth;
+                        shape.LLX -= shift;
+                        shape.URX -= shift;
+                        moved = true;
+                    }
 
-                                // Horizontal correction
-                                if (left < 0)
-                                {
-                                    double shift = -left;
-                                    left  += shift;
-                                    right += shift;
-                                }
-                                else if (right > pageWidth)
-                                {
-                                    double shift = right - pageWidth;
-                                    left  -= shift;
-                                    right -= shift;
-                                }
+                    // If shape extends beyond the left edge, shift it right
+                    if (shape.LLX < 0)
+                    {
+                        double shift = -shape.LLX;
+                        shape.LLX += shift;
+                        shape.URX += shift;
+                        moved = true;
+                    }
 
-                                // Vertical correction
-                                if (bottom < 0)
-                                {
-                                    double shift = -bottom;
-                                    bottom += shift;
-                                    top    += shift;
-                                }
-                                else if (top > pageHeight)
-                                {
-                                    double shift = top - pageHeight;
-                                    bottom -= shift;
-                                    top    -= shift;
-                                }
+                    // If shape extends beyond the top edge, shift it down
+                    if (ury > pageHeight)
+                    {
+                        double shift = ury - pageHeight;
+                        shape.LLY -= shift;
+                        shape.URY -= shift;
+                        moved = true;
+                    }
 
-                                // Apply the corrected position back to the rectangle shape.
-                                // Width and Height stay the same; only Left and Bottom are updated.
-                                rectShape.Left   = (float)left;
-                                rectShape.Bottom = (float)bottom;
-                            }
-                        }
+                    // If shape extends beyond the bottom edge, shift it up
+                    if (shape.LLY < 0)
+                    {
+                        double shift = -shape.LLY;
+                        shape.LLY += shift;
+                        shape.URY += shift;
+                        moved = true;
+                    }
+
+                    if (moved)
+                    {
+                        Console.WriteLine($"Adjusted shape on page {pageIndex}: LLX={shape.LLX}, LLY={shape.LLY}, URX={shape.URX}, URY={shape.URY}");
                     }
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified document (save inside the using block)
             doc.Save(outputPath);
         }
 

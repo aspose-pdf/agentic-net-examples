@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "rotated_graph.pdf";
-        const double rotationDegrees = 45; // rotation angle in degrees
+        const double rotationAngle = 45; // rotation angle in degrees
 
         if (!File.Exists(inputPath))
         {
@@ -17,40 +17,31 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add a new page to place the graph
-            Page page = doc.Pages.Add();
+            // Work with the first page (1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Define graph size (width x height)
-            double graphWidth = 300.0;
-            double graphHeight = 200.0;
+            // Create a Graph element at position (100, 500) with size 200x200
+            // Use the double‑parameter constructor (the float overload is obsolete)
+            Graph graph = new Graph(100.0, 500.0);
+            graph.Width = 200;
+            graph.Height = 200;
 
-            // Create the graph with explicit width and height
-            Graph graph = new Graph(graphWidth, graphHeight);
+            // Add a simple rectangle shape to the graph for visual reference
+            // Fully qualify the drawing Rectangle to avoid ambiguity with Aspose.Pdf.Rectangle
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 200);
+            rect.GraphInfo.FillColor = Color.LightGray; // fill color
+            rect.GraphInfo.Color = Color.Black;          // border color
+            rect.GraphInfo.LineWidth = 1;                // border thickness
 
-            // Position the graph on the page (coordinates are from the lower‑left corner)
-            graph.Left = 100;   // X position
-            graph.Top = 500;    // Y position
+            // Apply rotation to the rectangle via its GraphInfo (Graph itself has no Transformations)
+            rect.GraphInfo.RotationAngle = rotationAngle;
 
-            // Apply rotation and fill color via GraphInfo
-            graph.GraphInfo = new GraphInfo
-            {
-                RotationAngle = rotationDegrees,
-                FillColor = Color.LightGray
-            };
+            graph.Shapes.Add(rect);
 
-            // Set a border for the graph
-            graph.Border = new BorderInfo(BorderSide.All, 1, Color.Black);
-
-            // Add a simple line shape as sample data
-            Line line = new Line(new float[] { 0, 0, 300, 0 });
-            line.GraphInfo.Color = Color.Blue;
-            line.GraphInfo.LineWidth = 2;
-            graph.Shapes.Add(line);
-
-            // Add the graph to the page's paragraphs collection
+            // Add the graph to the page's content
             page.Paragraphs.Add(graph);
 
             // Save the modified PDF

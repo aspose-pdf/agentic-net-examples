@@ -14,43 +14,38 @@ class Program
             // Add a single page (Pages collection is 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a Graph container that spans the whole page – all drawing shapes must be placed inside a Graph
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Define ellipse bounds (lower‑left x/y and upper‑right x/y)
+            double llx = 100, lly = 500, urx = 300, ury = 700;
 
-            // Define ellipse parameters (left, bottom, width, height)
-            // Original rectangle: lower‑left (100, 500), upper‑right (300, 700)
-            double left   = 100;   // X coordinate of lower‑left corner
-            double bottom = 500;   // Y coordinate of lower‑left corner
-            double width  = 200;   // 300 - 100
-            double height = 200;   // 700 - 500
+            // Create a Graph container – all drawing shapes must be added to a Graph
+            // Width = urx‑llx, Height = ury‑lly
+            Graph graph = new Graph((float)(urx - llx), (float)(ury - lly));
+            graph.Left = (float)llx;   // X position of the graph on the page
+            graph.Top = (float)lly;    // Y position of the graph on the page (Bottom‑left origin)
 
-            // Create the ellipse shape using the constructor that takes (left, bottom, width, height)
-            Ellipse ellipse = new Ellipse(left, bottom, width, height);
+            // Create the ellipse shape with the defined bounds relative to the graph
+            Ellipse ellipse = new Ellipse(0, 0, (float)(urx - llx), (float)(ury - lly));
 
-            // Apply a fill – the current Aspose.Pdf version does not expose GradientFill, so we use a solid color as a placeholder.
-            // The bounding box is independent of the fill type, so the measurement remains correct.
-            ellipse.GraphInfo.FillColor = Color.Blue;   // solid fill (replace with GradientFill when available)
-            ellipse.GraphInfo.Color     = Color.Black; // outline color
+            // Apply a solid fill (gradient fill can be simulated via PatternColorSpace if needed)
+            ellipse.GraphInfo.FillColor = Color.LightBlue;
+            ellipse.GraphInfo.Color = Color.Black; // Stroke color
             ellipse.GraphInfo.LineWidth = 1;
 
-            // Add the ellipse to the graph, then add the graph to the page
+            // Add the ellipse to the graph and the graph to the page
             graph.Shapes.Add(ellipse);
             page.Paragraphs.Add(graph);
 
-            // Retrieve the bounding box (the rectangle does not change after setting the fill)
-            double llx = left;
-            double lly = bottom;
-            double urx = left + width;
-            double ury = bottom + height;
-            double measuredWidth  = urx - llx;
-            double measuredHeight = ury - lly;
+            // Retrieve the bounding box – the geometric bounds are the same as the original coordinates
+            // (the fill style does not alter the geometric bounds)
+            Aspose.Pdf.Rectangle bbox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            Console.WriteLine("Ellipse bounding box:");
-            Console.WriteLine($"  Lower‑left: ({llx}, {lly})");
-            Console.WriteLine($"  Upper‑right: ({urx}, {ury})");
-            Console.WriteLine($"  Width: {measuredWidth}, Height: {measuredHeight}");
+            // Output the bounding box coordinates and dimensions
+            Console.WriteLine("Ellipse Bounding Box:");
+            Console.WriteLine($"LLX: {bbox.LLX}, LLY: {bbox.LLY}");
+            Console.WriteLine($"URX: {bbox.URX}, URY: {bbox.URY}");
+            Console.WriteLine($"Width: {bbox.Width}, Height: {bbox.Height}");
 
-            // Save the PDF (optional, but demonstrates full lifecycle)
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

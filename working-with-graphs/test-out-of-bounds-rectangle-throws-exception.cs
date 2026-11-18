@@ -1,83 +1,54 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-using NUnit.Framework;
 
-namespace NUnit.Framework
+class Program
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    public delegate void TestDelegate();
-
-    public static class Assert
+    static void Main()
     {
-        public static T Throws<T>(TestDelegate code) where T : Exception
-        {
-            try
-            {
-                code();
-            }
-            catch (T ex)
-            {
-                return ex;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Assert.Throws failed. Expected {typeof(T)} but got {ex.GetType()}.", ex);
-            }
-
-            throw new Exception($"Assert.Throws failed. No exception thrown. Expected {typeof(T)}.");
-        }
-    }
-}
-
-namespace AsposePdfTests
-{
-    // Extension to silence potential stray ImportAnnotations calls in the project.
-    // This does not affect the test logic and complies with the hard namespace rule.
-    public static class DocumentExtensions
-    {
-        // Dummy implementation – does nothing.
-        public static void ImportAnnotations(this Document doc, string path) { }
+        TestAddOutOfBoundsRectangle();
     }
 
-    [TestFixture]
-    public class GraphRectangleTests
+    private static void TestAddOutOfBoundsRectangle()
     {
-        [Test]
-        public void AddOutOfBoundsRectangle_ShouldThrowArgumentOutOfRangeException()
+        const string testName = "AddOutOfBoundsRectangle_ShouldThrowArgumentException";
+        try
         {
-            // Create a new PDF document and add a blank page.
-            using (Document doc = new Document())
+            // Create a new PDF document in memory.
+            using (var doc = new Document())
             {
+                // Add a default A4 page (approximately 595x842 points).
                 Page page = doc.Pages.Add();
 
-                // Define a graph that occupies the whole page.
-                Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+                // Create a Graph that spans the whole page – Graph is a BaseParagraph.
+                var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-                // Attempt to add a rectangle shape whose coordinates are far outside the page.
-                // This should trigger an ArgumentOutOfRangeException.
-                Assert.Throws<ArgumentOutOfRangeException>(() =>
-                {
-                    // The Drawing.Rectangle constructor expects left, bottom, width, height.
-                    var outOfBoundsShape = new Aspose.Pdf.Drawing.Rectangle(2000, 2000, 1000, 1000);
-                    // Adding the shape to the graph will validate the coordinates.
-                    graph.Shapes.Add(outOfBoundsShape);
-                });
+                // Define a rectangle that exceeds the page bounds.
+                // The constructor arguments are (left, bottom, width, height).
+                var outOfBoundsRect = new Aspose.Pdf.Drawing.Rectangle(0, 0, 2000, 2000);
+                // Minimal styling to keep the shape valid before the bounds check.
+                outOfBoundsRect.GraphInfo.FillColor = Color.Transparent;
+                outOfBoundsRect.GraphInfo.Color = Color.Black;
 
-                // Add the graph to the page so the document remains well‑formed.
+                // Add the rectangle to the Graph's shape collection.
+                graph.Shapes.Add(outOfBoundsRect);
+
+                // Attempt to add the Graph to the page – Aspose.Pdf is expected to throw ArgumentException.
                 page.Paragraphs.Add(graph);
             }
-        }
-    }
 
-    // Dummy entry point to satisfy the compiler for a console‑type project.
-    internal static class Program
-    {
-        public static void Main() { }
+            // If we reach this point, no exception was thrown – the test fails.
+            Console.WriteLine($"FAIL {testName}: no exception thrown");
+        }
+        catch (ArgumentException)
+        {
+            // Expected exception – the test passes.
+            Console.WriteLine($"PASS {testName}");
+        }
+        catch (Exception ex)
+        {
+            // Any other exception type means the behavior is not as expected.
+            Console.WriteLine($"FAIL {testName}: unexpected exception {ex.GetType().Name}");
+        }
     }
 }

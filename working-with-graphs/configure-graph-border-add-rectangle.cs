@@ -10,49 +10,51 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Ensure the input PDF exists; otherwise create a blank document.
         if (!File.Exists(inputPath))
         {
-            using (Document blank = new Document())
-            {
-                blank.Pages.Add();
-                blank.Save(inputPath);
-            }
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Open the PDF and work within a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Add a new page if the document has none.
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
-
-            // Use the first page for demonstration.
             Page page = doc.Pages[1];
 
-            // Create a Graph container sized to the page.
+            // Create a Graph that covers the whole page
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            graph.Left = 0f;
+            graph.Top = page.PageInfo.Height;
 
-            // Define a rectangle shape (left, bottom, width, height).
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(100, 300, 200, 200);
+            // Configure line appearance for all shapes added to the graph
+            graph.GraphInfo.LineWidth = 2f;                     // 2 points line width
+            graph.GraphInfo.DashArray = new int[] { 3, 2 };    // dash: 3 on, 2 off
+            graph.GraphInfo.Color = Color.Black;              // stroke colour
 
-            // Configure the rectangle's border (line width and dash style) via GraphInfo.
-            rectShape.GraphInfo.Color = Aspose.Pdf.Color.Blue;          // Border color
-            rectShape.GraphInfo.LineWidth = 2.0f;                        // Border thickness
-            rectShape.GraphInfo.DashArray = new int[] { 3, 2 };         // 3 units on, 2 units off
-            rectShape.GraphInfo.DashPhase = 0;                         // Start of dash pattern
-            rectShape.GraphInfo.FillColor = Aspose.Pdf.Color.Transparent; // No fill
+            // Outer border (10 points margin)
+            float outerMargin = 10f;
+            var outerRect = new Aspose.Pdf.Drawing.Rectangle(
+                outerMargin,
+                outerMargin,
+                (float)page.PageInfo.Width - 2 * outerMargin,
+                (float)page.PageInfo.Height - 2 * outerMargin);
+            graph.Shapes.Add(outerRect);
 
-            // Add the rectangle to the graph.
-            graph.Shapes.Add(rectShape);
+            // Inner border (50 points margin)
+            float innerMargin = 50f;
+            var innerRect = new Aspose.Pdf.Drawing.Rectangle(
+                innerMargin,
+                innerMargin,
+                (float)page.PageInfo.Width - 2 * innerMargin,
+                (float)page.PageInfo.Height - 2 * innerMargin);
+            graph.Shapes.Add(innerRect);
 
-            // Add the graph to the page.
+            // Attach the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom rectangle border to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with custom borders to '{outputPath}'.");
     }
 }

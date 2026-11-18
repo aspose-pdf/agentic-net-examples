@@ -2,6 +2,10 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
+
+// Alias to avoid conflict with Aspose.Pdf.Rectangle (which is a different type)
+using DrawRect = Aspose.Pdf.Drawing.Rectangle;
 
 class Program
 {
@@ -15,31 +19,39 @@ class Program
             // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a Graph object (size 500x500, positioned at (0,0))
-            Graph graph = new Graph(500, 500);
-            graph.Left = 0;
-            graph.Top = 0;
+            // Create a graph of the desired size (width, height) using the double constructor
+            Graph graph = new Graph(500.0, 500.0)
+            {
+                Left = 0,
+                Top = 0,
+                Border = new BorderInfo(BorderSide.All, 1f, Color.Black),
+                Title = new TextFragment("Scaled Shapes Demo")
+            };
 
-            // Add a rectangle shape and scale it by 150 %
-            var rectShape = new Aspose.Pdf.Drawing.Rectangle(50, 50, 200, 150);
-            rectShape.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;   // fill
-            rectShape.GraphInfo.Color = Aspose.Pdf.Color.Black;          // stroke
-            rectShape.GraphInfo.ScalingRateX = 1.5f;                     // 150 % X scale
-            rectShape.GraphInfo.ScalingRateY = 1.5f;                     // 150 % Y scale
-            graph.Shapes.Add(rectShape);
+            // ----- Rectangle shape -----
+            DrawRect rect = new DrawRect(100, 100, 200, 100);
+            rect.GraphInfo.FillColor = Color.LightGray;   // fill
+            rect.GraphInfo.Color = Color.Black;           // stroke colour
+            rect.GraphInfo.LineWidth = 2;                 // stroke width
+            // Scale this shape by 150 %
+            rect.GraphInfo.ScalingRateX = 1.5f;
+            rect.GraphInfo.ScalingRateY = 1.5f;
+            graph.Shapes.Add(rect);
 
-            // Add an ellipse shape and scale it by 150 %
-            var ellipseShape = new Ellipse(250, 250, 400, 400);
-            ellipseShape.GraphInfo.FillColor = Aspose.Pdf.Color.LightBlue;
-            ellipseShape.GraphInfo.Color = Aspose.Pdf.Color.DarkBlue;
-            ellipseShape.GraphInfo.ScalingRateX = 1.5f;
-            ellipseShape.GraphInfo.ScalingRateY = 1.5f;
-            graph.Shapes.Add(ellipseShape);
+            // ----- Ellipse shape -----
+            Ellipse ellipse = new Ellipse(150, 250, 200, 150);
+            ellipse.GraphInfo.FillColor = Color.FromRgb(0.2, 0.5, 0.8);
+            ellipse.GraphInfo.Color = Color.Black;
+            ellipse.GraphInfo.LineWidth = 1.5f;
+            // Scale this shape by 150 %
+            ellipse.GraphInfo.ScalingRateX = 1.5f;
+            ellipse.GraphInfo.ScalingRateY = 1.5f;
+            graph.Shapes.Add(ellipse);
 
-            // Render the graph on the page
+            // Place the graph onto the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the PDF
             doc.Save(outputPath);
         }
 

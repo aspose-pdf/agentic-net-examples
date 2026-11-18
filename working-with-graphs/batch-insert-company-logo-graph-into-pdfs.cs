@@ -1,106 +1,91 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
-class BatchGraphInserter
+class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        string inputFolder  = "InputPdfs";
+        // Folder containing source PDFs
+        string inputFolder = "InputPdfs";
+        // Folder where processed PDFs will be saved
         string outputFolder = "OutputPdfs";
-        string graphPath    = "graph.png";   // predefined graph image
-        string logoPath     = "logo.png";    // company logo image
+        // Path to the predefined graph image to insert
+        string graphImagePath = "graph.png";
+        // Text to display inside the logo rectangle
+        string logoText = "Company Logo";
 
-        // Validate folders and resources
         if (!Directory.Exists(inputFolder))
         {
             Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
+
         Directory.CreateDirectory(outputFolder);
 
-        if (!File.Exists(graphPath) || !File.Exists(logoPath))
+        if (!File.Exists(graphImagePath))
         {
-            Console.Error.WriteLine("Graph or logo image file missing.");
+            Console.Error.WriteLine($"Graph image not found: {graphImagePath}");
             return;
         }
 
-        // Process each PDF in the input folder
-        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        foreach (string pdfPath in pdfFiles)
         {
-            // Disambiguate System.IO.Path calls
-            string fileName   = System.IO.Path.GetFileName(pdfFile);
-            string outputPath = System.IO.Path.Combine(outputFolder, fileName);
-
             try
             {
-                // Load PDF – Document must be wrapped in a using block (lifecycle rule)
-                using (Document doc = new Document(pdfFile))
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Ensure the document has at least one page (page indexing is 1‑based)
-                    if (doc.Pages.Count == 0)
-                        doc.Pages.Add();
-
-                    // Work with the first page (adjust index if needed)
-                    Page page = doc.Pages[1];
-
                     // -------------------------------------------------
-                    // Insert the predefined graph image using ImageStamp
+                    // Insert the predefined graph image on the first page
                     // -------------------------------------------------
-                    ImageStamp graphStamp = new ImageStamp(graphPath)
+                    ImageStamp graphStamp = new ImageStamp(graphImagePath)
                     {
-                        // Position using alignment + indents (XPosition/YPosition are not available)
-                        HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment   = VerticalAlignment.Bottom,
-                        XIndent = 50,   // distance from the left edge
-                        YIndent = 500,  // distance from the bottom edge
-                        Width   = 500,
-                        Height  = 250,
-                        Background = false
+                        Background = false,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Top,
+                        XIndent = 0,               // Centered horizontally
+                        YIndent = 20,              // 20 points from the top edge
+                        Width = 400,               // Desired width of the graph
+                        Height = 300               // Desired height of the graph
                     };
-                    page.AddStamp(graphStamp);
+                    doc.Pages[1].AddStamp(graphStamp);    // Add to the first page
 
                     // -------------------------------------------------
-                    // Insert a rectangle that will contain the company logo
+                    // Insert a logo rectangle (as a TextStamp with background)
                     // -------------------------------------------------
-                    // Create a Graph container that spans the whole page (size can be page size)
-                    Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-                    // Define rectangle shape (left, bottom, width, height)
-                    Aspose.Pdf.Drawing.Rectangle logoRect = new Aspose.Pdf.Drawing.Rectangle(400, 100, 100, 100);
-                    logoRect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;   // background colour
-                    logoRect.GraphInfo.Color     = Aspose.Pdf.Color.Black;      // border colour
-                    logoRect.GraphInfo.LineWidth = 1;
-
-                    graph.Shapes.Add(logoRect);
-                    page.Paragraphs.Add(graph);
-
-                    // -------------------------------------------------
-                    // Insert the logo image inside the rectangle using ImageStamp
-                    // -------------------------------------------------
-                    ImageStamp logoStamp = new ImageStamp(logoPath)
+                    TextStamp logoStamp = new TextStamp(logoText)
                     {
+                        Background = true,                     // make it a background stamp
                         HorizontalAlignment = HorizontalAlignment.Left,
-                        VerticalAlignment   = VerticalAlignment.Bottom,
-                        XIndent = 410,   // slightly inside the rectangle (left offset)
-                        YIndent = 110,   // slightly above the bottom of the rectangle (bottom offset)
-                        Width   = 100,
-                        Height  = 100,
-                        Background = false
+                        VerticalAlignment = VerticalAlignment.Bottom,
+                        XIndent = 20,               // 20 points from the left edge
+                        YIndent = 20,               // 20 points from the bottom edge
+                        Width = 150,                // Width of the rectangle
+                        Height = 50                 // Height of the rectangle
                     };
-                    page.AddStamp(logoStamp);
+                    // Text appearance
+                    logoStamp.TextState.Font = FontRepository.FindFont("Arial");
+                    logoStamp.TextState.FontSize = 12;
+                    logoStamp.TextState.ForegroundColor = Color.Black;
+                    // Background colour of the rectangle – use TextState.BackgroundColor (TextStamp has no BackgroundColor property)
+                    logoStamp.TextState.BackgroundColor = Color.LightGray;
 
-                    // Save the modified PDF – Save() is called inside the using block
+                    doc.Pages[1].AddStamp(logoStamp);    // Add to the first page
+
+                    // Save the modified PDF to the output folder
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {fileName} → {outputPath}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing {pdfPath}: {ex.Message}");
             }
         }
     }

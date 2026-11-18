@@ -7,61 +7,59 @@ class Program
 {
     static void Main()
     {
-        // Lookup table: shape index -> border color
-        var borderColors = new Dictionary<int, Aspose.Pdf.Color>
-        {
-            { 0, Aspose.Pdf.Color.FromRgb(1, 0, 0) }, // Red
-            { 1, Aspose.Pdf.Color.FromRgb(0, 1, 0) }, // Green
-            { 2, Aspose.Pdf.Color.FromRgb(0, 0, 1) }, // Blue
-            { 3, Aspose.Pdf.Color.FromRgb(1, 1, 0) }  // Yellow
-        };
+        const string outputPath = "graph.pdf";
 
-        // Create a new PDF document (wrapped in using for deterministic disposal)
         using (Document doc = new Document())
         {
-            // Add a single page
+            // Add a single page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Parameters for drawing circles
-            double startX = 100;      // X coordinate of first circle center
-            double centerY = 700;     // Y coordinate (same for all circles)
-            double radius = 40;       // Circle radius
-            double spacing = 120;     // Horizontal distance between circles
+            // Lookup table mapping shape index to border color (RGB values in 0‑1 range)
+            var colorLookup = new Dictionary<int, Color>
+            {
+                { 0, Color.FromRgb(1, 0, 0) }, // Red
+                { 1, Color.FromRgb(0, 1, 0) }, // Green
+                { 2, Color.FromRgb(0, 0, 1) }, // Blue
+                { 3, Color.FromRgb(1, 1, 0) }, // Yellow
+                { 4, Color.FromRgb(1, 0, 1) }  // Magenta
+            };
 
-            // Create a Graph container that will hold the drawing shapes
+            // Create a Graph that spans the whole page. The Graph constructor expects width and height (double).
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Draw four circles, each with a border color from the lookup table
-            for (int i = 0; i < 4; i++)
+            // Draw five circles, each using a border color from the lookup table
+            for (int i = 0; i < 5; i++)
             {
-                double cx = startX + i * spacing; // Current circle center X
+                double centerX = 100 + i * 100; // Horizontal spacing
+                double centerY = 600;           // Fixed vertical position
+                double radius = 30;
 
-                // Create an ellipse (circle) shape
-                Ellipse circle = new Ellipse(cx - radius, centerY - radius, cx + radius, centerY + radius);
+                // Ellipse constructor: left, bottom, width, height (all double)
+                double left   = centerX - radius;
+                double bottom = centerY - radius;
+                double width  = radius * 2;
+                double height = radius * 2;
 
-                // Determine border color; default to black if not found
-                if (!borderColors.TryGetValue(i, out Aspose.Pdf.Color border))
+                Ellipse ellipse = new Ellipse(left, bottom, width, height)
                 {
-                    border = Aspose.Pdf.Color.Black;
-                }
-
-                // Set stroke (border) and fill properties via GraphInfo
-                circle.GraphInfo = new GraphInfo
-                {
-                    LineWidth = 2,
-                    Color = border,                     // Border color
-                    FillColor = Aspose.Pdf.Color.Transparent // Transparent fill
+                    GraphInfo = new GraphInfo
+                    {
+                        Color = colorLookup[i],          // Border color
+                        FillColor = Color.Transparent    // Transparent fill
+                    }
                 };
 
-                // Add the shape to the graph container
-                graph.Shapes.Add(circle);
+                // Add the shape to the graph
+                graph.Shapes.Add(ellipse);
             }
 
-            // Add the graph (with all circles) to the page
+            // Attach the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF to disk
-            doc.Save("graph.pdf");
+            // Save the PDF document
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"PDF with graph saved to '{outputPath}'.");
     }
 }

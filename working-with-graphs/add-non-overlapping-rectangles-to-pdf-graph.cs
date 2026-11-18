@@ -1,97 +1,97 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
-    // Simple overlap check for two rectangles
-    static bool Overlaps(Rectangle r1, Rectangle r2)
-    {
-        return r1.LLX < r2.URX && r1.URX > r2.LLX &&
-               r1.LLY < r2.URY && r1.URY > r2.LLY;
-    }
-
     static void Main()
     {
-        const string outputPath = "graph_rectangles.pdf";
+        const string outputPath = "rectangles.pdf";
 
-        // Ensure output directory exists (handle case where Path.GetDirectoryName returns null)
-        string outDir = Path.GetDirectoryName(Path.GetFullPath(outputPath)) ?? Directory.GetCurrentDirectory();
-        if (!Directory.Exists(outDir))
-            Directory.CreateDirectory(outDir);
-
-        // Create a new PDF document
+        // Create a new PDF document and ensure proper disposal
         using (Document doc = new Document())
         {
-            // Add a page (first page is at index 1)
+            // Add a single page to host the rectangles
             Page page = doc.Pages.Add();
 
-            // List to keep track of placed rectangle bounds
-            List<Rectangle> placedRects = new List<Rectangle>();
+            // Create a Graph container that will hold all rectangle shapes
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Define rectangle sizes (width, height) and desired positions (llx, lly)
-            var rectDefinitions = new (double llx, double lly, double width, double height)[]
+            // Store bounds of rectangles that have been added (used for overlap checking)
+            List<Aspose.Pdf.Rectangle> existingRects = new List<Aspose.Pdf.Rectangle>();
+
+            // Define rectangle specifications (position and size)
+            var specs = new[]
             {
-                (50, 700, 100, 50),
-                (200, 700, 120, 80),
-                (350, 700, 80, 120),
-                (50, 550, 150, 70),
-                (250, 550, 100, 100),
-                (400, 550, 90, 60),
-                (100, 400, 130, 90),
-                (300, 400, 110, 110)
+                new { X = 50.0,  Y = 700.0, Width = 100.0, Height = 50.0 },
+                new { X = 200.0, Y = 650.0, Width = 120.0, Height = 80.0 },
+                new { X = 150.0, Y = 720.0, Width = 80.0,  Height = 40.0 },
+                new { X = 300.0, Y = 600.0, Width = 150.0, Height = 100.0 },
+                new { X = 100.0, Y = 500.0, Width = 200.0, Height = 150.0 }
             };
 
-            foreach (var def in rectDefinitions)
+            foreach (var s in specs)
             {
-                // Compute rectangle coordinates
-                double llx = def.llx;
-                double lly = def.lly;
-                double urx = llx + def.width;
-                double ury = lly + def.height;
-                Rectangle newRect = new Rectangle(llx, lly, urx, ury);
+                // Compute rectangle bounds (PDF coordinate system: origin at bottom‑left)
+                Aspose.Pdf.Rectangle bounds = new Aspose.Pdf.Rectangle(
+                    s.X,                 // lower‑left X (LLX)
+                    s.Y - s.Height,      // lower‑left Y (LLY)
+                    s.X + s.Width,       // upper‑right X (URX)
+                    s.Y);                // upper‑right Y (URY)
 
-                // Check against all previously placed rectangles
-                bool hasOverlap = false;
-                foreach (var existing in placedRects)
+                // Verify that the new rectangle does not overlap any existing one
+                bool overlaps = false;
+                foreach (var existing in existingRects)
                 {
-                    if (Overlaps(newRect, existing))
+                    if (RectanglesOverlap(bounds, existing))
                     {
-                        hasOverlap = true;
+                        overlaps = true;
                         break;
                     }
                 }
 
-                if (hasOverlap)
+                if (overlaps)
                 {
-                    Console.WriteLine($"Skipped rectangle at ({llx},{lly}) size ({def.width}x{def.height}) due to overlap.");
+                    // Skip this rectangle because it would intersect an existing one
                     continue;
                 }
 
-                // No overlap – add as a square annotation (the API name for a rectangular annotation)
-                SquareAnnotation squareAnnot = new SquareAnnotation(page, newRect)
-                {
-                    // FillColor property is not available in the current Aspose.Pdf version; omit it.
-                    Title = "Rect",
-                    Contents = $"Rect {placedRects.Count + 1}"
-                };
-                // Set border color and width (border color is controlled by the annotation's Color property)
-                squareAnnot.Color = Color.Black;
-                squareAnnot.Border = new Border(squareAnnot) { Width = 2 };
+                // Create the drawing rectangle (left, bottom, width, height)
+                float left   = (float)bounds.LLX;
+                float bottom = (float)bounds.LLY;
+                float width  = (float)(bounds.URX - bounds.LLX);
+                float height = (float)(bounds.URY - bounds.LLY);
 
-                page.Annotations.Add(squareAnnot);
+                Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(left, bottom, width, height);
 
-                // Store the bounds for future checks
-                placedRects.Add(newRect);
-                Console.WriteLine($"Added rectangle {placedRects.Count} at ({llx},{lly}) size ({def.width}x{def.height}).");
+                // Set visual properties via GraphInfo
+                shape.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;   // interior fill
+                shape.GraphInfo.Color     = Aspose.Pdf.Color.DarkGray;   // border color
+                shape.GraphInfo.LineWidth = 1;
+
+                // Add the shape to the graph
+                graph.Shapes.Add(shape);
+
+                // Record its bounds for subsequent overlap checks
+                existingRects.Add(bounds);
             }
 
-            // Save the resulting PDF
+            // Add the graph (which now contains all non‑overlapping rectangles) to the page
+            page.Paragraphs.Add(graph);
+
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with rectangles saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with non‑overlapping rectangles saved to '{outputPath}'.");
+    }
+
+    // Determines whether two rectangles intersect
+    static bool RectanglesOverlap(Aspose.Pdf.Rectangle a, Aspose.Pdf.Rectangle b)
+    {
+        // No overlap if one rectangle is completely to the left/right or above/below the other
+        bool noOverlap = a.URX <= b.LLX || a.LLX >= b.URX || a.URY <= b.LLY || a.LLY >= b.URY;
+        return !noOverlap;
     }
 }

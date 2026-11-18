@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -8,47 +10,47 @@ class Program
     {
         const string outputPath = "polygon_graph.pdf";
 
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
+            // Add a blank page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a Graph with double dimensions.
-            Graph graph = new Graph(400.0, 300.0);
+            // Graph constructor takes only width and height. Position it with Left/Top properties.
+            Graph graph = new Graph(500, 500)
+            {
+                Left = 0,
+                Top = 0,
+                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
+            };
+            page.Paragraphs.Add(graph);
 
-            // Define the polygon vertices (closed by repeating the first point).
+            // Define the vertices of the polygon – the first point is repeated at the end to close the shape.
             float[] polygonPoints = new float[]
             {
-                50f,  50f,
-                350f, 20f,
-                380f, 200f,
-                200f, 250f,
-                70f,  180f,
-                50f,  50f   // close the shape
+                100, 100,   // point 1
+                400, 100,   // point 2
+                300, 400,   // point 3
+                200, 400,   // point 4
+                100, 100    // close the polygon
             };
 
-            // Create the polygon as a closed Line.
+            // In Aspose.Pdf.Drawing a closed Line with a FillColor works as a polygon.
             Line polygon = new Line(polygonPoints);
 
-            // Create a simple axial gradient to use as a fill pattern.
-            GradientAxialShading axialShading = new GradientAxialShading(
-                Color.LightGray,   // start colour
-                Color.White);      // end colour
-            axialShading.Start = new Point(0, 0);
-            axialShading.End   = new Point(400, 300);
+            // Fill the polygon. Pattern fills are not directly supported in the current API, so we use a solid color.
+            // If a pattern is required, it can be simulated by drawing additional lines inside the polygon.
+            polygon.GraphInfo.FillColor = Color.LightGray;
 
-            // Apply styling via GraphInfo.
-            polygon.GraphInfo.FillColor = new Color { PatternColorSpace = axialShading };
-            polygon.GraphInfo.Color = Color.DarkBlue;   // outline colour
-            polygon.GraphInfo.LineWidth = 2;            // outline thickness
-            polygon.GraphInfo.DashArray = new int[] { 3, 2 }; // dash‑gap pattern
+            // Outline (stroke) settings – color, width and dash pattern.
+            polygon.GraphInfo.Color = Color.DarkBlue;
+            polygon.GraphInfo.LineWidth = 2f;
+            polygon.GraphInfo.DashArray = new int[] { 3, 1 }; // 3 units on, 1 unit off
 
             // Add the polygon to the graph.
             graph.Shapes.Add(polygon);
 
-            // Add the graph to the page.
-            page.Paragraphs.Add(graph);
-
-            // Save the PDF.
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

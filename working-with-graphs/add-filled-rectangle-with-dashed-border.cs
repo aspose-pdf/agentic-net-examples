@@ -13,20 +13,21 @@ class Program
             // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container with explicit width and height (the coordinate space)
-            // Width = UpperRightX - LowerLeftX, Height = UpperRightY - LowerLeftY
-            Graph graph = new Graph(300, 300); // 300 points wide, 300 points high
+            // Create a Graph container (size 500x300) – use double parameters as the float overload is obsolete
+            Graph graph = new Graph(500.0, 300.0);
+            // Position the graph on the page by setting its left/top coordinates (optional)
+            graph.Left = 50;
+            graph.Top = 500;
 
-            // Define a rectangle shape inside the graph coordinate space
-            // Parameters: lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(50, 150, 250, 50);
+            // Define a rectangle shape (left, bottom, width, height)
+            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 100, 200, 150);
 
             // Styling via GraphInfo
-            rect.GraphInfo.FillColor = Color.LightBlue;   // Fill colour
-            rect.GraphInfo.Color = Color.Black;          // Border colour
-            rect.GraphInfo.LineWidth = 2;                // Border width
-            rect.GraphInfo.DashArray = new int[] { 4, 2 }; // 4‑point dash, 2‑point gap
-            rect.GraphInfo.DashPhase = 0;
+            rect.GraphInfo.FillColor = Color.LightGray;          // Fill color
+            rect.GraphInfo.Color = Color.Black;                // Border color
+            rect.GraphInfo.LineWidth = 2;                       // Border width
+            rect.GraphInfo.DashArray = new int[] { 4, 2 };      // Dash pattern: 4 units dash, 2 units gap
+            rect.GraphInfo.DashPhase = 0;                       // Optional: start offset for dash pattern
 
             // Add the rectangle to the graph
             graph.Shapes.Add(rect);
@@ -34,10 +35,10 @@ class Program
             // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
+            // Save the PDF to the specified path
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

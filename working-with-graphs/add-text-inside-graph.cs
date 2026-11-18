@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // PDF that already contains a graph
-        const string outputPath = "output.pdf";     // Resulting PDF with added text
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,25 +16,25 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page that contains the graph (first page in this example)
-            Page page = doc.Pages[1];   // 1‑based indexing
+            // Assume the graph is on the first page; adjust the index if needed (1‑based)
+            Page page = doc.Pages[1];
 
             // Create a text fragment with the desired content
-            TextFragment tf = new TextFragment("Sample Text");
+            TextFragment text = new TextFragment("Graph Annotation");
 
-            // Set font family, size and color
-            tf.TextState.Font = FontRepository.FindFont("Arial");   // Font family
-            tf.TextState.FontSize = 14;                             // Font size
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.0, 0.5, 0.8); // Color (RGB)
+            // Set font family, size, and color
+            text.TextState.Font = FontRepository.FindFont("Arial");          // Font family
+            text.TextState.FontSize = 14;                                   // Font size
+            text.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0, 0, 1); // Blue color
 
-            // Position the text at specific coordinates (e.g., x=150, y=300)
-            tf.Position = new Position(150, 300); // Coordinates are in points
+            // Position the text at specific coordinates (e.g., x=200, y=400)
+            text.Position = new Position(200, 400);
 
-            // Add the text fragment to the page's paragraphs collection
-            page.Paragraphs.Add(tf);
+            // Add the text fragment to the page's paragraph collection
+            page.Paragraphs.Add(text);
 
             // Save the modified PDF
             doc.Save(outputPath);

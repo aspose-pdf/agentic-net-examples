@@ -1,59 +1,72 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source PDF (can be a blank page)
-        const string outputPath = "ellipse_with_text.pdf";
+        const string outputPath = "ellipse.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
-        {
-            // Use 1‑based indexing (rule: page-indexing-one-based)
-            Page page = doc.Pages[1];
+            // Determine page size
+            double pageWidth = page.PageInfo.Width;
+            double pageHeight = page.PageInfo.Height;
 
-            // Create a Graph container that covers the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Define ellipse size
+            double ellipseWidth = 200;
+            double ellipseHeight = 100;
 
-            // Define ellipse bounds: left, bottom, width, height
-            // (left=100, bottom=400, width=200, height=100) – this gives a centered ellipse between (100,400) and (300,500)
-            Aspose.Pdf.Drawing.Ellipse ellipse = new Aspose.Pdf.Drawing.Ellipse(100, 400, 200, 100);
+            // Calculate rectangle that bounds the ellipse (centered on the page)
+            double llx = (pageWidth - ellipseWidth) / 2; // left
+            double lly = (pageHeight - ellipseHeight) / 2; // bottom
 
-            // Styling via GraphInfo (border thickness, color, and semi‑transparent fill)
-            ellipse.GraphInfo.LineWidth = 5; // thick border
-            ellipse.GraphInfo.Color = Aspose.Pdf.Color.Red; // border color
-            ellipse.GraphInfo.FillColor = Aspose.Pdf.Color.FromArgb(128, 100, 150, 200); // 50% transparent fill
+            // Create a Graph container that will hold the drawing shapes
+            Graph graph = new Graph(pageWidth, pageHeight);
 
-            // Add the ellipse to the graph, then the graph to the page
+            // Create the ellipse shape (left, bottom, width, height)
+            Ellipse ellipse = new Ellipse(llx, lly, ellipseWidth, ellipseHeight);
+
+            // Style the ellipse: thick black border and semi‑transparent red fill
+            ellipse.GraphInfo = new GraphInfo
+            {
+                Color = Color.Black,          // stroke color
+                LineWidth = 3,                // thick border
+                FillColor = Color.FromArgb(128, 255, 0, 0) // semi‑transparent red
+            };
+
+            // Add the ellipse to the graph
             graph.Shapes.Add(ellipse);
+
+            // Add the graph (which now contains the ellipse) to the page
             page.Paragraphs.Add(graph);
 
-            // Centered text inside the ellipse
-            TextFragment tf = new TextFragment("Centered Text");
-            tf.TextState.FontSize = 24;
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Create a text fragment to be centered inside the ellipse
+            TextFragment tf = new TextFragment("Hello, Ellipse!");
+            tf.TextState.Font = FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 14;
+            tf.TextState.ForegroundColor = Color.White;
+            tf.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Approximate center of the ellipse: ((100+300)/2, (400+500)/2) = (200, 450)
-            tf.Position = new Position(200, 450);
+            // Position the text at the centre of the ellipse
+            double centerX = llx + ellipseWidth / 2;
+            double centerY = lly + ellipseHeight / 2;
+            tf.Position = new Position(centerX, centerY);
 
             // Add the text fragment to the page (after the graph so it appears on top)
             page.Paragraphs.Add(tf);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Ellipse with text saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

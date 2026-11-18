@@ -12,32 +12,30 @@ class Program
         {
             Page page = doc.Pages.Add();
 
-            // Create a graph with the required size (width, height).
-            Graph graph = new Graph(200.0, 200.0);
+            // Create a graph with width=500 and height=400 using the double overload (non‑obsolete)
+            Graph graph = new Graph(500.0, 400.0);
 
-            // Configure default appearance for shapes added to the graph.
-            graph.GraphInfo.LineWidth = 2.0f;               // 2 points stroke width
-            graph.GraphInfo.DashArray = new int[] { 5, 3 }; // 5 pt dash, 3 pt gap
-            graph.GraphInfo.DashPhase = 0;                  // start at beginning of pattern
-            graph.GraphInfo.FillColor = Color.Empty;        // transparent fill (no fill)
-            graph.GraphInfo.Color = Color.Black;            // stroke color
+            // Create an unfilled arc: center at (250,200), radius 100, start angle 0°, sweep 180°
+            // Arc constructor takes (posX, posY, radius, startAngle, sweepAngle) and expects float values
+            Arc arc = new Arc(250f, 200f, 100f, 0f, 180f);
 
-            // Create an unfilled half‑circle arc (0‑180 degrees).
-            // Arc constructor signature: Arc(double left, double bottom, double width, double startAngle, double sweepAngle)
-            Arc arc = new Arc(0, 0, 200, 0, 180);
-            // Apply the same styling to the arc (optional – it inherits from the graph if not set).
-            arc.GraphInfo.LineWidth = graph.GraphInfo.LineWidth;
-            arc.GraphInfo.DashArray = graph.GraphInfo.DashArray;
-            arc.GraphInfo.DashPhase = graph.GraphInfo.DashPhase;
-            arc.GraphInfo.FillColor = Color.Empty;
-            arc.GraphInfo.Color = Color.Black;
+            // Set line width (float literal to avoid narrowing conversion warnings)
+            arc.GraphInfo.LineWidth = 2f;
 
+            // Set dash style (5 units on, 3 units off)
+            arc.GraphInfo.DashArray = new int[] { 5, 3 };
+            arc.GraphInfo.DashPhase = 0;
+
+            // Ensure the arc has no fill (transparent)
+            arc.GraphInfo.FillColor = Color.Transparent;
+
+            // Add the arc to the graph
             graph.Shapes.Add(arc);
 
-            // Attach the graph to the page. Positioning is handled by the page layout.
+            // Add the graph to the page (Graph is a BaseParagraph)
             page.Paragraphs.Add(graph);
 
-            // Save the document as PDF.
+            // Save the PDF
             doc.Save(outputPath);
         }
 
