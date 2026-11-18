@@ -9,92 +9,80 @@ class Program
     {
         const string outputPath = "graph_footer.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Configure page size (A4) and 1‑inch margins (72 points = 1 inch)
-            PageInfo pageInfo = doc.PageInfo;
-            pageInfo.Width = PageSize.A4.Width;
-            pageInfo.Height = PageSize.A4.Height;
-            // Use MarginInfo (not the non‑existent Margin class)
-            pageInfo.Margin = new MarginInfo(72, 72, 72, 72); // left, top, right, bottom
-
             // Add a single page
             Page page = doc.Pages.Add();
 
-            // Define chart dimensions: width = page width minus left/right margins,
-            // height = 100 points, positioned just above the bottom margin (footer area)
-            const double chartHeight = 100;
-            double chartWidth = pageInfo.Width - pageInfo.Margin.Left - pageInfo.Margin.Right;
-            double chartLeft = pageInfo.Margin.Left;
-            double chartBottom = pageInfo.Margin.Bottom; // Y coordinate from bottom of page
-
-            // Create a Graph (manual bar chart) with the calculated size
-            Graph graph = new Graph(chartWidth, chartHeight)
+            // Set page margins (MarginInfo is the correct type)
+            page.PageInfo.Margin = new MarginInfo
             {
-                Left = chartLeft,
-                Top = chartBottom,
-                Title = new TextFragment("Quarterly Sales (k$)")
+                Top = 72,    // 1 inch
+                Bottom = 72, // 1 inch
+                Left = 72,
+                Right = 72
             };
 
-            // Draw axes
-            // X‑axis
+            // Footer‑area graph dimensions
+            double chartHeight = 40; // points
+            double chartWidth = page.PageInfo.Width - page.PageInfo.Margin.Left - page.PageInfo.Margin.Right;
+
+            // Create a Graph object (no Chart API in Aspose.Pdf)
+            Graph graph = new Graph(chartWidth, chartHeight)
+            {
+                // Position the graph inside the bottom margin
+                Left = (float)page.PageInfo.Margin.Left,
+                Top = (float)page.PageInfo.Margin.Bottom, // top aligns with bottom‑margin line
+                Width = (float)chartWidth,
+                Height = (float)chartHeight
+            };
+
+            // Sample data for a simple column chart
+            double[] values = { 120, 150, 180, 200 };
+            double max = 200; // maximum value for scaling
+            int barCount = values.Length;
+            float barSpacing = 5f; // space between bars
+            float availableWidth = (float)chartWidth - (barCount + 1) * barSpacing;
+            float barWidth = availableWidth / barCount;
+
+            // Draw X‑axis
             Line xAxis = new Line(new float[] { 0, 0, (float)chartWidth, 0 });
             xAxis.GraphInfo.Color = Color.Black;
             graph.Shapes.Add(xAxis);
-            // Y‑axis
+
+            // Draw Y‑axis
             Line yAxis = new Line(new float[] { 0, 0, 0, (float)chartHeight });
             yAxis.GraphInfo.Color = Color.Black;
             graph.Shapes.Add(yAxis);
 
-            // Data for the bar chart
-            double[] values = { 30, 45, 25, 60 };
-            string[] categories = { "Q1", "Q2", "Q3", "Q4" };
-            double maxValue = 60; // could be calculated with values.Max()
-            double scale = chartHeight / maxValue;
-
-            // Simple layout: equal spacing, bar width = 1/5 of chart width
-            int barCount = values.Length;
-            double barSpacing = chartWidth / (barCount * 2.0);
-            double barWidth = barSpacing; // make bar width equal to spacing for a tidy look
-
+            // Draw bars
             for (int i = 0; i < barCount; i++)
             {
-                double barHeight = values[i] * scale;
-                double x = barSpacing + i * 2 * barSpacing; // start after first spacing
-
-                // Rectangle shape for the bar (drawing rectangle, fully qualified)
-                Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle((float)x, 0, (float)barWidth, (float)barHeight);
+                float barHeight = (float)(values[i] / max) * (float)chartHeight;
+                float x = barSpacing + i * (barWidth + barSpacing);
+                // Use fully‑qualified Drawing.Rectangle to avoid ambiguity with Aspose.Pdf.Rectangle
+                Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle(x, 0, x + barWidth, barHeight);
                 bar.GraphInfo.FillColor = Color.Blue;
                 bar.GraphInfo.Color = Color.Blue; // border colour (optional)
                 graph.Shapes.Add(bar);
-
-                // Add category label under each bar
-                TextFragment label = new TextFragment(categories[i]);
-                label.TextState.FontSize = 9;
-                label.TextState.ForegroundColor = Color.Black;
-                label.HorizontalAlignment = HorizontalAlignment.Center;
-                // Position the label – use a TextFragment with a Position relative to the page
-                // Y coordinate is just below the X‑axis (bottom margin - 12 points)
-                label.Position = new Position(chartLeft + x + barWidth / 2, chartBottom - 12);
-                page.Paragraphs.Add(label);
             }
 
-            // Add the graph to the page (it will be placed in the footer area)
+            // Optional title – placed above the graph using a TextFragment inside a Paragraph
+            TextFragment title = new TextFragment("Quarterly Sales")
+            {
+                TextState = { Font = FontRepository.FindFont("Helvetica"), FontSize = 12, FontStyle = FontStyles.Bold, ForegroundColor = Color.Black },
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            // Add a small vertical space before the graph
+            page.Paragraphs.Add(new TextFragment("\n"));
+            page.Paragraphs.Add(title);
+            page.Paragraphs.Add(new TextFragment("\n"));
             page.Paragraphs.Add(graph);
-
-            // Optional footer text placed just below the chart within the bottom margin
-            TextFragment footer = new TextFragment("Confidential – Company XYZ");
-            footer.TextState.FontSize = 9;
-            footer.TextState.ForegroundColor = Color.Gray;
-            // Position: left margin, a few points below the chart
-            footer.Position = new Position(pageInfo.Margin.Left, pageInfo.Margin.Bottom - 24);
-            page.Paragraphs.Add(footer);
 
             // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to {outputPath}");
+        Console.WriteLine($"PDF with graph in footer saved to '{outputPath}'.");
     }
 }

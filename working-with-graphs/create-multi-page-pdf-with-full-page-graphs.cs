@@ -1,104 +1,79 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // Graph, Line, Rectangle, etc.
+using Aspose.Pdf.Text;   // TextFragment for titles
 
 class Program
 {
     static void Main()
     {
         const string outputPath = "multi_page_graph.pdf";
+        const int pageCount = 3;
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document.
         using (Document doc = new Document())
         {
-            int pageCount = 3; // Number of pages to generate
-
             for (int i = 1; i <= pageCount; i++)
             {
-                // Add a new page (default size, e.g., A4)
+                // Add a new page.
                 Page page = doc.Pages.Add();
 
-                // Retrieve the page dimensions (points)
+                // Use the page size for the graph so it fills the whole page.
                 double pageWidth = page.PageInfo.Width;
                 double pageHeight = page.PageInfo.Height;
 
-                // Create a Graph that occupies the whole page (use double ctor as the float ctor is obsolete)
+                // Create a Graph that occupies the full page.
                 Graph graph = new Graph(pageWidth, pageHeight)
                 {
-                    // Position the graph at the origin of the page
                     Left = 0,
                     Top = 0,
-                    // Optional visual styling for the graph container
                     Border = new BorderInfo(BorderSide.All, 1f, Color.Black),
-                    // Background colour for the graph area
-                    GraphInfo = new GraphInfo { FillColor = Color.LightGray }
+                    Title = new TextFragment($"Sample Chart on Page {i}")
                 };
 
-                // Set a title for the graph (appears above the drawing area)
-                graph.Title = new TextFragment($"Page {i} Chart");
+                // ------------------------------------------------------------
+                // Draw simple X and Y axes.
+                // ------------------------------------------------------------
+                Line xAxis = new Line(new float[] { 0, 0, (float)pageWidth, 0 });
+                xAxis.GraphInfo.Color = Color.Black;
+                graph.Shapes.Add(xAxis);
 
-                // Sample data series – you can replace this with any data you need
-                double[] sampleValues = new double[] { 30, 20, 50 };
-                DrawBarChart(graph, sampleValues);
+                Line yAxis = new Line(new float[] { 0, 0, 0, (float)pageHeight });
+                yAxis.GraphInfo.Color = Color.Black;
+                graph.Shapes.Add(yAxis);
 
-                // Insert the graph into the page's content.
+                // ------------------------------------------------------------
+                // Draw a very simple bar chart using rectangles.
+                // ------------------------------------------------------------
+                double[] data = new double[] { 10, 20, 30, 25, 15 };
+                // Determine bar width and spacing based on page width.
+                float margin = 40f; // left/right margin for the axes
+                float usableWidth = (float)pageWidth - 2 * margin;
+                float barSpacing = 10f;
+                float barWidth = (usableWidth - (data.Length - 1) * barSpacing) / data.Length;
+                float maxValue = 30f; // for scaling – in a real scenario compute from data
+                float scaleY = ((float)pageHeight - 60f) / maxValue; // leave top margin for title
+
+                for (int idx = 0; idx < data.Length; idx++)
+                {
+                    float barHeight = (float)data[idx] * scaleY;
+                    float x = margin + idx * (barWidth + barSpacing);
+                    // Rectangle(x, y, width, height) where y is the bottom coordinate.
+                    var bar = new Aspose.Pdf.Drawing.Rectangle(x, 0, barWidth, barHeight);
+                    bar.GraphInfo.FillColor = Color.SteelBlue;
+                    bar.GraphInfo.Color = Color.Transparent; // no stroke
+                    graph.Shapes.Add(bar);
+                }
+
+                // Add the graph to the page.
                 page.Paragraphs.Add(graph);
             }
 
-            // Save the multi‑page PDF.
+            // Save the document.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
-    }
-
-    /// <summary>
-    /// Draws a simple vertical bar chart inside the supplied graph.
-    /// The chart is scaled to the graph's width and height.
-    /// </summary>
-    private static void DrawBarChart(Graph graph, double[] values)
-    {
-        if (values == null || values.Length == 0)
-            return;
-
-        // Determine scaling factors based on graph size
-        float graphWidth = (float)graph.Width;
-        float graphHeight = (float)graph.Height;
-        double maxValue = 0;
-        foreach (double v in values)
-            if (v > maxValue) maxValue = v;
-        if (maxValue == 0) maxValue = 1; // avoid division by zero
-
-        // Bar layout calculations
-        int barCount = values.Length;
-        float barSpacing = graphWidth / (barCount * 2 + 1); // space between bars
-        float barWidth = barSpacing; // make bar width equal to spacing for a balanced look
-        float currentX = barSpacing; // start after initial spacing
-
-        for (int i = 0; i < barCount; i++)
-        {
-            // Height of the bar proportional to the value
-            float barHeight = (float)(values[i] / maxValue * (graphHeight * 0.8)); // leave 20% top margin
-
-            // Create a rectangle representing the bar. (x, y) is lower‑left corner.
-            // In Aspose.Pdf.Drawing.Rectangle the parameters are: lowerLeftX, lowerLeftY, upperRightX, upperRightY
-            Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle(currentX, 0, currentX + barWidth, barHeight);
-            bar.GraphInfo.FillColor = Color.SteelBlue;
-            bar.GraphInfo.Color = Color.Black; // border colour
-            bar.GraphInfo.LineWidth = 0.5f;
-
-            // Optional label under each bar
-            var label = new TextFragment($"{values[i]}");
-            label.TextState.Font = FontRepository.FindFont("Helvetica");
-            label.TextState.FontSize = 10;
-            label.TextState.ForegroundColor = Color.Black;
-            // Position the label centred under the bar
-            label.Position = new Position(currentX + barWidth / 2, -15);
-            bar.Text = label;
-
-            graph.Shapes.Add(bar);
-            currentX += barWidth + barSpacing; // move to next bar position
-        }
+        Console.WriteLine($"PDF with {pageCount} pages created at '{outputPath}'.");
     }
 }

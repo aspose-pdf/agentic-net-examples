@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 using Aspose.Pdf.Text;
@@ -8,48 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "skewed_graph.pdf";
 
-        if (!File.Exists(inputPath))
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Graph dimensions and position on the page
+            const float graphWidth = 300f;
+            const float graphHeight = 100f;
+            const float graphLeft = 100f;
+            const float graphTop = 500f;
 
-            // Create a Graph container with desired size
-            // Width = 200, Height = 200 (you can adjust as needed)
-            Graph graph = new Graph(200, 200);
+            // Create a Graph container (width, height) and set its location
+            Graph graph = new Graph(graphWidth, graphHeight)
+            {
+                Left = graphLeft,
+                Top = graphTop
+            };
 
-            // Position the graph on the page
-            graph.Left = 100;   // X‑coordinate of the left side
-            graph.Top = 500;    // Y‑coordinate of the top side (from bottom of page)
+            // Create a horizontal line primitive inside the graph
+            Line line = new Line(new float[] { 0f, 0f, graphWidth, 0f });
+            line.GraphInfo = new GraphInfo
+            {
+                Color = Color.Black,
+                LineWidth = 2f
+            };
 
-            // Apply X‑axis skew (shear) – 20 degrees
-            graph.GraphInfo.SkewAngleX = 20; // degrees
+            // Add the line to the graph's shape collection
+            graph.Shapes.Add(line);
 
-            // Create a rectangle shape that will act as the simple "graph"
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(0, 0, 200, 200);
-            rectShape.GraphInfo.FillColor = Color.LightGray; // Fill colour
-            rectShape.GraphInfo.Color = Color.Black;         // Border colour
-            rectShape.GraphInfo.LineWidth = 1;               // Border thickness
+            // Apply a skew transformation on the X axis (20 degrees)
+            graph.GraphInfo.SkewAngleX = 20f; // SkewAngleY remains 0 (default)
 
-            // Add the rectangle to the graph
-            graph.Shapes.Add(rectShape);
-
-            // Add the graph to the page's content
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Skewed graph saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with skewed graph saved to '{outputPath}'.");
     }
 }

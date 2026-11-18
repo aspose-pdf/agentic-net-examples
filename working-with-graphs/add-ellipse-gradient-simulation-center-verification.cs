@@ -1,6 +1,12 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
+
+// Alias to avoid confusion with System.Drawing.Rectangle
+using DrawRect = Aspose.Pdf.Drawing.Rectangle;
+using DrawPath = Aspose.Pdf.Drawing.Path;
 
 class Program
 {
@@ -8,59 +14,59 @@ class Program
     {
         const string outputPath = "ellipse_gradient.pdf";
 
-        // Document lifecycle must be wrapped in a using block (see document-disposal-with-using rule)
-        using (Document doc = new Document())
+        // Create a new PDF document and ensure deterministic disposal
+        using (var doc = new Document())
         {
-            // Add a single page to the document
+            // Add a single page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define ellipse geometry (center at (300,400), radii 100 and 150)
-            double centerX = 300;
-            double centerY = 400;
-            double radiusX = 100;
-            double radiusY = 150;
+            // Create a Graph that spans the whole page – Graph is the only container that can hold shapes
+            var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Since Aspose.Pdf does not expose a ConicalGradientFill in the referenced version,
-            // we simulate a simple two‑color fill using a solid colour (the API does not support
-            // gradient fills for shapes in this version). The gradient centre is stored separately
-            // for verification purposes.
-            Point gradientCenter = new Point(centerX, centerY);
+            // Define the bounding rectangle for the ellipse (left, bottom, width, height)
+            float left   = 100f;
+            float bottom = 300f;
+            float width  = 200f;
+            float height = 200f;
 
-            // Build the ellipse shape using explicit coordinates (left, bottom, width, height)
-            double left = centerX - radiusX;
-            double bottom = centerY - radiusY;
-            double width = radiusX * 2;
-            double height = radiusY * 2;
-            Ellipse ellipse = new Ellipse(left, bottom, width, height);
+            // Create the ellipse shape – the constructor expects four float values
+            var ellipse = new Ellipse(left, bottom, width, height);
 
-            // Apply a solid fill colour (simulating the start colour of a gradient).
-            ellipse.GraphInfo = new GraphInfo
+            // Compute the centre of the ellipse – needed for the gradient origin
+            float centerX = left + width / 2f;
+            float centerY = bottom + height / 2f;
+
+            // Aspose.Pdf does not expose a conical gradient. The closest built‑in option is a radial gradient.
+            // We use a radial gradient that starts at the centre with radius 0 and expands to the ellipse radius.
+            var radialGradient = new GradientRadialShading(
+                Color.FromRgb(1, 0, 0), // Red (start colour)
+                Color.FromRgb(0, 0, 1)  // Blue (end colour)
+            )
             {
-                FillColor = Color.FromRgb(1, 0, 0), // Red – start colour of the intended gradient
-                // Border colour (optional)
-                Color = Color.FromRgb(0, 0, 0) // Black border
+                Start = new Point(centerX, centerY),
+                End   = new Point(centerX, centerY),
+                StartingRadius = 0f,
+                EndingRadius   = Math.Max(width, height) / 2f
             };
 
-            // Shapes must be placed inside a Graph container before adding to the page.
-            // Use the double overload of the Graph constructor (the float overload is obsolete).
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Apply the gradient fill via the PatternColorSpace of the FillColor property
+            ellipse.GraphInfo.FillColor = new Color { PatternColorSpace = radialGradient };
+            // No stroke is required for this demo
+            ellipse.GraphInfo.Color = Color.Transparent;
+
+            // Add the ellipse to the graph and the graph to the page
             graph.Shapes.Add(ellipse);
             page.Paragraphs.Add(graph);
 
-            // ---- Verification ----
-            // Compute the centre of the rectangle (which is the centre of the ellipse)
-            double ellipseCenterX = (left + (left + width)) / 2; // (LLX + URX) / 2
-            double ellipseCenterY = (bottom + (bottom + height)) / 2; // (LLY + URY) / 2
+            // Verify that the gradient origin matches the ellipse centre
+            bool originMatches = Math.Abs(radialGradient.Start.X - centerX) < 0.001 &&
+                                 Math.Abs(radialGradient.Start.Y - centerY) < 0.001;
 
-            // Compare with the stored gradient centre
-            bool isAligned = Math.Abs(ellipseCenterX - gradientCenter.X) < 0.001 &&
-                             Math.Abs(ellipseCenterY - gradientCenter.Y) < 0.001;
-
-            Console.WriteLine(isAligned
-                ? "Gradient origin aligns with ellipse center."
+            Console.WriteLine(originMatches
+                ? "Gradient origin correctly aligned with ellipse center."
                 : "Gradient origin does NOT align with ellipse center.");
 
-            // Save the PDF (no PreSave needed for drawing operations)
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

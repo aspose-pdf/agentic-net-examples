@@ -2,42 +2,47 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "dimension_line.pdf";
-
-        // Ensure the output directory exists
-        string outDir = System.IO.Path.GetDirectoryName(outputPath);
-        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
-            Directory.CreateDirectory(outDir);
+        const string outputPath = "dimension_line_graph.pdf";
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to host the drawing
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph that spans the whole page – all drawing objects must be placed inside a Graph
+            // Create a Graph that covers the whole page (width x height)
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-            // Define the line coordinates (x1, y1, x2, y2)
-            // Example: a 200‑point long horizontal line starting at (100,500)
-            Line line = new Line(new float[] { 100f, 500f, 300f, 500f });
-            // Set visual properties via GraphInfo
-            line.GraphInfo.Color = Color.Black;
-            line.GraphInfo.LineWidth = 2f;
-
-            // Add the line to the graph and the graph to the page
-            graph.Shapes.Add(line);
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
+            // Create a dimension‑specific line inside the graph
+            // Start point (100, 100) and end point (400, 100) – coordinates are in points
+            Line line = new Line(new float[] { 100, 100, 400, 100 });
+
+            // Set line appearance via GraphInfo
+            line.GraphInfo.Color = Color.FromRgb(0, 0, 1); // blue line
+            line.GraphInfo.LineWidth = 2; // 2 points thick
+
+            // Add the line to the graph's shape collection
+            graph.Shapes.Add(line);
+
+            // Optionally add a caption (e.g., length) using the Graph's Title property
+            TextFragment caption = new TextFragment("Length: 300 pt")
+            {
+                TextState = { FontSize = 12, ForegroundColor = Color.Black }
+            };
+            // Assign the caption to the graph's Title (the graph does not have a Paragraphs collection)
+            graph.Title = caption;
+
+            // Save the document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with dimension‑specific line saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with dimension line saved to '{outputPath}'.");
     }
 }

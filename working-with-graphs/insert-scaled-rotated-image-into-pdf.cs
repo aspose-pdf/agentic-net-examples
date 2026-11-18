@@ -1,70 +1,91 @@
 using System;
 using System.IO;
+using System.Drawing; // kept for DPI information, but Image will be fully qualified
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // ImageStamp resides in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, external image, and output PDF paths
-        const string inputPdfPath = "input.pdf";
-        const string imagePath = "graph_image.png";
+        // Input and output file paths
+        const string inputPdfPath  = "input.pdf";
         const string outputPdfPath = "output.pdf";
+        const string imagePath     = "external_image.png";
 
-        // Desired scaling factor (e.g., 0.5 = 50% of original size) and rotation angle in degrees
-        const double scaleFactor = 0.5;
-        const double rotationAngle = 45.0; // rotate 45 degrees
+        // Page number where the image will be placed (1‑based indexing)
+        const int targetPageNumber = 1;
 
+        // Desired maximum dimensions for the image (points; 1 point = 1/72 inch)
+        const double maxWidth  = 200.0; // e.g., 200 points
+        const double maxHeight = 200.0; // e.g., 200 points
+
+        // Rotation angle in degrees (clockwise)
+        const float rotationAngle = 45.0f;
+
+        // Validate input files
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
+            // Ensure the requested page exists
+            if (targetPageNumber < 1 || targetPageNumber > pdfDoc.Pages.Count)
             {
-                // Choose the page where the image will be placed (first page in this example)
-                Page page = doc.Pages[1];
-
-                // Create an ImageStamp for the external image
-                ImageStamp imgStamp = new ImageStamp(imagePath)
-                {
-                    // Place the stamp over the page content (not as background)
-                    Background = false,
-
-                    // Align the stamp to the centre of the page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-
-                    // Rotate the image by the specified angle
-                    RotateAngle = rotationAngle,
-
-                    // Scale the image proportionally – use the Zoom property
-                    Zoom = scaleFactor
-                };
-
-                // Add the configured stamp to the selected page
-                page.AddStamp(imgStamp);
-
-                // Save the modified PDF
-                doc.Save(outputPdfPath);
+                Console.Error.WriteLine($"Page {targetPageNumber} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                return;
             }
 
-            Console.WriteLine($"Image inserted, scaled, and rotated successfully. Output saved to '{outputPdfPath}'.");
+            // Load the external image to obtain its original dimensions (points)
+            double originalWidthPoints;
+            double originalHeightPoints;
+            // Fully qualify System.Drawing.Image to avoid ambiguity with Aspose.Pdf.Image
+            using (System.Drawing.Image sysImg = System.Drawing.Image.FromFile(imagePath))
+            {
+                // Convert pixel dimensions to points using the image's DPI (72 points per inch)
+                originalWidthPoints  = sysImg.Width  * 72.0 / sysImg.HorizontalResolution;
+                originalHeightPoints = sysImg.Height * 72.0 / sysImg.VerticalResolution;
+            }
+
+            // Compute a uniform scaling factor to keep the aspect ratio
+            double widthScale  = maxWidth  / originalWidthPoints;
+            double heightScale = maxHeight / originalHeightPoints;
+            double scaleFactor = Math.Min(widthScale, heightScale);
+
+            // Calculate the scaled dimensions (points)
+            double scaledWidth  = originalWidthPoints  * scaleFactor;
+            double scaledHeight = originalHeightPoints * scaleFactor;
+
+            // Create an ImageStamp (a visual element that can be placed on a page)
+            ImageStamp imgStamp = new ImageStamp(imagePath)
+            {
+                // Apply the proportional size
+                Width  = scaledWidth,
+                Height = scaledHeight,
+
+                // Rotate the image around its centre (degrees clockwise)
+                RotateAngle = rotationAngle,
+
+                // Position the stamp – centred on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+
+            // Add the stamp to the specified page
+            pdfDoc.Pages[targetPageNumber].AddStamp(imgStamp);
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Image inserted, scaled, and rotated. Output saved to '{outputPdfPath}'.");
     }
 }

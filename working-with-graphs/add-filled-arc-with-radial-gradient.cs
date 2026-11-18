@@ -1,46 +1,72 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "graph.pdf";
+        const string outputPath = "arc_graph.pdf";
 
         using (Document doc = new Document())
         {
             Page page = doc.Pages.Add();
 
-            // Create a graph of size 300x300 and position it at (50,400)
-            Graph graph = new Graph(300f, 300f);
-            graph.Left = 50f;
-            graph.Top = 400f;
+            // Define the area for the graph (left‑lower‑x, left‑lower‑y, upper‑right‑x, upper‑right‑y)
+            var graphRect = new Aspose.Pdf.Rectangle(100, 500, 400, 200);
 
-            // Define an arc (center at 150,150, radius 100) with start and sweep angles
-            Arc arc = new Arc(150f, 150f, 100f, 30f, 120f);
-            arc.GraphInfo.Color = Aspose.Pdf.Color.Black; // stroke color (optional)
-            arc.GraphInfo.LineWidth = 1f;
+            // Graph size is the rectangle size
+            double graphWidth = graphRect.URX - graphRect.LLX;
+            double graphHeight = graphRect.URY - graphRect.LLY;
 
-            // Create a radial gradient fill
-            GradientRadialShading radial = new GradientRadialShading(
-                Aspose.Pdf.Color.FromRgb(0.9f, 0.2f, 0.2f), // light red
-                Aspose.Pdf.Color.FromRgb(0.2f, 0.2f, 0.9f)  // blue
-            );
-            // Apply the gradient as the fill color of the arc
-            arc.GraphInfo.FillColor = new Aspose.Pdf.Color { PatternColorSpace = radial };
+            // Create the Graph container and position it
+            var graph = new Graph(graphWidth, graphHeight)
+            {
+                Left = (float)graphRect.LLX,
+                Top = (float)graphRect.LLY
+            };
 
-            // Add the arc to the graph
+            // Arc parameters (degrees)
+            double startAngle = 45;   // start at 45°
+            double sweepAngle = 270;  // sweep 270° clockwise
+
+            // Bounding rectangle for the arc (can be smaller than the graph area)
+            var arcRect = new Aspose.Pdf.Rectangle(120, 480, 380, 220);
+            float centerX = (float)((arcRect.LLX + arcRect.URX) / 2);
+            float centerY = (float)((arcRect.LLY + arcRect.URY) / 2);
+            float radius = (float)Math.Min((arcRect.URX - arcRect.LLX) / 2, (arcRect.URY - arcRect.LLY) / 2);
+
+            // Create the arc shape: Arc(centerX, centerY, radius, startAngle, sweepAngle)
+            var arc = new Arc(centerX, centerY, radius, (float)startAngle, (float)sweepAngle);
+
+            // Radial gradient fill (blue → light blue)
+            var gradientFill = new Color
+            {
+                PatternColorSpace = new GradientRadialShading(
+                    Color.FromRgb(0, 0, 1),          // inner color (blue)
+                    Color.FromRgb(0.5f, 0.5f, 1)     // outer color (light blue)
+                )
+                {
+                    Start = new Point(centerX, centerY),
+                    End = new Point(centerX, centerY),
+                    StartingRadius = 0,
+                    EndingRadius = radius
+                }
+            };
+            arc.GraphInfo.FillColor = gradientFill;
+
+            // Stroke (outline) properties
+            arc.GraphInfo.Color = Color.Black;
+            arc.GraphInfo.LineWidth = 1;
+
+            // Add the arc to the graph and the graph to the page
             graph.Shapes.Add(arc);
-
-            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with filled arc saved to {outputPath}");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

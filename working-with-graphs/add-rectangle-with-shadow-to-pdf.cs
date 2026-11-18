@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,68 +6,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "rectangle_with_shadow.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (1‑based indexing)
+            Page page = doc.Pages.Add();
 
-        // Wrap the Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Aspose.Pdf uses 1‑based page indexing
-            Page page = doc.Pages[1];
+            // Rectangle coordinates
+            double llx = 100; // lower‑left X
+            double lly = 500; // lower‑left Y
+            double urx = 300; // upper‑right X
+            double ury = 600; // upper‑right Y
 
-            // Rectangle coordinates (lower‑left x/y, upper‑right x/y)
-            float llx = 100f; // left
-            float lly = 500f; // bottom
-            float urx = 300f; // right
-            float ury = 600f; // top
-            float offset = 5f; // shadow offset
+            // Offset for the shadow rectangle
+            double offsetX = 5;
+            double offsetY = -5;
 
-            // Create a Graph that is at least as large as the page.
-            // Shapes (rectangles) must be added to a Graph, then the Graph is added to the page.
-            var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Create a Graph that spans the whole page – Graph is the only object that can be added to page.Paragraphs
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // ---------- Shadow rectangle (offset, semi‑transparent) ----------
-            var shadowRect = new Aspose.Pdf.Drawing.Rectangle(
-                llx + offset,   // shifted right
-                lly - offset,   // shifted down
-                urx + offset,
-                ury - offset);
+            // ---- Shadow rectangle (semi‑transparent) ----
+            var shadow = new Aspose.Pdf.Drawing.Rectangle(
+                (float)(llx + offsetX),
+                (float)(lly + offsetY),
+                (float)(urx + offsetX),
+                (float)(ury + offsetY));
+            // Use an ARGB colour to express transparency (alpha = 128 → 50 % opacity)
+            shadow.GraphInfo.FillColor = Aspose.Pdf.Color.FromArgb(128, 128, 128, 128); // semi‑transparent gray
+            // Optional: no visible border for the shadow
+            shadow.GraphInfo.Color = Aspose.Pdf.Color.FromArgb(0, 0, 0, 0);
+            graph.Shapes.Add(shadow);
 
-            shadowRect.GraphInfo = new GraphInfo
-            {
-                // 50 % transparent black fill
-                FillColor = Aspose.Pdf.Color.FromArgb(128, 0, 0, 0),
-                // No visible border
-                Color = Aspose.Pdf.Color.Transparent,
-                LineWidth = 0
-            };
-            graph.Shapes.Add(shadowRect);
+            // ---- Main rectangle (opaque) ----
+            var rect = new Aspose.Pdf.Drawing.Rectangle(
+                (float)llx,
+                (float)lly,
+                (float)urx,
+                (float)ury);
+            rect.GraphInfo.FillColor = Aspose.Pdf.Color.Blue; // fully opaque fill
+            rect.GraphInfo.Color = Aspose.Pdf.Color.Black;   // optional border colour
+            graph.Shapes.Add(rect);
 
-            // ---------- Main rectangle ----------
-            var mainRect = new Aspose.Pdf.Drawing.Rectangle(llx, lly, urx, ury);
-            mainRect.GraphInfo = new GraphInfo
-            {
-                // Light blue fill (RGB values are 0‑1 range, cast to float)
-                FillColor = Aspose.Pdf.Color.FromRgb(0.2f, 0.6f, 0.9f),
-                // Border color and width
-                Color = Aspose.Pdf.Color.DarkBlue,
-                LineWidth = 1
-            };
-            graph.Shapes.Add(mainRect);
-
-            // Add the graph (containing both rectangles) to the page.
+            // Add the graph (which now contains both rectangles) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rectangle with shadow saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

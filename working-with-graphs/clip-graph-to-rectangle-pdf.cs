@@ -1,6 +1,11 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+
+// Alias to avoid ambiguity between PDF page rectangle and drawing rectangle
+using PdfRect = Aspose.Pdf.Rectangle;
+using DrawRect = Aspose.Pdf.Drawing.Rectangle;
 
 class Program
 {
@@ -8,58 +13,50 @@ class Program
     {
         const string outputPath = "clipped_graph.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Document lifecycle must be wrapped in a using block (document-disposal-with-using rule)
         using (Document doc = new Document())
         {
-            // Add a single page (page indexing is 1‑based)
+            // Add a new page (Pages.Add returns the newly created page)
             Page page = doc.Pages.Add();
 
-            // Create a Graph container that spans the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Define the clipping region as a rectangle on the page.
+            // Since Graph does not expose a Clip property, we position the Graph
+            // at the desired location and give it the same size as the clipping region.
+            // Anything drawn outside the Graph bounds will not be rendered.
+            const double clipLeft = 100;
+            const double clipBottom = 100;
+            const double clipWidth = 300;   // 400 - 100
+            const double clipHeight = 300;  // 400 - 100
 
-            // NOTE: Graph does NOT expose a Clip property. To emulate clipping we can
-            // add a background rectangle that defines the visible area. All subsequent
-            // shapes are drawn on top of this rectangle; anything outside the rectangle
-            // will simply be covered by the page background.
-            Aspose.Pdf.Drawing.Rectangle clipRect = new Aspose.Pdf.Drawing.Rectangle(100, 400, 400, 700);
-            clipRect.GraphInfo = new GraphInfo
+            // Create a Graph object using the double‑precision constructor (Graph(float,float) is obsolete).
+            Graph graph = new Graph(clipWidth, clipHeight)
             {
-                FillColor = Color.White,
-                Color = Color.White // no stroke – acts as a mask
+                Left = clipLeft,
+                Top = clipBottom   // Top is measured from the bottom of the page in Aspose.Pdf
             };
-            graph.Shapes.Add(clipRect);
 
-            // -------------------------------------------------
-            // Draw a large ellipse that extends beyond the clip
-            // -------------------------------------------------
-            // Center at (250,550) with horizontal and vertical radii of 200
-            Ellipse ellipse = new Ellipse(250, 550, 200, 200);
-            ellipse.GraphInfo = new GraphInfo
+            // Draw a large rectangle that exceeds the clipping bounds.
+            // Coordinates are relative to the Graph (0,0) = bottom‑left of the Graph.
+            DrawRect largeRect = new DrawRect( -50, 350, 500, 200)
             {
-                Color = Color.LightBlue,
-                FillColor = Color.LightBlue
+                GraphInfo = { FillColor = Aspose.Pdf.Color.LightGray }
             };
-            graph.Shapes.Add(ellipse);
+            graph.Shapes.Add(largeRect);
 
-            // -------------------------------------------------
-            // Draw a rectangle that partially overlaps the clip
-            // -------------------------------------------------
-            // Lower‑left (50,450) upper‑right (500,600)
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(50, 450, 500, 600);
-            rectShape.GraphInfo = new GraphInfo
+            // Draw a large ellipse that also exceeds the clipping bounds.
+            Ellipse largeEllipse = new Ellipse( -100, 400, 600, 200)
             {
-                Color = Color.LightCoral,
-                FillColor = Color.LightCoral
+                GraphInfo = { FillColor = Aspose.Pdf.Color.LightBlue }
             };
-            graph.Shapes.Add(rectShape);
+            graph.Shapes.Add(largeEllipse);
 
-            // Add the graph object to the page's content
+            // Add the graph to the page's paragraphs collection
             page.Paragraphs.Add(graph);
 
-            // Save the PDF – no PreSave() required for graphics
+            // Save the document as PDF (no special SaveOptions needed for PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with clipping region saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with clipped graph saved to '{outputPath}'.");
     }
 }

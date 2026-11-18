@@ -1,38 +1,37 @@
 using System;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // Graph and drawing shapes live here
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_page.pdf";
+        const string outputPath = "graph.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Document lifecycle must be wrapped in a using block
         using (Document doc = new Document())
         {
             // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Retrieve the page dimensions via PageInfo (Width/Height are not direct members of Page)
-            double pageWidth  = page.PageInfo.Width;
+            // Retrieve the page dimensions (width and height)
+            double pageWidth = page.PageInfo.Width;
             double pageHeight = page.PageInfo.Height;
 
-            // Instantiate a Graph that matches the page size
-            Graph graph = new Graph(pageWidth, pageHeight);
+            // Instantiate a Graph object that matches the page size.
+            // Graph constructor expects width and height (float values).
+            Graph graph = new Graph((float)pageWidth, (float)pageHeight);
 
-            // Create a rectangle shape (left, bottom, width, height)
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(100, 500, 200, 100);
-            // Style the rectangle through its GraphInfo property
-            rect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;   // Fill colour
-            rect.GraphInfo.Color     = Aspose.Pdf.Color.DarkGray;    // Border colour
-            rect.GraphInfo.LineWidth = 1;                           // Border width
+            // OPTIONAL: draw a sample line inside the graph to demonstrate usage.
+            // The Line constructor takes a float array: [x1, y1, x2, y2].
+            Line line = new Line(new float[] { 100f, 100f, 300f, 200f });
+            line.GraphInfo.Color = Color.Black; // set line colour via GraphInfo
+            graph.Shapes.Add(line);
 
-            // Add the rectangle to the graph and the graph to the page
-            graph.Shapes.Add(rect);
+            // Add the Graph to the page's content.
             page.Paragraphs.Add(graph);
 
-            // Save the document (PDF format)
+            // Save the PDF document.
             doc.Save(outputPath);
         }
 

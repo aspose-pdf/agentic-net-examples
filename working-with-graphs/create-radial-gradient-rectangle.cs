@@ -1,61 +1,62 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+
+// Alias the drawing Rectangle to avoid ambiguity with Aspose.Pdf.Rectangle (used for annotations)
+using DrawRect = Aspose.Pdf.Drawing.Rectangle;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "gradient_rectangle.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a single page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a Graph container that spans the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+        // Load the existing PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Work with the first page (1‑based indexing)
+            Page page = doc.Pages[1];
 
-            // Parameters for the simulated radial gradient
-            int steps = 12;                                 // Number of concentric rectangles
-            float centreX = 250f;                           // X‑coordinate of the centre
-            float centreY = 450f;                           // Y‑coordinate of the centre
-            float maxSize = 300f;                           // Size of the outermost rectangle
+            // Create a Graph that covers the whole page – shapes must be added to a Graph, not directly to the page
+            var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Build the gradient by drawing several rectangles with decreasing opacity
-            for (int i = 0; i < steps; i++)
+            // Rectangle bounds: left = 100, bottom = 500, width = 200, height = 200
+            var rectShape = new DrawRect(100, 500, 200, 200);
+
+            // Define a radial gradient: opaque red at the centre, fully transparent at the edges
+            var radialShading = new GradientRadialShading(
+                Color.FromArgb(255, 255, 0, 0), // opaque red (A=255)
+                Color.FromArgb(0,   255, 0, 0)  // transparent red (A=0)
+            )
             {
-                // Size shrinks towards the centre
-                float size = maxSize * (1f - (float)i / steps);
-                float left = centreX - size / 2f;
-                float bottom = centreY - size / 2f;
+                // Center of the rectangle (200, 600)
+                Start = new Point(200, 600),
+                End   = new Point(200, 600),
+                StartingRadius = 0,
+                EndingRadius   = 100 // half of the rectangle's smaller side
+            };
 
-                // Create the rectangle shape
-                var rect = new Aspose.Pdf.Drawing.Rectangle(left, bottom, size, size);
+            // Apply the gradient as the fill colour of the rectangle
+            rectShape.GraphInfo.FillColor = new Color { PatternColorSpace = radialShading };
+            // No stroke (border) for the rectangle
+            rectShape.GraphInfo.Color = Color.Transparent;
 
-                // Calculate opacity – fully opaque at the centre, fully transparent at the outer edge
-                int alpha = (int)(255 * (1f - (float)i / steps));
-
-                // Apply fill colour with the calculated alpha value
-                rect.GraphInfo = new GraphInfo
-                {
-                    FillColor = Color.FromArgb(alpha, 255, 0, 0), // Red with variable transparency
-                    Color = Color.Transparent,                  // No border colour
-                    LineWidth = 0f
-                };
-
-                // Add the rectangle to the graph
-                graph.Shapes.Add(rect);
-            }
-
-            // Add the graph to the page
+            // Add the rectangle to the graph and the graph to the page
+            graph.Shapes.Add(rectShape);
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Rectangle with radial gradient saved to '{outputPath}'.");
     }
 }

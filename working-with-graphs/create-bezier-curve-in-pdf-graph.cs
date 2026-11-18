@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "BezierGraph.pdf";
+        const string outputPath = "bezier_curve.pdf";
 
         // Create a new PDF document
         using (Document doc = new Document())
@@ -14,35 +14,42 @@ class Program
             // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Define the size of the graph (width, height)
-            double graphWidth = 500;
-            double graphHeight = 500;
+            // Define the four control points (start, two control points, end)
+            double startX = 100, startY = 400;   // Start point
+            double cp1X   = 150, cp1Y   = 300;   // First control point
+            double cp2X   = 250, cp2Y   = 500;   // Second control point
+            double endX   = 300, endY   = 400;   // End point
 
-            // Create a Graph object with the defined size
-            Graph graph = new Graph(graphWidth, graphHeight);
-            // Position the graph on the page (optional – defaults to (0,0))
-            graph.Left = 0;
-            graph.Top = 0;
+            // Create a Path that will contain the cubic Bezier curve
+            var bezierPath = new Aspose.Pdf.Drawing.Path();
 
-            // Define the four control points of the Bezier curve
-            // The Curve shape expects a flat float array: startX, startY, ctrl1X, ctrl1Y, ctrl2X, ctrl2Y, endX, endY
-            float[] bezierPoints = new float[] { 50f, 250f, 150f, 400f, 350f, 100f, 450f, 250f };
+            // Add the cubic Bezier curve shape (start, cp1, cp2, end)
+            bezierPath.Shapes.Add(new Curve(new float[]
+            {
+                (float)startX, (float)startY,
+                (float)cp1X,   (float)cp1Y,
+                (float)cp2X,   (float)cp2Y,
+                (float)endX,   (float)endY
+            }));
 
-            // Create the Bezier curve (as a Curve shape)
-            Curve bezierCurve = new Curve(bezierPoints);
-            // Set the stroke colour for the curve
-            bezierCurve.GraphInfo.Color = Color.Blue;
+            // Set the stroke color and line width of the curve (e.g., red)
+            bezierPath.GraphInfo = new GraphInfo
+            {
+                Color = Aspose.Pdf.Color.FromRgb(1.0, 0.0, 0.0), // Red color
+                LineWidth = 2f
+            };
 
-            // Add the curve to the graph
-            graph.Shapes.Add(bezierCurve);
+            // Create a Graph container and add the Path to it
+            Graph graph = new Graph(500.0, 500.0); // Width and Height of the graph area
+            graph.Shapes.Add(bezierPath);
 
-            // Add the graph (which now contains the Bezier curve) to the page
+            // Add the Graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document to the specified file
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bezier curve PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Bezier curve PDF saved to '{System.IO.Path.GetFullPath(outputPath)}'.");
     }
 }

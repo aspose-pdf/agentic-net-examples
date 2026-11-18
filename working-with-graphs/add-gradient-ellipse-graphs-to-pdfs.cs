@@ -1,74 +1,93 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
+
+// Alias to avoid the ambiguous System.IO.Path / Aspose.Pdf.Drawing.Path name clash
+using IOPath = System.IO.Path;
 
 class Program
 {
     static void Main()
     {
-        // Input and output directories
-        string inputDir = "InputPdfs";
-        string outputDir = "OutputPdfs";
-
-        if (!Directory.Exists(inputDir))
+        var inputFiles = new List<string>
         {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
-        Directory.CreateDirectory(outputDir);
-
-        // Get all PDF files in the input directory
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
-
-        // Process each PDF concurrently
-        Parallel.ForEach(pdfFiles, pdfPath =>
+        Parallel.ForEach(inputFiles, inputPath =>
         {
-            try
+            if (!File.Exists(inputPath))
             {
-                // Load the PDF inside a using block (deterministic disposal)
-                using (Document doc = new Document(pdfPath))
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                return;
+            }
+
+            // Build the output file name using the alias to System.IO.Path
+            string outputPath = IOPath.Combine(
+                IOPath.GetDirectoryName(inputPath) ?? string.Empty,
+                IOPath.GetFileNameWithoutExtension(inputPath) + "_out.pdf");
+
+            // Load the PDF, modify it, and save it – deterministic disposal via using
+            using (var doc = new Document(inputPath))
+            {
+                // Ensure at least one page exists
+                if (doc.Pages.Count == 0)
                 {
-                    // Ensure the document has at least one page
-                    if (doc.Pages.Count == 0)
-                    {
-                        doc.Pages.Add();
-                    }
-
-                    // Access the first page (1‑based indexing)
-                    Page page = doc.Pages[1];
-
-                    // Create a Graph container that spans the whole page
-                    Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-                    // Define the ellipse (left, bottom, width, height)
-                    Aspose.Pdf.Drawing.Ellipse ellipse = new Aspose.Pdf.Drawing.Ellipse(100, 300, 200, 200);
-
-                    // Style the ellipse via GraphInfo (solid fill – gradient not supported in core API)
-                    ellipse.GraphInfo.FillColor = Aspose.Pdf.Color.Blue; // solid fill (replace with gradient logic if available)
-                    ellipse.GraphInfo.Color = Aspose.Pdf.Color.Black;   // border color
-                    ellipse.GraphInfo.LineWidth = 2;                     // border width
-
-                    // Add the ellipse to the graph, then the graph to the page
-                    graph.Shapes.Add(ellipse);
-                    page.Paragraphs.Add(graph);
-
-                    // Save the modified PDF to the output directory
-                    string fileName = System.IO.Path.GetFileName(pdfPath);
-                    string outPath = System.IO.Path.Combine(outputDir, fileName);
-                    doc.Save(outPath);
+                    doc.Pages.Add();
                 }
 
-                Console.WriteLine($"Processed: {pdfPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing {pdfPath}: {ex.Message}");
-            }
-        });
+                Page page = doc.Pages[1];
 
-        Console.WriteLine("All PDFs processed.");
+                // Create a Graph that spans the whole page. The Graph ctor takes width & height only.
+                var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height)
+                {
+                    Left = 0,
+                    Top = 0,
+                    // No visible border – we only want the shapes inside the graph
+                    Border = new BorderInfo(BorderSide.All, 0f, Color.Transparent)
+                };
+
+                // ---------- First ellipse (blue axial gradient) ----------
+                var ellipse1 = new Ellipse(100f, 100f, 200f, 100f);
+                ellipse1.GraphInfo.FillColor = new Color
+                {
+                    PatternColorSpace = new GradientAxialShading(Color.LightBlue, Color.DarkBlue)
+                    {
+                        Start = new Point(100f, 100f),
+                        End   = new Point(300f, 200f)
+                    }
+                };
+                // No stroke for the ellipse
+                ellipse1.GraphInfo.Color = Color.Transparent;
+                graph.Shapes.Add(ellipse1);
+
+                // ---------- Second ellipse (red axial gradient) ----------
+                var ellipse2 = new Ellipse(200f, 250f, 200f, 100f);
+                ellipse2.GraphInfo.FillColor = new Color
+                {
+                    PatternColorSpace = new GradientAxialShading(Color.LightCoral, Color.DarkRed)
+                    {
+                        Start = new Point(200f, 250f),
+                        End   = new Point(400f, 350f)
+                    }
+                };
+                ellipse2.GraphInfo.Color = Color.Transparent;
+                graph.Shapes.Add(ellipse2);
+
+                // Add the graph to the page. Graph is a BaseParagraph, so it belongs in Paragraphs.
+                page.Paragraphs.Add(graph);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Processed and saved: {outputPath}");
+        });
     }
 }

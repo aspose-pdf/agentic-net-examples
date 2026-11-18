@@ -2,57 +2,56 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
+
+// Alias the drawing Rectangle to avoid confusion with Aspose.Pdf.Rectangle (used for page geometry)
+using DrawRect = Aspose.Pdf.Drawing.Rectangle;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "gradient_rectangle.pdf";
 
-        // Create a placeholder PDF if the input does not exist.
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists (disambiguate System.IO.Path)
+        string outputDir = System.IO.Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            using (Document tmp = new Document())
+            Page page = doc.Pages.Add();
+
+            // Create a Graph container – it is a BaseParagraph that holds drawing shapes
+            // Use the page size so the rectangle appears in page coordinates
+            var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+
+            // Define the rectangle (left, bottom, width, height)
+            var rect = new DrawRect(100, 300, 200, 200);
+
+            // Linear gradient from fully transparent black to fully opaque black
+            var gradient = new GradientAxialShading(
+                Color.FromArgb(0, 0, 0, 0),   // start: transparent black (alpha = 0)
+                Color.FromArgb(255, 0, 0, 0) // end:   opaque black   (alpha = 255)
+            )
             {
-                tmp.Pages.Add();
-                tmp.Save(inputPath);
-            }
-        }
-
-        // Load the document.
-        using (Document doc = new Document(inputPath))
-        {
-            // Aspose.Pdf pages are 1‑based.
-            Page page = doc.Pages[1];
-
-            // Create a drawing rectangle (lower‑left x,y and upper‑right x,y).
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(100, 500, 300, 700);
-
-            // Build a vertical axial gradient shading with alpha channel.
-            // Gradient from transparent blue (alpha 0) at the bottom to opaque blue (alpha 255) at the top.
-            GradientAxialShading axialGradient = new GradientAxialShading(
-                Aspose.Pdf.Color.FromArgb(0, 0, 0, 255),   // Transparent blue
-                Aspose.Pdf.Color.FromArgb(255, 0, 0, 255) // Opaque blue
-            );
-            // Define gradient direction (bottom to top of the rectangle).
-            axialGradient.Start = new Aspose.Pdf.Point(100, 500); // lower‑left corner
-            axialGradient.End = new Aspose.Pdf.Point(100, 700);   // upper‑left corner
-
-            // Apply the gradient as the rectangle's fill via PatternColorSpace.
-            rectShape.GraphInfo = new GraphInfo
-            {
-                FillColor = new Aspose.Pdf.Color { PatternColorSpace = axialGradient },
-                Color = Aspose.Pdf.Color.Black, // Border color
-                LineWidth = 1
+                // Gradient direction – from the lower‑left corner of the rectangle to the upper‑right
+                Start = new Point(100, 300),
+                End   = new Point(300, 500)
             };
 
-            // Shapes must be placed inside a Graph container.
-            Graph graph = new Graph(500, 800); // size large enough to contain the rectangle
-            graph.Shapes.Add(rectShape);
+            // Apply the gradient as the fill pattern
+            rect.GraphInfo.FillColor = new Color { PatternColorSpace = gradient };
+            // Optional: set a stroke (border) color and width
+            rect.GraphInfo.Color = Color.Black;
+            rect.GraphInfo.LineWidth = 1f;
+
+            // Add the rectangle to the graph and the graph to the page
+            graph.Shapes.Add(rect);
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF.
+            // Save the PDF
             doc.Save(outputPath);
         }
 
