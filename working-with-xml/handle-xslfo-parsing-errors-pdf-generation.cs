@@ -9,65 +9,88 @@ class Program
     static void Main()
     {
         const string xmlPath = "data.xml";
-        const string outputPdf = "output.pdf";
+        const string pdfPath = "output.pdf";
 
-        // Verify that the XML source file exists
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Error: XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"Error: XML file not found at '{xmlPath}'.");
             return;
         }
 
-        // Load and parse the XML document with graceful error handling
-        XmlDocument xmlDoc = new XmlDocument();
+        string extractedContent;
+
+        // Attempt to parse the XML file and extract a simple element value.
         try
         {
-            xmlDoc.Load(xmlPath);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(xmlPath); // May throw XmlException on malformed XML.
+
+            // Example: extract the inner text of the first <Message> element.
+            XmlNode messageNode = xmlDoc.SelectSingleNode("//Message");
+            if (messageNode == null)
+            {
+                Console.Error.WriteLine("Warning: No <Message> element found in the XML. Using default text.");
+                extractedContent = "No message provided.";
+            }
+            else
+            {
+                extractedContent = messageNode.InnerText.Trim();
+                if (string.IsNullOrEmpty(extractedContent))
+                {
+                    Console.Error.WriteLine("Warning: <Message> element is empty. Using default text.");
+                    extractedContent = "Empty message.";
+                }
+            }
         }
         catch (XmlException ex)
         {
-            // Provide a user‑friendly message that includes line/position information
-            Console.Error.WriteLine($"XML parsing error at line {ex.LineNumber}, position {ex.LinePosition}: {ex.Message}");
+            // Provide a user‑friendly message that includes line/position info.
+            Console.Error.WriteLine($"XML Parsing Error: {ex.Message}");
+            Console.Error.WriteLine($"Location: Line {ex.LineNumber}, Position {ex.LinePosition}.");
+            Console.Error.WriteLine("Please correct the XML file and try again.");
             return;
         }
         catch (Exception ex)
         {
-            // Catch any other unexpected errors while loading XML
-            Console.Error.WriteLine($"Unexpected error while loading XML: {ex.Message}");
+            // Catch any other unexpected errors during XML handling.
+            Console.Error.WriteLine($"Unexpected error while processing XML: {ex.Message}");
             return;
         }
 
-        // Generate a PDF from the parsed XML content
+        // Generate a PDF using the extracted content.
         try
         {
-            // Document lifecycle is managed with a using block (deterministic disposal)
             using (Document pdfDoc = new Document())
             {
-                // Add a new page (pages are 1‑based, but Add() returns the created page)
+                // Add a single page.
                 Page page = pdfDoc.Pages.Add();
 
-                // Extract simple text from the XML (for demonstration purposes)
-                string textContent = xmlDoc.DocumentElement?.InnerText ?? string.Empty;
+                // Create a text fragment with the extracted content.
+                TextFragment tf = new TextFragment(extractedContent)
+                {
+                    // Use Aspose.Pdf.Color for cross‑platform compatibility.
+                    TextState = { ForegroundColor = Aspose.Pdf.Color.Black, FontSize = 12 }
+                };
 
-                // Create a text fragment and position it on the page
-                TextFragment tf = new TextFragment(textContent);
-                tf.Position = new Position(50, 750); // Position uses Aspose.Pdf.Text.Position
+                // Position the text near the top of the page.
+                tf.Position = new Position(50, page.PageInfo.Height - 50);
                 page.Paragraphs.Add(tf);
 
-                // Save the PDF (no SaveOptions needed because the target format is PDF)
-                pdfDoc.Save(outputPdf);
-                Console.WriteLine($"PDF generated successfully: {outputPdf}");
+                // Save the PDF.
+                pdfDoc.Save(pdfPath);
             }
+
+            Console.WriteLine($"PDF successfully generated at '{pdfPath}'.");
         }
         catch (PdfException ex)
         {
-            // Handle Aspose.Pdf specific errors
+            // Handle Aspose.Pdf specific errors.
             Console.Error.WriteLine($"PDF generation error: {ex.Message}");
         }
         catch (Exception ex)
         {
-            // Handle any other unexpected errors during PDF creation
-            Console.Error.WriteLine($"Unexpected error during PDF generation: {ex.Message}");
+            // Handle any other unexpected errors.
+            Console.Error.WriteLine($"Unexpected error during PDF creation: {ex.Message}");
         }
     }
 }

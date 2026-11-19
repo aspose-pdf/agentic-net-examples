@@ -1,122 +1,130 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // for DefaultAppearance
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text; // for FontRepository
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "formDefinition.xml";   // XML describing the fields
-        const string outputPdf = "outputForm.pdf";
+        const string templatePdfPath = "template.pdf";   // existing blank PDF or template
+        const string xmlDefinitionPath = "fields.xml";   // XML that defines fields and defaults
+        const string outputPdfPath = "filled_form.pdf";
 
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(templatePdfPath))
         {
-            Console.Error.WriteLine($"XML definition not found: {xmlPath}");
+            Console.Error.WriteLine($"Template PDF not found: {templatePdfPath}");
             return;
         }
 
-        // Load the XML that defines the form fields
-        XDocument xDoc = XDocument.Load(xmlPath);
-        var fieldElements = xDoc.Root?.Elements("Field");
-
-        // Create a new PDF document (blank) and ensure proper disposal
-        using (Document pdfDoc = new Document())
+        if (!File.Exists(xmlDefinitionPath))
         {
-            // Ensure at least one page exists (Aspose.Pdf uses 1‑based page indexing)
-            if (pdfDoc.Pages.Count == 0)
-                pdfDoc.Pages.Add();
+            Console.Error.WriteLine($"XML definition not found: {xmlDefinitionPath}");
+            return;
+        }
 
-            if (fieldElements != null)
+        // Load the XML that describes the form fields
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlDefinitionPath);
+
+        // Open the PDF inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(templatePdfPath))
+        {
+            // Ensure we have at least one page to host the fields
+            // Aspose.Pdf uses 1‑based page indexing (global rule)
+            Page firstPage = pdfDoc.Pages[1];
+
+            // Simple rectangle that will be used for every generated field.
+            // In a real scenario you would read coordinates from the XML.
+            const float left = 100f;
+            const float bottom = 600f;
+            const float width = 200f;
+            const float height = 20f;
+            var defaultRect = new Aspose.Pdf.Rectangle(left, bottom, left + width, bottom + height);
+
+            // Iterate over each <Field> element in the XML
+            XmlNodeList fieldNodes = xmlDoc.SelectNodes("//Field");
+            foreach (XmlNode fieldNode in fieldNodes)
             {
-                foreach (var fld in fieldElements)
+                // Read required attributes
+                string type = fieldNode.Attributes["type"]?.Value?.Trim();
+                string name = fieldNode.Attributes["name"]?.Value?.Trim();
+                string value = fieldNode.Attributes["value"]?.Value?.Trim() ?? string.Empty;
+
+                if (string.IsNullOrEmpty(type) || string.IsNullOrEmpty(name))
+                    continue; // skip malformed entries
+
+                switch (type.ToLowerInvariant())
                 {
-                    string type = (string)fld.Attribute("type");
-                    string name = (string)fld.Attribute("name");
-                    string value = (string)fld.Attribute("value") ?? string.Empty;
-                    int page = (int?)fld.Attribute("page") ?? 1;
+                    case "textbox":
+                        // TextBoxField constructor expects a rectangle; set the field name via PartialName
+                        var txtField = new TextBoxField(firstPage, defaultRect);
+                        txtField.PartialName = name;
+                        txtField.Value = value;
+                        // Appearance – use DefaultAppearance (TextState does not exist)
+                        txtField.DefaultAppearance = new DefaultAppearance(
+                            FontRepository.FindFont("Helvetica"), 12, System.Drawing.Color.Black);
+                        pdfDoc.Form.Add(txtField, 1);
+                        break;
 
-                    double llx = double.Parse((string)fld.Attribute("llx"));
-                    double lly = double.Parse((string)fld.Attribute("lly"));
-                    double urx = double.Parse((string)fld.Attribute("urx"));
-                    double ury = double.Parse((string)fld.Attribute("ury"));
+                    case "checkbox":
+                        var chkField = new CheckboxField(firstPage, defaultRect);
+                        chkField.PartialName = name;
+                        if (bool.TryParse(value, out bool isChecked))
+                            chkField.Checked = isChecked;
+                        else
+                            chkField.Checked = false;
+                        // Appearance
+                        chkField.DefaultAppearance = new DefaultAppearance(
+                            FontRepository.FindFont("Helvetica"), 12, System.Drawing.Color.Black);
+                        pdfDoc.Form.Add(chkField, 1);
+                        break;
 
-                    // Fully qualified rectangle to avoid ambiguity
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                    case "radiobutton":
+                        // RadioButtonField represents the whole group. We create a group per XML entry.
+                        string groupName = fieldNode.Attributes["group"]?.Value?.Trim() ?? name;
+                        var radioGroup = new RadioButtonField(firstPage);
+                        radioGroup.PartialName = groupName;
+                        // Add a single option – in a real scenario you would have multiple <Option> nodes.
+                        radioGroup.AddOption(name, defaultRect);
+                        // Select the option if value == "true"
+                        if (bool.TryParse(value, out bool isSelected) && isSelected)
+                            radioGroup.Selected = 1; // 1‑based index of the first (and only) option
+                        pdfDoc.Form.Add(radioGroup, 1);
+                        break;
 
-                    // Resolve the page object (Aspose.Pdf pages are 1‑based)
-                    Page pdfPage = pdfDoc.Pages[page];
+                    case "listbox":
+                        var listField = new ListBoxField(firstPage, defaultRect);
+                        listField.PartialName = name;
+                        // Expect child <Item> elements for list entries
+                        XmlNodeList items = fieldNode.SelectNodes("Item");
+                        foreach (XmlNode itemNode in items)
+                        {
+                            string itemText = itemNode.InnerText.Trim();
+                            // AddOption(exportValue, displayName) – we use the same string for both
+                            listField.AddOption(itemText, itemText);
+                        }
+                        // Default selected index (optional attribute "selectedIndex") – 1‑based
+                        if (int.TryParse(fieldNode.Attributes["selectedIndex"]?.Value, out int selectedIdx) && selectedIdx > 0)
+                        {
+                            listField.Selected = selectedIdx; // single selection
+                        }
+                        pdfDoc.Form.Add(listField, 1);
+                        break;
 
-                    switch (type?.Trim().ToLowerInvariant())
-                    {
-                        case "textbox":
-                            // TextBoxField ctor: (Page, Rectangle)
-                            TextBoxField txtField = new TextBoxField(pdfPage, rect);
-                            txtField.PartialName = name;
-                            txtField.Value = value;               // set default value
-                            pdfDoc.Form.Add(txtField);
-                            break;
-
-                        case "checkbox":
-                            // CheckboxField ctor: (Page, Rectangle) – note the lowercase 'b'
-                            CheckboxField chkField = new CheckboxField(pdfPage, rect);
-                            chkField.PartialName = name;
-                            // Use dynamic to set the Checked property (available on CheckboxField)
-                            dynamic dynChk = chkField;
-                            dynChk.Checked = value.Equals("true", StringComparison.OrdinalIgnoreCase);
-                            pdfDoc.Form.Add(chkField);
-                            break;
-
-                        case "radiobutton":
-                            // RadioButtonOptionField ctor: (Page, Rectangle)
-                            RadioButtonOptionField rbField = new RadioButtonOptionField(pdfPage, rect);
-                            rbField.PartialName = name;
-                            dynamic dynRb = rbField;
-                            dynRb.Checked = value.Equals("true", StringComparison.OrdinalIgnoreCase);
-                            pdfDoc.Form.Add(rbField);
-                            break;
-
-                        case "listbox":
-                            // ListBoxField ctor: (Page, Rectangle)
-                            ListBoxField listField = new ListBoxField(pdfPage, rect);
-                            listField.PartialName = name;
-                            // Populate options from child <Item> elements
-                            foreach (var item in fld.Elements("Item"))
-                            {
-                                string itemValue = (string)item.Attribute("value") ?? string.Empty;
-                                // AddOption is the correct API for ChoiceField derived types
-                                listField.AddOption(itemValue);
-                            }
-                            // Set the default selected value (single‑select list)
-                            listField.Value = value;
-                            pdfDoc.Form.Add(listField);
-                            break;
-
-                        case "combobox":
-                            // ComboBoxField ctor: (Page, Rectangle)
-                            ComboBoxField comboField = new ComboBoxField(pdfPage, rect);
-                            comboField.PartialName = name;
-                            foreach (var item in fld.Elements("Item"))
-                            {
-                                string itemValue = (string)item.Attribute("value") ?? string.Empty;
-                                comboField.AddOption(itemValue);
-                            }
-                            comboField.Value = value; // pre‑select
-                            pdfDoc.Form.Add(comboField);
-                            break;
-
-                        default:
-                            Console.WriteLine($"Unsupported field type: {type}");
-                            break;
-                    }
+                    default:
+                        Console.WriteLine($"Unsupported field type: {type}");
+                        break;
                 }
             }
 
-            // Save the PDF (inside the using block as per lifecycle rule)
-            pdfDoc.Save(outputPdf);
+            // Save the resulting PDF (save rule – no extra SaveOptions needed for PDF)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Form PDF created: {outputPdf}");
+        Console.WriteLine($"Form PDF created: {outputPdfPath}");
     }
 }

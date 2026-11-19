@@ -2,74 +2,46 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PdfA2bValidation
+class Program
 {
     static void Main()
     {
-        // Input PDF, intermediate XML, and final PDF/A‑2b paths
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string xmlPath = "intermediate.xml";
         const string pdfAPath = "output_pdfa2b.pdf";
-        const string validationLogPath = "validation_log.xml";
+        const string logPath = "conversion_log.xml";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // 1. Load the original PDF and export it to XML (non‑PDF format)
-        // -----------------------------------------------------------------
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the original PDF and export it to XML.
+        using (Document srcDoc = new Document(inputPdf))
         {
-            // XmlSaveOptions is required; otherwise the file would be saved as PDF
-            XmlSaveOptions xmlOpts = new XmlSaveOptions();
-            pdfDoc.Save(xmlPath, xmlOpts);
+            srcDoc.Save(xmlPath, new XmlSaveOptions());
         }
 
-        // -----------------------------------------------------------------
-        // 2. Load the XML representation back into a Document object
-        // -----------------------------------------------------------------
+        // Load the XML representation and convert it to PDF/A‑2b.
         using (Document xmlDoc = new Document(xmlPath, new XmlLoadOptions()))
         {
-            // -----------------------------------------------------------------
-            // 3. Convert the document to PDF/A‑2b using PdfFormatConversionOptions
-            // -----------------------------------------------------------------
-            PdfFormatConversionOptions convOpts = new PdfFormatConversionOptions(PdfFormat.PDF_A_2B);
-            xmlDoc.Convert(convOpts);
-
-            // Save the PDF/A‑2b file
+            xmlDoc.Convert(logPath, PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
             xmlDoc.Save(pdfAPath);
         }
 
-        // -----------------------------------------------------------------
-        // 4. Validate the resulting PDF/A‑2b file for compliance
-        // -----------------------------------------------------------------
-        try
+        // Validate the resulting PDF/A‑2b file.
+        using (Document pdfADoc = new Document(pdfAPath))
         {
-            // Load the generated PDF/A‑2b document
-            using (Document pdfADoc = new Document(pdfAPath))
+            bool isValid = pdfADoc.Validate(logPath, PdfFormat.PDF_A_2B);
+            if (isValid)
             {
-                // The Validate method returns a boolean indicating compliance.
-                // It also creates a log file (XML) with detailed validation information.
-                bool isCompliant = pdfADoc.Validate(validationLogPath, PdfFormat.PDF_A_2B);
-
-                if (isCompliant)
-                {
-                    Console.WriteLine($"The file '{pdfAPath}' is compliant with PDF/A‑2b.");
-                }
-                else
-                {
-                    Console.WriteLine($"The file '{pdfAPath}' is NOT compliant with PDF/A‑2b.");
-                    Console.WriteLine($"See validation details in '{validationLogPath}'.");
-                }
+                Console.WriteLine("PDF/A‑2b validation succeeded. The document is compliant.");
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Validation failed: {ex.Message}");
+            else
+            {
+                Console.WriteLine("PDF/A‑2b validation failed. See log for details.");
+            }
         }
     }
 }

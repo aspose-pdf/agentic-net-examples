@@ -1,6 +1,8 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,59 +13,66 @@ class Program
 
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML layout file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML layout definition
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlPath);
+        // Load the XML that defines page layout attributes
+        XDocument layoutDoc = XDocument.Load(xmlPath);
 
-        // Create a new PDF document
-        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document())
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document())
         {
-            // Expect <Page orientation="landscape|portrait" /> elements
-            XmlNodeList pageNodes = xmlDoc.SelectNodes("//Page");
-            if (pageNodes == null || pageNodes.Count == 0)
-            {
-                Console.Error.WriteLine("No <Page> elements found in XML.");
-                return;
-            }
-
-            foreach (XmlNode pageNode in pageNodes)
+            // Iterate over each <Page> element in the XML (1‑based indexing is not required here)
+            foreach (XElement pageNode in layoutDoc.Root.Elements("Page"))
             {
                 // Add a new page to the document
-                Aspose.Pdf.Page page = pdfDoc.Pages.Add();
+                Page page = pdfDoc.Pages.Add();
 
-                // Default A4 portrait dimensions
-                double width = Aspose.Pdf.PageSize.A4.Width;
-                double height = Aspose.Pdf.PageSize.A4.Height;
+                // Parse width and height attributes; fall back to A4 dimensions if missing
+                double width = double.TryParse(pageNode.Attribute("width")?.Value, out double w) ? w : 842;   // default landscape A4 width
+                double height = double.TryParse(pageNode.Attribute("height")?.Value, out double h) ? h : 595; // default landscape A4 height
 
-                // Determine orientation from the XML attribute
-                string orientation = pageNode.Attributes["orientation"]?.Value?.ToLowerInvariant();
-                if (orientation == "landscape")
+                // Determine orientation from the XML attribute and adjust dimensions if necessary
+                string orientationAttr = pageNode.Attribute("orientation")?.Value?.Trim().ToLowerInvariant();
+                if (orientationAttr == "landscape")
                 {
-                    // Swap width and height for landscape layout
-                    double temp = width;
-                    width = height;
-                    height = temp;
+                    // Ensure width is greater than height for landscape
+                    if (width < height)
+                    {
+                        double tmp = width;
+                        width = height;
+                        height = tmp;
+                    }
                 }
+                else if (orientationAttr == "portrait")
+                {
+                    // Ensure height is greater than width for portrait
+                    if (height < width)
+                    {
+                        double tmp = width;
+                        width = height;
+                        height = tmp;
+                    }
+                }
+                // If the attribute is missing or unrecognised we keep the values as‑is (the caller can supply any size).
 
-                // Apply the calculated page size
+                // Apply the calculated dimensions – PageInfo does not expose an Orientation property.
                 page.PageInfo.Width = width;
                 page.PageInfo.Height = height;
 
-                // Add a simple label showing the page number and orientation
-                string label = $"Page {pdfDoc.Pages.Count} - {(orientation ?? "portrait")}";
-                Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment(label);
-                tf.Position = new Aspose.Pdf.Text.Position(50, height - 50);
-                page.Paragraphs.Add(tf);
+                // Optional: add a label showing the applied orientation based on dimensions
+                string appliedOrientation = width > height ? "Landscape" : "Portrait";
+                TextFragment label = new TextFragment($"Page {pdfDoc.Pages.Count} - {appliedOrientation}");
+                // Position uses Aspose.Pdf.Text.Position (fully qualified via using)
+                label.Position = new Position(50, height - 50);
+                page.Paragraphs.Add(label);
             }
 
-            // Save the resulting PDF
+            // Save the resulting PDF; no SaveOptions needed because the output is PDF
             pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF generated with custom orientations: {outputPdf}");
     }
 }

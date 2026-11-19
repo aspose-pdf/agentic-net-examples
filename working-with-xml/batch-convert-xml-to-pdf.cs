@@ -1,19 +1,20 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains Document, XmlLoadOptions)
 
-class Program
+class XmlToPdfBatch
 {
     static void Main()
     {
-        // Folder containing the source XML files
-        const string inputFolder = "XmlInput";
-        // Folder where the generated PDFs will be placed
-        const string outputFolder = "PdfOutput";
+        // Input folder containing XML files
+        const string inputFolder = @"C:\InputXml";
+        // Output folder for generated PDFs
+        const string outputFolder = @"C:\OutputPdf";
 
+        // Validate input folder
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
@@ -25,27 +26,29 @@ class Program
 
         foreach (string xmlPath in xmlFiles)
         {
-            // Derive the PDF file name from the XML file name
-            string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
-            string pdfPath = Path.Combine(outputFolder, pdfFileName);
-
             try
             {
-                // Load the XML into a PDF Document using XmlLoadOptions
-                using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+                // Load the XML file as a PDF document using XmlLoadOptions
+                XmlLoadOptions loadOptions = new XmlLoadOptions();
+                using (Document pdfDoc = new Document(xmlPath, loadOptions))
                 {
-                    // Save the document as PDF; Document.Save without options always writes PDF
-                    doc.Save(pdfPath);
+                    // Determine output PDF path (same file name, .pdf extension)
+                    string pdfFileName = Path.GetFileNameWithoutExtension(xmlPath) + ".pdf";
+                    string pdfPath = Path.Combine(outputFolder, pdfFileName);
+
+                    // Save the document as PDF (default format)
+                    pdfDoc.Save(pdfPath);
                 }
 
-                Console.WriteLine($"Converted: {xmlPath} → {pdfPath}");
+                Console.WriteLine($"Converted: {Path.GetFileName(xmlPath)} → {Path.GetFileNameWithoutExtension(xmlPath)}.pdf");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error converting '{xmlPath}': {ex.Message}");
+                // Log any errors but continue processing remaining files
+                Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.Message}");
             }
         }
 
-        Console.WriteLine("Batch processing completed.");
+        Console.WriteLine("Batch conversion completed.");
     }
 }

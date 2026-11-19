@@ -19,77 +19,56 @@ class Program
         }
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML data file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
         Directory.CreateDirectory(outputDir);
 
-        XDocument xdoc;
-        try
-        {
-            xdoc = XDocument.Load(xmlPath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to load XML: {ex.Message}");
-            return;
-        }
-
-        // Expect each record to be a <Record> element whose child element names match PDF field names
-        var records = xdoc.Root?.Elements("Record");
-        if (records == null)
-        {
-            Console.Error.WriteLine("No <Record> elements found in XML.");
-            return;
-        }
+        XDocument xdoc = XDocument.Load(xmlPath);
+        var records = xdoc.Root.Elements("Record");
 
         int index = 1;
         foreach (var record in records)
         {
-            // Lifecycle rule: wrap Document in a using block for deterministic disposal
+            // Load a fresh copy of the template for each XML record
             using (Document pdfDoc = new Document(templatePath))
             {
-                var form = pdfDoc.Form;
-                if (form != null && form.Fields != null)
+                // Access the AcroForm attached to the document
+                Form pdfForm = pdfDoc.Form;
+
+                // Iterate over every field defined in the form
+                foreach (Field field in pdfForm.Fields)
                 {
-                    foreach (Field field in form.Fields)
+                    string fieldName = field.FullName;
+                    var xmlElement = record.Element(fieldName);
+                    if (xmlElement != null)
                     {
-                        // Determine the field name – try the most common properties
-                        string fieldName = field.Name ?? field.FullName ?? field.PartialName ?? string.Empty;
-                        if (string.IsNullOrEmpty(fieldName))
-                            continue;
+                        string value = xmlElement.Value ?? string.Empty;
 
-                        // Find matching XML element for the current field
-                        var xmlElement = record.Element(fieldName);
-                        if (xmlElement == null)
-                            continue;
-
-                        // Set the field value based on its concrete type
-                        if (field is TextBoxField txt)
+                        // Checkbox fields need special handling
+                        if (field is CheckboxField checkBox)
                         {
-                            txt.Value = xmlElement.Value;
+                            checkBox.Checked = !string.IsNullOrEmpty(value) &&
+                                                value != "0" &&
+                                                !value.Equals("false", StringComparison.OrdinalIgnoreCase);
                         }
-                        else if (field is CheckboxField chk)
+                        else
                         {
-                            chk.Checked = string.Equals(xmlElement.Value, "true", StringComparison.OrdinalIgnoreCase);
+                            // Most other field types expose a Value property that accepts a string
+                            field.Value = value;
                         }
-                        else if (field is RadioButtonOptionField rad)
-                        {
-                            rad.Value = xmlElement.Value;
-                        }
-                        else if (field is ListBoxField list)
-                        {
-                            list.Value = xmlElement.Value;
-                        }
-                        // Additional field types can be handled here as needed
                     }
                 }
 
-                string outPath = Path.Combine(outputDir, $"filled_{index}.pdf");
-                pdfDoc.Save(outPath); // Save as PDF (no SaveOptions needed)
-                Console.WriteLine($"Saved record {index} to {outPath}");
+                // Build the output file name – use the Id element if it exists, otherwise fall back to an index
+                string id = record.Element("Id")?.Value ?? index.ToString();
+                string outPath = Path.Combine(outputDir, $"filled_{id}.pdf");
+
+                pdfDoc.Save(outPath);
+                Console.WriteLine($"Saved filled PDF: {outPath}");
             }
+
             index++;
         }
     }

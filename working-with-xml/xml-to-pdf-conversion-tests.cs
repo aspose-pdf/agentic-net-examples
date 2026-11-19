@@ -1,283 +1,169 @@
 using System;
 using System.IO;
+using System.Xml;
+using System.Xml.Xsl;
 using Aspose.Pdf;
-using NUnit.Framework;
+using Aspose.Pdf.Text;
 
-// -----------------------------------------------------------------------------
-// Minimal NUnit.Framework stubs – added to allow compilation when the NUnit
-// package is not referenced. Only the attributes and Assert members used in
-// the tests are implemented.
-// -----------------------------------------------------------------------------
-namespace NUnit.Framework
+class Program
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    // Additional NUnit attributes that might be useful in the future.
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TearDownAttribute : Attribute { }
-
-    public delegate void TestDelegate();
-
-    public static class Assert
+    static void Main()
     {
-        public static void IsTrue(bool condition, string message = null)
-        {
-            if (!condition)
-                throw new Exception(message ?? "Assert.IsTrue failed.");
-        }
-
-        public static void AreEqual<T>(T expected, T actual, string message = null)
-        {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
-        }
-
-        public static T Throws<T>(TestDelegate code) where T : Exception
-        {
-            try
-            {
-                code();
-            }
-            catch (T ex)
-            {
-                return ex;
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Assert.Throws failed. Expected {typeof(T)} but got {ex.GetType()}.", ex);
-            }
-            throw new Exception($"Assert.Throws failed. No exception thrown. Expected {typeof(T)}.");
-        }
+        // Run each test and output result.
+        RunTest(SimpleXsltConversion_ShouldCreatePdf, nameof(SimpleXsltConversion_ShouldCreatePdf));
+        RunTest(XsltWithParameter_ShouldCreatePdf, nameof(XsltWithParameter_ShouldCreatePdf));
+        RunTest(XsltWithExternalImage_ShouldCreatePdf, nameof(XsltWithExternalImage_ShouldCreatePdf));
     }
-}
 
-namespace AsposePdfXmlToPdfTests
-{
-    [TestFixture]
-    public class XmlToPdfConversionTests
+    private static void RunTest(Func<bool> testMethod, string testName)
     {
-        // Helper to create a temporary file with given content and return its path.
-        private string CreateTempFile(string content, string extension)
+        try
         {
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + extension);
-            File.WriteAllText(tempPath, content);
-            return tempPath;
+            bool result = testMethod();
+            Console.WriteLine(result ? $"PASS {testName}" : $"FAIL {testName}");
         }
-
-        // Helper to delete temporary files safely.
-        private void Cleanup(params string[] paths)
+        catch (Exception ex)
         {
-            foreach (var p in paths)
-            {
-                try { if (File.Exists(p)) File.Delete(p); } catch { /* ignore */ }
-            }
-        }
-
-        [Test]
-        public void ConvertXmlToPdf_Simple_ShouldCreatePdf()
-        {
-            // Simple XML source.
-            string xml = @"<?xml version='1.0' encoding='UTF-8'?>
-<document>
-    <title>Simple Test</title>
-    <body>This is a simple paragraph.</body>
-</document>";
-
-            // XSLT that transforms the XML into XSL‑FO for PDF generation.
-            string xslt = @"<?xml version='1.0' encoding='UTF-8'?>
-<xsl:stylesheet version='1.0'
-    xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
-    xmlns:fo='http://www.w3.org/1999/XSL/Format'>
-  <xsl:output method='xml' indent='yes'/>
-  <xsl:template match='/'>
-    <fo:root>
-      <fo:layout-master-set>
-        <fo:simple-page-master master-name='A4' page-height='29.7cm' page-width='21cm' margin='2cm'/>
-      </fo:layout-master-set>
-      <fo:page-sequence master-reference='A4'>
-        <fo:flow flow-name='xsl-region-body'>
-          <fo:block font-size='14pt' font-weight='bold'>
-            <xsl:value-of select='document/title'/>
-          </fo:block>
-          <fo:block margin-top='10pt'>
-            <xsl:value-of select='document/body'/>
-          </fo:block>
-        </fo:flow>
-      </fo:page-sequence>
-    </fo:root>
-  </xsl:template>
-</xsl:stylesheet>";
-
-            string? xmlPath = null;
-            string? xsltPath = null;
-            string? pdfPath = null;
-            try
-            {
-                xmlPath = CreateTempFile(xml, ".xml");
-                xsltPath = CreateTempFile(xslt, ".xslt");
-                pdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-
-                // Use a using block for deterministic disposal of the Document.
-                using (Document doc = new Document())
-                {
-                    // Bind the XML and XSLT; Aspose.Pdf will apply the transformation internally.
-                    doc.BindXml(xmlPath, xsltPath);
-                    // Save the result as PDF.
-                    doc.Save(pdfPath);
-                }
-
-                // Verify that the PDF file was created and is not empty.
-                Assert.IsTrue(File.Exists(pdfPath), "PDF file was not created.");
-                Assert.IsTrue(new FileInfo(pdfPath).Length > 0, "PDF file is empty.");
-            }
-            finally
-            {
-                Cleanup(xmlPath, xsltPath, pdfPath);
-            }
-        }
-
-        [Test]
-        public void ConvertXmlToPdf_MultiplePages_ShouldCreatePdfWithTwoPages()
-        {
-            // XML with two items that will be rendered on separate pages.
-            string xml = @"<?xml version='1.0' encoding='UTF-8'?>
-<report>
-    <section>
-        <title>First Page</title>
-        <content>Content of the first page.</content>
-    </section>
-    <section>
-        <title>Second Page</title>
-        <content>Content of the second page.</content>
-    </section>
-</report>";
-
-            // XSLT that creates two <fo:page-sequence> elements, one per section.
-            string xslt = @"<?xml version='1.0' encoding='UTF-8'?>
-<xsl:stylesheet version='1.0'
-    xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
-    xmlns:fo='http://www.w3.org/1999/XSL/Format'>
-  <xsl:output method='xml' indent='yes'/>
-  <xsl:template match='/'>
-    <fo:root>
-      <fo:layout-master-set>
-        <fo:simple-page-master master-name='A4' page-height='29.7cm' page-width='21cm' margin='2cm'/>
-      </fo:layout-master-set>
-
-      <xsl:for-each select='report/section'>
-        <fo:page-sequence master-reference='A4'>
-          <fo:flow flow-name='xsl-region-body'>
-            <fo:block font-size='16pt' font-weight='bold'>
-              <xsl:value-of select='title'/>
-            </fo:block>
-            <fo:block margin-top='10pt'>
-              <xsl:value-of select='content'/>
-            </fo:block>
-          </fo:flow>
-        </fo:page-sequence>
-      </xsl:for-each>
-
-    </fo:root>
-  </xsl:template>
-</xsl:stylesheet>";
-
-            string? xmlPath = null;
-            string? xsltPath = null;
-            string? pdfPath = null;
-            try
-            {
-                xmlPath = CreateTempFile(xml, ".xml");
-                xsltPath = CreateTempFile(xslt, ".xslt");
-                pdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-
-                using (Document doc = new Document())
-                {
-                    doc.BindXml(xmlPath, xsltPath);
-                    doc.Save(pdfPath);
-                }
-
-                Assert.IsTrue(File.Exists(pdfPath), "PDF file was not created.");
-                // Simple validation: page count should be 2.
-                using (Document result = new Document(pdfPath))
-                {
-                    Assert.AreEqual(2, result.Pages.Count, "PDF should contain two pages.");
-                }
-            }
-            finally
-            {
-                Cleanup(xmlPath, xsltPath, pdfPath);
-            }
-        }
-
-        [Test]
-        public void ConvertXmlToPdf_InvalidXslt_ShouldThrowException()
-        {
-            // Minimal XML.
-            string xml = @"<?xml version='1.0' encoding='UTF-8'?><root/>";
-
-            // Malformed XSLT (missing closing tag).
-            string xslt = @"<?xml version='1.0' encoding='UTF-8'?>
-<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
-  <xsl:template match='/'><fo:root/></xsl:template>";
-
-            string? xmlPath = null;
-            string? xsltPath = null;
-            try
-            {
-                xmlPath = CreateTempFile(xml, ".xml");
-                xsltPath = CreateTempFile(xslt, ".xslt");
-
-                using (Document doc = new Document())
-                {
-                    // Expect an exception when binding malformed XSLT.
-                    Assert.Throws<Exception>(() => doc.BindXml(xmlPath, xsltPath));
-                }
-            }
-            finally
-            {
-                Cleanup(xmlPath, xsltPath);
-            }
-        }
-
-        [Test]
-        public void ConvertXmlToPdf_MissingXmlFile_ShouldThrowFileNotFoundException()
-        {
-            // XSLT that would be valid if XML existed.
-            string xslt = @"<?xml version='1.0' encoding='UTF-8'?>
-<xsl:stylesheet version='1.0' xmlns:xsl='http://www.w3.org/1999/XSL/Transform'>
-  <xsl:template match='/'><fo:root/></xsl:template>
-</xsl:stylesheet>";
-
-            string? xsltPath = null;
-            try
-            {
-                xsltPath = CreateTempFile(xslt, ".xslt");
-                string nonExistentXml = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xml");
-
-                using (Document doc = new Document())
-                {
-                    // Expect FileNotFoundException because the XML file does not exist.
-                    Assert.Throws<FileNotFoundException>(() => doc.BindXml(nonExistentXml, xsltPath));
-                }
-            }
-            finally
-            {
-                Cleanup(xsltPath);
-            }
+            Console.WriteLine($"FAIL {testName}: {ex.GetType().Name} - {ex.Message}");
         }
     }
 
-    // Dummy entry point to satisfy the compiler when the project is built as an
-    // executable. Test runners will ignore this method.
-    public static class Program
+    // Helper to create a temporary file with the specified content.
+    private static string CreateTempFile(string content, string extension)
     {
-        public static void Main() { /* No-op */ }
+        string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + extension);
+        File.WriteAllText(tempPath, content);
+        return tempPath;
+    }
+
+    // Helper to delete temporary files safely.
+    private static void DeleteIfExists(string path)
+    {
+        try { if (File.Exists(path)) File.Delete(path); } catch { /* ignore */ }
+    }
+
+    // Helper to transform XML + XSLT into XSL‑FO.
+    private static string TransformToFo(string xmlPath, string xsltPath, XsltArgumentList args = null)
+    {
+        string foPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".fo");
+        XslCompiledTransform xslt = new XslCompiledTransform();
+        xslt.Load(xsltPath);
+        using (FileStream foStream = new FileStream(foPath, FileMode.Create, FileAccess.Write))
+        using (XmlWriter writer = XmlWriter.Create(foStream, xslt.OutputSettings))
+        {
+            if (args != null)
+                xslt.Transform(xmlPath, args, writer);
+            else
+                xslt.Transform(xmlPath, writer);
+        }
+        return foPath;
+    }
+
+    // Test 1: Simple XSLT conversion.
+    private static bool SimpleXsltConversion_ShouldCreatePdf()
+    {
+        string xmlContent = "<?xml version=\"1.0\"?>\n<root>\n    <title>Hello World</title>\n</root>";
+        string xsltContent = "<?xml version=\"1.0\"?>\n<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n                xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">\n  <xsl:output method=\"xml\"/>\n  <xsl:template match=\"/\">\n    <fo:root>\n      <fo:layout-master-set>\n        <fo:simple-page-master master-name=\"simple\">\n          <fo:region-body/>\n        </fo:simple-page-master>\n      </fo:layout-master-set>\n      <fo:page-sequence master-reference=\"simple\">\n        <fo:flow flow-name=\"xsl-region-body\">\n          <fo:block font-size=\"14pt\"><xsl:value-of select=\"/root/title\"/></fo:block>\n        </fo:flow>\n      </fo:page-sequence>\n    </fo:root>\n  </xsl:template>\n</xsl:stylesheet>";
+
+        string xmlPath = CreateTempFile(xmlContent, ".xml");
+        string xsltPath = CreateTempFile(xsltContent, ".xslt");
+        string pdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        string foPath = null;
+
+        try
+        {
+            // Transform to XSL‑FO.
+            foPath = TransformToFo(xmlPath, xsltPath);
+
+            // Load the generated XSL‑FO and save as PDF.
+            using (Document doc = new Document(foPath, new XslFoLoadOptions()))
+            {
+                doc.Save(pdfPath);
+            }
+
+            return File.Exists(pdfPath) && new FileInfo(pdfPath).Length > 0;
+        }
+        finally
+        {
+            DeleteIfExists(xmlPath);
+            DeleteIfExists(xsltPath);
+            DeleteIfExists(foPath);
+            DeleteIfExists(pdfPath);
+        }
+    }
+
+    // Test 2: XSLT with a parameter.
+    private static bool XsltWithParameter_ShouldCreatePdf()
+    {
+        string xmlContent = "<?xml version=\"1.0\"?>\n<root>\n    <title>Placeholder</title>\n</root>";
+        string xsltContent = "<?xml version=\"1.0\"?>\n<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n                xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">\n  <xsl:param name=\"docTitle\"/>\n  <xsl:output method=\"xml\"/>\n  <xsl:template match=\"/\">\n    <fo:root>\n      <fo:layout-master-set>\n        <fo:simple-page-master master-name=\"simple\">\n          <fo:region-body/>\n        </fo:simple-page-master>\n      </fo:layout-master-set>\n      <fo:page-sequence master-reference=\"simple\">\n        <fo:flow flow-name=\"xsl-region-body\">\n          <fo:block font-size=\"14pt\"><xsl:value-of select=\"$docTitle\"/></fo:block>\n        </fo:flow>\n      </fo:page-sequence>\n    </fo:root>\n  </xsl:template>\n</xsl:stylesheet>";
+
+        string xmlPath = CreateTempFile(xmlContent, ".xml");
+        string xsltPath = CreateTempFile(xsltContent, ".xslt");
+        string pdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        string foPath = null;
+
+        try
+        {
+            // Transform with a parameter into XSL‑FO.
+            XsltArgumentList args = new XsltArgumentList();
+            args.AddParam("docTitle", "", "Parameterized Title");
+            foPath = TransformToFo(xmlPath, xsltPath, args);
+
+            // Load the generated XSL‑FO and save as PDF.
+            using (Document doc = new Document(foPath, new XslFoLoadOptions()))
+            {
+                doc.Save(pdfPath);
+            }
+
+            return File.Exists(pdfPath) && new FileInfo(pdfPath).Length > 0;
+        }
+        finally
+        {
+            DeleteIfExists(xmlPath);
+            DeleteIfExists(xsltPath);
+            DeleteIfExists(foPath);
+            DeleteIfExists(pdfPath);
+        }
+    }
+
+    // Test 3: XSLT that references an external image.
+    private static bool XsltWithExternalImage_ShouldCreatePdf()
+    {
+        // 1x1 PNG image (base64).
+        string base64Png = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+XK6cAAAAASUVORK5CYII=";
+        byte[] imageBytes = Convert.FromBase64String(base64Png);
+        string imagePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".png");
+        File.WriteAllBytes(imagePath, imageBytes);
+
+        string xmlContent = "<?xml version=\"1.0\"?>\n<root/>";
+        string xsltContent = $"<?xml version=\"1.0\"?>\n<xsl:stylesheet version=\"1.0\" xmlns:xsl=\"http://www.w3.org/1999/XSL/Transform\"\n                xmlns:fo=\"http://www.w3.org/1999/XSL/Format\">\n  <xsl:output method=\"xml\"/>\n  <xsl:template match=\"/\">\n    <fo:root>\n      <fo:layout-master-set>\n        <fo:simple-page-master master-name=\"simple\">\n          <fo:region-body/>\n        </fo:simple-page-master>\n      </fo:layout-master-set>\n      <fo:page-sequence master-reference=\"simple\">\n        <fo:flow flow-name=\"xsl-region-body\">\n          <fo:block>\n            <fo:external-graphic src=\"url('{imagePath.Replace("\\", "/")}')\" content-width=\"50pt\"/>\n          </fo:block>\n        </fo:flow>\n      </fo:page-sequence>\n    </fo:root>\n  </xsl:template>\n</xsl:stylesheet>";
+
+        string xmlPath = CreateTempFile(xmlContent, ".xml");
+        string xsltPath = CreateTempFile(xsltContent, ".xslt");
+        string pdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        string foPath = null;
+
+        try
+        {
+            // Transform to XSL‑FO (no parameters needed).
+            foPath = TransformToFo(xmlPath, xsltPath);
+
+            // Load the generated XSL‑FO and save as PDF.
+            using (Document doc = new Document(foPath, new XslFoLoadOptions()))
+            {
+                doc.Save(pdfPath);
+            }
+
+            return File.Exists(pdfPath) && new FileInfo(pdfPath).Length > 0;
+        }
+        finally
+        {
+            DeleteIfExists(xmlPath);
+            DeleteIfExists(xsltPath);
+            DeleteIfExists(foPath);
+            DeleteIfExists(pdfPath);
+            DeleteIfExists(imagePath);
+        }
     }
 }

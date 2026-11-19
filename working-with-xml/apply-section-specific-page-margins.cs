@@ -1,94 +1,81 @@
 using System;
 using System.IO;
 using System.Xml.Linq;
-using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
 {
-    // Simple DTO to hold margin settings for a page range
-    class SectionMargin
-    {
-        public int StartPage { get; set; }
-        public int EndPage   { get; set; }
-        public MarginInfo Margins { get; set; }
-    }
-
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string marginXmlPath  = "margins.xml";
+        const string inputPdfPath  = "input.pdf";
+        const string marginsXmlPath = "margins.xml";
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(marginXmlPath))
+
+        if (!File.Exists(marginsXmlPath))
         {
-            Console.Error.WriteLine($"Margin definition XML not found: {marginXmlPath}");
+            Console.Error.WriteLine($"Margins XML not found: {marginsXmlPath}");
             return;
         }
 
-        // Load margin definitions from XML
-        List<SectionMargin> sections = LoadMarginDefinitions(marginXmlPath);
+        // Load margin definitions from XML.
+        // Expected format:
+        // <Margins>
+        //   <Section start="1" end="3" top="50" bottom="50" left="40" right="40"/>
+        //   <Section start="4" end="6" top="30" bottom="30" left="20" right="20"/>
+        //   ...
+        // </Margins>
+        XDocument xmlDoc = XDocument.Load(marginsXmlPath);
+        var sections = xmlDoc.Root.Elements("Section");
 
-        // Open the PDF inside a using block (document-disposal-with-using rule)
-        using (Document doc = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate through all pages (1‑based indexing).
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
             {
-                // Find the first section that covers the current page
-                SectionMargin matchingSection = sections.Find(s => pageNum >= s.StartPage && pageNum <= s.EndPage);
+                // Find the first section whose page range includes the current page.
+                var matchingSection = FindSectionForPage(sections, i);
                 if (matchingSection != null)
                 {
-                    // Apply the margin to the page
-                    doc.Pages[pageNum].PageInfo.Margin = new MarginInfo
+                    // Parse margin values; default to 0 if missing.
+                    double top    = (double?)matchingSection.Attribute("top")    ?? 0;
+                    double bottom = (double?)matchingSection.Attribute("bottom") ?? 0;
+                    double left   = (double?)matchingSection.Attribute("left")   ?? 0;
+                    double right  = (double?)matchingSection.Attribute("right")  ?? 0;
+
+                    // Apply margins to the page.
+                    pdfDoc.Pages[i].PageInfo.Margin = new MarginInfo
                     {
-                        Left   = matchingSection.Margins.Left,
-                        Right  = matchingSection.Margins.Right,
-                        Top    = matchingSection.Margins.Top,
-                        Bottom = matchingSection.Margins.Bottom
+                        Top    = top,
+                        Bottom = bottom,
+                        Left   = left,
+                        Right  = right
                     };
                 }
             }
 
-            // Save the modified PDF (save-to-non-pdf-always-use-save-options not needed here)
-            doc.Save(outputPdfPath);
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"PDF saved with section‑specific margins to '{outputPdfPath}'.");
     }
 
-    // Parses the XML file and returns a list of SectionMargin objects
-    static List<SectionMargin> LoadMarginDefinitions(string xmlPath)
+    // Helper to locate the section element that covers a given page number.
+    static XElement FindSectionForPage(IEnumerable<XElement> sections, int pageNumber)
     {
-        XDocument xdoc = XDocument.Load(xmlPath);
-        var sections = new List<SectionMargin>();
-
-        foreach (XElement sec in xdoc.Root.Elements("Section"))
+        foreach (var sec in sections)
         {
-            int start = (int)sec.Attribute("start");
-            int end   = (int)sec.Attribute("end");
-
-            XElement m = sec.Element("Margins");
-            MarginInfo marginInfo = new MarginInfo {
-                Left   = (double)m.Attribute("left"),
-                Right  = (double)m.Attribute("right"),
-                Top    = (double)m.Attribute("top"),
-                Bottom = (double)m.Attribute("bottom")
-            };
-
-            sections.Add(new SectionMargin
-            {
-                StartPage = start,
-                EndPage   = end,
-                Margins   = marginInfo
-            });
+            int start = (int?)sec.Attribute("start") ?? 1;
+            int end   = (int?)sec.Attribute("end")   ?? int.MaxValue;
+            if (pageNumber >= start && pageNumber <= end)
+                return sec;
         }
-
-        return sections;
+        return null;
     }
 }

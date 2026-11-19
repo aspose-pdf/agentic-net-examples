@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
-using System.Xml.Linq;
-using System.Linq;
+using System.Xml;
 using Aspose.Pdf;
 
 class Program
@@ -18,48 +17,52 @@ class Program
             return;
         }
 
-        // Create an empty PDF document to collect rendered pages
-        using (Document outputDoc = new Document())
+        // Load the XML document
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
+
+        // Create the target PDF document
+        using (Document targetPdf = new Document())
         {
-            // Load the XML document
-            XDocument xdoc = XDocument.Load(xmlPath);
-
-            // Find all CDATA sections (they may contain HTML fragments)
-            var cdataNodes = xdoc.DescendantNodes().OfType<XCData>();
-
-            foreach (var cdata in cdataNodes)
+            // Iterate over all CDATA sections containing HTML fragments
+            var cdataNodes = xmlDoc.SelectNodes("//text()");
+            if (cdataNodes != null)
             {
-                string html = cdata.Value;
-
-                // Render each HTML fragment to PDF pages
-                try
+                foreach (XmlNode node in cdataNodes)
                 {
-                    // Load HTML from a memory stream using HtmlLoadOptions (Windows GDI+ required)
-                    using (MemoryStream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(html)))
-                    using (Document htmlDoc = new Document(htmlStream, new HtmlLoadOptions()))
+                    if (node.NodeType != XmlNodeType.CDATA)
+                        continue;
+
+                    string htmlFragment = node.Value;
+                    if (string.IsNullOrWhiteSpace(htmlFragment))
+                        continue;
+
+                    // Convert the HTML fragment to a temporary PDF document
+                    try
                     {
-                        // Append each page from the temporary HTML document to the output PDF
-                        foreach (Page page in htmlDoc.Pages)
+                        using (MemoryStream htmlStream = new MemoryStream(Encoding.UTF8.GetBytes(htmlFragment)))
+                        using (Document htmlDoc = new Document(htmlStream, new HtmlLoadOptions()))
                         {
-                            outputDoc.Pages.Add(page);
+                            // Append the pages of the temporary document to the target PDF
+                            targetPdf.Pages.Add(htmlDoc.Pages);
                         }
                     }
-                }
-                catch (TypeInitializationException)
-                {
-                    // HTML rendering is Windows‑only; skip on other platforms
-                    Console.WriteLine("HTML rendering requires Windows (GDI+). Skipping this fragment.");
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Error rendering HTML fragment: {ex.Message}");
+                    catch (TypeInitializationException)
+                    {
+                        // HTML conversion requires GDI+ (Windows only)
+                        Console.WriteLine("HTML rendering skipped on this platform (requires Windows GDI+).");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Error.WriteLine($"Error processing HTML fragment: {ex.Message}");
+                    }
                 }
             }
 
-            // Save the combined PDF
-            outputDoc.Save(outputPdf);
+            // Save the assembled PDF
+            targetPdf.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF created: {outputPdf}");
+        Console.WriteLine($"PDF generated: {outputPdf}");
     }
 }

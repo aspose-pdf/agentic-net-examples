@@ -1,52 +1,59 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class BatchXmlToPdfProfiler
 {
     static void Main()
     {
-        // Input folder containing XML files and output folder for PDFs
-        const string inputFolder = "XmlInputs";
-        const string outputFolder = "PdfOutputs";
+        // Input directory containing XML files
+        const string inputDir = "XmlInputs";
+        // Output directory for generated PDFs
+        const string outputDir = "PdfOutputs";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Collect timing data for each phase
+        // Collect all XML files
+        string[] xmlFiles = Directory.GetFiles(inputDir, "*.xml", SearchOption.TopDirectoryOnly);
+        if (xmlFiles.Length == 0)
+        {
+            Console.WriteLine("No XML files to process.");
+            return;
+        }
+
+        // Statistics containers
         var loadTimes = new List<long>();
         var saveTimes = new List<long>();
         var totalTimes = new List<long>();
 
-        // Process each XML file in the input folder
-        foreach (string xmlPath in Directory.GetFiles(inputFolder, "*.xml"))
+        foreach (string xmlPath in xmlFiles)
         {
             string fileName = Path.GetFileNameWithoutExtension(xmlPath);
-            string pdfPath = Path.Combine(outputFolder, fileName + ".pdf");
+            string pdfPath = Path.Combine(outputDir, fileName + ".pdf");
 
             var totalStopwatch = Stopwatch.StartNew();
 
-            // ---------- Load XML into Document ----------
+            // Measure XML loading time
             var loadStopwatch = Stopwatch.StartNew();
-            XmlLoadOptions loadOptions = new XmlLoadOptions();
-            using (Document doc = new Document(xmlPath, loadOptions))
+            using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
             {
                 loadStopwatch.Stop();
                 loadTimes.Add(loadStopwatch.ElapsedMilliseconds);
 
-                // ---------- Save Document as PDF ----------
+                // Measure PDF saving time
                 var saveStopwatch = Stopwatch.StartNew();
-                doc.Save(pdfPath); // PDF format, no SaveOptions needed
+                doc.Save(pdfPath);
                 saveStopwatch.Stop();
                 saveTimes.Add(saveStopwatch.ElapsedMilliseconds);
-            }
+            } // Document disposed here per lifecycle rule
 
             totalStopwatch.Stop();
             totalTimes.Add(totalStopwatch.ElapsedMilliseconds);
@@ -54,51 +61,43 @@ class BatchXmlToPdfProfiler
             Console.WriteLine($"{fileName}: Load={loadTimes[^1]}ms, Save={saveTimes[^1]}ms, Total={totalTimes[^1]}ms");
         }
 
-        // ---------- Summary ----------
-        if (totalTimes.Count == 0)
-        {
-            Console.WriteLine("No XML files processed.");
-            return;
-        }
-
+        // Compute and display aggregated statistics
         long avgLoad = Average(loadTimes);
         long avgSave = Average(saveTimes);
         long avgTotal = Average(totalTimes);
 
-        Console.WriteLine("\n=== Performance Summary ===");
-        Console.WriteLine($"Files processed: {totalTimes.Count}");
-        Console.WriteLine($"Average Load time : {avgLoad} ms");
-        Console.WriteLine($"Average Save time : {avgSave} ms");
-        Console.WriteLine($"Average Total time: {avgTotal} ms");
+        long maxLoad = Max(loadTimes);
+        long maxSave = Max(saveTimes);
+        long maxTotal = Max(totalTimes);
 
-        // ---------- Simple bottleneck analysis ----------
+        Console.WriteLine("\n--- Performance Summary ---");
+        Console.WriteLine($"Processed files: {xmlFiles.Length}");
+        Console.WriteLine($"Average Load Time (ms): {avgLoad}");
+        Console.WriteLine($"Average Save Time (ms): {avgSave}");
+        Console.WriteLine($"Average Total Time (ms): {avgTotal}");
+        Console.WriteLine($"Max Load Time (ms): {maxLoad}");
+        Console.WriteLine($"Max Save Time (ms): {maxSave}");
+        Console.WriteLine($"Max Total Time (ms): {maxTotal}");
+
+        // Simple bottleneck identification
         if (avgLoad > avgSave)
-        {
-            Console.WriteLine("Loading XML is the dominant cost. Consider:");
-            Console.WriteLine("- Reusing XmlLoadOptions if possible.");
-            Console.WriteLine("- Reducing XML size or simplifying structure.");
-            Console.WriteLine("- Parallelizing the load phase (ensure thread safety).");
-        }
-        else if (avgSave > avgLoad)
-        {
-            Console.WriteLine("Saving PDF is the dominant cost. Consider:");
-            Console.WriteLine("- Enabling PDF optimization (doc.OptimizeResources).");
-            Console.WriteLine("- Using a faster storage medium (SSD).");
-            Console.WriteLine("- Parallelizing the save phase if CPU bound.");
-        }
+            Console.WriteLine("Loading XML is the primary bottleneck.");
         else
-        {
-            Console.WriteLine("Load and Save times are comparable. Overall optimization may focus on:");
-            Console.WriteLine("- Reducing I/O latency.");
-            Console.WriteLine("- Profiling memory usage for large documents.");
-        }
+            Console.WriteLine("Saving PDF is the primary bottleneck.");
     }
 
-    // Helper to compute average of a list of long values
-    private static long Average(List<long> values)
+    static long Average(List<long> values)
     {
+        if (values.Count == 0) return 0;
         long sum = 0;
         foreach (long v in values) sum += v;
         return sum / values.Count;
+    }
+
+    static long Max(List<long> values)
+    {
+        long max = 0;
+        foreach (long v in values) if (v > max) max = v;
+        return max;
     }
 }

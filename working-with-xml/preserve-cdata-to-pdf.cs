@@ -1,9 +1,12 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
+
+// Alias to disambiguate the LoadOptions enum that exists in both System.Xml.Linq and Aspose.Pdf
+using XmlLoadOptions = System.Xml.Linq.LoadOptions;
 
 class Program
 {
@@ -18,95 +21,45 @@ class Program
             return;
         }
 
-        // Load the XML document
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlPath);
+        // Load the XML document preserving CDATA sections and whitespace
+        XDocument xDoc = XDocument.Load(xmlPath, XmlLoadOptions.PreserveWhitespace | XmlLoadOptions.SetLineInfo);
 
         // Create a new PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a page to the PDF
+            // Add a single page to host the formatted text
             Page page = pdfDoc.Pages.Add();
 
-            // Process the XML nodes recursively and add them to the PDF page
-            ProcessXmlNode(xmlDoc.DocumentElement, page, 0);
+            // Define a monospaced font for CDATA content
+            Font cdataFont = FontRepository.FindFont("Courier New");
 
-            // Save the PDF
+            // Iterate over all CDATA sections in the XML
+            foreach (XCData cdata in xDoc.DescendantNodes().OfType<XCData>())
+            {
+                // Create a text fragment with the CDATA content
+                TextFragment tf = new TextFragment(cdata.Value);
+
+                // Apply formatting: monospaced font, light gray background for visibility
+                tf.TextState.Font = cdataFont;
+                tf.TextState.FontSize = 12;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                tf.TextState.BackgroundColor = Aspose.Pdf.Color.LightGray;
+
+                // NOTE: TextFragment automatically respects line‑break characters (\n, \r\n) in the text.
+                // Therefore no explicit "IsWrapped" property is required; removing the non‑existent
+                // property eliminates the CS1061 compile error while preserving the original line breaks.
+
+                // Add the fragment to the page
+                page.Paragraphs.Add(tf);
+
+                // Add an empty line after each CDATA block for readability
+                page.Paragraphs.Add(new TextFragment(Environment.NewLine));
+            }
+
+            // Save the PDF document
             pdfDoc.Save(pdfPath);
         }
 
         Console.WriteLine($"PDF created at '{pdfPath}'.");
-    }
-
-    /// <summary>
-    /// Recursively processes an XmlNode and adds formatted text fragments to the PDF page.
-    /// </summary>
-    /// <param name="node">Current XML node.</param>
-    /// <param name="page">PDF page to which text fragments are added.</param>
-    /// <param name="indentLevel">Current indentation level (for visual hierarchy).</param>
-    private static void ProcessXmlNode(XmlNode node, Page page, int indentLevel)
-    {
-        if (node == null) return;
-
-        // Indentation string
-        string indent = new string(' ', indentLevel * 4);
-
-        // Handle element nodes
-        if (node.NodeType == XmlNodeType.Element)
-        {
-            // Write the start tag
-            TextFragment startTag = new TextFragment($"{indent}<{node.Name}>");
-            startTag.TextState.Font = FontRepository.FindFont("Helvetica");
-            startTag.TextState.FontSize = 12;
-            startTag.TextState.FontStyle = FontStyles.Bold;
-            page.Paragraphs.Add(startTag);
-
-            // Process child nodes
-            foreach (XmlNode child in node.ChildNodes)
-            {
-                ProcessXmlNode(child, page, indentLevel + 1);
-            }
-
-            // Write the end tag
-            TextFragment endTag = new TextFragment($"{indent}</{node.Name}>");
-            endTag.TextState.Font = FontRepository.FindFont("Helvetica");
-            endTag.TextState.FontSize = 12;
-            endTag.TextState.FontStyle = FontStyles.Bold;
-            page.Paragraphs.Add(endTag);
-        }
-        // Handle CDATA sections
-        else if (node.NodeType == XmlNodeType.CDATA)
-        {
-            // Render CDATA content with a distinct background color
-            TextFragment cdataFragment = new TextFragment($"{indent}<![CDATA[{node.Value}]]>");
-            cdataFragment.TextState.Font = FontRepository.FindFont("Courier New");
-            cdataFragment.TextState.FontSize = 12;
-            cdataFragment.TextState.ForegroundColor = Color.FromRgb(0.2, 0.2, 0.8);
-            cdataFragment.TextState.BackgroundColor = Color.LightGray;
-            page.Paragraphs.Add(cdataFragment);
-        }
-        // Handle text nodes (including whitespace)
-        else if (node.NodeType == XmlNodeType.Text)
-        {
-            // Trim to avoid adding empty fragments
-            string text = node.Value?.Trim();
-            if (!string.IsNullOrEmpty(text))
-            {
-                TextFragment textFragment = new TextFragment($"{indent}{text}");
-                textFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-                textFragment.TextState.FontSize = 12;
-                page.Paragraphs.Add(textFragment);
-            }
-        }
-        // Handle comments (optional)
-        else if (node.NodeType == XmlNodeType.Comment)
-        {
-            TextFragment commentFragment = new TextFragment($"{indent}<!--{node.Value}-->");
-            commentFragment.TextState.Font = FontRepository.FindFont("Helvetica");
-            commentFragment.TextState.FontSize = 12;
-            commentFragment.TextState.FontStyle = FontStyles.Italic;
-            commentFragment.TextState.ForegroundColor = Color.Gray;
-            page.Paragraphs.Add(commentFragment);
-        }
     }
 }
