@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Forms;
@@ -8,63 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string buttonName = "MyButton"; // name of the button field in the PDF
 
-        if (!File.Exists(inputPath))
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page that will host the button and the floating box
+            Page page = doc.Pages.Add();
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-            {
-                Console.Error.WriteLine("Document contains no pages.");
-                return;
-            }
+            // Use PopupAnnotation as the floating box (shown on mouse entry)
+            PopupAnnotation floatingBox = new PopupAnnotation(
+                page,
+                new Aspose.Pdf.Rectangle(100, 500, 300, 550) // llx, lly, urx, ury
+            );
+            floatingBox.Name = "MyFloatingBox";                     // Identifier used by HideAction
+            floatingBox.Contents = "Info box displayed on hover.";   // Text shown inside the popup
+            page.Annotations.Add(floatingBox);
 
-            // Get the first page (or any page you prefer) to host the floating box
-            Page page = doc.Pages[1];
+            // Create a button field (ButtonField is the correct type in Aspose.Pdf.Forms)
+            ButtonField button = new ButtonField(
+                page,
+                new Aspose.Pdf.Rectangle(50, 600, 150, 650) // llx, lly, urx, ury
+            );
+            button.PartialName = "ShowBoxButton";
+            // DefaultAppearance must be set before assigning a caption
+            button.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            button.NormalCaption = "Hover me";
 
-            // Create a rectangle for the floating box (Popup annotation)
-            // Coordinates: lower-left X, lower-left Y, upper-right X, upper-right Y
-            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(100, 500, 300, 650);
+            // Assign a HideAction to the button's OnEnter event.
+            // Hide = false means the specified annotation(s) will be shown.
+            // The HideAction constructor expects the target annotation instance and a bool flag.
+            button.Actions.OnEnter = new HideAction(floatingBox, false);
 
-            // Create the Popup annotation
-            PopupAnnotation popup = new PopupAnnotation(page, popupRect)
-            {
-                // Set the text that will appear inside the floating box
-                Contents = "This is a floating box displayed on mouse entry."
-                // Title property is not available in the current Aspose.Pdf version, so it is omitted.
-            };
+            // Add the button to the document's form collection (page index is 1‑based)
+            doc.Form.Add(button, 1);
 
-            // Add the popup annotation to the page
-            page.Annotations.Add(popup);
-
-            // Retrieve the button field by name
-            ButtonField button = doc.Form[buttonName] as ButtonField;
-            if (button == null)
-            {
-                Console.Error.WriteLine($"Button field '{buttonName}' not found.");
-                return;
-            }
-
-            // Create a HideAction that will SHOW the popup (Hide = false) when the mouse enters the button
-            // HideAction constructor requires the target annotation and a boolean indicating whether to hide (true) or show (false).
-            HideAction showPopupAction = new HideAction(popup, false);
-
-            // Assign the action to the button's OnEnter event
-            button.Actions.OnEnter = showPopupAction;
-
-            // Save the modified PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

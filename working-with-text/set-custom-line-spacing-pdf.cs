@@ -7,9 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const float leading = 15f; // Desired line spacing
 
         if (!File.Exists(inputPath))
         {
@@ -17,34 +16,32 @@ class Program
             return;
         }
 
-        try
+        // Load the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document (lifecycle rule: use using)
-            using (Document doc = new Document(inputPath))
-            {
-                // Create a text fragment with multiple lines
-                TextFragment fragment = new TextFragment("First line\nSecond line\nThird line");
+            // Access the first page (Aspose.Pdf uses 1‑based indexing)
+            Page page = doc.Pages[1];
 
-                // Set line spacing via TextState.LineSpacing (the correct property)
-                fragment.TextState.LineSpacing = leading;
+            // Define the rectangle where the text will be placed
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(50, 750, 550, 50);
 
-                // Optional: set other text properties
-                fragment.TextState.FontSize = 12;
-                fragment.TextState.Font = FontRepository.FindFont("Arial");
+            // Create a TextFragment containing multiple lines
+            TextFragment tf = new TextFragment("Line 1\nLine 2\nLine 3");
 
-                // Add the fragment to the first page (1‑based indexing)
-                Page page = doc.Pages[1];
-                page.Paragraphs.Add(fragment);
+            // Set the line spacing (leading) in points using the correct property
+            tf.TextState.LineSpacing = 20; // 20‑point spacing between baselines
 
-                // Save the modified PDF (lifecycle rule: save inside using)
-                doc.Save(outputPath);
-            }
+            // Optional: set additional text properties
+            tf.TextState.FontSize = 12;
+            tf.TextState.Font = FontRepository.FindFont("Arial");
 
-            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(tf);
+
+            // Save the modified PDF; Document.Save writes PDF by default
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

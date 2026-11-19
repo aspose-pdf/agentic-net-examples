@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "search_results.txt";
+        const string targetPhrase = "target phrase";
 
         if (!File.Exists(inputPath))
         {
@@ -16,45 +17,47 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Phrase to search (approximate/fuzzy match)
-            string phrase = "sample phrase";
+            // TextSearchOptions constructor requires a bool indicating whether to search in annotations.
+            var searchOptions = new TextSearchOptions(true);
 
-            // Configure fuzzy search options – the constructor that takes a bool enables fuzzy search
-            TextSearchOptions searchOptions = new TextSearchOptions(true);
-
-            // Prepare the output file
-            using (StreamWriter writer = new StreamWriter(outputPath))
+            // ---------------------------------------------------------------------
+            // Enable fuzzy matching – the exact property name differs between Aspose.Pdf
+            // versions ("FuzzySearch" in newer releases, "FuzzySearchEnabled" in older).
+            // We use reflection to set whichever property exists, avoiding compile‑time
+            // errors and keeping the code version‑agnostic.
+            // ---------------------------------------------------------------------
+            Type optsType = typeof(TextSearchOptions);
+            PropertyInfo fuzzyProp = optsType.GetProperty("FuzzySearch") ?? optsType.GetProperty("FuzzySearchEnabled");
+            if (fuzzyProp != null && fuzzyProp.CanWrite)
             {
-                int totalMatches = 0;
-                writer.WriteLine($"Searching for \"{phrase}\" with fuzzy matching …");
-
-                // Iterate through all pages because TextFragment does not expose a PageNumber property in newer versions
-                for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
-                {
-                    // Create a new absorber for each page (required to get page‑specific results)
-                    TextFragmentAbsorber absorber = new TextFragmentAbsorber(phrase);
-                    absorber.TextSearchOptions = searchOptions;
-
-                    // Apply the absorber to the current page
-                    doc.Pages[pageIdx].Accept(absorber);
-
-                    // Process found fragments
-                    foreach (TextFragment fragment in absorber.TextFragments)
-                    {
-                        totalMatches++;
-                        // Rectangle of the found text fragment
-                        Aspose.Pdf.Rectangle rect = fragment.Rectangle;
-                        writer.WriteLine($"Page {pageIdx}: Rect [{rect.LLX}, {rect.LLY}, {rect.URX}, {rect.URY}]");
-                    }
-                }
-
-                writer.WriteLine($"Found {totalMatches} matches for \"{phrase}\" (fuzzy).");
+                fuzzyProp.SetValue(searchOptions, true);
             }
 
-            Console.WriteLine($"Search results written to '{outputPath}'.");
+            PropertyInfo threshProp = optsType.GetProperty("FuzzySearchThreshold");
+            if (threshProp != null && threshProp.CanWrite)
+            {
+                threshProp.SetValue(searchOptions, 0.8f);
+            }
+
+            // Set up the absorber with the (now) fuzzy‑enabled options
+            var absorber = new TextFragmentAbsorber(targetPhrase)
+            {
+                TextSearchOptions = searchOptions
+            };
+
+            // Apply the absorber to all pages
+            doc.Pages.Accept(absorber);
+
+            // Output each match with its page number (pages are 1‑based)
+            foreach (TextFragment fragment in absorber.TextFragments)
+            {
+                int pageNumber = fragment.Page.Number; // correct way to get page number
+                string text = fragment.Text;
+                Console.WriteLine($"Page {pageNumber}: \"{text}\"");
+            }
         }
     }
 }

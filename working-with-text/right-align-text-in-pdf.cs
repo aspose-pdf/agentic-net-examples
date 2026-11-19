@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "right_aligned.pdf";
-        const string text = "Right aligned text";
+        const string content    = "Right aligned text";
 
         if (!File.Exists(inputPath))
         {
@@ -24,25 +24,22 @@ class Program
             if (doc.Pages.Count == 0)
                 doc.Pages.Add();
 
-            // Get the first page
-            Page page = doc.Pages[1];
+            Page page = doc.Pages[1]; // first page
 
-            // Create a TextFragment containing the desired text
-            TextFragment tf = new TextFragment(text);
+            // Create a text fragment and set its horizontal alignment to Right
+            TextFragment fragment = new TextFragment(content);
+            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Right;
 
-            // Right‑align the text by setting HorizontalAlignment on the TextState
-            tf.TextState.HorizontalAlignment = HorizontalAlignment.Right;
-
-            // Position the fragment (Y coordinate only matters for right alignment)
-            tf.Position = new Position(0, 800); // X is ignored when aligned right
+            // Optional: set vertical position (X is ignored for right alignment)
+            fragment.Position = new Position(0, 800);
 
             // Add the fragment to the page
-            page.Paragraphs.Add(tf);
+            page.Paragraphs.Add(fragment);
 
-            // Save the modified PDF (still inside the using block)
+            // Save the modified PDF (PDF format, no extra SaveOptions needed)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved right‑aligned PDF to '{outputPath}'.");
+        Console.WriteLine($"Right‑aligned PDF saved to '{outputPath}'.");
     }
 }

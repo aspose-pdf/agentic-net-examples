@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_hyphenated.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,32 +16,59 @@ class Program
             return;
         }
 
-        // Open the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure we have at least one page; Aspose.Pdf uses 1‑based indexing
-            Page page = doc.Pages[1];
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+            {
+                // -------------------------------------------------
+                // Extract all text from the document using TextAbsorber
+                // -------------------------------------------------
+                TextAbsorber absorber = new TextAbsorber();
+                doc.Pages.Accept(absorber);
+                string extractedText = absorber.Text;
+                Console.WriteLine($"Extracted text length: {extractedText.Length}");
 
-            // Create a TextFragment with a long word that would benefit from hyphenation
-            string longText = "Antidisestablishmentarianism is a famously long word that can be hyphenated automatically when the text exceeds the line width.";
-            TextFragment fragment = new TextFragment(longText);
+                // -------------------------------------------------
+                // Add a new TextFragment with hyphenation enabled (via reflection for compatibility)
+                // -------------------------------------------------
+                // Get the first page (pages are 1‑based)
+                Page page = doc.Pages[1];
 
-            // NOTE: The Hyphenation property is not available in the current Aspose.Pdf version.
-            // Automatic hyphenation can be enabled in newer library versions via:
-            //     fragment.TextState.Hyphenation = true;
-            // For this example we keep the line‑wrapping behavior without explicit hyphenation.
+                // Create the text fragment
+                TextFragment fragment = new TextFragment(
+                    "This is a sample long text that will demonstrate hyphenation when the line wraps across multiple lines in the PDF document."
+                );
 
-            // Optionally set other text formatting properties
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.Font = FontRepository.FindFont("Arial");
+                // Set font and size
+                fragment.TextState.Font = FontRepository.FindFont("Arial");
+                fragment.TextState.FontSize = 12;
 
-            // Add the fragment to the page's paragraph collection
-            page.Paragraphs.Add(fragment);
+                // Enable hyphenation – the Hyphenation property may not exist in older versions,
+                // so we set it via reflection when it is available.
+                var hyphenProp = fragment.TextState.GetType().GetProperty("Hyphenation");
+                if (hyphenProp != null && hyphenProp.CanWrite)
+                {
+                    hyphenProp.SetValue(fragment.TextState, true);
+                }
 
-            // Save the modified PDF; the Document is still alive until Save completes
-            doc.Save(outputPath);
+                // Position the fragment on the page
+                fragment.Position = new Position(50, 700);
+
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(fragment);
+
+                // -------------------------------------------------
+                // Save the modified document
+                // -------------------------------------------------
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Hyphenated PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

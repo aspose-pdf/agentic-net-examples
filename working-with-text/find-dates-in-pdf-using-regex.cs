@@ -18,26 +18,23 @@ class Program
         // Load the PDF document with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Regular‑expression pattern for dates in MM/DD/YYYY format.
-            // \d{2} matches two digits, '/' matches the slash, and \d{4} matches four digits.
-            const string dateRegex = @"\d{2}/\d{2}/\d{4}";
+            // Regular‑expression pattern for dates in MM/DD/YYYY format
+            // Two digits, '/', two digits, '/', four digits
+            const string dateRegex = @"(?<!\d)(\d{2}/\d{2}/\d{4})(?!\d)";
 
-            // Create a TextFragmentAbsorber that uses the regular‑expression pattern.
+            // Use TextFragmentAbsorber (core API) to find all matching fragments
             TextFragmentAbsorber absorber = new TextFragmentAbsorber(dateRegex);
-            absorber.TextSearchOptions = new TextSearchOptions(true); // enable RegEx
-
-            // Apply the absorber to all pages of the document.
+            // Apply the absorber to all pages
             doc.Pages.Accept(absorber);
 
-            // Retrieve the collection of matched fragments.
             TextFragmentCollection matches = absorber.TextFragments;
+            Console.WriteLine($"Found {matches.Count} date(s) in the document.");
 
-            Console.WriteLine($"Found {matches.Count} date(s) in the document:");
-
-            // Iterate over each matched fragment and output the date string.
+            // Output each found date with its page number
             foreach (TextFragment fragment in matches)
             {
-                Console.WriteLine(fragment.Text);
+                // fragment.Page returns the Page object; its Number property is the page index (1‑based)
+                Console.WriteLine($"Page {fragment.Page.Number}: {fragment.Text}");
             }
         }
     }

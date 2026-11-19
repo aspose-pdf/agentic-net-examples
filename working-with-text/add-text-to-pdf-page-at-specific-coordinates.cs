@@ -9,9 +9,9 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string text       = "Hello, Aspose.Pdf!";
-        const double x = 100; // X coordinate (points, from left)
-        const double y = 500; // Y coordinate (points, from bottom)
+        const string text       = "Sample text";
+        const double x = 100; // X coordinate (lower‑left corner)
+        const double y = 500; // Y coordinate (lower‑left corner)
 
         if (!File.Exists(inputPath))
         {
@@ -19,19 +19,22 @@ class Program
             return;
         }
 
-        // Load the PDF; using ensures proper disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextFragment containing the desired string
-            TextFragment tf = new TextFragment(text);
+            // Aspose.Pdf uses 1‑based page indexing
+            Page page = doc.Pages[1];
 
-            // Position the fragment at the specified coordinates
-            tf.Position = new Position(x, y);
+            // Create a TextFragment with the desired string
+            TextFragment fragment = new TextFragment(text);
 
-            // Add the fragment to the first page's paragraph collection
-            doc.Pages[1].Paragraphs.Add(tf);
+            // Set the exact position on the page
+            fragment.Position = new Position(x, y);
 
-            // Save the modified document
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(fragment);
+
+            // Save the modified PDF (PDF format is default)
             doc.Save(outputPath);
         }
 

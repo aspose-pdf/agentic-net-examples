@@ -1,32 +1,41 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TextFragment, TextState, MarginInfo, HorizontalAlignment
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
+        const string outputPath = "multiline_paragraph.pdf";
 
-        // Use a using block for deterministic disposal of the Document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add a blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment that contains several lines (\n for line breaks)
-            TextFragment fragment = new TextFragment("First line.\nSecond line.\nThird line.");
+            // Create a TextFragment instance (represents a paragraph of text)
+            TextFragment fragment = new TextFragment();
 
-            // Configure the visual appearance of the text
-            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            // Set the paragraph text (multiple lines separated by newline characters)
+            fragment.Text = "First line of the paragraph.\nSecond line of the paragraph.\nThird line of the paragraph.";
+
+            // Align the paragraph horizontally to the center of the page
+            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+
+            // Define margins (left, top, right, bottom) in points
+            fragment.Margin = new MarginInfo(20, 20, 20, 20);
+
+            // Configure text formatting via TextState
             fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Color.FromRgb(0, 0, 0); // black
-            fragment.TextState.LineSpacing = 14; // custom leading (line spacing)
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black; // cross‑platform color
 
-            // Add the fragment to the page's paragraph collection
+            // Add the fragment (paragraph) to the page's paragraph collection
             page.Paragraphs.Add(fragment);
 
-            // Save the document as PDF
+            // Save the PDF document (PDF format, no special SaveOptions needed)
             doc.Save(outputPath);
         }
 

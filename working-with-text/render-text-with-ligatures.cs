@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,32 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "ligatures.pdf";
+        const string outputPath = "ligatures_output.pdf";
 
-        // Create a PDF document inside a using block for deterministic disposal
+        // Create a new PDF document with deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page to the document
+            // Add the first page (1‑based indexing)
             Page page = doc.Pages.Add();
 
-            // Text containing characters that can form ligatures (e.g., "ff")
+            // Text containing characters that form ligatures (e.g., "office")
             TextFragment fragment = new TextFragment("office");
 
-            // Aspose.Pdf does not expose a Ligatures property; ligatures are handled automatically.
-            // If you need to adjust spacing, you can use CharacterSpacing or WordSpacing instead.
-            // fragment.TextState.CharacterSpacing = 0.5; // optional spacing tweak
+            // Aspose.Pdf does not expose a Ligatures property on TextState.
+            // Ligature support is handled internally by the PDF renderer and cannot be toggled via the API.
+            // If you need to adjust text rendering, you can use properties such as CharacterSpacing or WordSpacing.
+            // Example (optional): fragment.TextState.CharacterSpacing = 0.0;
 
-            // Set a readable font and size (optional but recommended)
+            // Optional: set font and size
             fragment.TextState.Font = FontRepository.FindFont("Arial");
-            fragment.TextState.FontSize = 48;
+            fragment.TextState.FontSize = 24;
 
-            // Add the text fragment to the page
+            // Add the fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Save the PDF file
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with ligatures saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

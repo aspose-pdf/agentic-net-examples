@@ -11,8 +11,10 @@ class Program
         const string outputPath  = "output.pdf";
         const string searchText  = "old text";
         const string replaceText = "new text";
-        const int startPage = 2; // inclusive
-        const int endPage   = 4; // inclusive
+
+        // Define the page range (inclusive) where replacement should occur
+        const int startPage = 2;
+        const int endPage   = 5;
 
         if (!File.Exists(inputPath))
         {
@@ -20,38 +22,32 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Document must be wrapped in a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Clamp the requested range to the actual number of pages
+            int maxPage = doc.Pages.Count;
+            int from    = Math.Max(1, startPage);          // Aspose.Pdf uses 1‑based indexing
+            int to      = Math.Min(endPage, maxPage);
+
+            // Iterate over each page in the range and replace text only on that page
+            for (int i = from; i <= to; i++)
             {
-                // Validate page range against the actual page count
-                int maxPage = doc.Pages.Count;
-                int from = Math.Max(1, startPage);          // pages are 1‑based
-                int to   = Math.Min(endPage, maxPage);
+                // Use TextFragmentAbsorber to locate the text on the specific page
+                var absorber = new TextFragmentAbsorber(searchText);
+                doc.Pages[i].Accept(absorber);
 
-                // Iterate over the specified pages and replace text on each page
-                for (int i = from; i <= to; i++)
+                // Replace each found fragment's text with the new value
+                foreach (TextFragment fragment in absorber.TextFragments)
                 {
-                    // Use TextFragmentAbsorber to find and replace text on a single page
-                    var absorber = new TextFragmentAbsorber(searchText);
-                    doc.Pages[i].Accept(absorber);
-
-                    foreach (TextFragment fragment in absorber.TextFragments)
-                    {
-                        fragment.Text = replaceText;
-                    }
+                    fragment.Text = replaceText;
                 }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Text replacement completed. Saved to '{outputPath}'.");
+            // Save the modified document as PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text replacement completed. Output saved to '{outputPath}'.");
     }
 }

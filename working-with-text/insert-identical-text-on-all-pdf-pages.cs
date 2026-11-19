@@ -13,41 +13,29 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+            // Iterate through all pages (1‑based indexing)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    Aspose.Pdf.Page page = doc.Pages[i];
+                Page page = doc.Pages[i];
 
-                    // Create a TextFragment containing the plain text
-                    Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment(textToInsert);
+                // Create a plain text fragment
+                TextFragment tf = new TextFragment(textToInsert);
 
-                    // Optional: set position, font, size, etc.
-                    // tf.Position = new Aspose.Pdf.Text.Position(100, 700);
-                    // tf.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Arial");
-                    // tf.TextState.FontSize = 12;
-
-                    // Add the fragment to the page's Paragraphs collection
-                    page.Paragraphs.Add(tf);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Insert the text fragment into the page's Paragraphs collection
+                page.Paragraphs.Add(tf);
             }
 
-            Console.WriteLine($"Text inserted on all pages. Saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Inserted text on all pages. Saved to '{outputPath}'.");
     }
 }

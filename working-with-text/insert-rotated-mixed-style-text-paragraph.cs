@@ -16,49 +16,52 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages
+            // Ensure the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
             while (doc.Pages.Count < 3)
             {
                 doc.Pages.Add();
             }
 
-            // Get the third page (1‑based indexing)
+            // Get the third page
             Page page = doc.Pages[3];
 
-            // Create a TextFragment that will hold mixed‑style segments
+            // Create a TextFragment that will contain multiple styled text segments
             TextFragment mixedFragment = new TextFragment();
-            mixedFragment.TextState.Font = FontRepository.FindFont("Arial");
-            mixedFragment.TextState.FontSize = 12;
-            // Rotate the whole fragment 45 degrees
+
+            // First segment: bold, red, 20pt
+            TextSegment segment1 = new TextSegment("Bold Red ");
+            segment1.TextState.Font = FontRepository.FindFont("Arial");
+            segment1.TextState.FontSize = 20;
+            segment1.TextState.FontStyle = FontStyles.Bold;
+            segment1.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(1, 0, 0); // red
+
+            // Second segment: italic, blue, 20pt
+            TextSegment segment2 = new TextSegment("Italic Blue");
+            segment2.TextState.Font = FontRepository.FindFont("Arial");
+            segment2.TextState.FontSize = 20;
+            segment2.TextState.FontStyle = FontStyles.Italic;
+            segment2.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0, 0, 1); // blue
+
+            // Add the styled segments to the fragment
+            mixedFragment.Segments.Add(segment1);
+            mixedFragment.Segments.Add(segment2);
+
+            // Rotate the entire fragment 45 degrees
             mixedFragment.TextState.Rotation = 45;
 
-            // First segment – bold
-            TextSegment segBold = new TextSegment("Bold Text ");
-            segBold.TextState.FontStyle = FontStyles.Bold;
+            // Optional: set the position of the fragment on the page
+            mixedFragment.Position = new Position(100, 500);
 
-            // Second segment – italic
-            TextSegment segItalic = new TextSegment("Italic Text ");
-            segItalic.TextState.FontStyle = FontStyles.Italic;
-
-            // Third segment – regular
-            TextSegment segRegular = new TextSegment("Regular Text");
-            segRegular.TextState.FontStyle = FontStyles.Regular;
-
-            // Add segments to the fragment
-            mixedFragment.Segments.Add(segBold);
-            mixedFragment.Segments.Add(segItalic);
-            mixedFragment.Segments.Add(segRegular);
-
-            // Insert the fragment into the third page
+            // Insert the fragment into the page's content
             page.Paragraphs.Add(mixedFragment);
 
-            // Save the modified PDF
+            // Save the modified PDF (save inside the using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

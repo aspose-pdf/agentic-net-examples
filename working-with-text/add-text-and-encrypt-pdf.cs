@@ -20,18 +20,19 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Add a text fragment to the first page (pages are 1‑based)
+                // Add a text fragment to the first page (1‑based indexing)
                 Page page = doc.Pages[1];
-                TextFragment tf = new TextFragment("Confidential document");
-                tf.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.0, 0.0); // cross‑platform color
-                tf.Position = new Position(100, 750); // place near top-left
+                TextFragment tf = new TextFragment("Confidential");
+                tf.Position = new Position(100, 700); // coordinates in points
                 page.Paragraphs.Add(tf);
 
-                // Encrypt the document with a user password (AES‑256)
+                // Set permissions for the encrypted document
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Encrypt using AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
