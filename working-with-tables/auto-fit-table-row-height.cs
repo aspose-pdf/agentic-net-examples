@@ -8,53 +8,40 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_auto_row.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a simple PDF if the input does not exist
-        if (!File.Exists(inputPath))
+        // Load existing PDF or create a new one if the file does not exist
+        Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document();
+
+        // Ensure there is at least one page to place the table on
+        if (doc.Pages.Count == 0)
+            doc.Pages.Add();
+
+        // Create a table with two columns (each 200 points wide)
+        Table table = new Table
         {
-            using (Document doc = new Document())
-            {
-                doc.Pages.Add();
-                doc.Save(inputPath);
-            }
-        }
+            ColumnWidths = "200 200"
+        };
 
-        // Load the PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Add a page if the document is empty
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
+        // Add a row to the table. By default the row height auto‑fits the content,
+        // so we do not set a fixed height. If you need to enforce a minimum height,
+        // you could use row.MinRowHeight.
+        Row row = table.Rows.Add();
+        // row.MinRowHeight = 0; // optional – ensures true auto‑fit behavior
 
-            // Create a table and add it to the first page
-            Table table = new Table
-            {
-                // Define two columns with relative widths
-                ColumnWidths = "200 300",
-                // Optional: set border for visual clarity
-                Border = new BorderInfo(BorderSide.All, 0.5f)
-            };
+        // Populate cells with text. Long text will wrap and cause the row to grow.
+        Cell cell1 = row.Cells.Add();
+        cell1.Paragraphs.Add(new TextFragment("First cell with a long text that should wrap and cause the row to grow automatically."));
 
-            // Build the header row
-            Row headerRow = table.Rows.Add();
-            headerRow.BackgroundColor = Color.LightGray;
-            headerRow.Cells.Add("Description");
-            headerRow.Cells.Add("Details");
+        Cell cell2 = row.Cells.Add();
+        cell2.Paragraphs.Add(new TextFragment("Second cell"));
 
-            // Build the body row. Row height auto‑fits by default; no explicit Height property exists.
-            Row bodyRow = table.Rows.Add();
-            // If you need a minimum height you can set it, e.g., bodyRow.MinRowHeight = 20;
-            bodyRow.Cells.Add("Short text.");
-            bodyRow.Cells.Add("This is a much longer piece of text that should cause the row to expand automatically to fit all the content without clipping.");
+        // Add the table to the first page
+        doc.Pages[1].Paragraphs.Add(table);
 
-            // Add the table to the page's paragraphs collection
-            doc.Pages[1].Paragraphs.Add(table);
+        // Save the modified PDF
+        doc.Save(outputPath);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with auto‑fit row to '{outputPath}'.");
     }
 }

@@ -1,46 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "TableWithColSpan.pdf";
+        const string outputPath = "colspan_table.pdf";
 
-        // Wrap Document in a using block for deterministic disposal
+        // Create a new PDF document (lifecycle rule: use using for disposal)
         using (Document doc = new Document())
         {
-            // Add a new page (pages are 1‑based)
+            // Add a blank page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table with three columns of equal width
+            // Define a table with three equal-width columns
             Table table = new Table
             {
                 ColumnWidths = "100 100 100"
             };
+            page.Paragraphs.Add(table); // attach table to the page
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+            // First row: a single cell that spans all three columns
+            Row mergedRow = table.Rows.Add();
+            Cell mergedCell = mergedRow.Cells.Add("Merged Cell");
+            mergedCell.ColSpan = 3; // merge three adjacent columns into one cell
 
-            // ----- Header row: one cell spanning three columns -----
-            Row headerRow = table.Rows.Add();
-            Cell headerCell = headerRow.Cells.Add("Header spanning three columns");
-            headerCell.ColSpan = 3; // Merge three adjacent columns
-            // Set a light gray background using Aspose.Pdf.Color (fully qualified)
-            headerCell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            // Second row: three regular cells for visual reference
+            Row normalRow = table.Rows.Add();
+            normalRow.Cells.Add("Cell 1");
+            normalRow.Cells.Add("Cell 2");
+            normalRow.Cells.Add("Cell 3");
 
-            // ----- Data row: three separate cells -----
-            Row dataRow = table.Rows.Add();
-            dataRow.Cells.Add("Cell 1");
-            dataRow.Cells.Add("Cell 2");
-            dataRow.Cells.Add("Cell 3");
-
-            // Save the PDF document
+            // Save the PDF (lifecycle rule: save inside using block)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with a colspan cell saved to '{outputPath}'.");
     }
 }

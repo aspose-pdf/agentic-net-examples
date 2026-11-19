@@ -7,74 +7,59 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "TableInParagraph.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the output directory exists
-        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
-        if (!Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
-
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page (pages are 1‑based)
-            Page page = doc.Pages.Add();
-
-            // -------------------------------------------------
-            // 1. Add a paragraph with some introductory text
-            // -------------------------------------------------
-            TextFragment intro = new TextFragment("Below is a table inserted after this paragraph:");
-            // Optional: set some formatting
-            intro.TextState.FontSize = 12;
-            intro.TextState.Font = FontRepository.FindFont("Arial");
-            page.Paragraphs.Add(intro);
-
-            // -------------------------------------------------
-            // 2. Create a table and populate it
-            // -------------------------------------------------
-            Table table = new Table
-            {
-                // Define column widths (percentage of the page width)
-                ColumnWidths = "200 200"
-            };
-
-            // Add a header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            // Header formatting
-            foreach (Cell cell in header.Cells)
-            {
-                cell.BackgroundColor = Aspose.Pdf.Color.LightGray;
-                cell.DefaultCellTextState.FontSize = 12;
-                cell.DefaultCellTextState.Font = FontRepository.FindFont("Arial");
-                cell.DefaultCellTextState.FontStyle = FontStyles.Bold;
-                cell.Margin = new MarginInfo(5, 5, 5, 5);
-            }
-
-            // Add a few data rows
-            for (int i = 1; i <= 3; i++)
-            {
-                Row row = table.Rows.Add();
-                row.Cells.Add($"Row {i} - Col 1");
-                row.Cells.Add($"Row {i} - Col 2");
-                foreach (Cell cell in row.Cells)
-                {
-                    cell.DefaultCellTextState.FontSize = 11;
-                    cell.DefaultCellTextState.Font = FontRepository.FindFont("Arial");
-                    cell.Margin = new MarginInfo(5, 5, 5, 5);
-                }
-            }
-
-            // -------------------------------------------------
-            // 3. Insert the table after the paragraph
-            // -------------------------------------------------
-            page.Paragraphs.Add(table);
-
-            // Save the document
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        try
+        {
+            using (Document doc = new Document(inputPath))
+            {
+                // Use the first page (or add a new one if needed)
+                Page page = doc.Pages[1];
+
+                // Add introductory text as a TextFragment (Paragraph type does not exist in Aspose.PDF)
+                TextFragment intro = new TextFragment("Below is a table:");
+                page.Paragraphs.Add(intro);
+
+                // Create a table and define column widths (percentage)
+                Table table = new Table
+                {
+                    ColumnWidths = "50 50"
+                };
+
+                // Header row
+                Row header = table.Rows.Add();
+                header.Cells.Add("Product");
+                header.Cells.Add("Price");
+
+                // First data row
+                Row row1 = table.Rows.Add();
+                row1.Cells.Add("Widget A");
+                row1.Cells.Add("$10");
+
+                // Second data row
+                Row row2 = table.Rows.Add();
+                row2.Cells.Add("Widget B");
+                row2.Cells.Add("$20");
+
+                // Add the table to the page after the introductory text
+                page.Paragraphs.Add(table);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

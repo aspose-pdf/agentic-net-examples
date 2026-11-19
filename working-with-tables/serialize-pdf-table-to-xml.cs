@@ -1,109 +1,102 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 using System.Xml.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Text;
+
+// Suppress known package vulnerability warnings (NU1902, NU1903)
+#pragma warning disable NU1902 // Package 'System.Security.Cryptography.Pkcs' has a known moderate severity vulnerability
+#pragma warning disable NU1903 // Package 'System.Security.Cryptography.Pkcs' has a known high severity vulnerability
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string outputPdf = "table.pdf";
         const string outputXml = "table.xml";
 
-        if (!File.Exists(inputPdf))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
+            // Add a page (first page is at index 1)
+            Page page = doc.Pages.Add();
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        {
-            // Verify that the PDF is tagged by checking the TaggedContent property
-            if (doc.TaggedContent == null)
+            // Create a table with 3 columns
+            Table table = new Table
             {
-                Console.WriteLine("PDF is not tagged. No structure tree to extract tables.");
-                return;
+                ColumnWidths = "100 150 200", // column widths in points
+                Border = new BorderInfo(BorderSide.All, 0.5f)
+            };
+
+            // Add header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("ID");
+            header.Cells.Add("Name");
+            header.Cells.Add("Description");
+            // Style header cells
+            foreach (Cell cell in header.Cells)
+            {
+                cell.BackgroundColor = Color.LightGray;
+                cell.DefaultCellTextState = new TextState { FontSize = 12, FontStyle = FontStyles.Bold };
             }
 
-            ITaggedContent tagged = doc.TaggedContent;
-
-            // Find all TableElement objects in the structure tree (recursive search)
-            var tables = tagged.RootElement.FindElements<TableElement>(true);
-
-            // Build an XML document that will hold the serialized tables
-            XElement rootXml = new XElement("Tables");
-
-            foreach (TableElement table in tables)
+            // Add a few data rows
+            for (int i = 1; i <= 3; i++)
             {
-                XElement tableXml = new XElement("Table");
-
-                // Optional description of the table – guard against null
-                if (!string.IsNullOrEmpty(table.AlternativeText))
-                    tableXml.SetAttributeValue("Description", table.AlternativeText ?? string.Empty);
-
-                // Process each section of the table (thead, tbody, tfoot)
-                foreach (Element child in table.ChildElements)
-                {
-                    if (child is TableTHeadElement thead)
-                        ProcessTableSection(thead, "Header", tableXml);
-                    else if (child is TableTBodyElement tbody)
-                        ProcessTableSection(tbody, "Body", tableXml);
-                    else if (child is TableTFootElement tfoot)
-                        ProcessTableSection(tfoot, "Footer", tableXml);
-                }
-
-                rootXml.Add(tableXml);
+                Row row = table.Rows.Add();
+                row.Cells.Add(i.ToString());
+                row.Cells.Add($"Item {i}");
+                row.Cells.Add($"This is a description for item {i}.");
             }
 
-            // Save the constructed XML to a file
-            XDocument xdoc = new XDocument(new XDeclaration("1.0", "utf-8", "yes"), rootXml);
-            xdoc.Save(outputXml);
-            Console.WriteLine($"Table data serialized to XML: {outputXml}");
+            // Add the table to the page
+            page.Paragraphs.Add(table);
+
+            // Save the PDF (optional, just to have a visual file)
+            doc.Save(outputPdf);
+
+            // -----------------------------------------------------------------
+            // Serialize the table structure to a custom XML representation
+            // -----------------------------------------------------------------
+            XDocument xmlDoc = new XDocument(
+                new XElement("Table",
+                    // Iterate over each row in the Aspose.Pdf.Table
+                    IterateRows(table)
+                )
+            );
+
+            // Save the generated XML to disk
+            xmlDoc.Save(outputXml);
         }
+
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"XML representation saved to '{outputXml}'.");
     }
 
-    // Helper method to convert a table section (thead, tbody, tfoot) into XML
-    private static void ProcessTableSection(Element section, string sectionName, XElement tableXml)
+    /// <summary>
+    /// Converts the rows of an Aspose.Pdf.Table into a collection of XElement objects.
+    /// </summary>
+    private static object IterateRows(Table table)
     {
-        // Each section contains TableTRElement rows
-        foreach (Element rowElem in section.ChildElements)
+        // Use a LINQ style projection to build the XML for each row
+        var rows = new System.Collections.Generic.List<XElement>();
+        foreach (Row r in table.Rows)
         {
-            if (rowElem is TableTRElement row)
+            var rowElem = new XElement("Row");
+            foreach (Cell c in r.Cells)
             {
-                XElement rowXml = new XElement("Row");
-
-                // Convert each cell in the row
-                foreach (Element cellElem in row.ChildElements)
+                // Each cell may contain one or more paragraphs; we extract the first TextFragment if present.
+                string cellText = string.Empty;
+                if (c.Paragraphs.Count > 0 && c.Paragraphs[0] is TextFragment tf)
                 {
-                    if (cellElem is TableTHElement th)
-                    {
-                        XElement cellXml = new XElement("Cell",
-                            new XAttribute("Type", "Header"),
-                            th.ActualText ?? string.Empty);
-                        rowXml.Add(cellXml);
-                    }
-                    else if (cellElem is TableTDElement td)
-                    {
-                        XElement cellXml = new XElement("Cell",
-                            new XAttribute("Type", "Data"),
-                            td.ActualText ?? string.Empty);
-                        rowXml.Add(cellXml);
-                    }
+                    cellText = tf.Text;
                 }
-
-                // Ensure the section element exists in the table XML
-                XElement? sectionXml = tableXml.Element(sectionName);
-                if (sectionXml == null)
-                {
-                    sectionXml = new XElement(sectionName);
-                    tableXml.Add(sectionXml);
-                }
-
-                sectionXml.Add(rowXml);
+                rowElem.Add(new XElement("Cell", cellText));
             }
+            rows.Add(rowElem);
         }
+        return rows;
     }
 }
+#pragma warning restore NU1902
+#pragma warning restore NU1903

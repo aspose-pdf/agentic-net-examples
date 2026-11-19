@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,43 +16,38 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Ensure the document has at least one page
+            Page page = doc.Pages[1];
+
+            // Create a table and set its Z‑index higher than default (0) 
+            // so it appears above other page elements.
+            Table table = new Table
             {
-                // Access the first page (Aspose.Pdf uses 1‑based indexing)
-                Page page = doc.Pages[1];
+                ZIndex = 10,                     // Controls overlapping order
+                ColumnWidths = "150 150",        // Define column widths
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
+            };
 
-                // Create a table and configure its appearance
-                Table table = new Table
-                {
-                    // Define three equal columns
-                    ColumnWidths = "100 100 100",
-                    // Add a thin border around each cell
-                    DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                    // Set ZIndex to control overlapping order (higher value = front)
-                    ZIndex = 10
-                };
+            // Add header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
 
-                // Add a single row with three cells
-                Row row = table.Rows.Add();
-                row.Cells.Add("Cell 1");
-                row.Cells.Add("Cell 2");
-                row.Cells.Add("Cell 3");
+            // Add data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Value 1");
+            data.Cells.Add("Value 2");
 
-                // Place the table on the page
-                page.Paragraphs.Add(table);
+            // Place the table on the page
+            page.Paragraphs.Add(table);
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Table with ZIndex saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Table with ZIndex saved to '{outputPath}'.");
     }
 }

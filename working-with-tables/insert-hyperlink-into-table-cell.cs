@@ -9,8 +9,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // existing PDF or can be a blank PDF
-        const string outputPath = "output_with_link.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,79 +18,84 @@ class Program
             return;
         }
 
-        try
+        // Load the existing PDF
+        using (Document doc = new Document(inputPath))
         {
-            // Open the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Access tagged content (creates a tagged structure if not present)
-                ITaggedContent taggedContent = doc.TaggedContent;
-                taggedContent.SetLanguage("en-US");
-                taggedContent.SetTitle("PDF with Hyperlink in Table Cell");
+            // Access tagged content (creates one if missing)
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("PDF with Hyperlink Table");
 
-                // Root element of the structure tree
-                StructureElement root = taggedContent.RootElement;
+            // Root of the logical structure tree
+            StructureElement root = tagged.RootElement;
 
-                // Create a table element and attach it to the root
-                TableElement table = taggedContent.CreateTableElement();
-                table.AlternativeText = "Sample data table with hyperlink";
-                root.AppendChild(table);
+            // Create a table element
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table with hyperlink";
+            root.AppendChild(table);
 
-                // ----- Table Header -----
-                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
-                table.AppendChild(thead);
+            // ----- Header row -----
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
 
-                TableTRElement headerRow = taggedContent.CreateTableTRElement();
-                thead.AppendChild(headerRow);
+            TableTHElement th1 = tagged.CreateTableTHElement();
+            th1.SetText("Item");
+            headerRow.AppendChild(th1);
 
-                TableTHElement th1 = taggedContent.CreateTableTHElement();
-                th1.SetText("Item");
-                headerRow.AppendChild(th1);
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Link");
+            headerRow.AppendChild(th2);
 
-                TableTHElement th2 = taggedContent.CreateTableTHElement();
-                th2.SetText("Link");
-                headerRow.AppendChild(th2);
+            // ----- Body row -----
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+            TableTRElement dataRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
 
-                // ----- Table Body -----
-                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
-                table.AppendChild(tbody);
+            // First cell: plain text
+            TableTDElement td1 = tagged.CreateTableTDElement();
+            td1.SetText("Example");
+            dataRow.AppendChild(td1);
 
-                TableTRElement dataRow = taggedContent.CreateTableTRElement();
-                tbody.AppendChild(dataRow);
+            // Second cell: text that will act as a hyperlink
+            TableTDElement td2 = tagged.CreateTableTDElement();
+            // Create a paragraph element for the cell content
+            ParagraphElement para = tagged.CreateParagraphElement();
+            para.SetText("Click here");
+            td2.AppendChild(para);
+            dataRow.AppendChild(td2);
 
-                // First cell: plain text
-                TableTDElement tdItem = taggedContent.CreateTableTDElement();
-                tdItem.SetText("Example");
-                dataRow.AppendChild(tdItem);
+            // -------------------------------------------------
+            // Add a LinkAnnotation that covers the second cell.
+            // For demonstration we use approximate coordinates.
+            // In a real scenario you would calculate the exact
+            // rectangle of the cell (e.g., via layout analysis).
+            // -------------------------------------------------
+            // Assume the table is placed on the first page.
+            Page page = doc.Pages[1];
 
-                // Second cell: text that will be hyperlinked
-                TableTDElement tdLink = taggedContent.CreateTableTDElement();
-                // Create a paragraph element for the cell content
-                ParagraphElement para = taggedContent.CreateParagraphElement();
-                para.SetText("Visit Example.com");
-                tdLink.AppendChild(para);
-                dataRow.AppendChild(tdLink);
+            // Approximate rectangle covering the second cell.
+            // Values are in points (1/72 inch). Adjust as needed.
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(
+                llx: 300, // lower‑left X
+                lly: 500, // lower‑left Y
+                urx: 450, // upper‑right X
+                ury: 520  // upper‑right Y
+            );
 
-                // Add a LinkAnnotation that covers the cell area.
-                // For demonstration we use static coordinates; in a real scenario
-                // you would calculate the rectangle based on the cell position.
-                Page firstPage = doc.Pages[1];
-                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 250, 520);
-                LinkAnnotation link = new LinkAnnotation(firstPage, linkRect)
-                {
-                    Action = new GoToURIAction("https://www.example.com")
-                };
-                firstPage.Annotations.Add(link);
+            // Create the link annotation with a URI action.
+            LinkAnnotation link = new LinkAnnotation(page, linkRect);
+            link.Action = new GoToURIAction("https://example.com");
+            // Set an invisible border for the annotation.
+            link.Border = new Border(link) { Width = 0 };
+            page.Annotations.Add(link);
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF saved with hyperlink: '{outputPath}'");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Hyperlinked table saved to '{outputPath}'.");
     }
 }

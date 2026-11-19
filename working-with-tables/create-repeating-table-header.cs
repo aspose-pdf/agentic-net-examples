@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_header_table.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,68 +17,51 @@ class Program
             return;
         }
 
-        // Load the PDF and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
+            // Access tagged content and set basic properties
             ITaggedContent tagged = doc.TaggedContent;
-            // Set language and title (optional)
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Root element of the structure tree
             StructureElement root = tagged.RootElement;
 
-            // Create a table element
+            // Create a table element and attach it to the root
             TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Sample data table with repeating header row";
-            // Set the first row to repeat on each new page
-            table.RepeatingRowsCount = 1;
+            table.AlternativeText = "Sample data table with repeating header";
             root.AppendChild(table);
 
-            // ----- Header row (repeats on each new page) -----
-            TableTHeadElement thead = tagged.CreateTableTHeadElement();
-            table.AppendChild(thead);
-
-            // Create a table row for the header
+            // Create the header row
             TableTRElement headerRow = tagged.CreateTableTRElement();
-            thead.AppendChild(headerRow);
+            table.AppendChild(headerRow);
+
+            // Mark the first row as a repeating header
+            table.RepeatingRowsCount = 1; // first row repeats on each new page
 
             // Header cells
-            TableTHElement thName = tagged.CreateTableTHElement();
-            thName.SetText("Name");
-            headerRow.AppendChild(thName);
+            TableTHElement th1 = tagged.CreateTableTHElement();
+            th1.SetText("Column A");
+            headerRow.AppendChild(th1);
 
-            TableTHElement thValue = tagged.CreateTableTHElement();
-            thValue.SetText("Value");
-            headerRow.AppendChild(thValue);
+            TableTHElement th2 = tagged.CreateTableTHElement();
+            th2.SetText("Column B");
+            headerRow.AppendChild(th2);
 
-            // ----- Body rows (example data) -----
+            // Create a body section with one data row (example)
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
 
-            // First data row
-            TableTRElement row1 = tagged.CreateTableTRElement();
-            tbody.AppendChild(row1);
+            TableTRElement dataRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
 
-            TableTDElement td1a = tagged.CreateTableTDElement();
-            td1a.SetText("Item A");
-            row1.AppendChild(td1a);
+            TableTDElement td1 = tagged.CreateTableTDElement();
+            td1.SetText("Value 1");
+            dataRow.AppendChild(td1);
 
-            TableTDElement td1b = tagged.CreateTableTDElement();
-            td1b.SetText("123");
-            row1.AppendChild(td1b);
-
-            // Second data row
-            TableTRElement row2 = tagged.CreateTableTRElement();
-            tbody.AppendChild(row2);
-
-            TableTDElement td2a = tagged.CreateTableTDElement();
-            td2a.SetText("Item B");
-            row2.AppendChild(td2a);
-
-            TableTDElement td2b = tagged.CreateTableTDElement();
-            td2b.SetText("456");
-            row2.AppendChild(td2b);
+            TableTDElement td2 = tagged.CreateTableTDElement();
+            td2.SetText("Value 2");
+            dataRow.AppendChild(td2);
 
             // Save the modified PDF
             doc.Save(outputPath);

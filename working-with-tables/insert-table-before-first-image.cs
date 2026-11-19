@@ -3,7 +3,7 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class InsertTableBeforeImage
 {
     static void Main()
     {
@@ -16,51 +16,42 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Find the first Image element in the page's paragraph collection
-                int imageIndex = -1;
-                for (int i = 0; i < page.Paragraphs.Count; i++)
+                Aspose.Pdf.Page page = doc.Pages[pageIndex];
+
+                // Check if the page contains any images
+                if (page.Resources.Images.Count > 0)
                 {
-                    if (page.Paragraphs[i] is Image)
-                    {
-                        imageIndex = i;
-                        break;
-                    }
-                }
+                    // Create a table
+                    Aspose.Pdf.Table table = new Aspose.Pdf.Table();
+                    // Define two columns with equal width
+                    table.ColumnWidths = "200 200";
 
-                // If an image was found, insert a table before it
-                if (imageIndex != -1)
-                {
-                    // Create a simple 2‑column table
-                    Table table = new Table
-                    {
-                        // Set column widths (percentage of page width)
-                        ColumnWidths = "50% 50%",
-                        // Optional: add a border to make the table visible
-                        Border = new BorderInfo(BorderSide.All, 0.5f)
-                    };
+                    // Header row
+                    Aspose.Pdf.Row headerRow = table.Rows.Add();
+                    Aspose.Pdf.Cell headerCell1 = headerRow.Cells.Add();
+                    headerCell1.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Column 1"));
+                    Aspose.Pdf.Cell headerCell2 = headerRow.Cells.Add();
+                    headerCell2.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Column 2"));
 
-                    // Add a header row
-                    Row header = table.Rows.Add();
-                    Cell headerCell1 = header.Cells.Add();
-                    headerCell1.Paragraphs.Add(new TextFragment("Header 1"));
-                    Cell headerCell2 = header.Cells.Add();
-                    headerCell2.Paragraphs.Add(new TextFragment("Header 2"));
+                    // Data row
+                    Aspose.Pdf.Row dataRow = table.Rows.Add();
+                    Aspose.Pdf.Cell dataCell1 = dataRow.Cells.Add();
+                    dataCell1.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Value A"));
+                    Aspose.Pdf.Cell dataCell2 = dataRow.Cells.Add();
+                    dataCell2.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("Value B"));
 
-                    // Add a data row
-                    Row data = table.Rows.Add();
-                    Cell dataCell1 = data.Cells.Add();
-                    dataCell1.Paragraphs.Add(new TextFragment("Value A"));
-                    Cell dataCell2 = data.Cells.Add();
-                    dataCell2.Paragraphs.Add(new TextFragment("Value B"));
+                    // Insert the table at the beginning of the page's content stream
+                    // This places the table before any existing content, including the image
+                    page.Paragraphs.Insert(0, table);
 
-                    // Insert the table at the image's index, pushing the image forward
-                    page.Paragraphs.Insert(imageIndex, table);
+                    // Only insert before the first image found; break after handling this page
+                    break;
                 }
             }
 
@@ -68,6 +59,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table inserted before images and saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted before image and saved to '{outputPath}'.");
     }
 }

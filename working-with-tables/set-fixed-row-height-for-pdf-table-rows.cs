@@ -7,62 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_table.pdf";
+        const string outputPath = "table_fixed_row_height.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a single page to host the table
+            Page page = doc.Pages.Add();
 
-        try
-        {
-            // Load the existing PDF
-            using (Document doc = new Document(inputPath))
+            // Instantiate a table
+            Table table = new Table();
+
+            // Optional: define column widths (three equal columns)
+            table.ColumnWidths = "100 100 100";
+
+            // Populate the table with rows and cells
+            for (int i = 0; i < 5; i++) // 5 rows
             {
-                // Ensure there is at least one page to host the table
-                Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+                Row row = table.Rows.Add(); // Add a new row
 
-                // Create a visual table (not a tagged structure table)
-                Table table = new Table
+                for (int j = 0; j < 3; j++) // 3 columns per row
                 {
-                    // Define two equal columns (widths in points)
-                    ColumnWidths = "200 200",
-                    // Optional: set a default border for all cells
-                    DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5F, Color.Black)
-                };
-
-                // ----- Header row -----
-                Row header = table.Rows.Add();
-                header.Cells.Add("Column A");
-                header.Cells.Add("Column B");
-                header.BackgroundColor = Color.LightGray;
-                // Fixed height for the header row (points)
-                header.FixedRowHeight = 20F;
-
-                // ----- Data rows -----
-                for (int i = 1; i <= 5; i++)
-                {
-                    Row dataRow = table.Rows.Add();
-                    dataRow.Cells.Add($"Row {i} - A");
-                    dataRow.Cells.Add($"Row {i} - B");
-                    // Apply the same fixed height to every data row
-                    dataRow.FixedRowHeight = 20F;
+                    // Create a text fragment for the cell content
+                    TextFragment tf = new TextFragment($"R{i + 1}C{j + 1}");
+                    // Add the cell containing the text fragment
+                    row.Cells.Add(tf);
                 }
-
-                // Add the table to the page's paragraph collection
-                page.Paragraphs.Add(table);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF with table saved to '{outputPath}'.");
+            // Apply a fixed height to every row (float value)
+            foreach (Row r in table.Rows)
+            {
+                r.FixedRowHeight = 20F; // 20 points high for each row
+            }
+
+            // Add the completed table to the page's content
+            page.Paragraphs.Add(table);
+
+            // Save the PDF document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

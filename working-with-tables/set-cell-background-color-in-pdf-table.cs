@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -10,40 +11,58 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Load existing PDF if present; otherwise create a new document with a blank page.
-        Document doc = File.Exists(inputPath) ? new Document(inputPath) : new Document();
-        if (doc.Pages.Count == 0)
-            doc.Pages.Add();
-
-        // Work with the first page.
-        Page page = doc.Pages[1];
-
-        // Create a table with two equal‑width columns.
-        Table table = new Table
+        if (!File.Exists(inputPath))
         {
-            ColumnWidths = "200 200",
-            Border = new BorderInfo(BorderSide.All, 0.5f)
-        };
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-        // ----- Header row -----
-        Row headerRow = table.Rows.Add();
-        Cell headerCell1 = headerRow.Cells.Add("Item");
-        Cell headerCell2 = headerRow.Cells.Add("Value");
-        headerCell1.BackgroundColor = Color.LightGray;
-        headerCell2.BackgroundColor = Color.LightGray;
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Access tagged content and set basic properties
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Table with colored cell");
 
-        // ----- Data row -----
-        Row dataRow = table.Rows.Add();
-        Cell dataCell1 = dataRow.Cells.Add("Widget A");
-        Cell dataCell2 = dataRow.Cells.Add("$50,000");
-        // Set background colour of the second cell as required by the task.
-        dataCell2.BackgroundColor = Color.LightGray;
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
 
-        // Add the table to the page.
-        page.Paragraphs.Add(table);
+            // Create a table element and attach it to the root
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table";
+            root.AppendChild(table);
 
-        // Save the PDF.
-        doc.Save(outputPath);
+            // Header row
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+            TableTHElement thItem = tagged.CreateTableTHElement();
+            thItem.SetText("Item");
+            headerRow.AppendChild(thItem);
+            TableTHElement thValue = tagged.CreateTableTHElement();
+            thValue.SetText("Value");
+            headerRow.AppendChild(thValue);
+
+            // Body row
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+            TableTRElement dataRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
+            TableTDElement tdItem = tagged.CreateTableTDElement();
+            tdItem.SetText("Widget A");
+            dataRow.AppendChild(tdItem);
+            TableTDElement tdValue = tagged.CreateTableTDElement();
+            tdValue.SetText("$100");
+            // Set background color for this cell
+            tdValue.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            dataRow.AppendChild(tdValue);
+
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
+
         Console.WriteLine($"Saved PDF with colored cell to '{outputPath}'.");
     }
 }

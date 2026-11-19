@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextFragment if needed
 
 class Program
 {
@@ -15,19 +14,16 @@ class Program
             // Add a new blank page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with three columns
+            // Create a table with three columns; set column widths and a border
             Table table = new Table
             {
-                // Define column widths (in points)
-                ColumnWidths = "100 150 200",
-                // Add a thin border around the table
-                Border = new BorderInfo(BorderSide.All, 0.5f)
+                ColumnWidths = "100 150 200",                     // column widths in points
+                Border = new BorderInfo(BorderSide.All, 0.5f)    // thin border around the table
             };
 
             // ----- Header row -----
             Row header = table.Rows.Add();
-            // Set background color for the header (use Aspose.Pdf.Color to avoid System.Drawing)
-            header.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray; // use Aspose.Pdf.Color to avoid System.Drawing
             header.Cells.Add("Product");
             header.Cells.Add("Quantity");
             header.Cells.Add("Price");
@@ -44,10 +40,10 @@ class Program
             row2.Cells.Add("7");
             row2.Cells.Add("$7.50");
 
-            // Add the table to the page's paragraph collection so it gets rendered
+            // Add the table to the page's content (Paragraphs collection)
             page.Paragraphs.Add(table);
 
-            // Save the PDF document (PDF format by default)
+            // Save the PDF to the specified file
             doc.Save(outputPath);
         }
 

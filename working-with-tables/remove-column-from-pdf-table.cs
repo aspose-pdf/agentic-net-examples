@@ -1,82 +1,73 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "input.pdf";   // not used, just placeholder
         const string outputPath = "output.pdf";
-        const int columnToRemove = 1; // zero‑based index of the column to delete
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and add a page
+        var doc = new Document();
+        var page = doc.Pages.Add();
+
+        // -----------------------------------------------------------------
+        // Build a sample table (3 columns, 2 rows) to demonstrate removal
+        // -----------------------------------------------------------------
+        var table = new Table
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            // Define three equal column widths (you can adjust as needed)
+            ColumnWidths = "120 120 120",
+            // Optional visual styling
+            Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black),
+            DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Gray),
+            DefaultCellPadding = new MarginInfo(4, 4, 4, 4)
+        };
+
+        // Header row
+        var header = table.Rows.Add();
+        header.Cells.Add("Col 1");
+        header.Cells.Add("Col 2");
+        header.Cells.Add("Col 3");
+
+        // Body row
+        var body = table.Rows.Add();
+        body.Cells.Add("A1");
+        body.Cells.Add("B1");
+        body.Cells.Add("C1");
+
+        // ---------------------------------------------------------------
+        // Remove a specific column (e.g., column 2) from the table
+        // ---------------------------------------------------------------
+        int columnToRemove = 2; // 1‑based column number
+        int zeroBasedIndex = columnToRemove - 1;
+
+        // Remove the cell at the given index from every row
+        foreach (Row row in table.Rows)
+        {
+            if (zeroBasedIndex >= 0 && zeroBasedIndex < row.Cells.Count)
+                row.Cells.Remove(row.Cells[zeroBasedIndex]);
         }
 
-        try
+        // Adjust the ColumnWidths string to match the new column count
+        // (simply remove the corresponding width entry)
+        var widths = table.ColumnWidths.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (zeroBasedIndex >= 0 && zeroBasedIndex < widths.Length)
         {
-            using (Document doc = new Document(inputPath))
-            {
-                // Access tagged content (creates one if the document is not already tagged)
-                ITaggedContent tagged = doc.TaggedContent;
-
-                // Find all tables in the document
-                var tables = tagged.RootElement.FindElements<TableElement>(true);
-                if (tables.Count == 0)
-                {
-                    Console.WriteLine("No table found in the document.");
-                }
-                else
-                {
-                    foreach (TableElement table in tables)
-                    {
-                        // Helper to process rows inside a container (thead, tbody, tfoot)
-                        void ProcessRows(StructureElement container)
-                        {
-                            foreach (Element rowElem in container.ChildElements)
-                            {
-                                if (rowElem is TableTRElement row)
-                                {
-                                    // Convert cells to a list for indexed access
-                                    var cells = row.ChildElements.Cast<Element>().ToList();
-                                    if (columnToRemove >= 0 && columnToRemove < cells.Count)
-                                    {
-                                        // Remove the cell at the specified column index
-                                        row.RemoveChild(columnToRemove);
-                                    }
-                                }
-                            }
-                        }
-
-                        // Header rows
-                        var thead = table.ChildElements.OfType<TableTHeadElement>().FirstOrDefault();
-                        if (thead != null) ProcessRows(thead);
-
-                        // Body rows
-                        var tbody = table.ChildElements.OfType<TableTBodyElement>().FirstOrDefault();
-                        if (tbody != null) ProcessRows(tbody);
-
-                        // Footer rows (optional)
-                        var tfoot = table.ChildElements.OfType<TableTFootElement>().FirstOrDefault();
-                        if (tfoot != null) ProcessRows(tfoot);
-                    }
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Column removed and saved to '{outputPath}'.");
+            var newWidths = string.Join(" ", widths, 0, zeroBasedIndex) +
+                            (zeroBasedIndex + 1 < widths.Length ? " " + string.Join(" ", widths, zeroBasedIndex + 1, widths.Length - zeroBasedIndex - 1) : string.Empty);
+            table.ColumnWidths = newWidths.Trim();
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Add the table to the page
+        page.Paragraphs.Add(table);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

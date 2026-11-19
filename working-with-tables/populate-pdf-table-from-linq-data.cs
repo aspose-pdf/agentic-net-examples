@@ -1,95 +1,118 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
+    // Simple data model
+    class Person
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string City { get; set; }
+    }
+
     static void Main()
     {
         // Sample data source
-        var people = new List<Person>
+        List<Person> people = new List<Person>
         {
-            new Person { Id = 1, Name = "Alice",   Age = 30 },
-            new Person { Id = 2, Name = "Bob",     Age = 25 },
-            new Person { Id = 3, Name = "Charlie", Age = 35 }
+            new Person { Name = "Alice",   Age = 30, City = "New York" },
+            new Person { Name = "Bob",     Age = 22, City = "London"   },
+            new Person { Name = "Charlie", Age = 19, City = "Paris"    },
+            new Person { Name = "Diana",   Age = 27, City = "Tokyo"    }
         };
 
-        // LINQ query: select Id, Name, Age where Age > 28
-        var query = from p in people
-                    where p.Age > 28
-                    select new { p.Id, p.Name, p.Age };
+        // LINQ query – filter and project
+        var query = people
+            .Where(p => p.Age > 20)
+            .Select(p => new { p.Name, p.Age, p.City });
 
         // Convert query result to a DataTable
-        DataTable dt = QueryToDataTable(query);
+        DataTable tableData = new DataTable();
+        // Add columns based on the anonymous type's properties
+        tableData.Columns.Add("Name", typeof(string));
+        tableData.Columns.Add("Age",  typeof(int));
+        tableData.Columns.Add("City", typeof(string));
 
-        const string outputPath = "output.pdf";
+        // Populate rows
+        foreach (var item in query)
+        {
+            DataRow row = tableData.NewRow();
+            row["Name"] = item.Name;
+            row["Age"]  = item.Age;
+            row["City"] = item.City;
+            tableData.Rows.Add(row);
+        }
 
-        // Create PDF document and add a table populated from the DataTable
+        // Create PDF and add a tagged table populated from the DataTable
+        const string outputPath = "TableFromLinq.pdf";
+
         using (Document doc = new Document())
         {
-            // Add a new page
-            Page page = doc.Pages.Add();
+            // Enable tagging and set language/title
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("LINQ Query Result Table");
 
-            // Create a Table layout object
-            Table table = new Table
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
+
+            // Create the table element
+            TableElement pdfTable = tagged.CreateTableElement();
+            pdfTable.AlternativeText = "Table showing filtered persons from LINQ query.";
+            root.AppendChild(pdfTable);
+
+            // ----- Header -----
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            pdfTable.AppendChild(thead);
+
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+
+            // Helper to create a header cell
+            TableTHElement CreateHeader(string text)
             {
-                // Define column widths (adjust as needed)
-                ColumnWidths = "80 200 60",
-                // Optional: set a default border for all cells
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
-            };
+                TableTHElement th = tagged.CreateTableTHElement();
+                th.SetText(text);
+                return th;
+            }
 
-            // Import the DataTable into the Table (include header row)
-            table.ImportDataTable(dt, true, 0, 0);
+            headerRow.AppendChild(CreateHeader("Name"));
+            headerRow.AppendChild(CreateHeader("Age"));
+            headerRow.AppendChild(CreateHeader("City"));
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+            // ----- Body -----
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            pdfTable.AppendChild(tbody);
 
-            // Save the PDF
+            foreach (DataRow dr in tableData.Rows)
+            {
+                TableTRElement dataRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
+
+                TableTDElement tdName = tagged.CreateTableTDElement();
+                tdName.SetText(dr["Name"].ToString());
+                dataRow.AppendChild(tdName);
+
+                TableTDElement tdAge = tagged.CreateTableTDElement();
+                tdAge.SetText(dr["Age"].ToString());
+                dataRow.AppendChild(tdAge);
+
+                TableTDElement tdCity = tagged.CreateTableTDElement();
+                tdCity.SetText(dr["City"].ToString());
+                dataRow.AppendChild(tdCity);
+            }
+
+            // Save the PDF (no PreSave needed)
             doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDF with table saved to '{outputPath}'.");
-    }
-
-    // Helper: converts any IEnumerable<T> to a DataTable using reflection
-    static DataTable QueryToDataTable<T>(IEnumerable<T> data)
-    {
-        DataTable table = new DataTable();
-
-        var properties = typeof(T).GetProperties();
-
-        // Create columns based on the properties of T
-        foreach (var prop in properties)
-        {
-            Type colType = Nullable.GetUnderlyingType(prop.PropertyType) ?? prop.PropertyType;
-            table.Columns.Add(prop.Name, colType);
-        }
-
-        // Populate rows
-        foreach (var item in data)
-        {
-            DataRow row = table.NewRow();
-            foreach (var prop in properties)
-            {
-                object value = prop.GetValue(item, null) ?? DBNull.Value;
-                row[prop.Name] = value;
-            }
-            table.Rows.Add(row);
-        }
-
-        return table;
-    }
-
-    // Simple POCO used for the example
-    class Person
-    {
-        public int    Id   { get; set; }
-        public string Name { get; set; }
-        public int    Age  { get; set; }
     }
 }

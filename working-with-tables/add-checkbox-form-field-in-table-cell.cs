@@ -1,91 +1,71 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Needed for Border class
+using Aspose.Pdf.Annotations; // for widget annotations
+using Aspose.Pdf.Tagged;      // ITaggedContent
+using Aspose.Pdf.LogicalStructure; // structure element types
+using Aspose.Pdf.Forms;       // form field types (CheckboxField, etc.)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_checkbox.pdf";
+        const string outputPath = "checkbox_in_table.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (required for placing the form field)
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Access tagged content (creates a tagged structure if not present)
-            ITaggedContent taggedContent = doc.TaggedContent;
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // ----- Build a simple table using the tagged PDF API -----
+            ITaggedContent tagged = doc.TaggedContent;
+            // Set language and title for accessibility (optional)
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Table with Checkbox");
 
             // Root element of the structure tree
-            StructureElement root = taggedContent.RootElement;
+            StructureElement root = tagged.RootElement;
 
-            // Create a table element
-            TableElement table = taggedContent.CreateTableElement();
-            table.AlternativeText = "Sample table with a checkbox in the first cell";
+            // Create a table element and attach it to the root
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table with a checkbox in the first cell.";
             root.AppendChild(table);
 
-            // Create table header (optional)
-            TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
-            table.AppendChild(thead);
-            TableTRElement headerRow = taggedContent.CreateTableTRElement();
-            thead.AppendChild(headerRow);
-            TableTHElement th = taggedContent.CreateTableTHElement();
-            th.SetText("Option");
-            headerRow.AppendChild(th);
-
-            // Create table body
-            TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+            // Create table body, a single row, and a single cell
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
-            TableTRElement dataRow = taggedContent.CreateTableTRElement();
-            tbody.AppendChild(dataRow);
 
-            // Create a cell where the checkbox will appear
-            TableTDElement td = taggedContent.CreateTableTDElement();
-            td.SetText(" "); // placeholder text; actual visual will be the checkbox
-            dataRow.AppendChild(td);
+            TableTRElement row = tagged.CreateTableTRElement();
+            tbody.AppendChild(row);
 
-            // Save the document temporarily to force layout so we can obtain page dimensions
-            // (Aspose.Pdf does not provide cell coordinates before layout, so we use a fixed rectangle)
-            string tempPath = Path.Combine(Path.GetDirectoryName(outputPath) ?? "", "temp.pdf");
-            doc.Save(tempPath);
+            TableTDElement cell = tagged.CreateTableTDElement();
+            // The cell can contain placeholder text; the checkbox will be positioned over it
+            cell.SetText(" "); // empty space to reserve the cell
+            row.AppendChild(cell);
 
-            // Re-open the temporary PDF to add the form field on the first page
-            using (Document tempDoc = new Document(tempPath))
+            // ----- Add a Checkbox form field positioned inside the cell -----
+            // For demonstration we use fixed coordinates that match the cell location.
+            // In a real scenario you would calculate the cell's rectangle via layout APIs.
+            Aspose.Pdf.Rectangle checkboxRect = new Aspose.Pdf.Rectangle(
+                llx: 100, // lower‑left X
+                lly: 700, // lower‑left Y
+                urx: 120, // upper‑right X
+                ury: 720  // upper‑right Y
+            );
+
+            // Create the checkbox field on the first page
+            CheckboxField checkBox = new CheckboxField(page, checkboxRect)
             {
-                // Define a rectangle where the checkbox will be placed.
-                // Adjust coordinates (llx, lly, urx, ury) as needed for your layout.
-                // Here we place it near the top‑left of the page for demonstration.
-                Aspose.Pdf.Rectangle checkboxRect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
+                PartialName = "CheckBox1", // field name
+                Checked = false            // default state (unchecked). Use true to check.
+            };
 
-                // Create the checkbox field
-                CheckboxField checkBox = new CheckboxField(tempDoc.Pages[1], checkboxRect);
-                checkBox.PartialName = "SampleCheckBox";
-                checkBox.Checked = false; // default state
-                // Set border after construction (Border requires the parent annotation instance)
-                checkBox.Border = new Border(checkBox) { Width = 1 };
-                // Note: BackgroundColor is not available on CheckboxField in this version; omitted.
+            // Add the checkbox to the document's form collection
+            doc.Form.Add(checkBox, 1);
 
-                // Add the field to the document's form collection
-                tempDoc.Form.Add(checkBox);
-
-                // Save final output
-                tempDoc.Save(outputPath);
-            }
-
-            // Clean up temporary file
-            if (File.Exists(tempPath))
-                File.Delete(tempPath);
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDF with checkbox saved to '{outputPath}'.");

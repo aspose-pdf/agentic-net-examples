@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Globalization;
 using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
@@ -10,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,78 +18,70 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Example column widths in points (or any unit). These will be converted to percentages.
+        double[] rawWidths = { 120.0, 80.0, 200.0, 100.0 };
+
+        // Calculate total width.
+        double total = rawWidths.Sum();
+
+        // Compute percentage strings with one decimal place.
+        string[] percentStrings = rawWidths
+            .Select(w => $"{(w / total * 100):0.##}%")
+            .ToArray();
+
+        // Join percentages as required by TableElement.ColumnWidths (space‑separated).
+        string columnWidthsSpec = string.Join(" ", percentStrings);
+
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (creates it if missing) and set basic metadata
+            // Ensure the document is tagged (required for logical structure manipulation).
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the structure tree
+            // Root element of the structure tree.
             StructureElement root = tagged.RootElement;
 
-            // Create a table element and attach it to the root
+            // Create a table element and assign the calculated column widths.
             TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample table with proportional column widths";
+            table.ColumnWidths = columnWidthsSpec; // e.g. "20% 13.33% 33.33% 26.67%"
+
+            // Append the table to the root.
             root.AppendChild(table);
 
-            // Initial column widths (as a space‑separated string, the API expects a string)
-            table.ColumnWidths = "120 80 200";
-
-            // ----- Proportional width adjustment -----
-            // Parse the string into a float array
-            float[] originalWidths = table.ColumnWidths
-                .Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(s => float.Parse(s, CultureInfo.InvariantCulture))
-                .ToArray();
-
-            float totalWidth = originalWidths.Sum();
-
-            // Guard against division by zero
-            if (totalWidth > 0f)
-            {
-                float[] percentWidths = new float[originalWidths.Length];
-                for (int i = 0; i < originalWidths.Length; i++)
-                {
-                    // Convert each width to a percentage of the total
-                    percentWidths[i] = (originalWidths[i] / totalWidth) * 100f;
-                }
-                // Convert back to the string format expected by the API
-                string percentString = string.Join(" ", percentWidths.Select(p => p.ToString(CultureInfo.InvariantCulture)));
-                table.ColumnWidths = percentString;
-            }
-
-            // Use the final column count for building rows
-            int columnCount = originalWidths.Length;
-
-            // Build a simple header row
+            // OPTIONAL: add a header row.
             TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
             TableTRElement headerRow = tagged.CreateTableTRElement();
             thead.AppendChild(headerRow);
-            for (int i = 0; i < columnCount; i++)
+
+            // Create header cells.
+            string[] headers = { "Col A", "Col B", "Col C", "Col D" };
+            foreach (string hdr in headers)
             {
                 TableTHElement th = tagged.CreateTableTHElement();
-                th.SetText($"Header {i + 1}");
+                th.SetText(hdr);
                 headerRow.AppendChild(th);
             }
 
-            // Build a single data row
+            // OPTIONAL: add a single data row.
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
             TableTRElement dataRow = tagged.CreateTableTRElement();
             tbody.AppendChild(dataRow);
-            for (int i = 0; i < columnCount; i++)
+            string[] data = { "A1", "B1", "C1", "D1" };
+            foreach (string cell in data)
             {
                 TableTDElement td = tagged.CreateTableTDElement();
-                td.SetText($"Cell {i + 1}");
+                td.SetText(cell);
                 dataRow.AppendChild(td);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF. No PreSave() call is required.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with proportional column widths saved to '{outputPath}'.");
     }
 }

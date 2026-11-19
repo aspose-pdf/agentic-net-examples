@@ -1,15 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "output_with_image.pdf";
-        const string imagePath = "sample.jpg"; // external image file
+        // Input PDF (can be empty or existing) and output PDF paths
+        const string outputPdfPath = "output_with_image_table.pdf";
+        // Path to the external image to insert into the table cell
+        const string imagePath = "image.jpg";
 
+        // Verify that the image file exists
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
@@ -19,45 +21,36 @@ class Program
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Set basic document metadata (avoid properties that may not exist in older versions)
-            doc.Info.Title = "PDF with Image in Table Cell";
-
-            // Add a page to the document
+            // Add a page to the document (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a table with a single column (width can be adjusted as needed)
-            Table table = new Table
-            {
-                ColumnWidths = "200" // width of the single column in points
-            };
+            // Create a table with a single column
+            Table table = new Table();
+            // Optionally set column widths (percentage of page width)
+            table.ColumnWidths = "100%";
 
             // Add a row to the table
             Row row = table.Rows.Add();
 
-            // Add a cell (TD) to the row
+            // Add a cell to the row
             Cell cell = row.Cells.Add();
 
-            // Load the external image and add it to the cell using the Image class
-            using (FileStream imgStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read))
+            // Create an Image object and point it to the external file
+            Image img = new Image
             {
-                Image img = new Image
-                {
-                    ImageStream = imgStream,
-                    // Optional: set explicit size (in points). Adjust as required.
-                    FixWidth = 180,
-                    FixHeight = 180
-                };
-                // Add the image to the cell's paragraph collection
-                cell.Paragraphs.Add(img);
-            }
+                File = imagePath
+            };
 
-            // Add the table to the page
+            // Insert the image into the cell's paragraph collection
+            cell.Paragraphs.Add(img);
+
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF
-            doc.Save(outputPath);
+            // Save the resulting PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}' with the image inserted into a table cell.");
+        Console.WriteLine($"PDF with image table saved to '{outputPdfPath}'.");
     }
 }

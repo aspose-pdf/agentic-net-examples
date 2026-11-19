@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "accessible_table_with_footer.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_footer_table.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,69 +17,72 @@ class Program
             return;
         }
 
-        // Load the PDF and work with its tagged content
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            ITaggedContent taggedContent = doc.TaggedContent;
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Access the tagged content API
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Root element of the structure tree
-            StructureElement root = taggedContent.RootElement;
+            // Root of the logical structure tree
+            StructureElement root = tagged.RootElement;
 
             // Create a table element and attach it to the root
-            TableElement table = taggedContent.CreateTableElement();
+            TableElement table = tagged.CreateTableElement();
             table.AlternativeText = "Sample data table with footer";
             root.AppendChild(table);
 
             // ----- Header -----
-            TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
-            TableTRElement headerRow = taggedContent.CreateTableTRElement();
+            TableTRElement headerRow = tagged.CreateTableTRElement();
             thead.AppendChild(headerRow);
 
-            TableTHElement th1 = taggedContent.CreateTableTHElement();
-            th1.SetText("Product");
-            headerRow.AppendChild(th1);
+            TableTHElement thProduct = tagged.CreateTableTHElement();
+            thProduct.SetText("Product");
+            headerRow.AppendChild(thProduct);
 
-            TableTHElement th2 = taggedContent.CreateTableTHElement();
-            th2.SetText("Revenue");
-            headerRow.AppendChild(th2);
+            TableTHElement thPrice = tagged.CreateTableTHElement();
+            thPrice.SetText("Price");
+            headerRow.AppendChild(thPrice);
 
             // ----- Body -----
-            TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
-            TableTRElement dataRow = taggedContent.CreateTableTRElement();
+
+            // Example data row
+            TableTRElement dataRow = tagged.CreateTableTRElement();
             tbody.AppendChild(dataRow);
 
-            TableTDElement td1 = taggedContent.CreateTableTDElement();
-            td1.SetText("Widget A");
-            dataRow.AppendChild(td1);
+            TableTDElement tdItem = tagged.CreateTableTDElement();
+            tdItem.SetText("Widget A");
+            dataRow.AppendChild(tdItem);
 
-            TableTDElement td2 = taggedContent.CreateTableTDElement();
-            td2.SetText("$50,000");
-            dataRow.AppendChild(td2);
+            TableTDElement tdCost = tagged.CreateTableTDElement();
+            tdCost.SetText("$10");
+            dataRow.AppendChild(tdCost);
 
             // ----- Footer -----
-            TableTFootElement tfoot = taggedContent.CreateTableTFootElement();
-            // In the current Aspose.Pdf version the TableTFootElement does not expose a Repeat property.
-            // Footers are automatically rendered on each page when the table spans multiple pages.
+            TableTFootElement tfoot = tagged.CreateTableTFootElement();
+            // The footer will automatically repeat on each page when the table spans multiple pages.
+            // No explicit Repeat property exists on TableTFootElement in the current Aspose.Pdf version.
             table.AppendChild(tfoot);
-            TableTRElement footerRow = taggedContent.CreateTableTRElement();
+            TableTRElement footerRow = tagged.CreateTableTRElement();
             tfoot.AppendChild(footerRow);
 
-            TableTDElement footCell1 = taggedContent.CreateTableTDElement();
+            TableTDElement footCell1 = tagged.CreateTableTDElement();
             footCell1.SetText("Total");
             footerRow.AppendChild(footCell1);
 
-            TableTDElement footCell2 = taggedContent.CreateTableTDElement();
-            footCell2.SetText("$50,000");
+            TableTDElement footCell2 = tagged.CreateTableTDElement();
+            footCell2.SetText("$10");
             footerRow.AppendChild(footCell2);
 
-            // Save the modified PDF (no PreSave required)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF with table footer saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

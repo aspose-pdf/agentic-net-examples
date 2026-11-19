@@ -5,35 +5,31 @@ class Program
 {
     static void Main()
     {
-        // Create source DataTable and populate it
-        DataTable sourceTable = new DataTable("Source");
-        sourceTable.Columns.Add("Id", typeof(int));
-        sourceTable.Columns.Add("Name", typeof(string));
-        sourceTable.Columns.Add("IsActive", typeof(bool));
+        // Create a source DataTable with sample data
+        DataTable source = new DataTable("Source");
+        source.Columns.Add("Id", typeof(int));
+        source.Columns.Add("Name", typeof(string));
+        source.Columns.Add("Amount", typeof(decimal));
 
-        sourceTable.Rows.Add(1, "Alice", true);
-        sourceTable.Rows.Add(2, "Bob", false);
-        sourceTable.Rows.Add(3, "Charlie", true);
-        sourceTable.Rows.Add(4, "Diana", false);
+        source.Rows.Add(1, "Alice", 120.5m);
+        source.Rows.Add(2, "Bob", 80.0m);
+        source.Rows.Add(3, "Charlie", 150.0m);
+        source.Rows.Add(4, "Diana", 60.0m);
 
-        // Filter rows using a DataView
-        DataView view = new DataView(sourceTable);
-        view.RowFilter = "IsActive = true";
+        // Build a DataView on the source table
+        DataView view = new DataView(source);
 
-        // Create destination table with the same schema
-        DataTable destTable = sourceTable.Clone();
+        // Filter rows: keep only records where Amount > 100
+        view.RowFilter = "Amount > 100";
 
-        // Import only the filtered rows
-        foreach (DataRowView rowView in view)
-        {
-            destTable.ImportRow(rowView.Row);
-        }
+        // Import the filtered rows into a new DataTable
+        DataTable filtered = view.ToTable();
 
-        // Display the filtered records
+        // Output the filtered rows to verify the result
         Console.WriteLine("Filtered rows:");
-        foreach (DataRow row in destTable.Rows)
+        foreach (DataRow row in filtered.Rows)
         {
-            Console.WriteLine($"{row["Id"]}, {row["Name"]}, {row["IsActive"]}");
+            Console.WriteLine($"Id={row["Id"]}, Name={row["Name"]}, Amount={row["Amount"]}");
         }
     }
 }

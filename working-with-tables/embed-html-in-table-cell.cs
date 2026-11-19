@@ -1,47 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // HtmlFragment resides here
+using Aspose.Pdf.Text;   // HtmlFragment resides here
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_html.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with a single column (width 200 points)
+        // Load the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a table and add it to the first page
             Table table = new Table
             {
-                ColumnWidths = "200"
+                ColumnWidths = "200 200",   // two columns, each 200 points wide
+                Border = new BorderInfo(BorderSide.All, 0.5f)
             };
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
+            doc.Pages[1].Paragraphs.Add(table);
 
             // Add a row to the table
             Row row = table.Rows.Add();
 
-            // Add a cell to the row
+            // Add a cell to the row (first column)
             Cell cell = row.Cells.Add();
 
-            // Embed HTML markup inside the cell using HtmlFragment
-            HtmlFragment html = new HtmlFragment(
-                "<p>This is <b>bold</b> and <i>italic</i> text inside a table cell.</p>"
-            );
+            // Embed HTML markup inside the cell by adding an HtmlFragment
+            // The HtmlFragment parses the HTML string and renders it as PDF content
+            HtmlFragment html = new HtmlFragment("<b>Bold Text</b> <i>Italic Text</i> <u>Underlined</u>");
             cell.Paragraphs.Add(html);
 
-            // Optional: add a visible border to the cell for demonstration
-            cell.Border = new BorderInfo(BorderSide.All, 1f);
+            // Optionally add a second cell with plain text for comparison
+            Cell secondCell = row.Cells.Add();
+            secondCell.Paragraphs.Add(new TextFragment("Plain text cell"));
 
-            // Save the PDF (no SaveOptions needed for PDF output)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with HTML‑embedded cell saved to '{outputPath}'.");
     }
 }

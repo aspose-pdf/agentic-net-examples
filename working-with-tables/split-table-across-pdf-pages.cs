@@ -9,41 +9,29 @@ class Program
     {
         const string outputPath = "table_split.pdf";
 
-        // Ensure the output directory exists
-        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
-        if (!Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
-
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
             // Add a single page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table that can split across pages
+            // Create a table that will span multiple pages
             Table table = new Table
             {
-                // Enable automatic breaking of the table when it exceeds page height
+                // Enable automatic splitting of the table across pages
                 IsBroken = true,
-
-                // Define column widths (percentage of the page width)
-                ColumnWidths = "30% 40% 30%",
-
-                // Optional: set border for visual clarity
-                Border = new BorderInfo(BorderSide.All, 0.5f)
+                // Optional: set column widths (in points)
+                ColumnWidths = "100 100 100"
             };
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
-            // Make header bold
-            foreach (Cell cell in header.Cells)
-                cell.DefaultCellTextState = new TextState { FontStyle = FontStyles.Bold };
+            header.Cells.Add("Column 1");
+            header.Cells.Add("Column 2");
+            header.Cells.Add("Column 3");
 
-            // Add many data rows to force the table to span multiple pages
-            for (int i = 1; i <= 100; i++)
+            // Populate the table with enough rows to force a page break
+            for (int i = 1; i <= 200; i++)
             {
                 Row row = table.Rows.Add();
                 row.Cells.Add($"Row {i} - Col 1");
@@ -54,10 +42,10 @@ class Program
             // Add the table to the page's paragraphs collection
             page.Paragraphs.Add(table);
 
-            // Save the document as PDF
+            // Save the document (Document.Save without SaveOptions writes PDF)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with split‑able table saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with split table saved to '{outputPath}'.");
     }
 }
