@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,55 +8,65 @@ class BatchStringReplacer
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\Pdf\Input";
-        // Folder where modified PDFs will be saved
-        const string outputFolder = @"C:\Pdf\Output";
+        // NOTE: To avoid known vulnerabilities in System.Security.Cryptography.Pkcs (v9.0.0),
+        // add the following PackageReference to the .csproj file (or update the existing one):
+        // <PackageReference Include="System.Security.Cryptography.Pkcs" Version="8.0.0" />
+        const string inputFolder = "InputPdfs";
+        const string outputFolder = "OutputPdfs";
 
-        // Ensure output directory exists
+        // Validate input folder existence before proceeding
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder \"{inputFolder}\" does not exist.");
+            return;
+        }
         Directory.CreateDirectory(outputFolder);
 
-        // Dictionary of old string => new string replacements
-        var replacements = new Dictionary<string, string>(StringComparer.Ordinal)
+        // Define the old‑new string pairs
+        var replacements = new Dictionary<string, string>
         {
-            { "OldCompany", "NewCompany" },
-            { "Confidential", "Public" },
-            { "2022", "2023" }
-            // add more pairs as needed
+            { "OldString1", "NewString1" },
+            { "OldString2", "NewString2" },
+            { "Confidential", "Public" }
+            // Add more pairs as needed
         };
 
         // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(inputPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
-            // Load PDF using the core Document API (no Facades)
-            using (Document doc = new Document(inputPath))
+            try
             {
-                // Absorb all text fragments in the document
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-                doc.Pages.Accept(absorber);
-
-                // Iterate over each fragment and apply all replacements
-                foreach (TextFragment fragment in absorber.TextFragments)
+                // Load the PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    string text = fragment.Text;
-                    foreach (var kvp in replacements)
+                    // Perform all replacements on the document using TextFragmentAbsorber
+                    foreach (KeyValuePair<string, string> pair in replacements)
                     {
-                        if (text.Contains(kvp.Key))
+                        // Absorb all occurrences of the old text (case‑sensitive search)
+                        var absorber = new TextFragmentAbsorber(pair.Key)
                         {
-                            text = text.Replace(kvp.Key, kvp.Value);
+                            TextSearchOptions = new TextSearchOptions(true)
+                        };
+                        doc.Pages.Accept(absorber);
+
+                        // Replace each found fragment with the new text
+                        foreach (TextFragment fragment in absorber.TextFragments)
+                        {
+                            fragment.Text = pair.Value;
                         }
                     }
-                    fragment.Text = text;
+
+                    // Build the output file path and save the modified PDF
+                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                    doc.Save(outputPath);
                 }
 
-                // Save the modified PDF (same format, so no SaveOptions needed)
-                doc.Save(outputPath);
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)} → {outputFolder}");
             }
-
-            Console.WriteLine($"Processed: {fileName}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to process \"{pdfPath}\": {ex.Message}");
+            }
         }
 
         Console.WriteLine("Batch replacement completed.");

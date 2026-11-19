@@ -2,14 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_annotation.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "annotated.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (pages are 1‑based)
+            // Aspose.Pdf uses 1‑based page indexing
             Page page = doc.Pages[1];
 
-            // Define the rectangle for the annotation (llx, lly, urx, ury)
+            // Define the annotation rectangle (lower‑left x,y and upper‑right x,y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create a text annotation
             TextAnnotation txtAnnot = new TextAnnotation(page, rect)
             {
-                Title    = "Note Title",
-                Contents = "This is a text annotation.",
-                Open     = true,
-                Icon     = TextIcon.Note
+                Title = "Info",
+                Contents = "Click to run script.",
+                Open = true,
+                Icon = TextIcon.Note
             };
 
-            // NOTE:
-            // The current Aspose.Pdf version used in this project does NOT expose
-            // an Action property nor a JavaScriptAction class on TextAnnotation.
-            // Therefore attaching JavaScript to the annotation is not possible here.
-            // If JavaScript actions are required, upgrade to a newer Aspose.Pdf version
-            // that provides the appropriate API.
+            // NOTE: The current Aspose.Pdf version does not expose an Action property on TextAnnotation
+            // and does not provide a JavascriptAction class for annotations. If you need a JavaScript
+            // action attached to an annotation, upgrade to a newer Aspose.Pdf version that supports it
+            // or assign a document‑level JavaScript action, e.g.:
+            // doc.OpenAction = new JavascriptAction("app.alert('Hello from JavaScript!');");
 
             // Add the annotation to the page
             page.Annotations.Add(txtAnnot);

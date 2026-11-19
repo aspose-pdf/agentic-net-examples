@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // required for TextFragment and TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,23 +16,24 @@ class Program
             return;
         }
 
-        // Always wrap Document in a using block for deterministic disposal
+        // Load the existing PDF (or create a new one if needed)
         using (Document doc = new Document(inputPath))
         {
             // Create a new text fragment
-            TextFragment fragment = new TextFragment("Line 1\nLine 2\nLine 3");
+            TextFragment tf = new TextFragment("Line 1\nLine 2\nLine 3");
 
-            // Set a custom line spacing (e.g., 1.5 times the default)
-            fragment.TextState.LineSpacing = 1.5f; // LineSpacing is the correct property
+            // Set a custom line spacing (e.g., 1.8 times the default font size)
+            // TextFragmentState does not expose a LineHeight property; use LineSpacing instead.
+            tf.TextState.LineSpacing = 1.8f; // float value representing line spacing multiplier
 
-            // Optionally set other text properties
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.Font = FontRepository.FindFont("Arial");
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Optional: set other text properties
+            tf.TextState.FontSize = 12;
+            tf.TextState.Font = FontRepository.FindFont("Arial");
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-            // Position the fragment on the first page
+            // Add the fragment to the first page
             Page page = doc.Pages[1];
-            page.Paragraphs.Add(fragment);
+            page.Paragraphs.Add(tf);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated.pdf";
-        const string targetText = "Sample Text"; // text to rotate
+        const string inputPath  = "input.pdf";
+        const string outputPath = "rotated_output.pdf";
+        const string searchText = "Hello"; // text to locate and rotate
 
         if (!File.Exists(inputPath))
         {
@@ -17,49 +17,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Variables to hold the page and fragment once we find the text
-            Page targetPage = null;
-            TextFragment foundFragment = null;
+            // Find the first occurrence of the specified text
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
+            doc.Pages.Accept(absorber);
 
-            // Iterate through pages until the fragment is found – this avoids the missing PageNumber property
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Ensure at least one fragment was found
+            if (absorber.TextFragments.Count > 0)
             {
-                Page page = doc.Pages[pageIndex];
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber(targetText);
-                absorber.TextSearchOptions = new TextSearchOptions(true);
-                page.Accept(absorber);
+                // TextFragment collections are 1‑based
+                TextFragment fragment = absorber.TextFragments[1];
 
-                if (absorber.TextFragments.Count > 0)
-                {
-                    // First occurrence on this page
-                    foundFragment = absorber.TextFragments[1];
-                    targetPage = page;
-                    break;
-                }
+                // Rotate the fragment by 45 degrees
+                fragment.TextState.Rotation = 45;
+            }
+            else
+            {
+                Console.WriteLine($"Text \"{searchText}\" not found in the document.");
             }
 
-            if (foundFragment == null || targetPage == null)
-            {
-                Console.WriteLine($"Text \"{targetText}\" not found.");
-                doc.Save(outputPath); // Save unchanged document
-                return;
-            }
-
-            // Create a new fragment with the same text, positioned at the original location
-            TextFragment rotatedFragment = new TextFragment(targetText);
-            rotatedFragment.Position = new Position(foundFragment.Position.XIndent, foundFragment.Position.YIndent);
-            rotatedFragment.TextState.Rotation = 45; // rotate 45 degrees
-
-            // Add the rotated fragment to the page (it will appear on top of the original)
-            targetPage.Paragraphs.Add(rotatedFragment);
-
-            // Save the modified PDF
+            // Save the modified PDF (PDF format is default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rotated text saved to '{outputPath}'.");
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

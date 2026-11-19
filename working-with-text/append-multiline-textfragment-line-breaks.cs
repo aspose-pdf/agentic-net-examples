@@ -16,30 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (Aspose.Pdf uses 1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             Page page = doc.Pages[1];
 
-            // Define a multi‑line string (\n denotes line breaks)
-            string multiLineText = "First line.\nSecond line.\nThird line.";
+            // Multi‑line text using various line‑break characters
+            string multiLineText = "First line\nSecond line\r\nThird line";
 
-            // Create a TextFragment with the multi‑line content
-            TextFragment textFragment = new TextFragment(multiLineText);
+            // Create a TextFragment containing the multi‑line text
+            TextFragment tf = new TextFragment(multiLineText);
 
-            // Optionally set the position of the fragment on the page
-            textFragment.Position = new Position(100, 700);
+            // Set the fragment's position on the page (optional)
+            tf.Position = new Position(100, 700); // Position is in Aspose.Pdf.Text namespace
 
             // Append the fragment to the page's paragraph collection
-            page.Paragraphs.Add(textFragment);
+            page.Paragraphs.Add(tf);
 
-            // Retrieve line‑break information by analysing the original text
-            Console.WriteLine("Line‑break information for each line:");
-            string[] lines = multiLineText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
-            for (int i = 0; i < lines.Length; i++)
+            // Retrieve line‑break information from the fragment's segments
+            Console.WriteLine("Line break information per segment:");
+            int index = 0;
+            int segmentCount = tf.Segments.Count;
+            foreach (TextSegment segment in tf.Segments)
             {
-                Console.WriteLine($"Line {i}: Text=\"{lines[i]}\"");
+                // In newer Aspose.Pdf versions TextSegment no longer exposes IsNewLine.
+                // A line break exists after every segment except the last one.
+                bool hasLineBreak = index < segmentCount - 1;
+                Console.WriteLine($"Segment {index}: \"{segment.Text}\"  NewLine: {hasLineBreak}");
+                index++;
             }
 
             // Save the modified document

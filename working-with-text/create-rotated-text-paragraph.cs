@@ -7,41 +7,31 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
+        const string outputPath = "rotated_paragraph.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Ensure the Document is disposed properly
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a new page (first page)
             Page page = doc.Pages.Add();
 
-            // Create a TextFragment which can hold multiple TextSegments (acts like a paragraph)
-            TextFragment paragraph = new TextFragment();
+            // Create individual TextFragments – each fragment can be rotated.
+            // Adding them sequentially to the page results in a single visual paragraph.
+            TextFragment fragment1 = new TextFragment("Hello, ");
+            TextFragment fragment2 = new TextFragment("world! ");
+            TextFragment fragment3 = new TextFragment("This paragraph is rotated.");
 
-            // Position of the paragraph on the page
-            paragraph.Position = new Position(100, 500);
+            // Apply a 30‑degree rotation to each fragment (the whole visual line will appear rotated)
+            fragment1.TextState.Rotation = 30;
+            fragment2.TextState.Rotation = 30;
+            fragment3.TextState.Rotation = 30;
 
-            // Apply a 30-degree rotation to the entire paragraph
-            paragraph.TextState.Rotation = 30; // rotation in degrees (clockwise)
+            // Add the fragments to the page in order – they will be rendered as one paragraph.
+            page.Paragraphs.Add(fragment1);
+            page.Paragraphs.Add(fragment2);
+            page.Paragraphs.Add(fragment3);
 
-            // First text segment
-            TextSegment segment1 = new TextSegment("Hello, ");
-            segment1.TextState.FontSize = 12;
-            segment1.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-            // Second text segment
-            TextSegment segment2 = new TextSegment("world!");
-            segment2.TextState.FontSize = 12;
-            segment2.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
-
-            // Add the segments to the fragment (paragraph)
-            paragraph.Segments.Add(segment1);
-            paragraph.Segments.Add(segment2);
-
-            // Add the fragment to the page's paragraph collection
-            page.Paragraphs.Add(paragraph);
-
-            // Save the document to a PDF file
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

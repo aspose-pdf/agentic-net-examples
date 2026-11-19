@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,53 +7,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputCsv = "page_word_counts.csv";
+        const string inputPdfPath = "input.pdf";
+        const string outputCsvPath = "word_counts.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Create a CSV writer
-            using (StreamWriter csvWriter = new StreamWriter(outputCsv))
+            // Open the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Write CSV header
-                csvWriter.WriteLine("PageNumber,WordCount");
-
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Prepare CSV writer
+                using (StreamWriter csvWriter = new StreamWriter(outputCsvPath, false))
                 {
-                    // Extract text from the current page
-                    TextAbsorber absorber = new TextAbsorber
-                    {
-                        ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-                    };
-                    doc.Pages[i].Accept(absorber);
-                    string pageText = absorber.Text ?? string.Empty;
+                    // Write CSV header
+                    csvWriter.WriteLine("Page,WordCount");
 
-                    // Count words by splitting on whitespace
-                    int wordCount = 0;
-                    if (!string.IsNullOrWhiteSpace(pageText))
+                    // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+                    for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
                     {
-                        string[] words = Regex.Split(pageText, @"\s+");
-                        foreach (string w in words)
+                        // Extract text from the current page
+                        TextAbsorber absorber = new TextAbsorber();
+                        absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                        pdfDoc.Pages[pageNumber].Accept(absorber);
+                        string pageText = absorber.Text ?? string.Empty;
+
+                        // Count words (split on whitespace, ignore empty entries)
+                        int wordCount = 0;
+                        if (!string.IsNullOrWhiteSpace(pageText))
                         {
-                            if (!string.IsNullOrEmpty(w))
-                                wordCount++;
+                            string[] words = pageText.Split(
+                                new char[] { ' ', '\t', '\r', '\n' },
+                                StringSplitOptions.RemoveEmptyEntries);
+                            wordCount = words.Length;
                         }
-                    }
 
-                    // Write the statistics for this page
-                    csvWriter.WriteLine($"{i},{wordCount}");
+                        // Write statistics for this page
+                        csvWriter.WriteLine($"{pageNumber},{wordCount}");
+                    }
                 }
+
+                Console.WriteLine($"Word count statistics saved to '{outputCsvPath}'.");
             }
         }
-
-        Console.WriteLine($"Word count per page written to '{outputCsv}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+        }
     }
 }

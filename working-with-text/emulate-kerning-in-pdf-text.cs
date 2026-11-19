@@ -8,7 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_kerning.pdf";
+        const string sampleText = "Kerning enabled text";
 
         if (!File.Exists(inputPath))
         {
@@ -16,28 +17,26 @@ class Program
             return;
         }
 
-        // Load the PDF, add a text fragment with adjusted character spacing (kerning is not a direct property), and save.
+        // Load the PDF document within a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TextFragment containing the desired text.
-            TextFragment tf = new TextFragment("Kerning enabled text");
+            // Create a TextFragment containing the desired text
+            TextFragment fragment = new TextFragment(sampleText);
 
-            // Kerning cannot be toggled via a Kerning property on TextFragmentState.
-            // Use CharacterSpacing to fine‑tune inter‑character spacing, which approximates kerning.
-            tf.TextState.CharacterSpacing = 0.5f; // adjust as needed for the desired visual effect
+            // Aspose.Pdf does not expose a Kerning property on TextFragmentState.
+            // To adjust spacing between characters, use CharacterSpacing instead.
+            fragment.TextState.CharacterSpacing = 0.5f;
 
-            // Optional: set font and size.
-            tf.TextState.Font = FontRepository.FindFont("Arial");
-            tf.TextState.FontSize = 12;
+            // Optional: set position on the page (example coordinates)
+            fragment.Position = new Position(100, 700);
 
-            // Add the fragment to the first page (pages are 1‑based).
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(tf);
+            // Add the fragment to the first page's paragraph collection
+            doc.Pages[1].Paragraphs.Add(fragment);
 
-            // Save the modified PDF.
+            // Save the modified document as PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with adjusted character spacing to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with simulated kerning: {outputPath}");
     }
 }

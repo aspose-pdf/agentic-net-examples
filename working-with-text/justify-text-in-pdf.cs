@@ -7,30 +7,41 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "justified.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "justified_output.pdf";
 
-        // Ensure deterministic disposal of the Document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a new page (Pages collection is 1‑based)
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Sample paragraph text
-            string sampleText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
-                                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Use the first page (pages are 1‑based)
+            Page page = doc.Pages[1];
 
-            // Create a TextFragment and set justification
-            TextFragment fragment = new TextFragment(sampleText);
+            // Create a text fragment with the content to justify
+            TextFragment fragment = new TextFragment(
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+            );
+
+            // Set horizontal alignment to Justify during creation
             fragment.TextState.HorizontalAlignment = HorizontalAlignment.Justify;
+
+            // Optional styling
+            fragment.TextState.FontSize = 12;
+            fragment.Margin = new MarginInfo { Top = 20, Bottom = 20, Left = 40, Right = 40 };
 
             // Add the fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Save as PDF (no SaveOptions needed for PDF format)
+            // Save the modified PDF (PDF format is default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Justified PDF saved to '{outputPath}'.");
     }
 }

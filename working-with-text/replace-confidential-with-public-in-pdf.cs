@@ -16,34 +16,27 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document with deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Create an absorber for the text to be replaced
+            var absorber = new TextFragmentAbsorber("Confidential");
+            // Configure case‑insensitive search (false => case‑insensitive)
+            absorber.TextSearchOptions = new TextSearchOptions(false);
+
+            // Search all pages
+            doc.Pages.Accept(absorber);
+
+            // Replace each found fragment with the new text
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Create an absorber that searches for the text "Confidential"
-                TextFragmentAbsorber absorber = new TextFragmentAbsorber("Confidential");
-                // Optional: make the search case‑sensitive (true) or case‑insensitive (false)
-                absorber.TextSearchOptions = new TextSearchOptions(true);
-
-                // Apply the absorber to all pages of the document
-                doc.Pages.Accept(absorber);
-
-                // Replace each found fragment with the new text "Public"
-                foreach (TextFragment fragment in absorber.TextFragments)
-                {
-                    fragment.Text = "Public";
-                }
-
-                // Save the modified document
-                doc.Save(outputPath);
+                fragment.Text = "Public";
             }
 
-            Console.WriteLine($"Replacement completed. Saved to '{outputPath}'.");
+            // Save the updated PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"All occurrences replaced. Output saved to '{outputPath}'.");
     }
 }

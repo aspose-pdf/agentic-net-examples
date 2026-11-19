@@ -7,8 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string watermark = "Rotated Text";
 
         if (!File.Exists(inputPath))
         {
@@ -16,30 +17,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the last page (Aspose.Pdf uses 1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             Page lastPage = doc.Pages[doc.Pages.Count];
 
-            // Create the text fragment to be placed
-            TextFragment fragment = new TextFragment("Rotated Text");
-            fragment.TextState.Font = FontRepository.FindFont("Arial");
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // Define a small margin from the right and bottom edges
+            double margin = 10.0;
+            double x = lastPage.PageInfo.Width - margin; // right‑most X
+            double y = margin;                           // bottom‑most Y
 
-            // Rotate the text (degrees clockwise)
-            fragment.TextState.Rotation = 45;
-
-            // Position at the bottom‑right corner with a small margin
-            const double margin = 20;
-            double x = lastPage.PageInfo.Width - margin;   // right side
-            double y = margin;                             // bottom side (origin is bottom‑left)
+            // Create a TextFragment, set rotation and position, then add to the page
+            TextFragment fragment = new TextFragment(watermark);
+            fragment.TextState.Rotation = 45.0; // degrees clockwise
             fragment.Position = new Position(x, y);
-
-            // Use TextBuilder to add the fragment to the page
-            TextBuilder builder = new TextBuilder(lastPage);
-            builder.AppendText(fragment);
+            lastPage.Paragraphs.Add(fragment);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -1,16 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string url        = "https://www.example.com";
+        const string url = "https://www.example.com";
 
         if (!File.Exists(inputPath))
         {
@@ -18,36 +18,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Work with the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
-            // Create a text fragment that will contain the clickable text
-            TextFragment fragment = new TextFragment("Visit Example");
-
-            // Optional visual styling for the clickable text
-            fragment.TextState.Underline = true;
-            fragment.TextState.FontSize   = 12;
-            fragment.TextState.Font       = FontRepository.FindFont("Arial");
-
-            // Position the fragment on the page (adjust as needed)
+            // Create a TextFragment that will contain the clickable text
+            TextFragment fragment = new TextFragment("Click here to visit Example.com");
+            // Position the fragment on the page (coordinates are in points)
             fragment.Position = new Position(100, 700);
+            // Optional visual style
+            fragment.TextState.FontSize = 14;
+            fragment.TextState.FontStyle = FontStyles.Bold;
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
 
-            // Add the fragment to the page's paragraph collection first – this will render the text
+            // Add the fragment to the page's paragraphs collection first so that its rectangle is calculated
             page.Paragraphs.Add(fragment);
 
             // Create a link annotation that covers the same rectangle as the text fragment
-            // The rectangle coordinates are (llx, lly, urx, ury) – here we approximate the size
-            double llx = fragment.Position.XIndent;
-            double lly = fragment.Position.YIndent;
-            double urx = llx + fragment.TextState.FontSize * fragment.Text.Length * 0.6; // rough width estimate
-            double ury = lly + fragment.TextState.FontSize;
-            LinkAnnotation link = new LinkAnnotation(page, new Rectangle(llx, lly, urx, ury))
-            {
-                Action = new GoToURIAction(url)
-            };
+            // The TextFragment.Rectangle is populated after the fragment is added to the page
+            LinkAnnotation link = new LinkAnnotation(page, fragment.Rectangle);
+            // Assign a URI action (GoToURIAction) to open the web address
+            link.Action = new GoToURIAction(url);
+            // Optionally set the visible tooltip (Contents) for the annotation
+            link.Contents = "Open example.com";
 
             // Add the annotation to the page
             page.Annotations.Add(link);

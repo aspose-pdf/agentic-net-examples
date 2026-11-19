@@ -7,36 +7,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (pages are 1‑based)
+            // Access the first page (1‑based indexing)
             Page page = doc.Pages[1];
 
             // Create a text fragment
             TextFragment fragment = new TextFragment("Semi‑transparent text");
 
-            // Set opacity by using a color with an alpha component (0‑255).
-            // 128 (≈50%) alpha makes the text semi‑transparent.
-            fragment.TextState.ForegroundColor = Color.FromArgb(128, 0, 0, 0); // 50% transparent black
+            // Configure opacity via the alpha component of the foreground color (0‑255).
+            // 128 = 50 % opacity. Keep the original blue hue.
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.FromArgb(128, 0, 0, 255);
 
-            // Optional styling
-            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            // Optionally set other visual properties
             fragment.TextState.FontSize = 24;
+            // If you also want a solid color elsewhere, you can set it separately.
 
             // Add the fragment to the page
             page.Paragraphs.Add(fragment);
 
-            // Save the modified PDF
+            // Save the modified PDF (still PDF format)
             doc.Save(outputPath);
         }
 

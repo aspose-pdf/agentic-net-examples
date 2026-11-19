@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "subscript_output.pdf";
+        const string outputPath = "output_subscript.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +16,38 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure there is at least one page to work with
-            Page page = doc.Pages[1];
+            // Load the existing PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Access the first page (Aspose.Pdf uses 1‑based indexing)
+                Page page = doc.Pages[1];
 
-            // Base coordinates for the formula (adjust as needed)
-            double startX = 100;      // X‑position of the first character
-            double baselineY = 700;   // Y‑position of the normal baseline
+                // Create a TextFragment containing the subscript text
+                TextFragment subscript = new TextFragment("H₂O");
 
-            // "H" fragment (normal text)
-            var hFragment = new TextFragment("H");
-            hFragment.TextState.FontSize = 12;               // normal size
-            hFragment.Position = new Position(startX, baselineY);
-            page.Paragraphs.Add(hFragment);
+                // Set font and size (optional, but ensures consistent appearance)
+                subscript.TextState.Font = FontRepository.FindFont("Arial");
+                subscript.TextState.FontSize = 12;
 
-            // Subscript "2" fragment
-            var subFragment = new TextFragment("2");
-            subFragment.TextState.FontSize = 8;               // smaller size for subscript
-            // Lower the baseline to create a subscript effect
-            subFragment.Position = new Position(startX + 12, baselineY - 4);
-            page.Paragraphs.Add(subFragment);
+                // Render subscript by lowering the Y‑coordinate of the fragment.
+                // Adjust the offset (e.g., -2 points) to achieve the desired visual effect.
+                double subscriptOffset = 2; // points to move downwards
+                subscript.Position = new Position(100, 700 - subscriptOffset);
 
-            // "O" fragment (normal text)
-            var oFragment = new TextFragment("O");
-            oFragment.TextState.FontSize = 12;
-            oFragment.Position = new Position(startX + 20, baselineY);
-            page.Paragraphs.Add(oFragment);
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(subscript);
 
-            // Save the modified document (still inside the using block)
-            doc.Save(outputPath);
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Subscript PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Subscript PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

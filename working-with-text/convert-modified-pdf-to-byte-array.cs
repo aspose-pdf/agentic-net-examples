@@ -15,30 +15,31 @@ class Program
             return;
         }
 
-        // Load the PDF and apply a simple modification
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Add a text annotation on the first page as an example change
-            Page page = doc.Pages[1];
+            // Example modification: add a text annotation on the first page
+            Page page = doc.Pages[1]; // 1‑based page indexing
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
             TextAnnotation annotation = new TextAnnotation(page, rect)
             {
                 Title    = "Note",
-                Contents = "This is an added annotation.",
+                Contents = "Sample annotation",
                 Open     = true,
                 Icon     = TextIcon.Note
             };
             page.Annotations.Add(annotation);
 
-            // Save the modified PDF into a byte array for further processing
+            // Save the modified PDF to a byte array
+            byte[] pdfBytes;
             using (MemoryStream ms = new MemoryStream())
             {
-                doc.Save(ms);               // Saves as PDF by default
-                byte[] pdfBytes = ms.ToArray();
-
-                // pdfBytes now contains the PDF data
-                Console.WriteLine($"PDF saved to byte array, length = {pdfBytes.Length} bytes.");
+                doc.Save(ms); // Saves as PDF to the stream
+                pdfBytes = ms.ToArray();
             }
+
+            // pdfBytes now holds the PDF data for further processing or transmission
+            Console.WriteLine($"PDF saved to byte array, length = {pdfBytes.Length} bytes.");
         }
     }
 }
