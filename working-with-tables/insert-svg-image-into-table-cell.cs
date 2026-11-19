@@ -1,71 +1,78 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextFragment
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_with_table.pdf";
-        const string svgPath   = "image.svg";
+        const string inputPdfPath  = "input.pdf";      // existing PDF (can be empty)
+        const string outputPdfPath = "output.pdf";     // result PDF
+        const string svgImagePath  = "image.svg";      // SVG file to embed
 
-        // Verify required files exist
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(svgImagePath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
-        if (!File.Exists(svgPath))
-        {
-            Console.Error.WriteLine($"SVG image not found: {svgPath}");
+            Console.Error.WriteLine($"SVG image not found: {svgImagePath}");
             return;
         }
 
-        // Open the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Ensure the input PDF exists; if not, create a blank document.
+        if (!File.Exists(inputPdfPath))
         {
-            // Add a new page to host the table (could also use an existing page)
-            Page page = doc.Pages.Add();
+            using (var blank = new Document())
+            {
+                blank.Pages.Add(); // add a single empty page
+                blank.Save(inputPdfPath);
+            }
+        }
 
-            // Create a table and configure basic appearance
+        // Open the PDF, add a table with one cell containing the SVG image.
+        using (Document doc = new Document(inputPdfPath))
+        {
+            // Add a new page if the document has no pages.
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
+
+            // Use the first page for simplicity.
+            Page page = doc.Pages[1];
+
+            // Create a table (core API) and set its position.
             Table table = new Table
             {
-                Border = new BorderInfo(BorderSide.All, 0.5f), // thin border on all sides
-                ColumnWidths = "200 200" // two equal columns, width in points
+                // Position the table at (50, 700) with a width of 500 points.
+                // The Height will be auto‑calculated based on content.
+                ColumnWidths = "500",
+                Border = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
             };
+            table.ColumnWidths = "500"; // single column
 
-            // Add a row to the table
+            // Add a single row.
             Row row = table.Rows.Add();
 
-            // First cell: simple text
-            Cell textCell = row.Cells.Add();
-            textCell.Paragraphs.Add(new TextFragment("Sample text"));
+            // Add a single cell.
+            Cell cell = row.Cells.Add();
 
-            // Second cell: SVG image
-            Cell imageCell = row.Cells.Add();
-
-            // Load the SVG file into an Image object
-            Image img = new Image();
-            using (FileStream fs = new FileStream(svgPath, FileMode.Open, FileAccess.Read))
+            // Create an Image object that reads the SVG file.
+            // Aspose.Pdf.Image can handle SVG streams.
+            Image svgImage = new Image
             {
-                img.ImageStream = fs; // Image will read the SVG from the stream
-            }
-            // Optional: set explicit dimensions for the SVG rendering
-            img.FixWidth  = 150; // width in points
-            img.FixHeight = 150; // height in points
+                ImageStream = new FileStream(svgImagePath, FileMode.Open, FileAccess.Read)
+            };
 
-            // Insert the image into the cell
-            imageCell.Paragraphs.Add(img);
+            // Add the image to the cell's paragraph collection.
+            // The cell can contain any TextFragment‑derived objects; Image is acceptable.
+            cell.Paragraphs.Add(svgImage);
 
-            // Add the completed table to the page
+            // Add the table to the page's paragraphs collection.
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with SVG image in table cell saved to '{outputPdf}'.");
+        Console.WriteLine($"SVG image inserted into table cell and saved to '{outputPdfPath}'.");
     }
 }

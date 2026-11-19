@@ -1,72 +1,77 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Globalization;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // required for Table cell text
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Output PDF path
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPdf));
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            // Create a table with three columns
+            // Add a page
+            Page page = doc.Pages.Add();
+
+            // Create a table with a visible border
             Table table = new Table
             {
-                // Define column widths (absolute values in points)
-                ColumnWidths = "100 100 100"
+                Border = new BorderInfo(BorderSide.All, 0.5f)
             };
 
-            // Add a single row with three cells
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
-            row.Cells.Add("Cell 3");
+            // Optional: define column widths so we can calculate the rendered width later
+            // If you omit this, the width will be auto‑fit to content and we fall back to the page width.
+            table.ColumnWidths = "200 200"; // two columns, each 200 points wide
 
-            // Insert the table into the first page
-            Page page = doc.Pages[1];
+            // Header row
+            Row header = table.Rows.Add();
+            header.Cells.Add(new TextFragment("Header 1"));
+            header.Cells.Add(new TextFragment("Header 2"));
+
+            // Data row
+            Row data = table.Rows.Add();
+            data.Cells.Add(new TextFragment("Value A"));
+            data.Cells.Add(new TextFragment("Value B"));
+
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Force layout by saving to a memory stream (no file is written)
-            using (MemoryStream ms = new MemoryStream())
+            // Save a temporary file to force layout calculation.
+            // The layout engine computes the actual dimensions of the table during this save.
+            doc.Save("temp_layout.pdf");
+
+            // After layout, calculate the rendered width.
+            double renderedWidth = 0;
+            if (!string.IsNullOrEmpty(table.ColumnWidths))
             {
-                doc.Save(ms);
-                // After layout the actual width of the table can be derived from the column widths
-                double renderedWidth = GetRenderedTableWidth(table);
-                Console.WriteLine($"Rendered table width: {renderedWidth}");
+                // ColumnWidths is a space‑separated list of widths (in points).
+                string[] parts = table.ColumnWidths.Split(new[] { ' ', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string part in parts)
+                {
+                    if (float.TryParse(part, out float w))
+                        renderedWidth += w;
+                }
+            }
+            else
+            {
+                // If ColumnWidths is not set, fall back to the page width (minus any margins you may have applied).
+                renderedWidth = page.PageInfo.Width;
             }
 
-            // Save the modified PDF (optional)
-            doc.Save(outputPath);
+            Console.WriteLine($"Rendered table width: {renderedWidth} points");
+
+            // Save the final document
+            doc.Save(outputPdf);
         }
-    }
 
-    /// <summary>
-    /// Calculates the rendered width of a table after layout.
-    /// Aspose.Pdf.Table does not expose a Width property; the effective width is the sum of the column widths.
-    /// </summary>
-    /// <param name="table">The table whose width is required.</param>
-    /// <returns>The total width in points.</returns>
-    private static double GetRenderedTableWidth(Table table)
-    {
-        if (string.IsNullOrWhiteSpace(table.ColumnWidths))
-            return 0.0;
-
-        // ColumnWidths is a space‑separated list of absolute values (e.g., "100 100 100")
-        // Parse each value using invariant culture to avoid locale issues.
-        var widths = table.ColumnWidths
-                         .Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries)
-                         .Select(s => double.Parse(s, CultureInfo.InvariantCulture));
-        return widths.Sum();
+        Console.WriteLine($"PDF saved to '{outputPdf}'.");
     }
 }

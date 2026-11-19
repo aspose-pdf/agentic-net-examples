@@ -16,62 +16,53 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Iterate over each page to locate and replace tables
-            foreach (Aspose.Pdf.Page page in doc.Pages)
+            // Use TableAbsorber (core API) to locate absorbed tables on the pages
+            var absorber = new TableAbsorber();
+            bool replaced = false;
+
+            foreach (Page page in doc.Pages)
             {
-                Aspose.Pdf.Table oldTable = null;
-                int oldIndex = -1;
+                absorber.Visit(page);
+                if (absorber.TableList.Count == 0)
+                    continue;
 
-                // Find the first Table in the page's Paragraphs collection
-                for (int i = 0; i < page.Paragraphs.Count; i++)
+                // Take the first absorbed table on the page
+                var oldTable = absorber.TableList[0];
+
+                // Build a new table with the core Table API
+                var newTable = new Table
                 {
-                    if (page.Paragraphs[i] is Aspose.Pdf.Table tbl)
-                    {
-                        oldTable = tbl;
-                        oldIndex = i;
-                        break;
-                    }
-                }
+                    ColumnWidths = "120 120",
+                    Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black),
+                    DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Gray),
+                    DefaultCellPadding = new MarginInfo(4, 4, 4, 4)
+                };
 
-                // If a table was found, replace it
-                if (oldTable != null && oldIndex >= 0)
-                {
-                    // Remove the existing table
-                    page.Paragraphs.Remove(oldTable);
+                // Header row
+                var headerRow = newTable.Rows.Add();
+                headerRow.Cells.Add("Column A");
+                headerRow.Cells.Add("Column B");
 
-                    // Create a new table (example: 2 columns, 2 rows)
-                    Aspose.Pdf.Table newTable = new Aspose.Pdf.Table();
-                    newTable.ColumnWidths = "200 200";
+                // Data row
+                var dataRow = newTable.Rows.Add();
+                dataRow.Cells.Add("Value 1");
+                dataRow.Cells.Add("Value 2");
 
-                    // First row
-                    Aspose.Pdf.Row row1 = new Aspose.Pdf.Row();
-                    Aspose.Pdf.Cell cell11 = new Aspose.Pdf.Cell();
-                    cell11.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 1"));
-                    Aspose.Pdf.Cell cell12 = new Aspose.Pdf.Cell();
-                    cell12.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 2"));
-                    row1.Cells.Add(cell11);
-                    row1.Cells.Add(cell12);
-                    newTable.Rows.Add(row1);
-
-                    // Second row
-                    Aspose.Pdf.Row row2 = new Aspose.Pdf.Row();
-                    Aspose.Pdf.Cell cell21 = new Aspose.Pdf.Cell();
-                    cell21.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 3"));
-                    Aspose.Pdf.Cell cell22 = new Aspose.Pdf.Cell();
-                    cell22.Paragraphs.Add(new Aspose.Pdf.Text.TextFragment("New Cell 4"));
-                    row2.Cells.Add(cell21);
-                    row2.Cells.Add(cell22);
-                    newTable.Rows.Add(row2);
-
-                    // Insert the new table at the original position
-                    page.Paragraphs.Insert(oldIndex, newTable);
-                }
+                // Replace the absorbed table with the new one – the new table will be placed at the same position
+                absorber.Replace(page, oldTable, newTable);
+                replaced = true;
+                break; // replace only the first found table
             }
 
-            // Save the modified document
+            if (!replaced)
+            {
+                Console.Error.WriteLine("No table element found to replace.");
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

@@ -1,75 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Drawing; // for BorderInfo and BorderSide
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_tagged_table.pdf";
+        const string outputPath = "table_with_border.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the tagged content API
-            ITaggedContent taggedContent = doc.TaggedContent;
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Create a visual Table object
+            Table table = new Table();
 
-            // Root element of the structure tree
-            StructureElement root = taggedContent.RootElement;
+            // Set column widths (example: two columns of equal width)
+            table.ColumnWidths = "200 200";
 
-            // Create a table element
-            TableElement table = taggedContent.CreateTableElement();
-            table.AlternativeText = "Sample table with 2‑point border thickness";
+            // Configure the border thickness to 2 points for all cells
+            // Use DefaultCellBorder which accepts a BorderInfo constructed with side and width
+            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 2f);
 
-            // Set the border thickness to 2 points using the BorderInfo constructor
-            table.Border = new BorderInfo(BorderSide.All, 2f);
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
 
-            // Attach the table to the root
-            root.AppendChild(table);
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Cell A");
+            data.Cells.Add("Cell B");
 
-            // ----- Build a simple table (header + one data row) -----
-            TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
-            table.AppendChild(thead);
-            TableTRElement headerRow = taggedContent.CreateTableTRElement();
-            thead.AppendChild(headerRow);
+            // Add the table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-            TableTHElement th1 = taggedContent.CreateTableTHElement();
-            th1.SetText("Column 1");
-            headerRow.AppendChild(th1);
-
-            TableTHElement th2 = taggedContent.CreateTableTHElement();
-            th2.SetText("Column 2");
-            headerRow.AppendChild(th2);
-
-            TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
-            table.AppendChild(tbody);
-            TableTRElement bodyRow = taggedContent.CreateTableTRElement();
-            tbody.AppendChild(bodyRow);
-
-            TableTDElement td1 = taggedContent.CreateTableTDElement();
-            td1.SetText("Cell A");
-            bodyRow.AppendChild(td1);
-
-            TableTDElement td2 = taggedContent.CreateTableTDElement();
-            td2.SetText("Cell B");
-            bodyRow.AppendChild(td2);
-            // ---------------------------------------------------------
-
-            // Save the modified PDF (no PreSave call needed)
+            // Save the PDF (Document.Save writes PDF regardless of extension)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Document saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with table border saved to '{outputPath}'.");
     }
 }

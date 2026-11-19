@@ -15,39 +15,45 @@ class Program
             return;
         }
 
-        // Load the PDF document using the core Document API (no Facades).
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages collection is 1‑based.
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNumber];
-                Rotation rotation = page.Rotate; // Rotation enum: None, on90, on180, on270
+                Page page = doc.Pages[i];
 
-                if (rotation != Rotation.None)
+                // Check the page rotation using the Rotate property (Rotation enum)
+                if (page.Rotate != Rotation.None)
                 {
-                    // Convert enum to a numeric angle for display purposes.
-                    int angle = rotation == Rotation.on90 ? 90 :
-                                rotation == Rotation.on180 ? 180 :
-                                rotation == Rotation.on270 ? 270 : 0;
+                    Console.WriteLine($"Page {i} is rotated ({page.Rotate}). Scanning for tables...");
 
-                    Console.WriteLine($"Page {pageNumber} rotated {angle}°. Scanning for tables...");
+                    // TableAbsorber works on a single page; create a fresh instance per page
+                    TableAbsorber tableAbsorber = new TableAbsorber();
 
-                    // TableAbsorber works on a single page; we call Visit(page) to limit the scope.
-                    TableAbsorber absorber = new TableAbsorber();
-                    absorber.Visit(page);
+                    // Absorb tables from the current page using the correct API (Visit)
+                    tableAbsorber.Visit(page);
 
-                    Console.WriteLine($"  Tables found: {absorber.TableList.Count}");
-                    for (int t = 0; t < absorber.TableList.Count; t++)
+                    // Report found tables
+                    if (tableAbsorber.TableList.Count > 0)
                     {
-                        var table = absorber.TableList[t];
-                        // Rectangle is expressed in the page's coordinate system.
-                        Console.WriteLine($"    Table {t + 1}: Bounds = {table.Rectangle}");
+                        for (int t = 0; t < tableAbsorber.TableList.Count; t++)
+                        {
+                            var absorbedTable = tableAbsorber.TableList[t];
+                            // The Rectangle is in page coordinates (lower‑left x,y, upper‑right x,y)
+                            Aspose.Pdf.Rectangle rect = absorbedTable.Rectangle;
+                            Console.WriteLine($"  Table {t + 1}: LL=({rect.LLX},{rect.LLY}) UR=({rect.URX},{rect.URY})");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("  No tables detected on this rotated page.");
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Page {pageNumber} has no rotation. Skipping.");
+                    // Non‑rotated pages are ignored for this specific task
+                    Console.WriteLine($"Page {i} is not rotated. Skipping table detection.");
                 }
             }
         }

@@ -1,73 +1,100 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // Image lives here
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input high‑DPI image files (ensure they exist)
-        string[] imagePaths = { "highdpi1.jpg", "highdpi2.jpg", "highdpi3.jpg", "highdpi4.jpg" };
-        const string outputPdf = "TableWithHighDpiImages.pdf";
+        // Paths – adjust as needed
+        const string outputPdf = "high_dpi_table.pdf";
+        const string imagePath1 = "image1.jpg";
+        const string imagePath2 = "image2.jpg";
 
-        // Verify all images are present
-        foreach (var imgPath in imagePaths)
+        // Verify image files exist
+        if (!File.Exists(imagePath1) || !File.Exists(imagePath2))
         {
-            if (!File.Exists(imgPath))
-            {
-                Console.Error.WriteLine($"Image not found: {imgPath}");
-                return;
-            }
+            Console.Error.WriteLine("One or more image files not found.");
+            return;
         }
+
+        // Keep image streams alive until the document is saved
+        var imageStreams = new List<MemoryStream>();
 
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page
+            // Add a page to host the table
             Page page = doc.Pages.Add();
 
-            // Create a table with 2 columns and 2 rows
+            // Create a visual Table (Aspose.Pdf.Table) – not the logical structure table
             Table table = new Table
             {
-                // Define column widths (percentage of page width)
-                ColumnWidths = "50 50",
-                // Optional: set border for visual clarity
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
+                // Optional: set column widths (in points). Adjust as needed.
+                ColumnWidths = "200 200"
             };
 
-            // Add rows and cells, inserting high‑DPI images
-            int imgIndex = 0;
-            for (int row = 0; row < 2; row++)
+            // ------------------------------
+            // First row – high‑DPI Image 1
+            // ------------------------------
+            Row row1 = table.Rows.Add();
+
+            // Load the first image into a memory stream
+            byte[] imgBytes1 = File.ReadAllBytes(imagePath1);
+            var ms1 = new MemoryStream(imgBytes1);
+            imageStreams.Add(ms1);
+            Image img1 = new Image
             {
-                Row tableRow = table.Rows.Add();
-                for (int col = 0; col < 2; col++)
-                {
-                    // Create a new cell
-                    Cell cell = tableRow.Cells.Add();
+                ImageStream = ms1,
+                // Instruct Aspose.Pdf to respect the image's DPI information
+                IsApplyResolution = true
+            };
 
-                    // Load the image and add it to the cell
-                    using (FileStream imgStream = new FileStream(imagePaths[imgIndex], FileMode.Open, FileAccess.Read))
-                    {
-                        Image img = new Image
-                        {
-                            ImageStream = imgStream,
-                            // Set a fixed width (points). Height will be scaled proportionally.
-                            // The original DPI of the image is preserved, so the rendered quality remains high.
-                            FixWidth = 200
-                        };
-                        cell.Paragraphs.Add(img);
-                    }
+            // Add the image to the first cell of the row
+            Cell cell1 = row1.Cells.Add();
+            cell1.Paragraphs.Add(img1);
 
-                    imgIndex++;
-                }
-            }
+            // Second cell in the same row – placeholder text
+            Cell cell2 = row1.Cells.Add();
+            TextFragment tf = new TextFragment("Image 1 (300 DPI)");
+            cell2.Paragraphs.Add(tf);
+
+            // ------------------------------
+            // Second row – high‑DPI Image 2
+            // ------------------------------
+            Row row2 = table.Rows.Add();
+
+            // Load the second image into a memory stream
+            byte[] imgBytes2 = File.ReadAllBytes(imagePath2);
+            var ms2 = new MemoryStream(imgBytes2);
+            imageStreams.Add(ms2);
+            Image img2 = new Image
+            {
+                ImageStream = ms2,
+                IsApplyResolution = true
+            };
+
+            Cell cell1b = row2.Cells.Add();
+            cell1b.Paragraphs.Add(img2);
+
+            // Second cell in the second row – placeholder text
+            Cell cell2b = row2.Cells.Add();
+            TextFragment tf2 = new TextFragment("Image 2 (300 DPI)");
+            cell2b.Paragraphs.Add(tf2);
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
             // Save the PDF
             doc.Save(outputPdf);
+        }
+
+        // Dispose image streams after the document has been saved
+        foreach (var ms in imageStreams)
+        {
+            ms.Dispose();
         }
 
         Console.WriteLine($"PDF with high‑DPI images saved to '{outputPdf}'.");

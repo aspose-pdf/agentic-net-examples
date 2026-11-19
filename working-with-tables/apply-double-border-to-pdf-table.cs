@@ -8,73 +8,70 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Access tagged content (creates if missing) and set basic properties
-                ITaggedContent tagged = doc.TaggedContent;
-                tagged.SetLanguage("en-US");
-                tagged.SetTitle("Document with Double-Bordered Table");
+                // Access tagged content and set basic properties
+                ITaggedContent taggedContent = doc.TaggedContent;
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle("PDF with Double Border Table");
 
-                // Root element of the logical structure tree
-                StructureElement root = tagged.RootElement;
+                // Root element of the structure tree
+                StructureElement root = taggedContent.RootElement;
 
-                // Create a table element and set its description
-                TableElement table = tagged.CreateTableElement();
+                // Create a table element
+                TableElement table = taggedContent.CreateTableElement();
                 table.AlternativeText = "Sample data table with double border";
 
-                // Apply double‑border like appearance by using a thick border on all sides
-                // BorderInfo does not expose a Style property; a double border can be mimicked
-                // with a wider line. Use the constructor to set side, width and (optional) color.
+                // Apply double‑like border style using BorderInfo constructor (width = 2 points)
+                // Aspose.Pdf.BorderInfo does not expose a BorderStyle property; the double style is
+                // represented by setting a thicker width. If a specific double style is required,
+                // it can be simulated with custom drawing, but for the API the width is the
+                // configurable attribute.
                 table.Border = new BorderInfo(BorderSide.All, 2f);
 
-                // Attach the table to the root element
+                // Attach table to the root
                 root.AppendChild(table);
 
-                // ----- Header row -----
-                TableTHeadElement thead = tagged.CreateTableTHeadElement();
+                // Header section
+                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
                 table.AppendChild(thead);
-                TableTRElement headerRow = tagged.CreateTableTRElement();
+                TableTRElement headerRow = taggedContent.CreateTableTRElement();
                 thead.AppendChild(headerRow);
-
-                TableTHElement th1 = tagged.CreateTableTHElement();
+                TableTHElement th1 = taggedContent.CreateTableTHElement();
                 th1.SetText("Product");
                 headerRow.AppendChild(th1);
-
-                TableTHElement th2 = tagged.CreateTableTHElement();
+                TableTHElement th2 = taggedContent.CreateTableTHElement();
                 th2.SetText("Price");
                 headerRow.AppendChild(th2);
 
-                // ----- Body row -----
-                TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+                // Body section
+                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
                 table.AppendChild(tbody);
-                TableTRElement dataRow = tagged.CreateTableTRElement();
+                TableTRElement dataRow = taggedContent.CreateTableTRElement();
                 tbody.AppendChild(dataRow);
-
-                TableTDElement td1 = tagged.CreateTableTDElement();
+                TableTDElement td1 = taggedContent.CreateTableTDElement();
                 td1.SetText("Widget A");
                 dataRow.AppendChild(td1);
-
-                TableTDElement td2 = tagged.CreateTableTDElement();
-                td2.SetText("$25.00");
+                TableTDElement td2 = taggedContent.CreateTableTDElement();
+                td2.SetText("$50");
                 dataRow.AppendChild(td2);
 
                 // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF saved with double‑bordered table: '{outputPath}'.");
+            Console.WriteLine($"Saved PDF with double border table to '{outputPath}'.");
         }
         catch (Exception ex)
         {

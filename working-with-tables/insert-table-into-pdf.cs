@@ -1,81 +1,91 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;          // Required for Position
-using Aspose.Pdf.Annotations;   // Kept for completeness
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path, output PDF path, target page number (1‑based) and insertion coordinates
-        const string inputPath   = "input.pdf";
-        const string outputPath  = "output.pdf";
-        const int    targetPage  = 2;          // Insert table on page 2
-        const double insertX      = 100;      // X coordinate (points) from left
-        const double insertY      = 500;      // Y coordinate (points) from bottom
+        // Input parameters
+        const string inputPdfPath  = "input.pdf";          // existing PDF
+        const string outputPdfPath = "output.pdf";         // result PDF
+        const int    targetPage    = 2;                    // 1‑based page number where the table will be placed
+        const double posX          = 100;                  // X coordinate (points) of the table's lower‑left corner
+        const double posY          = 500;                  // Y coordinate (points) of the table's lower‑left corner
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Open the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Open the PDF inside a using block (deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Validate the requested page exists (pages are 1‑based)
-            if (targetPage < 1 || targetPage > doc.Pages.Count)
+            // Validate requested page number
+            if (targetPage < 1 || targetPage > pdfDoc.Pages.Count)
             {
-                Console.Error.WriteLine($"Invalid page number: {targetPage}");
+                Console.Error.WriteLine($"Invalid page number {targetPage}. Document has {pdfDoc.Pages.Count} pages.");
                 return;
             }
 
-            Page page = doc.Pages[targetPage];
+            // Retrieve the target page (1‑based indexing)
+            Page page = pdfDoc.Pages[targetPage];
 
-            // ------------------------------------------------------------
-            // Construct a visual Table
-            // ------------------------------------------------------------
+            // -------------------------------------------------
+            // Construct a visual Table (Aspose.Pdf.Table)
+            // -------------------------------------------------
             Table table = new Table
             {
-                // Use Margin to position the table (Aspose.Pdf.Table does not expose a Position property)
-                Margin = new MarginInfo(insertX, insertY, 0, 0),
-
-                // Optional visual settings
+                // Optional visual styling
                 Border = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                Margin = new MarginInfo { Top = 0, Bottom = 0, Left = 0, Right = 0 },
+                // Define column widths (relative percentages)
+                ColumnWidths = "50 50"
             };
 
-            // Define column widths (space‑separated string)
-            table.ColumnWidths = "150 150";
+            // First row – header
+            Row headerRow = table.Rows.Add();
+            Cell headerCell1 = headerRow.Cells.Add("Product");
+            Cell headerCell2 = headerRow.Cells.Add("Price");
+            // Header styling – use DefaultCellTextState instead of the non‑existent TextInfo
+            headerCell1.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            headerCell2.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            headerCell1.DefaultCellTextState = new TextState
+            {
+                FontSize = 12,
+                FontStyle = FontStyles.Bold
+            };
+            headerCell2.DefaultCellTextState = new TextState
+            {
+                FontSize = 12,
+                FontStyle = FontStyles.Bold
+            };
 
-            // Header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Product");
-            header.Cells.Add("Price");
+            // Second row – data
+            Row dataRow = table.Rows.Add();
+            dataRow.Cells.Add("Widget A");
+            dataRow.Cells.Add("$25.00");
 
-            // Mark the first row as a repeating header (Aspose.Pdf.Table uses RepeatingRowsCount)
-            table.RepeatingRowsCount = 1;
+            // Third row – data
+            Row dataRow2 = table.Rows.Add();
+            dataRow2.Cells.Add("Widget B");
+            dataRow2.Cells.Add("$40.00");
 
-            // Data rows
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add("Widget A");
-            row1.Cells.Add("$25.00");
+            // Position the table on the page.
+            // Table uses Left and Top properties (lower‑left corner coordinates).
+            table.Left = (float)posX;
+            table.Top  = (float)posY;
 
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("Widget B");
-            row2.Cells.Add("$40.00");
-
-            // ------------------------------------------------------------
-            // Insert the table into the page content
-            // ------------------------------------------------------------
+            // Add the table to the page's paragraph collection.
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified document.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted on page {targetPage} and saved to '{outputPdfPath}'.");
     }
 }

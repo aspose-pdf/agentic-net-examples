@@ -18,28 +18,22 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over each page and absorb tables individually.
-            // This way we know the page number without relying on a non‑existent property.
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Create a TableAbsorber to extract tables from the document
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Absorb tables from the whole document (or you can call absorber.Visit(doc.Pages[i]) per page)
+            absorber.Visit(doc);
+
+            // Iterate over the extracted tables
+            Console.WriteLine($"Found {absorber.TableList.Count} tables.");
+            int tableIndex = 1;
+            foreach (AbsorbedTable absorbed in absorber.TableList)
             {
-                Page page = doc.Pages[pageIndex];
-                TableAbsorber absorber = new TableAbsorber();
-                absorber.Visit(page);
-
-                foreach (var table in absorber.TableList)
-                {
-                    Console.WriteLine($"Table found on page {pageIndex}");
-                    Console.WriteLine($"Location: {table.Rectangle}");
-                    Console.WriteLine($"Rows: {table.RowList.Count}");
-
-                    if (table.RowList.Count > 0)
-                    {
-                        var firstRow = table.RowList[0];
-                        Console.WriteLine($"Cells in first row: {firstRow.CellList.Count}");
-                    }
-
-                    Console.WriteLine();
-                }
+                // AbsorbedTable provides the page number via PageNum and geometry via Rectangle
+                int page = absorbed.PageNum; // NOT PageNumber
+                Aspose.Pdf.Rectangle bounds = absorbed.Rectangle;
+                Console.WriteLine($"Table {tableIndex}: Page {page}, Rows {absorbed.RowList.Count}, Bounds [{bounds.LLX},{bounds.LLY},{bounds.URX},{bounds.URY}]");
+                tableIndex++;
             }
         }
     }

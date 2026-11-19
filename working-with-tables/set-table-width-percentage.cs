@@ -1,44 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "table_width_percent.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a table whose total width occupies 80% of the page width.
-            // This is achieved by assigning percentage values to each column.
-            // Two columns each get 40% → 40% + 40% = 80% of the page width.
+            // Calculate column widths so that the whole table occupies 80% of the page width
+            double pageWidth = page.PageInfo.Width;               // total page width in points
+            double columnWidth = pageWidth * 0.4;                 // two columns => 40% each = 80% total
+
+            // Create a table and set its column widths accordingly
             Table table = new Table
             {
-                ColumnWidths = "40% 40%",
-                Border = new BorderInfo(BorderSide.All, 0.5f)
+                ColumnWidths = $"{columnWidth} {columnWidth}" // each column gets 40% of page width
             };
 
-            // Add a row with two cells
-            Row row = table.Rows.Add();
-            row.Cells.Add("Cell 1");
-            row.Cells.Add("Cell 2");
+            // Add a header row
+            Row header = table.Rows.Add();
+            header.Cells.Add("Header 1");
+            header.Cells.Add("Header 2");
 
-            // Insert the table into the first page's paragraph collection
-            doc.Pages[1].Paragraphs.Add(table);
+            // Add a data row
+            Row data = table.Rows.Add();
+            data.Cells.Add("Data 1");
+            data.Cells.Add("Data 2");
 
-            // Save the modified PDF
+            // Insert the table into the page's content
+            page.Paragraphs.Add(table);
+
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table with 80% width saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

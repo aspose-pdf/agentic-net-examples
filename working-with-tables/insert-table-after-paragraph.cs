@@ -17,29 +17,18 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content (no need for IsTagged property)
+            // Access tagged content (document must be tagged)
             ITaggedContent tagged = doc.TaggedContent;
-            if (tagged == null)
-            {
-                Console.Error.WriteLine("Document does not contain tagged content.");
-                return;
-            }
 
-            // Optional: set language and title for accessibility
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
-
-            // Root of the logical structure tree
-            StructureElement root = tagged.RootElement;
-
-            // Locate the first paragraph element (the insertion point)
+            // Locate the paragraph after which the table will be inserted.
             ParagraphElement targetParagraph = null;
-            foreach (Element child in root.ChildElements)
+            var allParagraphs = tagged.RootElement.FindElements<ParagraphElement>(true);
+            foreach (var para in allParagraphs)
             {
-                if (child is ParagraphElement para)
+                if (!string.IsNullOrEmpty(para.ActualText) &&
+                    para.ActualText.Contains("Insert table after this paragraph"))
                 {
                     targetParagraph = para;
                     break;
@@ -48,55 +37,74 @@ class Program
 
             if (targetParagraph == null)
             {
-                Console.Error.WriteLine("No paragraph element found in the document.");
+                Console.WriteLine("Target paragraph not found. No changes made.");
+                doc.Save(outputPath);
                 return;
             }
 
-            // Create a table element using the ITaggedContent factory
+            // Get the parent element of the located paragraph.
+            StructureElement parent = targetParagraph.ParentElement as StructureElement;
+            if (parent == null)
+            {
+                Console.WriteLine("Parent element not found. No changes made.");
+                doc.Save(outputPath);
+                return;
+            }
+
+            // Create a table element using the ITaggedContent factory.
             TableElement table = tagged.CreateTableElement();
             table.AlternativeText = "Sample data table";
 
-            // ----- Build table header -----
+            // Build table header.
             TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
-
             TableTRElement headerRow = tagged.CreateTableTRElement();
             thead.AppendChild(headerRow);
-
             TableTHElement th1 = tagged.CreateTableTHElement();
             th1.SetText("Column 1");
             headerRow.AppendChild(th1);
-
             TableTHElement th2 = tagged.CreateTableTHElement();
             th2.SetText("Column 2");
             headerRow.AppendChild(th2);
 
-            // ----- Build table body -----
+            // Build table body.
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
-
-            TableTRElement dataRow = tagged.CreateTableTRElement();
-            tbody.AppendChild(dataRow);
-
+            TableTRElement bodyRow = tagged.CreateTableTRElement();
+            tbody.AppendChild(bodyRow);
             TableTDElement td1 = tagged.CreateTableTDElement();
             td1.SetText("Value A");
-            dataRow.AppendChild(td1);
-
+            bodyRow.AppendChild(td1);
             TableTDElement td2 = tagged.CreateTableTDElement();
             td2.SetText("Value B");
-            dataRow.AppendChild(td2);
+            bodyRow.AppendChild(td2);
 
             // Insert the table after the located paragraph.
-            // ElementList does not provide Insert, so we append the table.
-            // If the paragraph is the last child, AppendChild places the table correctly.
-            // Otherwise we still append; precise positioning would require rebuilding the list,
-            // which is beyond the supported API surface.
-            root.AppendChild(table);
+            int paragraphIndex = -1;
+            for (int i = 0; i < parent.ChildElements.Count; i++)
+            {
+                if (parent.ChildElements[i] == targetParagraph)
+                {
+                    paragraphIndex = i;
+                    break;
+                }
+            }
 
-            // Save the modified PDF
+            if (paragraphIndex >= 0 && paragraphIndex < parent.ChildElements.Count - 1)
+            {
+                // Insert directly after the paragraph. Note: InsertChild expects (Element element, int index).
+                parent.InsertChild(table, paragraphIndex + 1);
+            }
+            else
+            {
+                // Paragraph is the last child – just append.
+                parent.AppendChild(table);
+            }
+
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF with table saved to '{outputPath}'.");
+        Console.WriteLine($"Table inserted and saved to '{outputPath}'.");
     }
 }

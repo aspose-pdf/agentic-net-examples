@@ -1,83 +1,78 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // Graph, Rectangle, Color, etc.
+using Aspose.Pdf.Drawing; // FloatingBox, Color, BorderInfo, MarginInfo
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_shadow_table.pdf";
+        const string outputPath = "table_with_shadow.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Wrap Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Add a new page where the table will be placed
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a table with two columns
+            // ------------------------------------------------------------
+            // Build the table using the core Table API (no Rect, no ShadowEffect)
+            // ------------------------------------------------------------
             Table table = new Table
             {
-                ColumnWidths = "200 200", // set column widths
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5)
+                ColumnWidths = "30% 70%",
+                // Optional visual styling
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Black),
+                DefaultCellPadding = new MarginInfo(4, 4, 4, 4)
             };
 
-            // Add a header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-
-            // Add a couple of data rows
-            Row row1 = table.Rows.Add();
-            row1.Cells.Add("Cell 1");
-            row1.Cells.Add("Cell 2");
-
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("Cell 3");
-            row2.Cells.Add("Cell 4");
+            Row row = table.Rows.Add();
+            row.Cells.Add("Header");
+            row.Cells.Add("This is a sample table with a shadow effect.");
 
             // ------------------------------------------------------------
-            // Simulate a shadow for the table.
+            // Simulate a shadow by drawing a semi‑transparent box behind the table
             // ------------------------------------------------------------
-            // Estimate table dimensions: total column width + some padding.
-            float tableWidth = 200 + 200; // matches ColumnWidths
-            // Approximate row height (default) – 20 points per row works well.
-            float rowHeight = 20f;
-            // Include header row in the height calculation.
-            int totalRows = 1 + table.Rows.Count; // 1 header + data rows
-            float tableHeight = totalRows * rowHeight;
+            // Desired table position (left, top) in points – same as the original Rect
+            const float tableLeft = 50f;
+            const float tableTop = 750f;
+            // Shadow offset
+            const float offsetX = 5f;
+            const float offsetY = -5f; // negative moves the shadow downwards
 
-            // Create a Graph container that will hold the shadow rectangle.
-            // Use the double‑based constructor (the float overload is obsolete).
-            Graph shadowGraph = new Graph((double)tableWidth + 10.0, (double)tableHeight + 10.0);
+            // Approximate the table size. For a simple table we can use the page width minus margins.
+            // Here we use the width derived from the page (right‑left = 500 points) and a modest height.
+            float tableWidth = 500f; // 550 - 50 as in the original Rect
+            float tableHeight = (float)table.GetHeight(page); // let Aspose calculate the height
+            if (tableHeight < 20f) tableHeight = 50f; // fallback for very small tables
 
-            // Rectangle positioned with an offset (e.g., 5 points right, -5 points up).
-            Aspose.Pdf.Drawing.Rectangle shadowRect = new Aspose.Pdf.Drawing.Rectangle(5, -5, tableWidth, tableHeight);
-            // Configure the rectangle's appearance via GraphInfo.
-            shadowRect.GraphInfo.FillColor = Color.LightGray; // fill colour for the shadow
-            // No border is required; leaving the stroke colour transparent.
-            shadowRect.GraphInfo.Color = Color.Transparent;
-            shadowRect.GraphInfo.LineWidth = 0;
+            // Shadow box (drawn first so it appears behind the table)
+            var shadowBox = new FloatingBox(tableWidth, tableHeight)
+            {
+                PositioningMode = ParagraphPositioningMode.Absolute,
+                Left = tableLeft + offsetX,
+                Top = tableTop + offsetY,
+                BackgroundColor = Color.FromArgb(80, 0, 0, 0) // semi‑transparent black
+            };
 
-            shadowGraph.Shapes.Add(shadowRect);
+            // Table container box (white background to hide the shadow edges)
+            var tableBox = new FloatingBox(tableWidth, tableHeight)
+            {
+                PositioningMode = ParagraphPositioningMode.Absolute,
+                Left = tableLeft,
+                Top = tableTop,
+                BackgroundColor = Color.White
+            };
+            tableBox.Paragraphs.Add(table);
 
-            // Add the shadow graph first so it appears behind the table.
-            page.Paragraphs.Add(shadowGraph);
-            // Then add the actual table.
-            page.Paragraphs.Add(table);
+            // Add the shadow first, then the table box
+            page.Paragraphs.Add(shadowBox);
+            page.Paragraphs.Add(tableBox);
 
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with shadowed table saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with table shadow saved to '{outputPath}'.");
     }
 }

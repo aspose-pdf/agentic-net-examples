@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -16,77 +17,84 @@ class Program
             return;
         }
 
-        // Open the source PDF
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        try
         {
-            // Ensure there is at least one page
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
-
-            // Work with the first page
-            Aspose.Pdf.Page page = doc.Pages[1];
-
-            // Create a table
-            Aspose.Pdf.Table table = new Aspose.Pdf.Table
+            // Load the existing PDF
+            using (Document doc = new Document(inputPath))
             {
-                // Set column widths (percentage of page width)
-                ColumnWidths = "30% 70%"
-            };
+                // Access tagged content (creates a tagged structure if none exists)
+                ITaggedContent taggedContent = doc.TaggedContent;
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Row 1
-            Aspose.Pdf.Row row1 = table.Rows.Add();
-            // Cell 1
-            Aspose.Pdf.Cell cell11 = row1.Cells.Add();
-            TextFragment tf11 = new TextFragment("Product");
-            tf11.TextState.FontSize = 12;
-            tf11.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica")!; // Suppress possible null warning
-            cell11.Paragraphs.Add(tf11);
-            // Cell 2 with footnote reference superscript ¹
-            Aspose.Pdf.Cell cell12 = row1.Cells.Add();
-            TextFragment tf12 = new TextFragment("Widget A¹");
-            tf12.TextState.FontSize = 12;
-            tf12.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica")!; // Suppress possible null warning
-            cell12.Paragraphs.Add(tf12);
+                // Root element of the structure tree
+                StructureElement root = taggedContent.RootElement;
 
-            // Row 2
-            Aspose.Pdf.Row row2 = table.Rows.Add();
-            // Cell 1
-            Aspose.Pdf.Cell cell21 = row2.Cells.Add();
-            TextFragment tf21 = new TextFragment("Price");
-            tf21.TextState.FontSize = 12;
-            tf21.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica")!; // Suppress possible null warning
-            cell21.Paragraphs.Add(tf21);
-            // Cell 2 with footnote reference superscript ²
-            Aspose.Pdf.Cell cell22 = row2.Cells.Add();
-            TextFragment tf22 = new TextFragment("$50²");
-            tf22.TextState.FontSize = 12;
-            tf22.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica")!; // Suppress possible null warning
-            cell22.Paragraphs.Add(tf22);
+                // ---------- Create a table ----------
+                TableElement table = taggedContent.CreateTableElement();
+                table.AlternativeText = "Sample data table with footnote references";
+                root.AppendChild(table);
 
-            // Add the table to the page
-            page.Paragraphs.Add(table);
+                // Table header
+                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+                table.AppendChild(thead);
+                TableTRElement headerRow = taggedContent.CreateTableTRElement();
+                thead.AppendChild(headerRow);
 
-            // Add a blank line before footnotes
-            page.Paragraphs.Add(new TextFragment(Environment.NewLine));
+                TableTHElement thProduct = taggedContent.CreateTableTHElement();
+                thProduct.SetText("Product");
+                headerRow.AppendChild(thProduct);
 
-            // Footnote 1
-            TextFragment footnote1 = new TextFragment("¹ This is the first footnote describing Widget A.");
-            footnote1.TextState.FontSize = 10;
-            footnote1.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica")!; // Suppress possible null warning
-            footnote1.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-            page.Paragraphs.Add(footnote1);
+                TableTHElement thRevenue = taggedContent.CreateTableTHElement();
+                thRevenue.SetText("Revenue");
+                headerRow.AppendChild(thRevenue);
 
-            // Footnote 2
-            TextFragment footnote2 = new TextFragment("² Price includes tax.");
-            footnote2.TextState.FontSize = 10;
-            footnote2.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica")!; // Suppress possible null warning
-            footnote2.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-            page.Paragraphs.Add(footnote2);
+                // Table body
+                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+                table.AppendChild(tbody);
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // First data row with a footnote reference (superscript ¹)
+                TableTRElement row1 = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(row1);
+
+                TableTDElement tdItemA = taggedContent.CreateTableTDElement();
+                tdItemA.SetText("Widget A\u00B9"); // \u00B9 = superscript 1
+                row1.AppendChild(tdItemA);
+
+                TableTDElement tdRevenueA = taggedContent.CreateTableTDElement();
+                tdRevenueA.SetText("$50,000");
+                row1.AppendChild(tdRevenueA);
+
+                // Second data row with a footnote reference (superscript ²)
+                TableTRElement row2 = taggedContent.CreateTableTRElement();
+                tbody.AppendChild(row2);
+
+                TableTDElement tdItemB = taggedContent.CreateTableTDElement();
+                tdItemB.SetText("Widget B\u00B2"); // \u00B2 = superscript 2
+                row2.AppendChild(tdItemB);
+
+                TableTDElement tdRevenueB = taggedContent.CreateTableTDElement();
+                tdRevenueB.SetText("$30,000");
+                row2.AppendChild(tdRevenueB);
+
+                // ---------- Add footnote paragraphs ----------
+                ParagraphElement footnote1 = taggedContent.CreateParagraphElement();
+                footnote1.SetText("\u00B9 Revenue includes taxes.");
+                root.AppendChild(footnote1);
+
+                ParagraphElement footnote2 = taggedContent.CreateParagraphElement();
+                footnote2.SetText("\u00B2 Figures are estimates.");
+                root.AppendChild(footnote2);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF with table and footnotes saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with table and footnotes saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

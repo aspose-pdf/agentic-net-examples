@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_table.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_table.pdf";
+        const double maxColumnWidth = 200; // points
 
         if (!File.Exists(inputPath))
         {
@@ -16,42 +16,46 @@ class Program
             return;
         }
 
-        // Load the existing PDF (wrapped in a using block for deterministic disposal)
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Access the first page (Aspose.Pdf uses 1‑based page indexing)
-            Page page = doc.Pages[1];
+            // Ensure there is at least one page to place the table on
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
 
-            // Create a table and limit each column to a maximum width of 150 points
+            // Desired column widths (points) before applying the max constraint
+            double col1Width = 250; // exceeds max
+            double col2Width = 150; // within max
+
+            // Enforce maximum column width
+            col1Width = Math.Min(col1Width, maxColumnWidth);
+            col2Width = Math.Min(col2Width, maxColumnWidth);
+
+            // Create a table and set the column widths
             Table table = new Table
             {
-                // ColumnWidths is a space‑separated list of widths in points.
-                // Here we define three columns, each capped at 150 points.
-                ColumnWidths = "150 150 150"
+                // ColumnWidths expects a string with widths separated by spaces
+                ColumnWidths = $"{col1Width} {col2Width}",
+                // Optional: add a thin border to all cells for visual clarity
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
             };
 
-            // Optional: add a thin border to make column limits visible
-            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f);
+            // ----- Header -----
+            Row headerRow = table.Rows.Add();
+            headerRow.Cells.Add("Header 1");
+            headerRow.Cells.Add("Header 2");
 
-            // Add a header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Column 1");
-            header.Cells.Add("Column 2");
-            header.Cells.Add("Column 3");
+            // ----- Body -----
+            Row bodyRow = table.Rows.Add();
+            bodyRow.Cells.Add("Cell with long content that would normally expand the column beyond the limit.");
+            bodyRow.Cells.Add("Short cell");
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Data A");
-            data.Cells.Add("Data B");
-            data.Cells.Add("Data C");
-
-            // Insert the table into the page's paragraph collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the modified PDF (still inside the using block)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with limited column widths saved to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with limited column width to '{outputPath}'.");
     }
 }

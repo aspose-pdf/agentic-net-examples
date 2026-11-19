@@ -1,65 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;   // needed for Table and MarginInfo
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "table_with_padding.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_tagged.pdf";
 
-        // Ensure the output directory exists
-        string outDir = Path.GetDirectoryName(outputPath);
-        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
-            Directory.CreateDirectory(outDir);
-
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a Table and set default cell padding for all cells
-            Table table = new Table
-            {
-                // MarginInfo defines padding on each side of a cell
-                DefaultCellPadding = new MarginInfo
-                {
-                    Left   = 5,   // 5 points left padding
-                    Right  = 5,   // 5 points right padding
-                    Top    = 2,   // 2 points top padding
-                    Bottom = 2    // 2 points bottom padding
-                },
-                // Optional: set column widths (percentage of page width)
-                ColumnWidths = "30% 70%"
-            };
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Access the tagged content API
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Add a header row
-            Row header = table.Rows.Add();
-            Cell headerCell1 = header.Cells.Add("Item");
-            Cell headerCell2 = header.Cells.Add("Description");
-            // Header cells can have their own style if needed
-            headerCell1.BackgroundColor = Color.LightGray;
-            headerCell2.BackgroundColor = Color.LightGray;
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Apple");
-            data.Cells.Add("A sweet red fruit.");
+            // Create a table structure element
+            TableElement table = tagged.CreateTableElement();
 
-            // Add another data row
-            Row data2 = table.Rows.Add();
-            data2.Cells.Add("Banana");
-            data2.Cells.Add("A long yellow fruit.");
+            // Define default cell padding for the entire table (left, top, right, bottom)
+            table.DefaultCellPadding = new MarginInfo(5, 5, 5, 5);
 
-            // Add the table to the page's paragraphs collection
-            page.Paragraphs.Add(table);
+            // Optional: give the table a description for accessibility
+            table.AlternativeText = "Sample data table with uniform cell padding";
 
-            // Save the PDF
+            // Attach the table to the root of the structure tree
+            root.AppendChild(table);
+
+            // Save the modified PDF (no PreSave required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Tagged PDF with default cell padding saved to '{outputPath}'.");
     }
 }

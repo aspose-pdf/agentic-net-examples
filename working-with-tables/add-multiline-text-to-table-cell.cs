@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -6,44 +7,57 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "multiline_cell.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_with_table.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (var doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a new page (first page)
-            var page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with a single column of width 300 points
-            var table = new Table
+        // Load the PDF
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure there is at least one page to place the table on
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+
+            // Create a table (core API, not the TaggedContent API)
+            Table table = new Table
             {
-                ColumnWidths = "300"
+                // Optional: set table width to page width minus margins
+                ColumnWidths = "100%",
+                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
             };
 
-            // Add a row to the table
-            var row = table.Rows.Add();
+            // ----- Table Header (optional) -----
+            Row headerRow = table.Rows.Add();
+            Cell headerCell = headerRow.Cells.Add();
+            headerCell.Paragraphs.Add(new TextFragment("Description")
+            {
+                // Make header bold for visual distinction
+                TextState = { FontStyle = FontStyles.Bold }
+            });
 
-            // Add a cell to the row
-            var cell = row.Cells.Add();
+            // ----- Table Body -----
+            Row dataRow = table.Rows.Add();
+            Cell dataCell = dataRow.Cells.Add();
 
-            // First line of text
-            cell.Paragraphs.Add(new TextFragment("This is the first line."));
-            // Insert a line break fragment
-            cell.Paragraphs.Add(new TextFragment("\n"));
-            // Second line of text
-            cell.Paragraphs.Add(new TextFragment("This is the second line."));
-            // Insert another line break fragment
-            cell.Paragraphs.Add(new TextFragment("\n"));
-            // Third line of text
-            cell.Paragraphs.Add(new TextFragment("Third line goes here."));
+            // Add multiline text using separate TextFragment objects.
+            // A line‑break fragment is a TextFragment that contains only "\n".
+            dataCell.Paragraphs.Add(new TextFragment("First line of text."));
+            dataCell.Paragraphs.Add(new TextFragment("\n"));
+            dataCell.Paragraphs.Add(new TextFragment("Second line of text."));
+            dataCell.Paragraphs.Add(new TextFragment("\n"));
+            dataCell.Paragraphs.Add(new TextFragment("Third line of text."));
 
-            // Add the table to the page's paragraph collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF (PDF format does not require explicit SaveOptions)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with multiline cell saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

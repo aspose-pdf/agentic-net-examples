@@ -7,87 +7,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_table.pdf";
+        const string outputPath = "table_example.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Wrap Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Add a new page where the table will be placed
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Table and configure basic appearance
+            // Create a Table object
             Table table = new Table
             {
-                // Define column widths (in points). Adjust as needed.
-                ColumnWidths = "100 150 200",
-                // Add a thin border around the whole table
+                // Optional: set a border for the whole table
                 Border = new BorderInfo(BorderSide.All, 0.5f),
-                // Default border for cells (optional, can also be set per‑cell)
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
+                // Optional: define column widths (three equal columns)
+                ColumnWidths = "100 100 100"
             };
+
+            // ----- First row (header) -----
+            Row headerRow = table.Rows.Add();
+
+            // Add cells to the header row
+            Cell headerCell1 = headerRow.Cells.Add("Header 1");
+            Cell headerCell2 = headerRow.Cells.Add("Header 2");
+            Cell headerCell3 = headerRow.Cells.Add("Header 3");
+
+            // Apply formatting to header cells
+            foreach (Cell cell in headerRow.Cells)
+            {
+                cell.BackgroundColor = Aspose.Pdf.Color.LightGray; // cross‑platform color
+                cell.DefaultCellTextState = new TextState
+                {
+                    FontSize = 12,
+                    FontStyle = FontStyles.Bold,
+                    Font = FontRepository.FindFont("Arial")
+                };
+                cell.Alignment = HorizontalAlignment.Center;
+            }
+
+            // ----- Second row -----
+            Row row2 = table.Rows.Add();
+            row2.Cells.Add("Row 1, Col 1");
+            row2.Cells.Add("Row 1, Col 2");
+            row2.Cells.Add("Row 1, Col 3");
+
+            // ----- Third row -----
+            Row row3 = table.Rows.Add();
+            row3.Cells.Add("Row 2, Col 1");
+            row3.Cells.Add("Row 2, Col 2");
+            row3.Cells.Add("Row 2, Col 3");
 
             // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // ---------- First Row (Header) ----------
-            Row headerRow = new Row();
-
-            // Cell 1
-            Cell headerCell1 = new Cell();
-            headerCell1.Border = new BorderInfo(BorderSide.All, 0.5f);
-            headerCell1.Paragraphs.Add(new TextFragment("Header 1"));
-            headerRow.Cells.Add(headerCell1);
-
-            // Cell 2
-            Cell headerCell2 = new Cell();
-            headerCell2.Border = new BorderInfo(BorderSide.All, 0.5f);
-            headerCell2.Paragraphs.Add(new TextFragment("Header 2"));
-            headerRow.Cells.Add(headerCell2);
-
-            // Cell 3
-            Cell headerCell3 = new Cell();
-            headerCell3.Border = new BorderInfo(BorderSide.All, 0.5f);
-            headerCell3.Paragraphs.Add(new TextFragment("Header 3"));
-            headerRow.Cells.Add(headerCell3);
-
-            // Attach the header row to the table
-            table.Rows.Add(headerRow);
-
-            // ---------- Second Row (Data) ----------
-            Row dataRow = new Row();
-
-            // Cell 1
-            Cell dataCell1 = new Cell();
-            dataCell1.Border = new BorderInfo(BorderSide.All, 0.5f);
-            dataCell1.Paragraphs.Add(new TextFragment("Row1 Col1"));
-            dataRow.Cells.Add(dataCell1);
-
-            // Cell 2
-            Cell dataCell2 = new Cell();
-            dataCell2.Border = new BorderInfo(BorderSide.All, 0.5f);
-            dataCell2.Paragraphs.Add(new TextFragment("Row1 Col2"));
-            dataRow.Cells.Add(dataCell2);
-
-            // Cell 3
-            Cell dataCell3 = new Cell();
-            dataCell3.Border = new BorderInfo(BorderSide.All, 0.5f);
-            dataCell3.Paragraphs.Add(new TextFragment("Row1 Col3"));
-            dataRow.Cells.Add(dataCell3);
-
-            // Attach the data row to the table
-            table.Rows.Add(dataRow);
-
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Table added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with table saved to '{outputPath}'.");
     }
 }

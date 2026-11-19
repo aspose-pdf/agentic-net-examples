@@ -16,46 +16,27 @@ class Program
             return;
         }
 
+        // Load PDF within a using block for proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the PDF contains tagged content (the replacement for the removed IsTagged property)
-            if (doc.TaggedContent == null)
-            {
-                Console.WriteLine("Document is not tagged; no table structure to inspect.");
-                return;
-            }
-
+            // Access the tagged content of the document
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Locate the first TableElement in the structure tree
-            TableElement? table = FindFirstTable(tagged.RootElement);
+            // Retrieve the first TableElement in the structure tree
+            TableElement table = null;
+            var tables = tagged.RootElement.FindElements<TableElement>(true);
+            if (tables.Count > 0)
+                table = tables[0];
+
             if (table == null)
             {
                 Console.WriteLine("No table element found in the document.");
                 return;
             }
 
-            // Determine whether the table is broken across pages
+            // Determine whether the table breaks across pages
             bool isBroken = table.IsBroken;
-            Console.WriteLine($"Table.IsBroken = {isBroken}");
+            Console.WriteLine($"Table IsBroken: {isBroken}");
         }
-    }
-
-    // Recursively searches for a TableElement starting from the given element
-    static TableElement? FindFirstTable(StructureElement element)
-    {
-        if (element is TableElement tbl)
-            return tbl;
-
-        foreach (Element child in element.ChildElements)
-        {
-            if (child is StructureElement se)
-            {
-                TableElement? result = FindFirstTable(se);
-                if (result != null)
-                    return result;
-            }
-        }
-        return null;
     }
 }

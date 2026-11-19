@@ -6,25 +6,28 @@ using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
 using Aspose.Pdf.LogicalStructure;
 
-class TableCellInfo
-{
-    public string CellType { get; set; } = string.Empty;          // "Header" or "Data"
-    public string Text { get; set; } = string.Empty;              // Visible text (ActualText)
-    public string AlternativeText { get; set; } = string.Empty;   // /Alt text if present
-}
-
-class TableRowInfo
-{
-    public List<TableCellInfo> Cells { get; set; } = new List<TableCellInfo>();
-}
-
-class TableInfo
-{
-    public List<TableRowInfo> Rows { get; set; } = new List<TableRowInfo>();
-}
-
 class Program
 {
+    // DTOs for JSON serialization
+    public class TableInfo
+    {
+        public string AlternativeText { get; set; }
+        public List<RowInfo> Rows { get; set; } = new List<RowInfo>();
+    }
+
+    public class RowInfo
+    {
+        public int Index { get; set; }
+        public List<CellInfo> Cells { get; set; } = new List<CellInfo>();
+    }
+
+    public class CellInfo
+    {
+        public string CellType { get; set; }   // "Header" or "Data"
+        public string Text { get; set; }
+        public string AlternativeText { get; set; }
+    }
+
     static void Main()
     {
         const string inputPdf = "input.pdf";
@@ -36,76 +39,93 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            using (Document doc = new Document(inputPdf))
+            // Access tagged content
+            ITaggedContent tagged = doc.TaggedContent;
+
+            // Find all table elements in the structure tree (recursive search)
+            List<TableElement> tables = tagged.RootElement.FindElements<TableElement>(true);
+
+            var tablesInfo = new List<TableInfo>();
+
+            foreach (TableElement table in tables)
             {
-                // Verify that the PDF is tagged. In newer Aspose.Pdf versions the IsTagged property does not exist.
-                if (doc.TaggedContent == null)
+                TableInfo tableInfo = new TableInfo {
+                    AlternativeText = table.AlternativeText
+                };
+
+                int rowIndex = 0;
+
+                // Helper local function to process a row element
+                void ProcessRow(TableTRElement row)
                 {
-                    Console.WriteLine("Document is not a tagged PDF. No table structure to export.");
-                    return;
-                }
+                    RowInfo rowInfo = new RowInfo { Index = ++rowIndex };
 
-                ITaggedContent tagged = doc.TaggedContent;
-                StructureElement root = tagged.RootElement;
-
-                // Find all TableElement objects in the structure tree.
-                var tableElements = root.FindElements<TableElement>(true);
-                var tables = new List<TableInfo>();
-
-                foreach (TableElement table in tableElements)
-                {
-                    TableInfo tableInfo = new TableInfo();
-
-                    // Retrieve all rows (TableTRElement) belonging to this table.
-                    var rows = table.FindElements<TableTRElement>(true);
-                    foreach (TableTRElement row in rows)
+                    foreach (Element cell in row.ChildElements)
                     {
-                        TableRowInfo rowInfo = new TableRowInfo();
+                        CellInfo cellInfo = new CellInfo();
 
-                        // Iterate over each cell in the row.
-                        foreach (Element cell in row.ChildElements)
+                        if (cell is TableTHElement th)
                         {
-                            if (cell is TableTHElement th)
-                            {
-                                TableCellInfo cellInfo = new TableCellInfo
-                                {
-                                    CellType = "Header",
-                                    Text = th.ActualText ?? string.Empty,
-                                    AlternativeText = th.AlternativeText ?? string.Empty
-                                };
-                                rowInfo.Cells.Add(cellInfo);
-                            }
-                            else if (cell is TableTDElement td)
-                            {
-                                TableCellInfo cellInfo = new TableCellInfo
-                                {
-                                    CellType = "Data",
-                                    Text = td.ActualText ?? string.Empty,
-                                    AlternativeText = td.AlternativeText ?? string.Empty
-                                };
-                                rowInfo.Cells.Add(cellInfo);
-                            }
+                            cellInfo.CellType = "Header";
+                            cellInfo.Text = th.ActualText;
+                            cellInfo.AlternativeText = th.AlternativeText;
+                        }
+                        else if (cell is TableTDElement td)
+                        {
+                            cellInfo.CellType = "Data";
+                            cellInfo.Text = td.ActualText;
+                            cellInfo.AlternativeText = td.AlternativeText;
+                        }
+                        else
+                        {
+                            // Skip unknown elements
+                            continue;
                         }
 
-                        tableInfo.Rows.Add(rowInfo);
+                        rowInfo.Cells.Add(cellInfo);
                     }
 
-                    tables.Add(tableInfo);
+                    tableInfo.Rows.Add(rowInfo);
                 }
 
-                // Serialize the collected table information to JSON.
-                JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-                string json = JsonSerializer.Serialize(tables, jsonOptions);
-                File.WriteAllText(outputJson, json);
+                // Iterate over possible sections: THead, TBody, TFoot
+                foreach (Element section in table.ChildElements)
+                {
+                    if (section is TableTHeadElement thead)
+                    {
+                        foreach (Element row in thead.ChildElements)
+                        {
+                            if (row is TableTRElement tr) ProcessRow(tr);
+                        }
+                    }
+                    else if (section is TableTBodyElement tbody)
+                    {
+                        foreach (Element row in tbody.ChildElements)
+                        {
+                            if (row is TableTRElement tr) ProcessRow(tr);
+                        }
+                    }
+                    else if (section is TableTFootElement tfoot)
+                    {
+                        foreach (Element row in tfoot.ChildElements)
+                        {
+                            if (row is TableTRElement tr) ProcessRow(tr);
+                        }
+                    }
+                }
 
-                Console.WriteLine($"Exported {tables.Count} table(s) to '{outputJson}'.");
+                tablesInfo.Add(tableInfo);
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+
+            // Serialize the collected table information to JSON
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(tablesInfo, jsonOptions);
+            File.WriteAllText(outputJson, json);
+
+            Console.WriteLine($"Exported {tablesInfo.Count} table(s) to '{outputJson}'.");
         }
     }
 }

@@ -2,14 +2,15 @@ using System;
 using System.IO;
 using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for Color definitions
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_alternating.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +18,55 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Attempt to locate the first Table on the first page
-            Table table = doc.Pages[1].Paragraphs
-                                 .OfType<Table>()
-                                 .FirstOrDefault();
-
-            if (table == null)
+            // Verify that the PDF is tagged by checking TaggedContent (IsTagged does not exist)
+            if (doc.TaggedContent == null)
             {
-                Console.Error.WriteLine("No table found on the first page.");
+                Console.WriteLine("Document is not tagged. Table structure cannot be accessed.");
                 return;
             }
 
-            // Iterate over rows and apply alternating background colors
-            for (int rowIndex = 0; rowIndex < table.Rows.Count; rowIndex++)
-            {
-                Row row = table.Rows[rowIndex];
-                // Choose background color based on parity of the row index
-                Aspose.Pdf.Color bgColor = (rowIndex % 2 == 0)
-                                            ? Aspose.Pdf.Color.LightGray   // even rows
-                                            : Aspose.Pdf.Color.White;      // odd rows
+            ITaggedContent tagged = doc.TaggedContent;
 
-                // Apply the chosen color to every cell in the current row
-                foreach (Cell cell in row.Cells)
+            // Find the first table element in the structure tree
+            TableElement table = tagged.RootElement
+                                        .FindElements<TableElement>(true)
+                                        .FirstOrDefault();
+
+            if (table == null)
+            {
+                Console.WriteLine("No table element found in the PDF.");
+                return;
+            }
+
+            // Iterate over each row (TableTRElement) and apply alternating background colors
+            int rowIndex = 0;
+            foreach (Element rowElem in table.ChildElements)
+            {
+                if (rowElem is TableTRElement row)
                 {
-                    cell.BackgroundColor = bgColor;
+                    // Choose background color based on row parity
+                    Aspose.Pdf.Color bgColor = (rowIndex % 2 == 0)
+                        ? Aspose.Pdf.Color.White
+                        : Aspose.Pdf.Color.LightGray;
+
+                    // Apply the background color to each cell in the row
+                    foreach (Element cellElem in row.ChildElements)
+                    {
+                        switch (cellElem)
+                        {
+                            case TableTHElement th:
+                                th.BackgroundColor = bgColor;
+                                break;
+                            case TableTDElement td:
+                                td.BackgroundColor = bgColor;
+                                break;
+                        }
+                    }
+
+                    rowIndex++;
                 }
             }
 
@@ -51,6 +74,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Alternating row colors applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Alternating row colors applied. Saved to '{outputPath}'.");
     }
 }

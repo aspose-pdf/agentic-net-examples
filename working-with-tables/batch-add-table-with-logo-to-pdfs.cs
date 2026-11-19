@@ -1,106 +1,88 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing; // Required for Image class
+using Aspose.Pdf.Text; // Added to resolve TextFragment reference
 
-class BatchAddTableWithLogo
+class BatchTableWithLogo
 {
+    // Path to the folder containing source PDFs
+    private const string InputFolder = @"C:\PdfInput";
+
+    // Path to the folder where processed PDFs will be saved
+    private const string OutputFolder = @"C:\PdfOutput";
+
+    // Path to the company logo image (PNG, JPG, etc.)
+    private const string LogoPath = @"C:\Assets\company_logo.png";
+
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\InputPdfs";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = @"C:\OutputPdfs";
-        // Path to the company logo image (PNG, JPEG, etc.)
-        const string logoPath = @"C:\Resources\company_logo.png";
+        // Ensure output directory exists
+        Directory.CreateDirectory(OutputFolder);
 
-        // Validate paths
-        if (!Directory.Exists(inputFolder))
+        // Verify logo file exists once before processing
+        if (!File.Exists(LogoPath))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Logo file not found: {LogoPath}");
             return;
         }
-
-        if (!File.Exists(logoPath))
-        {
-            Console.Error.WriteLine($"Logo image not found: {logoPath}");
-            return;
-        }
-
-        Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfFile in Directory.GetFiles(InputFolder, "*.pdf"))
         {
-            // Disambiguate System.IO.Path from Aspose.Pdf.Drawing.Path
-            string fileName = System.IO.Path.GetFileName(pdfFile);
-            string outputPath = System.IO.Path.Combine(outputFolder, fileName);
+            string fileName = Path.GetFileName(pdfFile);
+            string outputPath = Path.Combine(OutputFolder, fileName);
 
-            try
+            // Load the PDF, modify it, and save the result
+            using (Document doc = new Document(pdfFile))
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfFile))
-                {
-                    // Ensure the document has at least one page
-                    if (doc.Pages.Count == 0)
-                    {
-                        // Add a blank page if none exist
-                        doc.Pages.Add();
-                    }
-
-                    // Use the first page (1‑based indexing) to insert the table
-                    Page page = doc.Pages[1];
-
-                    // Create a table with two columns
-                    Table table = new Table
-                    {
-                        // Optional: set border for visual clarity
-                        Border = new BorderInfo(BorderSide.All, 0.5f),
-                        // Define column widths (percentage of page width)
-                        ColumnWidths = "30% 70%"
-                    };
-
-                    // Add a single row to the table
-                    Row row = table.Rows.Add();
-
-                    // ----- Logo cell -----
-                    Cell logoCell = row.Cells.Add();
-                    // Load the logo image from file stream
-                    using (FileStream logoStream = File.OpenRead(logoPath))
-                    {
-                        Image logoImage = new Image
-                        {
-                            ImageStream = logoStream,
-                            HorizontalAlignment = HorizontalAlignment.Center,
-                            VerticalAlignment = VerticalAlignment.Center
-                        };
-                        logoCell.Paragraphs.Add(logoImage);
-                    }
-
-                    // ----- Text cell -----
-                    Cell textCell = row.Cells.Add();
-                    TextFragment tf = new TextFragment("Company Name")
-                    {
-                        TextState = { FontSize = 14, FontStyle = FontStyles.Bold }
-                    };
-                    textCell.Paragraphs.Add(tf);
-
-                    // Insert the table at the top of the page
-                    page.Paragraphs.Add(table);
-
-                    // Save the modified PDF to the output folder
-                    doc.Save(outputPath);
-                }
-
-                Console.WriteLine($"Processed: {fileName} → {outputPath}");
+                AddTableWithLogo(doc, LogoPath);
+                doc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {fileName}");
         }
+    }
 
-        Console.WriteLine("Batch processing completed.");
+    // Adds a table containing the company logo to the first page of the document
+    private static void AddTableWithLogo(Document doc, string logoPath)
+    {
+        // Create a table with a single row and two columns
+        Table table = new Table
+        {
+            // Optional visual styling
+            Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.LightGray),
+            HorizontalAlignment = HorizontalAlignment.Center,
+            Margin = new MarginInfo(10, 10, 10, 10)
+        };
+
+        // Add a row to the table
+        Row row = table.Rows.Add();
+
+        // ----- Logo cell -----
+        Cell logoCell = row.Cells.Add();
+
+        // Load the logo image and place it into the cell
+        Image logoImage = new Image();
+        // Keep the stream open for the lifetime of the image (Aspose.Pdf copies the data internally)
+        logoImage.ImageStream = File.OpenRead(logoPath);
+        // Scale the image to fit the cell (optional)
+        logoImage.FixWidth = 100; // width in points
+        logoImage.FixHeight = 50; // height in points
+
+        logoCell.Paragraphs.Add(logoImage);
+
+        // ----- Text cell -----
+        Cell textCell = row.Cells.Add();
+        // Add a simple text fragment describing the logo or company name
+        TextFragment tf = new TextFragment("Company Name")
+        {
+            // Use Aspose.Pdf.Color to avoid System.Drawing dependency
+            TextState = { FontSize = 14, ForegroundColor = Aspose.Pdf.Color.Black }
+        };
+        textCell.Paragraphs.Add(tf);
+
+        // Insert the table at the top of the first page
+        Page firstPage = doc.Pages[1];
+        firstPage.Paragraphs.Insert(0, table);
     }
 }

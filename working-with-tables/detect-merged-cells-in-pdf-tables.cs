@@ -1,7 +1,8 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TableAbsorber resides in this namespace
 
 class Program
 {
@@ -15,73 +16,64 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // TableAbsorber extracts tables from the document – it does NOT implement IDisposable
+            // TableAbsorber extracts table structures from the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Visit each page to collect tables
-            foreach (Page page in doc.Pages)
-            {
-                absorber.Visit(page);
-            }
+            // Visit the whole document (or each page) to populate TableList
+            absorber.Visit(doc);
 
-            int tableIndex = 1;
-            foreach (var table in absorber.TableList)
+            // Iterate over each detected table
+            foreach (AbsorbedTable table in absorber.TableList)
             {
-                bool hasMerged = false;
-                int rowIndex = 1;
+                bool hasMergedCells = false;
+                int pageNumber = table.PageNum; // Correct property name (not PageNumber)
 
-                // Iterate through rows and cells to check RowSpan and ColumnSpan
-                foreach (var row in table.RowList)
+                // Examine each cell's RowSpan and ColumnSpan using reflection – these members may not exist in older library versions
+                foreach (AbsorbedRow row in table.RowList)
                 {
-                    int colIndex = 1;
-                    foreach (var cell in row.CellList)
+                    foreach (AbsorbedCell cell in row.CellList)
                     {
-                        // Use reflection to obtain RowSpan / ColumnSpan – these members may not be present in older library versions
                         int rowSpan = GetIntProperty(cell, "RowSpan", 1);
                         int colSpan = GetIntProperty(cell, "ColumnSpan", 1);
+                        int rowIdx = GetIntProperty(cell, "RowIndex", -1);
+                        int colIdx = GetIntProperty(cell, "ColumnIndex", -1);
 
                         if (rowSpan > 1 || colSpan > 1)
                         {
-                            hasMerged = true;
-                            Console.WriteLine(
-                                $"Table {tableIndex}, Cell at Row {rowIndex}, Column {colIndex} " +
-                                $"has RowSpan={rowSpan}, ColumnSpan={colSpan}");
+                            hasMergedCells = true;
+                            Console.WriteLine($"Table on page {pageNumber}: Merged cell at (Row {rowIdx}, Column {colIdx}) RowSpan={rowSpan}, ColumnSpan={colSpan}");
                         }
-                        colIndex++;
                     }
-                    rowIndex++;
                 }
 
-                if (!hasMerged)
+                if (!hasMergedCells)
                 {
-                    Console.WriteLine($"Table {tableIndex} contains no merged cells.");
+                    Console.WriteLine($"Table on page {pageNumber} has no merged cells.");
                 }
-
-                tableIndex++;
             }
         }
     }
 
     /// <summary>
-    /// Safely retrieves an integer property value via reflection.
-    /// Returns <paramref name="defaultValue"/> if the property does not exist or cannot be read.
+    /// Safely obtains an integer property value via reflection. If the property does not exist or cannot be read,
+    /// the supplied default value is returned.
     /// </summary>
     private static int GetIntProperty(object obj, string propertyName, int defaultValue)
     {
-        var prop = obj.GetType().GetProperty(propertyName);
-        if (prop != null && prop.PropertyType == typeof(int))
+        try
         {
-            try
+            PropertyInfo pi = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+            if (pi != null && pi.PropertyType == typeof(int))
             {
-                return (int)prop.GetValue(obj);
+                return (int)pi.GetValue(obj);
             }
-            catch
-            {
-                // ignore and fall back to default
-            }
+        }
+        catch
+        {
+            // ignored – fall back to default
         }
         return defaultValue;
     }

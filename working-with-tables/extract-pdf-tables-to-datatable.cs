@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Data;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -20,64 +19,63 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Create a TableAbsorber to extract tables from the document
+            TableAbsorber absorber = new TableAbsorber();
+
+            // Process all pages of the document
+            absorber.Visit(doc);
+
             int tableIndex = 0;
-            bool anyTableFound = false;
-
-            // Iterate through each page because TableAbsorber works per‑page in the current API
-            foreach (Page page in doc.Pages)
+            // Iterate over each extracted table via TableList
+            foreach (var absorbedTable in absorber.TableList)
             {
-                // Create a TableAbsorber and visit the current page
-                TableAbsorber absorber = new TableAbsorber();
-                absorber.Visit(page);
+                // Create a DataTable to hold the extracted data
+                DataTable dataTable = new DataTable($"Table_{tableIndex}");
 
-                // Process each extracted table
-                foreach (var tableInfo in absorber.TableList)
+                // Determine the maximum column count across all rows
+                int maxColumns = 0;
+                foreach (var row in absorbedTable.RowList)
                 {
-                    anyTableFound = true;
-                    // Create a DataTable to hold the extracted data
-                    DataTable dt = new DataTable($"Table_{tableIndex}");
-
-                    // Determine the maximum number of columns in this table
-                    int maxColumns = tableInfo.RowList.Count > 0
-                        ? tableInfo.RowList.Max(r => r.CellList.Count)
-                        : 0;
-
-                    // Add columns to the DataTable
-                    for (int col = 0; col < maxColumns; col++)
-                    {
-                        dt.Columns.Add($"Column{col + 1}", typeof(string));
-                    }
-
-                    // Populate the DataTable with cell text values
-                    foreach (var rowInfo in tableInfo.RowList)
-                    {
-                        DataRow dataRow = dt.NewRow();
-                        for (int col = 0; col < rowInfo.CellList.Count; col++)
-                        {
-                            var cell = rowInfo.CellList[col];
-                            // Concatenate all text fragments that belong to the cell
-                            string cellText = string.Join(" ", cell.TextFragments.Select(tf => tf.Text));
-                            dataRow[col] = cellText;
-                        }
-                        dt.Rows.Add(dataRow);
-                    }
-
-                    // Output basic information about the extracted table
-                    Console.WriteLine($"Extracted Table {tableIndex}: {dt.Rows.Count} rows, {dt.Columns.Count} columns.");
-
-                    // Optionally, print the table contents
-                    foreach (DataRow dr in dt.Rows)
-                    {
-                        Console.WriteLine(string.Join("\t", dr.ItemArray));
-                    }
-
-                    tableIndex++;
+                    if (row.CellList.Count > maxColumns)
+                        maxColumns = row.CellList.Count;
                 }
-            }
 
-            if (!anyTableFound)
-            {
-                Console.WriteLine("No tables found in the document.");
+                // Add columns to the DataTable
+                for (int col = 0; col < maxColumns; col++)
+                {
+                    dataTable.Columns.Add($"Column_{col + 1}", typeof(string));
+                }
+
+                // Populate the DataTable with cell text
+                foreach (var row in absorbedTable.RowList)
+                {
+                    DataRow dataRow = dataTable.NewRow();
+                    for (int col = 0; col < row.CellList.Count; col++)
+                    {
+                        var cell = row.CellList[col];
+                        // Concatenate all TextFragments inside the cell
+                        string cellText = string.Empty;
+                        foreach (var fragment in cell.TextFragments)
+                        {
+                            cellText += fragment.Text;
+                        }
+                        dataRow[col] = cellText.Trim();
+                    }
+                    dataTable.Rows.Add(dataRow);
+                }
+
+                // Example output: print the extracted table to the console
+                Console.WriteLine($"--- Extracted Table {tableIndex} ---");
+                foreach (DataRow dr in dataTable.Rows)
+                {
+                    for (int i = 0; i < dataTable.Columns.Count; i++)
+                    {
+                        Console.Write($"{dr[i]}\t");
+                    }
+                    Console.WriteLine();
+                }
+
+                tableIndex++;
             }
         }
     }

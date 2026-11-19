@@ -19,25 +19,27 @@ class Program
         // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a page to host the table
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create the table (parameterless constructor) and configure it
-            Table table = new Table();
-            table.ColumnWidths = "100 200 100"; // optional column width specification
-            // Optional: add a simple border to all cells
-            table.DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f, Color.Black);
+            // Create a table and define column widths (optional)
+            Table table = new Table
+            {
+                // Three columns of equal width
+                ColumnWidths = "100 100 100"
+            };
 
-            // Import the DataTable rows (include column headers)
+            // Import the DataTable into the Aspose.Pdf Table
+            // Parameters: (DataTable source, bool hasHeader, int startRow, int startColumn)
             table.ImportDataTable(dt, true, 0, 0);
 
             // Add the table to the page
             page.Paragraphs.Add(table);
 
             // Save the PDF
-            doc.Save("DataTableExport.pdf");
+            doc.Save("DataTable_Export.pdf");
         }
 
-        Console.WriteLine("PDF with imported DataTable saved as 'DataTableExport.pdf'.");
+        Console.WriteLine("PDF with imported DataTable has been saved as 'DataTable_Export.pdf'.");
     }
 }

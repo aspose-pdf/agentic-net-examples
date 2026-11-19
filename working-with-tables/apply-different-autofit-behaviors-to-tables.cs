@@ -7,74 +7,79 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";      // existing PDF (can be empty)
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Ensure we have at least one page to place the tables
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
-
-            // -----------------------------------------------------------------
-            // First table – fit to page width (AutoFitToWindow)
-            // -----------------------------------------------------------------
-            Table table1 = new Table
+            // Load the existing PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // ColumnAdjustment controls how the table sizes itself
-                ColumnAdjustment = ColumnAdjustment.AutoFitToWindow,
-                Border = new BorderInfo(BorderSide.All, 0.5f)
-            };
+                // Ensure the document has at least one page (1‑based indexing)
+                Page page = doc.Pages[1];
 
-            // Add a header row
-            Row header1 = table1.Rows.Add();
-            header1.Cells.Add("Header A");
-            header1.Cells.Add("Header B");
-            header1.BackgroundColor = Color.LightGray;
+                // -------------------------------------------------
+                // Table 1 – AutoFit to content (ColumnAdjustment)
+                // -------------------------------------------------
+                Table table1 = new Table
+                {
+                    ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
+                    Border = new BorderInfo(BorderSide.All, 0.5f)
+                };
 
-            // Add a data row
-            Row data1 = table1.Rows.Add();
-            data1.Cells.Add("Row1 Col1");
-            data1.Cells.Add("Row1 Col2");
+                // Header row
+                Row headerRow1 = table1.Rows.Add();
+                headerRow1.Cells.Add("Header 1");
+                headerRow1.Cells.Add("Header 2");
 
-            // Place the first table on the first page
-            doc.Pages[1].Paragraphs.Add(table1);
+                // Data row
+                Row dataRow1 = table1.Rows.Add();
+                dataRow1.Cells.Add("Value A1");
+                dataRow1.Cells.Add("Value A2");
 
-            // -----------------------------------------------------------------
-            // Second table – size to content (AutoFitToContent)
-            // -----------------------------------------------------------------
-            Table table2 = new Table
-            {
-                ColumnAdjustment = ColumnAdjustment.AutoFitToContent,
-                Border = new BorderInfo(BorderSide.All, 0.5f)
-            };
+                // Add the first table to the page
+                page.Paragraphs.Add(table1);
 
-            // Add a header row
-            Row header2 = table2.Rows.Add();
-            header2.Cells.Add("Long Header Column 1");
-            header2.Cells.Add("Long Header Column 2");
-            header2.BackgroundColor = Color.LightBlue;
+                // -------------------------------------------------
+                // Table 2 – AutoFit to window (ColumnAdjustment)
+                // -------------------------------------------------
+                Table table2 = new Table
+                {
+                    // AutoFitToWindow makes the table stretch to the page width
+                    ColumnAdjustment = ColumnAdjustment.AutoFitToWindow,
+                    Border = new BorderInfo(BorderSide.All, 0.5f)
+                };
 
-            // Add a data row with longer text to demonstrate content‑based sizing
-            Row data2 = table2.Rows.Add();
-            data2.Cells.Add("This is a much longer piece of text that will expand the column width.");
-            data2.Cells.Add("Short");
+                // Header row
+                Row headerRow2 = table2.Rows.Add();
+                headerRow2.Cells.Add("Header X");
+                headerRow2.Cells.Add("Header Y");
 
-            // Place the second table below the first one (add a blank line first)
-            doc.Pages[1].Paragraphs.Add(new TextFragment("\n"));
-            doc.Pages[1].Paragraphs.Add(table2);
+                // Data row
+                Row dataRow2 = table2.Rows.Add();
+                dataRow2.Cells.Add("Value B1");
+                dataRow2.Cells.Add("Value B2");
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Add a blank line for visual separation
+                page.Paragraphs.Add(new TextFragment("\n"));
+                // Add the second table to the page
+                page.Paragraphs.Add(table2);
+
+                // Save the modified PDF (PDF format, no SaveOptions needed)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with varied table sizing to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with varied ColumnAdjustment settings: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

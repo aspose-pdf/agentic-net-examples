@@ -1,6 +1,7 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // for TextFragment if needed
 
 class Program
 {
@@ -11,52 +12,50 @@ class Program
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page
+            // Add a new page and set its orientation to Landscape by swapping width/height
             Page page = doc.Pages.Add();
+            // Set page size to A4 dimensions but in landscape orientation
+            page.PageInfo.Width = PageSize.A4.Height;   // 842 points
+            page.PageInfo.Height = PageSize.A4.Width;  // 595 points
 
-            // Set the page size to landscape (A4 landscape: width > height)
-            page.PageInfo.Width = 842;   // points (approximately 297 mm)
-            page.PageInfo.Height = 595;  // points (approximately 210 mm)
-
-            // Create a table with many columns to demonstrate a wide layout
+            // Create a visual Table that will be wide enough to require landscape orientation
             Table table = new Table
             {
-                // Set the table width to 100% of the page width
-                ColumnWidths = "10% 10% 10% 10% 10% 10% 10% 10% 10% 10%",
-                // Optional: add a border for visual clarity
-                Border = new BorderInfo(BorderSide.All, 0.5f)
+                // Define column widths (example: five equal columns)
+                ColumnWidths = "100 100 100 100 100",
+                // Optional: set border for visibility
+                Border = new BorderInfo(BorderSide.All, 0.5f, Aspose.Pdf.Color.Black)
             };
 
             // Add a header row
             Row header = table.Rows.Add();
-            for (int i = 1; i <= 10; i++)
+            header.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            for (int c = 1; c <= 5; c++)
             {
-                Cell headerCell = header.Cells.Add($"Header {i}");
-                headerCell.BackgroundColor = Color.LightGray;
-                // Use DefaultCellTextState to format cell text
-                headerCell.DefaultCellTextState = new TextState
-                {
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold
-                };
+                Cell cell = header.Cells.Add();
+                TextFragment tf = new TextFragment($"Header {c}");
+                tf.TextState.FontSize = 12;
+                tf.TextState.FontStyle = FontStyles.Bold;
+                cell.Paragraphs.Add(tf);
             }
 
-            // Add a few data rows
-            for (int r = 1; r <= 5; r++)
+            // Add several data rows to demonstrate width
+            for (int r = 1; r <= 10; r++)
             {
-                Row dataRow = table.Rows.Add();
-                for (int c = 1; c <= 10; c++)
+                Row row = table.Rows.Add();
+                for (int c = 1; c <= 5; c++)
                 {
-                    Cell dataCell = dataRow.Cells.Add($"R{r}C{c}");
-                    // Optional: set a default text state for data cells
-                    dataCell.DefaultCellTextState = new TextState { FontSize = 10 };
+                    Cell cell = row.Cells.Add();
+                    TextFragment tf = new TextFragment($"R{r}C{c}");
+                    tf.TextState.FontSize = 10;
+                    cell.Paragraphs.Add(tf);
                 }
             }
 
-            // Add the table to the page's paragraphs collection
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the document (PDF format) inside the using block
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

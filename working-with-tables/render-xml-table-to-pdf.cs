@@ -1,18 +1,16 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        // Input XML that defines the table structure
-        const string xmlPath = "tableDefinition.xml";
-        // Output PDF file
-        const string pdfPath = "tableOutput.pdf";
+        const string xmlPath   = "tableDefinition.xml";
+        const string pdfPath   = "output.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -20,66 +18,62 @@ class Program
             return;
         }
 
-        // Load the XML document
+        // Load the XML that defines the table structure
         XDocument xDoc = XDocument.Load(xmlPath);
-        XElement root = xDoc.Root; // Expected <Table> root element
-        if (root == null)
-        {
-            Console.Error.WriteLine("Invalid XML: missing root element.");
-            return;
-        }
+        XElement tableElem = xDoc.Root; // <Table>
 
-        // Create a new PDF document
+        // Create a new empty PDF document
         using (Document pdfDoc = new Document())
         {
-            // Add a blank page (Pages are 1‑based)
-            Page page = pdfDoc.Pages.Add();
+            // Enable tagging and set basic metadata
+            ITaggedContent tagged = pdfDoc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Table from XML");
 
-            // Create an Aspose.Pdf.Table instance
-            Table table = new Table();
+            // Root element of the logical structure tree
+            StructureElement root = tagged.RootElement;
 
-            // Determine column count from the first <Row> element
-            int columnCount = 0;
-            XElement firstRow = root.Element("Row");
-            if (firstRow != null)
+            // Create the table structure element
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Table generated from XML definition";
+            root.AppendChild(table);
+
+            // Process optional <Header> section
+            XElement headerXml = tableElem.Element("Header");
+            if (headerXml != null)
             {
-                columnCount = firstRow.Elements("Cell").Count();
-                if (columnCount > 0)
+                TableTHeadElement thead = tagged.CreateTableTHeadElement();
+                table.AppendChild(thead);
+
+                TableTRElement headerRow = tagged.CreateTableTRElement();
+                thead.AppendChild(headerRow);
+
+                foreach (XElement cellXml in headerXml.Elements("Cell"))
                 {
-                    // Set equal column widths (optional: adjust as needed)
-                    double[] columnWidths = new double[columnCount];
-                    for (int i = 0; i < columnCount; i++)
-                        columnWidths[i] = 1.0 / columnCount;
-                    // ColumnWidths property expects a comma‑separated string
-                    table.ColumnWidths = string.Join(",", columnWidths.Select(w => w.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                    TableTHElement th = tagged.CreateTableTHElement();
+                    th.SetText(cellXml.Value.Trim());
+                    headerRow.AppendChild(th);
                 }
             }
 
-            // Iterate over each <Row> element in the XML
-            foreach (XElement rowElem in root.Elements("Row"))
+            // Process <Row> elements (body)
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
+
+            foreach (XElement rowXml in tableElem.Elements("Row"))
             {
-                // Create a new row in the PDF table
-                Row pdfRow = table.Rows.Add();
+                TableTRElement bodyRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(bodyRow);
 
-                // Iterate over each <Cell> within the current row
-                foreach (XElement cellElem in rowElem.Elements("Cell"))
+                foreach (XElement cellXml in rowXml.Elements("Cell"))
                 {
-                    // Create a new cell in the PDF table
-                    Cell pdfCell = pdfRow.Cells.Add();
-
-                    // Extract the cell text (trim to avoid whitespace issues)
-                    string cellText = (cellElem.Value ?? string.Empty).Trim();
-
-                    // Add the text to the cell using a TextFragment
-                    TextFragment tf = new TextFragment(cellText);
-                    pdfCell.Paragraphs.Add(tf);
+                    TableTDElement td = tagged.CreateTableTDElement();
+                    td.SetText(cellXml.Value.Trim());
+                    bodyRow.AppendChild(td);
                 }
             }
 
-            // Add the constructed table to the page's paragraph collection
-            page.Paragraphs.Add(table);
-
-            // Save the PDF document
+            // Save the PDF (no PreSave required)
             pdfDoc.Save(pdfPath);
         }
 
