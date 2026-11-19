@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -10,7 +10,7 @@ class Program
     {
         const string pdfPath = "input.pdf";
         const string xmlPath = "structure.xml";
-        const string outputPdf = "output.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(pdfPath))
         {
@@ -23,75 +23,95 @@ class Program
             return;
         }
 
-        // Load the XML that defines the outline hierarchy.
-        XDocument xmlDoc = XDocument.Load(xmlPath);
-        XElement rootElement = xmlDoc.Root;
-        if (rootElement == null)
+        try
         {
-            Console.Error.WriteLine("XML does not contain a root element.");
-            return;
-        }
-
-        // Open the PDF inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(pdfPath))
-        {
-            // Ensure the document has at least one page to link outlines to.
-            int targetPageNumber = 1;
-            if (pdfDoc.Pages.Count == 0)
+            using (Document doc = new Document(pdfPath))
             {
-                // Add a blank page if the source PDF is empty.
-                pdfDoc.Pages.Add();
+                // Ensure at least one page exists for outline destinations
+                if (doc.Pages.Count == 0)
+                {
+                    doc.Pages.Add();
+                }
+
+                // Load the XML structure
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(xmlPath);
+
+                // Build outline hierarchy based on XML nesting
+                ProcessXmlNode(xmlDoc.DocumentElement, doc, 1);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Clear any existing outlines (optional).
-            pdfDoc.Outlines.Clear();
-
-            // Build the outline hierarchy based on XML nesting.
-            AddTopLevelOutlines(pdfDoc, rootElement, targetPageNumber);
-
-            // Save the modified PDF.
-            pdfDoc.Save(outputPdf);
+            Console.WriteLine($"PDF with outlines saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with custom outline saved to '{outputPdf}'.");
-    }
-
-    // Adds top‑level outline items (children of the document root).
-    private static void AddTopLevelOutlines(Document pdfDoc, XElement xmlRoot, int pageNumber)
-    {
-        foreach (XElement child in xmlRoot.Elements())
+        catch (Exception ex)
         {
-            // Create an outline item for the current XML element.
-            var outlineItem = new OutlineItemCollection(pdfDoc.Outlines)
-            {
-                Title = child.Attribute("title")?.Value ?? child.Name.LocalName,
-                Destination = new XYZExplicitDestination(pdfDoc.Pages[pageNumber], 0, 0, 1)
-            };
-
-            // Add the item to the document's root outline collection.
-            pdfDoc.Outlines.Add(outlineItem);
-
-            // Recursively add any nested children.
-            AddChildOutlines(outlineItem, child, pdfDoc, pageNumber);
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    // Recursively adds child outline items to a parent outline item.
-    private static void AddChildOutlines(OutlineItemCollection parent, XElement xmlElement, Document pdfDoc, int pageNumber)
+    // Handles the root element – adds the first‑level outline items to doc.Outlines
+    static void ProcessXmlNode(XmlNode node, Document doc, int pageNumber)
     {
-        foreach (XElement child in xmlElement.Elements())
+        if (node == null) return;
+
+        // Create an outline item for the current XML node
+        OutlineItemCollection item = new OutlineItemCollection(doc.Outlines);
+        item.Title = GetNodeTitle(node);
+        item.Destination = new XYZExplicitDestination(
+            doc.Pages[pageNumber],
+            0,                                   // left
+            doc.Pages[pageNumber].MediaBox.Height, // top
+            1);                                 // zoom
+
+        // Add the item to the document's root outline collection
+        doc.Outlines.Add(item);
+
+        // Recursively process child elements
+        foreach (XmlNode child in node.ChildNodes)
         {
-            var childItem = new OutlineItemCollection(pdfDoc.Outlines)
+            if (child.NodeType == XmlNodeType.Element)
             {
-                Title = child.Attribute("title")?.Value ?? child.Name.LocalName,
-                Destination = new XYZExplicitDestination(pdfDoc.Pages[pageNumber], 0, 0, 1)
-            };
-
-            // Add the child to its parent outline item.
-            parent.Add(childItem);
-
-            // Recurse further if the child has its own children.
-            AddChildOutlines(childItem, child, pdfDoc, pageNumber);
+                ProcessXmlChildNode(child, item, doc, pageNumber);
+            }
         }
+    }
+
+    // Handles nested elements – adds them as sub‑items of the supplied parent outline item
+    static void ProcessXmlChildNode(XmlNode node, OutlineItemCollection parentItem, Document doc, int pageNumber)
+    {
+        if (node == null) return;
+
+        OutlineItemCollection item = new OutlineItemCollection(doc.Outlines);
+        item.Title = GetNodeTitle(node);
+        item.Destination = new XYZExplicitDestination(
+            doc.Pages[pageNumber],
+            0,
+            doc.Pages[pageNumber].MediaBox.Height,
+            1);
+
+        // Nest under the parent outline item
+        parentItem.Add(item);
+
+        // Recurse for deeper levels
+        foreach (XmlNode child in node.ChildNodes)
+        {
+            if (child.NodeType == XmlNodeType.Element)
+            {
+                ProcessXmlChildNode(child, item, doc, pageNumber);
+            }
+        }
+    }
+
+    // Helper to obtain a readable title from an XML node
+    static string GetNodeTitle(XmlNode node)
+    {
+        if (node.Attributes != null && node.Attributes["title"] != null)
+        {
+            return node.Attributes["title"].Value;
+        }
+        return node.Name;
     }
 }

@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        const string xmlPath = "data.xml";
+        const string pdfPath = "protected.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
@@ -19,16 +19,14 @@ class Program
 
         try
         {
-            // Load XML and convert it to a PDF document
+            // Load XML and generate PDF
             using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
             {
-                // Define permissions for the protected PDF (allow printing and content extraction)
+                // Define permissions and apply password protection
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                // Apply password protection using AES‑256 encryption
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF
+                // Save the protected PDF
                 doc.Save(pdfPath);
             }
 

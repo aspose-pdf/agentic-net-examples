@@ -1,58 +1,48 @@
 using System;
 using System.IO;
-using System.Xml;               // For XmlException
-using Aspose.Pdf;               // Core PDF API (Document, XmlSaveOptions, PdfException)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputXml = "output.xml";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_pdfa.pdf";
+        const string logPath    = "conversion_log.xml";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Load the source PDF inside a using block for deterministic disposal.
+            using (Document doc = new Document(inputPath))
             {
-                // Configure XML save options (default options are sufficient for most cases)
-                XmlSaveOptions xmlOptions = new XmlSaveOptions();
+                // Convert to PDF/A; this operation may involve internal XML processing.
+                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-                try
-                {
-                    // Attempt to save the PDF as XML
-                    doc.Save(outputXml, xmlOptions);
-                    Console.WriteLine($"PDF successfully converted to XML: {outputXml}");
-                }
-                catch (XmlException xmlEx)
-                {
-                    // Handles malformed XML that may be produced during conversion
-                    Console.Error.WriteLine($"Malformed XML generated: {xmlEx.Message}");
-                    // Optional: fallback logic (e.g., save as plain text) could be placed here
-                }
-                catch (PdfException pdfEx)
-                {
-                    // Handles PDF-specific conversion errors
-                    Console.Error.WriteLine($"PDF conversion error: {pdfEx.Message}");
-                }
-                catch (Exception ex)
-                {
-                    // Catch‑all for any other unexpected issues
-                    Console.Error.WriteLine($"Unexpected error during conversion: {ex.Message}");
-                }
+                // Save the converted document.
+                doc.Save(outputPath);
+                Console.WriteLine($"Conversion succeeded. Saved to '{outputPath}'.");
             }
+        }
+        catch (System.Xml.XmlException xmlEx)
+        {
+            // Handles malformed XML that can arise during conversion.
+            Console.Error.WriteLine($"XML error during conversion: {xmlEx.Message}");
+        }
+        catch (PdfException pdfEx)
+        {
+            // Handles PDF-specific errors, including XML-related issues inside the PDF.
+            Console.Error.WriteLine($"PDF processing error: {pdfEx.Message}");
         }
         catch (Exception ex)
         {
-            // Handles errors that occur while loading the PDF document
-            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
+            // Fallback for any other unexpected exceptions.
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

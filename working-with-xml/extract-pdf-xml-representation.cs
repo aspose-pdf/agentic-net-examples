@@ -1,31 +1,39 @@
 using System;
 using System.IO;
-using Aspose.Pdf;               // All SaveOptions are in this namespace
+using Aspose.Pdf;               // Core Aspose.Pdf namespace (contains XmlSaveOptions)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";      // source PDF
-        const string outputXmlPath = "output.xml";     // XML representation
+        const string inputPdfPath  = "input.pdf";
+        const string outputXmlPath = "output.xml";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdfPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // XmlSaveOptions forces the output format to XML
-            XmlSaveOptions xmlOpts = new XmlSaveOptions();
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
+            {
+                // Configure XML save options (explicitly required to get XML output)
+                XmlSaveOptions xmlOptions = new XmlSaveOptions();
 
-            // Save the PDF as XML. The overload with SaveOptions is required;
-            // otherwise the file would be saved as PDF regardless of extension.
-            pdfDoc.Save(outputXmlPath, xmlOpts);
+                // Save the PDF as XML representation
+                pdfDoc.Save(outputXmlPath, xmlOptions);
+            }
+
+            Console.WriteLine($"XML representation saved to '{outputXmlPath}'.");
         }
-
-        Console.WriteLine($"XML representation saved to '{outputXmlPath}'.");
+        catch (Exception ex)
+        {
+            // Generic error handling – report any issues during processing
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

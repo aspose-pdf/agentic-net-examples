@@ -16,27 +16,30 @@ class Program
             return;
         }
 
-        // Load the XML file and convert it to a PDF document
-        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+        // Load the XML file as a PDF document
+        XmlLoadOptions loadOptions = new XmlLoadOptions();
+
+        using (Document doc = new Document(xmlPath, loadOptions))
         {
-            // Attempt to set viewer preferences if the current Aspose.Pdf version supports them.
-            // The ViewerPreferences property was introduced in later versions of Aspose.Pdf.
-            // Using dynamic bypasses compile‑time checks and allows the code to compile against older versions.
+            // ViewerPreferences were introduced in later versions of Aspose.Pdf.
+            // To keep the code compatible with older versions we access the property
+            // via dynamic binding and handle the possible RuntimeBinderException.
             dynamic d = doc;
             try
             {
-                d.ViewerPreferences.FitWindow = true;
-                d.ViewerPreferences.PageLayout = PageLayout.SinglePage;
+                d.ViewerPreferences.FitWindow = true;                     // Fit the window to the first page size
+                d.ViewerPreferences.PageLayout = PageLayout.SinglePage;   // Show one page at a time
+                d.ViewerPreferences.HideToolbar = false;                  // Keep the toolbar visible (optional)
             }
             catch (RuntimeBinderException)
             {
-                Console.WriteLine("ViewerPreferences property is not available in the referenced Aspose.Pdf version. Skipping viewer preference configuration.");
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
             }
 
-            // Save the PDF with the (potentially) applied viewer preferences
+            // Save the resulting PDF
             doc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF created with viewer preferences: {pdfPath}");
+        Console.WriteLine($"PDF created with viewer preferences (if supported): {pdfPath}");
     }
 }

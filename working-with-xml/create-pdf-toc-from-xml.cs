@@ -3,98 +3,115 @@ using System.IO;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "source.pdf";   // existing PDF to augment
-        const string xmlPath = "headings.xml"; // XML with heading hierarchy
-        const string outputPdfPath = "output_with_toc.pdf";
+        const string xmlPath = "headings.xml";
+        const string outputPdf = "DocumentWithTOC.pdf";
 
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
-            return;
-        }
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPdfPath))
+        // Load heading hierarchy from XML.
+        // Expected format:
+        // <Document>
+        //   <Heading level="1">Chapter 1</Heading>
+        //   <Heading level="2">Section 1.1</Heading>
+        //   ...
+        // </Document>
+        XDocument xDoc = XDocument.Load(xmlPath);
+        var headings = xDoc.Root.Elements("Heading");
+
+        // Create a new PDF document.
+        using (Document pdfDoc = new Document())
         {
-            // Parse the XML file. Expected format:
-            // <Headings>
-            //   <Heading Level="1" Title="Chapter 1" Page="2" />
-            //   <Heading Level="2" Title="Section 1.1" Page="3" />
-            //   ...
-            // </Headings>
-            XDocument xmlDoc = XDocument.Load(xmlPath);
-            var headingElements = xmlDoc.Root?.Elements("Heading") ?? Array.Empty<XElement>();
+            // ----- Tagged PDF setup -----
+            ITaggedContent tagged = pdfDoc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Document with Table of Contents");
 
-            // Insert a new page at the beginning for the Table of Contents
-            Page tocPage = doc.Pages.Add();
-            doc.Pages.Insert(1, tocPage);
+            // Root of the logical structure tree.
+            StructureElement root = tagged.RootElement;
 
-            // Add a visible title for the TOC
-            TextFragment titleFragment = new TextFragment("Table of Contents");
-            titleFragment.TextState.FontSize = 18;
-            titleFragment.Position = new Position(50, tocPage.PageInfo.Height - 50);
-            tocPage.Paragraphs.Add(titleFragment);
+            // ----- Create TOC page (first page) -----
+            Page tocPage = pdfDoc.Pages.Add();
+            double yPos = tocPage.PageInfo.Height - 50; // start position
+            const double lineHeight = 20;
 
-            // Starting vertical position for the first entry (some space after the title)
-            double currentY = tocPage.PageInfo.Height - 80;
-            const double lineHeight = 20; // space between entries
+            // Add a visible TOC heading.
+            TextFragment tocHeader = new TextFragment("Table of Contents");
+            tocHeader.Position = new Position(50, yPos);
+            tocHeader.TextState.FontSize = 18;
+            tocHeader.TextState.FontStyle = FontStyles.Bold;
+            tocPage.Paragraphs.Add(tocHeader);
+            yPos -= lineHeight;
 
-            foreach (var h in headingElements)
+            // Create a structure element for the TOC.
+            ParagraphElement tocStruct = tagged.CreateParagraphElement();
+            tocStruct.SetText("Table of Contents");
+            root.AppendChild(tocStruct);
+
+            // ----- Process each heading -----
+            int pageNumber = 2; // TOC occupies page 1
+            foreach (var headingElem in headings)
             {
-                // Safely read attributes; if missing, skip the entry
-                if (h.Attribute("Level") == null || h.Attribute("Title") == null || h.Attribute("Page") == null)
-                    continue;
+                // Parse level and text.
+                int level = (int)headingElem.Attribute("level");
+                string headingText = headingElem.Value.Trim();
 
-                int level = (int)h.Attribute("Level");
-                string title = (string)h.Attribute("Title");
-                int pageNum = (int)h.Attribute("Page");
+                // ----- Add a new page for the heading -----
+                Page contentPage = pdfDoc.Pages.Add();
 
-                // Adjust page number because we inserted the TOC page at position 1
-                int targetPageNumber = pageNum + 1;
+                // Visible heading on the page.
+                TextFragment tf = new TextFragment(headingText);
+                tf.Position = new Position(50, contentPage.PageInfo.Height - 100);
+                tf.TextState.FontSize = 24;
+                tf.TextState.FontStyle = FontStyles.Bold;
+                contentPage.Paragraphs.Add(tf);
 
-                // Create the visible TOC entry
-                TextFragment entryFragment = new TextFragment(title);
-                entryFragment.TextState.FontSize = 12;
-                double indent = 50 + (level - 1) * 20; // simple left indent per level
-                entryFragment.Position = new Position(indent, currentY);
-                tocPage.Paragraphs.Add(entryFragment);
+                // Logical structure: HeaderElement with appropriate level.
+                HeaderElement headerStruct = tagged.CreateHeaderElement(level);
+                headerStruct.SetText(headingText);
+                root.AppendChild(headerStruct);
 
-                // Create a clickable link annotation that jumps to the target page
-                double fontSize = entryFragment.TextState.FontSize;
-                Rectangle linkRect = new Rectangle(
-                    indent,
-                    currentY - fontSize,
-                    tocPage.PageInfo.Width - 50,
-                    currentY);
+                // ----- Add entry to TOC -----
+                // Visible TOC entry.
+                string tocLine = $"{headingText} ................................ {pageNumber}";
+                TextFragment tocEntry = new TextFragment(tocLine);
+                tocEntry.Position = new Position(50, yPos);
+                tocEntry.TextState.FontSize = 12;
+                tocPage.Paragraphs.Add(tocEntry);
 
-                // Use the correct GoToAction constructor (expects a Page instance)
-                Page targetPage = doc.Pages[targetPageNumber];
-                GoToAction goTo = new GoToAction(targetPage);
-                LinkAnnotation link = new LinkAnnotation(tocPage, linkRect)
-                {
-                    Action = goTo
-                };
+                // Structure entry for TOC.
+                ParagraphElement tocItemStruct = tagged.CreateParagraphElement();
+                tocItemStruct.SetText(tocLine);
+                tocStruct.AppendChild(tocItemStruct);
+
+                // Link annotation from TOC entry to the heading page.
+                // Rectangle coordinates are (llx, lly, urx, ury).
+                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(50, yPos - 5, 500, yPos + 10);
+                // Use GoToAction directly with the target page (no Destination class).
+                GoToAction goTo = new GoToAction(contentPage);
+                LinkAnnotation link = new LinkAnnotation(tocPage, linkRect) { Action = goTo };
                 tocPage.Annotations.Add(link);
 
-                // Move to the next line
-                currentY -= lineHeight;
+                // Update positions.
+                yPos -= lineHeight;
+                pageNumber++;
             }
 
-            // Save the resulting PDF
-            doc.Save(outputPdfPath);
+            // Save the PDF.
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with Table of Contents saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with TOC saved to '{outputPdf}'.");
     }
 }

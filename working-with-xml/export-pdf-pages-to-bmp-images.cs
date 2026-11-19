@@ -3,49 +3,59 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class Program
+class ExportPdfPagesToImages
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string outputDir = "ExportedImages";
+        // Paths
+        const string xmlInputPath   = "input.xml";
+        const string pdfOutputPath  = "generated.pdf";
+        const string imagesFolder   = "PageImages";
 
-        if (!File.Exists(xmlPath))
+        // Verify XML exists
+        if (!File.Exists(xmlInputPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlInputPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output folder exists
+        Directory.CreateDirectory(imagesFolder);
 
-        try
+        // -----------------------------------------------------------------
+        // 1. Create a PDF document from the XML source.
+        // -----------------------------------------------------------------
+        // XmlLoadOptions loads XML (XFA, XDP, etc.) into a PDF.
+        // The class resides in the Aspose.Pdf namespace.
+        using (Document pdfDoc = new Document(xmlInputPath, new XmlLoadOptions()))
         {
-            // Load the XML and convert it to a PDF document in memory
-            using (Document pdfDoc = new Document(xmlPath, new XmlLoadOptions()))
+            // Save the intermediate PDF (optional, useful for inspection)
+            pdfDoc.Save(pdfOutputPath);
+
+            // -----------------------------------------------------------------
+            // 2. Export each page of the PDF as a separate PNG image.
+            // -----------------------------------------------------------------
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Define the resolution for the exported images (e.g., 300 DPI)
-                var resolution = new Resolution(300);
-                // PngDevice does NOT implement IDisposable, so instantiate it directly
-                var pngDevice = new PngDevice(resolution) { TransparentBackground = true };
+                Page page = pdfDoc.Pages[pageNumber];
 
-                // Iterate over pages using 1‑based indexing (Aspose.Pdf requirement)
-                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+                // Build the image file name, e.g., Page_1.png
+                string imagePath = Path.Combine(imagesFolder, $"Page_{pageNumber}.png");
+
+                // Use a PNG device to render the page.
+                // The device writes the image directly to a stream.
+                using (FileStream imageStream = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                 {
-                    string outPath = Path.Combine(outputDir, $"page_{i}.png");
-
-                    // Render a single page to PNG. Only the stream needs a using block.
-                    using (var outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                    {
-                        pngDevice.Process(pdfDoc.Pages[i], outStream);
-                    }
-
-                    Console.WriteLine($"Saved page {i} as image: {outPath}");
+                    // PngDevice is part of Aspose.Pdf.Devices and works cross‑platform.
+                    // No additional options are required for a basic export.
+                    PngDevice pngDevice = new PngDevice();
+                    pngDevice.Process(page, imageStream);
                 }
+
+                Console.WriteLine($"Exported page {pageNumber} to '{imagePath}'.");
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine("All pages have been exported as images.");
     }
 }

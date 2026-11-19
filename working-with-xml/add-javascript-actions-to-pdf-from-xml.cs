@@ -8,46 +8,53 @@ class Program
 {
     static void Main()
     {
-        const string xmlInputPath = "input.xml";
-        const string pdfOutputPath = "output.pdf";
+        const string xmlPath = "input.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(xmlInputPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input XML not found: {xmlInputPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load XML and create a PDF document.
-        using (Document pdfDoc = new Document(xmlInputPath, new XmlLoadOptions()))
+        // Load the XML file and convert it to a PDF document.
+        XmlLoadOptions loadOptions = new XmlLoadOptions();
+        using (Document doc = new Document(xmlPath, loadOptions))
         {
-            // Add a text box form field.
-            TextBoxField txtField = new TextBoxField(pdfDoc.Pages[1], new Rectangle(100, 600, 300, 630))
+            // Ensure the document has at least one page (Aspose.Pdf uses 1‑based indexing).
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
+
+            // Get the first page.
+            Page page = doc.Pages[1];
+
+            // Create a text box form field for user input.
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+            TextBoxField nameField = new TextBoxField(page, rect)
             {
-                PartialName = "UserName",
+                PartialName = "Name",
                 Value = ""
             };
-            pdfDoc.Form.Add(txtField);
 
-            // JavaScript for field validation.
-            string jsCode = @"
-if (this.getField('UserName').value == '') {
-    app.alert('Please enter your name.');
-}
-";
+            // Set the border using the Border class (requires the field as parent).
+            nameField.Color = Aspose.Pdf.Color.Black; // border color
+            nameField.Border = new Border(nameField) { Width = 1 };
 
-            // Attach JavaScript to the OnLostFocus event (blur equivalent).
-            txtField.Actions.OnLostFocus = new JavascriptAction(jsCode);
+            // Add JavaScript validation that runs when the field loses focus.
+            nameField.Actions.OnValidate = new JavascriptAction(
+                "if (event.value == '') { app.alert('Name is required'); event.rc = false; } else { event.rc = true; }"
+            );
 
-            // Document‑level JavaScript (executed when the PDF opens).
-            string docLevelJs = @"
-app.alert('Welcome to the interactive PDF!');
-";
-            pdfDoc.OpenAction = new JavascriptAction(docLevelJs);
+            // Add the field to the document's form collection.
+            doc.Form.Add(nameField);
 
-            // Save the PDF.
-            pdfDoc.Save(pdfOutputPath);
+            // Optional: JavaScript that runs when the PDF is opened.
+            doc.OpenAction = new JavascriptAction("app.alert('PDF loaded');");
+
+            // Save the resulting PDF.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with embedded JavaScript saved to '{pdfOutputPath}'.");
+        Console.WriteLine($"PDF with embedded JavaScript saved to '{outputPdf}'.");
     }
 }

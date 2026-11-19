@@ -6,43 +6,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input_from_xml.pdf";   // PDF generated from XML
-        const string outputHtmlPath = "preview.html";
+        const string xmlPath  = "input.xml";
+        const string pdfPath  = "temp.pdf";
+        const string htmlPath = "preview.html";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify the source XML exists
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Configure HTML conversion options
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            // 1. Convert XML to PDF using XmlLoadOptions
+            using (Document pdfDoc = new Document(xmlPath, new XmlLoadOptions()))
             {
-                // Embed all resources (fonts, images) into the HTML file
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                // Render images as PNGs embedded into SVG (cross‑browser friendly)
-                RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg,
-                // Optional: split each PDF page into a separate HTML file
-                // SplitIntoPages = true
-            };
+                pdfDoc.Save(pdfPath); // PDF generated from XML
+            }
 
-            // HTML conversion relies on GDI+ and works only on Windows.
-            // Wrap the save call to handle non‑Windows platforms gracefully.
-            try
+            // 2. Load the generated PDF and convert it to HTML
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                pdfDoc.Save(outputHtmlPath, htmlOpts);
-                Console.WriteLine($"HTML preview saved to '{outputHtmlPath}'.");
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    // Embed all resources into a single HTML file
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Render raster images as PNGs embedded in SVG (cross‑browser friendly)
+                    RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
+                };
+
+                try
+                {
+                    pdfDoc.Save(htmlPath, htmlOpts);
+                    Console.WriteLine($"HTML preview saved to '{htmlPath}'.");
+                }
+                catch (TypeInitializationException)
+                {
+                    // GDI+ not available (non‑Windows platforms)
+                    Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+                catch (DllNotFoundException)
+                {
+                    // GDI+ DLL missing
+                    Console.WriteLine("GDI+ library not found. HTML conversion is Windows‑only.");
+                }
             }
-            catch (TypeInitializationException)
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+        finally
+        {
+            // Optional cleanup of the intermediate PDF
+            if (File.Exists(pdfPath))
             {
-                Console.WriteLine("HTML conversion requires GDI+ (Windows only). Operation skipped on this platform.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error during HTML conversion: {ex.Message}");
+                try { File.Delete(pdfPath); } catch { }
             }
         }
     }

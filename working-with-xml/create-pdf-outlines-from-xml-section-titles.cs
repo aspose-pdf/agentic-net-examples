@@ -4,14 +4,14 @@ using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations; // for XYZExplicitDestination
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "sections.xml";   // input XML with <section><title>...</title></section>
-        const string pdfPath = "output.pdf";
+        const string xmlPath = "sections.xml";
+        const string outputPdf = "document_with_outline.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -19,53 +19,59 @@ class Program
             return;
         }
 
-        // Load XML and extract all section titles
+        // Load XML and extract section titles (assumes <section><title>...</title></section>)
         XDocument xDoc = XDocument.Load(xmlPath);
         var titles = xDoc.Root?
-                         .Descendants("section")
-                         .Select(s => (string)s.Element("title"))
-                         .Where(t => !string.IsNullOrWhiteSpace(t));
+                        .Descendants("section")
+                        .Select(s => (string)s.Element("title"))
+                        .Where(t => !string.IsNullOrWhiteSpace(t))
+                        .ToList();
 
-        if (titles == null || !titles.Any())
+        if (titles == null || titles.Count == 0)
         {
-            Console.Error.WriteLine("No <section><title> elements found in the XML.");
+            Console.Error.WriteLine("No section titles found in XML.");
             return;
         }
 
-        // Create PDF document and add pages + outline entries
+        // Create a new PDF document and add outline entries
         using (Document pdfDoc = new Document())
         {
-            // Root outline collection
-            OutlineCollection outlineRoot = pdfDoc.Outlines;
+            // Ensure the document has at least one page (Aspose.Pdf requires a page to exist before adding outlines)
+            pdfDoc.Pages.Add();
 
-            foreach (string title in titles)
+            // Root outline collection (type OutlineCollection, not OutlineItemCollection)
+            OutlineCollection rootOutline = pdfDoc.Outlines;
+
+            // Iterate over titles, add a page per title and a corresponding bookmark
+            for (int i = 0; i < titles.Count; i++)
             {
-                // Add a new page for the section
-                Page page = pdfDoc.Pages.Add();
+                string title = titles[i];
 
-                // Write the title on the page
+                // Add a new page for this section (skip first page if already added)
+                Page page = i == 0 ? pdfDoc.Pages[1] : pdfDoc.Pages.Add();
+
+                // Optional: add visible text showing the section title on the page
                 TextFragment tf = new TextFragment(title)
                 {
-                    TextState = { FontSize = 24, ForegroundColor = Aspose.Pdf.Color.Black }
+                    TextState = { FontSize = 24, FontStyle = FontStyles.Bold }
                 };
                 page.Paragraphs.Add(tf);
 
-                // Create an outline (bookmark) that points to this page
-                // First, create the outline item and set its title
-                OutlineItemCollection entry = new OutlineItemCollection(outlineRoot)
+                // Create a bookmark (outline item) that points to this page
+                OutlineItemCollection bookmark = new OutlineItemCollection(pdfDoc.Outlines)
                 {
-                    Title = title
+                    Title = title,
+                    Destination = new XYZExplicitDestination(page, 0, page.PageInfo.Height, 1)
                 };
-                // Destination: top‑left of the page (coordinates 0,0) with default zoom (1.0)
-                entry.Destination = new XYZExplicitDestination(page.Number, 0, 0, 1.0f);
-                // Add the entry to the root collection
-                outlineRoot.Add(entry);
+
+                // Add the bookmark as a top‑level entry
+                rootOutline.Add(bookmark);
             }
 
             // Save the PDF
-            pdfDoc.Save(pdfPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF with custom outline saved to '{pdfPath}'.");
+        Console.WriteLine($"PDF with outline saved to '{outputPdf}'.");
     }
 }

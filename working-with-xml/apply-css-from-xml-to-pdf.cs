@@ -1,46 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath   = "input.xml";   // XML (or XHTML) that references external CSS
-        const string cssFolder = "styles";      // Folder containing the CSS files
-        const string outputPdf = "styled_output.pdf";
+        const string xmlPath = "input.xml";          // XML (XHTML) file with CSS references
+        const string outputPdf = "styled_output.pdf"; // Desired PDF output
 
+        // Verify input file exists
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"Input file not found: {xmlPath}");
+            Console.Error.WriteLine($"File not found: {xmlPath}");
             return;
         }
 
-        // HtmlLoadOptions constructor that accepts a base path resolves relative URLs
-        // (e.g., <link href="style.css" ...>) to the specified folder.
-        HtmlLoadOptions loadOptions = new HtmlLoadOptions(Path.GetFullPath(cssFolder));
-
         try
         {
-            // Load the XML/HTML document with the specified options.
+            // HtmlLoadOptions.BasePath is read‑only; provide the base path via the constructor.
+            string basePath = Path.GetDirectoryName(Path.GetFullPath(xmlPath));
+            HtmlLoadOptions loadOptions = new HtmlLoadOptions(basePath);
+
+            // Load the XML as an HTML document; CSS will be applied automatically.
             using (Document doc = new Document(xmlPath, loadOptions))
             {
-                // The document now contains styled content based on the external CSS.
-                // Save directly to PDF.
+                // Save the styled document as PDF.
                 doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"PDF generated with CSS styling: {outputPdf}");
+            Console.WriteLine($"PDF generated successfully: {outputPdf}");
         }
+        // HTML/CSS conversion relies on GDI+ and is Windows‑only.
         catch (TypeInitializationException)
         {
-            // HTML-to-PDF conversion relies on GDI+ and is Windows‑only.
-            Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
+            Console.WriteLine("HTML/CSS processing requires Windows (GDI+). Operation skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

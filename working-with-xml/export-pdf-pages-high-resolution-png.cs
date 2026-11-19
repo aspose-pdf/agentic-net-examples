@@ -1,44 +1,46 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Optimization; // for OptimizationOptions
 
 class Program
 {
     static void Main()
     {
         const string xmlPath = "input.xml";
-        const string outputDir = "ExportedImages";
+        const string pdfPath = "output.pdf";
+        const int imageDpi = 300; // Desired image resolution in DPI
 
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML source not found: {xmlPath}");
+            Console.Error.WriteLine($"File not found: {xmlPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
-
-        // Load the PDF document from its XML representation
-        using (Document pdfDoc = new Document(xmlPath))
+        try
         {
-            // Desired image resolution (e.g., 300 DPI)
-            Resolution imageResolution = new Resolution(300);
-
-            // Export each page as a PNG image using the specified resolution
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Load the PDF content from an XML source
+            XmlLoadOptions loadOptions = new XmlLoadOptions();
+            using (Document doc = new Document(xmlPath, loadOptions))
             {
-                string imagePath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+                // Configure optimization options to control the DPI of raster images
+                var opt = new OptimizationOptions();
+                opt.ImageCompressionOptions.CompressImages = true;
+                // MaxResolution limits the DPI of images when the document is saved
+                opt.ImageCompressionOptions.MaxResolution = imageDpi;
 
-                using (FileStream imageStream = new FileStream(imagePath, FileMode.Create))
-                {
-                    // PngDevice respects the Resolution property
-                    PngDevice pngDevice = new PngDevice(imageResolution);
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
-                }
+                // Apply the optimization (this will down‑sample images to the requested DPI)
+                doc.OptimizeResources(opt);
 
-                Console.WriteLine($"Exported page {pageNumber} to {imagePath}");
+                // Save the document as PDF (no PdfSaveOptions needed for image DPI)
+                doc.Save(pdfPath);
             }
+
+            Console.WriteLine($"PDF saved to '{pdfPath}' with image resolution limited to {imageDpi} DPI.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

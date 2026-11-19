@@ -1,69 +1,114 @@
 using System;
 using System.IO;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
+    // Adjust these constants as needed
+    const string XmlInputPath = "data.xml";          // Path to the large XML dataset
+    const string OutputFolder = "PdfPages";          // Folder where PDFs will be written
+    const int PagesPerPdf = 100;                     // Number of pages per PDF file
+
     static void Main()
     {
-        // Path to the large XML dataset
-        const string xmlPath = "large_dataset.xml";
-
-        // Directory where the split PDFs will be saved
-        const string outputDir = "SplitPdfs";
-
-        // Maximum number of PDF pages per output file (adjust as needed)
-        const int maxPagesPerPdf = 100;
-
-        // Verify input file exists
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(XmlInputPath))
         {
-            Console.Error.WriteLine($"Input XML not found: {xmlPath}");
+            Console.Error.WriteLine($"XML file not found: {XmlInputPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(OutputFolder);
 
-        // Load the XML as a PDF document using XmlLoadOptions
-        XmlLoadOptions loadOptions = new XmlLoadOptions();
-        using (Document sourceDoc = new Document(xmlPath, loadOptions))
+        // Load the XML document
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(XmlInputPath);
+
+        // Assume each <Record> element represents a unit of content to be placed on a page
+        XmlNodeList records = xmlDoc.SelectNodes("//Record");
+        if (records == null || records.Count == 0)
         {
-            // Total pages generated from the XML
-            int totalPages = sourceDoc.Pages.Count;
+            Console.Error.WriteLine("No <Record> elements found in the XML.");
+            return;
+        }
 
-            // Sequential part number for output files
-            int partNumber = 1;
+        int pdfIndex = 1;          // Sequential PDF file number
+        int pageCountInCurrent = 0;
+        Document currentDoc = null;
 
-            // Iterate over the source pages in chunks of maxPagesPerPdf
-            for (int startPage = 1; startPage <= totalPages; startPage += maxPagesPerPdf)
+        try
+        {
+            foreach (XmlNode record in records)
             {
-                // Create a new PDF document for the current chunk
-                using (Document partDoc = new Document())
+                // Create a new Document when starting the first PDF or when the page limit is reached
+                if (currentDoc == null || pageCountInCurrent >= PagesPerPdf)
                 {
-                    // Determine the last page index for this chunk (1‑based indexing)
-                    int endPage = Math.Min(startPage + maxPagesPerPdf - 1, totalPages);
-
-                    // Copy pages from the source document to the part document
-                    for (int i = startPage; i <= endPage; i++)
+                    // Dispose previous document if it exists
+                    if (currentDoc != null)
                     {
-                        // Pages collection is 1‑based; Add copies the page into the target document
-                        partDoc.Pages.Add(sourceDoc.Pages[i]);
+                        string outPath = Path.Combine(OutputFolder, $"Part_{pdfIndex:D3}.pdf");
+                        currentDoc.Save(outPath);
+                        Console.WriteLine($"Saved: {outPath}");
+                        currentDoc.Dispose();
+                        pdfIndex++;
                     }
 
-                    // Build the output file name with zero‑padded sequential numbering
-                    string outputPath = Path.Combine(outputDir, $"Part_{partNumber:D3}.pdf");
-
-                    // Save the part document (PDF format)
-                    partDoc.Save(outputPath);
-
-                    Console.WriteLine($"Saved {outputPath} (pages {startPage}-{endPage})");
+                    // Start a new PDF document
+                    currentDoc = new Document();
+                    pageCountInCurrent = 0;
                 }
 
-                partNumber++;
+                // Add a new page (Aspose.Pdf uses 1‑based indexing)
+                Page page = currentDoc.Pages.Add();
+
+                // Build a simple text representation of the record
+                string pageText = BuildRecordText(record);
+
+                // Create a TextFragment and add it to the page
+                TextFragment fragment = new TextFragment(pageText)
+                {
+                    // Optional formatting
+                    TextState = { FontSize = 12, Font = FontRepository.FindFont("Arial") }
+                };
+                page.Paragraphs.Add(fragment);
+
+                pageCountInCurrent++;
+            }
+
+            // Save the final document if it contains any pages
+            if (currentDoc != null && currentDoc.Pages.Count > 0)
+            {
+                string outPath = Path.Combine(OutputFolder, $"Part_{pdfIndex:D3}.pdf");
+                currentDoc.Save(outPath);
+                Console.WriteLine($"Saved: {outPath}");
+            }
+        }
+        finally
+        {
+            // Ensure the last document is disposed even if an exception occurs
+            currentDoc?.Dispose();
+        }
+    }
+
+    // Helper method to convert an XML node into a readable string
+    static string BuildRecordText(XmlNode recordNode)
+    {
+        // Simple concatenation of child element names and values
+        // Adjust formatting as required for your dataset
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.AppendLine("Record Details:");
+        sb.AppendLine("----------------");
+
+        foreach (XmlNode child in recordNode.ChildNodes)
+        {
+            if (child.NodeType == XmlNodeType.Element)
+            {
+                sb.AppendLine($"{child.Name}: {child.InnerText}");
             }
         }
 
-        Console.WriteLine("Pagination complete.");
+        return sb.ToString();
     }
 }

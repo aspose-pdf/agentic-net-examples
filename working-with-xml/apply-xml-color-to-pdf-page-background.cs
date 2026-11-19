@@ -7,82 +7,68 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "output.pdf";
-        const string colorXmlPath   = "backgroundColor.xml";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "colored_output.pdf";
+        const string colorXml  = "colors.xml";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf) || !File.Exists(colorXml))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine("Input PDF or XML color file not found.");
             return;
         }
 
-        if (!File.Exists(colorXmlPath))
-        {
-            Console.Error.WriteLine($"Color XML not found: {colorXmlPath}");
-            return;
-        }
-
-        // Load the XML and extract the color value (e.g., <BackgroundColor>#FFAA00</BackgroundColor>)
-        string hexColor = LoadHexColorFromXml(colorXmlPath);
+        // Load a hex color string (e.g. "#FFAA00") from the XML
+        string hexColor = LoadHexColor(colorXml);
         if (string.IsNullOrEmpty(hexColor))
         {
-            Console.Error.WriteLine("Failed to read background color from XML.");
+            Console.Error.WriteLine("No <PageColor> element found in XML.");
             return;
         }
 
-        // Convert hex string to Aspose.Pdf.Color (values are 0‑1 doubles)
-        Aspose.Pdf.Color bgColor = ColorFromHex(hexColor);
+        // Convert hex to normalized RGB values (0‑1) required by Aspose.Pdf.Color
+        (double r, double g, double b) = HexToRgb(hexColor);
 
-        // Open the PDF, apply the background color to each page, and save.
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Open the PDF and apply the background color to each page
+        using (Document doc = new Document(inputPdf))
         {
             // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = pdfDoc.Pages[i];
-                // Set the background color via the Page object (not PageInfo)
-                page.Background = bgColor;
+                Page page = doc.Pages[i];
+                // The background color is set on the Page object itself, not on PageInfo
+                page.Background = Aspose.Pdf.Color.FromRgb(r, g, b);
             }
 
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Background color applied and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Background color {hexColor} applied to all pages. Saved as '{outputPdf}'.");
     }
 
-    // Reads the first <BackgroundColor> element value from the XML file.
-    private static string LoadHexColorFromXml(string xmlPath)
+    // Reads the <PageColor> element value from the XML file
+    static string LoadHexColor(string xmlPath)
     {
-        try
-        {
-            XDocument doc = XDocument.Load(xmlPath);
-            XElement colorElement = doc.Root.Element("BackgroundColor");
-            return colorElement?.Value.Trim();
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error reading XML: {ex.Message}");
-            return null;
-        }
+        XDocument xdoc = XDocument.Load(xmlPath);
+        // Expected structure: <Colors><PageColor>#RRGGBB</PageColor></Colors>
+        XElement elem = xdoc.Root.Element("PageColor");
+        return elem?.Value.Trim();
     }
 
-    // Converts a hex color string (e.g., "#RRGGBB" or "RRGGBB") to Aspose.Pdf.Color.
-    private static Aspose.Pdf.Color ColorFromHex(string hex)
+    // Converts a hex string to normalized RGB components (0‑1 range)
+    static (double r, double g, double b) HexToRgb(string hex)
     {
-        // Remove leading '#', if present
         if (hex.StartsWith("#"))
             hex = hex.Substring(1);
 
         if (hex.Length != 6)
-            throw new ArgumentException("Hex color must be 6 characters long.");
+            return (0, 0, 0); // fallback to black on invalid format
 
-        // Parse RGB components
-        byte r = Convert.ToByte(hex.Substring(0, 2), 16);
-        byte g = Convert.ToByte(hex.Substring(2, 2), 16);
-        byte b = Convert.ToByte(hex.Substring(4, 2), 16);
+        int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+        int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+        int b = Convert.ToInt32(hex.Substring(4, 2), 16);
 
-        // Aspose.Pdf.Color expects values in the range 0‑1
-        return Aspose.Pdf.Color.FromRgb(r / 255.0, g / 255.0, b / 255.0);
+        return (r / 255.0, g / 255.0, b / 255.0);
     }
 }

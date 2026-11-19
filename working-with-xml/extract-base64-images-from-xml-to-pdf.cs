@@ -1,16 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // Image class lives here
+using Aspose.Pdf;                     // Core PDF API
+using Aspose.Pdf.Text;               // Required for text‑related types (not used here but safe)
 
-class Program
+class EmbedBase64Images
 {
     static void Main()
     {
-        const string xmlPath = "images.xml";
-        const string pdfPath = "output.pdf";
+        // Paths – adjust as needed
+        const string xmlPath   = "images.xml";
+        const string pdfPath   = "output.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -18,66 +19,51 @@ class Program
             return;
         }
 
-        // Load the XML document containing base64‑encoded images
-        XDocument xdoc = XDocument.Load(xmlPath);
-        // Assume each image is stored in an <ImageData> element
-        var imageElements = xdoc.Descendants("ImageData");
+        // Load XML and collect all Base64 strings inside <ImageData> elements
+        XDocument xDoc = XDocument.Load(xmlPath);
+        var base64Images = xDoc
+            .Descendants("ImageData")
+            .Select(e => e.Value.Trim())
+            .Where(v => !string.IsNullOrEmpty(v));
 
-        // Keep the memory streams alive until the PDF is saved
-        List<MemoryStream> streams = new List<MemoryStream>();
-
-        // Create a new PDF document (wrapped in using for deterministic disposal)
+        // Create a new PDF document – wrapped in a using block for deterministic disposal
         using (Document pdfDoc = new Document())
         {
-            int pageIndex = 0; // will be incremented to match 1‑based page indexing
-
-            foreach (var elem in imageElements)
+            int pageIndex = 1;
+            foreach (string b64 in base64Images)
             {
-                string base64 = elem.Value.Trim();
-                if (string.IsNullOrEmpty(base64))
-                    continue; // skip empty entries
-
-                // Decode the base64 string to a byte array
-                byte[] imgBytes;
+                // Decode the Base64 string to a byte array
+                byte[] imageBytes;
                 try
                 {
-                    imgBytes = Convert.FromBase64String(base64);
+                    imageBytes = Convert.FromBase64String(b64);
                 }
                 catch (FormatException)
                 {
-                    Console.Error.WriteLine("Invalid base64 string encountered; skipping this entry.");
+                    Console.Error.WriteLine($"Invalid Base64 data on image #{pageIndex}, skipping.");
                     continue;
                 }
 
-                // Add a new page for the image
-                pdfDoc.Pages.Add();
-                pageIndex++; // Aspose.Pdf uses 1‑based page indexing
+                // Add a new page for each image
+                Page page = pdfDoc.Pages.Add();
 
-                // Create a MemoryStream for the image data and keep it in the list
-                MemoryStream ms = new MemoryStream(imgBytes);
-                streams.Add(ms);
-
-                // Instantiate Image using the parameter‑less constructor and assign the stream
-                Image img = new Image
+                // Create an Aspose.Pdf.Image and feed it the decoded bytes via a MemoryStream
+                // Fully qualify the type to avoid ambiguity with System.Drawing.Image
+                Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
                 {
-                    ImageStream = ms,
-                    // Optional: scale the image to fit the page
-                    // FixWidth = pdfDoc.Pages[pageIndex].PageInfo.Width,
-                    // FixHeight = pdfDoc.Pages[pageIndex].PageInfo.Height
+                    ImageStream = new MemoryStream(imageBytes)
                 };
 
                 // Add the image to the page's paragraph collection
-                pdfDoc.Pages[pageIndex].Paragraphs.Add(img);
+                page.Paragraphs.Add(pdfImage);
+
+                pageIndex++;
             }
 
-            // Save the resulting PDF (no SaveOptions needed for PDF output)
+            // Save the resulting PDF
             pdfDoc.Save(pdfPath);
         }
 
-        // Dispose all streams after the document has been saved
-        foreach (var s in streams)
-            s.Dispose();
-
-        Console.WriteLine($"PDF successfully created at '{pdfPath}'.");
+        Console.WriteLine($"PDF with embedded images saved to '{pdfPath}'.");
     }
 }
