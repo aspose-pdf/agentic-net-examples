@@ -1,23 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Placeholder: replace with actual barcode generation logic (e.g., Aspose.BarCode or other library)
-    // Returns a byte array containing a PNG image of the barcode for the given identifier.
-    static byte[] GenerateBarcodeBytes(string identifier)
-    {
-        // For demonstration purposes, return an empty PNG byte array.
-        // Implement barcode generation here.
-        return new byte[0];
-    }
-
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_barcode.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_stamped.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -25,47 +16,52 @@ class Program
             return;
         }
 
-        // Load the PDF to obtain its unique identifier (using the document title as an example)
-        string uniqueId;
-        using (Document doc = new Document(inputPath))
+        // Load the PDF to obtain a unique identifier (use Title if present, otherwise file name)
+        string docId;
+        using (Document tempDoc = new Document(inputPath))
         {
-            uniqueId = doc.Info.Title ?? Guid.NewGuid().ToString();
+            docId = !string.IsNullOrEmpty(tempDoc.Info.Title)
+                ? tempDoc.Info.Title
+                : Path.GetFileNameWithoutExtension(inputPath);
         }
 
-        // Generate barcode image bytes for the identifier
-        byte[] barcodeBytes = GenerateBarcodeBytes(uniqueId);
-        if (barcodeBytes == null || barcodeBytes.Length == 0)
-        {
-            Console.Error.WriteLine("Barcode generation failed or returned empty data.");
-            return;
-        }
-
-        // Create an ImageStamp from the barcode image stream
-        ImageStamp barcodeStamp;
-        using (MemoryStream ms = new MemoryStream(barcodeBytes))
-        {
-            barcodeStamp = new ImageStamp(ms);
-        }
-
-        // Configure stamp appearance (size and alignment)
-        barcodeStamp.Width  = 150; // adjust as needed
-        barcodeStamp.Height = 50;  // adjust as needed
-        barcodeStamp.HorizontalAlignment = HorizontalAlignment.Center;
-        barcodeStamp.VerticalAlignment   = VerticalAlignment.Top;
-        barcodeStamp.Background = false; // make background transparent if supported
-
-        // Load the document again to apply the stamp to every page
+        // Load the PDF document and add a barcode field to each page
         using (Document pdfDoc = new Document(inputPath))
         {
+            int pageNumber = 1;
             foreach (Page page in pdfDoc.Pages)
             {
-                // Add the same stamp instance to each page
-                page.AddStamp(barcodeStamp);
+                // Define the rectangle where the barcode will be placed (top‑center of the page)
+                // Coordinates: lower‑left (x1, y1), upper‑right (x2, y2)
+                // Here we place a 150pt wide by 50pt high field 10pt below the top edge.
+                float pageWidth = (float)page.PageInfo.Width;               // cast double -> float
+                float fieldWidth = 150f;
+                float fieldHeight = 50f;
+                float x1 = (pageWidth - fieldWidth) / 2f;                    // centre horizontally
+                float y2 = (float)page.PageInfo.Height - 10f;                // 10pt from top, cast double -> float
+                float y1 = y2 - fieldHeight;                                 // bottom of the field
+                float x2 = x1 + fieldWidth;
+
+                var rect = new Aspose.Pdf.Rectangle(x1, y1, x2, y2);
+                var barcodeField = new TextBoxField(page, rect)
+                {
+                    PartialName = $"barcode_page_{pageNumber}"
+                };
+
+                // Add the field to the document's form collection (page index is 1‑based)
+                pdfDoc.Form.Add(barcodeField, pageNumber);
+
+                // Draw the barcode into the field. The AddBarcode method supports many symbologies;
+                // by default it uses Code128 when the string contains only ASCII characters.
+                barcodeField.AddBarcode(docId);
+
+                pageNumber++;
             }
 
+            // Save the stamped PDF
             pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Barcode stamp applied. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

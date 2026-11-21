@@ -1,76 +1,80 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputPdf = "output_icc.pdf";
-        const string iccPath = "profile.icc";
+        const string outputPdf = "output.pdf";
+        const string imagesFolder = "NewImages"; // folder with replacement images that already contain ICC profiles
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
-        if (!File.Exists(iccPath))
+        if (!Directory.Exists(imagesFolder))
         {
-            Console.Error.WriteLine($"ICC profile not found: {iccPath}");
+            Console.Error.WriteLine($"Images folder not found: {imagesFolder}");
             return;
         }
 
-        // Load ICC profile bytes once
-        byte[] iccData = File.ReadAllBytes(iccPath);
-
-        // Open PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Get all replacement image file paths
+        string[] replacementImages = Directory.GetFiles(imagesFolder, "*.*", SearchOption.TopDirectoryOnly);
+        if (replacementImages.Length == 0)
         {
-            // Iterate through all pages (1‑based indexing)
-            foreach (Page page in doc.Pages)
-            {
-                // Iterate over all images on the page
-                foreach (XImage img in page.Resources.Images)
-                {
-                    // Use reflection to access ImageInfo and its IccProfile property.
-                    // This works across Aspose.Pdf versions where ImageInfo may be missing.
-                    Type imgType = img.GetType();
-                    PropertyInfo imageInfoProp = imgType.GetProperty("ImageInfo", BindingFlags.Public | BindingFlags.Instance);
-                    if (imageInfoProp != null)
-                    {
-                        // Get or create ImageInfo instance
-                        object imageInfo = imageInfoProp.GetValue(img);
-                        if (imageInfo == null)
-                        {
-                            // ImageInfo type is usually Aspose.Pdf.ImageInfo
-                            Type imageInfoType = imgType.Assembly.GetType("Aspose.Pdf.ImageInfo");
-                            if (imageInfoType != null)
-                            {
-                                imageInfo = Activator.CreateInstance(imageInfoType);
-                                imageInfoProp.SetValue(img, imageInfo);
-                            }
-                        }
-
-                        if (imageInfo != null)
-                        {
-                            // Set the ICC profile if the property exists
-                            PropertyInfo iccProp = imageInfo.GetType().GetProperty("IccProfile", BindingFlags.Public | BindingFlags.Instance);
-                            if (iccProp != null && iccProp.CanWrite)
-                            {
-                                iccProp.SetValue(imageInfo, iccData);
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            Console.Error.WriteLine("No replacement images found.");
+            return;
         }
 
-        Console.WriteLine($"PDF saved with embedded ICC profiles: {outputPdf}");
+        try
+        {
+            // Load the source PDF
+            using (Document doc = new Document(inputPdf))
+            {
+                // Iterate through each page (1‑based indexing)
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                {
+                    Page page = doc.Pages[pageIndex];
+
+                    // Remove existing page contents (including any images)
+                    page.Paragraphs.Clear();
+
+                    // Starting Y position (from top of the page)
+                    double yPos = page.PageInfo.Height - 50; // start near the top margin
+
+                    foreach (string imgPath in replacementImages)
+                    {
+                        // Use ImageStamp – the core API that accepts a file path or stream.
+                        // ImageStamp keeps the original image dimensions if Width/Height are not set.
+                        ImageStamp imgStamp = new ImageStamp(imgPath)
+                        {
+                            // Position the stamp. YIndent is measured from the bottom of the page,
+                            // therefore we subtract the desired top offset from the page height.
+                            XIndent = 50,
+                            YIndent = yPos - 50 // a small offset from the calculated top position
+                        };
+
+                        // Add the stamp to the page.
+                        page.AddStamp(imgStamp);
+
+                        // Move the Y position down for the next image (add some spacing).
+                        yPos -= 150; // adjust this value based on typical image height or desired spacing
+                    }
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"PDF saved with ICC‑profiled images to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -1,11 +1,28 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
 class Program
 {
+    // Cubic Bézier helper – returns point on the curve for parameter t (0‑1)
+    private static (double X, double Y) BezierPoint(double t, double[] p0, double[] p1, double[] p2, double[] p3)
+    {
+        double u = 1 - t;
+        double x = u * u * u * p0[0] + 3 * u * u * t * p1[0] + 3 * u * t * t * p2[0] + t * t * t * p3[0];
+        double y = u * u * u * p0[1] + 3 * u * u * t * p1[1] + 3 * u * t * t * p2[1] + t * t * t * p3[1];
+        return (x, y);
+    }
+
+    // Derivative of the cubic Bézier – used to compute the tangent (angle) at t
+    private static (double X, double Y) BezierDerivative(double t, double[] p0, double[] p1, double[] p2, double[] p3)
+    {
+        double u = 1 - t;
+        double x = 3 * u * u * (p1[0] - p0[0]) + 6 * u * t * (p2[0] - p1[0]) + 3 * t * t * (p3[0] - p2[0]);
+        double y = 3 * u * u * (p1[1] - p0[1]) + 6 * u * t * (p2[1] - p1[1]) + 3 * t * t * (p3[1] - p2[1]);
+        return (x, y);
+    }
+
     static void Main()
     {
         const string inputPath = "input.pdf";
@@ -20,49 +37,41 @@ class Program
 
         using (Document doc = new Document(inputPath))
         {
-            // Define a quadratic Bezier curve for the watermark path
-            var start   = new Aspose.Pdf.Point(50, 400);
-            var control = new Aspose.Pdf.Point(300, 800);
-            var end     = new Aspose.Pdf.Point(550, 400);
-            var curvePoints = GetQuadraticBezierPoints(start, control, end, 20);
+            // Define the Bézier curve that the text will follow (page‑relative coordinates)
+            double[] p0 = { 50, 100 };   // bottom‑left
+            double[] p1 = { 200, 800 };  // first control
+            double[] p2 = { 400, 800 };  // second control
+            double[] p3 = { 550, 100 };  // top‑right
 
-            foreach (Page page in doc.Pages)
+            int charCount = watermarkText.Length;
+
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Place a small text stamp at each point to simulate a curved watermark
-                foreach (var pt in curvePoints)
+                Page page = doc.Pages[pageIndex];
+
+                for (int i = 0; i < charCount; i++)
                 {
-                    TextStamp stamp = new TextStamp(watermarkText);
-                    stamp.TextState.Font = FontRepository.FindFont("Arial");
-                    stamp.TextState.FontSize = 24;
-                    stamp.TextState.FontStyle = FontStyles.Bold;
-                    stamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.0, 0.0);
-                    stamp.Opacity = 0.3;
-                    stamp.XIndent = pt.X;
-                    stamp.YIndent = pt.Y;
-                    // Simple rotation can be added if desired
-                    stamp.RotateAngle = 0;
-                    page.AddStamp(stamp);
+                    double t = (i + 0.5) / charCount; // 0‑1 range
+                    var (x, y) = BezierPoint(t, p0, p1, p2, p3);
+                    var (dx, dy) = BezierDerivative(t, p0, p1, p2, p3);
+
+                    double angle = Math.Atan2(dy, dx) * 180.0 / Math.PI;
+
+                    TextFragment tf = new TextFragment(watermarkText[i].ToString());
+                    tf.TextState.FontSize = 48;
+                    tf.TextState.Font = FontRepository.FindFont("Arial");
+                    // 30% opacity → alpha ≈ 0.3 * 255 ≈ 77
+                    tf.TextState.ForegroundColor = Color.FromArgb(77, 204, 0, 0); // semi‑red with transparency
+                    tf.Position = new Position(x, y);
+                    tf.TextState.Rotation = angle;
+
+                    page.Paragraphs.Add(tf);
                 }
             }
 
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
-    }
-
-    // Generates points on a quadratic Bezier curve
-    static List<Aspose.Pdf.Point> GetQuadraticBezierPoints(Aspose.Pdf.Point p0, Aspose.Pdf.Point p1, Aspose.Pdf.Point p2, int segments)
-    {
-        var points = new List<Aspose.Pdf.Point>();
-        for (int i = 0; i <= segments; i++)
-        {
-            double t = (double)i / segments;
-            double oneMinusT = 1 - t;
-            double x = oneMinusT * oneMinusT * p0.X + 2 * oneMinusT * t * p1.X + t * t * p2.X;
-            double y = oneMinusT * oneMinusT * p0.Y + 2 * oneMinusT * t * p1.Y + t * t * p2.Y;
-            points.Add(new Aspose.Pdf.Point(x, y));
-        }
-        return points;
+        Console.WriteLine($"Watermarked PDF saved to '{Path.GetFullPath(outputPath)}'.");
     }
 }

@@ -1,105 +1,94 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Text.Json;
 using System.Xml.Linq;
+using System.Text.Json;
 
-namespace TaxRateUtility
+// Simple replacement for ASP.NET WebForms HiddenField control
+public class HiddenField
 {
-    // Minimal replacement for ASP.NET's HiddenField when System.Web is unavailable.
-    public class HiddenField
-    {
-        public string Value { get; set; } = string.Empty;
-    }
+    public string Value { get; set; } = string.Empty;
+}
 
-    public static class TaxRateLoader
+// The original class was a WebForms Page (System.Web.UI.Page) which is not available in
+// .NET 5/6+ projects.  We replace the inheritance with a plain class that can be used in
+// any .NET application (Console, ASP.NET Core, etc.).  The public API (LoadTaxRates) stays
+// the same, so existing callers only need to instantiate TaxPage and call LoadTaxRates.
+public class TaxPage
+{
+    // Hidden field that will hold the serialized tax rates for client‑side calculations
+    protected HiddenField hiddenTaxRates = new HiddenField();
+
+    // Simulates the original Page_Load behaviour.  In a real ASP.NET Core Razor page you
+    // would call this from OnGet/OnPost as appropriate.
+    public void Initialize(bool isPostBack, string xmlPath = @"C:\Data\taxrates.xml")
     {
-        /// <summary>
-        /// Loads tax rates from an XML file and stores them in a hidden field as JSON.
-        /// The hidden field can later be read on the client side for calculations.
-        /// </summary>
-        /// <param name="xmlFilePath">Full path to the XML file containing tax rates.</param>
-        /// <param name="hiddenField">The hidden field control to populate.</param>
-        public static void LoadTaxRates(string xmlFilePath, HiddenField hiddenField)
+        if (!isPostBack)
         {
-            if (string.IsNullOrWhiteSpace(xmlFilePath))
-                throw new ArgumentException("XML file path must be provided.", nameof(xmlFilePath));
-
-            if (hiddenField == null)
-                throw new ArgumentNullException(nameof(hiddenField));
-
-            if (!File.Exists(xmlFilePath))
-                throw new FileNotFoundException("Tax rates XML file not found.", xmlFilePath);
-
-            // Open the file in a using block to guarantee disposal.
-            using (FileStream stream = File.OpenRead(xmlFilePath))
-            {
-                XDocument doc = XDocument.Load(stream);
-
-                // Dictionary keyed by "Country|Type".
-                var rates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-
-                // Guard against a missing root element.
-                foreach (XElement rateElement in doc.Root?.Elements("Rate") ?? Array.Empty<XElement>())
-                {
-                    string country = (string)rateElement.Attribute("Country");
-                    string type = (string)rateElement.Attribute("Type");
-                    string valueStr = (string)rateElement.Attribute("Value");
-
-                    if (string.IsNullOrWhiteSpace(country) ||
-                        string.IsNullOrWhiteSpace(type) ||
-                        string.IsNullOrWhiteSpace(valueStr))
-                    {
-                        // Skip malformed entries.
-                        continue;
-                    }
-
-                    if (!decimal.TryParse(valueStr, out decimal value))
-                    {
-                        // Skip entries with invalid numeric values.
-                        continue;
-                    }
-
-                    string key = $"{country}|{type}";
-                    rates[key] = value;
-                }
-
-                // Serialize to JSON for client‑side consumption.
-                string json = JsonSerializer.Serialize(rates);
-                hiddenField.Value = json;
-            }
+            LoadTaxRates(xmlPath);
         }
     }
 
-    // Simple console entry point so the project compiles as an executable.
-    internal class Program
+    private void LoadTaxRates(string xmlPath)
     {
-        /// <summary>
-        /// Entry point required by the build system. Demonstrates loading tax rates when a file path is supplied.
-        /// </summary>
-        /// <param name="args">Command‑line arguments – the first argument should be the XML file path.</param>
-        private static void Main(string[] args)
+        XDocument doc;
+        try
         {
-            // If no argument is supplied we simply exit – this avoids null‑reference warnings.
-            if (args == null || args.Length == 0)
-            {
-                Console.WriteLine("Usage: TaxRateUtility <TaxRatesXmlPath>");
-                return;
-            }
-
-            string xmlPath = args[0];
-            var hidden = new HiddenField();
-
-            try
-            {
-                TaxRateLoader.LoadTaxRates(xmlPath, hidden);
-                Console.WriteLine("Tax rates loaded successfully. JSON payload stored in hidden field.");
-                Console.WriteLine(hidden.Value);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error: {ex.Message}");
-            }
+            // Load the XML document; XDocument implements IDisposable internally,
+            // but Load does not require an explicit using block.
+            doc = XDocument.Load(xmlPath);
         }
+        catch (Exception)
+        {
+            // If loading fails, ensure the hidden field is empty and exit.
+            hiddenTaxRates.Value = string.Empty;
+            return;
+        }
+
+        // Expected XML format:
+        // <TaxRates>
+        //   <Rate country="US" value="0.07" />
+        //   <Rate country="CA" value="0.13" />
+        //   ...
+        // </TaxRates>
+
+        var rates = new Dictionary<string, decimal>();
+
+        foreach (XElement rateElem in doc.Root.Elements("Rate"))
+        {
+            string country = (string)rateElem.Attribute("country");
+            string valueStr = (string)rateElem.Attribute("value");
+
+            if (string.IsNullOrWhiteSpace(country))
+                continue;
+
+            if (decimal.TryParse(valueStr, out decimal value))
+                rates[country] = value;
+        }
+
+        // Serialize the dictionary to JSON so JavaScript can read it easily.
+        // System.Text.Json is part of the base class library and does not require
+        // System.Web extensions.
+        string json = JsonSerializer.Serialize(rates);
+
+        // Populate the hidden field with the JSON string.
+        hiddenTaxRates.Value = json;
+    }
+
+    // Expose the hidden field value for callers (e.g., Razor view, API response)
+    public string GetSerializedTaxRates() => hiddenTaxRates.Value;
+}
+
+// Entry‑point required for a console‑style project.
+public class Program
+{
+    public static void Main(string[] args)
+    {
+        // Allow the XML path to be supplied via command line; fall back to a default.
+        string xmlPath = args.Length > 0 ? args[0] : "taxrates.xml";
+
+        var taxPage = new TaxPage();
+        taxPage.Initialize(isPostBack: false, xmlPath: xmlPath);
+
+        Console.WriteLine(taxPage.GetSerializedTaxRates());
     }
 }

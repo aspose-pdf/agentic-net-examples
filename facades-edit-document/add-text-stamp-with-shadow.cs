@@ -1,61 +1,63 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // FontRepository, TextState, Color
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "stamped_output.pdf";
         const string stampText = "Confidential";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document using the high‑level API (Document)
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document using the Document class (PdfFileEditor does not support AddStamp)
+        Document doc = new Document(inputPath);
 
         // ---------------------------------------------------------------------
-        // Create the shadow stamp (gray, slightly offset) – this mimics a shadow
+        // Create the *shadow* stamp (gray, slightly offset)
         // ---------------------------------------------------------------------
-        TextStamp shadowStamp = new TextStamp(stampText);
+        TextStamp shadowStamp = new TextStamp(stampText)
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Top,
+            XIndent = 2,               // offset a few points to the right
+            YIndent = -2,              // offset a few points down
+            TopMargin = 10             // distance from the top edge
+        };
         shadowStamp.TextState.Font = FontRepository.FindFont("Arial");
         shadowStamp.TextState.FontSize = 12;
-        shadowStamp.TextState.ForegroundColor = Color.Gray; // shadow colour
-        // Position the shadow – same alignment as the main stamp but with an offset
-        shadowStamp.HorizontalAlignment = HorizontalAlignment.Center;
-        shadowStamp.VerticalAlignment   = VerticalAlignment.Top;
-        shadowStamp.XIndent = 1;   // offset X (points) – positive moves right
-        shadowStamp.YIndent = 9;   // offset Y (points) – because YIndent is measured from bottom
-        // The YIndent value is calculated as (top margin) - offsetY.
-        // Since we use Top alignment with a 10‑point top margin, the effective Y position
-        // for the shadow becomes 10 pts (top margin) - 1 pt (offsetY) = 9 pts.
+        shadowStamp.TextState.ForegroundColor = Color.Gray;
 
-        // ---------------------------------------------------------------
-        // Create the actual visible stamp (black, no offset, on top of shadow)
-        // ---------------------------------------------------------------
-        TextStamp mainStamp = new TextStamp(stampText);
+        // ---------------------------------------------------------------------
+        // Create the main stamp (black, positioned exactly on top of the shadow)
+        // ---------------------------------------------------------------------
+        TextStamp mainStamp = new TextStamp(stampText)
+        {
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Top,
+            TopMargin = 10            // same top margin as the shadow stamp
+        };
         mainStamp.TextState.Font = FontRepository.FindFont("Arial");
         mainStamp.TextState.FontSize = 12;
         mainStamp.TextState.ForegroundColor = Color.Black;
-        mainStamp.HorizontalAlignment = HorizontalAlignment.Center;
-        mainStamp.VerticalAlignment   = VerticalAlignment.Top;
-        mainStamp.YIndent = 10; // distance from the top edge in points
-        // No XIndent needed because we centre horizontally.
 
-        // Add both stamps to the first page – shadow first, then the main stamp.
-        Page firstPage = pdfDocument.Pages[1];
-        firstPage.AddStamp(shadowStamp);
-        firstPage.AddStamp(mainStamp);
+        // ---------------------------------------------------------------------
+        // Apply both stamps to the first page using Page.AddStamp
+        // ---------------------------------------------------------------------
+        Page firstPage = doc.Pages[1];
+        firstPage.AddStamp(shadowStamp); // draw shadow first
+        firstPage.AddStamp(mainStamp);   // draw main text on top of shadow
 
         // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Text stamp with shadow added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text stamp with shadow applied and saved to '{outputPath}'.");
     }
 }

@@ -1,51 +1,62 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // Added for Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";   // source PDF
-        const string outputDir = "TiffPages"; // folder for TIFF images
-        const int dpi = 400;                    // desired resolution
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "TiffPages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // PdfConverter implements IDisposable – use a using block for deterministic cleanup
-        using (PdfConverter converter = new PdfConverter())
+        try
         {
-            // Bind the PDF document to the converter
-            converter.BindPdf(inputPdf);
-
-            // Set the resolution (DPI) for the output images using a Resolution object
-            converter.Resolution = new Resolution(dpi);
-
-            // Define the page range to convert (all pages)
-            converter.StartPage = 1;
-            converter.EndPage   = converter.PageCount; // available after BindPdf
-
-            // Prepare the conversion
-            converter.DoConvert();
-
-            // Loop through each page and save as a separate TIFF image
-            for (int page = converter.StartPage; page <= converter.EndPage; page++)
+            // Load the PDF document
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                string outPath = Path.Combine(outputDir, $"page_{page}.tiff");
-                // GetNextImage infers the format from the file extension (TIFF here)
-                converter.GetNextImage(outPath);
-                Console.WriteLine($"Saved page {page} as TIFF → {outPath}");
-            }
-        }
+                // Convert each page to a separate TIFF image using PdfConverter (cross‑platform API)
+                for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+                {
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.tiff");
 
-        Console.WriteLine("PDF to TIFF conversion completed.");
+                    // PdfConverter must be created per page when using the newer API
+                    using (PdfConverter converter = new PdfConverter())
+                    {
+                        // Bind the source PDF
+                        converter.BindPdf(pdfDoc);
+
+                        // Define the page range (single page) and resolution (400 DPI)
+                        converter.StartPage = pageNumber;
+                        converter.EndPage   = pageNumber;
+                        converter.Resolution = new Resolution(400);
+
+                        // Prepare the conversion
+                        converter.DoConvert();
+
+                        // Save the selected page as a TIFF image
+                        converter.SaveAsTIFF(outputPath);
+                    }
+
+                    Console.WriteLine($"Saved page {pageNumber} as TIFF: {outputPath}");
+                }
+            }
+
+            Console.WriteLine("PDF to TIFF conversion completed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"An error occurred during conversion: {ex.Message}");
+        }
     }
 }

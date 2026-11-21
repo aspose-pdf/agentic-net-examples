@@ -1,58 +1,85 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Define output PDF path
         const string outputPath = "AcroFormWithTooltips.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            // Add a single page (pages are 1‑based)
-            Page page = doc.Pages.Add();
+            // Add a page to the document
+            Aspose.Pdf.Page page = doc.Pages.Add();
 
-            // Define a rectangle for the first text box field
-            Aspose.Pdf.Rectangle nameRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
-            // Create a text box field, set its name, tooltip (via Contents) and initial value
-            TextBoxField nameField = new TextBoxField(page, nameRect)
-            {
-                PartialName = "FullName",
-                Value       = ""
-            };
-            // Set tooltip using the Contents property (the tooltip text for widget annotations)
-            nameField.Contents = "Enter your full name";
-            // Add the field to the document's form collection
-            doc.Form.Add(nameField);
+            // Load a font for field labels
+            Aspose.Pdf.Text.Font font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
 
-            // Define a rectangle for a second text box field (e.g., email)
-            Aspose.Pdf.Rectangle emailRect = new Aspose.Pdf.Rectangle(100, 650, 300, 680);
-            TextBoxField emailField = new TextBoxField(page, emailRect)
-            {
-                PartialName = "EmailAddress",
-                Value       = ""
-            };
-            emailField.Contents = "Enter your email address";
-            doc.Form.Add(emailField);
+            // ----- Name field -----
+            // Label
+            Aspose.Pdf.Text.TextFragment nameLabel = new Aspose.Pdf.Text.TextFragment("Name:");
+            nameLabel.Position = new Aspose.Pdf.Text.Position(50, 750);
+            nameLabel.TextState.Font = font;
+            nameLabel.TextState.FontSize = 12;
+            page.Paragraphs.Add(nameLabel);
 
-            // Define a rectangle for a checkbox field
-            Aspose.Pdf.Rectangle agreeRect = new Aspose.Pdf.Rectangle(100, 600, 115, 615);
-            CheckboxField agreeField = new CheckboxField(page, agreeRect)
-            {
-                PartialName = "AgreeTerms",
-                Checked     = false
-            };
-            agreeField.Contents = "Check to agree to the terms and conditions";
-            doc.Form.Add(agreeField);
+            // TextBox field
+            Aspose.Pdf.Forms.TextBoxField nameField = new Aspose.Pdf.Forms.TextBoxField(
+                page,
+                new Aspose.Pdf.Rectangle(150, 735, 350, 755));
+            nameField.PartialName = "NameField";
+            nameField.Value = "";
+            // Use AlternateName for tooltip (Tooltip property does not exist)
+            nameField.AlternateName = "Enter the full name of the person.";
+            doc.Form.Add(nameField, 1);
 
-            // Save the PDF (no SaveOptions needed for PDF format)
+            // ----- Age field -----
+            // Label
+            Aspose.Pdf.Text.TextFragment ageLabel = new Aspose.Pdf.Text.TextFragment("Age:");
+            ageLabel.Position = new Aspose.Pdf.Text.Position(50, 710);
+            ageLabel.TextState.Font = font;
+            ageLabel.TextState.FontSize = 12;
+            page.Paragraphs.Add(ageLabel);
+
+            // TextBox field
+            Aspose.Pdf.Forms.TextBoxField ageField = new Aspose.Pdf.Forms.TextBoxField(
+                page,
+                new Aspose.Pdf.Rectangle(150, 695, 200, 715));
+            ageField.PartialName = "AgeField";
+            ageField.Value = "";
+            ageField.AlternateName = "Enter the age in years.";
+            doc.Form.Add(ageField, 1);
+
+            // ----- Subscribe checkbox -----
+            // Label
+            Aspose.Pdf.Text.TextFragment subscribeLabel = new Aspose.Pdf.Text.TextFragment("Subscribe to newsletter:");
+            subscribeLabel.Position = new Aspose.Pdf.Text.Position(50, 670);
+            subscribeLabel.TextState.Font = font;
+            subscribeLabel.TextState.FontSize = 12;
+            page.Paragraphs.Add(subscribeLabel);
+
+            // CheckBox field (correct class name is CheckboxField)
+            Aspose.Pdf.Forms.CheckboxField subscribeCheck = new Aspose.Pdf.Forms.CheckboxField(
+                page,
+                new Aspose.Pdf.Rectangle(250, 655, 265, 670));
+            subscribeCheck.PartialName = "SubscribeCheck";
+            subscribeCheck.Checked = false;
+            subscribeCheck.AlternateName = "Check to receive the newsletter.";
+            doc.Form.Add(subscribeCheck, 1);
+
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with AcroForm fields and tooltips saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

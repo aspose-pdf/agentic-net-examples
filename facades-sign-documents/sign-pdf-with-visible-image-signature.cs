@@ -1,14 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Expect two arguments: input PDF path and signature image path
-        if (args.Length != 2)
+        // Expect two arguments: PDF file path and signature image path
+        if (args.Length < 2)
         {
             Console.Error.WriteLine("Usage: <app> <pdfPath> <signatureImagePath>");
             return;
@@ -25,45 +24,47 @@ class Program
 
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Signature image file not found: {imagePath}");
+            Console.Error.WriteLine($"Signature image not found: {imagePath}");
             return;
         }
 
-        // Prepare output file name
+        // Output file will be the original name with "_signed.pdf" suffix
         string outputPath = Path.Combine(
             Path.GetDirectoryName(pdfPath) ?? string.Empty,
             Path.GetFileNameWithoutExtension(pdfPath) + "_signed.pdf");
 
         try
         {
-            // Create an ImageStamp for the signature image
-            ImageStamp signatureStamp = new ImageStamp(imagePath)
-            {
-                // Position the stamp at the bottom‑right corner of the page
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
-                // Use individual margin properties instead of a non‑existent Margin object
-                BottomMargin = 20,
-                RightMargin  = 20,
-                // Set opacity if desired (1.0 = fully opaque)
-                Opacity = 1.0
-            };
-
-            // Load the PDF document
+            // Load the source PDF using the high‑level Document API (PdfContentEditor does not expose AddImageStamp)
             using (Document doc = new Document(pdfPath))
             {
-                // Iterate through all pages (1‑based indexing) and stamp each page
-                for (int i = 1; i <= doc.Pages.Count; i++)
-                {
-                    Page page = doc.Pages[i];
-                    page.AddStamp(signatureStamp);
-                }
+                // Define the rectangle where the signature will be placed (points, 1/72 inch)
+                double llx = 400; // left X
+                double lly = 50;  // lower Y
+                double urx = 550; // right X
+                double ury = 150; // upper Y
 
-                // Save the modified document
+                // Create an ImageStamp and position it using margins and size
+                ImageStamp imgStamp = new ImageStamp(imagePath)
+                {
+                    // Width and Height are derived from the rectangle size
+                    Width = urx - llx,
+                    Height = ury - lly,
+                    // Margins position the stamp on the page
+                    LeftMargin = llx,
+                    BottomMargin = lly,
+                    // Optional: keep the original image aspect ratio
+                    // ScaleProportionally = true
+                };
+
+                // Add the stamp to the first page (pages are 1‑based)
+                doc.Pages[1].AddStamp(imgStamp);
+
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Signature image applied. Output saved to: {outputPath}");
+            Console.WriteLine($"Signed PDF saved to: {outputPath}");
         }
         catch (Exception ex)
         {

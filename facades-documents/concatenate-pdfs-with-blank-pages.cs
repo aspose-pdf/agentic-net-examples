@@ -11,26 +11,21 @@ class Program
         // Input PDF files to be concatenated
         string[] inputPdfs = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
         // Output file path
-        const string outputPdf = "merged_with_blank.pdf";
-        // Temporary blank PDF file path
-        const string blankPdf = "blank_temp.pdf";
+        string outputPdf = "merged_with_blank.pdf";
 
-        // -----------------------------------------------------------------
-        // Create a temporary PDF that contains a single blank page.
-        // This file will be inserted between each source document.
-        // -----------------------------------------------------------------
+        // Temporary blank PDF file (single blank page)
+        string blankPdfPath = Path.Combine(Path.GetTempPath(), "blank_temp.pdf");
+
+        // Create a blank PDF with one empty page
         using (Document blankDoc = new Document())
         {
-            // Add an empty page to the document
+            // Add an empty page
             blankDoc.Pages.Add();
-            // Save the blank PDF to a temporary file
-            blankDoc.Save(blankPdf);
+            // Save to temporary location
+            blankDoc.Save(blankPdfPath);
         }
 
-        // -----------------------------------------------------------------
-        // Build the ordered list of files to merge:
-        //   source1.pdf, blank.pdf, source2.pdf, blank.pdf, source3.pdf
-        // -----------------------------------------------------------------
+        // Build the list of files to merge, inserting the blank page between each document
         List<string> filesToMerge = new List<string>();
         for (int i = 0; i < inputPdfs.Length; i++)
         {
@@ -44,26 +39,25 @@ class Program
                 continue; // skip missing file
             }
 
-            // Insert a blank page after each document except the last one
+            // Add the blank page after each document except the last one
             if (i < inputPdfs.Length - 1)
             {
-                filesToMerge.Add(blankPdf);
+                filesToMerge.Add(blankPdfPath);
             }
         }
 
-        // -----------------------------------------------------------------
-        // Concatenate the PDFs using Aspose.Pdf.Facades.PdfFileEditor.
-        // PdfFileEditor does NOT implement IDisposable, so no using block.
-        // -----------------------------------------------------------------
+        // Concatenate using PdfFileEditor (does NOT implement IDisposable, so no using)
         PdfFileEditor editor = new PdfFileEditor();
         editor.Concatenate(filesToMerge.ToArray(), outputPdf);
 
-        // -----------------------------------------------------------------
-        // Clean up the temporary blank PDF.
-        // -----------------------------------------------------------------
-        if (File.Exists(blankPdf))
+        // Clean up the temporary blank PDF
+        try
         {
-            File.Delete(blankPdf);
+            File.Delete(blankPdfPath);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Could not delete temporary file: {ex.Message}");
         }
 
         Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");

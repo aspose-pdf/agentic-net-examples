@@ -6,43 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";               // source PDF
-        const string attachmentFilePath = "Invoice2023.pdf";   // file to attach
-        const string outputPdfPath = "output.pdf";             // result PDF
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string attachmentPath = "Invoice2023.pdf";   // file to attach
+        const string attachmentDesc = "Invoice2023";
 
-        // Verify that required files exist
+        // Ensure source files exist
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
-        if (!File.Exists(attachmentFilePath))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
             return;
         }
 
-        // Load the source PDF using the Document class (the recommended way for manipulation).
-        Document pdfDoc = new Document(inputPdfPath);
-
-        // Create a FileSpecification for the attachment.
-        // The current Aspose.Pdf API does not expose CreationDate/ModDate on FileSpecification,
-        // so we embed the creation timestamp in the description (or a custom dictionary if needed).
-        var fileSpec = new FileSpecification(Path.GetFileName(attachmentFilePath))
+        // Load the PDF, add the attachment with description and creation date, then save.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Description = $"Invoice2023 (Created: {DateTime.Now:O})",
-            // Load the file contents into a memory stream as required by the EmbeddedFiles collection.
-            Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath))
-        };
+            // Create a FileSpecification for the embedded file.
+            var fileSpec = new FileSpecification(attachmentPath, attachmentDesc)
+            {
+                // Embed the file contents.
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
+            };
 
-        // Add the attachment to the PDF via the EmbeddedFiles collection.
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // The FileSpecification class no longer exposes CreationDate/ModDate directly.
+            // Use the Params.ModDate property to store the current time (acts as creation date).
+            fileSpec.Params.ModDate = DateTime.Now;
 
-        // Save the modified PDF, overwriting any existing output file.
-        if (File.Exists(outputPdfPath))
-            File.Delete(outputPdfPath);
-        pdfDoc.Save(outputPdfPath);
+            // Add the file to the PDF's EmbeddedFiles collection.
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdfPath}'.");
+            pdfDoc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"Attachment added to '{outputPdfPath}' with description '{attachmentDesc}'.");
     }
 }

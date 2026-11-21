@@ -17,14 +17,15 @@ class Program
         }
 
         // Load the PDF document
-        Document doc = new Document(inputPath);
+        using (Document doc = new Document(inputPath))
+        {
+            // Disable font embedding by unembedding fonts during optimization
+            var opt = new OptimizationOptions { UnembedFonts = true };
+            doc.OptimizeResources(opt);
 
-        // Disable font embedding using OptimizationOptions
-        var opt = new OptimizationOptions { UnembedFonts = true };
-        doc.OptimizeResources(opt);
-
-        // Save the document
-        doc.Save(outputPath);
+            // Save the optimized document (fonts will not be embedded)
+            doc.Save(outputPath);
+        }
 
         Console.WriteLine($"PDF saved without embedded fonts to '{outputPath}'.");
     }

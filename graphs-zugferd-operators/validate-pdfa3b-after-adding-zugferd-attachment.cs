@@ -6,68 +6,48 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";      // existing PDF/A‑3 document
-        const string zugferdXmlPath = "invoice.xml";   // ZUGFeRD XML file to embed
-        const string outputPdfPath  = "output_with_zugferd.pdf";
-        const string validationLogPath = "validation.log"; // log file for PDF/A validation
+        const string inputPdf = "input.pdf";
+        const string xmlAttachment = "invoice.xml";
+        const string outputPdf = "output_pdfa3.pdf";
+        const string validationLog = "validation_log.xml";
 
-        // Verify input files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf) || !File.Exists(xmlAttachment))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(zugferdXmlPath))
-        {
-            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXmlPath}");
+            Console.Error.WriteLine("Required files not found.");
             return;
         }
 
-        // Load the PDF/A‑3 document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Create a FileSpecification for the ZUGFeRD XML and embed it
-            using (FileStream xmlStream = File.OpenRead(zugferdXmlPath))
+            // Load the source PDF
+            using (Document doc = new Document(inputPdf))
             {
-                var zugferdSpec = new FileSpecification(xmlStream, Path.GetFileName(zugferdXmlPath), "ZUGFeRD invoice data")
+                // Embed ZUGFeRD XML as an embedded file (PDF/A‑3 requires embedded files, not Attachments)
+                byte[] xmlData = File.ReadAllBytes(xmlAttachment);
+                var fileSpec = new FileSpecification(xmlAttachment, "ZUGFeRD Invoice XML")
                 {
-                    // Set MIME type and relationship (AFRelationship.Data indicates attached data)
-                    MIMEType      = "application/xml",
-                    AFRelationship = AFRelationship.Data
+                    MIMEType = "application/xml",
+                    AFRelationship = AFRelationship.Data,
+                    Contents = new MemoryStream(xmlData)
                 };
+                doc.EmbeddedFiles.Add(fileSpec);
 
-                // Add the file specification to the EmbeddedFiles collection (required for PDF/A‑3)
-                doc.EmbeddedFiles.Add(zugferdSpec);
+                // Convert to PDF/A‑3U (required for ZUGFeRD compliance)
+                doc.Convert(validationLog, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
+
+                // Validate PDF/A compliance – Document.Validate returns a bool, not a ValidationResult
+                bool isCompliant = doc.Validate(validationLog, PdfFormat.PDF_A_3U);
+                Console.WriteLine($"PDF/A compliance: {(isCompliant ? "OK" : "FAIL")}");
+
+                // Save the final PDF/A‑3U document
+                doc.Save(outputPdf);
             }
 
-            // Run PDF/A‑3U compliance check. The Validate method returns a bool and writes details to a log file.
-            bool isCompliant = doc.Validate(validationLogPath, PdfFormat.PDF_A_3U);
-
-            // Output compliance result
-            if (isCompliant)
-            {
-                Console.WriteLine("Document remains PDF/A‑3U compliant after adding ZUGFeRD attachment.");
-            }
-            else
-            {
-                Console.WriteLine("Document is NOT PDF/A‑3U compliant after adding ZUGFeRD attachment.");
-                Console.WriteLine("Compliance errors (from log file):");
-                if (File.Exists(validationLogPath))
-                {
-                    foreach (var line in File.ReadAllLines(validationLogPath))
-                    {
-                        Console.WriteLine($"- {line}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("- No log file was generated.");
-                }
-            }
-
-            // Save the modified PDF (still a PDF, so no special SaveOptions needed)
-            doc.Save(outputPdfPath);
-            Console.WriteLine($"Modified PDF saved to '{outputPdfPath}'.");
+            Console.WriteLine($"PDF/A‑3U file with ZUGFeRD attachment saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

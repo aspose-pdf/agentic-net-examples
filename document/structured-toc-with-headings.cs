@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -17,88 +16,81 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Create Heading objects with the correct constructor and style usage
-            // -----------------------------------------------------------------
-            var headings = new List<Heading>
+            // Insert a new page at the beginning to hold the Table of Contents
+            Page tocPage = doc.Pages.Insert(1);
+
+            // Common text style for headings
+            TextState headingState = new TextState
             {
-                new Heading(1)
-                {
-                    Text = "Chapter 1 – Introduction",
-                    IsAutoSequence = true,
-                    Style = NumberingStyle.NumeralsArabic // decimal (1, 2, 3, …)
-                },
-                new Heading(1)
-                {
-                    Text = "Chapter 2 – Background",
-                    IsAutoSequence = true,
-                    Style = NumberingStyle.NumeralsRomanUppercase // I, II, III, …
-                },
-                new Heading(2)
-                {
-                    Text = "Section 2.1 – History",
-                    IsAutoSequence = true,
-                    Style = NumberingStyle.LettersLowercase // a, b, c, …
-                },
-                new Heading(2)
-                {
-                    Text = "Section 2.2 – Current State",
-                    IsAutoSequence = true,
-                    Style = NumberingStyle.LettersUppercase // A, B, C, …
-                },
-                new Heading(1)
-                {
-                    Text = "Appendix A – References",
-                    IsAutoSequence = true,
-                    Style = NumberingStyle.NumeralsRomanLowercase // i, ii, iii, …
-                }
+                FontSize = 14,
+                FontStyle = FontStyles.Bold,
+                Font = FontRepository.FindFont("Arial")
             };
 
-            // ---------------------------------------------------------------
-            // 2. Build a simple TOC page using the core Aspose.Pdf API
-            // ---------------------------------------------------------------
-            // Insert a new page at the beginning of the document
-            Page tocPage = doc.Pages.Insert(1);
-            // Starting vertical position (top of the page)
-            float yPos = 800;
-            foreach (var heading in headings)
+            // Helper to create a heading and add it to the TOC page
+            void AddHeading(int level, NumberingStyle numberingStyle, string title, Page destinationPage, double topPosition)
             {
-                // Indent according to the heading level
-                string indent = new string(' ', (heading.Level - 1) * 4);
-                // Create a text fragment for the TOC entry
-                TextFragment tf = new TextFragment(indent + heading.Text)
+                Heading heading = new Heading(level)
                 {
-                    Position = new Position(50, yPos),
-                    // Reduce font size for deeper levels (optional visual cue)
-                    TextState = { FontSize = 12 - (heading.Level - 1) }
+                    IsAutoSequence = true,          // automatically generate page number reference
+                    TocPage = tocPage,               // page where the TOC entry will be placed
+                    DestinationPage = destinationPage,
+                    Top = topPosition,
+                    Style = numberingStyle          // set numbering style
                 };
-                tocPage.Paragraphs.Add(tf);
-                yPos -= 20; // Move down for the next entry
+
+                // Create the visible text segment
+                TextSegment segment = new TextSegment(title);
+                // Apply the common style (modify the existing TextState, do NOT replace it)
+                segment.TextState.FontSize = headingState.FontSize;
+                segment.TextState.FontStyle = headingState.FontStyle;
+                segment.TextState.Font = headingState.Font;
+
+                heading.Segments.Add(segment);
+                tocPage.Paragraphs.Add(heading);
             }
 
-            // ---------------------------------------------------------------
-            // 3. (Optional) Add bookmarks to the document outline for navigation
-            // ---------------------------------------------------------------
-            foreach (var heading in headings)
-            {
-                // Create a bookmark (outline item) for each heading.
-                // In a real scenario you would also set the Destination to the page
-                // where the heading actually appears.
-                OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
-                {
-                    Title = heading.Text,
-                    Open = true // expanded by default; set false to collapse
-                };
-                doc.Outlines.Add(bookmark);
-            }
+            // Determine a destination page for the example (the first page after the TOC)
+            Page firstContentPage = doc.Pages.Count > 1 ? doc.Pages[2] : doc.Pages[1];
+
+            // 1. Decimal numbering (1., 2., …)
+            AddHeading(
+                level: 1,
+                numberingStyle: NumberingStyle.NumeralsArabic,
+                title: "Chapter 1 – Introduction",
+                destinationPage: firstContentPage,
+                topPosition: 20);
+
+            // 2. Upper‑roman numbering (I., II., …)
+            AddHeading(
+                level: 1,
+                numberingStyle: NumberingStyle.NumeralsRomanUppercase,
+                title: "Chapter 2 – Background",
+                destinationPage: firstContentPage,
+                topPosition: 50);
+
+            // 3. Lower‑letter numbering for a sub‑heading (a., b., …)
+            AddHeading(
+                level: 2,
+                numberingStyle: NumberingStyle.LettersLowercase,
+                title: "2.1 Details",
+                destinationPage: firstContentPage,
+                topPosition: 80);
+
+            // 4. No numbering (plain text)
+            AddHeading(
+                level: 1,
+                numberingStyle: NumberingStyle.None,
+                title: "Appendix A – References",
+                destinationPage: firstContentPage,
+                topPosition: 110);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with structured Table of Contents saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with Table of Contents saved to '{outputPath}'.");
     }
 }

@@ -6,47 +6,44 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "custom_row_height.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure proper disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table with three columns of equal width
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
+        {
+            // Create a table and add it to the first page
             Table table = new Table
             {
-                ColumnWidths = "100 100 100"
+                // Define column widths (optional)
+                ColumnWidths = "150 150"
             };
+            doc.Pages[1].Paragraphs.Add(table); // Pages are 1‑based
 
-            // Add a header row and set its custom height (40 points)
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
-            header.FixedRowHeight = 40; // Fixed point value for row height
+            // Add a new row to the table
+            Row row = table.Rows.Add();
 
-            // Add a second row and set a different custom height (30 points)
-            Row row2 = table.Rows.Add();
-            row2.Cells.Add("Cell 1");
-            row2.Cells.Add("Cell 2");
-            row2.Cells.Add("Cell 3");
-            row2.FixedRowHeight = 30; // Fixed point value for row height
+            // Set a fixed height for this row (value is in points)
+            row.FixedRowHeight = 40; // 40 points ≈ 0.56 inch
 
-            // Add a third row without custom height (uses default)
-            Row row3 = table.Rows.Add();
-            row3.Cells.Add("Data 1");
-            row3.Cells.Add("Data 2");
-            row3.Cells.Add("Data 3");
+            // Add cells to the row
+            Cell cell1 = row.Cells.Add("Cell 1");
+            Cell cell2 = row.Cells.Add("Cell 2");
 
-            // Insert the table into the page's paragraph collection
-            page.Paragraphs.Add(table);
+            // Optional: set cell text formatting
+            cell1.DefaultCellTextState.FontSize = 12;
+            cell2.DefaultCellTextState.FontSize = 12;
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom row height to '{outputPath}'.");
     }
 }

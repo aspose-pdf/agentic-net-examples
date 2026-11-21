@@ -7,42 +7,51 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string thumbnailPath = "thumb.png";
+        const string pdfPath = "input.pdf";          // PDF generated from XML
+        const string thumbnailPath = "thumbnail.png";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document with deterministic disposal
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // Verify that the document contains at least one page
+            // Verify that the document has at least one page
             if (pdfDoc.Pages.Count < 1)
             {
-                Console.Error.WriteLine("The PDF does not contain any pages.");
+                Console.Error.WriteLine("PDF contains no pages.");
                 return;
             }
 
-            // Define the resolution (DPI) for the thumbnail image
-            Resolution resolution = new Resolution(150); // 150 DPI gives a reasonable thumbnail size
+            // Aspose.Pdf uses 1‑based indexing for pages
+            Page firstPage = pdfDoc.Pages[1];
 
-            // Create a PNG device. Width and height set to 0 keep the original page dimensions.
-            PngDevice pngDevice = new PngDevice(0, 0, resolution);
+            // Define the resolution for the thumbnail (e.g., 150 DPI)
+            const int resolution = 150;
 
-            // Render the first page to a memory stream
+            // Devices are concrete but do NOT implement IDisposable – do NOT wrap them in a using block
+            var pngDevice = new PngDevice(new Resolution(resolution))
+            {
+                TransparentBackground = true // optional, makes background transparent
+            };
+
+            // Render the first page into a memory stream
             using (MemoryStream imageStream = new MemoryStream())
             {
-                // Process the first page (pages are 1‑based)
-                pngDevice.Process(pdfDoc.Pages[1], imageStream);
+                pngDevice.Process(firstPage, imageStream);
+                imageStream.Position = 0; // Reset stream before writing
 
-                // Save the resulting PNG bytes to a file
-                File.WriteAllBytes(thumbnailPath, imageStream.ToArray());
+                // Save the PNG bytes to the output file
+                using (FileStream fileStream = new FileStream(thumbnailPath, FileMode.Create, FileAccess.Write))
+                {
+                    imageStream.CopyTo(fileStream);
+                }
             }
-
-            Console.WriteLine($"Thumbnail image saved to '{thumbnailPath}'.");
         }
+
+        Console.WriteLine($"Thumbnail saved to '{thumbnailPath}'.");
     }
 }

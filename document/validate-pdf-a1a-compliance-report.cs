@@ -2,12 +2,11 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PdfAValidatorProgram
+class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string logPath = "validation_log.txt";
         const string reportPath = "validation_report.txt";
 
         if (!File.Exists(inputPath))
@@ -16,24 +15,29 @@ class PdfAValidatorProgram
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Validate against PDF/A‑1A conformance.
-            // Document.Validate returns a bool indicating overall validity and writes a detailed log file.
-            bool isValid = doc.Validate(logPath, PdfFormat.PDF_A_1A);
-
-            // Build a concise validation report and reference the detailed log.
-            using (StreamWriter writer = new StreamWriter(reportPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                writer.WriteLine($"PDF/A‑1A validation report for '{Path.GetFileName(inputPath)}'");
-                writer.WriteLine($"IsValid: {isValid}");
-                writer.WriteLine();
-                writer.WriteLine($"A detailed validation log has been saved to '{logPath}'.");
-                writer.WriteLine("You can inspect this file for the list of errors and warnings.");
-            }
+                // Validate the PDF against PDF/A‑1A conformance.
+                // The Validate method writes a detailed log to the supplied file and returns a bool indicating compliance.
+                bool isCompliant = doc.Validate(reportPath, PdfFormat.PDF_A_1A);
 
-            Console.WriteLine($"Validation report saved to '{reportPath}'.");
+                // Append a short summary to the same report file.
+                using (StreamWriter writer = new StreamWriter(reportPath, true))
+                {
+                    writer.WriteLine();
+                    writer.WriteLine("--- Summary ---");
+                    writer.WriteLine($"PDF/A‑1A compliant: {isCompliant}");
+                }
+
+                Console.WriteLine($"Validation completed. Report saved to '{reportPath}'.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

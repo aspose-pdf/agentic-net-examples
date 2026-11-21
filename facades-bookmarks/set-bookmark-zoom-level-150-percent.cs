@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_bookmarked.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +16,45 @@ class Program
             return;
         }
 
-        // Bind the PDF to the bookmark editor (PdfBookmarkEditor does NOT implement IDisposable)
-        PdfBookmarkEditor editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPath);
-
-        // Extract existing bookmarks
-        Bookmarks bookmarks = editor.ExtractBookmarks();
-
-        // Update each bookmark to open at 150% zoom (XYZ destination with Zoom = 150)
-        foreach (Bookmark bm in bookmarks)
+        // Use PdfBookmarkEditor (facade) to work with bookmarks.
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            bm.PageDisplay = "XYZ";          // specify XYZ destination type
-            bm.PageDisplay_Zoom = 150;        // zoom expressed as a percentage
+            editor.BindPdf(inputPath);
+
+            // Extract existing bookmarks.
+            Bookmarks bookmarks = editor.ExtractBookmarks();
+
+            // Update zoom level for every bookmark (including children).
+            SetZoomLevelRecursive(bookmarks, 150);
+
+            // Replace the old bookmarks with the modified ones.
+            editor.DeleteBookmarks();               // remove all existing bookmarks
+            foreach (Bookmark bm in bookmarks)
+            {
+                editor.CreateBookmarks(bm);        // add the updated bookmark back
+            }
+
+            // Save the PDF with the new bookmark settings.
+            editor.Save(outputPath);
         }
 
-        // Remove the old bookmarks and add the modified ones back
-        editor.DeleteBookmarks();
-        foreach (Bookmark bm in bookmarks)
+        Console.WriteLine($"Bookmarks updated with 150% zoom. Saved to '{outputPath}'.");
+    }
+
+    // Recursively walks through a Bookmarks collection and sets the zoom (XYZ destination).
+    static void SetZoomLevelRecursive(Bookmarks collection, int zoomPercent)
+    {
+        foreach (Bookmark bm in collection)
         {
-            editor.CreateBookmarks(bm);
+            // Set the destination to XYZ with the required zoom.
+            bm.PageDisplay = "XYZ";          // XYZ destination type
+            bm.PageDisplay_Zoom = zoomPercent; // zoom in percent (e.g., 150 = 150%)
+
+            // Process child bookmarks, if any.
+            if (bm.ChildItems != null && bm.ChildItems.Count > 0)
+            {
+                SetZoomLevelRecursive(bm.ChildItems, zoomPercent);
+            }
         }
-
-        // Save the modified PDF
-        editor.Save(outputPath);
-        editor.Close();
-
-        Console.WriteLine($"Bookmarks updated to 150% zoom and saved to '{outputPath}'.");
     }
 }

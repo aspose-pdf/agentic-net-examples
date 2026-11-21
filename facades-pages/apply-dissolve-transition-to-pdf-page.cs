@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -16,16 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Use PdfPageEditor to set a Dissolve transition (value 5) with a 3‑second duration on page 5
-        using (PdfPageEditor editor = new PdfPageEditor(doc))
+        // Use PdfPageEditor to set a page transition.
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            editor.ProcessPages = new int[] { 5 }; // 1‑based page index
-            editor.TransitionType = 5;            // 5 corresponds to Dissolve transition
-            editor.TransitionDuration = 3;        // duration in seconds
-            editor.ApplyChanges();
+            editor.BindPdf(inputPath);
+
+            // 1‑based page numbers to which the transition will be applied.
+            editor.ProcessPages = new int[] { 5 };
+
+            // Transition type: Dissolve.
+            // In newer Aspose.Pdf versions you can use the enum:
+            // editor.TransitionType = (int)TransitionType.Dissolve;
+            // For older versions the integer value (2) is used directly.
+            editor.TransitionType = 2; // Dissolve
+
+            // Duration of the transition in seconds.
+            editor.TransitionDuration = 3;
+
+            // Persist the changes.
             editor.Save(outputPath);
         }
 

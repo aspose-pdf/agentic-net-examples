@@ -6,46 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_attached.pdf";
-        const string attachmentFilePath = "attachment.txt";
-        const string attachmentDescription = "Sample attachment";
+        const string pdfPath = "input.pdf";
+        const string attachmentPath = "attachment.txt";
+        const string outputPath = "output.pdf";
 
-        // Verify that all required files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify source files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(attachmentFilePath))
+        if (!File.Exists(attachmentPath))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            Console.Error.WriteLine($"Attachment not found: {attachmentPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(pdfPath))
         {
-            // Load the existing PDF document
-            Document pdfDoc = new Document(inputPdfPath);
-
-            // Create a file specification for the attachment
-            var fileSpec = new FileSpecification(attachmentFilePath, attachmentDescription)
+            // Create a FileSpecification for the attachment
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
             {
-                // Optional: set MIME type based on the file type
-                MIMEType = "text/plain"
+                Description = Path.GetFileName(attachmentPath),
+                // Embed the file data via a stream
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
             };
 
             // Add the file specification to the EmbeddedFiles collection
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
+            doc.EmbeddedFiles.Add(fileSpec);
 
-            // Save the modified PDF to the desired output path
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"File attachment added and saved to '{outputPath}'.");
     }
 }

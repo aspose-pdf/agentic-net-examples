@@ -1,75 +1,73 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string ofdPath = "input.ofd";
-        const string pdfPath = "output.pdf";
+        const string sourcePdfPath = "source.pdf";      // Existing PDF to receive bookmarks
+        const string ofdPath       = "bookmarks.ofd"; // OFD file containing the bookmark hierarchy
+        const string outputPdfPath = "output.pdf";     // Resulting PDF with imported bookmarks
 
+        if (!File.Exists(sourcePdfPath))
+        {
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
+        }
         if (!File.Exists(ofdPath))
         {
-            Console.Error.WriteLine($"File not found: {ofdPath}");
+            Console.Error.WriteLine($"OFD file not found: {ofdPath}");
             return;
         }
 
-        // Load the OFD file into a Document object using OfdLoadOptions.
-        using (Document pdfDoc = new Document(ofdPath, new OfdLoadOptions()))
+        // Load the target PDF (the document that will receive the bookmarks)
+        using (Document targetPdf = new Document(sourcePdfPath))
         {
-            // -----------------------------------------------------------------
-            // Placeholder: Extract bookmark information from the OFD file.
-            // Since Aspose.Pdf does not expose a direct OFD bookmark API,
-            // we simulate this step with a manually created list.
-            // In a real scenario, replace this with actual extraction logic.
-            // -----------------------------------------------------------------
-            List<(string Title, int PageNumber)> ofdBookmarks = GetBookmarksFromOfd(ofdPath);
+            // Load the OFD file. Aspose.Pdf auto‑detects the format when no explicit load options are supplied.
+            Document ofdDoc = new Document(ofdPath);
 
-            // Convert each OFD bookmark to a PDF outline entry and add to the document.
-            foreach (var (title, pageNumber) in ofdBookmarks)
+            // Helper to obtain a page number from an outline entry. If the entry has a concrete
+            // explicit destination we extract its page number; otherwise we fall back to page 1.
+            int GetPageNumber(OutlineItemCollection item)
             {
-                // Ensure the page number is within the document range.
-                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {pageNumber} for bookmark '{title}'. Skipping.");
-                    continue;
-                }
-
-                // Create an outline (bookmark) node.
-                OutlineItemCollection bookmark = new OutlineItemCollection(pdfDoc.Outlines)
-                {
-                    Title = title,
-                    // GoToAction lives in Aspose.Pdf.Annotations and expects a Page object.
-                    Action = new GoToAction(pdfDoc.Pages[pageNumber])
-                };
-
-                // Add the bookmark to the document's outline collection.
-                pdfDoc.Outlines.Add(bookmark);
+                if (item.Destination is ExplicitDestination explicitDest && explicitDest.PageNumber > 0)
+                    return explicitDest.PageNumber;
+                return 1;
             }
 
-            // Save the resulting PDF.
-            pdfDoc.Save(pdfPath);
+            // Recursively convert an OFD outline entry into a PDF outline entry.
+            OutlineItemCollection ConvertOutline(OutlineItemCollection ofdItem)
+            {
+                // Create a new outline item for the target PDF.
+                var pdfItem = new OutlineItemCollection(targetPdf.Outlines)
+                {
+                    Title = ofdItem.Title,
+                    // Use a GoToAction that points to the appropriate page in the target PDF.
+                    Destination = new GoToAction(targetPdf.Pages[GetPageNumber(ofdItem)])
+                };
+
+                // Process child outlines recursively.
+                foreach (OutlineItemCollection child in ofdItem)
+                {
+                    pdfItem.Add(ConvertOutline(child));
+                }
+
+                return pdfItem;
+            }
+
+            // Iterate over the root outline collection of the OFD document and add each converted
+            // outline to the target PDF's root outline collection.
+            foreach (OutlineItemCollection rootItem in ofdDoc.Outlines)
+            {
+                targetPdf.Outlines.Add(ConvertOutline(rootItem));
+            }
+
+            // Save the updated PDF.
+            targetPdf.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with imported bookmarks saved to '{pdfPath}'.");
-    }
-
-    // -----------------------------------------------------------------
-    // Simulated method to obtain bookmark data from an OFD file.
-    // Replace with actual OFD bookmark extraction as needed.
-    // -----------------------------------------------------------------
-    private static List<(string Title, int PageNumber)> GetBookmarksFromOfd(string ofdFilePath)
-    {
-        // Example static data – in practice, parse the OFD structure.
-        return new List<(string Title, int PageNumber)>
-        {
-            ("Chapter 1", 1),
-            ("Chapter 2", 5),
-            ("Appendix", 12)
-        };
+        Console.WriteLine($"Bookmarks imported from OFD and saved to '{outputPdfPath}'.");
     }
 }

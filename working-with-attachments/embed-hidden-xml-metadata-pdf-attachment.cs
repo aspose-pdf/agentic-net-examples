@@ -1,64 +1,80 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml.Serialization;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class Program
+namespace PdfAttachmentMetadata
 {
-    static void Main()
+    // Sample metadata class to be serialized to XML
+    public class AttachmentMetadata
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
+        public string FileName { get; set; }
+        public string Description { get; set; }
+        public long SizeBytes { get; set; }
+    }
 
-        if (!File.Exists(inputPdfPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
+            const string inputPdfPath  = "input.pdf";
+            const string outputPdfPath = "output_with_metadata.pdf";
 
-        // Build XML metadata for the attachment
-        XDocument metadataXml = new XDocument(
-            new XElement("AttachmentMetadata",
-                new XElement("Author", "John Doe"),
-                new XElement("Created", DateTime.UtcNow.ToString("o"))
-            )
-        );
+            if (!File.Exists(inputPdfPath))
+            {
+                Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+                return;
+            }
 
-        // Convert XML to a memory stream (the embedded file)
-        using (MemoryStream xmlStream = new MemoryStream())
-        {
-            metadataXml.Save(xmlStream);
-            xmlStream.Position = 0; // reset for reading
+            // Create sample metadata
+            AttachmentMetadata metadata = new AttachmentMetadata {
+                FileName    = "example.txt",
+                Description = "Sample attachment metadata",
+                SizeBytes   = 12345
+            };
 
-            // Create a FileSpecification from the stream
-            FileSpecification fileSpec = new FileSpecification(xmlStream, "Metadata.xml");
-            fileSpec.Params.ModDate = DateTime.UtcNow;
+            // Serialize metadata to XML string
+            string xmlMetadata;
+            XmlSerializer serializer = new XmlSerializer(typeof(AttachmentMetadata));
+            using (StringWriter stringWriter = new StringWriter())
+            {
+                serializer.Serialize(stringWriter, metadata);
+                xmlMetadata = stringWriter.ToString();
+            }
 
-            // Open the PDF document
+            // Load the PDF and embed the XML as a hidden annotation
             using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Create a hidden file attachment annotation.
-                // The rectangle is set to zero size because the annotation is hidden.
-                Aspose.Pdf.Rectangle zeroRect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-                FileAttachmentAnnotation attachment = new FileAttachmentAnnotation(pdfDoc.Pages[1], zeroRect, fileSpec)
+                // Ensure we have at least one page
+                if (pdfDoc.Pages.Count == 0)
                 {
-                    // Title is shown in the attachment panel; Contents is a tooltip/description.
-                    Title = "Metadata.xml",
-                    Contents = "Embedded XML metadata (hidden)"
+                    Console.Error.WriteLine("The PDF has no pages.");
+                    return;
+                }
+
+                // Create a zero‑size rectangle (position does not matter for hidden annotation)
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(0, 0, 0, 0);
+
+                // Create a text annotation that will hold the XML
+                TextAnnotation hiddenAnnotation = new TextAnnotation(pdfDoc.Pages[1], rect)
+                {
+                    // Store the XML in the Contents property
+                    Contents = xmlMetadata,
+                    // Mark the annotation as hidden so it does not appear in viewers
+                    Flags    = AnnotationFlags.Hidden,
+                    // Optional: give it a title for identification
+                    Title    = "AttachmentMetadata"
                 };
 
-                // Mark the annotation as hidden so it does not appear in the UI
-                attachment.Flags = AnnotationFlags.Hidden;
-
-                // Add the annotation to the first page (any page works for hidden annotations)
-                pdfDoc.Pages[1].Annotations.Add(attachment);
+                // Add the annotation to the first page
+                pdfDoc.Pages[1].Annotations.Add(hiddenAnnotation);
 
                 // Save the modified PDF
                 pdfDoc.Save(outputPdfPath);
             }
-        }
 
-        Console.WriteLine($"PDF with hidden XML attachment saved to '{outputPdfPath}'.");
+            Console.WriteLine($"PDF saved with embedded metadata: {outputPdfPath}");
+        }
     }
 }

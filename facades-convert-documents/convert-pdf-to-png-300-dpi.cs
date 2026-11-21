@@ -1,52 +1,45 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // for Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "OutputImages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "OutputImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
+        using (PdfConverter converter = new PdfConverter(pdfDoc))
         {
-            // Load the PDF document using the cross‑platform Document class.
-            using (Document pdfDocument = new Document(inputPdf))
-            {
-                // Create a PNG device with 300 DPI resolution. The default coordinate type (Point) is used.
-                var pngDevice = new PngDevice(new Resolution(300));
+            // Set the desired resolution (300 DPI)
+            converter.Resolution = new Resolution(300);
 
-                int pageCount = pdfDocument.Pages.Count;
-                for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
-                {
-                    string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-                    // Render the page to a PNG stream and write it to a file.
-                    using (var outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                    {
-                        pngDevice.Process(pdfDocument.Pages[pageNumber], outStream);
-                    }
-                    Console.WriteLine($"Saved {outPath}");
-                }
+            // Convert all pages
+            converter.StartPage = 1;
+            converter.EndPage   = pdfDoc.Pages.Count;
+            converter.DoConvert();
+
+            // Save each page as a PNG image (format inferred from file extension)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            {
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                converter.GetNextImage(outputPath);
             }
         }
-        // PngDevice relies on GDI+ which is Windows‑only; handle the platform limitation gracefully.
-        catch (TypeInitializationException)
-        {
-            Console.WriteLine("Image conversion requires Windows (GDI+). Skipped on this platform.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF pages have been converted to PNG images at 300 DPI in folder: {outputFolder}");
     }
 }

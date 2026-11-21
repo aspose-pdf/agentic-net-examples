@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -19,35 +17,28 @@ class Program
             return;
         }
 
-        // Load the PDF and save it to a new file
+        // Load the PDF, then save it to a new file
         using (Document doc = new Document(inputPath))
         {
             doc.Save(outputPath);
         }
 
-        // Use PdfBookmarkEditor (Facades) to extract bookmarks to an XML file
-        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
-        bookmarkEditor.BindPdf(outputPath);
-
-        string tempXml = Path.GetTempFileName();
-        try
+        // Extract bookmarks from the saved PDF using the correct facade class
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
         {
-            bookmarkEditor.ExtractBookmarks(tempXml);
+            bookmarkEditor.BindPdf(outputPath);
+            Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
+            int actualCount = bookmarks?.Count ?? 0;
 
-            // Load the exported XML and count <Bookmark> elements
-            XDocument xdoc = XDocument.Load(tempXml);
-            int actualCount = xdoc.Descendants("Bookmark").Count();
-
+            // Validate the bookmark count
             if (actualCount == expectedBookmarks)
-                Console.WriteLine($"Validation succeeded: {actualCount} bookmarks found.");
+            {
+                Console.WriteLine($"Validation succeeded: {actualCount} bookmarks found as expected.");
+            }
             else
-                Console.WriteLine($"Validation failed: expected {expectedBookmarks}, but found {actualCount}.");
-        }
-        finally
-        {
-            // Clean up the temporary XML file
-            if (File.Exists(tempXml))
-                File.Delete(tempXml);
+            {
+                Console.WriteLine($"Validation failed: expected {expectedBookmarks} bookmarks, but found {actualCount}.");
+            }
         }
     }
 }

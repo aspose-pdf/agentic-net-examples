@@ -3,46 +3,49 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Comparison;
 
-class Program
+class PdfComparisonExample
 {
     static void Main()
     {
-        const string filePath1 = "doc1.pdf";
-        const string filePath2 = "doc2.pdf";
-        const string outputPath = "comparison_result.pdf";
+        // Input PDF files
+        const string firstPdfPath = "first.pdf";
+        const string secondPdfPath = "second.pdf";
+        // Output file that will contain the side‑by‑side comparison result
+        const string outputPdfPath = "comparison_result.pdf";
 
-        if (!File.Exists(filePath1) || !File.Exists(filePath2))
+        // Verify that both input files exist
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine("One or both input files are missing.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            return;
+        }
+        if (!File.Exists(secondPdfPath))
+        {
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
 
-        // Load the two PDFs inside using blocks for deterministic disposal.
-        using (Document doc1 = new Document(filePath1))
-        using (Document doc2 = new Document(filePath2))
-        {
-            // Assume both documents have the same page size; use the first page as reference.
-            Page firstPage = doc1.Pages[1];
-            double pageWidth = firstPage.PageInfo.Width;
-            double pageHeight = firstPage.PageInfo.Height;
+        // Load the PDF documents
+        Document firstDoc = new Document(firstPdfPath);
+        Document secondDoc = new Document(secondPdfPath);
 
-            // Define the footer height (e.g., 50 points). Adjust as needed.
-            double footerHeight = 50;
+        // Define the rectangular area that covers the footer region.
+        // Coordinates are in points (1/72 inch). The rectangle below
+        // spans the full width of a typical A4 page (595 pt) and the
+        // bottom 50 pt of the page.
+        Rectangle footerArea = new Rectangle(0, 0, 595, 50);
 
-            // Create a rectangle that covers the footer area (bottom of the page).
-            // Rectangle is defined as lower‑left X,Y and upper‑right X,Y.
-            Rectangle footerRect = new Rectangle(0, 0, pageWidth, footerHeight);
+        // Configure comparison options and add the footer rectangle to the
+        // excluded‑areas collections for each document.
+        SideBySideComparisonOptions compareOptions = new SideBySideComparisonOptions();
+        compareOptions.ExcludeAreas1 = new[] { footerArea };
+        compareOptions.ExcludeAreas2 = new[] { footerArea };
 
-            // Configure comparison options and add the footer rectangle to the ExcludeAreas collections
-            // for both documents (the same rectangle works for both if page sizes match).
-            var options = new SideBySideComparisonOptions();
-            options.ExcludeAreas1 = new[] { footerRect }; // Exclude footer from the first document
-            options.ExcludeAreas2 = new[] { footerRect }; // Exclude footer from the second document
+        // Perform the side‑by‑side visual comparison. The comparer is a static
+        // class; its Compare method writes the result directly to the target
+        // PDF file.
+        SideBySidePdfComparer.Compare(firstDoc, secondDoc, outputPdfPath, compareOptions);
 
-            // Perform side‑by‑side visual comparison. The method is static and returns void.
-            SideBySidePdfComparer.Compare(doc1, doc2, outputPath, options);
-        }
-
-        Console.WriteLine($"Comparison completed. Result saved to '{outputPath}'.");
+        Console.WriteLine($"Comparison completed. Result saved to '{outputPdfPath}'.");
     }
 }

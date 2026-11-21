@@ -1,14 +1,25 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // required for form field classes
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_field.pdf";
+        const string outputPath = "output.pdf";
+
+        // Text field properties
+        const string fieldName = "MyTextField";
+        const string fieldValue = "Default text";
+
+        // Coordinates for the field (left, bottom, right, top)
+        const double llx = 100; // lower‑left X
+        const double lly = 500; // lower‑left Y
+        const double urx = 300; // upper‑right X
+        const double ury = 520; // upper‑right Y
 
         if (!File.Exists(inputPath))
         {
@@ -16,25 +27,27 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Use FormEditor to add a text field.
+        using (FormEditor editor = new FormEditor())
         {
-            // Define the rectangle where the text field will appear (coordinates in points)
-            // Lower‑left (llx, lly) = (100, 500), Upper‑right (urx, ury) = (300, 530)
-            Rectangle fieldRect = new Rectangle(100, 500, 300, 530);
+            // Bind the existing PDF document.
+            editor.BindPdf(inputPath);
 
-            // Create a text box field on the first page
-            TextBoxField textField = new TextBoxField(doc.Pages[1], fieldRect)
-            {
-                PartialName = "MyTextField",
-                Value = "Enter text" // default value shown in the field
-            };
+            // Add a single‑line text field (FieldType.Text) on page 1.
+            // Signature: AddField(FieldType, string fieldName, string value, int pageNumber,
+            //                    float llx, float lly, float urx, float ury)
+            editor.AddField(
+                FieldType.Text,
+                fieldName,
+                fieldValue,
+                1, // page number (1‑based)
+                (float)llx,
+                (float)lly,
+                (float)urx,
+                (float)ury);
 
-            // Add the field to the document's form collection (page numbers are 1‑based)
-            doc.Form.Add(textField, 1);
-
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Text field added and saved to '{outputPath}'.");

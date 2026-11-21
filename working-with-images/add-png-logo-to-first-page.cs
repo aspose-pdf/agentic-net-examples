@@ -6,41 +6,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string logoPng   = "logo.png";
+        const string pdfPath   = "input.pdf";
+        const string logoPath  = "logo.png";
         const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(logoPng))
+
+        if (!File.Exists(logoPath))
         {
-            Console.Error.WriteLine($"Logo image not found: {logoPng}");
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(pdfPath))
         {
-            // Pages are 1‑based; get the first page
-            Page firstPage = doc.Pages[1];
+            // Ensure the document has at least one page
+            if (doc.Pages.Count < 1)
+            {
+                Console.Error.WriteLine("The PDF has no pages.");
+                return;
+            }
 
             // Create an ImageStamp for the PNG logo
-            ImageStamp logoStamp = new ImageStamp(logoPng)
+            ImageStamp logoStamp = new ImageStamp(logoPath)
             {
-                // Position the lower‑left corner of the image
-                XIndent = 50,   // distance from the left edge of the page
-                YIndent = 750,  // distance from the bottom edge of the page
-                // Optional: set explicit size (otherwise original image size is used)
-                // Width = 120,
-                // Height = 60,
-                // Place the image above existing content
-                Background = false
+                // Set the position (lower‑left corner) and size of the logo
+                // Coordinates are in points (1/72 inch). Adjust as needed.
+                XIndent = 50,   // distance from the left edge
+                YIndent = 750,  // distance from the bottom edge
+                Width   = 100,  // logo width
+                Height  = 50    // logo height
             };
 
-            // Add the stamp to the first page
+            // Add the stamp to the first page only
+            Page firstPage = doc.Pages[1]; // 1‑based indexing
             firstPage.AddStamp(logoStamp);
 
             // Save the modified PDF

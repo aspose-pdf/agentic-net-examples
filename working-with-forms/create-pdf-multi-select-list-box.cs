@@ -7,44 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "MultiSelectListBoxForm.pdf";
+        const string outputPath = "MultiSelectListBox.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
             // Add a blank page to host the form field
             Page page = doc.Pages.Add();
 
-            // Define the rectangle (llx, lly, urx, ury) where the list box will appear
-            // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
+            // Define the rectangle where the list box will appear (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 500);
 
-            // Create a ListBox form field
-            ListBoxField listBox = new ListBoxField(page, rect)
-            {
-                // Enable multi‑select so users can choose more than one option
-                MultiSelect = true,
+            // Create a ListBoxField that allows multiple selections
+            ListBoxField listBox = new ListBoxField(page, rect);
+            listBox.PartialName = "MultiSelectList";
+            listBox.MultiSelect = true; // enable multi‑select
 
-                // Optional: give the field a name (used when extracting form data)
-                PartialName = "MultiSelectOptions"
-            };
+            // Add selectable options to the list box
+            listBox.AddOption("Option 1");
+            listBox.AddOption("Option 2");
+            listBox.AddOption("Option 3");
+            listBox.AddOption("Option 4");
 
-            // Add options to the list box using AddOption (Option class has no public ctor)
-            listBox.AddOption("Option A");
-            listBox.AddOption("Option B");
-            listBox.AddOption("Option C");
-            listBox.AddOption("Option D");
+            // (Optional) Pre‑select some items by index
+            // listBox.SelectedIndices.Add(0); // selects "Option 1"
+            // listBox.SelectedIndices.Add(2); // selects "Option 3"
 
-            // Pre‑select "Option B" and "Option C" (indices are zero‑based)
-            listBox.SelectedItems = new int[] { 1, 2 };
+            // Register the field with the document's AcroForm (page number is 1)
+            doc.Form.Add(listBox, 1);
 
-            // Add the list box to the document's form collection
-            doc.Form.Add(listBox);
-
-            // Save the PDF; no SaveOptions needed because we are saving as PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form with multi‑select list box saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with multi‑select list box saved to '{outputPath}'.");
     }
 }

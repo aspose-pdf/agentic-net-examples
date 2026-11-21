@@ -6,36 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";
+        const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-            // Define custom permissions (allow printing and content extraction, deny modifications)
-            Permissions permissions = Permissions.PrintDocument | Permissions.ExtractContent;
+        // Define the desired permissions (e.g., allow printing and content extraction)
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Apply AES‑256 encryption with the specified passwords and permissions
-            pdfDoc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+        // Apply AES‑256 encryption together with the custom privileges
+        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF
-            pdfDoc.Save(outputPath);
+        // Save the encrypted PDF
+        doc.Save(outputPath);
 
-            Console.WriteLine($"Encryption successful: {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Encryption failed: {ex.Message}");
-        }
+        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
     }
 }

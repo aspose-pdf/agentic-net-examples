@@ -1,56 +1,55 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF path
-        const string pdfPath = "input.pdf";
-
-        // Directory to store extracted images
+        // Input PDF file
+        const string inputPdf = "input.pdf";
+        // Directory where extracted images will be saved
         const string outputDir = "ExtractedImages";
-
-        // Page number to extract images from (1‑based indexing)
+        // Page to extract images from (1‑based index)
         const int pageNumber = 2;
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Use PdfExtractor and limit extraction to a single page
+        // PdfExtractor implements IDisposable – wrap it in a using block
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
+            // Bind the source PDF
+            extractor.BindPdf(inputPdf);
 
-            // Limit extraction to the desired page (same start and end page)
-            extractor.StartPage = pageNumber; // first page to extract (1‑based)
-            extractor.EndPage   = pageNumber; // last page to extract (same as start)
+            // Limit extraction to a single page
+            extractor.StartPage = pageNumber; // inclusive start page (1‑based)
+            extractor.EndPage   = pageNumber; // inclusive end page (same as start)
 
-            // NOTE: The ExtractImageMode property is not available in the current
-            // version of Aspose.Pdf.Facades. The default behavior extracts all images,
-            // so we simply call ExtractImage() without setting a mode.
-
-            // Perform the extraction
+            // Extract images from the specified page range
             extractor.ExtractImage();
 
             int imageIndex = 1;
+            // Iterate over all extracted images
             while (extractor.HasNextImage())
             {
-                string imagePath = Path.Combine(outputDir, $"page{pageNumber}_image{imageIndex}.png");
+                // Build a unique file name for each image
+                string imagePath = Path.Combine(outputDir, $"Page{pageNumber}_Image{imageIndex}.png");
+                // Save the current image to the file system
                 extractor.GetNextImage(imagePath);
-                Console.WriteLine($"Saved image {imageIndex} to '{imagePath}'.");
+                Console.WriteLine($"Saved image: {imagePath}");
                 imageIndex++;
             }
 
-            Console.WriteLine($"Extracted {imageIndex - 1} image(s) from page {pageNumber}.");
+            if (imageIndex == 1)
+                Console.WriteLine($"No images found on page {pageNumber}.");
         }
     }
 }

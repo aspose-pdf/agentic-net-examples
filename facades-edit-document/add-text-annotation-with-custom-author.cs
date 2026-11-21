@@ -10,6 +10,7 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "annotated.pdf";
         const string author = "John Doe";
+        const string note = "Review this section.";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +18,31 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document inside a using block for proper disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Get the first page (or any page you need)
-            Page page = pdfDoc.Pages[1];
+            // Get the first page (pages are 1‑based)
+            Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (fully qualified to avoid ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            // Define the annotation rectangle (coordinates in points)
+            var rect = new Rectangle(100, 500, 300, 550);
 
-            // Create a text annotation and set custom author metadata
-            TextAnnotation annotation = new TextAnnotation(page, rect)
+            // Create a text annotation with custom author metadata
+            var txtAnnot = new TextAnnotation(page, rect)
             {
-                Title = author,               // author metadata
-                Contents = "This is a note added via Aspose.Pdf.",
-                Open = true,
-                Icon = TextIcon.Note
+                Title    = author,   // custom author metadata
+                Contents = note,
+                Open     = true,
+                Icon     = TextIcon.Note
             };
 
-            // Add the annotation to the page
-            page.Annotations.Add(annotation);
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(txtAnnot);
 
-            // Save the updated PDF
-            pdfDoc.Save(outputPath);
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation added with author '{author}' and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
     }
 }

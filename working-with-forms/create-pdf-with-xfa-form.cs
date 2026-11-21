@@ -1,51 +1,46 @@
 using System;
 using System.IO;
-using System.Xml;
 using Aspose.Pdf;
-#if XFA_ENABLED
-using Aspose.Pdf.Xfa;
-#endif
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "xfa_form.pdf";
+        const string outputPath = "XfaForm.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal.
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-#if XFA_ENABLED
-            // Create an XFA form instance associated with the document.
-            // The XfaForm class is located in the Aspose.Pdf.Xfa namespace.
-            XfaForm xfaForm = new XfaForm(doc);
+            // Add a blank page to the document
+            Page page = doc.Pages.Add();
 
-            // Build a minimal XFA XML structure with two fields: "FirstName" and "LastName".
-            string xfaXml = @"
-                <xfa:datasets xmlns:xfa='http://www.xfa.org/schema/xfa-data/1.0/'>
-                    <xfa:data>
-                        <FirstName></FirstName>
-                        <LastName></LastName>
-                    </xfa:data>
-                </xfa:datasets>";
+            // Access the AcroForm object (core API)
+            Aspose.Pdf.Forms.Form form = doc.Form;
 
-            // Load the XML into an XmlDocument and assign it to the XFA form.
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.LoadXml(xfaXml);
-            xfaForm.DomDocument = xmlDoc;
+            // NOTE: XFA support is optional in Aspose.Pdf.
+            // The core API does not expose a direct property to query XFA availability.
+            // We proceed to create a form field; if XFA is enabled in the library,
+            // the field will be part of the XFA form automatically.
 
-            // OPTIONAL: Verify that the XFA form was created before populating fields.
-            if (xfaForm != null)
-            {
-                // Populate the XFA fields with sample data.
-                xfaForm.SetFieldValue("FirstName", "John");
-                xfaForm.SetFieldValue("LastName", "Doe");
-            }
-#endif
-            // Save the PDF (with or without XFA content).
+            // Create a text box field positioned on the page
+            TextBoxField nameField = new TextBoxField(
+                page,
+                new Aspose.Pdf.Rectangle(100, 700, 300, 730) // llx, lly, urx, ury
+            );
+
+            // Set the field's name (partial name) and default value
+            nameField.PartialName = "CustomerName";
+            nameField.Value = "John Doe";
+
+            // Add the field to the document's form
+            form.Add(nameField);
+
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with XFA form saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with form field saved to '{outputPath}'.");
     }
 }

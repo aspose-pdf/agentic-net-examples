@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,18 +18,18 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf (see page-indexing-one-based rule)
+            // Aspose.Pdf uses 1‑based page indexing (see page-indexing-one-based rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Apply a 90° rotation when the page number is divisible by 3
+                // Rotate 90 degrees clockwise when the page number is divisible by 3
                 if (i % 3 == 0)
                 {
-                    // Use the Rotation enum (on90) – RotationAngle enum no longer exists
+                    // Use the Rotation enum instead of an integer literal
                     doc.Pages[i].Rotate = Rotation.on90;
                 }
             }
 
-            // Save the modified document
+            // Save the modified document (PDF format by default)
             doc.Save(outputPath);
         }
 

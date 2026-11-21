@@ -1,54 +1,49 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace included as requested
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        // Input PDF to be split
+        const string inputPdf = "input.pdf";
+
+        // Folder where individual page PDFs will be saved
         const string outputFolder = "SplitPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         try
         {
-            // Load the source PDF using Document (PdfFileEditor does not provide SplitToIndividual)
-            using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(inputPath))
+            // Use PdfFileEditor.SplitToPages to obtain a MemoryStream for each page.
+            PdfFileEditor editor = new PdfFileEditor();
+            MemoryStream[] pageStreams = editor.SplitToPages(inputPdf);
+
+            for (int i = 0; i < pageStreams.Length; i++)
             {
-                // Iterate over pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= sourceDoc.Pages.Count; pageNumber++)
+                string outPath = Path.Combine(outputFolder, $"Page_{i + 1}.pdf");
+                using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
                 {
-                    // Create a new empty PDF document for the current page
-                    using (Aspose.Pdf.Document singlePageDoc = new Aspose.Pdf.Document())
-                    {
-                        // Add the specific page from the source document
-                        singlePageDoc.Pages.Add(sourceDoc.Pages[pageNumber]);
-
-                        // Build output file name
-                        string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.pdf");
-
-                        // Save the single‑page PDF
-                        singlePageDoc.Save(outputPath);
-                        Console.WriteLine($"Saved page {pageNumber} → {outputPath}");
-                    }
+                    pageStreams[i].WriteTo(fs);
                 }
+                // Dispose the stream after it has been written.
+                pageStreams[i].Dispose();
             }
 
-            Console.WriteLine("All pages have been split into individual PDFs.");
+            Console.WriteLine($"PDF split into {pageStreams.Length} pages in folder: {outputFolder}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during splitting: {ex.Message}");
+            Console.Error.WriteLine($"Error during split operation: {ex.Message}");
         }
     }
 }

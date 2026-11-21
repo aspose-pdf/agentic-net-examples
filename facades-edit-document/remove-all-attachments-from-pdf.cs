@@ -16,33 +16,19 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+
+        // Remove all embedded file attachments, if any
+        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
         {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPath);
-
-            // Remove all embedded files (attachments) if any exist
-            if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
-            {
-                // Iterate backwards because Delete modifies the collection size
-                for (int i = pdfDoc.EmbeddedFiles.Count; i >= 1; i--)
-                {
-                    var fileSpec = pdfDoc.EmbeddedFiles[i]; // 1‑based indexing
-                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
-                    {
-                        pdfDoc.EmbeddedFiles.Delete(fileSpec.Name);
-                    }
-                }
-            }
-
-            // Save the modified PDF to a new file
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"All attachments removed. Saved to '{outputPath}'.");
+            // EmbeddedFileCollection does not support Clear(); use Delete() to remove all attachments
+            pdfDoc.EmbeddedFiles.Delete();
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Save the modified PDF without attachments
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"All attachments removed. Saved to '{outputPath}'.");
     }
 }

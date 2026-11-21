@@ -6,62 +6,84 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string targetPdfPath = "target.pdf";   // PDF that already has bookmarks
-        const string sourcePdfPath = "source.pdf";   // PDF whose bookmarks will be imported
-        const string outputPdfPath = "merged_bookmarks.pdf";
+        const string targetPath = "target.pdf";          // PDF to which bookmarks will be added
+        const string sourcePath = "source.pdf";          // PDF containing the bookmarks to import
+        const string outputPath = "merged_bookmarks.pdf"; // Resulting PDF
 
-        // Verify files exist
-        if (!File.Exists(targetPdfPath))
+        if (!File.Exists(targetPath) || !File.Exists(sourcePath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
-            return;
-        }
-        if (!File.Exists(sourcePdfPath))
-        {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        // Load the PDFs using the Document class (the recommended way for bookmark manipulation)
-        Document targetDoc = new Document(targetPdfPath);
-        Document sourceDoc = new Document(sourcePdfPath);
-
-        // Merge bookmarks from source into target while preserving order
-        foreach (OutlineItemCollection srcBookmark in sourceDoc.Outlines)
+        // Load both PDFs
+        using (Document targetDoc = new Document(targetPath))
+        using (Document sourceDoc = new Document(sourcePath))
         {
-            // Clone each bookmark (and its children) into the target document's outline collection
-            OutlineItemCollection cloned = CloneOutlineItem(srcBookmark, targetDoc);
-            targetDoc.Outlines.Add(cloned);
+            // Merge bookmarks preserving the order found in the source PDF
+            CopyOutlines(sourceDoc.Outlines, targetDoc.Outlines, targetDoc);
+
+            // Save the merged PDF
+            targetDoc.Save(outputPath);
         }
 
-        // Save the result to a new file (preserves the original target PDF)
-        targetDoc.Save(outputPdfPath);
-
-        Console.WriteLine($"Bookmarks merged successfully. Output saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Bookmarks merged and saved to '{outputPath}'.");
     }
 
-    /// <summary>
-    /// Recursively clones an OutlineItemCollection from one document to another.
-    /// </summary>
-    private static OutlineItemCollection CloneOutlineItem(OutlineItemCollection source, Document targetDoc)
+    // Recursively copies outline items from a source collection to a destination collection.
+    private static void CopyOutlines(
+        OutlineCollection sourceCollection,
+        OutlineCollection destinationCollection,
+        Document targetDoc)
     {
-        // Create a new outline item attached to the target document's outline collection
-        var copy = new OutlineItemCollection(targetDoc.Outlines)
+        foreach (OutlineItemCollection srcItem in sourceCollection)
         {
-            Title = source.Title,
-            Italic = source.Italic,
-            Bold = source.Bold,
-            Color = source.Color,
-            Action = source.Action // For simple GoTo actions this works; complex actions may need adaptation
-        };
+            // Create a new outline item for the target document and copy basic properties.
+            OutlineItemCollection destItem = new OutlineItemCollection(targetDoc.Outlines)
+            {
+                Title = srcItem.Title,
+                Destination = srcItem.Destination,
+                Italic = srcItem.Italic,
+                Bold = srcItem.Bold,
+                Color = srcItem.Color,
+                Open = srcItem.Open
+            };
 
-        // Recursively clone any child bookmarks
-        foreach (OutlineItemCollection child in source)
-        {
-            copy.Add(CloneOutlineItem(child, targetDoc));
+            // Add the new item to the destination collection.
+            destinationCollection.Add(destItem);
+
+            // If the source item has children, copy them recursively.
+            if (srcItem.Count > 0)
+            {
+                CopyOutlines(srcItem, destItem, targetDoc);
+            }
         }
+    }
 
-        return copy;
+    // Overload that works when the parent is an OutlineItemCollection (i.e., a child node).
+    private static void CopyOutlines(
+        OutlineItemCollection sourceParent,
+        OutlineItemCollection destParent,
+        Document targetDoc)
+    {
+        foreach (OutlineItemCollection srcItem in sourceParent)
+        {
+            OutlineItemCollection destItem = new OutlineItemCollection(targetDoc.Outlines)
+            {
+                Title = srcItem.Title,
+                Destination = srcItem.Destination,
+                Italic = srcItem.Italic,
+                Bold = srcItem.Bold,
+                Color = srcItem.Color,
+                Open = srcItem.Open
+            };
+
+            destParent.Add(destItem);
+
+            if (srcItem.Count > 0)
+            {
+                CopyOutlines(srcItem, destItem, targetDoc);
+            }
+        }
     }
 }

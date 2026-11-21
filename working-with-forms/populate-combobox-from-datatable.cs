@@ -8,74 +8,59 @@ class Program
 {
     static void Main()
     {
-        // Paths to the input PDF form and the output PDF
-        const string inputPdfPath = "form.pdf";
-        const string outputPdfPath = "form_filled.pdf";
+        const string inputPdf = "form.pdf";
+        const string outputPdf = "form_filled.pdf";
 
-        // Retrieve the list of items for the combo box from a database (simulated here)
-        List<string> comboBoxItems = GetComboBoxValuesFromDatabase();
-
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Retrieve combo box items from a database (placeholder implementation)
+        List<string> comboItems = GetComboBoxItemsFromDatabase();
+
+        // Open the PDF document
+        using (Document doc = new Document(inputPdf))
         {
-            // Access the AcroForm attached to the document
-            Form acroForm = pdfDocument.Form;
+            // Access the AcroForm
+            Form form = doc.Form;
 
-            // Locate the combo box field by its name (replace "MyComboBox" with the actual field name)
-            ComboBoxField comboBox = acroForm["MyComboBox"] as ComboBoxField;
-
-            if (comboBox != null)
+            // Locate the combo box field by its name (e.g., "myCombo")
+            ComboBoxField combo = form["myCombo"] as ComboBoxField;
+            if (combo == null)
             {
-                // NOTE: Options collection is read‑only; clear existing entries using DeleteOption.
-                // This loop removes all current options safely.
-                while (comboBox.Options.Count > 0)
-                {
-                    // Each option is an Option object; its Name property holds the display value.
-                    // DeleteOption expects the option's name (string).
-                    comboBox.DeleteOption(comboBox.Options[0].Name);
-                }
-
-                // Populate the combo box with items retrieved from the database using AddOption.
-                foreach (string item in comboBoxItems)
-                {
-                    comboBox.AddOption(item);
-                }
-
-                // Optionally set the first item as the selected value.
-                if (comboBox.Options.Count > 0)
-                {
-                    // The Selected property (int) represents the zero‑based index of the chosen option.
-                    comboBox.Selected = 0;
-                }
-            }
-            else
-            {
-                Console.Error.WriteLine("Combo box field 'MyComboBox' not found in the PDF form.");
+                Console.Error.WriteLine("Combo box field 'myCombo' not found.");
+                return;
             }
 
-            // Save the modified PDF to the output path
-            pdfDocument.Save(outputPdfPath);
+            // Remove any existing options
+            var existingOptionNames = new List<string>();
+            foreach (Option opt in combo.Options)
+                existingOptionNames.Add(opt.Name);
+            foreach (string name in existingOptionNames)
+                combo.DeleteOption(name);
+
+            // Populate the combo box with items retrieved from the database
+            foreach (string item in comboItems)
+                combo.AddOption(item); // export value == display name
+
+            // Optionally set the default selected value (1‑based index)
+            if (comboItems.Count > 0)
+                combo.Selected = 1; // selects the first added option
+
+            // Save the updated PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Combo box items have been set and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Combo box items set and saved to '{outputPdf}'.");
     }
 
-    // Simulated database call – replace with actual data access logic
-    static List<string> GetComboBoxValuesFromDatabase()
+    // Placeholder for actual database retrieval logic
+    static List<string> GetComboBoxItemsFromDatabase()
     {
-        // Example values; in a real scenario, fetch these from a database
-        return new List<string>
-        {
-            "Option A",
-            "Option B",
-            "Option C",
-            "Option D"
-        };
+        // In a real scenario, connect to the database and fetch values.
+        // Here we return a static list for demonstration purposes.
+        return new List<string> { "Option A", "Option B", "Option C" };
     }
 }

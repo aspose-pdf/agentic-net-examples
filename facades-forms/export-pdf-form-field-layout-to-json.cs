@@ -2,109 +2,57 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using System.Linq; // needed for Count()
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // for Field types
-using Aspose.Pdf.Annotations; // for WidgetAnnotation
+using Aspose.Pdf.Forms;
 
-class Program
+class ExportFormFieldsToJson
 {
-    // Simple DTO for JSON serialization
-    public class FormFieldInfo
-    {
-        public string Name { get; set; } = null!;          // non‑nullable, initialized to suppress CS8618
-        public string FieldType { get; set; } = null!;    // non‑nullable, initialized to suppress CS8618
-        public int PageNumber { get; set; }
-        public RectangleCoordinates Rect { get; set; } = null!; // non‑nullable, initialized to suppress CS8618
-    }
-
-    public class RectangleCoordinates
-    {
-        public double LowerLeftX { get; set; }
-        public double LowerLeftY { get; set; }
-        public double UpperRightX { get; set; }
-        public double UpperRightY { get; set; }
-    }
-
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "form_fields.json";
+        // Input PDF containing form fields
+        const string inputPdf = "form.pdf";
+        // Output JSON file with field layout information
+        const string outputJson = "form_fields.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document
+        Document doc = new Document(inputPdf);
+
+        // Prepare a list to hold field layout data
+        var fields = new List<object>();
+
+        // Iterate over all form fields present in the document using the correct Field type
+        foreach (Field field in doc.Form.Fields)
         {
-            // Ensure the document actually contains a form with fields
-            if (pdfDoc.Form == null || pdfDoc.Form.Fields == null || pdfDoc.Form.Fields.Count() == 0)
+            // The field's name (PartialName) and its rectangle (coordinates)
+            string name = field.PartialName;
+            Aspose.Pdf.Rectangle rect = field.Rect;
+
+            double width = rect.URX - rect.LLX;
+            double height = rect.URY - rect.LLY;
+
+            fields.Add(new
             {
-                Console.WriteLine("No form fields found in the PDF.");
-                return;
-            }
-
-            // Build a map of field name -> page number by scanning widget annotations on each page
-            var fieldPageMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-            for (int pageIdx = 1; pageIdx <= pdfDoc.Pages.Count; pageIdx++)
-            {
-                Page page = pdfDoc.Pages[pageIdx];
-                foreach (Annotation ann in page.Annotations)
-                {
-                    if (ann is WidgetAnnotation widget && !string.IsNullOrEmpty(widget.Name))
-                    {
-                        // The same field name can appear only once; later occurrences will overwrite which is fine for our purpose
-                        fieldPageMap[widget.Name] = pageIdx;
-                    }
-                }
-            }
-
-            var fieldsInfo = new List<FormFieldInfo>();
-
-            // Enumerate each field directly from the Form collection
-            foreach (Field field in pdfDoc.Form.Fields)
-            {
-                // Field name
-                string name = field.Name;
-
-                // Determine the field type via runtime type name (e.g., TextBoxField, CheckBoxField)
-                string fieldType = field.GetType().Name;
-
-                // Page number where the field resides – derived from the widget‑annotation map
-                int pageNum = fieldPageMap.TryGetValue(name, out int pn) ? pn : 0; // 0 if not found (should not happen)
-
-                // Rectangle coordinates of the field (field.Rect is never null for a valid form field)
-                // Use a fallback rectangle with explicit constructor arguments because Aspose.Pdf.Rectangle has no parameterless ctor.
-                Aspose.Pdf.Rectangle rect = field.Rect ?? new Aspose.Pdf.Rectangle(0, 0, 0, 0);
-
-                RectangleCoordinates rectInfo = new RectangleCoordinates
-                {
-                    LowerLeftX = rect.LLX,
-                    LowerLeftY = rect.LLY,
-                    UpperRightX = rect.URX,
-                    UpperRightY = rect.URY
-                };
-
-                fieldsInfo.Add(new FormFieldInfo
-                {
-                    Name = name,
-                    FieldType = fieldType,
-                    PageNumber = pageNum,
-                    Rect = rectInfo
-                });
-            }
-
-            // Serialize the list to JSON with indentation for readability
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(fieldsInfo, jsonOptions);
-
-            // Write JSON to the output file
-            File.WriteAllText(outputJsonPath, json);
-            Console.WriteLine($"Form field layout exported to '{outputJsonPath}'.");
+                Name = name,
+                X = rect.LLX,
+                Y = rect.LLY,
+                Width = width,
+                Height = height
+            });
         }
+
+        // Serialize the list to formatted JSON
+        var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+        string json = JsonSerializer.Serialize(fields, jsonOptions);
+
+        // Write JSON to the output file
+        File.WriteAllText(outputJson, json);
+
+        Console.WriteLine($"Form field layout exported to '{outputJson}'.");
     }
 }

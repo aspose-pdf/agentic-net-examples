@@ -9,9 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string altText    = "Description of the image for screen readers.";
-        const string actualText = "Image caption or actual text";
+        const string outputPath = "tagged_with_alt.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,33 +19,40 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
                 // Access the tagged content API
-                ITaggedContent tagged = doc.TaggedContent;
-                // Optional: set language and title for the document
-                tagged.SetLanguage("en-US");
-                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+                ITaggedContent taggedContent = doc.TaggedContent;
 
-                // Get the root of the structure tree (no cast needed)
-                StructureElement root = tagged.RootElement;
+                // Set language and title for the document (write‑only setters)
+                taggedContent.SetLanguage("en-US");
+                taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-                // Create a Figure element representing the image
-                FigureElement figure = tagged.CreateFigureElement();
-                // Set the alternate text (used by assistive technologies)
-                figure.AlternativeText = altText;
-                // Set the ActualText attribute (explicit textual representation)
-                figure.ActualText = actualText;
+                // Root element of the structure tree
+                StructureElement root = taggedContent.RootElement;
 
-                // Attach the figure element to the document structure
-                root.AppendChild(figure);
+                // Iterate over all pages and their images
+                foreach (Page page in doc.Pages)
+                {
+                    foreach (XImage img in page.Resources.Images)
+                    {
+                        // Create a Figure element for the image
+                        FigureElement figure = taggedContent.CreateFigureElement();
 
-                // Save the modified PDF
+                        // Set the alternative text (maps to /ActualText in the PDF/UA sense)
+                        figure.AlternativeText = "Screen‑reader description for this image";
+
+                        // Append the figure element to the structure tree
+                        root.AppendChild(figure);
+                    }
+                }
+
+                // Save the modified PDF (no PreSave call required)
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF with image ActualText saved to '{outputPath}'.");
+            Console.WriteLine($"Tagged PDF with image alt text saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

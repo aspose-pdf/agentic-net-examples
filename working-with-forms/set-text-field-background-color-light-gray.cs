@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -18,29 +18,32 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Locate the text box field via the Form.Fields collection
-            TextBoxField textField = doc.Form?.Fields
-                .FirstOrDefault(f => f is TextBoxField && f.FullName == fieldName) as TextBoxField;
-
-            if (textField != null)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
-                // Set the background‑like color to light gray.
-                // The TextBoxField class does not expose a BackgroundColor property in the
-                // current Aspose.Pdf version; the Color property is used to affect the field's
-                // fill appearance (acts as a background color for many form fields).
-                textField.Color = Color.LightGray;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Text field '{fieldName}' not found.");
+                // Get the text box field from the form
+                var textField = doc.Form[fieldName] as TextBoxField;
+                if (textField == null)
+                {
+                    Console.Error.WriteLine($"Text field '{fieldName}' not found.");
+                }
+                else
+                {
+                    // Set the background colour using the field's Characteristics (System.Drawing.Color)
+                    textField.Characteristics.Background = System.Drawing.Color.LightGray;
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF saved with updated field background: '{outputPath}'.");
         }
-
-        Console.WriteLine($"Saved PDF with updated field background to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

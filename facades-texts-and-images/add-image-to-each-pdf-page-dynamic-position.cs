@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "stamp.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_image.pdf";
+        const string imagePath = "logo.png";
 
         if (!File.Exists(inputPdf))
         {
@@ -21,50 +21,34 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
+        // Load the PDF document.
         using (Document doc = new Document(inputPdf))
         {
-            // Retrieve the first page (1‑based indexing).
-            Page page = doc.Pages[1];
-
-            // Get page dimensions (points). Width and Height are in points (1/72 inch).
-            double pageWidth  = page.PageInfo.Width;
-            double pageHeight = page.PageInfo.Height;
-
-            // Define desired image size (e.g., 100x100 points).
-            const double imageWidth  = 100;
-            const double imageHeight = 100;
-
-            // Define a margin from the page edges.
-            const double margin = 20;
-
-            // Calculate bottom‑right placement coordinates dynamically.
-            // X coordinate of lower‑left corner:
-            double llx = pageWidth - imageWidth - margin;
-            // Y coordinate of lower‑left corner:
-            double lly = margin;
-
-            // Create an ImageStamp and position it using the calculated coordinates.
-            ImageStamp stamp = new ImageStamp(imagePath)
+            // Iterate over every page (1‑based indexing).
+            foreach (Page page in doc.Pages)
             {
-                // Set the size of the stamp.
-                Width  = imageWidth,
-                Height = imageHeight,
-                // Position the lower‑left corner.
-                XIndent = llx,
-                YIndent = lly,
-                // Ensure the image is not scaled beyond the defined size.
-                // (Optional) Set the background to transparent.
-                Background = false
-            };
+                double pageWidth  = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-            // Add the stamp to the target page.
-            page.AddStamp(stamp);
+                // Create an ImageStamp for the logo.
+                ImageStamp stamp = new ImageStamp(imagePath)
+                {
+                    Width  = 100,   // desired width in points
+                    Height = 100    // desired height in points
+                };
+
+                // Center the image on the current page.
+                stamp.XIndent = (float)((pageWidth  - stamp.Width)  / 2);
+                stamp.YIndent = (float)((pageHeight - stamp.Height) / 2);
+
+                // Add the stamp to the page.
+                page.AddStamp(stamp);
+            }
 
             // Save the modified PDF.
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image placed and PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Image placed on each page and saved to '{outputPdf}'.");
     }
 }

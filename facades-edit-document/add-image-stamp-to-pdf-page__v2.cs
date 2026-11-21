@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Net.Http;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,31 +18,39 @@ class Program
             return;
         }
 
-        // Download the image from the external URL into a memory stream
-        using (HttpClient httpClient = new HttpClient())
-        using (Stream imageStream = httpClient.GetStreamAsync(imageUrl).Result)
+        // Download the image into a memory stream
+        byte[] imageBytes;
+        using (HttpClient client = new HttpClient())
         {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPdf);
-
-            // Create an ImageStamp from the downloaded stream
-            ImageStamp stamp = new ImageStamp(imageStream)
+            try
             {
-                // Position the stamp (distance from left and bottom edges)
-                XIndent = 100,
-                YIndent = 500,
-                // Set desired size of the stamp
-                Width = 150,
-                Height = 50,
-                // Place the stamp over existing content
-                Background = false
-            };
+                imageBytes = client.GetByteArrayAsync(imageUrl).Result;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to download image: {ex.Message}");
+                return;
+            }
+        }
+
+        using (MemoryStream imgStream = new MemoryStream(imageBytes))
+        using (Document pdfDoc = new Document(inputPdf))
+        {
+            // Create an ImageStamp from the stream
+            ImageStamp imgStamp = new ImageStamp(imgStream);
+
+            // Configure stamp appearance and position
+            imgStamp.Width = 100;                     // width in points
+            imgStamp.Height = 100;                    // height in points
+            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+            imgStamp.VerticalAlignment = VerticalAlignment.Top;
+            imgStamp.TopMargin = 50;                  // distance from top edge
 
             // Apply the stamp to page 2 (pages are 1‑based)
-            pdfDocument.Pages[2].AddStamp(stamp);
+            pdfDoc.Pages[2].AddStamp(imgStamp);
 
             // Save the modified PDF
-            pdfDocument.Save(outputPdf);
+            pdfDoc.Save(outputPdf);
         }
 
         Console.WriteLine($"Image stamp added to page 2 and saved as '{outputPdf}'.");

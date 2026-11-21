@@ -6,46 +6,55 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
-        const string fdfPath = "data.fdf";
-        const string outputPath = "filled_form.pdf";
+        // Paths for the source PDF, the XML data to import, and the output PDF
+        string inputPdfPath = "input.pdf";
+        string importXmlPath = "data.xml";
+        string outputPdfPath = "output.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(pdfPath) || !File.Exists(fdfPath))
+        // Verify that the required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine("Required input files not found.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
+        if (!File.Exists(importXmlPath))
         {
-            // Use Aspose.Pdf.Facades.Form to work with PDF forms
-            using (Form form = new Form(pdfPath))
-            {
-                // Import form data (e.g., FDF). Missing fields throw an exception with a FieldName property.
-                try
-                {
-                    using (FileStream fdfStream = File.OpenRead(fdfPath))
-                    {
-                        form.ImportFdf(fdfStream);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Attempt to read the optional FieldName property via reflection.
-                    var fieldProp = ex.GetType().GetProperty("FieldName");
-                    var missingField = fieldProp?.GetValue(ex) as string;
-                    Console.Error.WriteLine($"Missing form field: {missingField ?? "<unknown>"}");
-                }
+            Console.Error.WriteLine($"Import XML not found: {importXmlPath}");
+            return;
+        }
 
-                // Save the updated PDF with imported data
-                form.Save(outputPath);
-            }
-        }
-        catch (Exception ex)
+        // Create a Form object using only the source PDF path
+        using (Form form = new Form(inputPdfPath))
         {
-            // General error handling
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            try
+            {
+                // Open the XML stream and import the form data
+                using (FileStream importStream = File.OpenRead(importXmlPath))
+                {
+                    form.ImportXml(importStream);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Aspose may throw a FormException that contains a "FieldName" property
+                var fieldProp = ex.GetType().GetProperty("FieldName");
+                if (fieldProp != null)
+                {
+                    string fieldName = fieldProp.GetValue(ex) as string;
+                    Console.Error.WriteLine($"Missing form field: {fieldName}");
+                }
+                else
+                {
+                    // Log any other import errors
+                    Console.Error.WriteLine($"Error importing form data: {ex.Message}");
+                }
+            }
+
+            // Save the modified PDF to the destination path
+            form.Save(outputPdfPath);
         }
+
+        Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 }

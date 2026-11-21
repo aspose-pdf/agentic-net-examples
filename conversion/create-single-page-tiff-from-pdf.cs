@@ -7,29 +7,39 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tif";
+        const string inputPdfPath = "input.pdf";
+        const string outputTiffPath = "page1.tiff";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Set the resolution for the TIFF output (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
+            // Ensure the document has at least one page
+            if (pdfDoc.Pages.Count < 1)
+            {
+                Console.Error.WriteLine("The PDF does not contain any pages.");
+                return;
+            }
 
-            // Create the TiffDevice with the custom resolution
-            TiffDevice tiffDevice = new TiffDevice(resolution);
+            // Configure TIFF settings – 300 DPI and CCITT Group 4 compression
+            TiffSettings tiffSettings = new TiffSettings
+            {
+                Compression = CompressionType.CCITT4
+            };
 
-            // Convert only the first page (page numbers are 1‑based) to a single‑page TIFF
-            // The core API uses the Process method; no Compression property is available in older versions.
-            tiffDevice.Process(pdfDoc, 1, 1, outputTiff);
+            // Create a TiffDevice with the desired resolution and settings.
+            // TiffDevice does NOT implement IDisposable, so we do NOT wrap it in a using statement.
+            TiffDevice tiffDevice = new TiffDevice(new Resolution(300), tiffSettings);
+
+            // Process only the first page (page numbers are 1‑based) and write the result to the output file.
+            tiffDevice.Process(pdfDoc, 1, 1, outputTiffPath);
         }
 
-        Console.WriteLine($"TIFF created: {outputTiff}");
+        Console.WriteLine($"Single‑page TIFF created at: {outputTiffPath}");
     }
 }

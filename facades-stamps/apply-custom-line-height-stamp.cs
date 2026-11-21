@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TextState
 
 class Program
 {
@@ -17,44 +17,36 @@ class Program
             return;
         }
 
-        // Load the PDF to obtain page dimensions (required for positioning the stamps)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Assume we watermark the first page; adjust as needed
-            int pageNumber = 1;
-            Page page = doc.Pages[pageNumber];
-            double pageHeight = page.PageInfo.Height;
-            double pageWidth = page.PageInfo.Width;
-
-            // Watermark configuration
-            string[] watermarkLines = { "CONFIDENTIAL", "DO NOT DISTRIBUTE", "AUTHORIZED PERSONNEL ONLY" };
-            double marginTop = 100;               // distance from top edge
-            double lineHeight = 30;               // custom line spacing between lines
-            double startY = pageHeight - marginTop; // Y coordinate of the first line (from bottom)
-            // X position is handled by HorizontalAlignment = Center, so XIndent stays 0
-
-            // Add each line as a separate TextStamp with calculated Y position
-            for (int i = 0; i < watermarkLines.Length; i++)
+            // Prepare TextState with desired font, size, color and line spacing (leading)
+            TextState textState = new TextState("Arial", 36f)
             {
-                TextStamp stamp = new TextStamp(watermarkLines[i])
-                {
-                    // Center the text horizontally
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    // Position the stamp; YIndent is measured from the bottom of the page
-                    YIndent = startY - i * lineHeight,
-                    // Optional: keep XIndent at 0 because we use Center alignment
-                    XIndent = 0
-                };
+                ForegroundColor = Aspose.Pdf.Color.Gray
+                // Note: TextState does not have a 'Leading' property. Use LineSpacing instead.
+            };
+            // Set custom line spacing (leading) – 1.5 × font size for equal spacing
+            textState.LineSpacing = 54f; // 36 * 1.5
 
-                // Optional: style the watermark text
-                stamp.TextState.Font = FontRepository.FindFont("Arial");
-                stamp.TextState.FontSize = 36;
-                stamp.TextState.FontStyle = FontStyles.Bold;
-                stamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // red
-                stamp.Opacity = 0.5; // semi‑transparent
+            // Create a concrete TextStamp (the class exists in Aspose.Pdf.Facades)
+            TextStamp stamp = new TextStamp(
+                "Confidential\nDo Not Distribute\nCompany XYZ",
+                textState)
+            {
+                // Center the stamp on each page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
 
-                // Apply the stamp to the specified page
-                page.AddStamp(stamp);
+                // Make the stamp semi‑transparent and keep page content visible
+                Opacity   = 0.3,
+                Background = false
+            };
+
+            // Apply the stamp to every page
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                doc.Pages[i].AddStamp(stamp);
             }
 
             // Save the modified PDF

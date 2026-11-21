@@ -6,51 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // PDF with ZUGFeRD XML attachment
-        const string outputPath = "output_pdfa3u.pdf";  // Resulting PDF/A‑3u file
+        const string inputPdf  = "invoice_with_zugferd.pdf";
+        const string outputPdf = "invoice_pdfa3u.pdf";
+        const string logPath   = "conversion_log.xml";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the source PDF. The ZUGFeRD XML is stored as an embedded file.
-            using (Document doc = new Document(inputPath))
+            // Load the source PDF (contains ZUGFeRD XML attachment)
+            using (Document doc = new Document(inputPdf))
             {
-                // List existing embedded files to verify presence.
-                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
-                {
-                    foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
-                    {
-                        Console.WriteLine($"Found embedded file: {fileSpec.Name}");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("No embedded files found in the source PDF.");
-                }
+                // Convert to PDF/A‑3u. The Convert method preserves embedded files (e.g., the ZUGFeRD XML)
+                doc.Convert(logPath, PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
 
-                // Prepare conversion options for PDF/A‑3u.
-                var convOptions = new PdfFormatConversionOptions(PdfFormat.PDF_A_3U)
-                {
-                    OptimizeFileSize = true
-                };
-
-                // Perform the conversion. Embedded files are preserved automatically.
-                doc.Convert(convOptions);
-
-                // Save the converted document.
-                doc.Save(outputPath);
+                // Save the converted document. After conversion the document is already PDF/A‑3u compliant.
+                doc.Save(outputPdf);
             }
 
-            Console.WriteLine($"Conversion completed. PDF/A‑3u saved to '{outputPath}'.");
+            Console.WriteLine($"Conversion completed. PDF/A‑3u saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

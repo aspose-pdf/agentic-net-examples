@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // SignatureField, PKCS7, Signature, etc.
 
 class Program
 {
@@ -17,98 +16,63 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Collect all signature fields present in the document
-            List<SignatureField> signatureFields = new List<SignatureField>();
-            if (doc.Form != null && doc.Form.Fields != null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                foreach (var field in doc.Form.Fields)
+                // Iterate over all fields and pick the signature ones
+                foreach (Field f in doc.Form.Fields)
                 {
-                    if (field is SignatureField sigField)
-                        signatureFields.Add(sigField);
-                }
-            }
-
-            if (signatureFields.Count == 0)
-            {
-                Console.WriteLine("No digital signatures found in the PDF.");
-                return;
-            }
-
-            foreach (SignatureField sigField in signatureFields)
-            {
-                string fieldName = sigField.FullName ?? "<unnamed>";
-                Console.WriteLine($"Signature field '{fieldName}' found.");
-
-                // -----------------------------------------------------------------
-                // 1. Extract the signing certificate (if any)
-                // -----------------------------------------------------------------
-                X509Certificate2 cert = null;
-                try
-                {
-                    using (Stream certStream = sigField.ExtractCertificate())
-                    using (MemoryStream ms = new MemoryStream())
+                    if (f is SignatureField sigField && sigField.Signature != null)
                     {
-                        certStream.CopyTo(ms);
-                        cert = new X509Certificate2(ms.ToArray());
-                    }
+                        // Validate the digital signature (Verify returns true if the signature is cryptographically valid)
+                        bool signatureValid = sigField.Signature.Verify();
 
-                    Console.WriteLine($"  Certificate subject: {cert.Subject}");
-                    Console.WriteLine($"  Certificate validity: {cert.NotBefore:u} – {cert.NotAfter:u}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"  Unable to extract certificate: {ex.Message}");
-                }
+                        // Obtain the signing timestamp from the signature (Date property holds the signing time)
+                        DateTime signingTime = sigField.Signature.Date;
 
-                // -----------------------------------------------------------------
-                // 2. Retrieve the signing time (if the signature object exposes it)
-                // -----------------------------------------------------------------
-                DateTime signingTime = DateTime.MinValue;
-                try
-                {
-                    // The Signature object (returned by the field) may expose a SigningTime property.
-                    // Because the exact property name can differ between library versions, we use
-                    // reflection as a safe fallback.
-                    var signatureObj = sigField.Signature; // read‑only property
-                    if (signatureObj != null)
-                    {
-                        var prop = signatureObj.GetType().GetProperty("SigningTime") ??
-                                   signatureObj.GetType().GetProperty("SignatureDate") ??
-                                   signatureObj.GetType().GetProperty("SignDate");
-                        if (prop != null && prop.PropertyType == typeof(DateTime))
+                        // Retrieve the X.509 certificate used for signing
+                        X509Certificate2 cert = null;
+                        using (Stream certStream = sigField.ExtractCertificate())
                         {
-                            signingTime = (DateTime)prop.GetValue(signatureObj);
+                            if (certStream != null && certStream.Length > 0)
+                            {
+                                using (var ms = new MemoryStream())
+                                {
+                                    certStream.CopyTo(ms);
+                                    cert = new X509Certificate2(ms.ToArray());
+                                }
+                            }
                         }
+
+                        // Ensure the signing timestamp falls within the certificate's validity period
+                        bool withinValidity = false;
+                        if (cert != null)
+                        {
+                            withinValidity = signingTime >= cert.NotBefore && signingTime <= cert.NotAfter;
+                        }
+
+                        // Output results
+                        Console.WriteLine($"Signature field: {sigField.PartialName}");
+                        Console.WriteLine($"  Valid: {signatureValid}");
+                        Console.WriteLine($"  Signing time (UTC): {signingTime:u}");
+                        if (cert != null)
+                        {
+                            Console.WriteLine($"  Certificate valid from {cert.NotBefore:u} to {cert.NotAfter:u}");
+                        }
+                        else
+                        {
+                            Console.WriteLine("  Certificate could not be extracted.");
+                        }
+                        Console.WriteLine($"  Timestamp within certificate validity: {withinValidity}");
                     }
-
-                    if (signingTime != DateTime.MinValue)
-                        Console.WriteLine($"  Signing time: {signingTime:u}");
-                    else
-                        Console.WriteLine("  Signing time: <not available>");
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"  Unable to read signing time: {ex.Message}");
-                }
-
-                // -----------------------------------------------------------------
-                // 3. Basic validation – a signature is considered "valid" when a certificate
-                //    could be extracted and the signing time lies inside the certificate's
-                //    validity period. Full PKI validation (revocation, LTV, etc.) requires the
-                //    PdfFileSignature facade, which is prohibited by the hard rule.
-                // -----------------------------------------------------------------
-                bool isValid = false;
-                if (cert != null && signingTime != DateTime.MinValue)
-                {
-                    isValid = signingTime >= cert.NotBefore && signingTime <= cert.NotAfter;
-                }
-                Console.WriteLine($"  Signature valid (time within cert validity): {isValid}");
-
-                Console.WriteLine(); // blank line between signatures
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

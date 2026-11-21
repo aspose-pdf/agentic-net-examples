@@ -11,17 +11,18 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages and clear their annotation collections
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.Annotations.Clear();
+                // Remove all annotations from the current page
+                doc.Pages[i].Annotations.Clear();
             }
 
             // Save the cleaned PDF

@@ -8,48 +8,51 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_endnote.pdf";
+
+        const string endnoteText = "This is an endnote with **bold** and *italic* formatting.";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Extract all text from the document (optional demonstration)
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages.Accept(absorber);
-                Console.WriteLine($"Extracted text length: {absorber.Text.Length}");
+                // Get the last page (1‑based indexing)
+                Page lastPage = doc.Pages[doc.Pages.Count];
 
-                // Add a new page at the end for the endnote
-                Page endPage = doc.Pages.Add();
+                // Position near the bottom‑left corner
+                double marginLeft = 50;   // points from the left edge
+                double marginBottom = 50; // points from the bottom edge
 
-                // Create a TextFragment containing the endnote text
-                TextFragment endNote = new TextFragment("Endnote: This is a sample endnote with bold and italic styling.");
+                // Create the TextFragment and set its position
+                TextFragment fragment = new TextFragment(endnoteText)
+                {
+                    Position = new Aspose.Pdf.Text.Position(marginLeft, marginBottom)
+                };
 
-                // Apply bold and italic formatting via TextState
-                endNote.TextState.FontStyle = FontStyles.Bold | FontStyles.Italic;
-                endNote.TextState.FontSize = 12; // optional size
-                // Position the fragment on the page (optional)
-                endNote.Position = new Position(50, 750);
+                // Modify the existing TextState (property is read‑only)
+                fragment.TextState.Font = FontRepository.FindFont("Arial");
+                fragment.TextState.FontSize = 12;
+                fragment.TextState.FontStyle = FontStyles.Bold | FontStyles.Italic;
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
-                // Add the TextFragment to the page's paragraph collection
-                endPage.Paragraphs.Add(endNote);
+                // Add the fragment to the page
+                lastPage.Paragraphs.Add(fragment);
 
-                // Save the modified PDF
+                // Save the updated document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Document saved to '{outputPath}'.");
+            Console.WriteLine($"Endnote added and PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

@@ -1,16 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // needed for Color, etc.
-using PdfRect = Aspose.Pdf.Rectangle; // disambiguate Rectangle
+using Aspose.Pdf.Text; // retained for completeness, not used in this example
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";      // source PDF
-        const string outputSvgPath = "extracted.svg"; // destination SVG
-        const int graphicIndex = 1;                    // 1‑based index of the graphic element on the page
+        const string inputPdfPath = "input.pdf";   // source PDF
+        const string outputSvgPath = "element.svg"; // SVG output (single page)
+        const int graphicIndex = 2;                 // 1‑based index of the graphic element (page) to extract
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,60 +17,42 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Ensure the document has at least one page
-            if (pdfDoc.Pages.Count < 1)
+            // Load the PDF document inside a using block for deterministic disposal.
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                Console.Error.WriteLine("The PDF contains no pages.");
-                return;
-            }
-
-            // For this example we look at the first page only
-            Page page = pdfDoc.Pages[1]; // 1‑based indexing (global rule)
-
-            // Locate the graphic by its 1‑based index
-            int currentIndex = 0;
-            XImage? targetImage = null;
-
-            foreach (XImage img in page.Resources.Images)
-            {
-                currentIndex++;
-                if (currentIndex == graphicIndex)
+                // Validate the requested index.
+                if (graphicIndex < 1 || graphicIndex > pdfDoc.Pages.Count)
                 {
-                    targetImage = img;
-                    break;
+                    Console.Error.WriteLine($"Graphic index {graphicIndex} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                    return;
                 }
+
+                // Create a temporary document that will contain only the requested page.
+                using (Document singlePageDoc = new Document())
+                {
+                    // Add the selected page to the new document. The Add method copies the page content.
+                    singlePageDoc.Pages.Add(pdfDoc.Pages[graphicIndex]);
+
+                    // Configure SVG save options.
+                    SvgSaveOptions svgOptions = new SvgSaveOptions
+                    {
+                        // Optional: enable CSS style embedding by scaling to pixels.
+                        ScaleToPixels = true
+                    };
+
+                    // Save the single‑page document as SVG. When saving with SvgSaveOptions, one SVG file is created per page.
+                    // Because the temporary document contains only one page, the result will be a single SVG file at the path provided.
+                    singlePageDoc.Save(outputSvgPath, svgOptions);
+                }
+
+                Console.WriteLine($"Graphic element {graphicIndex} saved as SVG to '{outputSvgPath}'.");
             }
-
-            if (targetImage == null)
-            {
-                Console.Error.WriteLine($"Graphic element #{graphicIndex} not found on page 1.");
-                return;
-            }
-
-            // Create a temporary PDF that contains only the extracted image
-            Document svgDoc = new Document();
-            Page newPage = svgDoc.Pages.Add();
-
-            // Save the XImage into a memory stream and add it to the new page resources
-            using (MemoryStream imgStream = new MemoryStream())
-            {
-                targetImage.Save(imgStream);
-                imgStream.Position = 0; // reset stream position
-                string imgName = newPage.Resources.Images.Add(imgStream);
-
-                // Define a rectangle that covers the whole page (or adjust as needed)
-                PdfRect rect = new PdfRect(0, 0, newPage.PageInfo.Width, newPage.PageInfo.Height);
-                newPage.AddImage(imgName, rect);
-            }
-
-            // Save the temporary PDF as SVG
-            SvgSaveOptions svgOpts = new SvgSaveOptions();
-            svgDoc.Save(outputSvgPath, svgOpts);
-
-            Console.WriteLine($"Graphic element #{graphicIndex} saved as SVG to '{outputSvgPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

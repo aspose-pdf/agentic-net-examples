@@ -6,49 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";
-        const string outputPath     = "watermarked.pdf";
-        const string watermarkPath  = "watermark.png";
+        const string inputPdf  = "input.pdf";
+        const string watermarkImage = "watermark.png";
+        const string outputPdf = "watermarked.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(watermarkPath))
+
+        if (!File.Exists(watermarkImage))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
+            Console.Error.WriteLine($"Watermark image not found: {watermarkImage}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        using (Document doc = new Document(inputPdf))
         {
-            // Create an ImageStamp for the watermark image
-            ImageStamp stamp = new ImageStamp(watermarkPath)
+            // Create an ImageStamp for the watermark
+            ImageStamp stamp = new ImageStamp(watermarkImage)
             {
-                // Place the stamp above page content
-                Background = false,
                 // Rotate 45 degrees for diagonal placement
                 RotateAngle = 45,
-                // Optional: make the watermark semi‑transparent
-                Opacity = 0.3f,
-                // Center the stamp on each page
+
+                // Place the stamp in the center of each page
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                VerticalAlignment   = VerticalAlignment.Center,
+
+                // Make the watermark semi‑transparent
+                Opacity = 0.3,
+
+                // Ensure the stamp is drawn over page content
+                Background = false
             };
 
-            // Apply the stamp to every page (Aspose.Pdf uses 1‑based page indexing)
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            // Add the stamp to every page (must call AddStamp on each Page)
+            foreach (Page page in doc.Pages)
             {
-                Page page = pdfDoc.Pages[i];
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPath);
+            // Save the resulting PDF
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }

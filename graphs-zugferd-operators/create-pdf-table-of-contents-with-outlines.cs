@@ -1,12 +1,10 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -21,74 +19,89 @@ class Program
             return;
         }
 
-        // Enable automatic tagging so headings are detected as HeaderElements
-        AutoTaggingSettings.Default.EnableAutoTagging = true;
-
-        // Load the source PDF inside a using block (lifecycle rule)
+        // Load the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content
-            ITaggedContent taggedContent = doc.TaggedContent;
+            // Insert a new page at the beginning to hold the TOC
+            Page tocPage = doc.Pages.Insert(1);
+            tocPage.PageInfo.Margin = new MarginInfo(20, 20, 20, 20);
 
-            // Find all heading elements (HeaderElement) recursively
-            var headings = taggedContent.RootElement.FindElements<HeaderElement>(true);
+            // Extract all text fragments with formatting information
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            doc.Pages.Accept(absorber);
 
-            // Sort headings by their page number to preserve document order
-            var sortedHeadings = new List<HeaderElement>(headings);
-            sortedHeadings.Sort((h1, h2) =>
+            // Collect fragments that look like headings (font size > 14)
+            List<TextFragment> headingFragments = new List<TextFragment>();
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                int p1 = h1.Page?.Number ?? int.MaxValue;
-                int p2 = h2.Page?.Number ?? int.MaxValue;
-                return p1.CompareTo(p2);
-            });
-
-            // Insert a new blank page at the beginning for the Table of Contents
-            Page tocPage = doc.Pages.Insert(1); // creates a new empty page at position 1
-
-            // Add a title for the TOC
-            TextFragment title = new TextFragment("Table of Contents");
-            title.TextState.FontSize = 20;
-            title.TextState.FontStyle = FontStyles.Bold;
-            title.Position = new Position(50, 800);
-            tocPage.Paragraphs.Add(title);
-
-            // Vertical offset for TOC entries
-            double yOffset = 750;
-
-            // Process each heading
-            foreach (HeaderElement heading in sortedHeadings)
-            {
-                // Retrieve heading text and page number (fallback to 0 if not found)
-                string headingText = heading.ActualText ?? "Untitled";
-                int pageNumber = heading.Page?.Number ?? 0; // 1‑based page index
-
-                if (pageNumber == 0)
-                    continue; // skip headings that are not associated with a page
-
-                // Create a TOC entry line
-                string tocLine = $"{headingText} ................................ {pageNumber}";
-                TextFragment entry = new TextFragment(tocLine);
-                entry.Position = new Position(50, yOffset);
-                tocPage.Paragraphs.Add(entry);
-                yOffset -= 20; // move down for next entry
-
-                // Add a clickable outline (bookmark) that jumps to the heading page
-                // Use a FitExplicitDestination (fits the whole page) and set outline properties
-                OutlineItemCollection outline = new OutlineItemCollection(doc.Outlines)
+                if (fragment.TextState != null && fragment.TextState.FontSize > 14)
                 {
-                    Title = headingText,
-                    Bold = true,
-                    Italic = false,
-                    Color = System.Drawing.Color.DarkBlue,
-                    Destination = new FitExplicitDestination(heading.Page)
-                };
-                doc.Outlines.Add(outline);
+                    headingFragments.Add(fragment);
+                }
             }
 
-            // Save the modified document (lifecycle rule)
+            // Starting vertical position for TOC entries
+            double yPos = tocPage.PageInfo.Height - 40;
+            const double lineHeight = 20;
+
+            foreach (TextFragment heading in headingFragments)
+            {
+                // ------------------------------------------------------------
+                // 1. Add a Heading object to the TOC page (Aspose.Pdf.Heading)
+                // ------------------------------------------------------------
+                Heading tocHeading = new Heading(1); // level 1 heading
+                tocHeading.IsAutoSequence = true;   // auto‑numbered page reference
+                tocHeading.TocPage = tocPage;       // page that holds the TOC
+                tocHeading.DestinationPage = heading.Page; // page the heading points to
+                // Position the heading on the destination page (top of the page)
+                tocHeading.Top = heading.Page.Rect.Height;
+                // The visible text of the TOC entry
+                tocHeading.Segments.Add(new TextSegment(heading.Text));
+                tocPage.Paragraphs.Add(tocHeading);
+
+                // ------------------------------------------------------------
+                // 2. Create a clickable link annotation on the TOC page
+                // ------------------------------------------------------------
+                LinkAnnotation link = new LinkAnnotation(
+                    tocPage,
+                    new Aspose.Pdf.Rectangle(40, yPos - lineHeight + 5, tocPage.PageInfo.Width - 40, yPos + 5));
+                // Destination is the page that contains the heading
+                link.Action = new GoToAction(heading.Page);
+                // Remove the border of the link annotation
+                link.Border = new Border(link) { Width = 0 };
+                tocPage.Annotations.Add(link);
+
+                // ------------------------------------------------------------
+                // 3. Add an outline (bookmark) entry for the heading
+                // ------------------------------------------------------------
+                OutlineItemCollection outlineItem = new OutlineItemCollection(doc.Outlines)
+                {
+                    Title = heading.Text,
+                    Destination = new XYZExplicitDestination(
+                        heading.Page,
+                        0,
+                        heading.Page.Rect.Height,
+                        1)
+                };
+                doc.Outlines.Add(outlineItem);
+
+                // ------------------------------------------------------------
+                // 4. Move to the next line; add a new TOC page if needed
+                // ------------------------------------------------------------
+                yPos -= lineHeight;
+                if (yPos < 40)
+                {
+                    tocPage = doc.Pages.Add();
+                    tocPage.PageInfo.Margin = new MarginInfo(20, 20, 20, 20);
+                    yPos = tocPage.PageInfo.Height - 40;
+                }
+            }
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with Table of Contents saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with TOC saved to '{outputPath}'.");
     }
 }

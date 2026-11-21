@@ -1,87 +1,99 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;                 // Document, Page, Annotation
-using Aspose.Pdf.Annotations;    // Specific annotation types (e.g., TextAnnotation, MarkupAnnotation)
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
-class Program
+class AnnotationReporter
 {
-    static void Main()
+    // Holds annotation together with its page number for reporting
+    private class AnnotationInfo
     {
-        const string pdfPath = "input.pdf";
+        public int PageNumber { get; set; }
+        public Annotation Annotation { get; set; }
+    }
 
+    /// <summary>
+    /// Extracts all annotations from the PDF, groups them by author (Title property of MarkupAnnotation),
+    /// and writes a simple report to the console.
+    /// </summary>
+    /// <param name="pdfPath">Path to the input PDF file.</param>
+    public static void ExtractAndReportByAuthor(string pdfPath)
+    {
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        ReportAnnotationsByAuthor(pdfPath);
-    }
+        // Dictionary: author -> list of annotations (with page info)
+        var authorGroups = new Dictionary<string, List<AnnotationInfo>>(StringComparer.OrdinalIgnoreCase);
 
-    /// <summary>
-    /// Extracts all annotations from the specified PDF, groups them by the author
-    /// and prints a simple report to the console.
-    /// </summary>
-    /// <param name="pdfPath">Path to the PDF file.</param>
-    static void ReportAnnotationsByAuthor(string pdfPath)
-    {
-        // Use the high‑level Document API – it provides access to pages and their annotations.
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load the document inside a using block for deterministic disposal
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
         {
-            int pageCount = pdfDoc.Pages.Count; // 1‑based indexing in Aspose.Pdf
-
-            // Dictionary to hold author -> list of (annotation, pageNumber).
-            var authorAnnotations = new Dictionary<string, List<(Annotation annotation, int pageNumber)>>(StringComparer.OrdinalIgnoreCase);
-
-            // Iterate through all pages and collect annotations.
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageIdx = 1; pageIdx <= doc.Pages.Count; pageIdx++)
             {
-                Page page = pdfDoc.Pages[pageNumber];
-                if (page == null) continue;
+                Aspose.Pdf.Page page = doc.Pages[pageIdx];
 
-                // Each page has an Annotations collection.
-                foreach (Annotation annot in page.Annotations)
+                // If the page has no annotations, skip
+                if (page.Annotations == null || page.Annotations.Count == 0)
+                    continue;
+
+                foreach (Aspose.Pdf.Annotations.Annotation ann in page.Annotations)
                 {
-                    // Most markup‑type annotations expose a Subject property that can be used to store author information.
-                    string author = (annot as MarkupAnnotation)?.Subject;
-                    if (string.IsNullOrWhiteSpace(author))
-                        author = "Unknown";
+                    // Default author when Title is not available
+                    string author = "Unknown";
 
-                    if (!authorAnnotations.TryGetValue(author, out var list))
+                    // Title belongs to MarkupAnnotation, not the base Annotation class
+                    if (ann is Aspose.Pdf.Annotations.MarkupAnnotation markup)
                     {
-                        list = new List<(Annotation, int)>();
-                        authorAnnotations[author] = list;
+                        author = !string.IsNullOrEmpty(markup.Title) ? markup.Title : author;
                     }
 
-                    list.Add((annot, pageNumber));
+                    if (!authorGroups.TryGetValue(author, out var list))
+                    {
+                        list = new List<AnnotationInfo>();
+                        authorGroups[author] = list;
+                    }
+
+                    list.Add(new AnnotationInfo
+                    {
+                        PageNumber = pageIdx,
+                        Annotation = ann
+                    });
                 }
-            }
-
-            // Output the grouped report.
-            Console.WriteLine("Annotation report grouped by author:");
-            Console.WriteLine("------------------------------------");
-
-            foreach (var kvp in authorAnnotations.OrderBy(k => k.Key))
-            {
-                string author = kvp.Key;
-                var annots = kvp.Value;
-
-                Console.WriteLine($"Author: {author}");
-                Console.WriteLine($"  Total Annotations: {annots.Count}");
-
-                foreach (var (ann, pageNum) in annots)
-                {
-                    // Common properties available on the base Annotation class.
-                    string type = ann.GetType().Name;
-                    // Title is only on MarkupAnnotation (or derived types).
-                    string title = (ann as MarkupAnnotation)?.Title ?? string.Empty;
-                    Console.WriteLine($"    - Type: {type}, Title: {title}, Page: {pageNum}");
-                }
-
-                Console.WriteLine();
             }
         }
+
+        // Reporting
+        Console.WriteLine("Annotation report grouped by author:");
+        foreach (var kvp in authorGroups)
+        {
+            string author = kvp.Key;
+            List<AnnotationInfo> infos = kvp.Value;
+
+            Console.WriteLine($"Author: {author} – Total Annotations: {infos.Count}");
+            foreach (var info in infos)
+            {
+                // Contents is available on the base Annotation class
+                string contents = info.Annotation.Contents ?? string.Empty;
+                Console.WriteLine($"  Page {info.PageNumber}: Type={info.Annotation.GetType().Name}, Contents=\"{contents}\"");
+            }
+        }
+    }
+
+    // Example entry point
+    static void Main(string[] args)
+    {
+        if (args.Length == 0)
+        {
+            Console.Error.WriteLine("Usage: AnnotationReporter <pdf-file-path>");
+            return;
+        }
+
+        ExtractAndReportByAuthor(args[0]);
     }
 }

@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,47 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "payment_form.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a blank page to host the form field
+            Page page = doc.Pages.Add();
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure there is at least one page to place the radio button on
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
+            // Create a radio button field (group) on the page
+            RadioButtonField paymentMethod = new RadioButtonField(page);
+            paymentMethod.PartialName = "PaymentMethod"; // group name
 
-            // Get the first page
-            Page page = doc.Pages[1];
+            // Define rectangles for each option (left, bottom, right, top)
+            var creditRect = new Aspose.Pdf.Rectangle(100, 700, 115, 715);
+            var debitRect  = new Aspose.Pdf.Rectangle(150, 700, 165, 715);
 
-            // Define rectangles for the individual radio button options
-            Aspose.Pdf.Rectangle creditRect = new Aspose.Pdf.Rectangle(100, 700, 120, 720);
-            Aspose.Pdf.Rectangle debitRect  = new Aspose.Pdf.Rectangle(100, 660, 120, 680);
+            // Add the two options to the group
+            paymentMethod.AddOption("Credit", creditRect);
+            paymentMethod.AddOption("Debit",  debitRect);
 
-            // Create the radio button group (no rectangle in ctor)
-            RadioButtonField paymentRadio = new RadioButtonField(page);
-            paymentRadio.PartialName = "PaymentMethod";
+            // Add the field to the document's form collection (page index is 1‑based)
+            doc.Form.Add(paymentMethod, 1);
 
-            // Add the two options with their visual rectangles
-            paymentRadio.AddOption("Credit", creditRect);
-            paymentRadio.AddOption("Debit",  debitRect);
+            // Set a default selected option (1‑based index; 1 = first option added)
+            paymentMethod.Selected = 1; // selects "Credit"
 
-            // Optionally set a default selected option (1‑based index)
-            paymentRadio.Selected = 1; // selects "Credit" by default
-
-            // Register the field with the document's form collection
-            doc.Form.Add(paymentRadio);
-
-            // Save the updated PDF
+            // Save the resulting PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Radio button group 'PaymentMethod' added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with radio button group saved to '{outputPath}'.");
     }
 }

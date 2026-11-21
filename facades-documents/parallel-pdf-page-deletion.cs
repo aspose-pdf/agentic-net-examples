@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 
@@ -7,46 +9,58 @@ class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\Pdf\Input";
-        // Folder where processed PDFs will be written
-        const string outputFolder = @"C:\Pdf\Output";
-
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Example: delete page number 2 from each PDF
-        const int pageToDelete = 2;
-
-        // Gather all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-
-        // Process files in parallel to improve throughput
-        Parallel.ForEach(pdfFiles, pdfPath =>
+        // Define the PDFs to process and the pages that should be removed from each file.
+        // The key is the source PDF path, the value is a tuple containing the destination path
+        // and an array of 1‑based page numbers to delete.
+        var jobs = new Dictionary<string, (string outputPath, int[] pagesToDelete)>
         {
-            string outputPath = Path.Combine(outputFolder,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_modified.pdf");
+            { "doc1.pdf", ("doc1_clean.pdf", new[] { 2, 5 }) },
+            { "doc2.pdf", ("doc2_clean.pdf", new[] { 1 }) },
+            { "doc3.pdf", ("doc3_clean.pdf", new[] { 3, 4, 7 }) }
+        };
 
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+        // Process all PDFs in parallel to improve throughput.
+        Parallel.ForEach(jobs, job =>
+        {
+            string inputPath = job.Key;
+            string outputPath = job.Value.outputPath;
+            int[] pages = job.Value.pagesToDelete;
+
+            if (!File.Exists(inputPath))
             {
-                // If the requested page exists, delete it; otherwise just copy the file
-                if (pageToDelete >= 1 && pageToDelete <= doc.Pages.Count)
-                {
-                    // Delete the page and save the modified document
-                    doc.Pages.Delete(pageToDelete);
-                    doc.Save(outputPath);
-                }
-                else
-                {
-                    // No deletion needed – copy original PDF to the output location
-                    File.Copy(pdfPath, outputPath, true);
-                }
+                Console.Error.WriteLine($"Input file not found: {inputPath}");
+                return;
             }
 
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)} → {Path.GetFileName(outputPath)}");
+            try
+            {
+                // Load the PDF using the Document class (PdfFileEditor does not provide DeletePages).
+                Document pdfDoc = new Document(inputPath);
+
+                // Delete pages in descending order to keep the remaining page numbers stable.
+                foreach (int pageNum in pages.OrderByDescending(p => p))
+                {
+                    if (pageNum >= 1 && pageNum <= pdfDoc.Pages.Count)
+                    {
+                        pdfDoc.Pages.Delete(pageNum);
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Page {pageNum} out of range for '{inputPath}'.");
+                    }
+                }
+
+                // Save the modified PDF to the destination path.
+                pdfDoc.Save(outputPath);
+
+                Console.WriteLine($"Processed '{inputPath}' → '{outputPath}' (removed pages: {string.Join(",", pages)})");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+            }
         });
 
-        Console.WriteLine("All files have been processed.");
+        Console.WriteLine("All PDF page‑deletion jobs completed.");
     }
 }

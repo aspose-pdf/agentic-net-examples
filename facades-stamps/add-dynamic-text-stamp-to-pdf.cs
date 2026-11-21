@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "stamped_output.pdf";
-        const string author = "John Doe";
+        const string author     = "John Doe";
 
         if (!File.Exists(inputPath))
         {
@@ -17,39 +17,30 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Load the PDF document using the Document class (PdfFileEditor has no BindPdf method).
-            Document pdfDoc = new Document(inputPath);
-
-            // Create a text stamp with dynamic content using string interpolation.
-            string stampText = $"Created on {DateTime.Now:yyyy-MM-dd HH:mm} by {author}";
-            TextStamp textStamp = new TextStamp(stampText)
+            // Create a text stamp with dynamic content using string interpolation
+            TextStamp stamp = new TextStamp($"Author: {author}, Date: {DateTime.Now:yyyy-MM-dd}")
             {
-                // Position the stamp – use XIndent/YIndent instead of non‑existent X/Y properties.
-                XIndent = 100,
-                YIndent = 100,
-                // All visual formatting is done through the TextState object.
-                TextState =
-                {
-                    Font = FontRepository.FindFont("Arial"),
-                    FontSize = 12,
-                    ForegroundColor = Color.Black
-                }
+                Background          = false,
+                Opacity             = 0.5,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Use cross‑platform Aspose.Pdf.Color
+                TextState = { ForegroundColor = Aspose.Pdf.Color.Black }
             };
 
-            // Apply the stamp to every page – Document.Pages does not have an AddStamp method.
+            // Apply the stamp to every page in the document
             foreach (Page page in pdfDoc.Pages)
             {
-                page.AddStamp(textStamp);
+                page.AddStamp(stamp);
             }
 
-            // Save the modified document.
+            // Save the stamped PDF
             pdfDoc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text stamp applied and saved to '{outputPath}'.");
     }
 }

@@ -3,71 +3,54 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "price_calculator.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a single page
-            Page page = doc.Pages.Add();
-
-            // Quantity text field
-            TextBoxField qtyField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 700, 200, 720));
-            qtyField.PartialName = "Quantity";
-            qtyField.Value = "0";
-            doc.Form.Add(qtyField);
-
-            // Unit Price text field
-            TextBoxField priceField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 650, 200, 670));
-            priceField.PartialName = "UnitPrice";
-            priceField.Value = "0.00";
-            doc.Form.Add(priceField);
-
-            // Total text field (read‑only)
-            TextBoxField totalField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 600, 200, 620));
-            totalField.PartialName = "Total";
-            totalField.Value = "0.00";
-            totalField.ReadOnly = true;
-            doc.Form.Add(totalField);
-
-            // Button that runs JavaScript to calculate total = Quantity * UnitPrice
-            ButtonField calcButton = new ButtonField(page, new Aspose.Pdf.Rectangle(100, 550, 200, 570));
-            calcButton.PartialName = "CalcButton";
-            calcButton.Value = "Calculate";
-
-            string js = @"
-var qty = this.getField('Quantity').value;
-var price = this.getField('UnitPrice').value;
-var total = parseFloat(qty) * parseFloat(price);
-this.getField('Total').value = total.toFixed(2);
-";
-            // Assign JavaScript to the button's mouse‑press action (click)
-            calcButton.Actions.OnPressMouseBtn = new JavascriptAction(js);
-            doc.Form.Add(calcButton);
-
-            // Add visible labels for the fields
-            TextFragment lblQty = new TextFragment("Quantity:");
-            lblQty.Position = new Position(20, 710);
-            page.Paragraphs.Add(lblQty);
-
-            TextFragment lblPrice = new TextFragment("Unit Price:");
-            lblPrice.Position = new Position(20, 660);
-            page.Paragraphs.Add(lblPrice);
-
-            TextFragment lblTotal = new TextFragment("Total:");
-            lblTotal.Position = new Position(20, 610);
-            page.Paragraphs.Add(lblTotal);
-
-            // Save the PDF
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        try
+        {
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
+            {
+                // Retrieve the button field (assumed name "CalcButton")
+                ButtonField button = doc.Form["CalcButton"] as ButtonField;
+                if (button == null)
+                {
+                    Console.Error.WriteLine("Button field 'CalcButton' not found.");
+                }
+                else
+                {
+                    // JavaScript that reads Quantity and UnitPrice fields, calculates Total, and sets the Total field
+                    string js = @"
+var qty = this.getField('Quantity').value;
+var price = this.getField('UnitPrice').value;
+var total = qty * price;
+this.getField('Total').value = total;
+";
+
+                    // Assign the JavaScript to the button's mouse‑up (release) action
+                    button.Actions.OnReleaseMouseBtn = new JavascriptAction(js);
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with JavaScript to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

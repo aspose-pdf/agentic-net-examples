@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -10,97 +9,122 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "template.pdf";
-        const string encryptedXmlPath = "data.xml.enc";
+        const string encryptedXmlPath = "formdata.xml.enc";
+        const string pdfTemplatePath = "template.pdf";
         const string outputPdfPath = "filled.pdf";
 
-        // Replace with your actual key (32 bytes for AES‑256) and IV (16 bytes)
-        // For demo purposes we pad/truncate the strings to required lengths.
-        byte[] key = GetFixedLengthBytes("YOUR_32_BYTE_KEY_GOES_HERE_____", 32);
-        byte[] iv  = GetFixedLengthBytes("YOUR_16_BYTE_IV__", 16);
+        // -----------------------------------------------------------------
+        // 1. Decrypt the encrypted XML file (AES‑CBC example)
+        // -----------------------------------------------------------------
+        // NOTE: Replace the placeholder key/IV with the actual values used
+        // for encryption. Both must be the correct length (32 bytes for a
+        // 256‑bit key, 16 bytes for a 128‑bit IV).
+        byte[] key = new byte[32]; // TODO: populate with real key
+        byte[] iv  = new byte[16]; // TODO: populate with real IV
 
-        // Verify that the source files exist before proceeding.
-        if (!File.Exists(pdfPath))
-        {
-            Console.WriteLine($"PDF template not found: {Path.GetFullPath(pdfPath)}");
-            return;
-        }
         if (!File.Exists(encryptedXmlPath))
         {
-            Console.WriteLine($"Encrypted XML file not found: {Path.GetFullPath(encryptedXmlPath)}");
+            Console.Error.WriteLine($"Encrypted XML not found: {encryptedXmlPath}");
             return;
         }
 
-        // Decrypt the XML file
-        string xmlContent = DecryptXmlFile(encryptedXmlPath, key, iv);
-        if (string.IsNullOrWhiteSpace(xmlContent))
-        {
-            Console.WriteLine("Decrypted XML content is empty.");
-            return;
-        }
+        byte[] encryptedData = File.ReadAllBytes(encryptedXmlPath);
+        string decryptedXml;
 
-        // Load XML into an XDocument
-        XDocument xDoc = XDocument.Parse(xmlContent);
-
-        // Open the PDF template inside a using block (ensures disposal)
-        using (Document pdfDoc = new Document(pdfPath))
+        using (Aes aes = Aes.Create())
         {
-            // Expect XML like: <FormData><Field name="FieldName">Value</Field>...</FormData>
-            foreach (XElement fieldElem in xDoc.Descendants("Field"))
+            aes.Key = key;
+            aes.IV  = iv;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+
+            using (MemoryStream ms = new MemoryStream(encryptedData))
+            using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
+            using (StreamReader sr = new StreamReader(cs))
             {
-                XAttribute nameAttr = fieldElem.Attribute("name");
-                if (nameAttr == null) continue;
-
-                string fieldName = nameAttr.Value;
-                string fieldValue = fieldElem.Value;
-
-                // Retrieve the form field; the indexer returns a Field object or null.
-                // Use a nullable variable to avoid CS8600 warning.
-                Field? pdfField = pdfDoc.Form[fieldName] as Field;
-                if (pdfField != null)
-                {
-                    pdfField.Value = fieldValue;
-                }
-                else
-                {
-                    Console.WriteLine($"Warning: No form field named '{fieldName}' found in the PDF template.");
-                }
+                decryptedXml = sr.ReadToEnd();
             }
+        }
 
-            // Save the filled PDF (PDF format, no SaveOptions needed)
+        // -----------------------------------------------------------------
+        // 2. Load the PDF template and import the form data from XML
+        // -----------------------------------------------------------------
+        if (!File.Exists(pdfTemplatePath))
+        {
+            Console.Error.WriteLine($"PDF template not found: {pdfTemplatePath}");
+            return;
+        }
+
+        using (Document pdfDoc = new Document(pdfTemplatePath))
+        {
+            // Populate the PDF form fields from the decrypted XML.
+            PopulateFormFromXml(pdfDoc, decryptedXml);
+
+            // Save the resulting PDF
             pdfDoc.Save(outputPdfPath);
         }
 
         Console.WriteLine($"Form data imported and saved to '{outputPdfPath}'.");
     }
 
-    // Decrypts an AES‑CBC encrypted file and returns the plaintext as a string
-    static string DecryptXmlFile(string encryptedPath, byte[] key, byte[] iv)
+    /// <summary>
+    /// Parses a simple XML representation of form data and fills the PDF form.
+    /// Expected XML format:
+    /// <formdata>
+    ///   <field name="FieldName1">Value1</field>
+    ///   <field name="FieldName2">Value2</field>
+    ///   ...
+    /// </formdata>
+    /// </summary>
+    private static void PopulateFormFromXml(Document doc, string xmlContent)
     {
-        using (FileStream fs = new FileStream(encryptedPath, FileMode.Open, FileAccess.Read))
-        using (Aes aes = Aes.Create())
-        {
-            aes.Key = key;
-            aes.IV = iv;
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.PKCS7;
+        if (string.IsNullOrWhiteSpace(xmlContent))
+            return;
 
-            using (CryptoStream cs = new CryptoStream(fs, aes.CreateDecryptor(), CryptoStreamMode.Read))
-            using (MemoryStream ms = new MemoryStream())
+        XDocument xDoc;
+        try
+        {
+            xDoc = XDocument.Parse(xmlContent);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to parse XML form data: {ex.Message}");
+            return;
+        }
+
+        var form = doc.Form;
+        if (form == null)
+            return;
+
+        // Iterate over each <field> element in the XML and set the matching PDF field.
+        foreach (var fieldElement in xDoc.Descendants("field"))
+        {
+            var nameAttr = fieldElement.Attribute("name");
+            if (nameAttr == null)
+                continue; // skip malformed entries
+
+            string fieldName = nameAttr.Value;
+            string fieldValue = fieldElement.Value ?? string.Empty;
+
+            // Retrieve the field from the PDF form. The indexer returns a Field object.
+            Field pdfField = form[fieldName] as Field;
+            if (pdfField != null)
             {
-                cs.CopyTo(ms);
-                return Encoding.UTF8.GetString(ms.ToArray());
+                pdfField.Value = fieldValue;
+            }
+            else
+            {
+                // If the direct indexer lookup fails, fall back to searching the Fields collection.
+                foreach (Field f in form.Fields)
+                {
+                    // PartialName is the name used in the PDF form definition.
+                    if (string.Equals(f.PartialName, fieldName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        f.Value = fieldValue;
+                        break;
+                    }
+                }
             }
         }
-    }
-
-    // Helper: ensures a byte array of the exact required length (pads with zeros or truncates).
-    static byte[] GetFixedLengthBytes(string input, int length)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(input);
-        if (bytes.Length == length) return bytes;
-        byte[] fixedBytes = new byte[length];
-        Array.Copy(bytes, 0, fixedBytes, 0, Math.Min(bytes.Length, length));
-        return fixedBytes;
     }
 }

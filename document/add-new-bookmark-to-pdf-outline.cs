@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -9,8 +10,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string headingTitle = "New Section";
-        const int targetPageNumber = 2; // page where the bookmark should point (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -18,37 +17,47 @@ class Program
             return;
         }
 
+        // Load the existing PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Validate page number (Aspose.Pdf uses 1‑based indexing)
+            // Choose the page where the new bookmark should point.
+            // Aspose.Pdf uses 1‑based page indexing.
+            int targetPageNumber = 1; // change as needed
             if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
                 Console.Error.WriteLine("Target page number is out of range.");
                 return;
             }
 
-            // Get the target page instance
-            Page targetPage = doc.Pages[targetPageNumber];
-
-            // Create a GoToAction that points to the desired page.
-            // The constructor expects a Page object; the destination type defaults to FitH.
-            GoToAction goTo = new GoToAction(targetPage);
-
-            // Create a new outline (bookmark) item. The constructor expects the parent OutlineCollection.
-            OutlineItemCollection newOutline = new OutlineItemCollection(doc.Outlines)
+            // Create a new outline (bookmark) item using the document model API
+            OutlineItemCollection newItem = new OutlineItemCollection(doc.Outlines)
             {
-                Title = headingTitle,
-                Action = goTo,
-                Italic = true // optional visual style
+                Title = "New Section Heading",
+                // Use a GoToAction to point to the chosen page (top of the page)
+                Action = new GoToAction(doc.Pages[targetPageNumber])
             };
 
-            // Add the new outline to the document's root outline collection.
-            doc.Outlines.Add(newOutline);
+            // Insert the new outline item at the desired position.
+            // OutlineCollection does not provide an Insert method, so we rebuild the collection.
+            // Desired position: second top‑level bookmark (index 1, zero‑based).
+            const int desiredIndex = 1;
+            List<OutlineItemCollection> current = new List<OutlineItemCollection>();
+            foreach (OutlineItemCollection item in doc.Outlines)
+                current.Add(item);
 
-            // Save the updated PDF.
+            // Ensure the index is within the valid range.
+            int insertPos = Math.Max(0, Math.Min(desiredIndex, current.Count));
+            current.Insert(insertPos, newItem);
+
+            // Clear existing outlines and re‑add them in the new order.
+            doc.Outlines.Clear();
+            foreach (OutlineItemCollection item in current)
+                doc.Outlines.Add(item);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Outline updated and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with new heading bookmark to '{outputPath}'.");
     }
 }

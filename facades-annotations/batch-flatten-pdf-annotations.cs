@@ -7,37 +7,43 @@ class Program
 {
     static void Main(string[] args)
     {
-        // Folder containing PDFs to process – either passed as first argument or defaulted.
-        string sourceFolder = args.Length > 0 ? args[0] : "PdfFolder";
+        // Determine the folder to process: first argument or current directory
+        string folderPath = args.Length > 0 ? args[0] : Directory.GetCurrentDirectory();
 
-        if (!Directory.Exists(sourceFolder))
+        if (!Directory.Exists(folderPath))
         {
-            Console.Error.WriteLine($"Folder not found: {sourceFolder}");
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
             return;
         }
 
-        // Process each PDF file in the folder.
-        foreach (string inputPath in Directory.GetFiles(sourceFolder, "*.pdf"))
+        // Get all PDF files in the folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf");
+
+        foreach (string inputPath in pdfFiles)
         {
+            // Build output file name with "_flattened" suffix before the extension
+            string directory = Path.GetDirectoryName(inputPath);
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string extension = Path.GetExtension(inputPath);
+            string outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_flattened{extension}");
+
             try
             {
-                // Build output file name with "_flattened" suffix.
-                string directory = Path.GetDirectoryName(inputPath) ?? sourceFolder; // fallback to sourceFolder if null
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(directory, $"{fileName}_flattened.pdf");
-
-                // Use PdfAnnotationEditor to flatten annotations.
+                // Bind the source PDF, flatten its annotations and save the result
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    editor.BindPdf(inputPath);          // bind the source PDF
-                    editor.FlatteningAnnotations();    // correct method name
-                    editor.Save(outputPath);            // write the flattened PDF
+                    editor.BindPdf(inputPath);
+                    // If you need to remove annotations before flattening, uncomment the next line
+                    // editor.DeleteAnnotations();
+                    editor.FlatteningAnnotations(); // correct method name
+                    editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Flattened: '{inputPath}' → '{outputPath}'");
+                Console.WriteLine($"Flattened: {outputPath}");
             }
             catch (Exception ex)
             {
+                // Report any errors but continue processing remaining files
                 Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }

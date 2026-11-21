@@ -1,51 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "TiffPages";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.tiff";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Set a default font fallback for missing characters using RenderingOptions
-            RenderingOptions renderOptions = new RenderingOptions();
-            renderOptions.DefaultFontName = "Arial"; // fallback font name
-
-            // Iterate through all pages (1‑based indexing)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Load the PDF document
+            using (Document doc = new Document(inputPath))
             {
+                // Set a default font to be used when a glyph is missing in the original font.
+                // This is done via RenderingOptions.DefaultFontName.
+                var renderingOptions = new RenderingOptions
+                {
+                    DefaultFontName = "Arial" // change to any font that is guaranteed to be present
+                };
+
                 // Configure TIFF settings with LZW compression
-                TiffSettings tiffSettings = new TiffSettings();
-                tiffSettings.Compression = CompressionType.LZW; // LZW compression
+                var tiffSettings = new TiffSettings
+                {
+                    Compression = CompressionType.LZW
+                };
 
-                // Create a TIFF device with desired resolution and settings
-                TiffDevice tiffDevice = new TiffDevice(new Resolution(300), tiffSettings);
-                tiffDevice.RenderingOptions = renderOptions; // apply fallback font
+                // Create a TiffDevice with desired DPI (e.g., 300) and the settings above
+                var tiffDevice = new TiffDevice(new Resolution(300), tiffSettings)
+                {
+                    RenderingOptions = renderingOptions
+                };
 
-                // Build output file name for the current page
-                string outputTiffPath = Path.Combine(outputFolder, $"Page_{pageNumber}.tiff");
-
-                // Render the page to TIFF
-                tiffDevice.Process(pdfDoc.Pages[pageNumber], outputTiffPath);
+                // Render the whole PDF to a multi‑page TIFF file
+                tiffDevice.Process(doc, outputPath);
             }
-        }
 
-        Console.WriteLine("PDF pages have been rendered to TIFF with LZW compression.");
+            Console.WriteLine($"PDF rendered to TIFF with LZW compression: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

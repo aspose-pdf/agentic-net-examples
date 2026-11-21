@@ -1,33 +1,17 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
-using Aspose.Pdf.Security; // Permissions and CryptoAlgorithm enums
+using Aspose.Pdf.Security; // Permissions and CryptoAlgorithm are defined here
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "source.xml";
-        const string encryptedPdfPath = "secure_output.pdf";
-        const string asposeDll = "Aspose.PDF.dll";
-
-        // Verify that the Aspose.PDF assembly is available before any Aspose types are used.
-        if (!File.Exists(asposeDll))
-        {
-            Console.Error.WriteLine($"Required assembly not found: {asposeDll}. Ensure the Aspose.PDF NuGet package is installed or the DLL is copied to the output folder.");
-            return;
-        }
-        // Load the assembly explicitly to provide a clearer error if it cannot be loaded.
-        try
-        {
-            Assembly.LoadFrom(Path.GetFullPath(asposeDll));
-        }
-        catch (Exception loadEx)
-        {
-            Console.Error.WriteLine($"Failed to load {asposeDll}: {loadEx.Message}");
-            return;
-        }
+        const string xmlPath = "input.xml";          // Source XML file
+        const string pdfPath = "output.pdf";         // Intermediate PDF (optional)
+        const string encryptedPath = "secure_output.pdf"; // Final DRM‑protected PDF
+        const string userPassword = "user123";       // Password for opening the PDF
+        const string ownerPassword = "owner123";     // Password for changing permissions
 
         if (!File.Exists(xmlPath))
         {
@@ -37,24 +21,26 @@ class Program
 
         try
         {
-            // Load the XML and convert it directly to a PDF document
+            // Load the XML and convert it to a PDF document
             using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
             {
-                // Define the permissions that will be allowed for the end user
-                Permissions perms = Permissions.PrintDocument |
-                                     Permissions.ModifyContent |
-                                     Permissions.ExtractContent;
+                // Optional: save the plain PDF before encryption
+                doc.Save(pdfPath);
 
-                // Apply DRM encryption using AES‑256
-                string userPassword = "user123";
-                string ownerPassword = "owner123";
+                // Define allowed permissions for the encrypted PDF
+                // "ModifyAnnotations" does not exist in older Aspose.Pdf versions; use a valid flag such as ModifyTextAnnotations.
+                Permissions perms = Permissions.PrintDocument |
+                                    Permissions.ModifyTextAnnotations |
+                                    Permissions.ExtractContent;
+
+                // Apply DRM by encrypting the document with AES‑256
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                // Save the encrypted PDF for secure distribution
-                doc.Save(encryptedPdfPath);
+                // Save the encrypted PDF
+                doc.Save(encryptedPath);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdfPath}'.");
+            Console.WriteLine($"Secure PDF saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {

@@ -8,37 +8,39 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int pageToDelete = 5;
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document using the overload that accepts a file path.
-            Document pdfDoc = new Document(inputPath);
-
-            // Validate the requested page number.
-            if (pageToDelete < 1 || pageToDelete > pdfDoc.Pages.Count)
+            // Load the PDF document using Aspose.Pdf.Document
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Page {pageToDelete} is out of range. Document has {pdfDoc.Pages.Count} pages.");
-                return;
+                // Ensure the document has at least 5 pages before attempting deletion
+                if (doc.Pages.Count >= 5)
+                {
+                    // Delete page 5 (1‑based indexing)
+                    doc.Pages.Delete(5);
+                }
+                else
+                {
+                    Console.Error.WriteLine("PDF does not contain page 5; no deletion performed.");
+                }
+
+                // Save the modified PDF to the output path
+                doc.Save(outputPath);
             }
 
-            // Delete the specified page.
-            pdfDoc.Pages.Delete(pageToDelete);
-
-            // Save the modified PDF.
-            pdfDoc.Save(outputPath);
-
-            Console.WriteLine($"Page {pageToDelete} deleted. Saved to '{outputPath}'.");
+            Console.WriteLine($"Page 5 removed. Result saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during page deletion: {ex.Message}");
         }
     }
 }

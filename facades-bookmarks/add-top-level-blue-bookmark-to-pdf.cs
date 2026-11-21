@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Drawing; // needed for System.Drawing.Color
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -13,28 +13,30 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfBookmarkEditor does not implement IDisposable, so no using block is required.
-        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        // Bind the existing PDF to the bookmark editor
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        {
+            bookmarkEditor.BindPdf(inputPath);
 
-        // Load the PDF document.
-        bookmarkEditor.BindPdf(inputPath);
+            // Create a bookmark that points to page 1 and set its color to blue
+            Bookmark bookmark = new Bookmark
+            {
+                Title = "First Page Bookmark",
+                PageNumber = 1,
+                Action = "GoTo",               // required for a page‑goto bookmark
+                TitleColor = System.Drawing.Color.Blue // fully qualified to avoid ambiguity
+            };
 
-        // Create a top‑level bookmark that points to the first page and set its color to blue.
-        Bookmark firstPageBookmark = new Bookmark();
-        firstPageBookmark.Title = "First Page";
-        firstPageBookmark.PageNumber = 1;
-        // TitleColor expects a System.Drawing.Color – fully qualify to avoid ambiguity.
-        firstPageBookmark.TitleColor = System.Drawing.Color.Blue;
+            // Add the bookmark to the document (top‑level)
+            bookmarkEditor.CreateBookmarks(bookmark);
 
-        // Add the bookmark to the document.
-        bookmarkEditor.CreateBookmarks(firstPageBookmark);
-
-        // Save the updated PDF.
-        bookmarkEditor.Save(outputPath);
+            // Save the modified PDF
+            bookmarkEditor.Save(outputPath);
+        }
 
         Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }

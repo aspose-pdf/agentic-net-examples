@@ -15,32 +15,32 @@ class Program
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
         if (!File.Exists(stampPath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document pdfDocument = new Document(inputPath))
         {
-            // Create an image stamp and rotate it 90 degrees
+            // Create an ImageStamp, rotate it 90 degrees, and center it on each page.
             ImageStamp imgStamp = new ImageStamp(stampPath)
             {
-                RotateAngle        = 90,                     // rotate to match portrait‑to‑landscape
-                Background         = false,                  // place stamp over content
                 HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                VerticalAlignment   = VerticalAlignment.Center,
+                RotateAngle         = 90,    // 90° rotation to match landscape orientation
+                Opacity             = 0.5,   // optional semi‑transparent appearance
+                Background          = false  // draw on top of existing content
             };
 
-            // Apply the stamp to each page individually
+            // Apply the stamp to each page individually (Page.AddStamp, not PageCollection).
             foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF.
             pdfDocument.Save(outputPath);
         }
 

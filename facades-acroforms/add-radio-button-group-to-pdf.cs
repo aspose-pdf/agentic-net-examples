@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms; // <-- required for form field classes
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "radio_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,30 +17,30 @@ class Program
         }
 
         // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        Document doc = new Document(inputPath);
+
+        // Get the first page (Aspose.Pdf pages are 1‑based)
+        Page page = doc.Pages[1];
+
+        // Create a radio button group on the page. The constructor accepts only a Page (or Document).
+        RadioButtonField radioGroup = new RadioButtonField(page)
         {
-            // Get the first page (or any page you want the radio button to appear on)
-            Page page = doc.Pages[1];
+            PartialName = "MyRadioGroup"
+        };
 
-            // Create a radio button field attached to the page
-            RadioButtonField radio = new RadioButtonField(page);
-            // Set the field's partial name (identifier)
-            radio.PartialName = "SampleRadioGroup";
+        // Add three options to the group. Use AddOption – the overload without a rectangle lets Aspose place the widgets automatically.
+        radioGroup.AddOption("Option1");
+        radioGroup.AddOption("Option2");
+        radioGroup.AddOption("Option3");
 
-            // Add three options to the radio button group
-            radio.AddOption("Option1");
-            radio.AddOption("Option2");
-            radio.AddOption("Option3");
+        // Set the default selected option programmatically. "Selected" is 1‑based, so 2 selects "Option2".
+        radioGroup.Selected = 2;
 
-            // Set the default selected option (1‑based index). Here we select the second option.
-            radio.Selected = 2;
+        // Add the radio button field to the document's form (page index is 1‑based).
+        doc.Form.Add(radioGroup, 1);
 
-            // Add the radio button field to the document's form collection (position 1 on the page)
-            doc.Form.Add(radio, 1);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
+        // Save the modified PDF
+        doc.Save(outputPath);
 
         Console.WriteLine($"Radio button group added and saved to '{outputPath}'.");
     }

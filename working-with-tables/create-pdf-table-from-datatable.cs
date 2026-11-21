@@ -1,42 +1,50 @@
 using System;
 using System.Data;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Create an in‑memory DataTable with sample data (replaces the unavailable SqlClient code)
+        // Create an in‑memory DataTable that mimics the result of a database query
         DataTable dataTable = new DataTable();
         dataTable.Columns.Add("Column1", typeof(string));
-        dataTable.Columns.Add("Column2", typeof(int));
-        dataTable.Columns.Add("Column3", typeof(DateTime));
+        dataTable.Columns.Add("Column2", typeof(string));
+        dataTable.Columns.Add("Column3", typeof(string));
 
-        dataTable.Rows.Add("Row A", 10, DateTime.Today);
-        dataTable.Rows.Add("Row B", 20, DateTime.Today.AddDays(1));
-        dataTable.Rows.Add("Row C", 30, DateTime.Today.AddDays(2));
+        // Sample rows – replace or extend with your own data
+        dataTable.Rows.Add("Row 1 – A", "Row 1 – B", "Row 1 – C");
+        dataTable.Rows.Add("Row 2 – A", "Row 2 – B", "Row 2 – C");
+        dataTable.Rows.Add("Row 3 – A", "Row 3 – B", "Row 3 – C");
 
-        // Create PDF and import the DataTable as a table
-        using (Document pdfDoc = new Document())
+        // Create a new PDF document
+        using (Document pdfDocument = new Document())
         {
-            // Add a new page (pages are 1‑based)
-            Page page = pdfDoc.Pages.Add();
+            // Add a page to the document
+            Page page = pdfDocument.Pages.Add();
 
-            // Create a PDF table and import the DataTable
-            Table pdfTable = new Table();
-            // Optional: set column widths (adjust as needed)
-            pdfTable.ColumnWidths = "100 100 100";
+            // Create a table and configure its appearance
+            Table table = new Table
+            {
+                // Adjust column widths as needed
+                ColumnWidths = "100 150 200",
+                Border = new BorderInfo(BorderSide.All, 0.5f),
+                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
+                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
+            };
 
-            // Import data: include header row, start at first row/column
-            pdfTable.ImportDataTable(dataTable, true, 0, 0);
+            // Import the DataTable into the Aspose.Pdf.Table
+            // Parameters: (DataTable, includeColumnHeaders, startRow, startColumn)
+            table.ImportDataTable(dataTable, true, 0, 0);
 
-            // Add the table to the page
-            page.Paragraphs.Add(pdfTable);
+            // Add the table to the page's paragraph collection
+            page.Paragraphs.Add(table);
 
-            // Save the PDF
-            pdfDoc.Save("output.pdf");
+            // Save the PDF to disk
+            pdfDocument.Save("output.pdf");
         }
 
-        Console.WriteLine("PDF generated successfully.");
+        Console.WriteLine("PDF with imported table has been generated.");
     }
 }

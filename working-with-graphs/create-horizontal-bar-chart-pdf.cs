@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,53 +7,52 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "BarChart.pdf";
+        const string outputPath = "horizontal_bar_chart.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Ensure the output directory exists (fully qualify System.IO.Path to avoid ambiguity)
+        string outputDir = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(outputPath));
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page (Pages collection is 1‑based)
+            // Add a single page to host the bar chart
             Page page = doc.Pages.Add();
 
-            // Fixed vertical position and size for all bars
-            double barHeight = 20;
-            double barY = 500; // distance from bottom of the page
+            // Define common rectangle height and vertical position
+            double rectHeight = 30;
+            double rectY = 500; // Y coordinate of the lower edge
 
-            // Create a Graph container that spans the whole page
+            // Create a Graph that covers the whole page – Graph is the only paragraph that can contain drawing shapes
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
             // Loop to create ten rectangles with incremental X coordinates
             for (int i = 0; i < 10; i++)
             {
-                // Incremental X coordinate (spacing of 30 points)
-                double barX = 50 + i * 30;
+                // Incremental X coordinate (spacing of 40 units between bars)
+                double rectX = 50 + i * 40;
 
-                // Width of each bar (e.g., 20 points)
-                double barWidth = 20;
+                // Drawing.Rectangle constructor: left, bottom, width, height
+                Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(
+                    (float)rectX,
+                    (float)rectY,
+                    30f,
+                    (float)rectHeight);
 
-                // Define the rectangle shape (lower‑left and upper‑right corners)
-                var rect = new Aspose.Pdf.Drawing.Rectangle(
-                    (float)barX,
-                    (float)barY,
-                    (float)(barX + barWidth),
-                    (float)(barY + barHeight));
+                // Styling via GraphInfo – FillColor for the interior, Color for the border
+                shape.GraphInfo.FillColor = Color.LightGray;
+                shape.GraphInfo.Color = Color.Black;
+                shape.GraphInfo.LineWidth = 0.5f;
 
-                // Styling via GraphInfo – fill color, border color and line width
-                rect.GraphInfo = new GraphInfo
-                {
-                    FillColor = (i % 2 == 0) ? Color.LightBlue : Color.LightGreen,
-                    Color = Color.Black,          // Border color
-                    LineWidth = 0.5f               // Border thickness
-                };
-
-                // Add the rectangle to the graph container
-                graph.Shapes.Add(rect);
+                // Add the shape to the graph
+                graph.Shapes.Add(shape);
             }
 
             // Add the graph (which now contains all rectangles) to the page
             page.Paragraphs.Add(graph);
 
-            // Save the PDF (Document.Save writes PDF regardless of extension)
+            // Save the PDF
             doc.Save(outputPath);
         }
 

@@ -1,6 +1,6 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -17,49 +17,40 @@ class Program
             return;
         }
 
-        // Define the points that the polyline will pass through
-        List<Aspose.Pdf.Point> points = new List<Aspose.Pdf.Point>
+        // Define the points of the polyline
+        List<Point> polylinePoints = new List<Point>
         {
-            new Aspose.Pdf.Point(100, 700),
-            new Aspose.Pdf.Point(150, 750),
-            new Aspose.Pdf.Point(200, 720),
-            new Aspose.Pdf.Point(250, 770)
+            new Point(100, 700),
+            new Point(150, 650),
+            new Point(200, 700),
+            new Point(250, 650)
         };
 
-        // Compute a bounding rectangle that encloses all points (with a small margin)
-        double llx = double.MaxValue, lly = double.MaxValue, urx = double.MinValue, ury = double.MinValue;
-        foreach (var p in points)
-        {
-            if (p.X < llx) llx = p.X;
-            if (p.Y < lly) lly = p.Y;
-            if (p.X > urx) urx = p.X;
-            if (p.Y > ury) ury = p.Y;
-        }
-        const double margin = 5;
-        llx -= margin; lly -= margin; urx += margin; ury += margin;
-
-        // Open the PDF, add the polyline annotation, and save
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // For demonstration, add the annotation to the first page
+            // Use the first page (pages are 1‑based)
             Page page = doc.Pages[1];
 
-            // Create the annotation with the calculated rectangle and vertices
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-            PolylineAnnotation polyline = new PolylineAnnotation(page, rect, points.ToArray());
+            // Define a rectangle that roughly bounds the polyline (optional)
+            Rectangle bounds = new Rectangle(90, 660, 260, 720);
 
-            // Optional visual styling
-            polyline.Border = new Border(polyline) { Width = 2 };
-            polyline.Color = Aspose.Pdf.Color.Blue;                     // stroke color
-            polyline.InteriorColor = Aspose.Pdf.Color.LightGray;        // fill color (if needed)
+            // Create a PolylineAnnotation with the vertices supplied in the constructor
+            PolylineAnnotation polyline = new PolylineAnnotation(page, bounds, polylinePoints.ToArray())
+            {
+                Color = Aspose.Pdf.Color.Blue, // line color (use Aspose.Pdf.Color, not System.Drawing.Color)
+                Opacity = 0.8                 // semi‑transparent
+                // Note: Modern Aspose.PDF versions do not expose a LineWidth property for PolylineAnnotation.
+                // The default line thickness is used, or you can adjust it via the underlying PDF content if needed.
+            };
 
             // Add the annotation to the page
             page.Annotations.Add(polyline);
 
-            // Persist the changes
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PolyLine annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Polyline annotation added and saved to '{outputPath}'.");
     }
 }

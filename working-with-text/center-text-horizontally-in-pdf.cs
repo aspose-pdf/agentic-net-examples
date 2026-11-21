@@ -8,8 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "centered_output.pdf";
-        const string text = "Centered Text Example";
+        const string outputPath = "centered.pdf";
+        const string content = "Centered Text";
 
         if (!File.Exists(inputPath))
         {
@@ -17,36 +17,27 @@ class Program
             return;
         }
 
-        try
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Ensure there is at least one page
-                Page page = doc.Pages[1];
+            // Use the first page (or add a new one if needed)
+            Page page = doc.Pages[1];
 
-                // Create a text fragment with the desired content
-                TextFragment fragment = new TextFragment(text);
+            // Create a text fragment with the desired content
+            TextFragment fragment = new TextFragment(content);
 
-                // Center the text horizontally on the page
-                fragment.TextState.HorizontalAlignment = HorizontalAlignment.Center;
+            // Center the text horizontally on the page
+            fragment.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-                // Optional styling
-                fragment.TextState.FontSize = 14;
-                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Position the fragment vertically (X is ignored when centered)
+            fragment.Position = new Position(0, 500);
 
-                // Add the fragment to the page
-                page.Paragraphs.Add(fragment);
+            // Add the fragment to the page
+            page.Paragraphs.Add(fragment);
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Centered text saved to '{outputPath}'.");
+            // Save the modified document
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Centered text PDF saved to '{outputPath}'.");
     }
 }

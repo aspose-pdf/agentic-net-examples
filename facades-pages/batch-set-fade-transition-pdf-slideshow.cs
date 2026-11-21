@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";   // source 200‑page PDF
-        const string outputPath = "output.pdf"; // PDF with slide transitions
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,26 +17,28 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Use PdfPageEditor to apply a Fade transition (2‑second duration) to every page
-        using (PdfPageEditor editor = new PdfPageEditor())
+        // Load the source PDF
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(doc);
+            // Create a PdfPageEditor bound to the document
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            {
+                // Apply the transition to all pages (1‑based indexing)
+                editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
 
-            // Specify the pages to edit – 1‑based indexing
-            editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+                // Integer value for the Fade transition (as defined by Aspose.Pdf)
+                // Fade is typically represented by the value 10 in the internal enum.
+                editor.TransitionType = 10;      // Fade transition
+                editor.TransitionDuration = 2;   // 2‑second duration
 
-            // TransitionType uses the integer value defined by Aspose.Pdf's TransitionType enum.
-            // Fade corresponds to the value 11 in the current library version.
-            editor.TransitionType = 11;          // Fade transition
-            editor.TransitionDuration = 2;       // 2 seconds
+                // Apply the changes to the document
+                editor.ApplyChanges();
 
-            // Persist the changes
-            editor.Save(outputPath);
+                // Save the modified PDF
+                editor.Save(outputPath);
+            }
         }
 
-        Console.WriteLine($"Transitions applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Transition applied and saved to '{outputPath}'.");
     }
 }

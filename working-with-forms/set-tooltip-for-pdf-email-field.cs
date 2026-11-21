@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,26 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Retrieve the form field named "Email"
-            TextBoxField emailField = doc.Form["Email"] as TextBoxField;
-            if (emailField != null)
+            if (doc.Form["Email"] is TextBoxField emailField)
             {
-                // Set tooltip (popup text) to guide users on the required input format
-                // The Tooltip property is not available in this version; use the Contents property instead.
-                emailField.Contents = "Enter a valid email address (e.g., user@example.com)";
+                // Set the tooltip (alternate name) that appears when the user hovers over the field
+                emailField.AlternateName = "Enter email in format user@example.com";
             }
             else
             {
-                Console.Error.WriteLine("Email field not found or is not a TextBoxField.");
+                Console.Error.WriteLine("The 'Email' field was not found or is not a TextBoxField.");
             }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip to '{outputPath}'.");
+        Console.WriteLine($"Tooltip set and saved to '{outputPath}'.");
     }
 }

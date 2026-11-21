@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        // PDFs to be grouped in the portfolio
+        // Files to be included in the portfolio
         string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
         const string outputPath = "portfolio.pdf";
 
@@ -15,37 +15,36 @@ class Program
         {
             if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"File not found: {file}");
+                Console.Error.WriteLine($"Source file not found: {file}");
                 return;
             }
         }
 
-        // Create an empty PDF that will serve as the portfolio container
+        // Create a new PDF document that will serve as the portfolio container
         using (Document portfolioDoc = new Document())
         {
-            // Ensure the Collection object exists – it holds the embedded files for a portfolio
+            // Initialise the collection that holds embedded files (portfolio)
             if (portfolioDoc.Collection == null)
                 portfolioDoc.Collection = new Collection();
 
-            // Add each PDF as a FileSpecification (embedded file) to the collection
+            // Add each PDF as an embedded file in the portfolio
             foreach (var file in pdfFiles)
             {
                 var fileSpec = new FileSpecification(file, Path.GetFileName(file))
                 {
-                    // Load the file content; this is required for the portfolio entry
+                    // The file content must be supplied as a stream
                     Contents = new MemoryStream(File.ReadAllBytes(file))
                 };
                 portfolioDoc.Collection.Add(fileSpec);
             }
 
-            // Optional: set basic document metadata
-            portfolioDoc.Info.Title = "Combined PDF Portfolio";
-            portfolioDoc.Info.Author = "Aspose.Pdf Example";
+            // Optional: set document metadata
+            portfolioDoc.Info.Title = "My PDF Portfolio";
 
-            // Save the portfolio PDF
+            // Save the portfolio; the result is a single PDF containing the embedded PDFs
             portfolioDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Portfolio created at '{outputPath}'.");
+        Console.WriteLine($"Portfolio created successfully at '{outputPath}'.");
     }
 }

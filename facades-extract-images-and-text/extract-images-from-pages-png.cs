@@ -1,14 +1,16 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputDir  = "ExtractedImages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
+        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
@@ -18,51 +20,47 @@ class Program
         // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor implements IDisposable – wrap in using
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the source PDF
-            extractor.BindPdf(inputPath);
-
-            // Set the page range (Aspose.Pdf uses 1‑based indexing)
-            extractor.StartPage = 5;
-            extractor.EndPage   = 10;
-
-            // Extract images from the specified pages
-            extractor.ExtractImage();
-
-            int imageIndex = 1;
-
-            // Iterate through all extracted images
-            while (extractor.HasNextImage())
+            // PdfExtractor implements IDisposable – wrap in using for deterministic disposal
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                // Get the next image into a memory stream
-                using (MemoryStream imageStream = new MemoryStream())
+                // Load the PDF document
+                extractor.BindPdf(inputPath);
+
+                // NOTE: The ExtractImageMode property does not exist in the current Aspose.Pdf version.
+                // Image extraction is performed by calling ExtractImage() for the selected pages.
+
+                int imageCounter = 1;
+
+                // Loop through the required page range (5‑10 inclusive)
+                for (int page = 5; page <= 10; page++)
                 {
-                    // GetNextImage requires a stream argument
-                    extractor.GetNextImage(imageStream);
+                    // Set the page range to a single page for each iteration
+                    extractor.StartPage = page;
+                    extractor.EndPage   = page;
 
-                    // Reset stream position before writing
-                    imageStream.Position = 0;
+                    // Extract images from the current page
+                    extractor.ExtractImage();
 
-                    // Build a unique file name for each image
-                    string outputPath = Path.Combine(
-                        outputDir,
-                        $"Page5to10_Image_{imageIndex}.png");
-
-                    // Write the image bytes to a PNG file
-                    using (FileStream file = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                    // Save each extracted image as PNG
+                    while (extractor.HasNextImage())
                     {
-                        imageStream.CopyTo(file);
+                        string fileName = $"page{page}_img{imageCounter}.png";
+                        string outPath  = Path.Combine(outputDir, fileName);
+
+                        // GetNextImage overload that specifies output path and format
+                        extractor.GetNextImage(outPath, ImageFormat.Png);
+
+                        Console.WriteLine($"Saved: {outPath}");
+                        imageCounter++;
                     }
-
-                    Console.WriteLine($"Saved image {imageIndex} → {outputPath}");
                 }
-
-                imageIndex++;
             }
         }
-
-        Console.WriteLine("Image extraction completed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

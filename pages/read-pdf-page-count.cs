@@ -17,7 +17,7 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing; the Count property gives total pages
+            // Aspose.Pdf uses 1‑based page indexing; the Pages.Count property gives the total number of pages
             int pageCount = doc.Pages.Count;
             Console.WriteLine($"Total pages: {pageCount}");
         }

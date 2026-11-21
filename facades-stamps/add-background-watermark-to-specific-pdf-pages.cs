@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
-        const string watermark = "CONFIDENTIAL";
+        const string watermarkText = "CONFIDENTIAL";
 
         if (!File.Exists(inputPath))
         {
@@ -18,31 +18,36 @@ class Program
         }
 
         // Create a text stamp that will be placed behind existing content
-        TextStamp stamp = new TextStamp(watermark)
+        TextStamp textStamp = new TextStamp(watermarkText)
         {
-            Background = true,                         // render behind page content
-            Opacity = 0.3,                             // semi‑transparent
+            Background = true,               // render behind page content
+            Opacity = 0.2,                   // semi‑transparent
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment = VerticalAlignment.Center
+            VerticalAlignment = VerticalAlignment.Center,
+            TextState =
+            {
+                FontSize = 72,
+                FontStyle = FontStyles.Bold,
+                Font = FontRepository.FindFont("Arial"),
+                ForegroundColor = Color.Gray
+            }
         };
-        // TextState is read‑only – modify the existing instance instead of assigning a new one
-        stamp.TextState.FontSize = 72;
-        stamp.TextState.FontStyle = FontStyles.Bold;
-        stamp.TextState.Font = FontRepository.FindFont("Arial");
-        stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
-
-        // Apply the stamp to pages 2 through 5 (inclusive)
-        for (int pageNumber = 2; pageNumber <= 5 && pageNumber <= pdfDocument.Pages.Count; pageNumber++)
+        using (Document doc = new Document(inputPath))
         {
-            pdfDocument.Pages[pageNumber].AddStamp(stamp);
+            // Apply the stamp to pages 2‑5 (or up to the last page)
+            int lastPage = Math.Min(5, doc.Pages.Count);
+            for (int pageNum = 2; pageNum <= lastPage; pageNum++)
+            {
+                // No need to set a Rectangle – alignment properties cover the whole page
+                doc.Pages[pageNum].AddStamp(textStamp);
+            }
+
+            // Save the watermarked PDF
+            doc.Save(outputPath);
         }
 
-        // Save the result
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"Watermark applied to pages 2‑5 and saved as '{outputPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

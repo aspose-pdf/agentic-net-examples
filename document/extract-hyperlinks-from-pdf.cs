@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputTxt = "hyperlinks.txt";
+        const string outputTxt = "links.txt";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,34 +17,36 @@ class Program
             return;
         }
 
+        var links = new List<string>();
+
         try
         {
-            // Load the PDF and open a writer for the output text file
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
-            using (StreamWriter writer = new StreamWriter(outputTxt, false))
             {
-                // Pages are 1‑based in Aspose.Pdf
+                // Aspose.Pdf uses 1‑based page indexing
                 for (int i = 1; i <= doc.Pages.Count; i++)
                 {
                     Page page = doc.Pages[i];
+                    if (page.Annotations == null) continue;
 
-                    // Iterate all annotations on the page
+                    // Iterate over all annotations on the page
                     foreach (Annotation annotation in page.Annotations)
                     {
-                        // We are interested only in link annotations
-                        if (annotation is LinkAnnotation link)
+                        // Look for LinkAnnotation with a GoToURIAction
+                        if (annotation is LinkAnnotation linkAnno && linkAnno.Action is GoToURIAction uriAction)
                         {
-                            // The link's action may be a GoToURIAction containing the URL
-                            if (link.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
-                            {
-                                writer.WriteLine(uriAction.URI);
-                            }
+                            string uri = uriAction.URI;
+                            if (!string.IsNullOrEmpty(uri))
+                                links.Add(uri);
                         }
                     }
                 }
             }
 
-            Console.WriteLine($"Hyperlinks extracted to '{outputTxt}'.");
+            // Export the collected hyperlinks to a plain‑text file
+            File.WriteAllLines(outputTxt, links);
+            Console.WriteLine($"Extracted {links.Count} hyperlink(s) to '{outputTxt}'.");
         }
         catch (Exception ex)
         {

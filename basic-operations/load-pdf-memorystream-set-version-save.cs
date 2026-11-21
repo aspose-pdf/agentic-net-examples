@@ -6,32 +6,43 @@ class Program
 {
     static void Main()
     {
-        // Create a simple PDF in memory (self‑contained example)
-        using (var initialDoc = new Document())
+        // ------------------------------------------------------------
+        // 1. Ensure an input PDF exists – create a minimal one if needed.
+        // ------------------------------------------------------------
+        const string inputPath = "input.pdf";
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page so the PDF is not empty
-            initialDoc.Pages.Add();
-
-            // Save the document to a MemoryStream
-            using (var tempStream = new MemoryStream())
-            {
-                initialDoc.Save(tempStream);
-                // Reset the stream position before reading it back
-                tempStream.Position = 0;
-
-                // Load PDF from the MemoryStream
-                using (var doc = new Document(tempStream))
-                {
-                    // Change the PDF version to 1.4 using Document.Convert
-                    string logPath = "conversion_log.xml"; // optional conversion log
-                    doc.Convert(logPath, PdfFormat.v_1_4, ConvertErrorAction.Delete);
-
-                    // Save the modified PDF to the file system
-                    doc.Save("output.pdf");
-                }
-            }
+            using var placeholder = new Document();
+            placeholder.Pages.Add(); // add a blank page
+            placeholder.Save(inputPath);
         }
 
-        Console.WriteLine("PDF saved with version 1.4.");
+        // ------------------------------------------------------------
+        // 2. Load the PDF bytes into a MemoryStream.
+        // ------------------------------------------------------------
+        byte[] pdfBytes = File.ReadAllBytes(inputPath);
+        using var memoryStream = new MemoryStream(pdfBytes);
+        // Ensure the stream position is at the beginning before passing it to Document.
+        memoryStream.Position = 0;
+
+        // ------------------------------------------------------------
+        // 3. Open the document from the MemoryStream.
+        // ------------------------------------------------------------
+        using var doc = new Document(memoryStream);
+
+        // ------------------------------------------------------------
+        // 4. Convert the document to PDF version 1.4.
+        //    Document.Version is read‑only, so we use Document.Convert.
+        // ------------------------------------------------------------
+        string logPath = Path.Combine(Path.GetTempPath(), "pdf_version_convert_log.xml");
+        doc.Convert(logPath, PdfFormat.v_1_4, ConvertErrorAction.Delete);
+
+        // ------------------------------------------------------------
+        // 5. Save the modified PDF to the file system.
+        // ------------------------------------------------------------
+        const string outputPath = "output.pdf";
+        doc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved with version 1.4 to '{outputPath}'.");
     }
 }

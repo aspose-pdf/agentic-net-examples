@@ -15,39 +15,40 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // TableAbsorber extracts tables from the document.
+            // Create a TableAbsorber and absorb tables from the whole document
             TableAbsorber absorber = new TableAbsorber();
-
-            // Run the absorber on the whole document (or on specific pages).
-            absorber.Visit(doc);
+            absorber.Visit(doc); // <-- correct way to run the absorber
 
             Console.WriteLine($"Tables found: {absorber.TableList.Count}");
 
-            // Iterate over each absorbed table.
+            int tableNumber = 1;
+            // Iterate over each absorbed table
             foreach (AbsorbedTable table in absorber.TableList)
             {
-                Console.WriteLine("--- Table found ---");
-
-                int rowIndex = 0;
-                // Each table contains rows; iterate them.
+                Console.WriteLine($"Table {tableNumber}:");
+                int rowNumber = 1;
+                // Iterate over rows in the current table
                 foreach (AbsorbedRow row in table.RowList)
                 {
-                    rowIndex++;
-                    int colIndex = 0;
-                    // Each row contains cells; iterate them.
+                    int colNumber = 1;
+                    // Iterate over cells in the current row
                     foreach (AbsorbedCell cell in row.CellList)
                     {
-                        colIndex++;
-                        // A cell does not expose a direct Text property; its content is a collection of TextFragments.
+                        // Concatenate all text fragments inside the cell
+                        string cellText = string.Empty;
                         foreach (TextFragment fragment in cell.TextFragments)
                         {
-                            Console.WriteLine($"Cell [{rowIndex},{colIndex}]: {fragment.Text}");
+                            cellText += fragment.Text;
                         }
+
+                        Console.WriteLine($"  Row {rowNumber}, Column {colNumber}: {cellText}");
+                        colNumber++;
                     }
+                    rowNumber++;
                 }
+                tableNumber++;
             }
         }
     }

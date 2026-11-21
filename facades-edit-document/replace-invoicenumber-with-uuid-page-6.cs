@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,14 +15,21 @@ class Program
             return;
         }
 
-        // Generate a new UUID string
+        // Generate a UUID to replace the placeholder
         string uuid = Guid.NewGuid().ToString();
 
-        // Facades API: load PDF, replace text on page 6, and save
-        PdfContentEditor editor = new PdfContentEditor();
-        editor.BindPdf(inputPath);                     // load source PDF
-        editor.ReplaceText("InvoiceNumber", uuid, 6);  // case‑sensitive replace on page 6
-        editor.Save(outputPath);                       // write modified PDF
+        // Use the Facades API to edit the PDF
+        using (PdfContentEditor editor = new PdfContentEditor())
+        {
+            // Load the source PDF
+            editor.BindPdf(inputPath);
+
+            // Replace the exact case‑sensitive string "InvoiceNumber" on page 6
+            editor.ReplaceText("InvoiceNumber", uuid, 6);
+
+            // Save the modified document
+            editor.Save(outputPath);
+        }
 
         Console.WriteLine($"Replaced 'InvoiceNumber' with UUID on page 6 and saved to '{outputPath}'.");
     }

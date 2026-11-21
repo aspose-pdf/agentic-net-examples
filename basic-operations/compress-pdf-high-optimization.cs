@@ -8,7 +8,8 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_high.pdf";
+        const string defaultPath = "output_default.pdf";
+        const string highCompPath = "output_high_compression.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,41 +17,41 @@ class Program
             return;
         }
 
-        // Load the PDF, apply high compression, and save it
+        // Save with default settings (no explicit optimization)
         using (Document doc = new Document(inputPath))
         {
-            // Configure optimization options for high compression
+            doc.Save(defaultPath);
+        }
+
+        // Save with high compression using OptimizationOptions
+        using (Document highDoc = new Document(inputPath))
+        {
+            // Configure optimization for high compression
             OptimizationOptions opt = OptimizationOptions.All();
-            // Image compression settings (new API)
-            opt.ImageCompressionOptions.CompressImages = true;   // compress images
-            opt.ImageCompressionOptions.ImageQuality = 30;       // 0‑100, lower = higher compression
-            // General optimization flags
-            opt.RemoveUnusedObjects = true;      // strip unused objects
-            opt.RemoveUnusedStreams = true;      // strip unused streams
-            // Note: CompressStreams property has been removed; OptimizeResources handles stream compression.
+            opt.CompressImages = true;          // compress images
+            opt.ImageQuality = 50;              // lower quality to increase compression (adjust as needed)
+            opt.RemoveUnusedObjects = true;    // clean up unused objects
+            opt.RemoveUnusedStreams = true;    // clean up unused streams
 
             // Apply the optimization to the document
-            doc.OptimizeResources(opt);
+            highDoc.OptimizeResources(opt);
 
-            // Save the optimized document
-            doc.Save(outputPath);
+            // Save the optimized (high‑compression) PDF
+            highDoc.Save(highCompPath);
         }
 
-        // Compare file sizes
-        FileInfo originalInfo = new FileInfo(inputPath);
-        FileInfo compressedInfo = new FileInfo(outputPath);
+        // Compare file sizes of the two output PDFs
+        FileInfo defaultInfo = new FileInfo(defaultPath);
+        FileInfo highInfo = new FileInfo(highCompPath);
 
-        Console.WriteLine($"Original size   : {originalInfo.Length} bytes");
-        Console.WriteLine($"Compressed size : {compressedInfo.Length} bytes");
+        Console.WriteLine($"Default PDF size: {defaultInfo.Length} bytes");
+        Console.WriteLine($"High‑compression PDF size: {highInfo.Length} bytes");
 
-        if (originalInfo.Length > 0)
-        {
-            double reduction = 100.0 * (originalInfo.Length - compressedInfo.Length) / originalInfo.Length;
-            Console.WriteLine($"Size reduction  : {reduction:F2}%");
-        }
+        if (highInfo.Length < defaultInfo.Length)
+            Console.WriteLine("High compression reduced the file size.");
+        else if (highInfo.Length > defaultInfo.Length)
+            Console.WriteLine("High compression increased the file size (unexpected).");
         else
-        {
-            Console.WriteLine("Original file size is zero; cannot compute reduction.");
-        }
+            Console.WriteLine("File sizes are identical.");
     }
 }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -15,26 +16,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF document.
         Document pdfDoc = new Document(pdfPath);
 
-        // Retrieve the raw XMP metadata as a byte array using GetXmpMetadata(Stream)
-        byte[] xmpBytes;
-        using (MemoryStream ms = new MemoryStream())
+        // Retrieve the raw XMP metadata XML string using the PdfXmpMetadata facade.
+        string xmpXml;
+        using (PdfXmpMetadata xmp = new PdfXmpMetadata(pdfDoc))
         {
-            // The current Aspose.PDF API writes the XMP data into the provided stream
-            pdfDoc.GetXmpMetadata(ms);
-            xmpBytes = ms.ToArray();
+            // GetXmpMetadata returns a byte[]; convert it to a UTF‑8 string.
+            byte[] xmpBytes = xmp.GetXmpMetadata();
+            xmpXml = (xmpBytes != null && xmpBytes.Length > 0) ? Encoding.UTF8.GetString(xmpBytes) : string.Empty;
         }
 
-        if (xmpBytes == null || xmpBytes.Length == 0)
+        if (string.IsNullOrEmpty(xmpXml))
         {
             Console.WriteLine("No XMP metadata found in the PDF.");
         }
         else
         {
-            // Convert the byte array to a UTF‑8 string
-            string xmpXml = Encoding.UTF8.GetString(xmpBytes);
             Console.WriteLine("XMP Metadata:");
             Console.WriteLine(xmpXml);
         }

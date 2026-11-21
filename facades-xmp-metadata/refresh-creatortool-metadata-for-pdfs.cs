@@ -1,48 +1,58 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace imported as requested
 
-class CreatorToolRefresher
+class Program
 {
-    // Value to set for the Creator metadata field
-    private const string NewCreatorTool = "MyCreatorTool";
-
-    // Entry point – can be scheduled to run nightly (e.g., via Windows Task Scheduler)
-    static void Main()
+    // Entry point – can be invoked by a scheduler (e.g., Windows Task Scheduler) nightly
+    static void Main(string[] args)
     {
-        // Path to the repository containing PDF files
-        const string repositoryPath = @"C:\PdfRepository";
+        // Repository folder containing PDFs
+        string repositoryPath = @"C:\PdfRepository";
 
-        if (!Directory.Exists(repositoryPath))
+        // Value to set for the Creator metadata field
+        string creatorValue = "MyApplication v1.0";
+
+        RefreshCreatorMetadata(repositoryPath, creatorValue);
+    }
+
+    // Processes all PDF files in the specified folder (including subfolders)
+    static void RefreshCreatorMetadata(string folderPath, string creator)
+    {
+        if (!Directory.Exists(folderPath))
         {
-            Console.Error.WriteLine($"Repository folder not found: {repositoryPath}");
+            Console.Error.WriteLine($"Folder not found: {folderPath}");
             return;
         }
 
-        // Process each PDF file in the repository (including subfolders)
-        foreach (string pdfFile in Directory.EnumerateFiles(repositoryPath, "*.pdf", SearchOption.AllDirectories))
+        // Get all PDF files recursively
+        string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.AllDirectories);
+
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Load PDF document using the Document API (not Facades)
-                using (Document doc = new Document(pdfFile))
+                // Open the PDF document inside a using block for deterministic disposal
+                using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
                 {
-                    // Update the Creator metadata field
-                    doc.Info.Creator = NewCreatorTool;
+                    // Set the Creator metadata (DocumentInfo.CreatorTool does not exist)
+                    doc.Info.Creator = creator;
 
-                    // Save changes back to the same file (overwrite)
-                    doc.Save(pdfFile);
+                    // Update the modification date to the current UTC time
+                    doc.Info.ModDate = DateTime.UtcNow;
+
+                    // Save changes back to the same file
+                    doc.Save(pdfPath);
                 }
 
-                Console.WriteLine($"Updated Creator for: {pdfFile}");
+                Console.WriteLine($"Updated Creator for: {pdfPath}");
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing other files
-                Console.Error.WriteLine($"Error processing '{pdfFile}': {ex.Message}");
+                // Log any errors but continue processing remaining files
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("CreatorTool refresh job completed.");
     }
 }

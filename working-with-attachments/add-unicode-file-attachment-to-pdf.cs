@@ -1,54 +1,67 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPdf = "output_with_attachment.pdf";
-        const string attachmentPath = "sample.txt";
+        // Paths for the source PDF, the output PDF and the attachment file.
+        const string sourcePdfPath = "source.pdf";
+        const string outputPdfPath = "output_with_attachment.pdf";
 
-        // Ensure there is a file to attach
-        if (!File.Exists(attachmentPath))
+        // Unicode filename for the attachment (e.g., Chinese characters).
+        string unicodeFileName = "示例文件.txt";
+        string attachmentFilePath = Path.Combine(Path.GetTempPath(), unicodeFileName);
+
+        // Ensure the attachment file exists – create a simple text file.
+        File.WriteAllText(attachmentFilePath, "This is a test attachment with a Unicode filename.");
+
+        // If the source PDF does not exist, create a minimal PDF with one page.
+        if (!File.Exists(sourcePdfPath))
         {
-            File.WriteAllText(attachmentPath, "Sample attachment content.");
-        }
-
-        // Create a simple PDF and add a Unicode‑named attachment
-        using (Document doc = new Document())
-        {
-            // Add a blank page so the PDF is not empty
-            doc.Pages.Add();
-
-            // Create a file specification for the attachment
-            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath));
-            // Set the Unicode filename (display name inside the PDF)
-            fileSpec.Name = "示例附件.txt";
-            // Load the file contents
-            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
-
-            // Add the attachment to the document via the EmbeddedFiles collection
-            doc.EmbeddedFiles.Add(fileSpec);
-
-            // Save the PDF
-            doc.Save(outputPdf);
-        }
-
-        // Verify that the attachment was added with the correct Unicode name
-        using (Document verifyDoc = new Document(outputPdf))
-        {
-            if (verifyDoc.EmbeddedFiles != null && verifyDoc.EmbeddedFiles.Count > 0)
+            using (Document doc = new Document())
             {
-                // Retrieve the first attachment (1‑based indexing)
-                FileSpecification attachedFile = verifyDoc.EmbeddedFiles[1];
-                Console.WriteLine($"Attachment filename: {attachedFile.Name}");
-                // Expected output: 示例附件.txt
-            }
-            else
-            {
-                Console.WriteLine("No attachments found.");
+                Page page = doc.Pages.Add();
+                page.Paragraphs.Add(new TextFragment("Sample PDF for attachment test."));
+                doc.Save(sourcePdfPath);
             }
         }
+
+        // Open the source PDF, add the attachment, and save the result.
+        using (Document doc = new Document(sourcePdfPath))
+        {
+            // Create a FileSpecification for the attachment.
+            // The Name property holds the Unicode name that will appear in PDF viewers.
+            var attachmentSpec = new FileSpecification(Path.GetFileName(attachmentFilePath))
+            {
+                // Set the file data.
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath)),
+                // Override the stored name with the Unicode filename.
+                Name = unicodeFileName,
+                Description = "Unicode attachment"
+            };
+
+            // Add the attachment to the PDF via the EmbeddedFiles collection.
+            doc.EmbeddedFiles.Add(attachmentSpec);
+
+            // Save the PDF with the attachment.
+            doc.Save(outputPdfPath);
+        }
+
+        // Verify that the attachment is present and its filename is correct.
+        using (Document verifiedDoc = new Document(outputPdfPath))
+        {
+            Console.WriteLine($"Attachments in '{outputPdfPath}':");
+            foreach (FileSpecification fs in verifiedDoc.EmbeddedFiles)
+            {
+                // The Name property returns the Unicode name stored in the PDF.
+                Console.WriteLine($"- {fs.Name}");
+            }
+        }
+
+        // Clean up the temporary attachment file.
+        try { File.Delete(attachmentFilePath); } catch { /* ignore cleanup errors */ }
     }
 }

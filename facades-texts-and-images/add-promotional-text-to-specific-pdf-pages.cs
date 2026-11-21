@@ -1,7 +1,9 @@
 using System;
 using System.IO;
-using System.Drawing;
+using System.Drawing; // for System.Drawing.Color
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -9,51 +11,45 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string promoMessage = "Buy our product now!";
+        const string promoText = "Buy now and get 20% off!";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Pages where the promotional message will be inserted (1‑based indexing)
-        int[] targetPages = new int[] { 3, 5, 7 };
+        try
+        {
+            // Prepare formatted text (font, size, colour)
+            FormattedText formatted = new FormattedText(
+                promoText,
+                System.Drawing.Color.Blue, // fully qualified to avoid ambiguity
+                "Helvetica",            // font name (must be available)
+                EncodingType.Winansi,
+                false,                    // embed font?
+                12f);                     // font size
 
-        // Position (lower‑left corner) where the text will appear on each page (points)
-        double x = 100; // horizontal offset from the left
-        double y = 500; // vertical offset from the bottom
-        double rectWidth = 200;   // enough width for the message
-        double rectHeight = 30;   // enough height for a single line
-        double upperRightX = x + rectWidth;
-        double upperRightY = y + rectHeight;
+            // Pages on which the text will be added (1‑based indexing)
+            int[] pages = { 3, 5, 7 };
 
-        // Build a FormattedText object from the Facades namespace.
-        // The constructor expects System.Drawing.Color, a font name (optional),
-        // an EncodingType, a bold flag, and the font size.
-        FormattedText ft = new FormattedText(
-            promoMessage,
-            Color.Black,                 // System.Drawing.Color
-            "Helvetica",               // font name (optional, can be null)
-            EncodingType.Winansi,
-            false,                       // isBold – already covered by the font name
-            12f);                        // font size (float)
+            // Define the rectangle where the text will be placed.
+            // Lower‑left (llx, lly) and upper‑right (urx, ury) coordinates.
+            float llx = 50f;   // 50 points from the left edge
+            float lly = 50f;   // 50 points from the bottom edge
+            float urx = 250f;  // width of 200 points
+            float ury = 100f;  // height of 50 points
 
-        // Use PdfFileMend – it provides an AddText overload that accepts an array of page numbers.
-        PdfFileMend mend = new PdfFileMend();
-        mend.BindPdf(inputPath);
-
-        mend.AddText(
-            ft,
-            targetPages,
-            (float)x,
-            (float)y,
-            (float)upperRightX,
-            (float)upperRightY);
-
-        mend.Save(outputPath);
-        mend.Close();
-
-        Console.WriteLine($"Promotional message added to pages {string.Join(", ", targetPages)}. Saved as '{outputPath}'.");
+            // Use PdfFileMend which supports AddText for multiple pages.
+            PdfFileMend mend = new PdfFileMend();
+            mend.BindPdf(inputPath);
+            mend.AddText(formatted, pages, llx, lly, urx, ury);
+            mend.Save(outputPath);
+            mend.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

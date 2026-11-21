@@ -1,72 +1,71 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_pdfa2b.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdfA = "output_pdfa2b.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Document that will contain the extracted images
+        using (Document imgDoc = new Document())
         {
-            // Load the source PDF
-            using (Document srcDoc = new Document(inputPath))
+            // Open the source PDF
+            using (Document srcDoc = new Document(inputPdf))
             {
-                // Create a new PDF document that will become PDF/A‑2b
-                using (Document outDoc = new Document())
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= srcDoc.Pages.Count; i++)
                 {
-                    // Add a page to host the extracted images
-                    outDoc.Pages.Add();
-                    Aspose.Pdf.Page targetPage = outDoc.Pages[1];
+                    Page srcPage = srcDoc.Pages[i];
 
-                    // Extract each image from the source PDF and place it on the new page
-                    foreach (Aspose.Pdf.Page srcPage in srcDoc.Pages)
+                    // Iterate over each image resource on the page
+                    foreach (XImage xImg in srcPage.Resources.Images)
                     {
-                        foreach (Aspose.Pdf.XImage img in srcPage.Resources.Images)
+                        // Add a new page for the image
+                        Page newPage = imgDoc.Pages.Add();
+
+                        // Convert the XImage to a stream (PNG is a safe default)
+                        MemoryStream imgStream = new MemoryStream();
+                        xImg.Save(imgStream, ImageFormat.Png);
+                        imgStream.Position = 0;
+
+                        // Create an Aspose.Pdf.Image paragraph that uses the stream as its source
+                        Aspose.Pdf.Image pdfImage = new Aspose.Pdf.Image
                         {
-                            // Write the image to a memory stream
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                img.Save(ms);
-                                ms.Position = 0;
+                            ImageStream = imgStream,
+                            // Fit the image to the whole page
+                            FixWidth = newPage.PageInfo.Width,
+                            FixHeight = newPage.PageInfo.Height
+                        };
 
-                                // Create an ImageStamp from the stream
-                                ImageStamp stamp = new ImageStamp(ms)
-                                {
-                                    // Center the image on the page
-                                    HorizontalAlignment = HorizontalAlignment.Center,
-                                    VerticalAlignment   = VerticalAlignment.Center
-                                    // No XPosition/YPosition needed; alignment handles placement
-                                };
-
-                                // Add the stamp (image) to the target page
-                                targetPage.AddStamp(stamp);
-                            }
-                        }
+                        // Add the image to the page's paragraph collection
+                        newPage.Paragraphs.Add(pdfImage);
                     }
-
-                    // Convert the document to PDF/A‑2b compliance
-                    outDoc.Convert("conversion_log.xml", PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
-
-                    // Save the PDF/A‑2b document
-                    outDoc.Save(outputPath);
                 }
             }
 
-            Console.WriteLine($"PDF/A‑2b document created: {outputPath}");
+            // Ensure at least one page exists if no images were found
+            if (imgDoc.Pages.Count == 0)
+                imgDoc.Pages.Add();
+
+            // Convert the document to PDF/A‑2b compliance
+            imgDoc.Convert("conversion_log.xml", PdfFormat.PDF_A_2B, ConvertErrorAction.Delete);
+
+            // Save the PDF/A‑2b compliant document
+            imgDoc.Save(outputPdfA);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF/A‑2b document created: {outputPdfA}");
     }
 }

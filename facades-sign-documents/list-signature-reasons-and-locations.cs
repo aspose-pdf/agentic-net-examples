@@ -1,58 +1,49 @@
 using System;
 using System.IO;
-using System.Linq; // Added for Count() extension method
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Facades; // PKCS7 lives in this namespace
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // for SignatureName
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "signed.pdf";
+        // Path to the PDF file to be audited
+        const string inputPath = "input.pdf";
 
-        // Verify the input file exists
+        // Verify that the file exists before proceeding
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
-
-        // Ensure the document contains form fields
-        if (pdfDoc.Form == null || pdfDoc.Form.Fields == null || pdfDoc.Form.Fields.Count() == 0)
+        // PdfFileSignature provides access to digital signature information.
+        // It implements IDisposable, so we use a using block.
+        using (PdfFileSignature signatureHandler = new PdfFileSignature())
         {
-            Console.WriteLine("No form fields found in the document.");
-            return;
-        }
+            // Bind the PDF document to the signature handler.
+            signatureHandler.BindPdf(inputPath);
 
-        int signatureIndex = 0;
-        // Iterate over all form fields and process only signature fields
-        foreach (Field field in pdfDoc.Form.Fields)
-        {
-            if (field is SignatureField sigField)
+            // Retrieve the list of active signatures.
+            // GetSignatureNames(bool onlyActive) returns IList<SignatureName>.
+            var signatureNames = signatureHandler.GetSignatureNames(true);
+            int signatureCount = signatureNames.Count;
+
+            Console.WriteLine($"Found {signatureCount} signature(s) in '{Path.GetFileName(inputPath)}'.");
+
+            // Iterate over each signature and output its Reason and Location metadata.
+            foreach (SignatureName sigName in signatureNames)
             {
-                signatureIndex++;
-                Console.WriteLine($"Signature {signatureIndex}:");
+                // Reason for signing (e.g., "Approved", "Reviewed")
+                string reason = signatureHandler.GetReason(sigName);
 
-                // The Reason and Location are stored in the underlying PKCS7 object, not on the field itself
-                if (sigField.Signature is PKCS7 pkcs7)
-                {
-                    Console.WriteLine($"  Reason   : {pkcs7.Reason ?? "<none>"}");
-                    Console.WriteLine($"  Location : {pkcs7.Location ?? "<none>"}");
-                }
-                else
-                {
-                    Console.WriteLine("  No PKCS7 signature data available for this field.");
-                }
+                // Physical location description (e.g., "Page 2, top‑right")
+                string location = signatureHandler.GetLocation(sigName);
+
+                Console.WriteLine($"Signature '{sigName}':");
+                Console.WriteLine($"  Reason  : {reason}");
+                Console.WriteLine($"  Location: {location}");
             }
-        }
-
-        if (signatureIndex == 0)
-        {
-            Console.WriteLine("No signatures found in the document.");
         }
     }
 }

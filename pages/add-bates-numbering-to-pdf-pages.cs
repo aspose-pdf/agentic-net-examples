@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // needed for TextState
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -18,29 +18,30 @@ class Program
 
         try
         {
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Starting number for Bates numbering
-                int batesNumber = 1000;
-
-                // Add a TextStamp to each page with the current Bates number and a dash separator
-                foreach (Page page in doc.Pages)
+                // Create a Bates number stamp
+                PageNumberStamp batesStamp = new PageNumberStamp
                 {
-                    // Create the stamp with the current number
-                    TextStamp stamp = new TextStamp($"{batesNumber}-");
+                    // We start counting from 1 and prepend the fixed prefix "1000-"
+                    StartingNumber = 1,
+                    Format = "1000-{0}",               // dash separator between prefix and page number
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    BottomMargin = 10,
+                    RightMargin = 10
+                };
 
-                    // Positioning
-                    stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                    stamp.VerticalAlignment   = VerticalAlignment.Bottom;
+                // Configure the visual appearance of the stamp
+                batesStamp.TextState.Font = FontRepository.FindFont("Arial");
+                batesStamp.TextState.FontSize = 9;
+                batesStamp.TextState.ForegroundColor = Color.Black;
 
-                    // Configure the appearance via the read‑only TextState object
-                    stamp.TextState.FontSize = 12;
-                    stamp.TextState.ForegroundColor = Color.Black;
-
-                    // Add the stamp to the page
-                    page.AddStamp(stamp);
-
-                    batesNumber++; // increment for next page
+                // Apply the stamp to every page
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    doc.Pages[i].AddStamp(batesStamp);
                 }
 
                 // Save the modified PDF

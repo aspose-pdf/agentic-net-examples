@@ -1,54 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "ExtractedImages";
+        const string pdfPath = "input.pdf";
+        const string outputDir = "ExtractedImages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Initialize the extractor (Facades API)
-        PdfExtractor extractor = new PdfExtractor();
-
-        // Bind the PDF document to the extractor
-        extractor.BindPdf(inputPdfPath);
-
-        // Configure extractor to pull images only
-        extractor.ExtractImage();
-
-        int imageCounter = 1;
-
-        // Iterate over all extracted images
-        while (extractor.HasNextImage())
+        try
         {
-            // Generate a GUID for a unique filename (no hyphens)
-            string guidFileName = Guid.NewGuid().ToString("N") + ".png";
-
-            // Full path for the extracted image
-            string outputPath = Path.Combine(outputFolder, guidFileName);
-
-            // Save the current image to the file stream
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+            // PdfExtractor implements IDisposable – wrap it in a using block
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetNextImage(fs);
+                // Load the PDF document
+                extractor.BindPdf(pdfPath);
+
+                // The ExtractImageMode property does not exist in the referenced
+                // Aspose.Pdf.Facades version. Image extraction is performed by
+                // calling ExtractImage() which extracts all images by default.
+                extractor.ExtractImage();
+
+                // Iterate through all extracted images
+                while (extractor.HasNextImage())
+                {
+                    // Generate a unique file name using a GUID
+                    string guidFileName = Guid.NewGuid().ToString() + ".png";
+                    string outPath = Path.Combine(outputDir, guidFileName);
+
+                    // Write the image to disk (specify PNG format)
+                    extractor.GetNextImage(outPath, ImageFormat.Png);
+                }
             }
 
-            Console.WriteLine($"Image {imageCounter} saved as {outputPath}");
-            imageCounter++;
+            Console.WriteLine($"Images extracted to folder: {outputDir}");
         }
-
-        Console.WriteLine("Image extraction completed.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

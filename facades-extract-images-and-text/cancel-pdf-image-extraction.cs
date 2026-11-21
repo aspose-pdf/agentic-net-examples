@@ -1,97 +1,96 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputText = "output.txt";
-        const string outputImageDir = "Images";
+        const string inputPdf  = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        var cts = new CancellationTokenSource();
-
-        // Example cancellation trigger (after 5 seconds)
-        var cancelThread = new Thread(() =>
+        // Create a cancellation token source that can be triggered by the user.
+        using (CancellationTokenSource cts = new CancellationTokenSource())
         {
-            Thread.Sleep(5000);
-            Console.WriteLine("Cancellation requested.");
-            cts.Cancel();
-        });
-        cancelThread.Start();
+            // Start the extraction on a background task.
+            Task extractionTask = Task.Run(() =>
+                ExtractTextWithCancellation(inputPdf, outputTxt, cts.Token), cts.Token);
 
-        try
-        {
-            using (PdfExtractor extractor = new PdfExtractor())
+            Console.WriteLine("Press 'c' to cancel extraction...");
+            while (!extractionTask.IsCompleted)
             {
-                // Bind the PDF file
-                extractor.BindPdf(inputPath);
-
-                // Optional: limit to specific pages (1‑based indexing)
-                extractor.StartPage = 1;
-                // extractor.EndPage can be set if a range is needed
-
-                // Abort if cancellation requested before any extraction
-                if (cts.Token.IsCancellationRequested)
+                if (Console.KeyAvailable && Console.ReadKey(true).Key == ConsoleKey.C)
                 {
-                    Console.WriteLine("Operation cancelled before extraction.");
-                    return;
+                    cts.Cancel(); // Signal cancellation.
+                    break;
                 }
-
-                // Extract text
-                extractor.ExtractText();
-
-                if (cts.Token.IsCancellationRequested)
-                {
-                    Console.WriteLine("Operation cancelled after text extraction.");
-                    return;
-                }
-
-                // Save extracted text directly to file (GetText overload expects output path)
-                extractor.GetText(outputText);
-
-                // Extract images (no need to set ExtractImageMode – the method starts extraction)
-                extractor.ExtractImage();
-
-                if (cts.Token.IsCancellationRequested)
-                {
-                    Console.WriteLine("Operation cancelled after image extraction.");
-                    return;
-                }
-
-                // Save extracted images
-                Directory.CreateDirectory(outputImageDir);
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
-                {
-                    if (cts.Token.IsCancellationRequested)
-                    {
-                        Console.WriteLine("Operation cancelled during image saving.");
-                        break;
-                    }
-
-                    string imgPath = Path.Combine(outputImageDir, $"Image_{imageIndex}.png");
-                    using (FileStream imgStream = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
-                    {
-                        extractor.GetNextImage(imgStream);
-                    }
-                    imageIndex++;
-                }
+                Thread.Sleep(100);
             }
 
-            Console.WriteLine("Extraction completed.");
+            try
+            {
+                extractionTask.Wait(); // Propagate any exceptions.
+                Console.WriteLine("Extraction finished.");
+            }
+            catch (AggregateException ae)
+            {
+                if (ae.InnerException is OperationCanceledException)
+                    Console.WriteLine("Extraction was cancelled by the user.");
+                else
+                    Console.Error.WriteLine($"Error: {ae.InnerException?.Message}");
+            }
         }
-        catch (Exception ex)
+    }
+
+    // Performs text extraction page‑by‑page and respects the cancellation token.
+    static void ExtractTextWithCancellation(string pdfPath, string outputPath, CancellationToken token)
+    {
+        // Get total page count via Document (PdfExtractor no longer exposes PageCount).
+        int pageCount;
+        using (var doc = new Document(pdfPath))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            pageCount = doc.Pages.Count;
+        }
+
+        // Ensure the output file is created safely.
+        using (StreamWriter writer = new StreamWriter(outputPath, false))
+        {
+            for (int page = 1; page <= pageCount; page++)
+            {
+                // Abort if cancellation was requested.
+                token.ThrowIfCancellationRequested();
+
+                using (var extractor = new PdfExtractor())
+                {
+                    extractor.BindPdf(pdfPath);
+                    // Set the page range to the current page (1‑based).
+                    extractor.StartPage = page;
+                    extractor.EndPage   = page;
+                    extractor.ExtractText();
+
+                    // Get the extracted text via a MemoryStream (GetText has no parameter‑less overload).
+                    using (var textStream = new MemoryStream())
+                    {
+                        extractor.GetText(textStream);
+                        textStream.Position = 0;
+                        using (var reader = new StreamReader(textStream))
+                        {
+                            string pageText = reader.ReadToEnd();
+                            writer.WriteLine($"--- Page {page} ---");
+                            writer.WriteLine(pageText);
+                        }
+                    }
+                }
+            }
         }
     }
 }

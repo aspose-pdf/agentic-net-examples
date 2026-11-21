@@ -1,8 +1,9 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
 using System.Text.Json;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -11,7 +12,7 @@ class Program
         // Folder containing the source PDFs
         const string inputFolder = "InputPdfs";
         // Folder where JSON files will be written
-        const string outputFolder = "FormJson";
+        const string outputFolder = "FormDataJson";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -32,32 +33,54 @@ class Program
                 {
                     var formData = new Dictionary<string, object>();
 
-                    // Extract form fields if the document contains a form
+                    // Check that the document contains a form
                     if (doc.Form != null && doc.Form.Fields != null)
                     {
+                        // Iterate over all form fields
                         foreach (var field in doc.Form.Fields)
                         {
-                            // Retrieve the field's value; some field types may throw, so guard with try/catch
+                            // Resolve a field name (full name preferred)
+                            string name = field.FullName ?? field.PartialName ?? string.Empty;
+
                             object value = null;
-                            try
+
+                            // Extract the value based on the concrete field type
+                            switch (field)
                             {
-                                value = field.Value;
-                            }
-                            catch
-                            {
-                                // Ignore fields that cannot provide a value
+                                case TextBoxField txt:
+                                    value = txt.Value;
+                                    break;
+                                case CheckboxField chk:
+                                    value = chk.Checked;
+                                    break;
+                                case RadioButtonOptionField rad:
+                                    value = rad.Value;
+                                    break;
+                                case ListBoxField list:
+                                    value = list.SelectedItems;
+                                    break;
+                                case ComboBoxField combo:
+                                    value = combo.Value;
+                                    break;
+                                case SignatureField sig:
+                                    value = sig.Signature != null ? "Signed" : null;
+                                    break;
+                                default:
+                                    // Fallback: try to read a generic 'Value' property via reflection
+                                    var prop = field.GetType().GetProperty("Value");
+                                    if (prop != null)
+                                        value = prop.GetValue(field);
+                                    break;
                             }
 
-                            // Use FullName when available, otherwise fall back to Name
-                            string key = field.FullName ?? field.Name;
-                            formData[key] = value;
+                            formData[name] = value;
                         }
                     }
 
-                    // Serialize the dictionary to formatted JSON
+                    // Serialize the collected data to formatted JSON
                     string json = JsonSerializer.Serialize(formData, new JsonSerializerOptions { WriteIndented = true });
 
-                    // Determine the output JSON file path
+                    // Build the output JSON file path (same base name as the PDF)
                     string jsonFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".json";
                     string jsonPath = Path.Combine(outputFolder, jsonFileName);
 

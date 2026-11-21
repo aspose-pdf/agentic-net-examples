@@ -3,86 +3,93 @@ using System.Data;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths
-        const string templatePath = "template.pdf";
-        const string outputDir = "Output";
-        const string mergedPdfPath = "merged.pdf"; // final PDF containing all pages
+        // Input DataTable (replace with actual data source)
+        DataTable table = GetSampleDataTable();
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
-        string mergedPdfFullPath = Path.Combine(outputDir, mergedPdfPath);
+        // Log file path
+        string logPath = "process.log";
 
-        // -----------------------------------------------------------------
-        // Build a sample DataTable (in real life this would come from a DB)
-        // -----------------------------------------------------------------
-        DataTable dataTable = new DataTable("MailMerge");
-        dataTable.Columns.Add("Field1", typeof(string));
-        dataTable.Columns.Add("Field2", typeof(string));
-        for (int i = 0; i < 5; i++)
+        // Output PDF path
+        string outputPdf = "output.pdf";
+
+        // Ensure log file is created/cleared
+        using (StreamWriter logWriter = new StreamWriter(logPath, false))
         {
-            dataTable.Rows.Add($"Value1_{i}", $"Value2_{i}");
+            logWriter.WriteLine($"Processing started at {DateTime.Now}");
         }
 
-        // -----------------------------------------------------------------
-        // Create a PDF template with form fields that match the DataTable columns
-        // (self‑contained – no external files are required)
-        // -----------------------------------------------------------------
-        if (!File.Exists(templatePath))
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
         {
-            using (Document templateDoc = new Document())
+            int rowIndex = 0;
+
+            // Process each DataRow
+            foreach (DataRow row in table.Rows)
             {
-                Page page = templateDoc.Pages.Add();
-                float yPos = 750;
-                const float left = 100, width = 300, height = 20, vSpace = 30;
-                foreach (DataColumn col in dataTable.Columns)
+                rowIndex++;
+
+                // Add a new page for the current row
+                Page page = pdfDoc.Pages.Add();
+
+                // Simple text representation of the row (customize as needed)
+                string rowText = $"Row {rowIndex}";
+                foreach (DataColumn col in table.Columns)
                 {
-                    Rectangle rect = new Rectangle(left, yPos, left + width, yPos + height);
-                    TextBoxField txt = new TextBoxField(page, rect)
-                    {
-                        PartialName = col.ColumnName,
-                        Value = string.Empty
-                    };
-                    templateDoc.Form.Add(txt);
-                    yPos -= vSpace;
+                    rowText += $"\n{col.ColumnName}: {row[col]}";
                 }
-                templateDoc.Save(templatePath);
+
+                // Add the text to the page
+                TextFragment tf = new TextFragment(rowText);
+                tf.Position = new Position(50, 750); // top-left margin
+                page.Paragraphs.Add(tf);
+
+                // Log the processing information
+                using (StreamWriter logWriter = new StreamWriter(logPath, true))
+                {
+                    logWriter.WriteLine($"Row {rowIndex} processed – page {pdfDoc.Pages.Count} created.");
+                }
             }
+
+            // Save the PDF (Document.Save inside using ensures proper disposal)
+            pdfDoc.Save(outputPdf);
         }
 
-        // -----------------------------------------------------------------
-        // Log each DataTable row before processing (row‑level logging)
-        // -----------------------------------------------------------------
-        for (int i = 0; i < dataTable.Rows.Count; i++)
+        // Example usage of a Facades class (PdfFileEditor) – copy the generated PDF to another file
+        PdfFileEditor editor = new PdfFileEditor();
+        string copyPdf = "output_copy.pdf";
+        // Concatenate overload expects an array of source file paths (string[]) or Document[]
+        // Using the string[] overload here
+        editor.Concatenate(new string[] { outputPdf }, copyPdf);
+
+        // Final log entry
+        using (StreamWriter logWriter = new StreamWriter(logPath, true))
         {
-            Console.WriteLine($"Processing DataTable row {i + 1} of {dataTable.Rows.Count}");
+            logWriter.WriteLine($"PDF generation completed at {DateTime.Now}");
+            logWriter.WriteLine($"Output PDF: {outputPdf}");
+            logWriter.WriteLine($"Copied PDF via PdfFileEditor: {copyPdf}");
         }
 
-        // -----------------------------------------------------------------
-        // Use AutoFiller (new API) to merge the data into the template.
-        // -----------------------------------------------------------------
-        AutoFiller autoFiller = new AutoFiller();
-        // Initialize the facade with the template PDF (replaces obsolete InputFileName)
-        autoFiller.BindPdf(templatePath);
-        // Import the DataTable – this prepares the filler.
-        autoFiller.ImportDataTable(dataTable);
-        // Save generates a single PDF where each row becomes a separate page.
-        autoFiller.Save(mergedPdfFullPath);
+        Console.WriteLine("Processing completed. Check the log file for details.");
+    }
 
-        // -----------------------------------------------------------------
-        // Log the page numbers that were created in the output PDF.
-        // -----------------------------------------------------------------
-        for (int i = 0; i < dataTable.Rows.Count; i++)
-        {
-            Console.WriteLine($"Created PDF page {i + 1} in {mergedPdfFullPath}");
-        }
+    // Sample method to generate a DataTable (replace with real data retrieval)
+    static DataTable GetSampleDataTable()
+    {
+        DataTable dt = new DataTable();
+        dt.Columns.Add("ID", typeof(int));
+        dt.Columns.Add("Name", typeof(string));
+        dt.Columns.Add("Amount", typeof(decimal));
 
-        // Clean up resources.
-        autoFiller.Close();
+        dt.Rows.Add(1, "Alice", 123.45m);
+        dt.Rows.Add(2, "Bob", 678.90m);
+        dt.Rows.Add(3, "Charlie", 234.56m);
+
+        return dt;
     }
 }

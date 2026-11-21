@@ -1,75 +1,108 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace is used as required
+using Aspose.Pdf.Facades; // Facades namespace as requested
 
-class Program
+namespace PdfPasswordChanger
 {
-    // CSV format: PdfPath,NewUserPassword,NewOwnerPassword
-    static void Main(string[] args)
+    class Program
     {
-        if (args.Length == 0)
+        // Represents a single CSV record
+        private class CsvRecord
         {
-            Console.Error.WriteLine("Usage: ChangePdfPasswords <csvFilePath>");
-            return;
+            public string InputPath { get; set; }
+            public string OutputPath { get; set; }
+            public string NewUserPassword { get; set; }
+            public string NewOwnerPassword { get; set; }
         }
 
-        string csvPath = args[0];
-        if (!File.Exists(csvPath))
+        static void Main(string[] args)
         {
-            Console.Error.WriteLine($"CSV file not found: {csvPath}");
-            return;
-        }
-
-        // Read all lines, ignore empty lines
-        var lines = File.ReadAllLines(csvPath);
-        foreach (var rawLine in lines)
-        {
-            if (string.IsNullOrWhiteSpace(rawLine))
-                continue;
-
-            // Split by comma – simple CSV handling (no quoted commas)
-            var parts = rawLine.Split(',');
-            if (parts.Length < 3)
+            // Expect the CSV file path as the first argument
+            if (args.Length == 0)
             {
-                Console.Error.WriteLine($"Invalid line (expected 3 columns): {rawLine}");
-                continue;
+                Console.Error.WriteLine("Usage: PdfPasswordChanger <csvFilePath>");
+                return;
             }
 
-            string pdfPath      = parts[0].Trim();
-            string newUserPwd   = parts[1].Trim();
-            string newOwnerPwd  = parts[2].Trim();
-
-            if (!File.Exists(pdfPath))
+            string csvFile = args[0];
+            if (!File.Exists(csvFile))
             {
-                Console.Error.WriteLine($"PDF not found: {pdfPath}");
-                continue;
+                Console.Error.WriteLine($"CSV file not found: {csvFile}");
+                return;
             }
 
-            try
+            List<CsvRecord> records = LoadCsv(csvFile);
+            foreach (var rec in records)
             {
-                // Load the PDF document first – this gives us page count and encryption status
-                using (Document doc = new Document(pdfPath))
+                try
                 {
-                    Console.WriteLine($"Processing: {pdfPath}");
-                    Console.WriteLine($"  Pages: {doc.Pages.Count}");
-                    Console.WriteLine($"  Encrypted: {doc.IsEncrypted}");
-
-                    // Define permissions you want to keep (example: allow printing and content extraction)
-                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-                    // Encrypt with the new passwords using AES-256 (recommended)
-                    doc.Encrypt(newUserPwd, newOwnerPwd, perms, CryptoAlgorithm.AESx256);
-
-                    // Overwrite the original file
-                    doc.Save(pdfPath);
+                    ChangePdfPasswords(rec);
+                    Console.WriteLine($"Processed: {rec.InputPath} -> {rec.OutputPath}");
                 }
-
-                Console.WriteLine("  Passwords updated successfully.");
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error processing '{rec.InputPath}': {ex.Message}");
+                }
             }
-            catch (Exception ex)
+        }
+
+        // Loads CSV lines into CsvRecord objects (simple split on commas)
+        private static List<CsvRecord> LoadCsv(string path)
+        {
+            var list = new List<CsvRecord>();
+            foreach (var line in File.ReadLines(path))
             {
-                Console.Error.WriteLine($"  Error processing '{pdfPath}': {ex.Message}");
+                // Skip empty lines
+                if (string.IsNullOrWhiteSpace(line))
+                    continue;
+
+                // Optional: skip header line if it contains non‑file text
+                if (line.StartsWith("InputPath", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                string[] parts = line.Split(',');
+                if (parts.Length < 4)
+                    continue; // malformed line
+
+                list.Add(new CsvRecord
+                {
+                    InputPath = parts[0].Trim(),
+                    OutputPath = parts[1].Trim(),
+                    NewUserPassword = parts[2].Trim(),
+                    NewOwnerPassword = parts[3].Trim()
+                });
+            }
+            return list;
+        }
+
+        // Performs the password change using Aspose.Pdf.Document
+        private static void ChangePdfPasswords(CsvRecord rec)
+        {
+            if (!File.Exists(rec.InputPath))
+                throw new FileNotFoundException("Input PDF not found.", rec.InputPath);
+
+            // Ensure the output directory exists
+            string outDir = Path.GetDirectoryName(rec.OutputPath);
+            if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+                Directory.CreateDirectory(outDir);
+
+            // Open the source PDF, apply new encryption, and save to the target path
+            using (Document doc = new Document(rec.InputPath))
+            {
+                // Define permissions – adjust as needed
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+                // Apply encryption with the new passwords and AES‑256 algorithm
+                doc.Encrypt(
+                    rec.NewUserPassword,
+                    rec.NewOwnerPassword,
+                    perms,
+                    CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF
+                doc.Save(rec.OutputPath);
             }
         }
     }

@@ -1,69 +1,62 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputPdf = "output_figure.pdf";
-        const string imagePath = "figure.png"; // external image file
+        const string outputPdf = "output_with_figure_annotation.pdf";
+        const string imagePath = "figure.png"; // external image to use as appearance
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(imagePath))
         {
             Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        try
+        // Keep streams alive until the document is saved
+        List<MemoryStream> imageStreams = new List<MemoryStream>();
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
-            {
-                // Ensure the document is tagged (create structure if missing)
-                ITaggedContent tagged = doc.TaggedContent;
-                tagged.SetLanguage("en-US");
-                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPdf));
+            // Choose the page where the annotation will be placed (first page in this example)
+            Page page = doc.Pages[1];
 
-                // Root of the tagged structure tree
-                StructureElement root = tagged.RootElement;
+            // Define the annotation rectangle (llx, lly, urx, ury) in points
+            // Here we place a 200x200 box at position (100,500)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
-                // Create a Figure element and set its alternative text
-                FigureElement figure = tagged.CreateFigureElement();
-                figure.AlternativeText = "Illustration showing the concept.";
-                root.AppendChild(figure); // attach to the root
+            // Create a StampAnnotation which can use an external image as its appearance
+            StampAnnotation stamp = new StampAnnotation(page, rect);
 
-                // Add the external image to the first page (or any page you prefer)
-                Page page = doc.Pages[1];
+            // Load the external image into a MemoryStream and assign it to the annotation
+            byte[] imgBytes = File.ReadAllBytes(imagePath);
+            MemoryStream imgStream = new MemoryStream(imgBytes);
+            // Keep a reference so the stream is not disposed before saving
+            imageStreams.Add(imgStream);
+            stamp.Image = imgStream; // Image property expects a Stream
 
-                // Load the image into the page resources
-                using (FileStream imgStream = File.OpenRead(imagePath))
-                {
-                    // Images.Add returns the resource name (string). Retrieve the XImage via the name.
-                    string imgResourceName = page.Resources.Images.Add(imgStream);
-                    XImage img = page.Resources.Images[imgResourceName];
-                    // Associate alternative text with the image resource
-                    img.TrySetAlternativeText("Figure illustration", page);
-                }
+            // Optional: set a tooltip (Contents) and a title (Title) for the annotation
+            stamp.Title = "Figure Annotation";
+            stamp.Contents = "This annotation shows an external image as its appearance.";
 
-                // Save the modified PDF
-                doc.Save(outputPdf);
-            }
+            // Add the annotation to the page's annotation collection
+            page.Annotations.Add(stamp);
 
-            Console.WriteLine($"Figure annotation with external image saved to '{outputPdf}'.");
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with figure annotation: {outputPdf}");
     }
 }

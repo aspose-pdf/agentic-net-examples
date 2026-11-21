@@ -1,16 +1,15 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // Required for XYZExplicitDestination overload
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string xmlPath = "structure.xml";
-        const string outputPdf = "outlined.pdf";
+        const string xmlPath = "input.xml";
+        const string pdfPath = "output.pdf";
 
         if (!File.Exists(xmlPath))
         {
@@ -18,66 +17,58 @@ class Program
             return;
         }
 
-        // Load the XML document
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlPath);
+        // Load XML document
+        XDocument xdoc = XDocument.Load(xmlPath);
 
-        // Create a new PDF document inside a using block (deterministic disposal)
-        using (Document pdf = new Document())
+        // Create PDF document
+        using (Document pdfDoc = new Document())
         {
-            // Add a single blank page – all outline entries will point to this page
-            Page page = pdf.Pages.Add();
+            // Ensure the PDF has at least one page
+            pdfDoc.Pages.Add();
 
-            // Recursively build the outline hierarchy from the XML root element
-            XmlElement rootElement = xmlDoc.DocumentElement;
-            if (rootElement != null)
-            {
-                AddOutlineItem(rootElement, pdf, null, page);
-            }
+            // Build outline hierarchy from XML root
+            AddOutlineItems(pdfDoc, null, xdoc.Root);
 
             // Save the PDF
-            pdf.Save(outputPdf);
+            pdfDoc.Save(pdfPath);
         }
 
-        Console.WriteLine($"PDF with hierarchical outline saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with hierarchical outline saved to '{pdfPath}'.");
     }
 
     /// <summary>
-    /// Recursively creates outline items that mirror the XML element hierarchy.
+    /// Recursively adds outline items for each XML element.
     /// </summary>
-    /// <param name="xmlNode">Current XML element.</param>
-    /// <param name="pdf">The PDF document.</param>
-    /// <param name="parentOutline">Parent outline item; null for top‑level.</param>
-    /// <param name="targetPage">Page to which the outline entries will navigate.</param>
-    private static void AddOutlineItem(XmlElement xmlNode, Document pdf, OutlineItemCollection? parentOutline, Page targetPage)
+    /// <param name="doc">The PDF document.</param>
+    /// <param name="parentItem">The parent outline node; null for top‑level items.</param>
+    /// <param name="element">Current XML element.</param>
+    static void AddOutlineItems(Document doc, OutlineItemCollection parentItem, XElement element)
     {
-        // Create an outline entry with the element name as its title
-        OutlineItemCollection outline = new OutlineItemCollection(pdf.Outlines)
+        // Create a readable title for the outline entry
+        string title = element.Name.LocalName;
+        if (!element.HasElements && !string.IsNullOrWhiteSpace(element.Value))
         {
-            Title = xmlNode.Name,
-            // Use the XYZExplicitDestination overload that takes a page number (int)
-            Destination = new XYZExplicitDestination(targetPage.Number, 0, targetPage.PageInfo.Height, 1.0f)
+            title += $": {element.Value.Trim()}";
+        }
+
+        // Create a new outline node (OutlineItemCollection acts as a node)
+        OutlineItemCollection node = new OutlineItemCollection(doc.Outlines)
+        {
+            Title = title,
+            // Destination: first page, top‑left corner (zoom = 1)
+            Destination = new XYZExplicitDestination(doc.Pages[1], 0, doc.Pages[1].MediaBox.Height, 1)
         };
 
-        // Attach the outline to the document hierarchy
-        if (parentOutline == null)
-        {
-            // Top‑level outline items are added to the document's root outline collection
-            pdf.Outlines.Add(outline);
-        }
+        // Attach the node to the hierarchy
+        if (parentItem == null)
+            doc.Outlines.Add(node);   // top‑level bookmark
         else
-        {
-            // Child outline items are added to the parent's collection
-            parentOutline.Add(outline);
-        }
+            parentItem.Add(node);      // child bookmark
 
-        // Process child elements recursively
-        foreach (XmlNode child in xmlNode.ChildNodes)
+        // Recurse for child XML elements
+        foreach (XElement child in element.Elements())
         {
-            if (child.NodeType == XmlNodeType.Element)
-            {
-                AddOutlineItem((XmlElement)child, pdf, outline, targetPage);
-            }
+            AddOutlineItems(doc, node, child);
         }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "watermarked_output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,14 +16,20 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the source PDF
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the first WatermarkAnnotation from the first page
-            WatermarkAnnotation original = doc.Pages[1]
-                .Annotations
-                .OfType<WatermarkAnnotation>()
-                .FirstOrDefault();
+            // Assume the first page already contains a WatermarkAnnotation we want to clone.
+            // If not present, you could create one here instead.
+            WatermarkAnnotation original = null;
+            foreach (Annotation ann in doc.Pages[1].Annotations)
+            {
+                if (ann is WatermarkAnnotation wm)
+                {
+                    original = wm;
+                    break;
+                }
+            }
 
             if (original == null)
             {
@@ -32,25 +37,26 @@ class Program
                 return;
             }
 
-            // Base rectangle of the original annotation (use the Rect property)
-            Aspose.Pdf.Rectangle baseRect = original.Rect;
+            // Store the original rectangle for position calculations
+            Aspose.Pdf.Rectangle origRect = original.Rect;
 
-            // Apply cloned watermark to each subsequent page with a vertical offset
+            // Apply clones to pages 2..N with incremental offsets
+            const double offsetX = 20.0; // shift right by 20 points per page
+            const double offsetY = 10.0; // shift up   by 10 points per page
+
             for (int i = 2; i <= doc.Pages.Count; i++)
             {
                 // Clone the original annotation
                 WatermarkAnnotation clone = (WatermarkAnnotation)original.Clone();
 
-                // Calculate a new rectangle shifted down by 50 points per page
-                double offset = 50.0 * (i - 1);
-                Aspose.Pdf.Rectangle newRect = new Aspose.Pdf.Rectangle(
-                    baseRect.LLX,
-                    baseRect.LLY - offset,
-                    baseRect.URX,
-                    baseRect.URY - offset);
-
-                // Assign the adjusted rectangle to the clone (use Rect property)
-                clone.Rect = newRect;
+                // Compute new position based on page index
+                double dx = offsetX * (i - 1);
+                double dy = offsetY * (i - 1);
+                clone.Rect = new Aspose.Pdf.Rectangle(
+                    origRect.LLX + dx,
+                    origRect.LLY + dy,
+                    origRect.URX + dx,
+                    origRect.URY + dy);
 
                 // Add the cloned annotation to the current page
                 doc.Pages[i].Annotations.Add(clone);

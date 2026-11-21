@@ -1,131 +1,130 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf;               // Core Aspose.PDF API
+using Aspose.Pdf.Forms;        // For form field access
 
 class Program
 {
-    // Entry point – async Main is supported in C# 7.1+
+    // Entry point – async to allow await of file operations
     static async Task Main(string[] args)
     {
         // Paths – adjust as needed
-        const string xlsxPath = "data.xlsx";          // not used – kept for signature compatibility
-        const string pdfTemplatePath = "template.pdf"; // will be created on‑the‑fly if missing
-        const string outputPdfPath = "filled_output.pdf";
+        const string pdfTemplatePath = "template.pdf";
+        const string outputPdfPath   = "filled_output.pdf";
+        const string dataSourcePath  = "data.xlsx"; // placeholder – any file that would contain the Excel data
 
-        // Ensure a PDF template with the required form fields exists.
-        // This makes the example self‑contained and avoids FileNotFoundException.
-        CreatePdfTemplateIfMissing(pdfTemplatePath);
-
-        // Perform the fill operation asynchronously.
-        await FillPdfFromXlsxAsync(xlsxPath, pdfTemplatePath, outputPdfPath);
-        Console.WriteLine($"PDF saved to '{outputPdfPath}'.");
-    }
-
-    /// <summary>
-    /// Creates a minimal PDF template containing three text box fields (FirstName, LastName, Address).
-    /// The method is called only when the template file does not already exist.
-    /// </summary>
-    private static void CreatePdfTemplateIfMissing(string templatePath)
-    {
-        if (File.Exists(templatePath))
-            return;
-
-        // Create a new PDF document.
-        using var doc = new Document();
-        var page = doc.Pages.Add();
-
-        // Helper to add a TextBoxField at a given rectangle.
-        void AddField(string partialName, float llx, float lly, float urx, float ury)
+        // Validate input files
+        if (!File.Exists(pdfTemplatePath))
         {
-            var field = new TextBoxField(page, new Rectangle(llx, lly, urx, ury))
-            {
-                PartialName = partialName,
-                Value = string.Empty
-            };
-            doc.Form.Add(field);
+            Console.Error.WriteLine($"PDF template not found: {pdfTemplatePath}");
+            return;
+        }
+        if (!File.Exists(dataSourcePath))
+        {
+            Console.Error.WriteLine($"Data source not found: {dataSourcePath}");
+            return;
         }
 
-        // Add three fields that match the column names used later.
-        AddField("FirstName", 100, 700, 300, 720);
-        AddField("LastName",  100, 660, 300, 680);
-        AddField("Address",   100, 620, 400, 640);
-
-        // Save the template.
-        doc.Save(templatePath);
-    }
-
-    /// <summary>
-    /// Reads an XLSX file and a PDF template asynchronously, fills the PDF using
-    /// Aspose.Pdf.Facades.AutoFiller, and writes the resulting PDF asynchronously.
-    /// In this self‑contained example the XLSX file is not actually read – a DataTable
-    /// is built in‑memory – but the method still demonstrates async file I/O for the
-    /// template and the output PDF.
-    /// </summary>
-    private static async Task FillPdfFromXlsxAsync(
-        string xlsxFilePath,
-        string pdfTemplateFilePath,
-        string outputPdfFilePath,
-        CancellationToken cancellationToken = default)
-    {
-        // ------------------------------------------------------------
-        // 1. Build a DataTable that represents the data to fill.
-        //    In a real scenario you would parse the XLSX into this table.
-        // ------------------------------------------------------------
-        var dataTable = new DataTable("FormData");
-        dataTable.Columns.Add("FirstName", typeof(string));
-        dataTable.Columns.Add("LastName",  typeof(string));
-        dataTable.Columns.Add("Address",   typeof(string));
-
-        var row = dataTable.NewRow();
-        row["FirstName"] = "John";
-        row["LastName"]  = "Doe";
-        row["Address"]   = "123 Main St, Anytown";
-        dataTable.Rows.Add(row);
-
-        // ------------------------------------------------------------
-        // 2. Asynchronously read the PDF template into a memory stream.
-        // ------------------------------------------------------------
-        await using (var pdfTemplateStream = new FileStream(
-            pdfTemplateFilePath,
-            FileMode.Open,
-            FileAccess.Read,
-            FileShare.Read,
-            bufferSize: 8192,
-            useAsync: true))
+        try
         {
-            var pdfTemplateMemory = new MemoryStream();
-            await pdfTemplateStream.CopyToAsync(pdfTemplateMemory, cancellationToken);
-            pdfTemplateMemory.Position = 0; // Reset for binding.
+            // ------------------------------------------------------------
+            // 1. Asynchronously read the XLSX source (simulated) and build the field dictionary
+            // ------------------------------------------------------------
+            var fieldValues = await LoadFieldValuesAsync(dataSourcePath);
 
             // ------------------------------------------------------------
-            // 3. Use AutoFiller to bind the template, import the DataTable,
-            //    and generate the filled PDF into a memory stream.
+            // 2. Load the PDF template using the core Aspose.Pdf API
             // ------------------------------------------------------------
-            using var autoFiller = new AutoFiller();
-            autoFiller.BindPdf(pdfTemplateMemory);
-            autoFiller.ImportDataTable(dataTable);
-
-            using var filledPdfMemory = new MemoryStream();
-            autoFiller.Save(filledPdfMemory);
-            filledPdfMemory.Position = 0; // Prepare for async write.
+            var pdfDocument = new Document(pdfTemplatePath);
 
             // ------------------------------------------------------------
-            // 4. Asynchronously write the filled PDF to the output file.
+            // 3. Fill the form fields. Use the Aspose.Pdf.Forms.Field class (not WidgetAnnotation).
+            // ------------------------------------------------------------
+            var form = pdfDocument.Form;
+            foreach (var kvp in fieldValues)
+            {
+                // Find the field by its partial name (the key we have).
+                Field field = FindFieldByName(form, kvp.Key);
+                if (field != null)
+                {
+                    field.Value = kvp.Value; // Field.Value is the correct property.
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Warning: field '{kvp.Key}' not found in the PDF template.");
+                }
+            }
+
+            // ------------------------------------------------------------
+            // 4. Save the filled PDF to a MemoryStream (synchronous API)
+            // ------------------------------------------------------------
+            using var memoryStream = new MemoryStream();
+            pdfDocument.Save(memoryStream);
+            memoryStream.Position = 0; // rewind for reading
+
+            // ------------------------------------------------------------
+            // 5. Asynchronously write the MemoryStream to the final output file
             // ------------------------------------------------------------
             await using var outputStream = new FileStream(
-                outputPdfFilePath,
+                outputPdfPath,
                 FileMode.Create,
                 FileAccess.Write,
                 FileShare.None,
-                bufferSize: 8192,
+                bufferSize: 81920,
                 useAsync: true);
 
-            await filledPdfMemory.CopyToAsync(outputStream, cancellationToken);
+            await memoryStream.CopyToAsync(outputStream);
+
+            Console.WriteLine($"PDF successfully filled and saved to '{outputPdfPath}'.");
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Helper that searches a Form for a field whose PartialName matches the supplied name.
+    /// Returns null if the field cannot be found.
+    /// </summary>
+    private static Field FindFieldByName(Form form, string name)
+    {
+        // The Form.Fields collection contains objects derived from Field (e.g., TextBoxField, CheckBoxField, etc.).
+        foreach (Field f in form.Fields)
+        {
+            // PartialName is the name used in the PDF form definition.
+            if (string.Equals(f.PartialName, name, StringComparison.OrdinalIgnoreCase))
+                return f;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Simulates asynchronous reading of an Excel (XLSX) file and returns a dictionary of field names/values.
+    /// In a real‑world scenario you would parse the Excel file (e.g., using ClosedXML or EPPlus) after loading the bytes.
+    /// </summary>
+    private static async Task<Dictionary<string, string>> LoadFieldValuesAsync(string path)
+    {
+        // Asynchronously read the whole file – this demonstrates async I/O without pulling in a heavy Excel parser.
+        await using var stream = new FileStream(
+            path,
+            FileMode.Open,
+            FileAccess.Read,
+            FileShare.Read,
+            bufferSize: 81920,
+            useAsync: true);
+
+        // Discard the content – replace with real parsing logic as needed.
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms);
+        // For demonstration we return a static set of values.
+        return new Dictionary<string, string>
+        {
+            { "Name", "John Doe" },
+            { "Date", DateTime.Today.ToShortDateString() }
+            // Add more field/value pairs as required by the PDF form
+        };
     }
 }

@@ -17,15 +17,14 @@ class Program
 
         try
         {
-            // PdfFileInfo implements IDisposable – wrap in using for deterministic cleanup
+            // PdfFileInfo implements IDisposable, so wrap it in a using block
             using (PdfFileInfo info = new PdfFileInfo(pdfPath))
             {
-                // Read the Title metadata property
+                // Read the Title metadata; fallback to empty string if null
                 string title = info.Title ?? string.Empty;
 
                 // Append the title to the log file
-                string logEntry = $"Title: {title}{Environment.NewLine}";
-                File.AppendAllText(logPath, logEntry);
+                File.AppendAllText(logPath, $"Title: {title}{Environment.NewLine}");
             }
 
             Console.WriteLine($"Title metadata written to '{logPath}'.");

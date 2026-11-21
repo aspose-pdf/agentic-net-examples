@@ -1,72 +1,69 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf;
-
-// Model representing a bookmark node for JSON serialization
-public class BookmarkNode
-{
-    public string? Title { get; set; }
-    public string? Action { get; set; }
-    public int? DestinationPage { get; set; }
-    public List<BookmarkNode> Children { get; set; } = new List<BookmarkNode>();
-}
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "bookmarks.json";
+        const string inputPdf = "input.pdf";
+        const string outputJson = "bookmarks.json";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document using Aspose.Pdf.Document
-        Document pdfDocument = new Document(inputPdfPath);
+        // Load PDF and extract bookmarks using the Facades API
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        {
+            bookmarkEditor.BindPdf(inputPdf);
 
-        // In recent Aspose.Pdf versions the bookmark hierarchy is exposed via the Outlines collection
-        var topBookmarks = pdfDocument.Outlines; // OutlineCollection implements IEnumerable
+            // Extract the full bookmark hierarchy
+            Bookmarks topBookmarks = bookmarkEditor.ExtractBookmarks();
 
-        // Convert the Aspose outline hierarchy to our plain POCO hierarchy
-        List<BookmarkNode> jsonTree = ConvertBookmarks(topBookmarks);
+            // Convert the Aspose bookmark hierarchy to a POCO tree
+            List<BookmarkNode> jsonTree = ConvertBookmarks(topBookmarks);
 
-        // Serialize to indented JSON
-        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(jsonTree, jsonOptions);
+            // Serialize the tree to indented JSON
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(jsonTree, jsonOptions);
 
-        // Write JSON to file
-        File.WriteAllText(outputJsonPath, json);
-
-        Console.WriteLine($"Bookmarks exported to '{outputJsonPath}'.");
+            // Write JSON to file
+            File.WriteAllText(outputJson, json);
+            Console.WriteLine($"Bookmarks exported to '{outputJson}'.");
+        }
     }
 
-    // Recursively transforms any IEnumerable (OutlineCollection or its children) into List<BookmarkNode>
-    private static List<BookmarkNode> ConvertBookmarks(object? collectionObj)
+    // Recursively transforms a collection of Bookmark into a list of POCO nodes
+    static List<BookmarkNode> ConvertBookmarks(IList<Bookmark> collection)
     {
         var list = new List<BookmarkNode>();
-        if (collectionObj == null) return list;
+        if (collection == null) return list;
 
-        var enumerable = collectionObj as System.Collections.IEnumerable;
-        if (enumerable == null) return list;
-
-        foreach (var item in enumerable)
+        foreach (Bookmark bm in collection)
         {
-            // Use dynamic to avoid compile‑time coupling with Aspose's concrete Outline type
-            dynamic aspOutline = item;
             var node = new BookmarkNode
             {
-                Title = aspOutline.Title as string,
-                Action = aspOutline.Action as string,
-                DestinationPage = aspOutline.DestinationPage > 0 ? (int?)aspOutline.DestinationPage : null,
-                Children = ConvertBookmarks(aspOutline.Children)
+                Title = bm.Title,
+                PageNumber = bm.PageNumber,
+                // In the Facade model child bookmarks are accessed via ChildItems
+                Children = ConvertBookmarks(bm.ChildItems)
             };
             list.Add(node);
         }
+
         return list;
+    }
+
+    // POCO representing a bookmark for JSON serialization
+    public class BookmarkNode
+    {
+        public string Title { get; set; }
+        public int PageNumber { get; set; }
+        public List<BookmarkNode> Children { get; set; }
     }
 }

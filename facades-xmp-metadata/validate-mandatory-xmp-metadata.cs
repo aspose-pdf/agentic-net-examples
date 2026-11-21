@@ -1,110 +1,121 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Xml.Linq;
+using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class XmpValidator
+class Program
 {
-    // List of mandatory XMP fields (full qualified names as they appear in the XMP XML)
-    private static readonly string[] MandatoryFields = new[]
+    // List of mandatory XMP fields (XPath expressions relative to the XMP root)
+    static readonly string[] RequiredXmpFields = new[]
     {
-        "dc:title",
-        "dc:creator",
-        "dc:description"
+        "dc:title",          // Document title
+        "dc:creator",        // Author/creator
+        "dc:description",    // Description
+        "xmp:CreateDate"     // Creation date
     };
-
-    // Validates that all mandatory XMP fields exist in the PDF.
-    // Returns true if validation succeeds, false otherwise.
-    private static bool ValidateXmp(string pdfPath)
-    {
-        // Load XMP metadata using the Facades API.
-        PdfXmpMetadata xmp = new PdfXmpMetadata();
-        xmp.BindPdf(pdfPath);                     // Load the PDF into the XMP handler
-        byte[] xmpBytes = xmp.GetXmpMetadata();   // Retrieve XMP as a byte array
-
-        if (xmpBytes == null || xmpBytes.Length == 0)
-        {
-            Console.Error.WriteLine("No XMP metadata found in the document.");
-            return false;
-        }
-
-        // Convert the byte array to a UTF‑8 string.
-        string xmpXml = Encoding.UTF8.GetString(xmpBytes);
-
-        // Parse the XML for easy querying.
-        XDocument doc;
-        try
-        {
-            doc = XDocument.Parse(xmpXml);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to parse XMP XML: {ex.Message}");
-            return false;
-        }
-
-        // Build a set of element names present in the XMP (ignoring namespace prefixes).
-        HashSet<string> presentFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var element in doc.Descendants())
-        {
-            // Combine prefix (if any) with local name to match the format in MandatoryFields.
-            string local = element.Name.LocalName;
-            string nsUri = element.Name.NamespaceName;
-
-            // Add the plain local name.
-            presentFields.Add(local);
-
-            // Add with common prefixes if the namespace matches known ones.
-            if (nsUri.Contains("dc/"))
-                presentFields.Add($"dc:{local}");
-            else if (nsUri.Contains("pdf/"))
-                presentFields.Add($"pdf:{local}");
-            else if (nsUri.Contains("xmp/"))
-                presentFields.Add($"xmp:{local}");
-        }
-
-        // Verify each mandatory field.
-        bool allPresent = true;
-        foreach (string field in MandatoryFields)
-        {
-            if (!presentFields.Contains(field))
-            {
-                Console.Error.WriteLine($"Missing mandatory XMP field: {field}");
-                allPresent = false;
-            }
-        }
-
-        return allPresent;
-    }
 
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "validated_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "validated_output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Perform XMP validation.
-        if (!ValidateXmp(inputPdf))
+        // -----------------------------------------------------------------
+        // 1. Extract XMP metadata using the Facades API (PdfXmpMetadata)
+        // -----------------------------------------------------------------
+        PdfXmpMetadata xmpFacade = new PdfXmpMetadata();
+        string xmpXml;
+
+        try
+        {
+            // GetXmpMetadata returns the raw XMP packet as a byte[]
+            byte[] xmpBytes = xmpFacade.GetXmpMetadata(inputPath);
+            // Convert the byte[] to a UTF‑8 string for XML parsing
+            xmpXml = Encoding.UTF8.GetString(xmpBytes);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read XMP metadata: {ex.Message}");
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(xmpXml))
+        {
+            Console.Error.WriteLine("No XMP metadata found in the PDF.");
+            return;
+        }
+
+        // -----------------------------------------------------------------
+        // 2. Parse the XMP XML and verify mandatory fields
+        // -----------------------------------------------------------------
+        XDocument xmpDoc;
+        try
+        {
+            xmpDoc = XDocument.Parse(xmpXml);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Invalid XMP XML format: {ex.Message}");
+            return;
+        }
+
+        // XMP uses namespaces; define them for XPath queries
+        XNamespace dc = "http://purl.org/dc/elements/1.1/";
+        XNamespace xmp = "http://ns.adobe.com/xap/1.0/";
+
+        bool allFieldsPresent = true;
+
+        foreach (string field in RequiredXmpFields)
+        {
+            // Resolve namespace prefix
+            XName name = field switch
+            {
+                var f when f.StartsWith("dc:") => dc + f.Substring(3),
+                var f when f.StartsWith("xmp:") => xmp + f.Substring(4),
+                _ => XName.Get(field) // fallback (unlikely)
+            };
+
+            // Look for the element anywhere in the document
+            XElement element = xmpDoc.Root?.Descendants(name).FirstOrDefault();
+
+            if (element == null || string.IsNullOrWhiteSpace(element.Value))
+            {
+                Console.Error.WriteLine($"Missing mandatory XMP field: {field}");
+                allFieldsPresent = false;
+            }
+        }
+
+        if (!allFieldsPresent)
         {
             Console.Error.WriteLine("PDF validation failed. Publication aborted.");
             return;
         }
 
-        // Validation succeeded – copy the PDF to the publication location.
-        // Use the core Document API inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPdf))
+        // -----------------------------------------------------------------
+        // 3. All required XMP fields are present – proceed to "publish"
+        //    (here we simply copy the PDF to the output location)
+        // -----------------------------------------------------------------
+        try
         {
-            doc.Save(outputPdf);
-        }
+            // Use the core Document API inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                doc.Save(outputPath);
+            }
 
-        Console.WriteLine($"PDF passed XMP validation and was saved to '{outputPdf}'.");
+            Console.WriteLine($"PDF validated and saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during PDF save: {ex.Message}");
+        }
     }
 }

@@ -16,19 +16,20 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Open the PDF document; using ensures proper disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Verify the document has at least five pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 5)
             {
-                Console.Error.WriteLine("The document has fewer than 5 pages.");
+                Console.Error.WriteLine("Document contains fewer than 5 pages.");
                 return;
             }
 
+            // Access page five
             Page page5 = doc.Pages[5];
 
-            // Locate FreeTextAnnotation(s) on page five
+            // Locate free‑text annotations on this page
             foreach (Annotation annot in page5.Annotations)
             {
                 if (annot is FreeTextAnnotation freeText)
@@ -38,10 +39,10 @@ class Program
                 }
             }
 
-            // Save the modified PDF
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Free‑text annotation on page 5 made invisible and saved to '{outputPath}'.");
     }
 }

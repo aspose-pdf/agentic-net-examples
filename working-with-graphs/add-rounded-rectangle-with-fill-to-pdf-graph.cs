@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -7,47 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "rectangle_graph.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (pages are 1‑based).
+            Page page = doc.Pages.Add();
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Create a Graph container sized to the page.
+            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Create a Graph container with the desired size
-            Graph graph = new Graph(200f, 100f);
-            // Position the graph on the page (lower‑left corner at (100, 500))
-            graph.Left = 100f;
-            graph.Top = 500f;
+            // Define rectangle position and size (left, bottom, width, height).
+            // Original bounds: llx=100, lly=500, urx=300, ury=600 => width=200, height=100.
+            Aspose.Pdf.Drawing.Rectangle shape = new Aspose.Pdf.Drawing.Rectangle(100f, 500f, 200f, 100f);
 
-            // Create a rectangle shape inside the graph
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(0f, 0f, 200f, 100f);
-            // Set corner radius (rounded corners)
-            rectShape.RoundedCornerRadius = 15f;
+            // Rounded corners.
+            shape.RoundedCornerRadius = 10f;
 
-            // Apply styling via GraphInfo
-            rectShape.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(0.2f, 0.6f, 0.9f); // light blue fill
-            rectShape.GraphInfo.Color = Aspose.Pdf.Color.Black;                     // optional border colour
-            rectShape.GraphInfo.LineWidth = 1f;                                      // optional border width
+            // Styling via GraphInfo.
+            shape.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(0.4f, 0.6f, 0.9f); // light blue fill
+            shape.GraphInfo.Color = Aspose.Pdf.Color.Black;                     // border color
+            shape.GraphInfo.LineWidth = 1f;                                      // border width
 
-            // Add the rectangle to the graph's shape collection
-            graph.Shapes.Add(rectShape);
-
-            // Add the graph to the page's content
+            // Add the rectangle to the graph and the graph to the page.
+            graph.Shapes.Add(shape);
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the document as PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Rectangle added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with rectangle saved to '{outputPath}'.");
     }
 }

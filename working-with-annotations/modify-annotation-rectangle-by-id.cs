@@ -9,13 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string targetAnnotationName = "Annot123"; // Name of the annotation to modify
-
-        // New rectangle coordinates (lower‑left X/Y and upper‑right X/Y)
-        const double llx = 100;
-        const double lly = 500;
-        const double urx = 300;
-        const double ury = 550;
+        const string targetName = "Annot123"; // Name of the annotation to modify
 
         if (!File.Exists(inputPath))
         {
@@ -23,50 +17,43 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            bool found = false;
+            Annotation foundAnnotation = null;
 
-            // Search all pages for the annotation with the specified Name
-            foreach (Page page in doc.Pages)
+            // Iterate through all pages (1‑based indexing) to find the annotation with the given Name
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                // Preferred way: FindByName returns the annotation directly (or null)
-                Annotation annotation = page.Annotations.FindByName(targetAnnotationName);
-
-                // Fallback: enumerate annotations and compare the Name property
-                if (annotation == null)
+                Page page = doc.Pages[pageNum];
+                foreach (Annotation annot in page.Annotations)
                 {
-                    foreach (Annotation ann in page.Annotations)
+                    // The base Annotation class does not expose an Id property.
+                    // Use the Name property (or FullName) to locate a specific annotation.
+                    if (!string.IsNullOrEmpty(annot.Name) &&
+                        annot.Name.Equals(targetName, StringComparison.Ordinal))
                     {
-                        if (!string.IsNullOrEmpty(ann.Name) &&
-                            ann.Name.Equals(targetAnnotationName, StringComparison.Ordinal))
-                        {
-                            annotation = ann;
-                            break;
-                        }
+                        foundAnnotation = annot;
+                        break;
                     }
                 }
-
-                if (annotation != null)
-                {
-                    // Update the annotation rectangle
-                    annotation.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-                    found = true;
-                    break; // Assuming Names are unique across the document
-                }
+                if (foundAnnotation != null) break;
             }
 
-            if (!found)
+            if (foundAnnotation == null)
             {
-                Console.Error.WriteLine($"Annotation with Name '{targetAnnotationName}' not found.");
+                Console.Error.WriteLine($"Annotation with Name '{targetName}' not found.");
                 return;
             }
 
-            // Save the modified PDF
+            // Modify the rectangle (position and size) of the found annotation.
+            // Example: move to (100, 500) lower‑left and (300, 550) upper‑right.
+            foundAnnotation.Rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Annotation rectangle updated and saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation '{targetName}' updated and saved to '{outputPath}'.");
     }
 }

@@ -1,30 +1,66 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 using Aspose.Pdf.Text;
 
-class Program
+class RomanHeadingPdf
 {
-    // Simple Roman numeral to integer converter (supports I to XXX)
-    static int RomanToInt(string roman)
+    // Convert integer (1..3999) to Roman numeral
+    static string ToRoman(int number)
     {
+        if (number < 1 || number > 3999) throw new ArgumentOutOfRangeException(nameof(number));
+        var map = new[] {
+            new { Value = 1000, Numeral = "M" },
+            new { Value = 900,  Numeral = "CM" },
+            new { Value = 500,  Numeral = "D" },
+            new { Value = 400,  Numeral = "CD" },
+            new { Value = 100,  Numeral = "C" },
+            new { Value = 90,   Numeral = "XC" },
+            new { Value = 50,   Numeral = "L" },
+            new { Value = 40,   Numeral = "XL" },
+            new { Value = 10,   Numeral = "X" },
+            new { Value = 9,    Numeral = "IX" },
+            new { Value = 5,    Numeral = "V" },
+            new { Value = 4,    Numeral = "IV" },
+            new { Value = 1,    Numeral = "I" }
+        };
+        var result = "";
+        foreach (var entry in map)
+        {
+            while (number >= entry.Value)
+            {
+                result += entry.Numeral;
+                number -= entry.Value;
+            }
+        }
+        return result;
+    }
+
+    // Parse Roman numeral (valid for numbers up to 3999)
+    static int FromRoman(string roman)
+    {
+        if (string.IsNullOrWhiteSpace(roman)) throw new ArgumentException("Empty roman numeral", nameof(roman));
         var map = new Dictionary<char, int>
         {
-            {'I', 1}, {'V', 5}, {'X', 10}, {'L', 50}, {'C', 100}, {'D', 500}, {'M', 1000}
+            {'I',1},{'V',5},{'X',10},{'L',50},
+            {'C',100},{'D',500},{'M',1000}
         };
         int total = 0;
         int prev = 0;
-        foreach (char c in roman.ToUpper())
+        foreach (char c in roman.ToUpperInvariant())
         {
-            if (!map.ContainsKey(c)) throw new ArgumentException($"Invalid Roman numeral character: {c}");
-            int cur = map[c];
+            if (!map.TryGetValue(c, out int cur))
+                throw new ArgumentException($"Invalid Roman numeral character '{c}'", nameof(roman));
             if (cur > prev)
+            {
                 total += cur - 2 * prev; // adjust for previous addition
+            }
             else
+            {
                 total += cur;
+            }
             prev = cur;
         }
         return total;
@@ -34,98 +70,104 @@ class Program
     {
         const string outputPath = "roman_headings.pdf";
 
-        // Define heading texts with Roman numerals
-        string[] headings = new[]
+        // Sample section titles
+        List<string> titles = new List<string>
         {
-            "I. Introduction",
-            "II. Background",
-            "III. Methodology",
-            "IV. Results",
-            "V. Discussion",
-            "VI. Conclusion"
+            "Introduction",
+            "Methods",
+            "Results",
+            "Discussion",
+            "Conclusion"
         };
 
-        // ---------- Create PDF with tagged headings ----------
+        // Create PDF with Roman numeral headings
         using (Document doc = new Document())
         {
-            // Add a blank page
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Enable tagging and set basic metadata
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Roman Numeral Headings Example");
+            // Starting Y position (top of page)
+            double yPos = page.PageInfo.Height - 50; // 50 points margin
 
-            // Root of the logical structure tree
-            StructureElement root = tagged.RootElement;
-
-            // Add visible text and corresponding structure elements
-            foreach (string heading in headings)
+            foreach (var (title, index) in titles.WithIndex())
             {
-                // Visible heading text on the page
-                TextFragment tf = new TextFragment(heading)
-                {
-                    // Simple styling for visibility
-                    TextState = { FontSize = 14, FontStyle = FontStyles.Bold }
-                };
+                int headingNumber = index + 1; // 1‑based
+                string roman = ToRoman(headingNumber);
+                string headingText = $"{roman}. {title}";
+
+                // Create a text fragment for the heading
+                TextFragment tf = new TextFragment(headingText);
+                tf.TextState.FontSize = 16;
+                tf.TextState.FontStyle = FontStyles.Bold;
+                tf.Position = new Position(50, yPos); // left margin 50
+
+                // Add to page
                 page.Paragraphs.Add(tf);
 
-                // Logical heading element (H1 level)
-                HeaderElement headerElem = tagged.CreateHeaderElement(1);
-                headerElem.SetText(heading);
-                root.AppendChild(headerElem);
+                // Move Y position down for next heading
+                yPos -= tf.TextState.FontSize + 10; // line spacing
             }
 
             // Save the PDF
             doc.Save(outputPath);
         }
 
-        // ---------- Validate Roman numeral sequence ----------
-        using (Document checkDoc = new Document(outputPath))
+        // Validate Roman numeral sequence by reading back the PDF
+        using (Document doc = new Document(outputPath))
         {
-            // Retrieve all header elements from the tagged structure
-            StructureElement root = checkDoc.TaggedContent.RootElement;
-            var headerElements = root.FindElements<HeaderElement>(true);
+            TextAbsorber absorber = new TextAbsorber();
+            doc.Pages.Accept(absorber);
+            string allText = absorber.Text;
 
-            List<int> numbers = new List<int>();
-            foreach (HeaderElement hdr in headerElements)
+            // Extract lines that start with a Roman numeral followed by a dot
+            var headingNumbers = new List<int>();
+            string[] lines = allText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            Regex regex = new Regex(@"^(?<roman>[IVXLCDM]+)\.\s", RegexOptions.IgnoreCase);
+            foreach (string line in lines)
             {
-                // Expected format: "RomanNumeral. Text"
-                string text = hdr.ActualText ?? string.Empty;
-                int dotIndex = text.IndexOf('.');
-                if (dotIndex <= 0)
+                Match m = regex.Match(line.Trim());
+                if (m.Success)
                 {
-                    Console.WriteLine($"Invalid heading format: \"{text}\"");
-                    continue;
-                }
-
-                string romanPart = text.Substring(0, dotIndex).Trim();
-                try
-                {
-                    int value = RomanToInt(romanPart);
-                    numbers.Add(value);
-                }
-                catch (ArgumentException ex)
-                {
-                    Console.WriteLine($"Failed to parse Roman numeral \"{romanPart}\": {ex.Message}");
+                    string roman = m.Groups["roman"].Value;
+                    try
+                    {
+                        int value = FromRoman(roman);
+                        headingNumbers.Add(value);
+                    }
+                    catch
+                    {
+                        // ignore invalid numerals
+                    }
                 }
             }
 
-            // Verify sequential order starting from 1
+            // Verify sequential order (1,2,3,...)
             bool isSequential = true;
-            for (int i = 0; i < numbers.Count; i++)
+            for (int i = 0; i < headingNumbers.Count; i++)
             {
-                if (numbers[i] != i + 1)
+                if (headingNumbers[i] != i + 1)
                 {
                     isSequential = false;
-                    Console.WriteLine($"Heading out of order: expected {i + 1}, found {numbers[i]}");
+                    break;
                 }
             }
 
-            if (isSequential && numbers.Count == headings.Length)
-                Console.WriteLine("Roman numeral headings are in correct sequential order.");
-            else
-                Console.WriteLine("Roman numeral heading validation failed.");
+            Console.WriteLine(isSequential
+                ? "Roman numeral headings are in correct sequential order."
+                : "Roman numeral headings sequence is incorrect.");
+        }
+    }
+}
+
+// Extension method to provide index while iterating
+static class EnumerableExtensions
+{
+    public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> source)
+    {
+        int i = 0;
+        foreach (var item in source)
+        {
+            yield return (item, i++);
         }
     }
 }

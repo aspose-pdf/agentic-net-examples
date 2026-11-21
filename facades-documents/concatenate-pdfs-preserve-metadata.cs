@@ -10,7 +10,7 @@ class Program
         // Input PDF files to concatenate
         string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
         // Output file path
-        const string outputPath = "merged.pdf";
+        const string outputFile = "merged.pdf";
 
         // Verify that all input files exist
         foreach (string file in inputFiles)
@@ -22,31 +22,36 @@ class Program
             }
         }
 
-        // Concatenate PDFs using PdfFileEditor (no using – it is not IDisposable)
+        // Concatenate PDFs using PdfFileEditor (Facades API)
         PdfFileEditor editor = new PdfFileEditor();
-        editor.Concatenate(inputFiles, outputPath);
+        // The Concatenate method accepts an array of source files and the destination file
+        editor.Concatenate(inputFiles, outputFile);
 
-        // Preserve original metadata (author, title, etc.) from the first source PDF
+        // Preserve original metadata (Author, Title) from the first source PDF
         // Load the first source document to read its metadata
-        using (Document sourceDoc = new Document(inputFiles[0]))
-        // Load the concatenated result to apply metadata
-        using (Document resultDoc = new Document(outputPath))
-        {
-            // Copy metadata fields
-            resultDoc.Info.Author      = sourceDoc.Info.Author;
-            resultDoc.Info.Title       = sourceDoc.Info.Title;
-            resultDoc.Info.Subject     = sourceDoc.Info.Subject;
-            resultDoc.Info.Keywords    = sourceDoc.Info.Keywords;
-            resultDoc.Info.Creator     = sourceDoc.Info.Creator;
-            resultDoc.Info.Producer    = sourceDoc.Info.Producer;
-            resultDoc.Info.CreationDate    = sourceDoc.Info.CreationDate;
-            // Use ModDate instead of the non‑existent ModificationDate
-            resultDoc.Info.ModDate = sourceDoc.Info.ModDate;
+        string firstSource = inputFiles[0];
+        string author;
+        string title;
 
-            // Save the PDF with updated metadata (overwrites the previous file)
-            resultDoc.Save(outputPath);
+        using (Document srcDoc = new Document(firstSource))
+        {
+            author = srcDoc.Info.Author;
+            title  = srcDoc.Info.Title;
         }
 
-        Console.WriteLine($"PDFs concatenated and metadata preserved: {outputPath}");
+        // Load the concatenated document and apply the preserved metadata
+        using (Document mergedDoc = new Document(outputFile))
+        {
+            // If the source metadata is not empty, assign it to the merged document
+            if (!string.IsNullOrEmpty(author))
+                mergedDoc.Info.Author = author;
+            if (!string.IsNullOrEmpty(title))
+                mergedDoc.Info.Title = title;
+
+            // Save the document back to the same output path
+            mergedDoc.Save(outputFile);
+        }
+
+        Console.WriteLine($"PDFs concatenated successfully. Metadata preserved in '{outputFile}'.");
     }
 }

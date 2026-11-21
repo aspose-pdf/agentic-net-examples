@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "compressed.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,22 +15,28 @@ class Program
             return;
         }
 
-        // Record original file size
-        long originalSize = new FileInfo(inputPath).Length;
-
-        // Load the PDF and save it using default compression settings
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // No SaveOptions are specified; default compression is applied
-            doc.Save(outputPath);
+            // Get original file size
+            long originalSize = new FileInfo(inputPath).Length;
+
+            // Load the PDF and save it with default compression settings
+            using (Document doc = new Document(inputPath))
+            {
+                // Document.Save without explicit SaveOptions writes a PDF using default compression
+                doc.Save(outputPath);
+            }
+
+            // Get compressed file size
+            long compressedSize = new FileInfo(outputPath).Length;
+
+            Console.WriteLine($"Original size : {originalSize} bytes");
+            Console.WriteLine($"Compressed size: {compressedSize} bytes");
+            Console.WriteLine($"Size reduction : {originalSize - compressedSize} bytes");
         }
-
-        // Record compressed file size
-        long compressedSize = new FileInfo(outputPath).Length;
-
-        // Output size comparison
-        Console.WriteLine($"Original size:   {originalSize} bytes");
-        Console.WriteLine($"Compressed size: {compressedSize} bytes");
-        Console.WriteLine($"Reduction:       {originalSize - compressedSize} bytes");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

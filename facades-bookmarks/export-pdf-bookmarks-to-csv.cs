@@ -1,58 +1,59 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;   // Facade API for bookmark handling
-using Aspose.Pdf;           // Core API (required for Destination type)
+using System.Text;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputCsv = "bookmarks.csv";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        try
+        // Bind the PDF to the PdfBookmarkEditor (Facades API)
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
         {
-            // Bind the PDF to the bookmark editor (no IDisposable required)
-            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
-            bookmarkEditor.BindPdf(inputPdf);
+            editor.BindPdf(inputPdf);
 
-            // Extract all bookmarks; each Bookmark contains Title, Destination and Level
-            IList<Bookmark> bookmarks = bookmarkEditor.ExtractBookmarks();
+            // Extract the collection of bookmarks
+            var bookmarks = editor.ExtractBookmarks();
 
-            // Write CSV header and rows
-            using (StreamWriter writer = new StreamWriter(outputCsv))
+            // Create (or overwrite) the CSV file
+            using (StreamWriter writer = new StreamWriter(outputCsv, false, Encoding.UTF8))
             {
-                writer.WriteLine("Title,Destination,Level"); // CSV header
+                // CSV header
+                writer.WriteLine("Title,Destination,Level");
 
-                foreach (Bookmark bm in bookmarks)
+                // Local function to write a bookmark and its children recursively
+                void WriteBookmark(Bookmark bm)
                 {
-                    // Destination: use the raw destination string (it may be a page number, named destination, etc.)
-                    string destination = bm.Destination ?? string.Empty;
+                    // Escape commas and quotes for CSV compliance
+                    string Escape(string s) => $"\"{s?.Replace("\"", "\"\"")}\"";
 
-                    // Escape title for CSV (double quotes and commas)
-                    string title = bm.Title ?? string.Empty;
-                    title = title.Replace("\"", "\"\""); // double up quotes
-                    if (title.Contains(",") || title.Contains("\""))
+                    writer.WriteLine($"{Escape(bm.Title)},{Escape(bm.Destination)},{bm.Level}");
+
+                    // Recursively process child bookmarks, if any
+                    foreach (var child in bm.ChildItems)
                     {
-                        title = $"\"{title}\"";
+                        WriteBookmark(child);
                     }
+                }
 
-                    writer.WriteLine($"{title},{destination},{bm.Level}");
+                // Process all top‑level bookmarks
+                foreach (var bm in bookmarks)
+                {
+                    WriteBookmark(bm);
                 }
             }
+        }
 
-            Console.WriteLine($"Bookmarks extracted to '{outputCsv}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Bookmarks exported to '{outputCsv}'.");
     }
 }

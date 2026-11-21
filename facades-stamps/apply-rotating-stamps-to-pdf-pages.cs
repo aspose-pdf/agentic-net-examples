@@ -1,21 +1,22 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // Use the modern ImageStamp class
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
         const string outputPath = "stamped_output.pdf";
-        const string stampPath = "stamp.png";
 
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
+
         if (!File.Exists(stampPath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampPath}");
@@ -27,32 +28,25 @@ class Program
             // Load the PDF document inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPath))
             {
-                // Create a single ImageStamp instance; its properties will be adjusted per page
-                ImageStamp imgStamp = new ImageStamp(stampPath)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
                 {
-                    // Position the stamp at the centre of each page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
-                    // Make the stamp semi‑transparent
-                    Opacity = 0.5
-                };
+                    // Create an image stamp for the current page
+                    ImageStamp imgStamp = new ImageStamp(stampPath);
 
-                // Iterate pages (1‑based indexing)
-                int pageIndex = 1;
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    // Calculate rotation angle based on page index (e.g., 0°, 45°, 90°, …)
-                    float rotationAngle = ((pageIndex - 1) * 45) % 360;
-                    // Use RotateAngle (not a non‑existent Rotation property)
-                    imgStamp.RotateAngle = rotationAngle;
+                    // Rotate each stamp by an angle that depends on the page index
+                    // Example: 10 degrees per page index (page 1 → 10°, page 2 → 20°, etc.)
+                    imgStamp.RotateAngle = i * 10;
+
+                    // Center the stamp on the page
+                    imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
+                    imgStamp.VerticalAlignment   = VerticalAlignment.Center;
 
                     // Apply the stamp to the current page
-                    page.AddStamp(imgStamp);
-
-                    pageIndex++;
+                    pdfDoc.Pages[i].AddStamp(imgStamp);
                 }
 
-                // Save the modified PDF
+                // Save the modified document
                 pdfDoc.Save(outputPath);
             }
 

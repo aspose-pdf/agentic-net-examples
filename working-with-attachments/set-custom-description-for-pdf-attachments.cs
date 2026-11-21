@@ -1,36 +1,38 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_custom.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Use Document.EmbeddedFiles collection (Attachments property does not exist)
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all embedded files (attachments)
+            int idx = 1;
             if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
                 foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    // Set a custom description (example uses the file name)
-                    fileSpec.Description = $"Attachment: {fileSpec.Name}";
+                    // Custom description
+                    fileSpec.Description = $"Attachment {idx} description";
 
-                    // Determine a MIME type based on the file extension
+                    // Determine MIME type based on file extension
                     string ext = Path.GetExtension(fileSpec.Name)?.ToLowerInvariant();
                     switch (ext)
                     {
+                        case ".txt":
+                            fileSpec.MIMEType = "text/plain";
+                            break;
                         case ".jpg":
                         case ".jpeg":
                             fileSpec.MIMEType = "image/jpeg";
@@ -38,21 +40,18 @@ class Program
                         case ".png":
                             fileSpec.MIMEType = "image/png";
                             break;
-                        case ".txt":
-                            fileSpec.MIMEType = "text/plain";
-                            break;
                         case ".pdf":
                             fileSpec.MIMEType = "application/pdf";
                             break;
                         default:
-                            // Fallback for unknown types
                             fileSpec.MIMEType = "application/octet-stream";
                             break;
                     }
+                    idx++;
                 }
             }
 
-            // Save the PDF (PDF format, no SaveOptions needed)
+            // Save the PDF (no explicit SaveOptions required for this task)
             doc.Save(outputPath);
         }
 

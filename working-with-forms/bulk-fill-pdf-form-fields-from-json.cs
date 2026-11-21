@@ -8,67 +8,78 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "template.pdf";
-        const string outputPath = "filled.pdf";
+        const string templatePath = "template.pdf";
+        const string outputPath   = "filled.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(templatePath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
 
-        // Define the values to fill – keys are field names in the PDF form
+        // Bulk data to fill – some keys may not exist in the PDF form
         var fieldValues = new Dictionary<string, string>
         {
-            { "FirstName", "John" },
-            { "LastName",  "Doe" },
-            { "Email",     "john.doe@example.com" },
-            { "Phone",     "555-1234" } // may not exist in the template
+            { "Name", "John Doe" },
+            { "Date", DateTime.Today.ToShortDateString() },
+            { "MissingField", "This field does not exist and will be skipped" }
         };
 
         try
         {
-            // Open the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Ensure deterministic disposal of the Document
+            using (Document pdf = new Document(templatePath))
             {
-                // Iterate over the values to set
-                foreach (var kvp in fieldValues)
+                // Verify that the PDF actually contains a form
+                if (pdf.Form == null)
                 {
-                    string fieldName = kvp.Key;
-                    string fieldValue = kvp.Value;
-
-                    // Attempt to retrieve the form field; if it does not exist, skip it
-                    try
+                    Console.Error.WriteLine("The PDF does not contain any form fields.");
+                }
+                else
+                {
+                    // Iterate over each entry and attempt to set the value
+                    foreach (var kvp in fieldValues)
                     {
-                        // The Form collection returns a FormField; null if not present
-                        var field = doc.Form[fieldName] as TextBoxField;
-                        if (field == null)
+                        try
                         {
-                            // Field not found or not a TextBoxField – skip gracefully
-                            continue;
-                        }
+                            // The Form indexer returns a WidgetAnnotation; cast safely to Field
+                            Field? field = pdf.Form[kvp.Key] as Field;
 
-                        // Set the value
-                        field.Value = fieldValue;
-                    }
-                    catch (Exception ex)
-                    {
-                        // Any unexpected error while processing this field is logged,
-                        // but the bulk operation continues with the next field.
-                        Console.Error.WriteLine($"Skipping field '{fieldName}': {ex.Message}");
+                            // If the field is missing or not a form field, skip it
+                            if (field == null)
+                            {
+                                Console.WriteLine($"Field '{kvp.Key}' not found – skipping.");
+                                continue;
+                            }
+
+                            // If the field is a TextBoxField, set its value; otherwise skip
+                            if (field is TextBoxField textBox)
+                            {
+                                textBox.Value = kvp.Value;
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Field '{kvp.Key}' is present but not a TextBoxField – skipping.");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log the error for this specific field and continue
+                            Console.WriteLine($"Error processing field '{kvp.Key}': {ex.Message}");
+                        }
                     }
                 }
 
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Save the filled PDF
+                pdf.Save(outputPath);
             }
 
-            Console.WriteLine($"Bulk fill completed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Filled PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // Top‑level error handling
-            Console.Error.WriteLine($"Operation failed: {ex.Message}");
+            // Catch any unexpected errors (e.g., file I/O)
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
     }
 }

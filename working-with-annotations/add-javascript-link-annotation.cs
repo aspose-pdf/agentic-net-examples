@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_link.pdf";
-        const string url = "https://www.example.com";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string url        = "https://www.example.com";
 
         if (!File.Exists(inputPath))
         {
@@ -17,44 +17,34 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the first page (Aspose.Pdf uses 1‑based indexing)
+            // Use the first page; adjust index as needed
             Page page = doc.Pages[1];
 
-            // Define the clickable area for the link annotation
-            // Fully qualify Rectangle to avoid ambiguity with System.Drawing
+            // Define the clickable area (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // Create a JavaScript action that opens a new browser window with the URL
-            // The JavaScript uses the Acrobat JavaScript API: app.launchURL(url, true)
-            JavascriptAction jsAction = new JavascriptAction($"app.launchURL('{url}', true);");
+            // Create a link annotation on the page
+            LinkAnnotation link = new LinkAnnotation(page, rect);
 
-            // Create the link annotation and assign the rectangle and the JavaScript action
-            LinkAnnotation link = new LinkAnnotation(page, rect)
-            {
-                Action = jsAction,
-                // Optional: make the annotation invisible (transparent color)
-                Color = Color.Transparent
-            };
+            // JavaScript that opens a new browser window with the specified URL
+            string js = $"app.launchURL('{url}', true);";
 
-            // Border must be instantiated with the parent annotation instance.
-            // It cannot be set via an object‑initializer because the annotation variable
-            // is not assigned yet. Set it after the annotation is created.
-            link.Border = new Border(link)
-            {
-                Width = 0,               // 0 = invisible border
-                Style = BorderStyle.Solid
-            };
+            // Assign the JavaScript action to the annotation
+            link.Action = new JavascriptAction(js);
+
+            // Optional visual styling
+            link.Color = Aspose.Pdf.Color.Blue;
+            link.Border = new Border(link) { Width = 1 };
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(link);
 
-            // Save the modified PDF (Document.Save writes PDF regardless of extension)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with JavaScript link saved to '{outputPath}'.");
+        Console.WriteLine($"Link annotation added and saved to '{outputPath}'.");
     }
 }

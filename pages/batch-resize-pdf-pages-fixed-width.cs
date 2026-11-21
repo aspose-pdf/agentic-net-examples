@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "resized_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "resized.pdf";
         const double targetWidth = 800.0; // points
 
         if (!File.Exists(inputPath))
@@ -16,31 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            // Aspose.Pdf uses 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-
-                // Original dimensions
-                double originalWidth  = page.PageInfo.Width;
+                double originalWidth = page.PageInfo.Width;
                 double originalHeight = page.PageInfo.Height;
 
                 // Compute scaling factor to achieve the target width while preserving aspect ratio
-                double scaleFactor = targetWidth / originalWidth;
-                double newHeight   = originalHeight * scaleFactor;
+                double scale = targetWidth / originalWidth;
+                double newHeight = originalHeight * scale;
 
                 // Apply new dimensions
-                page.PageInfo.Width  = targetWidth;
+                page.PageInfo.Width = targetWidth;
                 page.PageInfo.Height = newHeight;
             }
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
+            // Save the modified document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Pages resized to width {targetWidth} points. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Pages resized and saved to '{outputPath}'.");
     }
 }

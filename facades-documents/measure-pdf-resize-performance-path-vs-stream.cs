@@ -5,73 +5,68 @@ using Aspose.Pdf;
 
 class Program
 {
-    // Resize using file‑path overloads
-    static void ResizePdfByPath(string inputPath, string outputPath)
-    {
-        // Load the PDF document from a file path
-        Document pdfDoc = new Document(inputPath);
-
-        // Desired page size (A4) – Aspose.Pdf.PageSize provides Width/Height in points
-        var a4Size = Aspose.Pdf.PageSize.A4;
-
-        // Apply the new size to every page
-        foreach (Page page in pdfDoc.Pages)
-        {
-            page.PageInfo.Width = a4Size.Width;
-            page.PageInfo.Height = a4Size.Height;
-        }
-
-        // Save the modified PDF to the specified output path
-        pdfDoc.Save(outputPath);
-    }
-
-    // Resize using stream overloads
-    static void ResizePdfByStream(string inputPath, string outputPath)
-    {
-        // Open input and output streams
-        using (FileStream inputStream = File.OpenRead(inputPath))
-        using (FileStream outputStream = File.Create(outputPath))
-        {
-            // Load the PDF document from the input stream
-            Document pdfDoc = new Document(inputStream);
-
-            // Desired page size (A4)
-            var a4Size = Aspose.Pdf.PageSize.A4;
-
-            // Apply the new size to every page
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.PageInfo.Width = a4Size.Width;
-                page.PageInfo.Height = a4Size.Height;
-            }
-
-            // Save the result to the output stream
-            pdfDoc.Save(outputStream);
-        }
-    }
-
     static void Main()
     {
-        const string sourcePdf = "large_input.pdf";
+        const string inputPath = "large_input.pdf";
+        const string outputPathPath = "resized_path.pdf";
+        const string outputPathStream = "resized_stream.pdf";
 
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Measure performance of the file‑path overload
-        string outputPathPath = "resized_by_path.pdf";
-        Stopwatch swPath = Stopwatch.StartNew();
-        ResizePdfByPath(sourcePdf, outputPathPath);
+        // Measure resizing when binding via file path
+        var swPath = Stopwatch.StartNew();
+        ResizePdfUsingPath(inputPath, outputPathPath);
         swPath.Stop();
-        Console.WriteLine($"Resize via file path: {swPath.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Resize using file path: {swPath.ElapsedMilliseconds} ms");
 
-        // Measure performance of the stream overload
-        string outputPathStream = "resized_by_stream.pdf";
-        Stopwatch swStream = Stopwatch.StartNew();
-        ResizePdfByStream(sourcePdf, outputPathStream);
+        // Measure resizing when binding via stream
+        var swStream = Stopwatch.StartNew();
+        ResizePdfUsingStream(inputPath, outputPathStream);
         swStream.Stop();
-        Console.WriteLine($"Resize via stream: {swStream.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Resize using stream: {swStream.ElapsedMilliseconds} ms");
+    }
+
+    // Resizes all pages to A4 (595 x 842 points) using a file path
+    static void ResizePdfUsingPath(string sourcePath, string destinationPath)
+    {
+        // Load the PDF document from the file system
+        using (var doc = new Document(sourcePath))
+        {
+            // Set each page size to A4 dimensions (points)
+            foreach (Page page in doc.Pages)
+            {
+                page.PageInfo.Width = 595;   // A4 width in points
+                page.PageInfo.Height = 842;  // A4 height in points
+            }
+
+            // Save the modified document
+            doc.Save(destinationPath);
+        }
+    }
+
+    // Resizes all pages to A4 (595 x 842 points) using a stream
+    static void ResizePdfUsingStream(string sourcePath, string destinationPath)
+    {
+        // Open the source PDF as a read‑only stream
+        using (FileStream readStream = File.OpenRead(sourcePath))
+        {
+            // Load the PDF document from the stream
+            using (var doc = new Document(readStream))
+            {
+                // Adjust each page size to A4 dimensions
+                foreach (Page page in doc.Pages)
+                {
+                    page.PageInfo.Width = 595;
+                    page.PageInfo.Height = 842;
+                }
+
+                // Save the modified document to the destination file
+                doc.Save(destinationPath);
+            }
+        }
     }
 }

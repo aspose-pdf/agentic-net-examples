@@ -9,10 +9,14 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input_form.pdf";      // Source PDF containing form fields
-        const string xmlPath = "form_data.xml";       // Intermediate XML file with exported data
-        const string xsltPath = "report.xslt";        // XSLT stylesheet defining the custom report
-        const string reportPath = "custom_report.html"; // Final report output (can be any format)
+        // Input PDF containing form fields
+        const string pdfPath = "input_form.pdf";
+        // Temporary XML file that will hold the exported form data
+        const string xmlPath = "form_data.xml";
+        // XSLT stylesheet that defines the custom report layout
+        const string xsltPath = "report_template.xslt";
+        // Final report output (could be HTML, TXT, etc. depending on XSLT)
+        const string reportPath = "custom_report.html";
 
         // Verify required files exist
         if (!File.Exists(pdfPath))
@@ -26,52 +30,58 @@ class Program
             return;
         }
 
-        // -----------------------------------------------------------------
+        // ------------------------------------------------------------
         // 1. Load the PDF and export its form fields to an XML file.
-        // -----------------------------------------------------------------
+        // ------------------------------------------------------------
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // The Form class does not expose an ExportToXml method in the core API.
-            // We therefore serialize the form fields manually.
-            using (XmlWriter writer = XmlWriter.Create(xmlPath, new XmlWriterSettings { Indent = true }))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("FormData");
-
-                if (pdfDoc.Form != null && pdfDoc.Form.Fields != null)
-                {
-                    foreach (Field field in pdfDoc.Form.Fields)
-                    {
-                        // Use the field's full name if the short name is null.
-                        string fieldName = field.Name ?? field.FullName ?? "UnnamedField";
-                        string fieldValue = field.Value?.ToString() ?? string.Empty;
-
-                        writer.WriteStartElement("Field");
-                        writer.WriteAttributeString("name", fieldName);
-                        writer.WriteString(fieldValue);
-                        writer.WriteEndElement(); // Field
-                    }
-                }
-
-                writer.WriteEndElement(); // FormData
-                writer.WriteEndDocument();
-            }
+            ExportFormDataToXml(pdfDoc, xmlPath);
         }
 
-        // -----------------------------------------------------------------
-        // 2. Transform the exported XML using the provided XSLT stylesheet.
-        // -----------------------------------------------------------------
+        // ------------------------------------------------------------
+        // 2. Apply the XSLT transformation to the exported XML.
+        // ------------------------------------------------------------
         XslCompiledTransform xslt = new XslCompiledTransform();
-        xslt.Load(xsltPath);
+        xslt.Load(xsltPath); // Load the stylesheet
 
-        using (FileStream xmlStream = File.OpenRead(xmlPath))
+        // Perform the transformation: XML -> custom report
         using (FileStream resultStream = File.Create(reportPath))
-        using (XmlReader xmlReader = XmlReader.Create(xmlStream))
-        using (XmlWriter xmlWriter = XmlWriter.Create(resultStream, xslt.OutputSettings))
         {
-            xslt.Transform(xmlReader, xmlWriter);
+            // Use the overload that accepts the XML file path (string).
+            xslt.Transform(xmlPath, null, resultStream);
         }
 
-        Console.WriteLine($"Report generated successfully at '{reportPath}'.");
+        Console.WriteLine($"Report generated at '{reportPath}'.");
+    }
+
+    /// <summary>
+    /// Serialises the AcroForm fields of a PDF document to a simple XML structure.
+    /// The XML format is custom (FormData → Field elements) because the core
+    /// Aspose.Pdf API does not expose an ExportToXml method.
+    /// </summary>
+    private static void ExportFormDataToXml(Document doc, string outputPath)
+    {
+        using (XmlWriter writer = XmlWriter.Create(outputPath, new XmlWriterSettings { Indent = true }))
+        {
+            writer.WriteStartDocument();
+            writer.WriteStartElement("FormData");
+
+            if (doc?.Form?.Fields != null)
+            {
+                foreach (Field field in doc.Form.Fields)
+                {
+                    writer.WriteStartElement("Field");
+                    // Prefer the explicit Name; fall back to FullName if needed.
+                    writer.WriteAttributeString("Name", field.Name ?? field.FullName);
+                    writer.WriteAttributeString("Type", field.GetType().Name);
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    writer.WriteString(value);
+                    writer.WriteEndElement(); // Field
+                }
+            }
+
+            writer.WriteEndElement(); // FormData
+            writer.WriteEndDocument();
+        }
     }
 }

@@ -1,80 +1,73 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Facades;            // Facades namespace (required by task)
+using Aspose.Pdf;
 
-// Insert selected pages from a source PDF stream into a destination PDF at a specific position.
 class Program
 {
     static void Main()
     {
-        // Paths to the source and destination PDF files (replace with actual paths or streams as needed)
-        const string destinationPath = "destination.pdf";
-        const string sourcePath      = "source.pdf";
-        const string outputPath      = "merged_output.pdf";
+        const string sourcePath = "source.pdf";      // PDF containing pages to insert
+        const string destinationPath = "destination.pdf"; // PDF into which pages will be inserted
+        const string outputPath = "result.pdf";      // Final PDF after insertion
 
-        // Verify that both input files exist
-        if (!File.Exists(destinationPath))
-        {
-            Console.Error.WriteLine($"File not found: {destinationPath}");
-            return;
-        }
-        if (!File.Exists(sourcePath))
-        {
-            Console.Error.WriteLine($"File not found: {sourcePath}");
-            return;
-        }
-
-        // Define which pages (1‑based) from the source PDF should be inserted
-        // Example: insert pages 2, 4 and 5
+        // Pages to insert from the source PDF (1‑based indexing)
         int[] pagesToInsert = new int[] { 2, 4, 5 };
 
-        // Define the position in the destination PDF where the first page will be inserted.
-        // The new pages will appear before the page with this number (1‑based).
-        // For example, insertPosition = 3 will place the first inserted page before page 3.
+        // Position in the destination PDF where the pages will be inserted.
+        // Insert after this page number (1‑based). Use 0 to insert at the very beginning.
         int insertPosition = 3;
 
-        try
+        if (!File.Exists(sourcePath) || !File.Exists(destinationPath))
         {
-            // Open the destination PDF as a stream
-            using (FileStream destStream = new FileStream(destinationPath, FileMode.Open, FileAccess.ReadWrite))
-            // Open the source PDF as a stream
-            using (FileStream srcStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read))
-            // Load both PDFs into Aspose.Pdf.Document objects (wrapped in using for deterministic disposal)
-            using (Aspose.Pdf.Document destDoc = new Aspose.Pdf.Document(destStream))
-            using (Aspose.Pdf.Document srcDoc = new Aspose.Pdf.Document(srcStream))
+            Console.Error.WriteLine("Source or destination file not found.");
+            return;
+        }
+
+        // Load both PDFs into memory streams
+        using (FileStream srcFile = File.OpenRead(sourcePath))
+        using (MemoryStream srcStream = new MemoryStream())
+        using (FileStream destFile = File.OpenRead(destinationPath))
+        using (MemoryStream destStream = new MemoryStream())
+        {
+            srcFile.CopyTo(srcStream);
+            destFile.CopyTo(destStream);
+
+            // Reset stream positions for reading
+            srcStream.Position = 0;
+            destStream.Position = 0;
+
+            // Load the PDFs with the Document class
+            Document srcDoc = new Document(srcStream);
+            Document destDoc = new Document(destStream);
+
+            // Ensure the pages are inserted in the order supplied
+            Array.Sort(pagesToInsert);
+
+            int offset = 0; // tracks how many pages have already been inserted
+            foreach (int srcPageNumber in pagesToInsert)
             {
-                // Current insertion index (adjusted as pages are added)
-                int currentInsertIndex = insertPosition;
+                // Aspose.Pdf inserts *before* the supplied page number.
+                // To insert *after* insertPosition we add 1 + current offset.
+                int targetPosition = insertPosition + offset + 1; // 1‑based index
 
-                // Insert each selected page in the order defined in pagesToInsert
-                foreach (int srcPageNumber in pagesToInsert)
-                {
-                    // Validate source page number
-                    if (srcPageNumber < 1 || srcPageNumber > srcDoc.Pages.Count)
-                    {
-                        Console.Error.WriteLine($"Source page {srcPageNumber} is out of range. Skipping.");
-                        continue;
-                    }
-
-                    // Retrieve the page from the source document
-                    Aspose.Pdf.Page pageToInsert = srcDoc.Pages[srcPageNumber];
-
-                    // Insert a copy of the page into the destination document at the current index
-                    // Pages.Insert shifts existing pages to the right, so we increment the index after each insertion
-                    destDoc.Pages.Insert(currentInsertIndex, pageToInsert);
-                    currentInsertIndex++;
-                }
-
-                // Save the modified destination PDF to a new file
-                destDoc.Save(outputPath);
+                // Correct overload: insert a single Page object from the source document.
+                // Pages collection is 1‑based, so we can access srcDoc.Pages[srcPageNumber].
+                destDoc.Pages.Insert(targetPosition, srcDoc.Pages[srcPageNumber]);
+                offset++;
             }
 
-            Console.WriteLine($"Pages inserted successfully. Output saved to '{outputPath}'.");
+            // Save the modified PDF to the output file via a temporary stream
+            using (MemoryStream resultStream = new MemoryStream())
+            {
+                destDoc.Save(resultStream);
+                resultStream.Position = 0;
+                using (FileStream outFile = File.Create(outputPath))
+                {
+                    resultStream.CopyTo(outFile);
+                }
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
+
+        Console.WriteLine($"Pages inserted successfully. Result saved to '{outputPath}'.");
     }
 }

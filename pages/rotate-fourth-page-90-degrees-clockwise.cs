@@ -15,21 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load PDF with deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify the document has at least four pages (Aspose.Pdf uses 1‑based indexing)
+            // Ensure the document has at least four pages (1‑based indexing)
             if (doc.Pages.Count < 4)
             {
                 Console.Error.WriteLine("The document contains fewer than 4 pages.");
                 return;
             }
 
-            // Rotate page 4 by 90 degrees clockwise using the Rotate property
-            Page page = doc.Pages[4];
-            page.Rotate = Rotation.on90; // 90° clockwise
+            // Rotate page 4 by 90 degrees clockwise using the Rotate property.
+            doc.Pages[4].Rotate = Rotation.on90;
 
-            // Save the modified document
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 

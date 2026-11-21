@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
-        const string outputPath = "form_zoomed.pdf";
-        const int zoomPercent = 150; // Desired initial zoom (e.g., 150%)
+        const string inputPath = "input_form.pdf";
+        const string outputPath = "output_form_zoomed.pdf";
+        const int zoomLevel = 150; // Zoom percentage (e.g., 150 = 150%)
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +17,23 @@ class Program
             return;
         }
 
-        // Load the PDF document using the core API.
+        // Load the PDF document using the core Aspose.Pdf API.
         Document pdfDoc = new Document(inputPath);
 
-        // Attempt to set the initial zoom level for the PDF viewer.
-        // Use dynamic access to avoid compile‑time errors on older Aspose.Pdf versions
-        // where ViewerPreferences may not be available.
-        dynamic doc = pdfDoc;
+        // Set the initial zoom level using a JavaScript OpenAction.
+        // This works with all Aspose.Pdf versions and does not rely on ViewerPreferences.
         try
         {
-            doc.ViewerPreferences.Zoom = zoomPercent;
+            pdfDoc.OpenAction = new JavascriptAction($"this.zoom = {zoomLevel};");
         }
-        catch (RuntimeBinderException)
+        catch (Exception ex)
         {
-            Console.WriteLine("ViewerPreferences.Zoom is not supported by the current Aspose.Pdf library version.");
+            Console.Error.WriteLine($"Failed to set zoom level: {ex.Message}");
         }
 
-        // Save the updated PDF.
+        // Save the modified PDF.
         pdfDoc.Save(outputPath);
 
-        Console.WriteLine($"PDF saved with zoom level {zoomPercent}% to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with zoom {zoomLevel}% to '{outputPath}'.");
     }
 }

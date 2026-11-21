@@ -2,41 +2,50 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;               // Facade namespace for Form operations
+using Aspose.Pdf.Forms;                 // For FieldType enum
+
+// Alias the Facade Form class to avoid ambiguity with Aspose.Pdf.Forms.Form
+using FacadeForm = Aspose.Pdf.Facades.Form;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputJson = "text_fields.json";
+        const string inputPdfPath = "input.pdf";
+        const string outputJsonPath = "text_fields.json";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Collect only text field names
-        List<string> textFieldNames = new List<string>();
-        foreach (Field field in pdfDocument.Form.Fields)
+        // Use the Form facade to work with PDF form fields.
+        using (FacadeForm form = new FacadeForm())
         {
-            // TextBoxField represents a text form field
-            if (field is TextBoxField)
+            form.BindPdf(inputPdfPath);
+
+            // Retrieve all field names.
+            string[] allFieldNames = form.FieldNames;
+
+            // Filter only text fields.
+            List<string> textFieldNames = new List<string>();
+            foreach (string name in allFieldNames)
             {
-                // PartialName returns the field's name (without hierarchy prefixes)
-                textFieldNames.Add(field.PartialName);
+                if (form.GetFieldType(name) == FieldType.Text)
+                {
+                    textFieldNames.Add(name);
+                }
             }
+
+            // Serialize the list of text field names to a JSON array.
+            string json = JsonSerializer.Serialize(textFieldNames, new JsonSerializerOptions { WriteIndented = true });
+
+            // Write the JSON output to a file.
+            File.WriteAllText(outputJsonPath, json);
+
+            Console.WriteLine($"Exported {textFieldNames.Count} text field name(s) to '{outputJsonPath}'.");
         }
-
-        // Serialize the list to a JSON array
-        string json = JsonSerializer.Serialize(textFieldNames, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(outputJson, json);
-
-        Console.WriteLine($"Exported {textFieldNames.Count} text field names to '{outputJson}'.");
     }
 }

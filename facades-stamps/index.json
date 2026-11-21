@@ -1,133 +1,134 @@
 {
   "category": "facades-stamps",
-  "nuget_version": "26.9.0",
-  "last_updated": "2026-10-21T13:06:21Z",
+  "nuget_version": "26.10.0",
+  "last_updated": "2026-11-12T06:15:02Z",
   "examples": {
     "add-multi-line-text-watermark-facade": {
-      "title": "Add Multi-Line Text Watermark to PDF Pages",
+      "title": "Add Multi-Line Text Watermark to PDF",
       "filename": "add-multi-line-text-watermark-facade.cs",
-      "description": "Shows how to create a multi-line text watermark using WatermarkArtifact and apply it to every page of a PDF with Aspose.Pdf.",
+      "description": "Demonstrates how to create a multi‑line text watermark using FormattedText and apply it to every page of a PDF with Aspose.Pdf.Facades.",
       "tags": [
         "watermark",
-        "multiline",
         "text",
         "pdf",
-        "Aspose.Pdf"
+        "multiline",
+        "Aspose"
       ],
       "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.WatermarkArtifact",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.WatermarkArtifact.SetTextAndState",
-        "Aspose.Pdf.Page.Artifacts.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.FormattedText.AddNewLineText",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindLogo",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22278"
     },
     "rotate-text-stamp-45-degrees": {
       "title": "Rotate Text Stamp 45 Degrees in PDF",
       "filename": "rotate-text-stamp-45-degrees.cs",
-      "description": "Shows how to rotate a text stamp by 45 degrees around its center and apply it to every page of a PDF using Aspose.Pdf.",
+      "description": "Demonstrates creating a TextStamp, setting a 45° rotation around its center, centering it on each page, and applying it to a PDF using Aspose.Pdf.Facades.",
       "tags": [
         "text-stamp",
         "rotation",
         "pdf",
-        "aspose-pdf",
-        "watermark"
+        "facades",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.TextStamp",
-        "Aspose.Pdf.TextStamp.TextState",
+        "Aspose.Pdf.Facades.TextStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22279"
     },
     "apply-pdf-page-stamp-as-background": {
-      "title": "Apply Image Stamp as Background to All PDF Pages",
+      "title": "Apply PDF Page Stamp as Background to All Pages",
       "filename": "apply-pdf-page-stamp-as-background.cs",
-      "description": "Shows how to load a PDF, create an ImageStamp, set it as a background, and add it to every page before saving.",
+      "description": "Shows how to load a source PDF and a stamp PDF, create a PdfPageStamp from the stamp page, set it as a background, and apply it to every page of the target document.",
       "tags": [
-        "image-stamp",
-        "background",
         "pdf",
-        "Aspose.Pdf",
-        "page"
+        "stamp",
+        "background",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PdfPageStamp",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Drawing.HorizontalAlignment",
-        "Aspose.Pdf.Drawing.VerticalAlignment"
+        "Aspose.Pdf.PdfPageStamp.Put",
+        "Aspose.Pdf.PdfPageStamp.Background"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22280"
     },
     "apply-external-pdf-template-stamp": {
-      "title": "Apply External PDF Stamp to Page 3",
+      "title": "Apply External PDF Stamp to Third Page",
       "filename": "apply-external-pdf-template-stamp.cs",
-      "description": "Demonstrates creating a stamp from an external PDF template and overlaying it on the third page of another PDF using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to create a PdfFileStamp from an external PDF template and apply it only to the third page of a PDF document using Aspose.Pdf.Facades.",
       "tags": [
         "pdf",
         "stamp",
-        "template",
-        "page",
-        "facade"
+        "external-template",
+        "page3",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Facades.Stamp",
         "Aspose.Pdf.Facades.PdfFileStamp",
         "Aspose.Pdf.Facades.Stamp.BindPdf",
         "Aspose.Pdf.Facades.Stamp.SetOrigin",
-        "Aspose.Pdf.Facades.Stamp.Pages",
-        "Aspose.Pdf.Facades.Stamp.IsBackground",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
         "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
         "Aspose.Pdf.Facades.PdfFileStamp.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22281"
     },
     "add-lower-roman-page-numbers-odd-pages": {
-      "title": "Add Lower‑Roman Page Numbers to Odd Pages",
+      "title": "Add Lower-Roman Page Numbers to Odd Pages",
       "filename": "add-lower-roman-page-numbers-odd-pages.cs",
-      "description": "Demonstrates how to add lower‑case Roman numeral page numbers to only the odd pages of a PDF using Aspose.Pdf's TextStamp.",
+      "description": "Demonstrates how to add page numbers in lower‑case Roman numerals to only the odd pages of a PDF using a TextStamp.",
       "tags": [
         "page-numbering",
+        "roman-numerals",
         "text-stamp",
-        "lower-roman",
         "odd-pages",
-        "aspose-pdf"
+        "aspdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.TextStamp",
-        "Aspose.Pdf.TextState",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22282"
     },
     "combine-image-text-pdf-stamp": {
-      "title": "Add Logo and Text Stamps to PDF",
+      "title": "Add Image and Text Stamps to PDF Pages",
       "filename": "combine-image-text-pdf-stamp.cs",
-      "description": "Demonstrates how to create an ImageStamp and a TextStamp, configure their appearance and placement, and apply both stamps to every page of a PDF using Aspose.Pdf.",
+      "description": "Demonstrates how to load a PDF, iterate through its pages, and apply both an image stamp (logo) and a text stamp (custom label) with custom positioning and styling, then save the result.",
       "tags": [
         "image-stamp",
         "text-stamp",
@@ -137,406 +138,405 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.TextStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Color.FromRgb"
+        "Aspose.Pdf.FontRepository"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22283"
     },
     "add-header-stamp-to-pdf-pages": {
       "title": "Add Header Stamp to All PDF Pages",
       "filename": "add-header-stamp-to-pdf-pages.cs",
-      "description": "Shows how to load a PDF, iterate through its Pages collection, and add a centered header TextStamp to each page using Aspose.Pdf before saving the result.",
+      "description": "Shows how to load a PDF with Aspose.Pdf, create a TextStamp as a header, and apply it to every page in the document.",
       "tags": [
-        "pdf",
         "header",
         "stamp",
+        "pdf",
         "textstamp",
-        "aspose"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Facades.TextStamp",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22284"
     },
     "add-footer-date-stamp-to-last-pdf-page": {
       "title": "Add Footer Date Stamp to Last PDF Page",
       "filename": "add-footer-date-stamp-to-last-pdf-page.cs",
-      "description": "Demonstrates how to insert a footer stamp containing the current date (MM-dd-yyyy) on the last page of a PDF using Aspose.Pdf.",
+      "description": "Shows how to insert a footer stamp with the current date (MM-dd-yyyy) on the last page of a PDF using Aspose.Pdf.",
       "tags": [
         "footer",
-        "stamp",
-        "date",
+        "date-stamp",
         "last-page",
-        "Aspose.Pdf"
+        "Aspose.Pdf",
+        "PDF"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.HorizontalAlignment",
-        "Aspose.Pdf.Text.FontStyles"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22285"
     },
     "apply-rotating-stamps-to-pdf-pages": {
-      "title": "Apply Rotating Image Stamp to PDF Pages",
+      "title": "Apply Rotating Image Stamp to Each PDF Page",
       "filename": "apply-rotating-stamps-to-pdf-pages.cs",
-      "description": "Shows how to add an image stamp to each page of a PDF and rotate it according to the page index.",
+      "description": "Shows how to add an image stamp to every page of a PDF and rotate the stamp by an angle derived from the page index.",
       "tags": [
         "image-stamp",
         "rotation",
         "pdf",
         "aspose-pdf",
-        "page-loop"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Drawing.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22286"
-    },
-    "add-background-watermark-to-specific-pdf-pages": {
-      "title": "Add Background Text Watermark to Selected PDF Pages",
-      "filename": "add-background-watermark-to-specific-pdf-pages.cs",
-      "description": "Demonstrates how to create a semi‑transparent background text stamp and apply it to pages 2‑5 of a PDF using Aspose.Pdf.",
-      "tags": [
-        "watermark",
-        "textstamp",
-        "pdf",
-        "pages",
-        "background"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22287"
-    },
-    "batch-add-multi-line-watermark-to-pdfs": {
-      "title": "Batch Add Multi‑Line Watermark to PDFs",
-      "filename": "batch-add-multi-line-watermark-to-pdfs.cs",
-      "description": "Demonstrates how to process a folder of PDF files and apply the same multi‑line text watermark to every page using Aspose.Pdf's high‑level API.",
-      "tags": [
-        "watermark",
-        "batch",
-        "pdf",
-        "textstamp",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22288"
-    },
-    "add-image-stamp-to-pdfs-preserve-filenames": {
-      "title": "Apply Image Stamp to PDFs and Save to New Directory",
-      "filename": "add-image-stamp-to-pdfs-preserve-filenames.cs",
-      "description": "Shows how to load PDF files from a folder, add an image stamp to every page, and write the stamped PDFs to another folder while preserving the original file names.",
-      "tags": [
-        "pdf",
-        "image-stamp",
-        "batch",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.ImageStamp.HorizontalAlignment",
-        "Aspose.Pdf.ImageStamp.VerticalAlignment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22289"
-    },
-    "overlay-legal-disclaimer-with-pdffilestamp": {
-      "title": "Overlay Disclaimer PDF on First Page",
-      "filename": "overlay-legal-disclaimer-with-pdffilestamp.cs",
-      "description": "Shows how to use Aspose.Pdf.Facades.Stamp and PdfFileStamp to overlay a disclaimer PDF onto the first page of a target PDF and save the stamped document.",
-      "tags": [
-        "stamp",
-        "disclaimer",
-        "pdf",
-        "overlay",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Stamp",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Stamp.BindPdf",
-        "Stamp.Pages",
-        "Stamp.IsBackground",
-        "PdfFileStamp.BindPdf",
-        "PdfFileStamp.AddStamp",
-        "PdfFileStamp.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22290"
-    },
-    "apply-translucent-text-watermark": {
-      "title": "Add Translucent Image Watermark to PDF",
-      "filename": "apply-translucent-text-watermark.cs",
-      "description": "Shows how to place a 50% opacity image stamp as a watermark on every page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "image-stamp",
-        "opacity",
-        "watermark",
-        "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.ImageStamp.Opacity"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22291"
-    },
-    "apply-rotated-image-stamp-to-pdf-pages": {
-      "title": "Add Rotated Image Stamp to Bottom-Right of PDF Pages",
-      "filename": "apply-rotated-image-stamp-to-pdf-pages.cs",
-      "description": "Demonstrates loading a PDF with Aspose.Pdf, creating an ImageStamp, rotating it 30°, aligning it to the bottom‑right corner of each page, and saving the stamped document.",
-      "tags": [
-        "image-stamp",
-        "rotation",
-        "pdf",
-        "bottom-right",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22292"
-    },
-    "add-page-number-stamp-to-pdf": {
-      "title": "Add Dynamic Page Number Stamp to PDF",
-      "filename": "add-page-number-stamp-to-pdf.cs",
-      "description": "Demonstrates how to create a TextStamp with the {page_number} placeholder, apply it to every page of a PDF, and save the stamped document using Aspose.Pdf.",
-      "tags": [
-        "text-stamp",
-        "page-number",
-        "pdf",
-        "aspose-pdf",
-        "facade"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.TextStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22293"
-    },
-    "add-multi-line-watermark-custom-font": {
-      "title": "Add Multi‑Line Watermark with Custom Font to PDF",
-      "filename": "add-multi-line-watermark-custom-font.cs",
-      "description": "Demonstrates loading a PDF from a memory stream and applying a multi‑line watermark with a custom font size, color, and opacity to every page using Aspose.Pdf.",
-      "tags": [
-        "watermark",
-        "pdf",
-        "memory-stream",
-        "custom-font",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.WatermarkArtifact",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Drawing.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22294"
-    },
-    "add-footer-stamp-10-points-above-bottom": {
-      "title": "Add Footer Image Stamp 10 Points Above Bottom Edge",
-      "filename": "add-footer-stamp-10-points-above-bottom.cs",
-      "description": "The example loads a PDF, creates an ImageStamp configured as a footer, sets its vertical alignment to bottom with a 10‑point bottom margin, and applies it to every page before saving.",
-      "tags": [
-        "image-stamp",
-        "footer",
-        "margin",
-        "Aspose.Pdf",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Facades.ImageStamp.VerticalAlignment",
-        "Aspose.Pdf.Facades.ImageStamp.HorizontalAlignment",
-        "Aspose.Pdf.Facades.ImageStamp.BottomMargin"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22295"
-    },
-    "apply-stamp-to-even-pdf-pages": {
-      "title": "Apply Image Stamp to Even Pages of a PDF",
-      "filename": "apply-stamp-to-even-pdf-pages.cs",
-      "description": "Shows how to add an image stamp only to even-numbered pages of a PDF document using Aspose.Pdf.",
-      "tags": [
-        "image-stamp",
-        "even-pages",
-        "pdf",
-        "Aspose.Pdf",
         "page-iteration"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.PageCollection"
+        "Aspose.Pdf.ImageStamp.RotateAngle",
+        "Aspose.Pdf.ImageStamp.HorizontalAlignment",
+        "Aspose.Pdf.ImageStamp.VerticalAlignment",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22286"
+    },
+    "add-background-watermark-to-specific-pdf-pages": {
+      "title": "Add Background Text Watermark to Selected PDF Pages",
+      "filename": "add-background-watermark-to-specific-pdf-pages.cs",
+      "description": "Demonstrates how to create a semi‑transparent background text stamp and apply it to pages 2 through 5 of a PDF using Aspose.Pdf.",
+      "tags": [
+        "watermark",
+        "textstamp",
+        "pdf",
+        "background",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
-      "task_id": "22296"
+      "task_id": "22287"
     },
-    "qr-code-and-text-stamp-for-pdf": {
-      "title": "Add QR Code and Verification Text Stamp to PDF",
-      "filename": "qr-code-and-text-stamp-for-pdf.cs",
-      "description": "Demonstrates loading a PDF, creating an ImageStamp for a QR code and a TextStamp for verification instructions, positioning them on each page, and saving the stamped document using Aspose.Pdf.",
+    "batch-add-multi-line-watermark-to-pdfs": {
+      "title": "Batch Add Multi‑Line Watermark to PDFs",
+      "filename": "batch-add-multi-line-watermark-to-pdfs.cs",
+      "description": "Demonstrates how to process a folder of PDF files and apply the same multi‑line text watermark to every page using Aspose.Pdf.",
       "tags": [
-        "qr-code",
-        "pdf-stamp",
-        "image-stamp",
-        "text-stamp",
-        "aspose-pdf"
+        "watermark",
+        "pdf",
+        "batch",
+        "textstamp",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Drawing.ImageStamp",
-        "Aspose.Pdf.Text.TextStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Text.FontRepository.FindFont"
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
-      "task_id": "22297"
+      "task_id": "22288"
     },
-    "apply-text-stamp-to-specific-pdf-pages": {
-      "title": "Apply Image Stamp to Specific PDF Pages",
-      "filename": "apply-text-stamp-to-specific-pdf-pages.cs",
-      "description": "Demonstrates how to add an image stamp to pages 1, 5, and 10 of a PDF by directly accessing page indices using Aspose.Pdf.",
+    "add-image-stamp-to-pdfs-preserve-filenames": {
+      "title": "Add Image Stamp to PDFs and Save to Output Folder",
+      "filename": "add-image-stamp-to-pdfs-preserve-filenames.cs",
+      "description": "The example loads each PDF from a source folder, applies an image stamp to every page, and saves the stamped documents to a separate output directory while keeping the original file names.",
       "tags": [
-        "image-stamp",
-        "specific-pages",
-        "Aspose.Pdf",
-        "pdf-manipulation",
-        "C#"
+        "pdf",
+        "stamp",
+        "image",
+        "batch",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22289"
+    },
+    "overlay-legal-disclaimer-with-pdffilestamp": {
+      "title": "Add Disclaimer Stamp to First Page of PDFs",
+      "filename": "overlay-legal-disclaimer-with-pdffilestamp.cs",
+      "description": "Demonstrates how to overlay a legal disclaimer PDF onto the first page of multiple target PDFs using Aspose.Pdf's PdfFileStamp and Stamp classes.",
+      "tags": [
+        "stamp",
+        "disclaimer",
+        "pdf",
+        "first-page",
+        "overlay"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save",
+        "PdfFileStamp.Close",
+        "Stamp",
+        "Stamp.BindPdf",
+        "Stamp.IsBackground"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22290"
+    },
+    "apply-translucent-text-watermark": {
+      "title": "Add Translucent Image Watermark to PDF Pages",
+      "filename": "apply-translucent-text-watermark.cs",
+      "description": "Demonstrates creating an ImageStamp, setting its opacity to 50% and applying it to every page of a PDF document using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "watermark",
+        "opacity",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Document.Pages"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22291"
+    },
+    "apply-rotated-image-stamp-to-pdf-pages": {
+      "title": "Apply Rotated Image Stamp to PDF Pages",
+      "filename": "apply-rotated-image-stamp-to-pdf-pages.cs",
+      "description": "Demonstrates how to add an image stamp rotated by 30 degrees to the bottom‑right corner of every page in a PDF using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "rotation",
+        "pdf",
+        "Aspose.Pdf",
+        "page-stamping"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22292"
+    },
+    "add-page-number-stamp-to-pdf": {
+      "title": "Add Dynamic Page Number Text Stamp to PDF",
+      "filename": "add-page-number-stamp-to-pdf.cs",
+      "description": "Demonstrates how to create a TextStamp with the {page_number} placeholder and apply it to every page of a PDF, resulting in automatically generated page numbers.",
+      "tags": [
+        "text-stamp",
+        "page-number",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.TextState"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22293"
+    },
+    "add-multi-line-watermark-custom-font": {
+      "title": "Add Multi‑Line Watermark with Custom Font Size and Color to PDF",
+      "filename": "add-multi-line-watermark-custom-font.cs",
+      "description": "Demonstrates loading a PDF from a memory stream, creating a multi‑line text stamp with custom font size and color, and applying it as a semi‑transparent background watermark to every page.",
+      "tags": [
+        "watermark",
+        "pdf",
+        "textstamp",
+        "memory-stream",
+        "custom-font"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Text.Color.FromRgb",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22294"
+    },
+    "add-footer-stamp-10-points-above-bottom": {
+      "title": "Add Footer Image Stamp 10 Points Above Bottom",
+      "filename": "add-footer-stamp-10-points-above-bottom.cs",
+      "description": "Demonstrates how to place an image stamp as a footer exactly 10 points above the bottom edge of each PDF page using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "footer",
+        "margin",
+        "Aspose.Pdf",
+        "pdf-stamping"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22295"
+    },
+    "apply-stamp-to-even-pdf-pages": {
+      "title": "Apply Text Stamp to Even PDF Pages",
+      "filename": "apply-stamp-to-even-pdf-pages.cs",
+      "description": "Demonstrates iterating through a PDF document and adding a semi‑transparent \"CONFIDENTIAL\" text stamp only to even‑numbered pages using Aspose.Pdf.",
+      "tags": [
+        "stamp",
+        "even-pages",
+        "text-watermark",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22296"
+    },
+    "qr-code-and-text-stamp-for-pdf": {
+      "title": "Stamp QR Code and Verification Text on PDF",
+      "filename": "qr-code-and-text-stamp-for-pdf.cs",
+      "description": "Demonstrates how to load a PDF, create an ImageStamp for a QR code and a TextStamp for descriptive text, position them on the first page, and save the stamped document.",
+      "tags": [
+        "qr-code",
+        "stamp",
+        "pdf",
+        "text",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.Facades.TextStamp",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Page.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22297"
+    },
+    "apply-text-stamp-to-specific-pdf-pages": {
+      "title": "Apply Image Stamp to Specific PDF Pages",
+      "filename": "apply-text-stamp-to-specific-pdf-pages.cs",
+      "description": "Shows how to add an image stamp to selected pages (1, 5, and 10) of a PDF document using Aspose.Pdf.",
+      "tags": [
+        "image-stamp",
+        "specific-pages",
+        "pdf",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22298"
     },
     "overlay-image-stamp-on-pdf-pages": {
       "title": "Overlay Image Stamp on PDF Pages",
       "filename": "overlay-image-stamp-on-pdf-pages.cs",
-      "description": "Shows how to apply an image stamp as an overlay (Background = false) to every page of a PDF using Aspose.Pdf.Facades.",
+      "description": "Demonstrates how to add an image stamp that overlays existing content on every page of a PDF by setting the stamp's Background property to false.",
       "tags": [
         "image-stamp",
         "pdf",
         "overlay",
         "Aspose.Pdf",
-        "facade"
+        "background"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Facades.ImageStamp.Background",
+        "Aspose.Pdf.Drawing.ImageStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22299"
     },
     "add-transparent-confidential-text-stamp": {
-      "title": "Add Transparent Confidential Text Stamp to Selected PDF Pages",
+      "title": "Add Transparent Text Stamp to Selected PDF Pages",
       "filename": "add-transparent-confidential-text-stamp.cs",
-      "description": "Demonstrates how to apply a semi‑transparent 'CONFIDENTIAL' text stamp with 70% opacity to specific pages of a PDF using Aspose.Pdf.",
+      "description": "Shows how to place a semi‑transparent text stamp (e.g., CONFIDENTIAL) on specific pages of a PDF using Aspose.Pdf.",
       "tags": [
         "text-stamp",
         "pdf",
-        "confidential",
+        "watermark",
         "opacity",
         "selected-pages"
       ],
@@ -544,64 +544,68 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Text.TextStamp",
         "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22301"
-    },
-    "custom-font-stamp-branding": {
-      "title": "Add Custom Font Text Stamp to PDF",
-      "filename": "custom-font-stamp-branding.cs",
-      "description": "Demonstrates loading a TrueType font and applying a branded text stamp to each page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "text-stamp",
-        "custom-font",
-        "branding",
-        "pdf",
-        "Aspose.Pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.FontRepository.OpenFont",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Color.FromRgb",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22301"
+    },
+    "custom-font-stamp-branding": {
+      "title": "Add Custom Font Stamp to PDF",
+      "filename": "custom-font-stamp-branding.cs",
+      "description": "Demonstrates loading a TrueType font from file, creating formatted text with that font, and applying it as a stamp to every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "stamp",
+        "custom-font",
+        "pdf",
+        "branding",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindLogo",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22302"
     },
     "add-page-number-stamp-leading-zeros": {
-      "title": "Add Page Number Stamp with Leading Zeros to PDF",
+      "title": "Add Page Number Stamps with Leading Zeros",
       "filename": "add-page-number-stamp-leading-zeros.cs",
-      "description": "Demonstrates how to add a page‑number stamp formatted with leading zeros to every page of a PDF using Aspose.Pdf.",
+      "description": "Demonstrates how to add Arabic numeral page‑number stamps with leading zeros to every page of a PDF using Aspose.Pdf.",
       "tags": [
         "page-number",
         "stamp",
-        "leading-zeros",
         "pdf",
+        "leading-zeros",
         "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.PageNumberStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page"
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.FontRepository",
+        "Aspose.Pdf.Color"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22303"
     },
     "batch-apply-rotated-pdf-stamp": {
       "title": "Batch Apply Rotated Text Stamp to PDFs",
       "filename": "batch-apply-rotated-pdf-stamp.cs",
-      "description": "Demonstrates loading multiple PDF files from a network share, adding a 45‑degree rotated \"CONFIDENTIAL\" text stamp to every page, and saving the stamped documents with a new name.",
+      "description": "Demonstrates iterating over PDF files on a network share, adding a 45‑degree \"CONFIDENTIAL\" text stamp to every page, and saving the stamped PDFs to an output folder.",
       "tags": [
         "pdf",
         "stamp",
@@ -611,72 +615,75 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Color"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22304"
     },
     "multi-line-watermark-addnewlinetext": {
-      "title": "Add Multi-Line Watermark with Different Font Styles",
+      "title": "Create Multi-Line Watermark with Different Font Styles",
       "filename": "multi-line-watermark-addnewlinetext.cs",
-      "description": "Demonstrates how to apply a three‑line watermark to each page of a PDF, using a different font style for each line.",
+      "description": "Demonstrates how to add a three‑line watermark to a PDF using Aspose.Pdf, applying distinct fonts and styles to each line and positioning them vertically.",
       "tags": [
         "watermark",
+        "textstamp",
+        "fonts",
         "pdf",
-        "textfragment",
-        "font-style",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Drawing.Color.FromRgb"
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22305"
     },
     "add-right-aligned-logo-stamp-to-pdf": {
-      "title": "Add Right-Aligned Logo Stamp to PDF Pages",
+      "title": "Add Right-Aligned Logo Stamp to PDF",
       "filename": "add-right-aligned-logo-stamp-to-pdf.cs",
-      "description": "Demonstrates how to place an image stamp (logo) at the right‑hand side of each page in a PDF using Aspose.Pdf. The stamp's HorizontalAlignment is set to Right and applied to all pages.",
+      "description": "Demonstrates how to load a PDF, create an image stamp for a logo, align it to the right margin, and apply it to every page using Aspose.Pdf.",
       "tags": [
         "image-stamp",
-        "alignment",
+        "horizontal-alignment",
         "pdf",
         "logo",
         "Aspose.Pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.ImageStamp",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.HorizontalAlignment"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22306"
     },
     "apply-semi-transparent-png-background-stamp": {
-      "title": "Add Semi‑Transparent PNG Background Stamp to PDF",
+      "title": "Add Semi-Transparent Background Image Stamp to PDF",
       "filename": "apply-semi-transparent-png-background-stamp.cs",
-      "description": "Demonstrates how to apply a semi‑transparent PNG image as a background stamp that covers the entire area of each PDF page using Aspose.Pdf.",
+      "description": "Demonstrates how to apply a semi‑transparent PNG as a background stamp that covers the entire page of a PDF using Aspose.Pdf.",
       "tags": [
         "background",
         "stamp",
-        "png",
+        "image",
         "opacity",
-        "aspose-pdf"
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -685,15 +692,15 @@
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22307"
     },
     "add-creation-date-stamp": {
-      "title": "Add Creation Date Stamp to PDF",
+      "title": "Add Creation Date Stamp to PDF Pages",
       "filename": "add-creation-date-stamp.cs",
-      "description": "Shows how to read a PDF's creation date and place it as a text stamp on the top‑left corner of every page using Aspose.Pdf.",
+      "description": "Shows how to read a PDF's creation date and add it as a text stamp in the top‑left corner of each page using Aspose.Pdf.",
       "tags": [
         "pdf",
         "stamp",
@@ -703,452 +710,72 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.FontRepository",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.HorizontalAlignment",
+        "Aspose.Pdf.Text.VerticalAlignment",
+        "Aspose.Pdf.Text.Color"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22309"
     },
     "merge-cover-page-background": {
-      "title": "Merge Cover Page as Background Using PdfFileStamp",
+      "title": "Merge Cover PDF as Background Using PdfFileStamp",
       "filename": "merge-cover-page-background.cs",
-      "description": "Shows how to bind a cover PDF page as a background stamp and apply it to another PDF using Aspose.Pdf.Facades, resulting in a merged document.",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfFileStamp and Stamp classes to apply the first page of a cover PDF as a background to every page of a main document, producing a merged PDF.",
       "tags": [
         "pdf",
         "cover-page",
-        "stamp",
         "background",
-        "merge"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.Stamp",
-        "Aspose.Pdf.Facades.PdfFileStamp",
-        "Aspose.Pdf.Facades.Stamp.BindPdf",
-        "Aspose.Pdf.Facades.Stamp.IsBackground",
-        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
-        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
-        "Aspose.Pdf.Facades.PdfFileStamp.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22310"
-    },
-    "add-confidential-text-and-logo-stamp": {
-      "title": "Add Logo and Confidential Stamps to PDF",
-      "filename": "add-confidential-text-and-logo-stamp.cs",
-      "description": "Loads a PDF, adds an image stamp for a company logo and a bold red \"Confidential\" text stamp to each page, then saves the stamped document.",
-      "tags": [
-        "stamp",
-        "image",
-        "text",
-        "pdf",
-        "confidential"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.TextStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Text.TextState"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22311"
-    },
-    "apply-custom-line-height-stamp": {
-      "title": "Apply Multi-Line Watermark with Custom Line Height",
-      "filename": "apply-custom-line-height-stamp.cs",
-      "description": "Shows how to add several TextStamp watermarks to a PDF page and control the vertical spacing between them using a custom line height.",
-      "tags": [
-        "watermark",
-        "textstamp",
-        "line-height",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Text.Color",
-        "Aspose.Pdf.Text.HorizontalAlignment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22312"
-    },
-    "rotate-text-stamp-on-pdf-pages": {
-      "title": "Rotate Image Stamp 90° and Verify Text Readability",
-      "filename": "rotate-text-stamp-on-pdf-pages.cs",
-      "description": "The example creates an ImageStamp, sets its RotateAngle to 90 degrees, applies it to each page of a PDF, saves the result, and then extracts text to confirm the original content remains readable.",
-      "tags": [
-        "image-stamp",
-        "rotation",
-        "text-extraction",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Text.TextAbsorber",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Document.Pages.Accept"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22313"
-    },
-    "add-footer-with-page-count": {
-      "title": "Add Footer Stamp with Page Count to PDF",
-      "filename": "add-footer-with-page-count.cs",
-      "description": "Demonstrates how to add a footer text stamp that automatically displays the current page number and total page count on each page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "footer",
-        "stamp",
-        "page-count",
-        "Aspose.Pdf",
-        "C#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22314"
-    },
-    "combine-multiple-pdfs-into-multi-page-stamp": {
-      "title": "Create Multi‑Page PDF Stamp by Merging PDFs",
-      "filename": "combine-multiple-pdfs-into-multi-page-stamp.cs",
-      "description": "Merges several PDF files into a single document and adds a header stamp that appears on every page of the combined PDF.",
-      "tags": [
-        "pdf",
-        "stamp",
-        "merge",
-        "header",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Pages.Add",
-        "Aspose.Pdf.HeaderFooter",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Color.FromRgb",
-        "Aspose.Pdf.Page.Header",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22315"
-    },
-    "add-custom-border-stamp-to-pdf": {
-      "title": "Apply Custom Border Stamp to PDF Pages",
-      "filename": "add-custom-border-stamp-to-pdf.cs",
-      "description": "Shows how to add a text annotation with a custom border thickness and color to each page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "stamp",
-        "border",
-        "annotation",
-        "pdf",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Annotations.TextAnnotation",
-        "Aspose.Pdf.Annotations.Border",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22316"
-    },
-    "batch-add-rotated-image-stamp-to-first-page": {
-      "title": "Batch Add Rotated Image Stamp to PDFs",
-      "filename": "batch-add-rotated-image-stamp-to-first-page.cs",
-      "description": "Shows how to iterate through PDF files in a directory and apply a rotated image stamp to the first page of each document using Aspose.Pdf.",
-      "tags": [
-        "image-stamp",
-        "rotation",
-        "batch",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.HorizontalAlignment",
-        "Aspose.Pdf.VerticalAlignment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22317"
-    },
-    "apply-image-stamp-to-all-pdf-pages": {
-      "title": "Apply Image Stamp to All PDF Pages",
-      "filename": "apply-image-stamp-to-all-pdf-pages.cs",
-      "description": "Shows how to load a PDF, create a single ImageStamp, and efficiently add that stamp to every page using Page.AddStamp, then save the stamped document.",
-      "tags": [
-        "image-stamp",
-        "pdf",
-        "pages",
-        "watermark",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Pages",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22318"
-    },
-    "add-file-name-header-stamp-to-pdf": {
-      "title": "Add File Name Header Stamp to PDF",
-      "filename": "add-file-name-header-stamp-to-pdf.cs",
-      "description": "Demonstrates how to add a header stamp that displays the PDF's file name using the {file_name} placeholder (or manual replacement) with Aspose.Pdf.",
-      "tags": [
-        "header",
-        "stamp",
-        "filename",
-        "aspose-pdf",
-        "csharp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.HeaderFooter",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.FontRepository.FindFont",
-        "Aspose.Pdf.Page.Header",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22319"
-    },
-    "add-semi-transparent-background-stamp": {
-      "title": "Add Background Image Stamp with 30% Opacity",
-      "filename": "add-semi-transparent-background-stamp.cs",
-      "description": "Demonstrates how to place an image stamp as a background on every page of a PDF using Aspose.Pdf, setting the stamp opacity to 30% to keep the document readable.",
-      "tags": [
-        "image-stamp",
-        "background",
-        "opacity",
-        "pdf",
-        "watermark"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Facades.ImageStamp",
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.ImageStamp.Opacity"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22320"
-    },
-    "add-multi-line-text-watermark": {
-      "title": "Add Multi-Line Watermark with Varying Font Sizes",
-      "filename": "add-multi-line-text-watermark.cs",
-      "description": "Loads a PDF, iterates over each page, and adds three centered text fragments as a watermark, each using a different font size to create visual hierarchy.",
-      "tags": [
-        "pdf",
-        "watermark",
-        "text",
-        "font-size",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextFragment",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Position",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22321"
-    },
-    "stamp-pdf-with-dynamic-barcode": {
-      "title": "Add Dynamic Barcode Stamp to PDF Pages",
-      "filename": "stamp-pdf-with-dynamic-barcode.cs",
-      "description": "Demonstrates how to generate a barcode image from a document's unique identifier and apply it as an ImageStamp on every page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "barcode",
-        "stamp",
-        "pdf",
-        "image",
-        "aspose"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Page"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22322"
-    },
-    "apply-rotated-text-stamp-odd-pages": {
-      "title": "Apply Rotated Text Stamp to Odd Pages",
-      "filename": "apply-rotated-text-stamp-odd-pages.cs",
-      "description": "Shows how to add a 30‑degree rotated text stamp to the left margin of every odd‑numbered page in a PDF using Aspose.Pdf.",
-      "tags": [
-        "text-stamp",
-        "rotation",
-        "odd-pages",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository.FindFont",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22323"
-    },
-    "add-dynamic-text-stamp-to-pdf": {
-      "title": "Add Dynamic Text Stamp to PDF",
-      "filename": "add-dynamic-text-stamp-to-pdf.cs",
-      "description": "Shows how to load a PDF, create a TextStamp with the current date and author using string interpolation, apply the stamp to every page, and save the modified document.",
-      "tags": [
-        "pdf",
-        "text-stamp",
-        "aspose-pdf",
-        "dynamic-content",
-        "stamp"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Text.FontRepository",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22324"
-    },
-    "add-repeating-background-watermark-image": {
-      "title": "Add Background Image Stamp to All PDF Pages",
-      "filename": "add-repeating-background-watermark-image.cs",
-      "description": "Demonstrates how to create a single ImageStamp and reuse it to apply a semi‑transparent background watermark image to every page of a PDF using Aspose.Pdf.",
-      "tags": [
-        "image-stamp",
-        "watermark",
-        "background",
-        "pdf",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Drawing.HorizontalAlignment",
-        "Aspose.Pdf.Drawing.VerticalAlignment"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
-      "status": "verified",
-      "task_id": "22325"
-    },
-    "add-multi-line-colored-header-stamp": {
-      "title": "Add Multi-Line Colored Header Stamp to PDF",
-      "filename": "add-multi-line-colored-header-stamp.cs",
-      "description": "Shows how to apply a multi-line header stamp to each page of a PDF, with each line displayed in a different font color using Aspose.Pdf.",
-      "tags": [
-        "header",
-        "multiline",
-        "color",
         "stamp",
         "Aspose.Pdf"
       ],
       "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Text.TextStamp",
-        "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.Color",
-        "Aspose.Pdf.HorizontalAlignment"
+        "PdfFileStamp.BindPdf",
+        "Stamp.BindPdf",
+        "Stamp.IsBackground",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
-      "task_id": "22327"
+      "task_id": "22310"
     },
-    "add-header-barcode-stamp-to-pdf-pages": {
-      "title": "Add Header Barcode Stamp to PDF Pages",
-      "filename": "add-header-barcode-stamp-to-pdf-pages.cs",
-      "description": "Shows how to generate a barcode image and place it as a header stamp on each page of a PDF using Aspose.Pdf.",
+    "add-confidential-text-and-logo-stamp": {
+      "title": "Add Image and Text Stamps to PDF Pages",
+      "filename": "add-confidential-text-and-logo-stamp.cs",
+      "description": "Demonstrates how to place a company logo image and a bold 'Confidential' text stamp on every page of a PDF using Aspose.Pdf.",
       "tags": [
-        "barcode",
-        "header",
         "stamp",
-        "pdf",
-        "aspose"
+        "image",
+        "text",
+        "confidential",
+        "pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
         "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Text.TextStamp",
         "Aspose.Pdf.Page.AddStamp",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
-      "task_id": "22300"
+      "task_id": "22311"
     },
-    "add-multi-line-text-stamp-with-line-spacing": {
-      "title": "Add Multi-Line Text Stamp with 1.5 Line Spacing",
-      "filename": "add-multi-line-text-stamp-with-line-spacing.cs",
-      "description": "Loads a PDF, creates a multi-line TextStamp, configures font, size, style, color and a line spacing of 1.5, then applies the stamp to every page and saves the watermarked document.",
+    "apply-custom-line-height-stamp": {
+      "title": "Apply Text Stamp with Custom Line Height to PDF",
+      "filename": "apply-custom-line-height-stamp.cs",
+      "description": "Demonstrates adding a multi‑line text watermark to every page of a PDF using a TextStamp with custom line spacing (leading) for equal line spacing.",
       "tags": [
         "text-stamp",
         "line-spacing",
@@ -1157,17 +784,426 @@
         "Aspose.Pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.TextStamp",
-        "Aspose.Pdf.Text.TextState",
-        "Aspose.Pdf.FontRepository.FindFont",
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Facades.TextStamp",
         "Aspose.Pdf.Page.AddStamp",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-21T13:06:21Z",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22312"
+    },
+    "rotate-text-stamp-on-pdf-pages": {
+      "title": "Apply Rotated Text Stamp and Verify PDF Text",
+      "filename": "rotate-text-stamp-on-pdf-pages.cs",
+      "description": "Demonstrates adding a 90‑degree rotated text stamp to each page of a PDF with Aspose.Pdf and verifies that the original document text remains unchanged after stamping.",
+      "tags": [
+        "text-stamp",
+        "rotation",
+        "pdf",
+        "verification",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Facades.TextStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22313"
+    },
+    "add-footer-with-page-count": {
+      "title": "Add Footer Stamp with Page Count to PDF",
+      "filename": "add-footer-with-page-count.cs",
+      "description": "Shows how to add a footer text stamp that automatically displays the current page number and total page count on each page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "footer",
+        "stamp",
+        "page-number",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22314"
+    },
+    "combine-multiple-pdfs-into-multi-page-stamp": {
+      "title": "Create Multi‑Page PDF Stamp from Multiple PDFs",
+      "filename": "combine-multiple-pdfs-into-multi-page-stamp.cs",
+      "description": "Demonstrates how to combine several single‑page PDF files into a multi‑page stamp and apply it to corresponding pages of a target PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "stamp",
+        "multipage",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "PdfFileStamp.BindPdf",
+        "Stamp.BindPdf",
+        "Stamp.SetOrigin",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22315"
+    },
+    "add-custom-border-stamp-to-pdf": {
+      "title": "Apply Custom Border Stamp to PDF Pages",
+      "filename": "add-custom-border-stamp-to-pdf.cs",
+      "description": "Shows how to add a text annotation with a colored, thick border to each page of a PDF to highlight important sections.",
+      "tags": [
+        "stamp",
+        "border",
+        "annotation",
+        "highlight",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22316"
+    },
+    "batch-add-rotated-image-stamp-to-first-page": {
+      "title": "Batch Add Rotated Image Stamp to PDFs",
+      "filename": "batch-add-rotated-image-stamp-to-first-page.cs",
+      "description": "Iterates through all PDF files in a folder, loads each document, creates an ImageStamp from a PNG, rotates it 45 degrees, adds it to the first page, and saves the stamped PDF to an output directory.",
+      "tags": [
+        "image-stamp",
+        "pdf-batch",
+        "rotation",
+        "aspose-pdf",
+        "first-page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.ImageStamp.RotateAngle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22317"
+    },
+    "add-file-name-header-stamp-to-pdf": {
+      "title": "Add File Name Header Stamp to PDF",
+      "filename": "add-file-name-header-stamp-to-pdf.cs",
+      "description": "Demonstrates how to create a text stamp that shows the source PDF's file name and add it as a centered header on every page using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "stamp",
+        "header",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22319"
+    },
+    "add-semi-transparent-background-stamp": {
+      "title": "Add Background Image Stamp with 30% Opacity",
+      "filename": "add-semi-transparent-background-stamp.cs",
+      "description": "Demonstrates how to place an image stamp behind the content of each PDF page with 30% opacity, covering the full page size.",
+      "tags": [
+        "image-stamp",
+        "background",
+        "opacity",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22320"
+    },
+    "add-multi-line-text-watermark": {
+      "title": "Add Multi‑Line Watermark with Varying Font Sizes",
+      "filename": "add-multi-line-text-watermark.cs",
+      "description": "Loads a PDF and adds three centered watermark lines—\"CONFIDENTIAL\", \"Do Not Distribute\", and \"Internal Use Only\"—each with a different font size to create visual hierarchy. Uses WatermarkArtifact and TextState to configure font, size, color, rotation, opacity, and position.",
+      "tags": [
+        "watermark",
+        "pdf",
+        "aspose",
+        "font-size",
+        "multiline"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22321"
+    },
+    "stamp-pdf-with-dynamic-barcode": {
+      "title": "Add Dynamic Barcode Stamp to PDF Pages",
+      "filename": "stamp-pdf-with-dynamic-barcode.cs",
+      "description": "Demonstrates how to generate a barcode from a document's unique identifier and stamp it onto each page of a PDF using a form textbox field.",
+      "tags": [
+        "barcode",
+        "stamp",
+        "pdf",
+        "aspose-pdf",
+        "form-field"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.TextBoxField.AddBarcode",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22322"
+    },
+    "apply-rotated-text-stamp-odd-pages": {
+      "title": "Add Rotated Text Stamp to Odd PDF Pages",
+      "filename": "apply-rotated-text-stamp-odd-pages.cs",
+      "description": "Loads a PDF, creates a red bold text stamp rotated 30 degrees, and applies it to the left margin of every odd‑numbered page before saving the document.",
+      "tags": [
+        "text-stamp",
+        "odd-pages",
+        "rotation",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextStamp.TextState",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22323"
+    },
+    "add-dynamic-text-stamp-to-pdf": {
+      "title": "Add Dynamic Text Stamp to PDF Pages",
+      "filename": "add-dynamic-text-stamp-to-pdf.cs",
+      "description": "Demonstrates creating a TextStamp with dynamic content using string interpolation and applying it to every page of a PDF document with Aspose.Pdf.",
+      "tags": [
+        "text-stamp",
+        "pdf",
+        "aspose-pdf",
+        "dynamic-content",
+        "watermark"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.TextStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.TextStamp.TextState"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22324"
+    },
+    "add-repeating-background-watermark-image": {
+      "title": "Add Repeating Background Image Stamp to PDF",
+      "filename": "add-repeating-background-watermark-image.cs",
+      "description": "Demonstrates how to create a single ImageStamp and apply it as a semi‑transparent background watermark on every page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "image-stamp",
+        "background",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22325"
+    },
+    "add-multi-line-colored-header-stamp": {
+      "title": "Add Multi-Line Colored Header Stamp to PDF",
+      "filename": "add-multi-line-colored-header-stamp.cs",
+      "description": "Shows how to create a multi-line header stamp with different font colors using Aspose.Pdf and apply it to every page of a PDF document.",
+      "tags": [
+        "pdf",
+        "stamp",
+        "header",
+        "color",
+        "textstamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22327"
+    },
+    "add-header-barcode-stamp": {
+      "title": "Add Header Barcode Stamp to PDF Pages",
+      "filename": "add-header-barcode-stamp.cs",
+      "description": "Shows how to create a header stamp that inserts a dynamically generated barcode image on each page of a PDF using Aspose.Pdf.",
+      "tags": [
+        "barcode",
+        "header",
+        "stamp",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.Form.Add",
+        "Aspose.Pdf.Forms.TextBoxField.AddBarcode",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22300"
+    },
+    "add-multi-line-text-watermark-with-line-spacing": {
+      "title": "Add Multi-Line Text Watermark with Custom Line Spacing",
+      "filename": "add-multi-line-text-watermark-with-line-spacing.cs",
+      "description": "Loads a PDF, creates a multi-line TextStamp, sets line spacing to 1.5 × font size, and applies a semi‑transparent watermark to every page.",
+      "tags": [
+        "text-stamp",
+        "watermark",
+        "line-spacing",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Page.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
       "status": "verified",
       "task_id": "22308"
+    },
+    "apply-image-stamp-to-all-pdf-pages__v2": {
+      "title": "Apply Image Stamp to All PDF Pages",
+      "filename": "apply-image-stamp-to-all-pdf-pages__v2.cs",
+      "description": "Shows how to load a PDF, create an ImageStamp, and efficiently apply the stamp to every page using the Page.AddStamp method.",
+      "tags": [
+        "image-stamp",
+        "pdf",
+        "aspose-pdf",
+        "add-stamp",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22318"
+    },
+    "add-qr-code-stamp-from-pdf-metadata": {
+      "title": "Add QR Code Stamp from PDF Metadata",
+      "filename": "add-qr-code-stamp-from-pdf-metadata.cs",
+      "description": "Shows how to extract a PDF's metadata, generate a QR‑code barcode from it, and place the barcode as a stamp on every page using Aspose.Pdf form fields.",
+      "tags": [
+        "qr-code",
+        "stamp",
+        "metadata",
+        "barcode",
+        "form-field"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.DocumentInfo",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Forms.TextBoxField",
+        "Aspose.Pdf.Forms.TextBoxField.AddBarcode",
+        "Aspose.Pdf.Form.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-12T06:15:02Z",
+      "status": "verified",
+      "task_id": "22326"
     }
   }
 }

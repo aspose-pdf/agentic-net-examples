@@ -1,46 +1,49 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf;               // Core PDF API
-using Aspose.Pdf.Forms;        // For Form handling
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";          // PDF containing form fields
-        const string outputJson = "formData.json";    // Destination JSON file
-        const string tempJson = "tempFormData.json"; // Intermediate file (raw export)
+        const string inputPath = "input.pdf";
+        const string outputPath = "formdata.json";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF inside a using block to ensure deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Export the form data to a temporary JSON file using the default (compact) format
-            doc.Form.ExportToJson(tempJson);
+            // Collect form field names and their values
+            var formData = new Dictionary<string, object>();
+
+            // Iterate over the form fields collection (not WidgetAnnotation)
+            foreach (Field field in doc.Form.Fields)
+            {
+                // Prefer FullName, fall back to Name if FullName is null
+                string name = field.FullName ?? field.Name ?? string.Empty;
+
+                // Retrieve the field value as a string (handles different field types)
+                string value = field.Value?.ToString() ?? string.Empty;
+
+                formData[name] = value;
+            }
+
+            // Serialize the dictionary to JSON with pretty‑printing (indented)
+            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(formData, jsonOptions);
+
+            // Write the JSON to the output file
+            File.WriteAllText(outputPath, json);
         }
 
-        // Read the raw JSON, re‑serialize it with indentation for pretty‑printing, and write the final file
-        string rawJson = File.ReadAllText(tempJson);
-        using (JsonDocument doc = JsonDocument.Parse(rawJson))
-        {
-            var options = new JsonSerializerOptions { WriteIndented = true };
-            string prettyJson = JsonSerializer.Serialize(doc.RootElement, options);
-            File.WriteAllText(outputJson, prettyJson);
-        }
-
-        // Clean up the temporary file
-        if (File.Exists(tempJson))
-        {
-            File.Delete(tempJson);
-        }
-
-        Console.WriteLine($"Form data exported to '{outputJson}' with pretty‑printing.");
+        Console.WriteLine($"Form data exported to '{outputPath}'.");
     }
 }

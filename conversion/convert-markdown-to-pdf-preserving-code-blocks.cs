@@ -1,37 +1,30 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // MdLoadOptions and Document are in this namespace
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string markdownPath = "input.md";
-        const string pdfPath      = "output.pdf";
+        const string pdfPath = "output.pdf";
 
         if (!File.Exists(markdownPath))
         {
-            Console.Error.WriteLine($"Markdown file not found: {markdownPath}");
+            Console.Error.WriteLine($"File not found: {markdownPath}");
             return;
         }
 
-        try
-        {
-            // Configure loading options. PreserveCodeBlocks is enabled by default, so no explicit property is required.
-            MdLoadOptions loadOptions = new MdLoadOptions();
+        // Load options for Markdown files. Default settings preserve code blocks.
+        MdLoadOptions loadOptions = new MdLoadOptions();
 
-            // Load the Markdown file into a Document using the options
-            using (Document doc = new Document(markdownPath, loadOptions))
-            {
-                // Save the document as PDF (default format, no SaveOptions needed)
-                doc.Save(pdfPath);
-            }
-
-            Console.WriteLine($"Markdown converted to PDF successfully: {pdfPath}");
-        }
-        catch (Exception ex)
+        // Load the Markdown document and convert it to PDF.
+        using (Document doc = new Document(markdownPath, loadOptions))
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            // Save the result as a PDF file.
+            doc.Save(pdfPath);
         }
+
+        Console.WriteLine($"Markdown successfully converted to PDF: {pdfPath}");
     }
 }

@@ -1,10 +1,10 @@
 # Parse PDF
 
-> **Parse PDF** in PDF using C# / .NET -- **63** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Parse PDF** in PDF using C# / .NET -- **62** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `parse-pdf`
-- Examples: 63
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 62
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -32,7 +32,6 @@
 - [`export-pdf-pages-to-svg-preserving-coordinate-system.cs`](./export-pdf-pages-to-svg-preserving-coordinate-system.cs) -- Export pdf pages to svg preserving coordinate system
 - [`export-pdf-tables-to-csv-with-borders.cs`](./export-pdf-tables-to-csv-with-borders.cs) -- Export pdf tables to csv with borders
 - [`export-pdf-to-html-png-xfdf.cs`](./export-pdf-to-html-png-xfdf.cs) -- Export pdf to html png xfdf
-- [`export-pdf-to-svg-with-custom-options.cs`](./export-pdf-to-svg-with-custom-options.cs) -- Export pdf to svg with custom options
 - [`extract-checkbox-states-from-pdf.cs`](./extract-checkbox-states-from-pdf.cs) -- Extract checkbox states from pdf
 - [`extract-first-page-text-to-utf8-file.cs`](./extract-first-page-text-to-utf8-file.cs) -- Extract first page text to utf8 file
 - [`extract-fonts-from-pdf-ttf.cs`](./extract-fonts-from-pdf-ttf.cs) -- Extract fonts from pdf ttf
@@ -46,7 +45,7 @@
 - [`extract-pdf-paragraphs-to-markdown.cs`](./extract-pdf-paragraphs-to-markdown.cs) -- Extract pdf paragraphs to markdown
 - [`extract-pdf-stamp-texts-to-json.cs`](./extract-pdf-stamp-texts-to-json.cs) -- Extract pdf stamp texts to json
 - [`extract-pdf-tables-to-csv.cs`](./extract-pdf-tables-to-csv.cs) -- Extract pdf tables to csv
-- [`extract-subpaths-as-separate-svg.cs`](./extract-subpaths-as-separate-svg.cs) -- Extract subpaths as separate svg
+- [`extract-selected-radio-button-labels.cs`](./extract-selected-radio-button-labels.cs) -- Extract selected radio button labels
 - [`extract-subpaths-pdf-png.cs`](./extract-subpaths-pdf-png.cs) -- Extract subpaths pdf png
 - [`extract-superscript-subscript-from-pdf.cs`](./extract-superscript-subscript-from-pdf.cs) -- Extract superscript subscript from pdf
 - [`extract-superscript-subscript-from-pdf__v2.cs`](./extract-superscript-subscript-from-pdf__v2.cs) -- Extract superscript subscript from pdf  v2

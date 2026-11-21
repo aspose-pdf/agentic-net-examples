@@ -6,49 +6,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string watermarkPath = "watermark.png";   // fully opaque image to use as watermark
-        const string outputPdfPath = "watermarked.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "watermark.png";
+        const string outputPdf = "watermarked.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
-        if (!File.Exists(watermarkPath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Watermark image not found: {watermarkPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Create an ImageStamp from the watermark image
-            ImageStamp imgStamp = new ImageStamp(watermarkPath)
+            // Create an ImageStamp with full opacity
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Fully opaque (opacity range 0.0‑1.0)
-                Opacity = 1.0,
-
-                // Place the stamp in the foreground (over the page content)
+                // Place the stamp on top of page content
                 Background = false,
-
+                // Fully opaque (1.0 = 100% opacity)
+                Opacity = 1.0,
                 // Center the stamp on each page
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Apply the stamp to every page in the document
+            // Apply the stamp to every page individually
             foreach (Page page in pdfDoc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
             // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Watermarked PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }

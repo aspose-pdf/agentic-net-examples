@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,52 +9,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "invoice.pdf";
-        const string outputXmlPath = "total_price.xml";
+        const string pdfPath = "invoice.pdf";
+        const string xmlOutputPath = "total_price.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF and extract all text
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
+            TextAbsorber absorber = new TextAbsorber();
+            pdfDoc.Pages.Accept(absorber);
+            string allText = absorber.Text;
+
+            // Simple regex to find a monetary amount after the word "Total"
+            // Adjust the pattern according to the actual invoice layout if needed
+            Match match = Regex.Match(allText, @"Total\s*[:\-]?\s*\$?([\d,]+(?:\.\d{2})?)",
+                                      RegexOptions.IgnoreCase);
+            if (!match.Success)
             {
-                // Extract all text from the document
-                TextAbsorber absorber = new TextAbsorber();
-                doc.Pages.Accept(absorber);
-                string allText = absorber.Text;
-
-                // Find all monetary values (e.g., $123.45 or 123.45) and sum them
-                decimal totalPrice = 0m;
-                // Regex matches optional currency symbol followed by digits, optional decimal part
-                Regex priceRegex = new Regex(@"\$?\s*(\d{1,3}(?:,\d{3})*(?:\.\d{2})?)", RegexOptions.Compiled);
-                foreach (Match match in priceRegex.Matches(allText))
-                {
-                    // Remove commas and possible currency symbol, then parse
-                    string numericPart = match.Groups[1].Value.Replace(",", "");
-                    if (decimal.TryParse(numericPart, out decimal price))
-                    {
-                        totalPrice += price;
-                    }
-                }
-
-                // Store the calculated total price as custom metadata using DocumentInfo indexer
-                doc.Info["TotalPrice"] = totalPrice.ToString("F2");
-
-                // Save the document as XML using the required XmlSaveOptions
-                XmlSaveOptions xmlOptions = new XmlSaveOptions();
-                doc.Save(outputXmlPath, xmlOptions);
+                Console.Error.WriteLine("Total price not found in the PDF.");
+                return;
             }
 
-            Console.WriteLine($"Total price exported to XML: {outputXmlPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            string totalPrice = match.Groups[1].Value;
+
+            // Build the XML document
+            XDocument xmlDoc = new XDocument(
+                new XElement("Invoice",
+                    new XElement("TotalPrice", totalPrice)
+                )
+            );
+
+            // Save the XML file
+            xmlDoc.Save(xmlOutputPath);
+            Console.WriteLine($"Total price exported to XML: {xmlOutputPath}");
         }
     }
 }

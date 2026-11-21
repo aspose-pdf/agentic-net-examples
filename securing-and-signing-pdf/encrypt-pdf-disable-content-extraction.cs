@@ -19,13 +19,14 @@ class Program
 
         try
         {
-            // Load the original PDF inside a using block for deterministic disposal
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions: allow printing only, do NOT include ExtractContent
-                Permissions perms = Permissions.PrintDocument;
+                // Disable all permissions (no content extraction, printing, etc.)
+                // Permissions is a flags enum; using 0 (or Permissions.None if available) grants none.
+                Permissions perms = (Permissions)0; // equivalent to Permissions.None
 
-                // Encrypt the document with a strong algorithm (AES‑256)
+                // Encrypt the document with AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

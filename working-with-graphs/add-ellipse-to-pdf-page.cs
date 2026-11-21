@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -6,43 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "ellipse.pdf";
+        const string outputPath = "ellipse_graph.pdf";
 
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document())
         {
+            // Add a new page to the document
             Page page = doc.Pages.Add();
 
-            // Center and radii of the ellipse
-            double centerX = 300;   // horizontal center
-            double centerY = 400;   // vertical center
-            double radiusX = 100;   // horizontal radius
-            double radiusY = 60;    // vertical radius
-
-            // Calculate the bounding rectangle parameters required by the Ellipse constructor
-            double left   = centerX - radiusX;   // left coordinate
-            double bottom = centerY - radiusY;   // bottom coordinate
-            double width  = radiusX * 2;         // total width (diameter)
-            double height = radiusY * 2;         // total height (diameter)
-
-            // Create the ellipse shape
-            Ellipse ellipse = new Ellipse(left, bottom, width, height);
-            // Stroke (outline) color
-            ellipse.GraphInfo.Color = Color.Blue;
-            // Fill color – transparent (no fill)
-            ellipse.GraphInfo.FillColor = Color.Transparent;
-
-            // Create a Graph container that spans the whole page
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-            // Add the ellipse to the graph
-            graph.Shapes.Add(ellipse);
-
-            // Add the graph to the page content
+            // Create a Graph object with width and height, then position it on the page
+            Graph graph = new Graph(400.0, 400.0); // width, height
+            graph.Left = 50;   // X position on the page
+            graph.Top = 500;   // Y position on the page
             page.Paragraphs.Add(graph);
+
+            // Define an ellipse:
+            // - Centered at (200, 200) within the graph's coordinate space
+            // - Horizontal radius = 150 points, vertical radius = 80 points
+            // - Stroke (outline) color set to blue
+            // - No fill (transparent)
+            double centerX = 200.0;
+            double centerY = 200.0;
+            double radiusX = 150.0;
+            double radiusY = 80.0;
+            // Ellipse constructor: left, bottom, width, height
+            Ellipse ellipse = new Ellipse(
+                centerX - radiusX,               // left
+                centerY - radiusY,               // bottom
+                radiusX * 2,                     // width
+                radiusY * 2);                    // height
+
+            // Styling – stroke color and fill color
+            ellipse.GraphInfo.Color = Aspose.Pdf.Color.Blue;          // stroke
+            ellipse.GraphInfo.FillColor = Aspose.Pdf.Color.Transparent; // fill (transparent)
+
+            // Add the ellipse to the graph's shape collection
+            graph.Shapes.Add(ellipse);
 
             // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Ellipse PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

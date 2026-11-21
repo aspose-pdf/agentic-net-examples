@@ -1,15 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // for form field types
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_filled.pdf";
-        const int expectedFormCount = 5; // adjust as needed
+        const string outputPath = "filled.pdf";
+        const int expectedFormCount = 3; // adjust as needed
 
         if (!File.Exists(inputPath))
         {
@@ -17,33 +17,45 @@ class Program
             return;
         }
 
-        // Ensure the Document is disposed properly
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Verify the number of form fields
-            int actualCount = doc.Form.Count;
-            Console.WriteLine($"Form fields found: {actualCount}");
-
-            if (actualCount != expectedFormCount)
+            // Document must be wrapped in a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.Error.WriteLine($"Unexpected form field count. Expected {expectedFormCount}, but found {actualCount}.");
-                // Abort further processing if the count is not as expected
-                return;
-            }
+                // Verify the number of form fields
+                int actualFormCount = doc.Form.Count;
+                Console.WriteLine($"Form fields found: {actualFormCount}");
 
-            // Example processing: set a default value for each text box field
-            foreach (Field field in doc.Form)
-            {
-                if (field is TextBoxField txtField)
+                if (actualFormCount != expectedFormCount)
                 {
-                    txtField.Value = "Sample Text";
+                    Console.Error.WriteLine($"Unexpected number of form fields. Expected {expectedFormCount}, but found {actualFormCount}.");
+                    return;
                 }
+
+                // Example processing: set values for each form field
+                foreach (Field field in doc.Form)
+                {
+                    // TextBox fields
+                    if (field is TextBoxField txt)
+                    {
+                        txt.Value = "Sample text";
+                    }
+                    // CheckBox fields
+                    else if (field is CheckboxField chk)
+                    {
+                        chk.Checked = true;
+                    }
+                    // Add handling for other field types as required
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+                Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
             }
-
-            // Save the modified PDF
-            doc.Save(outputPath);
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

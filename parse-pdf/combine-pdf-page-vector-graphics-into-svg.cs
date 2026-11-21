@@ -11,7 +11,7 @@ class Program
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
@@ -20,17 +20,18 @@ class Program
             // Load the PDF document inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure SVG save options. ScaleToPixels preserves vector graphics.
-                var svgOpts = new SvgSaveOptions
+                // Configure SVG save options. The default behavior saves all pages into a single SVG.
+                // ScaleToPixels enables CSS style embedding.
+                var svgOptions = new SvgSaveOptions
                 {
                     ScaleToPixels = true
                 };
 
-                // Save the extracted vector graphics as a single (multi‑page) SVG file.
-                pdfDoc.Save(outputSvg, svgOpts);
+                // Save the extracted vector graphics as a multi‑page SVG document
+                pdfDoc.Save(outputSvg, svgOptions);
             }
 
-            Console.WriteLine($"Vector graphics extracted to '{outputSvg}'.");
+            Console.WriteLine($"Vector graphics extracted to multi-page SVG: {outputSvg}");
         }
         catch (Exception ex)
         {

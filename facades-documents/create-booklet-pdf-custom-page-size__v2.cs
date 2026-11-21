@@ -7,77 +7,67 @@ class Program
 {
     static void Main()
     {
-        // Path to the source PDF file (could be any existing PDF)
-        const string sourcePdfPath = "source.pdf";
+        // Input PDF stream (replace with actual source, e.g., a FileStream or MemoryStream)
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "booklet_output.pdf";
 
-        // Desired output path for the booklet with custom page size
-        const string outputPdfPath = "booklet_custom_size.pdf";
-
-        // Ensure the source file exists
-        if (!File.Exists(sourcePdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Open the source PDF as a stream
-        using (FileStream sourceStream = new FileStream(sourcePdfPath, FileMode.Open, FileAccess.Read))
+        // Load the PDF from a stream using Document (PdfFileEditor does not support BindPdf)
+        using (FileStream inputStream = File.OpenRead(inputPdfPath))
+        using (Document pdfDoc = new Document(inputStream))
         {
-            // Create the booklet and save it to the desired output path
-            CreateBookletFromStream(sourceStream, outputPdfPath);
-        }
+            // Define custom page size: 5.5 x 8.5 inches (points = inches * 72)
+            const double widthPoints = 5.5 * 72.0; // 396 points
+            const double heightPoints = 8.5 * 72.0; // 612 points
 
-        Console.WriteLine($"Booklet created successfully: {outputPdfPath}");
-    }
-
-    /// <summary>
-    /// Creates a booklet from a PDF stream, sets each page to 5.5×8.5 inches,
-    /// and saves the result to the specified output file.
-    /// </summary>
-    /// <param name="pdfStream">Input PDF stream.</param>
-    /// <param name="outputPath">Path where the final PDF will be saved.</param>
-    static void CreateBookletFromStream(Stream pdfStream, string outputPath)
-    {
-        // Temporary files are needed because PdfFileEditor works with file paths.
-        string tempInputPath  = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-        string tempBookletPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-
-        // Save the incoming stream to a temporary file.
-        using (FileStream tempInputFile = new FileStream(tempInputPath, FileMode.Create, FileAccess.Write))
-        {
-            pdfStream.CopyTo(tempInputFile);
-        }
-
-        // Create the booklet using the overload that does NOT require a PageSize argument.
-        PdfFileEditor editor = new PdfFileEditor();
-        bool bookletCreated = editor.MakeBooklet(tempInputPath, tempBookletPath);
-        if (!bookletCreated)
-        {
-            // Clean up temporary files before throwing.
-            File.Delete(tempInputPath);
-            throw new InvalidOperationException("Failed to create booklet.");
-        }
-
-        // Load the booklet PDF and adjust each page to the custom size (5.5×8.5 inches).
-        using (Document doc = new Document(tempBookletPath))
-        {
-            // 1 inch = 72 points. Convert inches to points.
-            const double widthPoints  = 5.5 * 72; // 396 points
-            const double heightPoints = 8.5 * 72; // 612 points
-
-            // Pages are 1‑based in Aspose.Pdf.
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Apply the custom size to every page
+            for (int i = 1; i <= pdfDoc.Pages.Count; i++) // 1‑based indexing
             {
-                Page page = doc.Pages[i];
-                page.SetPageSize(widthPoints, heightPoints);
+                Page page = pdfDoc.Pages[i];
+                page.PageInfo.Width = widthPoints;
+                page.PageInfo.Height = heightPoints;
             }
 
-            // Save the final booklet with the custom page size.
-            doc.Save(outputPath);
+            // OPTIONAL: If a simple booklet layout is desired, use MakeNUp with 2‑up landscape.
+            // This creates a new PDF where two pages are placed side‑by‑side on the custom size.
+            // Note: MakeNUp is a method of PdfFileEditor, not Document.
+            string tempNupPath = Path.Combine(Path.GetDirectoryName(outputPdfPath) ?? "", "temp_nup.pdf");
+            string[] sourceFiles = new string[] { inputPdfPath };
+
+            PdfFileEditor editor = new PdfFileEditor();
+            // true = landscape (pages placed side‑by‑side)
+            bool nupSuccess = editor.MakeNUp(sourceFiles, tempNupPath, true);
+
+            if (nupSuccess && File.Exists(tempNupPath))
+            {
+                // Load the N‑up result and apply the custom page size again
+                using (Document nupDoc = new Document(tempNupPath))
+                {
+                    for (int i = 1; i <= nupDoc.Pages.Count; i++)
+                    {
+                        Page page = nupDoc.Pages[i];
+                        page.PageInfo.Width = widthPoints;
+                        page.PageInfo.Height = heightPoints;
+                    }
+
+                    nupDoc.Save(outputPdfPath);
+                }
+
+                // Clean up temporary file
+                File.Delete(tempNupPath);
+            }
+            else
+            {
+                // If MakeNUp is not required or fails, just save the resized document
+                pdfDoc.Save(outputPdfPath);
+            }
         }
 
-        // Delete temporary files.
-        File.Delete(tempInputPath);
-        File.Delete(tempBookletPath);
+        Console.WriteLine($"Booklet PDF saved to '{outputPdfPath}'.");
     }
 }

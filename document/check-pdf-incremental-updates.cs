@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
 
 class Program
@@ -14,42 +15,42 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf exposes CreationDate (DateTime) and ModDate (DateTime).
-            // Compare them to infer whether the file has been modified after its initial creation.
-            bool hasModification = false;
-            if (doc.Info != null)
-            {
-                DateTime creation = doc.Info.CreationDate;
-                DateTime modification = doc.Info.ModDate;
+            // The UpdateInfo property is not part of the public API in recent versions.
+            // Use reflection to access it if it exists (it may be present in some builds).
+            bool hasIncrementalUpdates = false;
+            int updateCount = 0;
 
-                // When a PDF has never been modified, ModDate may be DateTime.MinValue.
-                if (modification != DateTime.MinValue && modification > creation)
+            PropertyInfo updateInfoProp = typeof(Document).GetProperty("UpdateInfo", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (updateInfoProp != null)
+            {
+                object updateInfo = updateInfoProp.GetValue(doc);
+                if (updateInfo != null)
                 {
-                    hasModification = true;
+                    PropertyInfo isIncProp = updateInfo.GetType().GetProperty("IsIncrementalUpdate", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (isIncProp != null && isIncProp.PropertyType == typeof(bool))
+                    {
+                        hasIncrementalUpdates = (bool)isIncProp.GetValue(updateInfo);
+                    }
+
+                    PropertyInfo countProp = updateInfo.GetType().GetProperty("UpdateCount", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (countProp != null && countProp.PropertyType == typeof(int))
+                    {
+                        updateCount = (int)countProp.GetValue(updateInfo);
+                    }
                 }
             }
 
-            if (hasModification)
+            if (hasIncrementalUpdates || updateCount > 0)
             {
-                Console.WriteLine("The PDF appears to have been modified after its initial creation.");
+                Console.WriteLine("The PDF has been modified after its initial creation (incremental updates detected).");
+                Console.WriteLine($"Number of incremental updates: {updateCount}");
             }
             else
             {
-                Console.WriteLine("No modification detected; the PDF appears unchanged since creation.");
-            }
-
-            // Optionally display the creation and modification dates if available
-            if (doc.Info != null)
-            {
-                Console.WriteLine($"Creation date: {doc.Info.CreationDate}");
-                // ModDate may be unset (MinValue); display only when meaningful.
-                if (doc.Info.ModDate != DateTime.MinValue)
-                {
-                    Console.WriteLine($"Last modification date: {doc.Info.ModDate}");
-                }
+                Console.WriteLine("The PDF appears to have no incremental updates; it likely has not been modified after creation.");
             }
         }
     }

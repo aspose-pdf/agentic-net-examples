@@ -3,7 +3,6 @@ using System.IO;
 using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -11,9 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "signed.pdf";
-        const string thumbprint = "YOUR_CERT_THUMBPRINT"; // replace with actual thumbprint
-        const string pfxPath = "certificate.pfx"; // path to a PFX that references the smart‑card key (or a placeholder for compilation)
-        const string pfxPassword = ""; // empty if the private key is on a smart‑card and does not require a password
+        const string certThumbprint = "YOUR_CERT_THUMBPRINT"; // replace with the actual thumbprint of the smart‑card certificate
 
         if (!File.Exists(inputPath))
         {
@@ -21,62 +18,67 @@ class Program
             return;
         }
 
-        // Load the certificate (with private key) from the smart‑card (CurrentUser\My store)
+        // Locate the certificate stored on the smart card (CurrentUser\My store)
         X509Certificate2 cert = null;
         using (X509Store store = new X509Store(StoreName.My, StoreLocation.CurrentUser))
         {
             store.Open(OpenFlags.ReadOnly);
-            var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, false);
-            if (certs.Count == 0)
+            foreach (var c in store.Certificates)
             {
-                Console.Error.WriteLine("Certificate not found on smart card.");
-                return;
+                if (string.Equals(c.Thumbprint, certThumbprint, StringComparison.OrdinalIgnoreCase) && c.HasPrivateKey)
+                {
+                    cert = c;
+                    break;
+                }
             }
-            cert = certs[0];
         }
 
-        if (!cert.HasPrivateKey)
+        if (cert == null)
         {
-            Console.Error.WriteLine("The selected certificate does not contain a private key.");
+            Console.Error.WriteLine("Certificate not found on the smart card or it does not contain a private key.");
             return;
         }
 
-        // Create a PKCS#7 object that Aspose.Pdf will use for signing.
-        // Use the overload that accepts a PFX file path and password.
-        PKCS7 pkcs7 = new PKCS7(pfxPath, pfxPassword);
-
-        // Optional: customise the visual appearance of the signature.
-        pkcs7.CustomAppearance = new SignatureCustomAppearance
+        try
         {
-            BackgroundColor = Color.LightGray,
-            ShowContactInfo = true,
-            ShowLocation = true,
-            ShowReason = true,
-            ContactInfoLabel = "Contact:",
-            LocationLabel = "Location:",
-            ReasonLabel = "Reason:"
-        };
+            // Load the PDF document
+            var doc = new Document(inputPath);
 
-        // Open the PDF document.
-        using (Document doc = new Document(inputPath))
-        {
-            // Define the rectangle where the visible signature will be placed.
-            Aspose.Pdf.Rectangle signatureRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
-
-            // Create a signature field and add it to the document's form collection.
-            SignatureField sigField = new SignatureField(doc, signatureRect)
+            // Create a visible signature field on the first page (you can set visible = false later)
+            var rect = new Rectangle(100, 100, 200, 150); // lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
+            var sigField = new SignatureField(doc.Pages[1], rect)
             {
-                Name = "Signature1"
+                PartialName = "SmartCardSignature"
             };
-            doc.Form.Add(sigField);
+            doc.Form.Add(sigField, 1);
 
-            // Sign the field. The overload without extra parameters signs the field using the PKCS7 object.
-            sigField.Sign(pkcs7);
+            // Build an ExternalSignature that uses the smart‑card certificate directly.
+            var externalSig = new ExternalSignature(cert)
+            {
+                Reason = "Approved",
+                Location = "Office",
+                ContactInfo = string.Empty,
+                CustomAppearance = new SignatureCustomAppearance
+                {
+                    FontSize = 8,
+                    ShowContactInfo = false,
+                    ShowLocation = false,
+                    ShowReason = true,
+                    BackgroundColor = Color.FromArgb(80, 173, 216, 230) // optional semi‑transparent background
+                }
+            };
 
-            // Save the signed PDF.
+            // Sign the field. The signature is written into the document.
+            sigField.Sign(externalSig);
+
+            // Save the signed PDF
             doc.Save(outputPath);
-        }
 
-        Console.WriteLine($"PDF signed and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF signed successfully: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Signing failed: {ex.Message}");
+        }
     }
 }

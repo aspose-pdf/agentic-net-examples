@@ -1,61 +1,50 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // <-- needed for SimpleFontSubstitution and FontRepository
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "BmpPages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "Images";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // ------------------------------------------------------------
-        // Font substitution: replace Helvetica with Arial
-        // ------------------------------------------------------------
-        // FontRepository works globally for the current AppDomain.
-        // SimpleFontSubstitution maps a source font name to a target font.
+        // Apply Helvetica → Arial substitution for the whole document
         FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
 
-        // Load the PDF document using the current Aspose.Pdf API (Document class)
-        using (Document pdfDocument = new Document(inputPdfPath))
+        using (Document doc = new Document(inputPath))
         {
-            // Define the resolution for the bitmap output (150 DPI is a good default)
-            Resolution resolution = new Resolution(150);
+            // Define the resolution for the bitmap images (e.g., 300 DPI)
+            var resolution = new Resolution(300);
 
-            // Convert pages 5‑7 to BMP files
-            for (int pageNumber = 5; pageNumber <= 7; pageNumber++)
+            // BmpDevice is a concrete device and does NOT implement IDisposable, so do NOT wrap it in a using block.
+            var bmpDevice = new BmpDevice(resolution);
+
+            for (int pageNum = 5; pageNum <= 7; pageNum++)
             {
-                // Validate page number
-                if (pageNumber > pdfDocument.Pages.Count)
+                if (pageNum > doc.Pages.Count)
                 {
-                    Console.WriteLine($"Page {pageNumber} does not exist in the document. Skipping.");
+                    Console.WriteLine($"Page {pageNum} does not exist in the document.");
                     continue;
                 }
 
-                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
+                string outPath = Path.Combine(outputDir, $"Page_{pageNum}.bmp");
 
-                // BmpDevice writes a single page to a stream as a BMP image
-                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    BmpDevice bmpDevice = new BmpDevice(resolution);
-                    bmpDevice.Process(pdfDocument.Pages[pageNumber], outStream);
-                }
+                // Render the page to BMP using BmpDevice
+                bmpDevice.Process(doc.Pages[pageNum], outPath);
 
-                Console.WriteLine($"Saved page {pageNumber} as BMP to '{outputPath}'.");
+                Console.WriteLine($"Saved page {pageNum} as BMP to {outPath}");
             }
         }
-
-        Console.WriteLine("Conversion completed.");
     }
 }

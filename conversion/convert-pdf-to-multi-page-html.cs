@@ -9,7 +9,6 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputHtml = "output.html";
 
-        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
@@ -18,26 +17,27 @@ class Program
 
         try
         {
-            // Load PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPdf))
             {
-                // Configure HTML save options with multi‑page split
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
                     SplitIntoPages = true,
-                    // Embed raster images as PNGs inside SVG (optional but common)
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
 
-                // HTML conversion uses GDI+ and is Windows‑only; handle gracefully on other platforms
+                // HTML conversion requires GDI+ (Windows only). Handle platform limitations.
                 try
                 {
                     doc.Save(outputHtml, htmlOpts);
-                    Console.WriteLine($"HTML pages saved to '{outputHtml}'.");
+                    Console.WriteLine($"HTML saved to '{outputHtml}' (multiple pages).");
                 }
                 catch (TypeInitializationException)
                 {
                     Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+                }
+                catch (DllNotFoundException)
+                {
+                    Console.WriteLine("GDI+ library not found. HTML conversion unavailable on this platform.");
                 }
             }
         }

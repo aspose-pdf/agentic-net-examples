@@ -1,58 +1,48 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using System.Xml.Linq;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
-        const string xmlPath = "tax_output.xml";
-        const double taxRate = 0.07; // 7% tax rate
+        const string pdfPath = "input_form.pdf";
+        const string xmlOutputPath = "tax_output.xml";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF form not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF form
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document containing the form
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // ----- Read the "Amount" field -----
-            // The Form indexer returns a Field (Aspose.Pdf.Forms.Field). Use its Value property.
-            Field amountField = doc.Form["Amount"] as Field;
-            string amountStr = amountField?.Value?.ToString() ?? "0";
-            if (!double.TryParse(amountStr, out double amount))
-            {
-                Console.Error.WriteLine($"Invalid amount value: {amountStr}");
-                amount = 0;
-            }
+            // Retrieve the submitted amount from a form field named "Amount"
+            // Use the Forms API – the indexer returns a Field object that has a Value property
+            Field amountField = pdfDoc.Form["Amount"] as Field;
+            string amountText = amountField?.Value?.ToString() ?? "0";
 
-            // ----- Calculate tax -----
-            double tax = Math.Round(amount * taxRate, 2);
+            // Parse the amount; fallback to 0 on parse failure
+            if (!decimal.TryParse(amountText, out decimal amount))
+                amount = 0m;
 
-            // ----- Write the tax back to a field named "Tax" (if it exists) -----
-            if (doc.Form["Tax"] is Field taxField)
-            {
-                taxField.Value = tax.ToString("F2");
-            }
+            // Example tax calculation: 10% of the amount
+            decimal taxValue = amount * 0.10m;
 
-            // ----- Build XML containing the calculation result -----
-            XDocument xmlDoc = new XDocument(
-                new XElement("TaxResult",
-                    new XElement("Amount", amount.ToString("F2")),
-                    new XElement("TaxRate", taxRate.ToString("P")),
-                    new XElement("Tax", tax.ToString("F2"))
+            // Build the XML document with the calculated tax
+            XDocument taxXml = new XDocument(
+                new XElement("TaxInfo",
+                    new XElement("OriginalAmount", amount),
+                    new XElement("TaxValue", taxValue)
                 )
             );
 
-            // Save the XML file
-            xmlDoc.Save(xmlPath);
+            // Save the XML to the specified path
+            taxXml.Save(xmlOutputPath);
+            Console.WriteLine($"Tax XML saved to '{xmlOutputPath}'.");
         }
-
-        Console.WriteLine($"Tax XML saved to '{xmlPath}'.");
     }
 }

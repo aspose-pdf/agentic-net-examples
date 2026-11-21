@@ -7,37 +7,34 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPath))
+            // Configure extraction options with explicit formatting mode (required by newer API)
+            var extractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+
+            // Create absorber and assign the configured options
+            TextAbsorber absorber = new TextAbsorber
             {
-                // Configure TextAbsorber to extract only visible (non‑hidden) text
-                TextAbsorber absorber = new TextAbsorber();
-                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                ExtractionOptions = extractionOptions
+            };
 
-                // Apply the absorber to all pages
-                pdfDoc.Pages.Accept(absorber);
-                string extractedText = absorber.Text;
+            // Apply the absorber to all pages
+            pdfDoc.Pages.Accept(absorber);
 
-                // Save the extracted text to a plain‑text file
-                File.WriteAllText(outputPath, extractedText);
-            }
-
-            Console.WriteLine($"Text extracted to '{outputPath}'.");
+            // Write the extracted (visible) text to a plain‑text file
+            File.WriteAllText(outputTxt, absorber.Text);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Visible text extracted to '{outputTxt}'.");
     }
 }

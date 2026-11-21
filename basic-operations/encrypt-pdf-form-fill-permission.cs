@@ -1,35 +1,43 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // CryptoAlgorithm, Permissions, Document are in this namespace
+using Aspose.Pdf;
+using Aspose.Pdf.Security;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "encrypted.pdf";
-        const string userPassword  = "user123";   // password required to open the PDF
-        const string ownerPassword = "owner123";  // password with full permissions
+        const string inputPath = "input.pdf";
+        const string encryptedPath = "encrypted.pdf";
+        const string userPassword = "user123";
+        const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Open the source PDF, apply encryption, and save the result
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Allow only form filling; all other actions (including printing) are denied
-            Permissions perms = Permissions.FillForm;
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Allow only form filling (ModifyContent) and disable printing
+                Permissions perms = Permissions.ModifyContent;
 
-            // Encrypt with AES‑256 (strongest symmetric algorithm supported)
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Encrypt using AES-256 algorithm
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF
-            doc.Save(outputPath);
+                // Save the encrypted PDF
+                doc.Save(encryptedPath);
+            }
+
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
-
-        Console.WriteLine($"Encrypted PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

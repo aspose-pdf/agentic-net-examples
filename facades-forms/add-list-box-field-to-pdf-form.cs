@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms; // needed for FieldType and ListBox handling
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_priority.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,49 +18,45 @@ class Program
         }
 
         // Load the existing PDF document
-        Document doc = new Document(inputPath);
-
-        // Define the list items and default selection
-        string[] items = new string[] { "Low", "Medium", "High" };
-        const string defaultValue = "Medium"; // value to pre‑select
-
-        // Position and size of the field on page 1 (coordinates in points)
-        int pageNumber = 1;
-        double llx = 100; // lower‑left X
-        double lly = 700; // lower‑left Y
-        double urx = 200; // upper‑right X
-        double ury = 720; // upper‑right Y
-
-        // Ensure the target page exists (add a blank page if necessary)
-        while (doc.Pages.Count < pageNumber)
+        using (Document doc = new Document(inputPath))
         {
-            doc.Pages.Add();
+            // -----------------------------------------------------------------
+            // 1. Create the list box field using FormEditor (real API members only)
+            // -----------------------------------------------------------------
+            using (FormEditor editor = new FormEditor())
+            {
+                editor.BindPdf(doc);
+
+                // Define the rectangle where the list field will appear
+                Rectangle rect = new Rectangle(100, 600, 250, 650);
+
+                // Add an empty ListBox field (FieldType.ListBox) on page 1
+                // AddField expects float parameters for the coordinates, so cast the double values
+                editor.AddField(FieldType.ListBox, "Priority", 1,
+                                (float)rect.LLX, (float)rect.LLY,
+                                (float)rect.URX, (float)rect.URY);
+
+                // Populate the list with the required items
+                editor.AddListItem("Priority", "Low");
+                editor.AddListItem("Priority", "Medium");
+                editor.AddListItem("Priority", "High");
+            }
+
+            // ---------------------------------------------------------------
+            // 2. Set the default selected item (value) using the Form facade
+            // ---------------------------------------------------------------
+            // Use the Form class from Aspose.Pdf.Facades to avoid ambiguity with Aspose.Pdf.Forms.Form
+            using (Aspose.Pdf.Facades.Form formFacade = new Aspose.Pdf.Facades.Form())
+            {
+                formFacade.BindPdf(doc);
+                // For a ListBox the value to fill is the item text you want selected
+                formFacade.FillField("Priority", "Medium");
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        // Create the rectangle that defines the field bounds
-        var rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-        // Create a ComboBox (drop‑down list) field
-        ComboBoxField combo = new ComboBoxField(doc.Pages[pageNumber], rect)
-        {
-            PartialName = "Priority"
-        };
-
-        // Populate the combo box with the options (export value, display value)
-        foreach (var item in items)
-        {
-            combo.AddOption(item, item);
-        }
-
-        // Set the default selected item by assigning the field's Value
-        combo.Value = defaultValue;
-
-        // Add the field to the document's form collection
-        doc.Form.Add(combo, pageNumber);
-
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"List field 'Priority' added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with list field saved to '{outputPath}'.");
     }
 }

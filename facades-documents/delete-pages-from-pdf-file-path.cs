@@ -1,36 +1,36 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block
-            PdfFileEditor editor = new PdfFileEditor();
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
 
-            // Delete pages 2 through 5 (inclusive). Use the overload that accepts an array of page numbers.
-            // NOTE: In the version of Aspose.Pdf used, the overload signature is Delete(string inputPath, int[] pagesToDelete, string outputPath).
-            int[] pagesToDelete = { 2, 3, 4, 5 };
-            editor.Delete(inputPath, pagesToDelete, outputPath);
-
-            Console.WriteLine($"Pages 2‑5 removed. Result saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
+        // Delete pages 2 through 5 (inclusive).
+        // The Pages.Delete method in this Aspose.Pdf version only accepts a single page number.
+        // Deleting from the highest page downwards preserves the correct indices.
+        for (int page = 5; page >= 2; page--)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            if (page <= pdfDoc.Pages.Count)
+                pdfDoc.Pages.Delete(page);
         }
+
+        // Save the modified PDF to the desired output path
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Pages 2‑5 removed. Result saved to '{outputPath}'.");
     }
 }

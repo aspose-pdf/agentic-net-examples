@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Aspose.Pdf;
@@ -8,65 +7,44 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_with_checksum.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document.
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Prepare a dictionary to hold checksums for each embedded file.
-            var checksums = new Dictionary<string, string>();
-
-            // Iterate over all embedded files (FileSpecification objects).
-            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            // Retrieve the collection of embedded files (attachments) as FileSpecification objects
+            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
             {
-                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
+                string name = fileSpec.Name;
+
+                // Compute SHA‑256 checksum directly from the embedded file's content stream
+                string checksum;
+                using (Stream content = fileSpec.Contents)
+                using (SHA256 sha = SHA256.Create())
                 {
-                    // The embedded file name is used as the dictionary key.
-                    string name = fileSpec.Name;
-
-                    // Ensure the file has content.
-                    if (fileSpec.Contents == null)
-                        continue;
-
-                    // Copy the content to a memory stream for hashing.
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        // Reset the source stream position before copying.
-                        if (fileSpec.Contents.CanSeek)
-                            fileSpec.Contents.Position = 0;
-
-                        fileSpec.Contents.CopyTo(ms);
-                        ms.Position = 0; // Reset for hashing.
-
-                        // Compute SHA‑256 checksum.
-                        using (SHA256 sha256 = SHA256.Create())
-                        {
-                            byte[] hash = sha256.ComputeHash(ms);
-                            string checksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
-                            checksums[name] = checksum;
-                        }
-                    }
+                    // Ensure the stream is positioned at the beginning
+                    if (content.CanSeek)
+                        content.Position = 0;
+                    byte[] hash = sha.ComputeHash(content);
+                    checksum = BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
                 }
+
+                // Store the checksum in custom metadata using the DocumentInfo indexer
+                string propName = $"Attachment_{name}_Checksum";
+                doc.Info[propName] = checksum; // overwrites any existing entry with the same key
             }
 
-            // Store each attachment checksum in the PDF's custom metadata using the DocumentInfo indexer.
-            foreach (var kvp in checksums)
-            {
-                string metaKey = $"AttachmentChecksum_{kvp.Key}";
-                doc.Info[metaKey] = kvp.Value; // Indexer adds/updates custom metadata.
-            }
-
-            // Save the updated PDF.
-            doc.Save(outputPdfPath);
+            // Save the updated PDF with the new metadata
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Checksums added to custom metadata and saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Checksums added to metadata and saved as '{outputPdf}'.");
     }
 }

@@ -8,31 +8,31 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_bookmarked.pdf";
         const string helpUrl = "https://example.com/documentation";
 
-        // Ensure the input PDF exists – create a minimal one if it does not.
         if (!File.Exists(inputPath))
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add(); // at least one page
-            placeholder.Save(inputPath);
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
         }
 
-        // Load the existing PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document using the core Document API.
+        Document doc = new Document(inputPath);
 
-        // Create a bookmark (outline item) that opens an external URL
-        var helpBookmark = new OutlineItemCollection(pdfDocument.Outlines)
+        // Create a top‑level bookmark (outline item) that opens the online documentation URL.
+        OutlineItemCollection helpBookmark = new OutlineItemCollection(doc.Outlines)
         {
             Title = "Help",
             Action = new GoToURIAction(helpUrl)
         };
 
-        // Add the bookmark to the document's outline tree
-        pdfDocument.Outlines.Add(helpBookmark);
+        // Add the bookmark to the document's outline collection.
+        doc.Outlines.Add(helpBookmark);
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        // Save the modified PDF.
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
     }
 }

@@ -1,40 +1,60 @@
 using System;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
-class Program
+// Minimal NUnit stubs to allow compilation without the NUnit package
+namespace NUnit.Framework
 {
-    static async Task Main(string[] args)
+    [AttributeUsage(AttributeTargets.Class)]
+    public sealed class TestFixtureAttribute : Attribute { }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public sealed class TestAttribute : Attribute { }
+
+    public static class Assert
     {
-        // Simulate form data as URL‑encoded content
-        var formData = new StringContent(
-            "field1=value1&field2=value2",
-            Encoding.UTF8,
-            "application/x-www-form-urlencoded");
-
-        // Create an HttpClient instance (no ASP.NET TestServer needed)
-        using var client = new HttpClient();
-
-        try
+        // Made the message parameter nullable to satisfy non‑nullable reference type analysis
+        public static void AreEqual<T>(T expected, T actual, string? message = null)
         {
-            // Adjust the URL to point to the actual service endpoint you want to test
-            HttpResponseMessage response = await client.PostAsync("http://localhost:5000/submit", formData);
+            if (!object.Equals(expected, actual))
+                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+        }
+    }
+}
 
-            // Validate that the response status is 200 OK
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                Console.WriteLine("POST succeeded with 200 OK.");
-            }
-            else
-            {
-                Console.WriteLine($"POST failed. Status: {(int)response.StatusCode} {response.ReasonPhrase}");
-            }
-        }
-        catch (Exception ex)
+namespace FormSubmissionTests
+{
+    [NUnit.Framework.TestFixture]
+    public class PostRequestTests
+    {
+        private static readonly string FormUrl = "https://example.com/submit"; // replace with actual endpoint
+
+        [NUnit.Framework.Test]
+        public async Task SubmitForm_Returns200Ok()
         {
-            Console.WriteLine($"Error during POST request: {ex.Message}");
+            // Arrange: create HttpClient and form content
+            using HttpClient httpClient = new HttpClient();
+
+            MultipartFormDataContent formData = new MultipartFormDataContent {
+                { new StringContent("value1"), "field1" },
+                { new StringContent("value2"), "field2" }
+                // add additional fields as needed
+            };
+
+            // Act: send POST request
+            HttpResponseMessage response = await httpClient.PostAsync(FormUrl, formData);
+
+            // Assert: verify that the response status code is 200 OK
+            NUnit.Framework.Assert.AreEqual(System.Net.HttpStatusCode.OK, response.StatusCode, "Form submission did not return 200 OK.");
         }
+    }
+}
+
+// Minimal entry point required for a console‑type project.
+public static class Program
+{
+    public static void Main()
+    {
+        // No operation – the presence of Main satisfies the compiler.
     }
 }

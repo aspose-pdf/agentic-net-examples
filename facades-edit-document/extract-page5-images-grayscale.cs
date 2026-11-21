@@ -2,77 +2,102 @@ using System;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const int targetPage = 5; // page to extract images from
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "ExtractedImages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // PdfExtractor is a Facades class used for extracting resources such as images.
-        using (PdfExtractor extractor = new PdfExtractor())
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Bind the PDF file.
-            extractor.BindPdf(pdfPath);
+            // -------------------------------------------------------------------
+            // NOTE: In recent versions of Aspose.PDF the "ImageExtractor" class has
+            // been removed.  The recommended way to obtain embedded images is to
+            // use the ImagePlacementAbsorber class which walks the page content and
+            // collects all image placements.
+            // -------------------------------------------------------------------
+            // Create an absorber for page 5 (pages are 1‑based)
+            ImagePlacementAbsorber absorber = new ImagePlacementAbsorber();
+            absorber.Visit(pdfDoc.Pages[5]);
 
-            // Limit extraction to page 5 only.
-            extractor.StartPage = targetPage;
-            extractor.EndPage   = targetPage;
+            var imagePlacements = absorber.ImagePlacements;
+            int imageCount = imagePlacements.Count;
 
-            // The ExtractImageMode property is not available in the current Aspose.Pdf version.
-            // Extraction of images is performed by calling ExtractImage() which extracts all images by default.
-            extractor.ExtractImage();
-
-            int imageIndex = 0;
-            while (extractor.HasNextImage())
+            for (int i = 0; i < imageCount; i++)
             {
-                // Save the raw extracted image to a temporary file.
-                string tempPath = $"temp_page{targetPage}_image_{imageIndex + 1}.png";
-                extractor.GetNextImage(tempPath);
+                // Each placement contains an XImage instance representing the
+                // embedded image.
+                XImage xImage = imagePlacements[i].Image;
 
-                // Load the temporary image, convert to grayscale, and save as JPEG.
-                using (Bitmap original = new Bitmap(tempPath))
-                using (Bitmap gray = new Bitmap(original.Width, original.Height))
+                // Build a unique file name for each image
+                string outputPath = Path.Combine(outputFolder, $"Page5_Image{i + 1}.jpg");
+
+                // Save the XImage to a memory stream first (original format)
+                using (MemoryStream originalStream = new MemoryStream())
                 {
-                    using (Graphics g = Graphics.FromImage(gray))
-                    {
-                        var matrix = new ColorMatrix(new float[][]
-                        {
-                            new float[] {0.299f, 0.299f, 0.299f, 0, 0},
-                            new float[] {0.587f, 0.587f, 0.587f, 0, 0},
-                            new float[] {0.114f, 0.114f, 0.114f, 0, 0},
-                            new float[] {0,      0,      0,      1, 0},
-                            new float[] {0,      0,      0,      0, 1}
-                        });
-                        var attrs = new ImageAttributes();
-                        attrs.SetColorMatrix(matrix);
-                        g.DrawImage(original,
-                                    new Rectangle(0, 0, original.Width, original.Height),
-                                    0, 0, original.Width, original.Height,
-                                    GraphicsUnit.Pixel, attrs);
-                    }
+                    // XImage.Save can write directly to a stream using a .NET image format.
+                    // We use PNG as an intermediate format because it preserves the
+                    // original pixel data without compression artifacts.
+                    xImage.Save(originalStream, ImageFormat.Png);
+                    originalStream.Position = 0;
 
-                    string outFile = $"page{targetPage}_image_{imageIndex + 1}.jpg";
-                    gray.Save(outFile, ImageFormat.Jpeg);
-                    Console.WriteLine($"Saved grayscale image: {outFile}");
+                    // Load the image into a System.Drawing.Bitmap so we can apply a
+                    // grayscale color matrix.
+                    using (Bitmap bitmap = new Bitmap(originalStream))
+                    {
+                        // Create a new bitmap that will hold the grayscale result.
+                        using (Bitmap grayBitmap = new Bitmap(bitmap.Width, bitmap.Height))
+                        {
+                            using (Graphics g = Graphics.FromImage(grayBitmap))
+                            {
+                                // Standard luminance conversion matrix.
+                                ColorMatrix colorMatrix = new ColorMatrix(new float[][]
+                                {
+                                    new float[] {0.299f, 0.299f, 0.299f, 0, 0},
+                                    new float[] {0.587f, 0.587f, 0.587f, 0, 0},
+                                    new float[] {0.114f, 0.114f, 0.114f, 0, 0},
+                                    new float[] {0,      0,      0,      1, 0},
+                                    new float[] {0,      0,      0,      0, 1}
+                                });
+
+                                ImageAttributes attributes = new ImageAttributes();
+                                attributes.SetColorMatrix(colorMatrix);
+
+                                // Draw the original bitmap onto the new bitmap using the
+                                // grayscale color matrix.
+                                g.DrawImage(
+                                    bitmap,
+                                    new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height), // Fully qualified to avoid CS0104
+                                    0, 0, bitmap.Width, bitmap.Height,
+                                    GraphicsUnit.Pixel,
+                                    attributes);
+                            }
+
+                            // Finally, save the grayscale bitmap as JPEG.
+                            grayBitmap.Save(outputPath, ImageFormat.Jpeg);
+                        }
+                    }
                 }
 
-                // Clean up the temporary file.
-                try { File.Delete(tempPath); } catch { /* ignore */ }
-
-                imageIndex++;
+                Console.WriteLine($"Saved grayscale JPEG: {outputPath}");
             }
-
-            if (imageIndex == 0)
-                Console.WriteLine($"No images found on page {targetPage}.");
         }
+
+        Console.WriteLine("Image extraction completed.");
     }
 }

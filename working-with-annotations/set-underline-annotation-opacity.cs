@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const int    targetPage = 2; // 1‑based page index to modify
+        const int targetPageNumber = 2; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -20,31 +20,31 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Validate page number
-            if (targetPage < 1 || targetPage > doc.Pages.Count)
+            // Ensure the target page exists (pages are 1‑based)
+            if (targetPageNumber < 1 || targetPageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Invalid page number: {targetPage}");
+                Console.Error.WriteLine("Target page number out of range.");
                 return;
             }
 
-            // Get the target page (Aspose.Pdf uses 1‑based indexing)
-            Page page = doc.Pages[targetPage];
+            // Retrieve the target page
+            Page page = doc.Pages[targetPageNumber];
 
             // Iterate over all annotations on the page
             foreach (Annotation annot in page.Annotations)
             {
-                // Check if the annotation is an underline annotation
+                // Process only underline annotations
                 if (annot is UnderlineAnnotation underline)
                 {
-                    // Set opacity to 50% (value range 0.0‑1.0)
-                    underline.Opacity = 0.5f;
+                    // Opacity range is 0.0 (transparent) to 1.0 (opaque)
+                    underline.Opacity = 0.5f; // 50 % opacity
                 }
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (PDF format is default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Underline annotation opacity adjusted and saved to '{outputPath}'.");
+        Console.WriteLine($"Underline annotation opacity set to 50 % and saved to '{outputPath}'.");
     }
 }

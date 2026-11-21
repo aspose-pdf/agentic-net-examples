@@ -1,53 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf;               // Core PDF API (Document, Page, ImageStamp, etc.)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string stampImagePath = "stamp.png";
-        const string outputPdfPath = "output_stamped.pdf";
+        const string inputPdf  = "input.pdf";      // Original PDF with embedded files
+        const string stampImg  = "stamp.png";      // Image to use as stamp
+        const string outputPdf = "output_stamped.pdf";
 
         // Verify required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(stampImagePath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        // Load the original PDF. Embedded files are kept in the Document.EmbeddedFiles collection
-        // and will be preserved when we save after stamping.
-        using (Document pdfDocument = new Document(inputPdfPath))
+        // Load the PDF (embedded files are loaded automatically)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Create an ImageStamp instance and configure its appearance.
-            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            // Configure the image stamp
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Place the stamp on top of page content (Background = false)
-                Background = false,
-                // Semi‑transparent stamp (optional)
-                Opacity = 0.7,
-                // Center the stamp horizontally and vertically on each page
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                // Position and size can be adjusted as needed
+                // Here we place the stamp at the bottom‑right corner of each page
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Keep the original image dimensions; set Opacity if a translucent effect is desired
+                Opacity = 0.8,
+                // Ensure the stamp is drawn over page content (false = background)
+                Background = false
             };
 
-            // Apply the stamp to every page individually.
-            foreach (Page page in pdfDocument.Pages)
+            // Apply the stamp to every page individually (PageCollection has no AddStamp method)
+            foreach (Page page in pdfDoc.Pages)
             {
                 page.AddStamp(imgStamp);
             }
 
-            // Save the modified PDF. All original embedded files remain intact.
-            pdfDocument.Save(outputPdfPath);
+            // Save the modified PDF; embedded files are preserved automatically
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPdfPath}'. Embedded files preserved.");
+        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'. Embedded files remain intact.");
     }
 }

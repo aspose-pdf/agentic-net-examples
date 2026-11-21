@@ -1,62 +1,68 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string coverPath   = "cover.pdf";   // PDF containing the cover page (used as background)
-        const string mainPath    = "main.pdf";    // Main document to which the cover will be applied
-        const string outputPath  = "merged.pdf"; // Resulting PDF
+        const string coverPath = "cover.pdf";               // PDF to be used as background
+        const string mainPath = "main.pdf";                 // Main document
+        const string outputPath = "merged_with_cover.pdf"; // Resulting PDF
 
         // Verify input files exist
         if (!File.Exists(coverPath))
         {
-            Console.Error.WriteLine($"Cover file not found: {coverPath}");
+            Console.Error.WriteLine($"Cover PDF not found: {coverPath}");
             return;
         }
         if (!File.Exists(mainPath))
         {
-            Console.Error.WriteLine($"Main document not found: {mainPath}");
+            Console.Error.WriteLine($"Main PDF not found: {mainPath}");
             return;
         }
 
         try
         {
-            // ------------------------------------------------------------
-            // 1. Create a Stamp that represents the cover PDF page.
-            //    The Stamp class (Aspose.Pdf.Facades) is the object that
-            //    PdfFileStamp.AddStamp expects.
-            // ------------------------------------------------------------
-            var coverStamp = new Aspose.Pdf.Facades.Stamp();
-            // Bind the first page of the cover PDF as the stamp content.
-            coverStamp.BindPdf(coverPath, 1);
-            // Place the stamp behind existing page content.
-            coverStamp.IsBackground = true;
-            // By default the stamp is applied to all pages of the bound PDF.
-            // If you need a specific subset, assign an int[] to coverStamp.Pages.
-
-            // ------------------------------------------------------------
-            // 2. Apply the stamp to the main document.
-            // ------------------------------------------------------------
-            using (PdfFileStamp pdfStamp = new PdfFileStamp())
+            // Bind the main document to the stamp processor
+            using (PdfFileStamp fileStamp = new PdfFileStamp())
             {
-                // Bind the main PDF that will receive the stamp.
-                pdfStamp.BindPdf(mainPath);
+                fileStamp.BindPdf(mainPath);
 
-                // Add the prepared stamp. The method accepts a single Stamp argument.
-                pdfStamp.AddStamp(coverStamp);
+                // Prepare a stamp that uses the cover PDF (first page) as background
+                Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+                // Source PDF and the page of the source to use as the stamp
+                stamp.BindPdf(coverPath, 1);
+                // Apply the stamp to every page of the target document
+                int pageCount = GetPageCount(mainPath);
+                stamp.Pages = new int[pageCount];
+                for (int i = 0; i < pageCount; i++)
+                    stamp.Pages[i] = i + 1; // pages are 1‑based
+                // Place the stamp behind existing page content
+                stamp.IsBackground = true;
 
-                // Save the merged document.
-                pdfStamp.Save(outputPath);
+                // Add the configured stamp to the target PDF
+                fileStamp.AddStamp(stamp);
+
+                // Save the merged PDF
+                fileStamp.Save(outputPath);
             }
 
-            Console.WriteLine($"Cover merged successfully. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Merged PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during stamping: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    // Helper to obtain the number of pages in a PDF
+    private static int GetPageCount(string pdfPath)
+    {
+        using (Document doc = new Document(pdfPath))
+        {
+            return doc.Pages.Count;
         }
     }
 }

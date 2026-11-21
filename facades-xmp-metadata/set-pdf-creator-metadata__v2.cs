@@ -9,34 +9,26 @@ namespace PdfExtensions
     public static class PdfDocumentExtensions
     {
         /// <summary>
-        /// Adds or updates the CreatorTool metadata entry of the PDF document.
+        /// Sets the Creator metadata on an Aspose.Pdf.Document.
+        /// The value is persisted when the document is saved.
         /// </summary>
-        /// <param name="pdfDoc">The Document instance to modify.</param>
-        /// <param name="creatorTool">The value to set for the Creator field.</param>
-        public static void AddCreatorTool(this Document pdfDoc, string creatorTool)
+        /// <param name="pdfDoc">The PDF document to modify.</param>
+        /// <param name="creator">The creator string to store.</param>
+        public static void SetCreator(this Document pdfDoc, string creator)
         {
             if (pdfDoc == null) throw new ArgumentNullException(nameof(pdfDoc));
-            if (creatorTool == null) throw new ArgumentNullException(nameof(creatorTool));
-
-            // The Info property holds document metadata. Setting the Creator
-            // property writes the /Creator entry in the PDF catalog.
-            pdfDoc.Info.Creator = creatorTool;
+            // Document.Info is a read‑only property; it is always instantiated by Aspose.Pdf.
+            // Directly set the Creator field on the existing DocumentInfo instance.
+            pdfDoc.Info.Creator = creator;
         }
     }
 
-    // ---------------------------------------------------------------------
-    // Minimal entry point required for a console‑style project.
-    // The method does not perform any work; it only satisfies the compiler
-    // that expects a static Main method.
-    // ---------------------------------------------------------------------
+    // Minimal entry point to satisfy the compiler when the project is built as an executable.
     internal class Program
     {
         private static void Main(string[] args)
         {
-            // Example (optional) – demonstrates that the extension works.
-            // var doc = new Document();
-            // doc.AddCreatorTool("MyApp");
-            // Console.WriteLine($"Creator set to: {doc.Info.Creator}");
+            // Intentionally left blank. The library can be used from other projects.
         }
     }
 }

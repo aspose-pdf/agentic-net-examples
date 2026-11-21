@@ -1,17 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.Annotations; // for GoToAction
-using Aspose.Pdf.Text; // required for TextFragment
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const int targetPage = 2; // internal page number to link to (1‑based)
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_with_link.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,49 +16,28 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged‑content API
-            ITaggedContent tagged = doc.TaggedContent;
-            // (optional) set document title / language for accessibility
-            tagged.SetTitle("Document with internal link");
-            tagged.SetLanguage("en-US");
+            // Choose the page where the visual link rectangle will be placed
+            Page page = doc.Pages[1]; // first page (1‑based indexing)
 
-            // Root of the structure tree – use dynamic to avoid compile‑time dependency on StructureElement
-            dynamic root = tagged.RootElement;
+            // Define the rectangle area for the link annotation (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // ------------------------------------------------------------
-            // 1. Create a structure element whose PDF role is "/Link"
-            // ------------------------------------------------------------
-            // The tagged API provides a method to create a Link element.
-            // Using dynamic bypasses the need for the concrete StructureElement type.
-            dynamic linkElement = root.CreateLinkElement();
+            // Create a LinkAnnotation (its subtype is /Link by default)
+            LinkAnnotation link = new LinkAnnotation(page, rect);
 
-            // ------------------------------------------------------------
-            // 2. Define an internal destination (GoTo action) pointing to the target page.
-            // ------------------------------------------------------------
-            linkElement.Action = new GoToAction(doc.Pages[targetPage]); // Pages collection is 1‑based
+            // Set the action to go to an internal page (e.g., page 2)
+            link.Action = new GoToAction(2); // target page number (1‑based)
 
-            // ------------------------------------------------------------
-            // 3. Add visible text that will act as the clickable link.
-            // ------------------------------------------------------------
-            TextFragment linkText = new TextFragment($"Go to page {targetPage}");
-            linkText.TextState.FontSize = 12;
-            // Add the text fragment to the first page (or any page you prefer)
-            doc.Pages[1].Paragraphs.Add(linkText);
-
-            // Associate the text fragment with the link element so that the
-            // structure tree knows the text belongs to the /Link element.
-            linkElement.AppendChild(linkText);
-
-            // Finally, attach the link element to the document's structure tree.
-            root.AppendChild(linkElement);
+            // Add the annotation to the page
+            page.Annotations.Add(link);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with internal link saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with internal link: '{outputPath}'.");
     }
 }

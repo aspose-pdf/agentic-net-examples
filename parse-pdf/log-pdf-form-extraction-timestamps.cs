@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "form.pdf";
+        const string outputCsv = "form_fields.csv";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,39 +17,82 @@ class Program
         }
 
         // Capture start timestamp
-        DateTime startTime = DateTime.UtcNow;
-        Console.WriteLine($"Form extraction started at: {startTime:O}");
+        DateTime start = DateTime.UtcNow;
+        Console.WriteLine($"Form extraction started at {start:O}");
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        try
         {
-            // Ensure the document contains a form and has fields
-            if (doc.Form == null || doc.Form.Fields == null || !doc.Form.Fields.Any())
+            using (Document doc = new Document(inputPdf))
             {
-                Console.WriteLine("No form fields found in the document.");
-            }
-            else
-            {
-                // Iterate over all form fields and output their names and values
-                foreach (var field in doc.Form.Fields)
+                // Check for form fields
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    // Field name
-                    string name = field.FullName;
-
-                    // Retrieve the field value as a string (handles different field types)
-                    string value = field.Value?.ToString() ?? string.Empty;
-
-                    Console.WriteLine($"Field: {name}, Value: {value}");
+                    Console.WriteLine("No form fields found.");
+                }
+                else
+                {
+                    using (StreamWriter writer = new StreamWriter(outputCsv, false))
+                    {
+                        writer.WriteLine("FieldName,FieldValue");
+                        foreach (Field field in doc.Form)
+                        {
+                            string name = field.FullName;
+                            string value = GetFieldValue(field);
+                            writer.WriteLine($"{EscapeCsv(name)},{EscapeCsv(value)}");
+                        }
+                    }
+                    Console.WriteLine($"Form data written to {outputCsv}");
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
 
         // Capture end timestamp
-        DateTime endTime = DateTime.UtcNow;
-        Console.WriteLine($"Form extraction ended at: {endTime:O}");
+        DateTime end = DateTime.UtcNow;
+        Console.WriteLine($"Form extraction ended at {end:O}");
+        Console.WriteLine($"Duration: {(end - start).TotalSeconds:F2} seconds");
+    }
 
-        // Optionally, display the duration
-        TimeSpan duration = endTime - startTime;
-        Console.WriteLine($"Total extraction time: {duration.TotalSeconds:F2} seconds");
+    // Retrieve a field's value as a string
+    private static string GetFieldValue(Field field)
+    {
+        switch (field)
+        {
+            case TextBoxField txt:
+                return txt.Value;
+            case CheckboxField chk:
+                return chk.Checked ? "Checked" : "Unchecked";
+            case RadioButtonField rad:
+                // RadioButtonField stores the selected option index (1‑based).
+                if (rad.Selected > 0 && rad.Options != null && rad.Options.Count >= rad.Selected)
+                {
+                    // Return the option's name (or value if preferred).
+                    return rad.Options[rad.Selected - 1].Name ?? string.Empty;
+                }
+                return string.Empty;
+            case ListBoxField list:
+                return string.Join(";", list.SelectedItems);
+            case ComboBoxField combo:
+                return combo.Value;
+            case SignatureField sig:
+                return sig.Signature != null ? "Signed" : "Unsigned";
+            default:
+                return string.Empty;
+        }
+    }
+
+    // Simple CSV escaping
+    private static string EscapeCsv(string s)
+    {
+        if (s == null) return "";
+        if (s.Contains("\"") || s.Contains(",") || s.Contains("\n"))
+        {
+            s = s.Replace("\"", "\"\"");
+            return $"\"{s}\"";
+        }
+        return s;
     }
 }

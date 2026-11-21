@@ -6,13 +6,13 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "image.png";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string imagePath     = "image.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
@@ -22,46 +22,39 @@ class Program
             return;
         }
 
-        // Load the image into a memory stream
-        byte[] imageBytes = File.ReadAllBytes(imagePath);
-        using (MemoryStream imgStream = new MemoryStream(imageBytes))
+        // Load the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Open the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Get the first page (Aspose.Pdf uses 1‑based indexing).
+            Aspose.Pdf.Page page = doc.Pages[1];
+
+            // Create a table and add it to the page.
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table();
+            page.Paragraphs.Add(table);
+
+            // Add a single row.
+            Aspose.Pdf.Row row = table.Rows.Add();
+
+            // Add a single cell to the row.
+            Aspose.Pdf.Cell cell = row.Cells.Add();
+
+            // Load the image into a memory stream.
+            using (MemoryStream imgStream = new MemoryStream(File.ReadAllBytes(imagePath)))
             {
-                // Ensure the document has at least one page
-                Page page = doc.Pages[1]; // 1‑based indexing
-
-                // Create a table with a single column that spans the page width
-                Table table = new Table
+                // Create an Image object and assign the stream.
+                Aspose.Pdf.Image img = new Aspose.Pdf.Image
                 {
-                    ColumnWidths = "100%" // full page width
+                    ImageStream = imgStream
                 };
 
-                // Add a row and a cell
-                Row row = table.Rows.Add();
-                Cell cell = row.Cells.Add();
-
-                // Create an Image object from the memory stream
-                Image img = new Image
-                {
-                    ImageStream = imgStream,
-                    // Optional: set explicit dimensions
-                    FixWidth = 200,
-                    FixHeight = 150
-                };
-
-                // Insert the image into the cell
+                // Add the image to the cell's paragraph collection.
                 cell.Paragraphs.Add(img);
-
-                // Add the table to the page
-                page.Paragraphs.Add(table);
-
-                // Save the modified PDF
-                doc.Save(outputPdf);
             }
+
+            // Save the modified PDF.
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image inserted and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image inserted into table cell and saved to '{outputPdfPath}'.");
     }
 }

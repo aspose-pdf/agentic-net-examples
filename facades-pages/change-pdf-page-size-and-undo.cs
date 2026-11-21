@@ -1,68 +1,59 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf; // Use the core Aspose.Pdf namespace for page manipulation
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string customPath = "custom_sized.pdf";
+        const string customSizePath = "custom_size.pdf";
         const string revertedPath = "reverted.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Load the PDF and record original page sizes
-        // -----------------------------------------------------------------
-        Document doc = new Document(inputPath);
-        int pageCount = doc.Pages.Count;
-        // Store width/height (in points) for each page so we can restore later
-        List<(double Width, double Height)> originalSizes = new List<(double, double)>(pageCount);
-
-        for (int i = 1; i <= pageCount; i++)
+        // Load the original document to capture the original page dimensions.
+        double originalWidth, originalHeight;
+        using (Document srcDoc = new Document(inputPath))
         {
-            var pageInfo = doc.Pages[i].PageInfo;
-            originalSizes.Add((pageInfo.Width, pageInfo.Height));
+            // Pages are 1‑based; retrieve the first page.
+            Page firstPage = srcDoc.Pages[1];
+            originalWidth = firstPage.PageInfo.Width;
+            originalHeight = firstPage.PageInfo.Height;
+        }
+
+        // Define custom dimensions (example: 500 × 700 points).
+        double customWidth = 500;
+        double customHeight = 700;
+
+        // -----------------------------------------------------------------
+        // Change page size using the Document API (PdfPageEditor no longer
+        // provides SetPageSizeByCropBox).
+        // -----------------------------------------------------------------
+        using (Document doc = new Document(inputPath))
+        {
+            Page page = doc.Pages[1];
+            page.PageInfo.Width = customWidth;
+            page.PageInfo.Height = customHeight;
+            doc.Save(customSizePath);
         }
 
         // -----------------------------------------------------------------
-        // Step 2: Change each page to a custom size (e.g., 400 x 600 points)
+        // Revert to the original page size to test undo functionality.
         // -----------------------------------------------------------------
-        const double customWidth = 400;   // points (1 point = 1/72 inch)
-        const double customHeight = 600;
-
-        for (int i = 1; i <= pageCount; i++)
+        using (Document doc = new Document(customSizePath))
         {
-            var pageInfo = doc.Pages[i].PageInfo;
-            pageInfo.Width = customWidth;
-            pageInfo.Height = customHeight;
+            Page page = doc.Pages[1];
+            page.PageInfo.Width = originalWidth;
+            page.PageInfo.Height = originalHeight;
+            doc.Save(revertedPath);
         }
 
-        // Save the PDF with custom page dimensions
-        doc.Save(customPath);
-        Console.WriteLine($"Custom-sized PDF saved to '{customPath}'.");
-
-        // -----------------------------------------------------------------
-        // Step 3: Revert pages back to their original dimensions
-        // -----------------------------------------------------------------
-        Document revertDoc = new Document(customPath);
-
-        for (int i = 1; i <= pageCount; i++)
-        {
-            var (origWidth, origHeight) = originalSizes[i - 1];
-            var pageInfo = revertDoc.Pages[i].PageInfo;
-            pageInfo.Width = origWidth;
-            pageInfo.Height = origHeight;
-        }
-
-        // Save the reverted PDF
-        revertDoc.Save(revertedPath);
+        Console.WriteLine($"Custom‑sized PDF saved to '{customSizePath}'.");
         Console.WriteLine($"Reverted PDF saved to '{revertedPath}'.");
     }
 }

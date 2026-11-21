@@ -1,92 +1,87 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class PdfUnicodeComparer
+class Program
 {
-    // Extracts all text from a PDF document, preserving page order.
-    static string ExtractText(string pdfPath)
+    // Extracts all text from a PDF document using TextAbsorber.
+    static string ExtractText(Document doc)
     {
-        if (!File.Exists(pdfPath))
-            throw new FileNotFoundException($"File not found: {pdfPath}");
-
-        using (Document doc = new Document(pdfPath))
+        // Use Pure formatting to get raw Unicode characters.
+        TextAbsorber absorber = new TextAbsorber
         {
-            // TextAbsorber extracts text from the whole document.
-            TextAbsorber absorber = new TextAbsorber();
-            // Use Pure mode to get raw Unicode characters without formatting.
-            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-            doc.Pages.Accept(absorber);
-            return absorber.Text;
-        }
+            ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+        };
+        // Apply absorber to all pages.
+        doc.Pages.Accept(absorber);
+        return absorber.Text ?? string.Empty;
     }
 
-    // Compares two Unicode strings and reports the first differing character (if any).
-    static void CompareTexts(string textA, string textB)
+    // Simple line‑by‑line diff that reports differing lines.
+    static void ReportDifferences(string textA, string textB)
     {
-        if (textA == textB)
-        {
-            Console.WriteLine("Documents are identical (Unicode text matches).");
-            return;
-        }
+        var linesA = textA.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        var linesB = textB.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+        int maxLines = Math.Max(linesA.Length, linesB.Length);
 
-        // Find the first index where the texts differ.
-        int minLen = Math.Min(textA.Length, textB.Length);
-        int diffIndex = -1;
-        for (int i = 0; i < minLen; i++)
+        bool anyDiff = false;
+        for (int i = 0; i < maxLines; i++)
         {
-            if (textA[i] != textB[i])
+            string lineA = i < linesA.Length ? linesA[i] : string.Empty;
+            string lineB = i < linesB.Length ? linesB[i] : string.Empty;
+
+            if (!lineA.Equals(lineB, StringComparison.Ordinal))
             {
-                diffIndex = i;
-                break;
+                anyDiff = true;
+                Console.WriteLine($"Line {i + 1} differs:");
+                Console.WriteLine($"  PDF A: \"{lineA}\"");
+                Console.WriteLine($"  PDF B: \"{lineB}\"");
+                Console.WriteLine();
             }
         }
 
-        // If no difference found within the shorter length, the longer document has extra text.
-        if (diffIndex == -1)
+        if (!anyDiff)
         {
-            Console.WriteLine("Documents differ in length.");
-            Console.WriteLine($"Document A length: {textA.Length}");
-            Console.WriteLine($"Document B length: {textB.Length}");
-            return;
+            Console.WriteLine("No textual differences detected between the two PDFs.");
         }
-
-        // Show surrounding context for the difference.
-        int contextRadius = 20;
-        int start = Math.Max(0, diffIndex - contextRadius);
-        int endA = Math.Min(textA.Length, diffIndex + contextRadius);
-        int endB = Math.Min(textB.Length, diffIndex + contextRadius);
-
-        string snippetA = textA.Substring(start, endA - start);
-        string snippetB = textB.Substring(start, endB - start);
-
-        Console.WriteLine($"Unicode text difference detected at character index {diffIndex}:");
-        Console.WriteLine($"Document A char: U+{((int)textA[diffIndex]):X4} ('{textA[diffIndex]}')");
-        Console.WriteLine($"Document B char: U+{((int)textB[diffIndex]):X4} ('{textB[diffIndex]}')");
-        Console.WriteLine("Context around the difference (Document A):");
-        Console.WriteLine(snippetA);
-        Console.WriteLine("Context around the difference (Document B):");
-        Console.WriteLine(snippetB);
     }
 
     static void Main()
     {
-        // Paths to the PDFs to compare.
-        const string pdfPathA = "document_en.pdf";   // e.g., English/Latin encoding
-        const string pdfPathB = "document_zh.pdf";   // e.g., Chinese/Unicode encoding
+        const string pdfPathA = "document_en.pdf";   // PDF with English/Latin text
+        const string pdfPathB = "document_zh.pdf";   // PDF with Chinese/Unicode text
+
+        if (!File.Exists(pdfPathA))
+        {
+            Console.Error.WriteLine($"File not found: {pdfPathA}");
+            return;
+        }
+        if (!File.Exists(pdfPathB))
+        {
+            Console.Error.WriteLine($"File not found: {pdfPathB}");
+            return;
+        }
 
         try
         {
-            string textA = ExtractText(pdfPathA);
-            string textB = ExtractText(pdfPathB);
+            // Load both PDFs inside using blocks for deterministic disposal.
+            using (Document docA = new Document(pdfPathA))
+            using (Document docB = new Document(pdfPathB))
+            {
+                // Extract Unicode text from each document.
+                string textA = ExtractText(docA);
+                string textB = ExtractText(docB);
 
-            CompareTexts(textA, textB);
+                // Compare the extracted texts and report Unicode differences.
+                ReportDifferences(textA, textB);
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
         }
     }
 }

@@ -1,45 +1,85 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Text;
 
-class Program
+public static class PdfComparer
 {
-    static void Main()
+    /// <summary>
+    /// Compares two PDF files by placing their pages sequentially in a single output PDF.
+    /// The method loads the source PDFs from memory streams, copies their pages into a new
+    /// document, and returns the resulting PDF as a byte array.
+    /// </summary>
+    /// <param name="pdfBytes1">First PDF content.</param>
+    /// <param name="pdfBytes2">Second PDF content.</param>
+    /// <returns>Byte array containing the comparison PDF.</returns>
+    public static byte[] ComparePdfs(byte[] pdfBytes1, byte[] pdfBytes2)
     {
-        // Paths to the PDFs to compare
-        const string firstPdfPath  = "first.pdf";
-        const string secondPdfPath = "second.pdf";
-
-        // Verify files exist
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Load the first PDF from a memory stream
+        using (MemoryStream ms1 = new MemoryStream(pdfBytes1))
+        using (Document doc1 = new Document(ms1))
+        // Load the second PDF from a memory stream
+        using (MemoryStream ms2 = new MemoryStream(pdfBytes2))
+        using (Document doc2 = new Document(ms2))
+        // Create the output document that will hold the comparison result
+        using (Document diffDoc = new Document())
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
-            return;
+            // -----------------------------------------------------------------
+            // Add a title page for the comparison result
+            // -----------------------------------------------------------------
+            Page titlePage = diffDoc.Pages.Add();
+            TextFragment title = new TextFragment("PDF Comparison Result");
+            title.Position = new Position(0, 800);
+            title.TextState.Font = FontRepository.FindFont("Helvetica");
+            title.TextState.FontSize = 24;
+            title.TextState.ForegroundColor = Color.FromRgb(0, 0, 0.8);
+            titlePage.Paragraphs.Add(title);
+
+            // -----------------------------------------------------------------
+            // Copy pages from the first document
+            // -----------------------------------------------------------------
+            for (int i = 1; i <= doc1.Pages.Count; i++) // 1‑based indexing
+            {
+                // New API: add the source page to the target document
+                diffDoc.Pages.Add(doc1.Pages[i]);
+            }
+
+            // -----------------------------------------------------------------
+            // Insert a separator page to distinguish the two source PDFs
+            // -----------------------------------------------------------------
+            Page separator = diffDoc.Pages.Add();
+            TextFragment sepText = new TextFragment("----- End of Document 1 -----");
+            sepText.Position = new Position(0, 800);
+            sepText.TextState.Font = FontRepository.FindFont("Helvetica");
+            sepText.TextState.FontSize = 16;
+            sepText.TextState.ForegroundColor = Color.FromRgb(0.5, 0, 0);
+            separator.Paragraphs.Add(sepText);
+
+            // -----------------------------------------------------------------
+            // Copy pages from the second document
+            // -----------------------------------------------------------------
+            for (int i = 1; i <= doc2.Pages.Count; i++) // 1‑based indexing
+            {
+                diffDoc.Pages.Add(doc2.Pages[i]);
+            }
+
+            // -----------------------------------------------------------------
+            // Save the resulting document to a memory stream and return the bytes
+            // -----------------------------------------------------------------
+            using (MemoryStream outputMs = new MemoryStream())
+            {
+                diffDoc.Save(outputMs);
+                return outputMs.ToArray();
+            }
         }
+    }
+}
 
-        // Load the PDFs from memory streams
-        using (MemoryStream firstStream  = new MemoryStream(File.ReadAllBytes(firstPdfPath)))
-        using (MemoryStream secondStream = new MemoryStream(File.ReadAllBytes(secondPdfPath)))
-        using (Document firstDoc  = new Document(firstStream))
-        using (Document secondDoc = new Document(secondStream))
-        // Stream that will hold the side‑by‑side comparison result
-        using (MemoryStream diffStream = new MemoryStream())
-        {
-            // Configure comparison options (default options are sufficient for a basic diff)
-            SideBySideComparisonOptions options = new SideBySideComparisonOptions();
-
-            // Perform the comparison – SideBySidePdfComparer is a static class, so call the method directly
-            SideBySidePdfComparer.Compare(firstDoc, secondDoc, diffStream, options);
-
-            // Reset the position of the output stream before reading or saving it
-            diffStream.Position = 0;
-
-            // Example: write the diff PDF to a file (optional – the stream can be used directly)
-            const string diffPdfPath = "diff.pdf";
-            File.WriteAllBytes(diffPdfPath, diffStream.ToArray());
-
-            Console.WriteLine($"Comparison completed. Diff PDF saved to '{diffPdfPath}'.");
-        }
+// Dummy entry point to satisfy the compiler when building an executable.
+public class Program
+{
+    public static void Main()
+    {
+        // No operation – this method exists only to provide a valid entry point.
     }
 }

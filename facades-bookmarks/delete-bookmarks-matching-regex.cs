@@ -2,48 +2,67 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Aspose.Pdf.Facades;
-using System.Collections;
+using Aspose.Pdf.Facades; // Bookmark and Bookmarks are in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string pattern = @"^Draft.*$"; // adjust the regex as needed
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string pattern = @"^Draft.*$"; // example regex: titles starting with "Draft"
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF to the bookmark editor
-        var editor = new PdfBookmarkEditor();
-        editor.BindPdf(inputPath);
-
-        // Extract all bookmarks. In recent Aspose.Pdf versions this returns a Bookmarks collection.
-        var bookmarks = editor.ExtractBookmarks();
-
-        // Prepare the regex
-        var regex = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-        // Iterate through the collection and delete matching titles.
-        // The concrete type of each item may vary between library versions, so we use reflection to obtain the Title.
-        foreach (var bm in (IEnumerable)bookmarks)
+        // Initialize the bookmark editor and bind the source PDF
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
         {
-            var titleProp = bm.GetType().GetProperty("Title");
-            var title = titleProp?.GetValue(bm) as string;
-            if (!string.IsNullOrEmpty(title) && regex.IsMatch(title))
+            bookmarkEditor.BindPdf(inputPdf);
+
+            // Retrieve all top‑level bookmarks using the correct facade method
+            Bookmarks topBookmarks = bookmarkEditor.ExtractBookmarks();
+
+            // Compile the regular expression once
+            Regex regex = new Regex(pattern, RegexOptions.Compiled);
+
+            // Recursively process bookmarks and delete those whose Title matches the pattern
+            foreach (Bookmark bm in topBookmarks)
             {
-                // DeleteBookmarks removes all entries that match the supplied title.
-                editor.DeleteBookmarks(title);
+                DeleteMatchingBookmarks(bookmarkEditor, bm, regex);
             }
+
+            // Save the modified PDF
+            bookmarkEditor.Save(outputPdf);
         }
 
-        // Save the modified PDF
-        editor.Save(outputPath);
+        Console.WriteLine($"Bookmarks matching '{pattern}' have been removed. Saved to '{outputPdf}'.");
+    }
 
-        Console.WriteLine($"Removed bookmarks matching '{pattern}'. Saved to '{outputPath}'.");
+    // Recursively walks the bookmark tree, deleting any bookmark whose Title matches the regex.
+    static void DeleteMatchingBookmarks(PdfBookmarkEditor editor, Bookmark bookmark, Regex regex)
+    {
+        if (regex.IsMatch(bookmark.Title))
+        {
+            // DeleteBookmarks(string title) removes the bookmark and all its descendants.
+            editor.DeleteBookmarks(bookmark.Title);
+            // No need to traverse children because they are already removed.
+            return;
+        }
+
+        // Process child bookmarks (if any). In the facade model children are accessed via ChildItems.
+        if (bookmark.ChildItems != null)
+        {
+            // Clone the collection to avoid modification issues during recursion.
+            Bookmarks children = new Bookmarks();
+            foreach (Bookmark child in bookmark.ChildItems)
+                children.Add(child);
+
+            foreach (Bookmark child in children)
+                DeleteMatchingBookmarks(editor, child, regex);
+        }
     }
 }

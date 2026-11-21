@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -15,30 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF and modify it inside a using block for deterministic disposal
+        // Facades class usage (no disposal required)
+        PdfFileEditor editor = new PdfFileEditor();
+
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Example modification: add a simple text annotation on the first page
+            // Example modification: add a text annotation to the first page
             Page page = doc.Pages[1];
-            var rect = new Rectangle(100, 500, 300, 550);
-            var annotation = new TextAnnotation(page, rect)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            TextAnnotation annotation = new TextAnnotation(page, rect)
             {
                 Title    = "Note",
-                Contents = "This PDF was processed in memory.",
+                Contents = "Sample annotation",
                 Open     = true,
                 Icon     = TextIcon.Note
             };
             page.Annotations.Add(annotation);
 
-            // Save the modified PDF directly to a MemoryStream (no file I/O)
-            using (MemoryStream pdfStream = new MemoryStream())
+            // Save the modified PDF to a MemoryStream for further processing
+            using (MemoryStream ms = new MemoryStream())
             {
-                doc.Save(pdfStream, SaveFormat.Pdf);
-                pdfStream.Position = 0; // reset for reading
+                doc.Save(ms);
+                ms.Position = 0; // Reset stream position for downstream consumers
 
-                Console.WriteLine($"Modified PDF size in memory: {pdfStream.Length} bytes");
-
-                // At this point pdfStream can be passed to other APIs (e.g., HTTP response, further processing)
+                // Example: output the size of the generated PDF
+                Console.WriteLine($"PDF saved to MemoryStream, size = {ms.Length} bytes");
+                // The MemoryStream can now be passed to other APIs without touching the file system
             }
         }
     }

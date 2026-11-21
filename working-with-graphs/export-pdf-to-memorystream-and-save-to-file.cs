@@ -11,23 +11,23 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Export PDF content to a memory stream
+            // Export the PDF to a memory stream
             using (MemoryStream ms = new MemoryStream())
             {
-                // Save the document into the memory stream (PDF format)
+                // Save the document into the stream (PDF format by default)
                 doc.Save(ms);
 
-                // Reset stream position before reading
+                // Ensure the stream position is at the beginning before reading
                 ms.Position = 0;
 
-                // Write the memory stream to a file on disk
+                // Write the stream contents to a file on disk
                 using (FileStream file = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
                 {
                     ms.CopyTo(file);

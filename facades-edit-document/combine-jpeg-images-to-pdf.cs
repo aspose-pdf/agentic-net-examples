@@ -1,60 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing; // for System.Drawing.Image
 
 class Program
 {
     static void Main()
     {
-        // Paths to the JPEG images to be merged.
-        string[] imagePaths = new string[]
-        {
-            "image1.jpg",
-            "image2.jpg",
-            "image3.jpg"
-        };
+        // List of JPEG image files to be added to the PDF.
+        string[] imageFiles = { "image1.jpg", "image2.jpg", "image3.jpg" };
+        string outputPdfPath = "combined.pdf";
 
-        // Output PDF file.
-        const string outputPdfPath = "merged_images.pdf";
-
-        // Verify that all image files exist before processing.
-        foreach (string imgPath in imagePaths)
+        // Verify that each image file exists before conversion.
+        foreach (string img in imageFiles)
         {
-            if (!File.Exists(imgPath))
+            if (!File.Exists(img))
             {
-                Console.Error.WriteLine($"Image file not found: {imgPath}");
+                Console.Error.WriteLine($"File not found: {img}");
                 return;
             }
         }
 
-        // Create a new PDF document.
-        var pdfDocument = new Document();
-
-        // Add each image to a separate page.
-        foreach (string imgPath in imagePaths)
+        try
         {
-            // Add a new page to the document.
-            var page = pdfDocument.Pages.Add();
+            // Create a new PDF document.
+            Document pdfDoc = new Document();
 
-            // Create an Aspose.Pdf.Image object and bind it to the file.
-            var image = new Aspose.Pdf.Image { File = imgPath };
+            foreach (string imgPath in imageFiles)
+            {
+                // Load the image to obtain its dimensions using the fully‑qualified System.Drawing.Image.
+                using (System.Drawing.Image sysImg = System.Drawing.Image.FromFile(imgPath))
+                {
+                    // Add a new page sized to the image.
+                    Page page = pdfDoc.Pages.Add();
+                    page.PageInfo.Width = sysImg.Width;
+                    page.PageInfo.Height = sysImg.Height;
 
-            // Optionally, you can set the page size to match the image dimensions.
-            // This requires System.Drawing.Common (or any other way to read image size).
-            // Uncomment the following block if you want the page size to match the image.
-            //
-            // using (var sysImg = System.Drawing.Image.FromFile(imgPath))
-            // {
-            //     page.SetPageSize(sysImg.Width, sysImg.Height);
-            // }
+                    // Create an Aspose.Pdf.Image object and set the source file.
+                    Aspose.Pdf.Image pdfImg = new Aspose.Pdf.Image
+                    {
+                        File = imgPath // Use the File property instead of the removed ImageInfo property.
+                    };
 
-            // Add the image to the page.
-            page.Paragraphs.Add(image);
+                    // Add the image to the page.
+                    page.Paragraphs.Add(pdfImg);
+                }
+            }
+
+            // Save the combined PDF.
+            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"PDF successfully created at '{outputPdfPath}'.");
         }
-
-        // Save the combined PDF.
-        pdfDocument.Save(outputPdfPath);
-
-        Console.WriteLine($"PDF successfully created at '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

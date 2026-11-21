@@ -1,17 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string templatePath = "FormTemplate.pdf";
-        const string targetPath   = "Invoice.pdf";
-        const string outputPath   = "Invoice_WithFields.pdf";
+        const string templatePath = "FormTemplate.pdf";   // PDF containing the form field definitions
+        const string targetPath   = "Invoice.pdf";        // PDF that will receive the fields
+        const string outputPath   = "Invoice_WithFields.pdf"; // Resulting PDF
 
-        // Verify input files exist
+        // Verify that source files exist
         if (!File.Exists(templatePath))
         {
             Console.Error.WriteLine($"Template not found: {templatePath}");
@@ -19,32 +18,44 @@ class Program
         }
         if (!File.Exists(targetPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPath}");
+            Console.Error.WriteLine($"Target not found: {targetPath}");
             return;
         }
 
-        // Load both PDFs
-        Document templateDoc = new Document(templatePath);
-        Document targetDoc   = new Document(targetPath);
+        // Create a copy of the target PDF that will be modified.
+        // This preserves the original Invoice.pdf.
+        File.Copy(targetPath, outputPath, overwrite: true);
 
-        // ---------------------------------------------------------------------
-        // Copy form field definitions from the template to the target PDF.
-        // The Document.Form property is read‑only, so we cannot assign it directly.
-        // Instead we iterate over the fields in the template, clone each field
-        // (using the ICloneable Clone method) and add the clone to the target
-        // document's form collection.
-        // ---------------------------------------------------------------------
-        foreach (Field templateField in templateDoc.Form.Fields)
+        // -------------------------------------------------------------------
+        // 1. Retrieve the list of field names from the template PDF.
+        // -------------------------------------------------------------------
+        string[] templateFieldNames;
+        using (Form form = new Form())
         {
-            // Clone creates an independent copy of the field (including its
-            // appearance, name, type, etc.) so the original template remains untouched.
-            Field clonedField = (Field)templateField.Clone();
-            targetDoc.Form.Add(clonedField);
+            form.BindPdf(templatePath);
+            templateFieldNames = form.FieldNames; // array of field names defined in the template
         }
 
-        // Save the updated PDF to a new file.
-        targetDoc.Save(outputPath);
+        // -------------------------------------------------------------------
+        // 2. Copy each field from the template into the output PDF.
+        //    FormEditor.CopyOuterField expects the destination page number (int) as the third argument.
+        // -------------------------------------------------------------------
+        using (FormEditor editor = new FormEditor())
+        {
+            // Bind the destination PDF (the copy we created above).
+            editor.BindPdf(outputPath);
 
-        Console.WriteLine($"Form fields copied to '{outputPath}'.");
+            foreach (var fieldName in templateFieldNames)
+            {
+                // Copy the field definition from the template PDF into the destination PDF.
+                // The third argument is the page number where the field will be placed. Use 1 (first page) as default.
+                editor.CopyOuterField(templatePath, fieldName, 1);
+            }
+
+            // Save the changes to the destination PDF.
+            editor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Form fields copied from '{templatePath}' to '{outputPath}'.");
     }
 }

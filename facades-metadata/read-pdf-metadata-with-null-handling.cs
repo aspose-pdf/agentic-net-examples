@@ -14,31 +14,33 @@ class Program
             return;
         }
 
-        try
+        // PdfFileInfo provides GetMetaInfo for reading PDF metadata.
+        PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath);
+
+        // List of standard metadata keys we want to read.
+        string[] metaKeys = new[]
         {
-            // PdfFileInfo provides access to PDF metadata via GetMetaInfo.
-            PdfFileInfo info = new PdfFileInfo(pdfPath);
+            "Title",
+            "Author",
+            "Subject",
+            "Keywords",
+            "Creator",
+            "Producer",
+            "CreationDate",
+            "ModDate"
+        };
 
-            // List of common metadata keys we want to read.
-            string[] metaKeys = { "Title", "Author", "Subject", "Keywords", "Creator", "Producer" };
-
-            foreach (string key in metaKeys)
-            {
-                // Retrieve the metadata value; GetMetaInfo may return null.
-                string value = info.GetMetaInfo(key);
-
-                // Gracefully handle null or empty values.
-                if (string.IsNullOrEmpty(value))
-                {
-                    value = "(not set)";
-                }
-
-                Console.WriteLine($"{key}: {value}");
-            }
-        }
-        catch (Exception ex)
+        Console.WriteLine("PDF Metadata:");
+        foreach (string key in metaKeys)
         {
-            Console.Error.WriteLine($"Error reading metadata: {ex.Message}");
+            // GetMetaInfo returns null if the key is absent.
+            string value = pdfInfo.GetMetaInfo(key);
+
+            // Gracefully handle null or empty values.
+            if (string.IsNullOrEmpty(value))
+                value = "(not set)";
+
+            Console.WriteLine($"{key}: {value}");
         }
     }
 }

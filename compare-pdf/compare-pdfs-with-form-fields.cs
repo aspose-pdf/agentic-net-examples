@@ -7,12 +7,12 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath1 = "input1.pdf";
-        const string pdfPath2 = "input2.pdf";
+        const string firstPdfPath = "original.pdf";
+        const string secondPdfPath = "modified.pdf";
         const string resultPath = "comparison_result.pdf";
 
-        // Verify that both source PDFs exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        // Verify that both source files exist
+        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
         {
             Console.Error.WriteLine("One or both input PDF files were not found.");
             return;
@@ -21,20 +21,22 @@ class Program
         try
         {
             // Load the PDF documents
-            Document doc1 = new Document(pdfPath1);
-            Document doc2 = new Document(pdfPath2);
+            Document firstDoc = new Document(firstPdfPath);
+            Document secondDoc = new Document(secondPdfPath);
 
-            // Side‑by‑side comparison options – form field values are compared by default
-            var sideOptions = new SideBySideComparisonOptions();
+            // Comparison options – form field values are compared by default, no extra flag needed
+            // (the ComparisonOptions class does not expose an IncludeFormFields property)
+            // If additional options are required, they can be set on SideBySideComparisonOptions.
+            SideBySideComparisonOptions sideOptions = new SideBySideComparisonOptions();
 
-            // Perform visual side‑by‑side comparison and generate a diff PDF
-            SideBySidePdfComparer.Compare(doc1, doc2, resultPath, sideOptions);
+            // Perform a visual side‑by‑side comparison. The comparer is a static class, so we call the static method.
+            SideBySidePdfComparer.Compare(firstDoc, secondDoc, resultPath, sideOptions);
 
             Console.WriteLine($"Comparison completed. Result saved to '{resultPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during PDF comparison: {ex.Message}");
+            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
         }
     }
 }

@@ -6,77 +6,64 @@ class BatchPdfAConverter
 {
     static void Main()
     {
-        // Base directory of the application (works for both Windows and Linux)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing source PDFs
+        const string sourceFolder = @"C:\PdfBatch\Input";
+        // Folder where converted PDF/A files will be saved
+        const string outputFolder = @"C:\PdfBatch\Output";
+        // Path to the CSV log file
+        const string csvLogPath   = @"C:\PdfBatch\conversion_results.csv";
 
-        // Input folder containing PDFs to convert (created if missing)
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        Directory.CreateDirectory(inputFolder);
-
-        // Output folder for PDF/A‑1b files (created if missing)
-        string outputFolder = Path.Combine(baseDir, "PdfA_Output");
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
-
-        // CSV file that will contain conversion results
-        string csvLogPath = Path.Combine(baseDir, "conversion_results.csv");
-
-        // Prepare CSV file (write header if file does not exist)
-        bool csvExists = File.Exists(csvLogPath);
-        using (StreamWriter csvWriter = new StreamWriter(csvLogPath, true))
+        // Create or overwrite the CSV file with header
+        using (StreamWriter csvWriter = new StreamWriter(csvLogPath, false))
         {
-            if (!csvExists)
+            csvWriter.WriteLine("InputFile,OutputFile,Status,Message");
+        }
+
+        // Process each PDF file in the source folder
+        foreach (string inputPath in Directory.GetFiles(sourceFolder, "*.pdf"))
+        {
+            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, fileName + "_PDF_A_1b.pdf");
+            // Temporary XML log for the conversion (optional)
+            string conversionLog = Path.Combine(outputFolder, fileName + "_log.xml");
+
+            string status;
+            string message;
+
+            try
             {
-                csvWriter.WriteLine("SourceFile,OutputFile,Status,Message");
+                // Load the source PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(inputPath))
+                {
+                    // Convert to PDF/A‑1b; errors are written to the XML log file
+                    doc.Convert(conversionLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+                    // Save the converted document
+                    doc.Save(outputPath);
+                }
+
+                status  = "Success";
+                message = "Converted successfully";
+            }
+            catch (Exception ex)
+            {
+                status  = "Failed";
+                message = ex.Message;
             }
 
-            // Enumerate all PDF files in the input folder
-            string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-            if (pdfFiles.Length == 0)
+            // Append the result to the CSV log
+            using (StreamWriter csvWriter = new StreamWriter(csvLogPath, true))
             {
-                Console.WriteLine($"No PDF files found in '{inputFolder}'. Nothing to convert.");
-            }
+                // Escape commas in paths if necessary
+                string escapedInput  = $"\"{inputPath}\"";
+                string escapedOutput = $"\"{outputPath}\"";
+                string escapedMsg    = $"\"{message.Replace("\"", "\"\"")}\"";
 
-            foreach (string sourcePath in pdfFiles)
-            {
-                string fileName = Path.GetFileName(sourcePath);
-                string outputPath = Path.Combine(outputFolder,
-                    Path.GetFileNameWithoutExtension(sourcePath) + "_pdfa.pdf");
-
-                try
-                {
-                    // Load source PDF inside a using block (deterministic disposal)
-                    using (Document doc = new Document(sourcePath))
-                    {
-                        // Convert to PDF/A‑1b; a temporary XML log is created (can be ignored)
-                        string tempXmlLog = Path.GetTempFileName();
-                        doc.Convert(tempXmlLog, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-
-                        // Save the converted document as PDF/A‑1b
-                        doc.Save(outputPath);
-                    }
-
-                    // Log successful conversion
-                    csvWriter.WriteLine($"{EscapeCsv(fileName)},{EscapeCsv(Path.GetFileName(outputPath))},Success,");
-                }
-                catch (Exception ex)
-                {
-                    // Log failure with exception message
-                    csvWriter.WriteLine($"{EscapeCsv(fileName)},{EscapeCsv(Path.GetFileName(outputPath))},Failure,{EscapeCsv(ex.Message)}");
-                }
+                csvWriter.WriteLine($"{escapedInput},{escapedOutput},{status},{escapedMsg}");
             }
         }
 
-        Console.WriteLine("Batch conversion completed. Results written to " + csvLogPath);
-    }
-
-    // Helper to escape CSV fields that may contain commas or quotes
-    static string EscapeCsv(string field)
-    {
-        if (field == null) return "";
-        if (field.Contains('"'))
-            field = field.Replace("\"", "\"\"");
-        if (field.Contains(',') || field.Contains('"') || field.Contains('\n') || field.Contains('\r'))
-            field = $"\"{field}\"";
-        return field;
+        Console.WriteLine("Batch conversion completed. Results written to CSV.");
     }
 }

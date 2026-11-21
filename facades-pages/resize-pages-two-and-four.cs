@@ -16,19 +16,32 @@ class Program
             return;
         }
 
-        // Use PdfPageEditor to scale page contents (ResizeContents is not available in recent versions)
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Facade class that provides page‑content manipulation features
+            PdfFileEditor editor = new PdfFileEditor();
 
-        // Specify the pages to affect (1‑based indexing)
-        editor.ProcessPages = new int[] { 2, 4 };
+            // Define which pages to resize (1‑based indexing)
+            int[] pagesToResize = new int[] { 2, 4 };
 
-        // Apply a uniform zoom factor. Adjust the factor to achieve the desired left/right margins.
-        editor.Zoom = 0.9f; // 90% of original size (example)
+            // Create resize parameters with left/right/top/bottom margins (points).
+            // The Margins overload does not support named arguments in the version
+            // of Aspose.Pdf.Facades used, so pass the values positionally.
+            var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(
+                50, // left margin
+                50, // right margin
+                0,  // top margin
+                0   // bottom margin
+            );
 
-        // Save the modified PDF
-        editor.Save(outputPath);
+            // Apply the resizing to the selected pages
+            editor.ResizeContents(doc, pagesToResize, resizeParams);
 
-        Console.WriteLine($"Pages 2 and 4 resized and saved to '{outputPath}'.");
+            // Save the modified document (still inside the using block)
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

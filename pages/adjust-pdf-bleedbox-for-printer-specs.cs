@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_bleed_adjusted.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,21 +18,27 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Printer specification: add a 5 mm bleed on each side
+            // 1 point = 1/72 inch, 1 inch = 25.4 mm
+            const double mmToPt = 72.0 / 25.4;
+            double bleedMargin = 5 * mmToPt; // 5 mm expressed in points
+
             // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Retrieve the current BleedBox (a Rectangle)
-                Aspose.Pdf.Rectangle bleed = doc.Pages[i].BleedBox;
+                Page page = doc.Pages[i];
 
-                // Example adjustment: expand each side by 5 points to meet printer specs
-                // Ensure coordinates stay non‑negative
-                double left   = Math.Max(0, bleed.LLX - 5);
-                double bottom = Math.Max(0, bleed.LLY - 5);
-                double right  = bleed.URX + 5;
-                double top    = bleed.URY + 5;
+                // Retrieve existing BleedBox; if null, fall back to MediaBox
+                Aspose.Pdf.Rectangle currentBleed = page.BleedBox ?? page.MediaBox;
 
-                // Apply the adjusted BleedBox back to the page
-                doc.Pages[i].BleedBox = new Aspose.Pdf.Rectangle(left, bottom, right, top);
+                // Expand the BleedBox outward by the specified margin
+                double llx = currentBleed.LLX - bleedMargin;
+                double lly = currentBleed.LLY - bleedMargin;
+                double urx = currentBleed.URX + bleedMargin;
+                double ury = currentBleed.URY + bleedMargin;
+
+                // Assign the adjusted BleedBox (use fully qualified type to avoid ambiguity)
+                page.BleedBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
             }
 
             // Save the modified PDF

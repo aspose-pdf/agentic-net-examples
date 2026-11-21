@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
+using Aspose.Pdf.Security; // Added for Permissions enum
 
 class Program
 {
@@ -18,26 +18,33 @@ class Program
             return;
         }
 
-        // Encrypt the PDF with AES‑128 and high‑quality printing permission
+        // ---------- Encrypt the PDF ----------
+        // Permissions: high‑quality printing only (using the available PrintDocument flag)
+        Permissions perms = Permissions.PrintDocument;
+
+        // AES‑128 encryption (CryptoAlgorithm.AESx128)
         using (Document doc = new Document(inputPath))
         {
-            Permissions perms = Permissions.PrintDocument;
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx128);
             doc.Save(encryptedPath);
         }
 
-        // Verify the encryption settings by reopening the file with the user password
+        Console.WriteLine($"Document encrypted with AES‑128 and saved to '{encryptedPath}'.");
+
+        // ---------- Verify encryption settings ----------
+        // Open the encrypted file with the user password
         using (Document encDoc = new Document(encryptedPath, userPassword))
         {
-            // Decrypt the document (no parameters needed)
-            encDoc.Decrypt();
+            // Verify that the document is indeed encrypted (owner password is required for full access)
+            bool isEncrypted = encDoc.IsEncrypted;
+            Console.WriteLine($"IsEncrypted: {isEncrypted}");
 
-            // Cast the integer permissions to the enum before using bitwise operators
-            Permissions currentPerms = (Permissions)encDoc.Permissions;
-            bool hasPrintPermission = (currentPerms & Permissions.PrintDocument) == Permissions.PrintDocument;
+            // Verify the applied permissions
+            Permissions appliedPerms = (Permissions)encDoc.Permissions; // cast to Permissions enum
+            bool hasPrintPermission = (appliedPerms & Permissions.PrintDocument) == Permissions.PrintDocument;
+            Console.WriteLine($"PrintDocument permission set: {hasPrintPermission}");
 
-            Console.WriteLine($"Encryption algorithm: AES‑128");
-            Console.WriteLine($"Print permission set: {hasPrintPermission}");
+            // Note: The exact encryption algorithm cannot be read directly via the API; successful decryption implies the algorithm matches the one used.
         }
     }
 }

@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "button_output.pdf";
+        const string outputPath = "button_navigate.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,42 +17,44 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least 10 pages; add blank pages if necessary
+            // Ensure the document has at least 10 pages (add blanks if necessary)
             while (doc.Pages.Count < 10)
-            {
                 doc.Pages.Add();
-            }
 
-            // Choose the page where the button will be placed (e.g., first page)
-            Page page = doc.Pages[1];
+            // Define the button rectangle (lower‑left X,Y and upper‑right X,Y)
+            Aspose.Pdf.Rectangle buttonRect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Define the button's rectangle (lower‑left x/y, upper‑right x/y) in points
-            Rectangle rect = new Rectangle(100, 700, 200, 750);
+            // Create a push‑button form field on the first page
+            ButtonField button = new ButtonField(doc.Pages[1], buttonRect)
+            {
+                PartialName = "GoToPage10"
+            };
 
-            // Create the button field
-            ButtonField button = new ButtonField(page, rect);
-            button.PartialName = "GoToPage10";
-            button.AlternateCaption = "Go to Page 10"; // label shown on the button
-            button.Border = new Border(button) { Width = 1 };
-            // Optional visual styling – only set if the property exists in the used version
-            // button.BackgroundColor = Color.LightGray;
+            // Set visual appearance (DefaultAppearance must be set before the caption)
+            button.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
+            button.NormalCaption = "Go to Page 10";
+            button.Color = Aspose.Pdf.Color.LightGray; // background color of the button
 
-            // Create a GoTo action that navigates to page 10 (1‑based index).
-            // In older Aspose.Pdf versions the constructor accepts the target page number directly.
-            GoToAction goTo = new GoToAction(10);
-            // Assign the action to the button's mouse‑press event (valid property name)
-            button.Actions.OnPressMouseBtn = goTo;
+            // Border – must be created after the button instance exists
+            button.Border = new Border(button)
+            {
+                Width = 1,
+                Style = BorderStyle.Solid
+            };
 
-            // Add the button to the document's AcroForm
+            // Assign a GoTo action that points directly to page 10 (1‑based indexing)
+            button.OnActivated = new GoToAction(doc.Pages[10]);
+
+            // Add the button to the document's form collection
             doc.Form.Add(button, 1);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Button annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with navigation button saved to '{outputPath}'.");
     }
 }

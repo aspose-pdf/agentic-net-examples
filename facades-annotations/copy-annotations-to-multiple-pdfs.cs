@@ -1,83 +1,95 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        // Path to the PDF that contains the source annotations
-        const string templatePath = "template.pdf";
+        // Paths – adjust as needed
+        const string templatePdfPath = "template.pdf";          // PDF containing the source annotations
+        const string annotationsXfdf = "template_annotations.xfdf"; // Temporary XFDF file
+        const string targetsFolder   = "TargetPdfs";          // Folder with PDFs to receive annotations
+        const string outputFolder    = "AnnotatedPdfs";       // Folder where annotated PDFs will be saved
 
-        // List of PDFs that should receive the copied annotations
-        string[] targetPaths = { "target1.pdf", "target2.pdf", "target3.pdf" };
-
-        // Directory where the annotated PDFs will be saved
-        const string outputDirectory = "Output";
-
-        if (!File.Exists(templatePath))
+        // Verify required files/folders exist
+        if (!File.Exists(templatePdfPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {templatePath}");
+            Console.Error.WriteLine($"Template PDF not found: {templatePdfPath}");
+            return;
+        }
+        if (!Directory.Exists(targetsFolder))
+        {
+            Console.Error.WriteLine($"Target folder not found: {targetsFolder}");
+            return;
+        }
+        Directory.CreateDirectory(outputFolder);
+
+        // -----------------------------------------------------------------
+        // Step 1: Export annotations from the template PDF to an XFDF file.
+        // Use Document.ExportAnnotationsToXfdf – the older ExportAnnotations method
+        // does not exist in recent Aspose.Pdf versions.
+        // -----------------------------------------------------------------
+        try
+        {
+            using (var templateDoc = new Document(templatePdfPath))
+            using (var xfdfStream = new FileStream(annotationsXfdf, FileMode.Create, FileAccess.Write))
+            {
+                templateDoc.ExportAnnotationsToXfdf(xfdfStream);
+            }
+            Console.WriteLine($"Annotations exported to '{annotationsXfdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to export annotations: {ex.Message}");
             return;
         }
 
-        Directory.CreateDirectory(outputDirectory);
-
-        // ------------------------------------------------------------
-        // Load template document and cache its annotations per page
-        // ------------------------------------------------------------
-        Document templateDoc = new Document(templatePath);
-        var templateAnnotations = new List<List<Annotation>>();
-        foreach (Page page in templateDoc.Pages)
+        // -----------------------------------------------------------------
+        // Step 2: Iterate over each target PDF, copy it to the output folder,
+        // and import the previously exported annotations.
+        // -----------------------------------------------------------------
+        string[] targetFiles = Directory.GetFiles(targetsFolder, "*.pdf");
+        foreach (string targetPath in targetFiles)
         {
-            var pageAnnotations = new List<Annotation>();
-            foreach (Annotation ann in page.Annotations)
-            {
-                // Clone each annotation so it can be reused for other documents
-                pageAnnotations.Add((Annotation)ann.Clone());
-            }
-            templateAnnotations.Add(pageAnnotations);
-        }
+            string fileName = Path.GetFileName(targetPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-        // ------------------------------------------------------------
-        // Import the cached annotations into each target PDF
-        // ------------------------------------------------------------
-        foreach (string targetPath in targetPaths)
-        {
-            if (!File.Exists(targetPath))
+            try
             {
-                Console.Error.WriteLine($"Target PDF not found: {targetPath}");
-                continue;
-            }
+                // Copy original PDF to output location (preserves original file)
+                File.Copy(targetPath, outputPath, overwrite: true);
 
-            string outputPath = Path.Combine(outputDirectory, Path.GetFileName(targetPath));
-
-            using (Document targetDoc = new Document(targetPath))
-            {
-                // Ensure the target has at least as many pages as the template
-                while (targetDoc.Pages.Count < templateDoc.Pages.Count)
+                // Import annotations from XFDF into the copied PDF.
+                using (var targetDoc = new Document(outputPath))
+                using (var xfdfRead = new FileStream(annotationsXfdf, FileMode.Open, FileAccess.Read))
                 {
-                    targetDoc.Pages.Add();
+                    // ImportAnnotationsFromXfdf is the current API for XFDF import.
+                    targetDoc.ImportAnnotationsFromXfdf(xfdfRead);
+                    targetDoc.Save(outputPath);
                 }
 
-                // Copy annotations page‑by‑page
-                for (int i = 0; i < templateDoc.Pages.Count; i++)
-                {
-                    Page targetPage = targetDoc.Pages[i + 1];
-                    foreach (Annotation ann in templateAnnotations[i])
-                    {
-                        // Clone again because the same instance cannot be added to multiple pages
-                        targetPage.Annotations.Add((Annotation)ann.Clone());
-                    }
-                }
-
-                // Save the modified document
-                targetDoc.Save(outputPath);
+                Console.WriteLine($"Annotations imported into '{outputPath}'.");
             }
-
-            Console.WriteLine($"Annotations copied to: {outputPath}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
         }
+
+        // -----------------------------------------------------------------
+        // Optional cleanup: delete the temporary XFDF file.
+        // -----------------------------------------------------------------
+        try
+        {
+            if (File.Exists(annotationsXfdf))
+                File.Delete(annotationsXfdf);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Could not delete temporary XFDF file: {ex.Message}");
+        }
+
+        Console.WriteLine("Annotation copying completed.");
     }
 }

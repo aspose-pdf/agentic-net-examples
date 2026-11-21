@@ -1,7 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // Document, Page
-using Aspose.Pdf.Annotations;   // Annotation
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -9,29 +9,27 @@ class Program
     {
         const string inputPath = "input.pdf";
 
-        // Verify the PDF file exists
+        // Verify the input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the PDF document using Aspose.Pdf.Document (PdfAnnotationEditor does not expose a GetAnnotations method)
+        Document doc = new Document(inputPath);
 
         int totalAnnotations = 0;
-        // Iterate through each page and collect annotations
-        foreach (Page page in pdfDocument.Pages)
+        foreach (Page page in doc.Pages)
         {
             foreach (Annotation annotation in page.Annotations)
             {
                 totalAnnotations++;
-                // The Name property holds the annotation's identifier (may be empty for some types)
-                Console.WriteLine($"Annotation Name: {annotation.Name}");
+                // Annotation.Name contains the annotation's name (or an empty string if not set)
+                Console.WriteLine($"- Name: {annotation.Name}");
             }
         }
 
-        // Output the number of annotations found
-        Console.WriteLine($"Annotations found: {totalAnnotations}");
+        Console.WriteLine($"Found {totalAnnotations} annotation(s) in the document.");
     }
 }

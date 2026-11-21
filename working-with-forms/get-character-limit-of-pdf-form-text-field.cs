@@ -7,7 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";
+        const string pdfPath = "form.pdf";   // path to the PDF containing the form
+        const string fieldName = "Address";   // name of the field whose limit we want
 
         if (!File.Exists(pdfPath))
         {
@@ -15,20 +16,15 @@ class Program
             return;
         }
 
-        // Load the PDF document using the core API.
+        // Load the PDF document using the core Document API
         Document doc = new Document(pdfPath);
 
-        // Retrieve the form field named "Address" as a TextBoxField.
-        var addressField = doc.Form["Address"] as TextBoxField;
-        if (addressField == null)
-        {
-            Console.Error.WriteLine("Field 'Address' not found or is not a text box.");
-            return;
-        }
+        // Access the form field via the Document.Form collection
+        TextBoxField addressField = doc.Form[fieldName] as TextBoxField;
 
-        // The MaxLen property represents the character limit of the field.
-        int limit = addressField.MaxLen;
+        // The character limit is stored in the MaxLen property of a TextBoxField
+        int limit = addressField?.MaxLen ?? 0;
 
-        Console.WriteLine($"Character limit for 'Address' field: {limit}");
+        Console.WriteLine($"Field '{fieldName}' character limit: {limit}");
     }
 }

@@ -1,66 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string backgroundImage = "background.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output_with_background.pdf";
+        const string backgroundPng = "background.png";
 
-        if (!File.Exists(inputPdf))
+        // Verify required files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(backgroundPng))
+        {
+            Console.Error.WriteLine($"Background image not found: {backgroundPng}");
             return;
         }
 
-        if (!File.Exists(backgroundImage))
+        // Load the PDF document
+        using (Document pdf = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Background image not found: {backgroundImage}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Iterate over each page and add the background image as a stamp
+            for (int i = 1; i <= pdf.Pages.Count; i++)
             {
-                // Iterate through all pages (1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = pdf.Pages[i];
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
+
+                // Create an ImageStamp that covers the whole page
+                ImageStamp imgStamp = new ImageStamp(backgroundPng)
                 {
-                    Page page = doc.Pages[i];
-                    double pageWidth = page.PageInfo.Width;
-                    double pageHeight = page.PageInfo.Height;
+                    // Set the stamp size to match the page size
+                    Width = pageWidth,
+                    Height = pageHeight,
+                    // Position at the lower‑left corner of the page
+                    LeftMargin = 0,
+                    BottomMargin = 0,
+                    // Place the stamp behind existing content
+                    Background = true
+                };
 
-                    // Create an Image object from the PNG file
-                    using (FileStream imgStream = File.OpenRead(backgroundImage))
-                    {
-                        Image img = new Image
-                        {
-                            ImageStream = imgStream,
-                            // Set the image size to cover the whole page
-                            FixWidth = pageWidth,
-                            FixHeight = pageHeight,
-                            // Position at lower‑left corner (0,0)
-                            // No need to set coordinates because FixWidth/FixHeight are used
-                        };
-
-                        // Insert the image as the first element so it appears behind existing content
-                        page.Paragraphs.Insert(0, img);
-                    }
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPdf);
+                // Add the stamp to the current page
+                page.AddStamp(imgStamp);
             }
 
-            Console.WriteLine($"Background image added to all pages. Saved as '{outputPdf}'.");
+            // Save the modified PDF
+            pdf.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Background image added to all pages. Output saved to '{outputPdfPath}'.");
     }
 }

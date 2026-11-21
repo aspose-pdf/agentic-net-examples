@@ -4,53 +4,53 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-public static class PdfAnnotationHelper
+class PdfAnnotationHelper
 {
-    // Returns a dictionary mapping annotation type names to their occurrence counts.
+    // Returns a dictionary where the key is the annotation type name
+    // (e.g., "TextAnnotation", "LinkAnnotation") and the value is the
+    // number of occurrences of that type in the specified PDF.
     public static Dictionary<string, int> GetAnnotationCounts(string pdfPath)
     {
         if (!File.Exists(pdfPath))
             throw new FileNotFoundException($"PDF file not found: {pdfPath}");
 
-        // Load the PDF document.
-        Document pdfDocument = new Document(pdfPath);
+        var counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
-        // Prepare the result dictionary.
-        Dictionary<string, int> typeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-        // Iterate through all pages and their annotations.
-        foreach (Page page in pdfDocument.Pages)
+        // Use a using block for deterministic disposal of the Document.
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(pdfPath))
         {
-            foreach (Annotation annotation in page.Annotations)
+            // Pages are 1‑based in Aspose.Pdf.
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Use the enum name if available; otherwise fall back to the class name.
-                string typeName = annotation.AnnotationType != AnnotationType.Unknown
-                    ? annotation.AnnotationType.ToString()
-                    : annotation.GetType().Name;
+                Aspose.Pdf.Page page = doc.Pages[i];
 
-                if (typeCounts.ContainsKey(typeName))
-                    typeCounts[typeName]++;
-                else
-                    typeCounts[typeName] = 1;
+                // Iterate over all annotations on the current page.
+                foreach (Aspose.Pdf.Annotations.Annotation annot in page.Annotations)
+                {
+                    string typeName = annot.GetType().Name;
+
+                    if (counts.ContainsKey(typeName))
+                        counts[typeName]++;
+                    else
+                        counts[typeName] = 1;
+                }
             }
         }
 
-        return typeCounts;
+        return counts;
     }
 
-    // Simple entry point to make the project compile as an executable.
-    public static void Main(string[] args)
+    // Example usage.
+    static void Main()
     {
-        if (args.Length == 0)
-        {
-            Console.WriteLine("Usage: PdfAnnotationHelper <pdf-path>");
-            return;
-        }
+        const string inputPdf = "sample.pdf";
 
         try
         {
-            var counts = GetAnnotationCounts(args[0]);
-            foreach (var kvp in counts)
+            Dictionary<string, int> annotationCounts = GetAnnotationCounts(inputPdf);
+
+            Console.WriteLine($"Annotation counts for '{inputPdf}':");
+            foreach (var kvp in annotationCounts)
             {
                 Console.WriteLine($"{kvp.Key}: {kvp.Value}");
             }

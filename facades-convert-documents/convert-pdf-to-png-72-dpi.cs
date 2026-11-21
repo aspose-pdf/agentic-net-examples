@@ -7,36 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "output_images";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "PreviewImages";
+        const int dpi = 72; // quick preview resolution
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document (wrap in using for deterministic disposal)
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            // Set the desired resolution (72 DPI) for the PNG output
-            var resolution = new Resolution(72);
+            int pageCount = pdfDocument.Pages.Count;
+            Resolution resolution = new Resolution(dpi);
 
-            // Iterate over all pages (1‑based indexing) and save each as a PNG file
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            // Iterate through each page and save as PNG using PngDevice
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
 
-                // Use PngDevice (cross‑platform) to render the page to a PNG stream
-                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
+                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    var pngDevice = new PngDevice(resolution);
-                    pngDevice.Process(doc.Pages[pageNumber], imageStream);
+                    // PngDevice handles PNG conversion; it respects the supplied resolution (DPI)
+                    PngDevice pngDevice = new PngDevice(resolution);
+                    pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
                 }
+
+                Console.WriteLine($"Saved page {pageNumber} as PNG → {outputPath}");
             }
         }
 

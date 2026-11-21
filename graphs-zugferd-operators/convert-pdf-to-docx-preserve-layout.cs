@@ -6,35 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.docx";
+        const string inputPdfPath = "input.pdf";
+        const string outputDocxPath = "output.docx";
 
-        if (!File.Exists(inputPath))
+        // Verify input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(inputPath))
+            // Configure DOCX save options – use the EnhancedFlow mode which preserves layout,
+            // tables and fonts automatically. Additional options such as bullet detection can be enabled.
+            var docxOptions = new DocSaveOptions
             {
-                // Set DOCX save options to preserve layout, fonts, and tables
-                DocSaveOptions saveOpts = new DocSaveOptions
-                {
-                    Format = DocSaveOptions.DocFormat.DocX
-                };
+                Format = DocSaveOptions.DocFormat.DocX,
+                Mode   = DocSaveOptions.RecognitionMode.EnhancedFlow, // preserves document flow, tables, fonts
+                RecognizeBullets = true                                 // optional: improve list handling
+            };
 
-                // Save as DOCX using the specified options
-                pdfDoc.Save(outputPath, saveOpts);
-            }
+            // Save the PDF as DOCX using the configured options
+            pdfDoc.Save(outputDocxPath, docxOptions);
+        }
 
-            Console.WriteLine($"PDF successfully converted to DOCX: '{outputPath}'");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+        Console.WriteLine($"Conversion completed: '{outputDocxPath}'");
     }
 }

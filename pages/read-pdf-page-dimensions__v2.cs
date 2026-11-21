@@ -14,10 +14,10 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];

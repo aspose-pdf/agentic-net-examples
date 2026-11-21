@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing; // ImageStamp and related enums are here
 
 class Program
 {
@@ -11,7 +11,6 @@ class Program
         const string stampPath  = "stamp.png";
         const string outputPath = "output.pdf";
 
-        // Verify input files exist
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPath}");
@@ -23,23 +22,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF document; using ensures deterministic disposal
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Create an ImageStamp (Aspose.Pdf.Facades) from the image file
-            ImageStamp imgStamp = new ImageStamp(stampPath);
+            // Create an ImageStamp from the image file (Aspose.Pdf.Drawing)
+            ImageStamp stamp = new ImageStamp(stampPath)
+            {
+                // Set Background to false so the stamp overlays existing content
+                Background = false,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
 
-            // Set Background to false so the stamp overlays existing page content
-            imgStamp.Background = false;
-
-            // Optional: set alignment or position as needed
-            imgStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            imgStamp.VerticalAlignment   = VerticalAlignment.Center;
-
-            // Apply the stamp to each page individually (Page.AddStamp)
+            // Apply the stamp to each page individually
             foreach (Page page in pdfDoc.Pages)
             {
-                page.AddStamp(imgStamp);
+                page.AddStamp(stamp);
             }
 
             // Save the modified PDF

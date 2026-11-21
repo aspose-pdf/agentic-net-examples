@@ -4,7 +4,7 @@ using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Text;
 
-class Program
+class RotateFormFieldLabel
 {
     static void Main()
     {
@@ -17,49 +17,50 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains at least one form field
-            if (doc.Form.Count == 0)
+            // Access the AcroForm of the document
+            Form form = doc.Form;
+
+            // Retrieve a specific form field by its name (e.g., "Name")
+            TextBoxField field = form["Name"] as TextBoxField;
+
+            if (field != null)
             {
-                Console.Error.WriteLine("No form fields found in the document.");
-                return;
+                // TextBoxField does not expose a Rotate property.
+                // If you need to change the visual appearance of the field itself,
+                // modify its rectangle or DefaultAppearance here.
+            }
+            else
+            {
+                Console.WriteLine("Form field 'Name' not found. Skipping field rotation.");
             }
 
-            // Get the first form field and cast the returned WidgetAnnotation to Field
-            Field? field = doc.Form[1] as Field;
-            if (field == null)
-            {
-                Console.Error.WriteLine("The first annotation is not a form field.");
-                return;
-            }
+            // Create a visual label for the field using a TextStamp
+            TextStamp labelStamp = new TextStamp("Name:");
 
-            // Create a text stamp that will act as the label. Use RotateAngle for rotation.
-            TextStamp labelStamp = new TextStamp("Customer Name")
-            {
-                // Position the stamp just above the form field using the field's rectangle
-                XIndent = field.Rect.LLX,
-                YIndent = field.Rect.URY + 10,
-                // No automatic alignment – we control the exact coordinates
-                HorizontalAlignment = HorizontalAlignment.None,
-                VerticalAlignment = VerticalAlignment.None,
-                // Visual tweaks
-                Background = false,
-                Opacity = 1.0,
-                // Rotate 45 degrees clockwise
-                RotateAngle = 45f
-            };
-            // Set font size via the TextState object (FontSize on TextStamp is read‑only)
+            // Position the stamp near the field (adjust XIndent/YIndent as required)
+            labelStamp.HorizontalAlignment = HorizontalAlignment.Left;
+            labelStamp.VerticalAlignment   = VerticalAlignment.Bottom;
+            labelStamp.XIndent = 50;   // example horizontal offset
+            labelStamp.YIndent = 750;  // example vertical offset
+
+            // Rotate the label 45 degrees – use RotateAngle, not the non‑existent Rotation property
+            labelStamp.RotateAngle = 45f;
+
+            // Set visual appearance of the label
+            labelStamp.TextState.Font = FontRepository.FindFont("Helvetica");
             labelStamp.TextState.FontSize = 12;
+            labelStamp.TextState.ForegroundColor = Color.Black;
 
-            // Add the stamp (label) to the first page
+            // Add the stamp to the first page (or choose the appropriate page)
             doc.Pages[1].AddStamp(labelStamp);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with rotated label: {outputPath}");
+        Console.WriteLine($"PDF saved with rotated form field label: '{outputPath}'.");
     }
 }

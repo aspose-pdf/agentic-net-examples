@@ -2,83 +2,78 @@ using System;
 using System.IO;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "thumbnails";
+        const string pdfPath = "input.pdf";
+        const string outputFolder = "Thumbnails";
+        const int maxDimension = 200; // maximum width or height for thumbnails
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
         Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(inputPdfPath))
+        // PdfExtractor implements IDisposable, so wrap it in a using block
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            int pageNumber = 1;
-            foreach (Aspose.Pdf.Page page in pdfDoc.Pages)
+            // Load the PDF document
+            extractor.BindPdf(pdfPath);
+
+            // Enable image extraction
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
+
+            // Iterate through all extracted images
+            while (extractor.HasNextImage())
             {
-                int imageIndex = 1;
-                // Iterate over all images on the page
-                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
+                // Retrieve the next image into a memory stream
+                using (MemoryStream imgStream = new MemoryStream())
                 {
-                    // Save the original image to a memory stream
-                    using (MemoryStream imgStream = new MemoryStream())
+                    extractor.GetNextImage(imgStream);
+                    imgStream.Position = 0; // reset stream position
+
+                    // Load the image using System.Drawing
+                    using (Image original = Image.FromStream(imgStream))
                     {
-                        img.Save(imgStream); // stream‑based overload, no ImageSaveOptions needed
-                        imgStream.Position = 0;
-
-                        // Load the image with System.Drawing for resizing
-                        using (System.Drawing.Image original = System.Drawing.Image.FromStream(imgStream))
+                        // Determine thumbnail size while preserving aspect ratio
+                        int thumbWidth, thumbHeight;
+                        if (original.Width > original.Height)
                         {
-                            // Determine new size while preserving aspect ratio (max dimension = 200)
-                            int maxDim = 200;
-                            int newWidth, newHeight;
-                            if (original.Width > original.Height)
+                            thumbWidth = maxDimension;
+                            thumbHeight = (int)(original.Height * (maxDimension / (float)original.Width));
+                        }
+                        else
+                        {
+                            thumbHeight = maxDimension;
+                            thumbWidth = (int)(original.Width * (maxDimension / (float)original.Height));
+                        }
+
+                        // Create the thumbnail bitmap
+                        using (Bitmap thumbnail = new Bitmap(thumbWidth, thumbHeight))
+                        {
+                            using (Graphics g = Graphics.FromImage(thumbnail))
                             {
-                                newWidth = maxDim;
-                                newHeight = (int)(original.Height * (maxDim / (float)original.Width));
-                            }
-                            else
-                            {
-                                newHeight = maxDim;
-                                newWidth = (int)(original.Width * (maxDim / (float)original.Height));
+                                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                                g.DrawImage(original, 0, 0, thumbWidth, thumbHeight);
                             }
 
-                            // Create the thumbnail bitmap
-                            using (Bitmap thumb = new Bitmap(newWidth, newHeight))
-                            {
-                                using (Graphics g = Graphics.FromImage(thumb))
-                                {
-                                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                                    g.DrawImage(original, 0, 0, newWidth, newHeight);
-                                }
-
-                                // Build output file name: page_image.png
-                                string outFile = Path.Combine(
-                                    outputFolder,
-                                    $"page{pageNumber}_img{imageIndex}.png");
-
-                                // Save as PNG
-                                thumb.Save(outFile, ImageFormat.Png);
-                                Console.WriteLine($"Thumbnail saved: {outFile}");
-                            }
+                            // Save the thumbnail as PNG
+                            string outPath = Path.Combine(outputFolder, $"image_{imageIndex}.png");
+                            thumbnail.Save(outPath, System.Drawing.Imaging.ImageFormat.Png);
+                            Console.WriteLine($"Saved thumbnail: {outPath}");
                         }
                     }
-
-                    imageIndex++;
                 }
 
-                pageNumber++;
+                imageIndex++;
             }
         }
 

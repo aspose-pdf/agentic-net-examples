@@ -3,63 +3,86 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class PdfSanitizer
+class Program
 {
     static void Main()
     {
-        // Input and output directories
-        const string inputFolder  = @"C:\InputPdfs";
-        const string outputFolder = @"C:\SanitizedPdfs";
+        // Input folder containing PDFs to be sanitized
+        const string inputFolder = "InputPdfs";
+        // Output folder for cleaned PDFs
+        const string outputFolder = "SanitizedPdfs";
 
-        // Ensure output directory exists
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+
+        foreach (string inputPath in pdfFiles)
         {
+            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileName}_sanitized.pdf");
+
             try
             {
-                // Determine output file path
-                string fileName   = Path.GetFileName(inputPath);
-                string outputPath = Path.Combine(outputFolder, fileName);
-
-                // Load the PDF inside a using block for deterministic disposal
+                // Load each PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(inputPath))
                 {
-                    // ---------- Sanitize metadata ----------
+                    // ==== Remove document metadata ====
                     doc.Info.Title        = string.Empty;
                     doc.Info.Author       = string.Empty;
                     doc.Info.Subject      = string.Empty;
                     doc.Info.Keywords     = string.Empty;
                     doc.Info.Creator      = string.Empty;
                     doc.Info.Producer     = string.Empty;
-                    doc.Info.ModDate      = DateTime.Now;
-                    doc.Info.CreationDate = DateTime.Now;
+                    doc.Info.ModDate      = DateTime.MinValue;
+                    doc.Info.CreationDate = DateTime.MinValue;
 
-                    // ---------- Remove all annotations ----------
-                    // Pages are 1‑based in Aspose.Pdf
+                    // ==== Remove document‑level JavaScript (if any) ====
+                    // The JavaScript property is read‑only; clear the OpenAction instead.
+                    doc.OpenAction = null;
+
+                    // ==== Remove embedded files (attachments) ====
+                    if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                    {
+                        // EmbeddedFileCollection uses 1‑based indexing; delete by name.
+                        for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                        {
+                            var fileSpec = doc.EmbeddedFiles[i];
+                            if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                            {
+                                doc.EmbeddedFiles.Delete(fileSpec.Name);
+                            }
+                        }
+                    }
+
+                    // ==== Remove page annotations (e.g., comments, links) ====
+                    // Pages are 1‑based; use the global rule for correct indexing
                     for (int i = 1; i <= doc.Pages.Count; i++)
                     {
                         Page page = doc.Pages[i];
-                        // Clear the annotations collection if it contains any
                         if (page.Annotations != null && page.Annotations.Count > 0)
                         {
                             page.Annotations.Clear();
                         }
                     }
 
-                    // Save the sanitized PDF to the output folder
+                    // Save the sanitized PDF; default format is PDF
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Sanitized: {fileName}");
+                Console.WriteLine($"Sanitized: {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to process '{inputPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch sanitization completed.");
     }
 }

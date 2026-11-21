@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Use Facades namespace for XMP metadata
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,17 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Set author and title – these values are written to the XMP metadata automatically.
-            doc.Info.Author = "John Doe";
-            doc.Info.Title  = "Project Plan";
+        // Bind the PDF file to the XMP metadata editor (PdfXmpMetadata lives in Facades)
+        PdfXmpMetadata xmp = new PdfXmpMetadata();
+        xmp.BindPdf(inputPath);
 
-            // Save the updated PDF
-            doc.Save(outputPath);
-        }
+        // Set XMP metadata fields using the proper Dublin Core schema keys
+        xmp.Add("dc:creator", "John Doe");   // Author
+        xmp.Add("dc:title", "Project Plan"); // Title
 
-        Console.WriteLine($"XMP metadata (author, title) added and saved to '{outputPath}'.");
+        // Save the PDF with updated metadata and release resources
+        xmp.Save(outputPath);
+        xmp.Close();
+
+        Console.WriteLine($"XMP metadata updated and saved to '{outputPath}'.");
     }
 }

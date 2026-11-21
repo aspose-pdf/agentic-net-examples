@@ -1,102 +1,111 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // needed for TextFragmentAbsorber and TextExtractionOptions
 
-class BookmarkTocComparer
+class BookmarkConsistencyChecker
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // PDF to analyze
-        const string tocPath = "toc.txt";            // Generated TOC (Title<TAB>PageNumber per line)
+        const string inputPdfPath = "input.pdf";
+        const string reportPath   = "bookmark_consistency_report.txt";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(tocPath))
+        // Load the PDF document (required for page count, etc.)
+        using (Document doc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"TOC file not found: {tocPath}");
-            return;
-        }
+            // Bind the PDF to the bookmark editor (Facades API)
+            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+            bookmarkEditor.BindPdf(inputPdfPath);
 
-        // Load PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(pdfPath))
-        {
-            // -----------------------------------------------------------------
-            // Extract bookmarks using the Facades API
-            // -----------------------------------------------------------------
-            using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+            // Retrieve all bookmarks (outline entries) using the Facade API
+            // NOTE: The Facade provides ExtractBookmarks(), not GetBookmarks().
+            Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
+
+            // Extract bookmark titles and their destination page numbers
+            var bookmarkList = new List<(string Title, int PageNumber)>();
+            foreach (Bookmark bm in bookmarks)
             {
-                bookmarkEditor.BindPdf(pdfDoc);
+                // In the Facade model the page number is exposed via PageNumber (1‑based).
+                int pageNum = bm.PageNumber;
+                bookmarkList.Add((bm.Title, pageNum));
+            }
 
-                // ExtractBookmarks returns a Bookmarks collection (facade model)
-                Bookmarks bookmarks = bookmarkEditor.ExtractBookmarks();
-
-                // Build a dictionary of bookmark title -> page number (1‑based)
-                var bookmarkMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (Bookmark bm in bookmarks)
+            // ------------------------------------------------------------
+            // Generate a simple Table of Contents (TOC) for comparison.
+            // In a real scenario this could be built from headings or
+            // another source. Here we simulate it by extracting the
+            // first line of each page as a TOC entry.
+            // ------------------------------------------------------------
+            var tocList = new List<(string Title, int PageNumber)>();
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            {
+                Page page = doc.Pages[i];
+                // Use TextFragmentAbsorber (the correct class) to get page text
+                TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                page.Accept(absorber);
+                string pageText = absorber.Text?.Trim() ?? string.Empty;
+                string[] lines = pageText.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                if (lines.Length > 0)
                 {
-                    // In the facade model the page number is exposed via the PageNumber property
-                    int pageNum = bm.PageNumber; // 1‑based page index
-                    bookmarkMap[bm.Title] = pageNum;
-                }
-
-                // -----------------------------------------------------------------
-                // Load the generated Table of Contents (simple TAB‑separated file)
-                // -----------------------------------------------------------------
-                var tocMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (string line in File.ReadAllLines(tocPath))
-                {
-                    // Expected format: Title<TAB>PageNumber
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    string[] parts = line.Split('\t');
-                    if (parts.Length != 2) continue;
-
-                    string title = parts[0].Trim();
-                    if (!int.TryParse(parts[1].Trim(), out int tocPage)) continue;
-
-                    tocMap[title] = tocPage;
-                }
-
-                // -----------------------------------------------------------------
-                // Compare bookmark page numbers with TOC entries
-                // -----------------------------------------------------------------
-                Console.WriteLine("=== Consistency Check Results ===");
-                foreach (var kvp in tocMap)
-                {
-                    string title = kvp.Key;
-                    int tocPage = kvp.Value;
-
-                    if (bookmarkMap.TryGetValue(title, out int bmPage))
+                    string firstLine = lines[0];
+                    if (!string.IsNullOrEmpty(firstLine))
                     {
-                        if (bmPage == tocPage)
-                        {
-                            Console.WriteLine($"OK   : \"{title}\" – page {tocPage}");
-                        }
-                        else
-                        {
-                            Console.WriteLine($"MISMATCH: \"{title}\" – TOC page {tocPage}, Bookmark page {bmPage}");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"MISSING BOOKMARK: \"{title}\" – TOC page {tocPage}");
-                    }
-                }
-
-                // Detect bookmarks that have no corresponding TOC entry
-                foreach (var bmTitle in bookmarkMap.Keys)
-                {
-                    if (!tocMap.ContainsKey(bmTitle))
-                    {
-                        Console.WriteLine($"EXTRA BOOKMARK: \"{bmTitle}\" – Bookmark page {bookmarkMap[bmTitle]}");
+                        tocList.Add((firstLine, i));
                     }
                 }
             }
+
+            // ------------------------------------------------------------
+            // Compare bookmark list against generated TOC
+            // ------------------------------------------------------------
+            var mismatches = new List<string>();
+            foreach (var bm in bookmarkList)
+            {
+                // Find matching TOC entry by title (case‑insensitive)
+                var match = tocList.Find(t => string.Equals(t.Title, bm.Title, StringComparison.OrdinalIgnoreCase));
+                if (match.Equals(default((string, int)))) // no match found
+                {
+                    mismatches.Add($"Bookmark \"{bm.Title}\" not found in TOC.");
+                }
+                else if (match.PageNumber != bm.PageNumber)
+                {
+                    mismatches.Add($"Page mismatch for \"{bm.Title}\": Bookmark page {bm.PageNumber}, TOC page {match.PageNumber}.");
+                }
+            }
+
+            // ------------------------------------------------------------
+            // Write the consistency report
+            // ------------------------------------------------------------
+            using (StreamWriter writer = new StreamWriter(reportPath, false))
+            {
+                writer.WriteLine("Bookmark Consistency Report");
+                writer.WriteLine($"Generated on: {DateTime.Now}");
+                writer.WriteLine();
+
+                if (mismatches.Count == 0)
+                {
+                    writer.WriteLine("All bookmarks match the generated Table of Contents.");
+                }
+                else
+                {
+                    writer.WriteLine("Mismatches found:");
+                    foreach (string line in mismatches)
+                    {
+                        writer.WriteLine("- " + line);
+                    }
+                }
+            }
+
+            Console.WriteLine($"Consistency check completed. Report saved to \"{reportPath}\".");
         }
     }
 }

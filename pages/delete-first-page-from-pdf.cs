@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,13 +19,16 @@ class Program
         using (Document doc = new Document(inputPath))
         {
             // Aspose.Pdf uses 1‑based page indexing.
-            // Delete the first page (page number 1) and shift remaining pages forward.
-            doc.Pages.Delete(1);
+            // Delete the first page (page number 1) if it exists.
+            if (doc.Pages.Count >= 1)
+            {
+                doc.Pages.Delete(1);
+            }
 
-            // Save the modified document back to PDF.
+            // Save the modified document. No SaveOptions needed for PDF output.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"First page removed. Saved to '{outputPath}'.");
+        Console.WriteLine($"First page removed. Result saved to '{outputPath}'.");
     }
 }

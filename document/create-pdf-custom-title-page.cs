@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,37 +6,39 @@ class Program
 {
     static void Main()
     {
-        // Paths (adjust as needed)
         const string outputPath = "TitlePage.pdf";
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a new page (this will be the title page)
+            // Add a new page that will serve as the title page
             Page titlePage = doc.Pages.Add();
 
-            // Create a TextFragment for the title text
+            // Set a light‑gray background via Page.Background (the correct property in recent Aspose.Pdf versions)
+            titlePage.Background = Aspose.Pdf.Color.FromRgb(0.95f, 0.95f, 0.95f);
+
+            // Create a text fragment for the title
             TextFragment title = new TextFragment("My Custom Title");
 
-            // Set custom font – using a built‑in font (Helvetica). 
-            // For external TTF fonts use FontRepository.OpenFont("path/to/font.ttf")
-            Font font = FontRepository.FindFont("Helvetica");
-            title.TextState.Font = font;
-
-            // Set custom font size
+            // Custom font and size
+            title.TextState.Font = FontRepository.FindFont("Times New Roman");
             title.TextState.FontSize = 36;
 
-            // Set custom text color (using Aspose.Pdf.Color, not System.Drawing.Color)
-            title.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.2, 0.5, 0.8); // Light blue
+            // Custom text colour (blue shade)
+            title.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.2f, 0.4f, 0.8f);
 
-            // Center the title on the page
-            title.HorizontalAlignment = HorizontalAlignment.Center;
-            title.VerticalAlignment = VerticalAlignment.Center;
+            // Horizontal centering – supported directly on TextState
+            title.TextState.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Add the TextFragment to the page's paragraph collection
+            // Vertical centering – achieved by positioning the fragment at half the page height
+            float pageHeight = (float)titlePage.PageInfo.Height; // explicit cast from double to float
+            float yPos = (pageHeight - title.TextState.FontSize) / 2; // approximate centre
+            title.Position = new Position(0, yPos);
+
+            // Add the title fragment to the page's paragraph collection
             titlePage.Paragraphs.Add(title);
 
-            // Save the document as PDF
+            // Save the document as a PDF file
             doc.Save(outputPath);
         }
 

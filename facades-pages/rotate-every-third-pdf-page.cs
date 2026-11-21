@@ -6,36 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Get total number of pages (1‑based indexing)
+        int pageCount = pdfDocument.Pages.Count;
+
+        // Rotate every third page by 270° (landscape)
+        for (int i = 1; i <= pageCount; i++)
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            if (i % 3 == 0)
             {
-                // Rotate every third page (3, 6, 9, ...) by 270 degrees (landscape)
-                for (int pageNumber = 3; pageNumber <= doc.Pages.Count; pageNumber += 3)
-                {
-                    // Aspose.Pdf uses a 1‑based page index and the Rotation enum
-                    doc.Pages[pageNumber].Rotate = Rotation.on270;
-                }
-
-                // Save the modified document
-                doc.Save(outputPath);
+                pdfDocument.Pages[i].Rotate = Rotation.on270;
             }
+        }
 
-            Console.WriteLine($"Pages rotated and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

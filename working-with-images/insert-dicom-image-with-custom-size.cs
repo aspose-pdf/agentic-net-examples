@@ -1,51 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "template.pdf";   // existing PDF to insert the image into
-        const string dicomImagePath = "image.dcm";   // DICOM image file
-        const string outputPdfPath = "output.pdf";   // result PDF
+        const string dicomPath = "image.dcm";   // Path to the DICOM image
+        const string outputPdf = "output.pdf";  // Resulting PDF file
 
-        // Verify input files exist
-        if (!File.Exists(inputPdfPath))
+        // Verify the DICOM file exists
+        if (!File.Exists(dicomPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(dicomImagePath))
-        {
-            Console.Error.WriteLine($"DICOM image not found: {dicomImagePath}");
+            Console.Error.WriteLine($"DICOM file not found: {dicomPath}");
             return;
         }
 
-        // Document lifecycle must be wrapped in a using block (deterministic disposal)
-        using (Document doc = new Document(inputPdfPath))
+        // Create a new PDF document
+        Document pdfDoc = new Document();
+        // Add a blank page to host the image
+        Page page = pdfDoc.Pages.Add();
+
+        // Load the DICOM image from a stream and add it as an ImageStamp
+        using (FileStream imgStream = File.OpenRead(dicomPath))
         {
-            // Load the DICOM image via ImageStream (Aspose.Pdf.Image has no ctor that accepts a path)
-            using (FileStream imgStream = new FileStream(dicomImagePath, FileMode.Open, FileAccess.Read))
+            ImageStamp stamp = new ImageStamp(imgStream)
             {
-                Image dicomImage = new Image
-                {
-                    ImageStream = imgStream,
-                    // Adjust resolution by setting explicit width and height (points, 1/72 inch)
-                    FixWidth = 300,   // desired width
-                    FixHeight = 200   // desired height
-                };
-
-                // Add the image to the first page (Aspose.Pdf uses 1‑based page indexing)
-                Page firstPage = doc.Pages[1];
-                firstPage.Paragraphs.Add(dicomImage);
-
-                // Save the modified PDF (no SaveOptions needed for PDF output)
-                doc.Save(outputPdfPath);
-            }
+                // Set custom size (points; 1 point = 1/72 inch)
+                Width = 300f,   // ≈4.17 inches
+                Height = 400f,  // ≈5.56 inches
+                // Optional: center the image on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center
+            };
+            page.AddStamp(stamp);
         }
 
-        Console.WriteLine($"DICOM image inserted and saved to '{outputPdfPath}'.");
+        // Save the resulting PDF
+        pdfDoc.Save(outputPdf);
+        Console.WriteLine($"PDF with DICOM image saved to '{outputPdf}'.");
     }
 }

@@ -11,31 +11,30 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // 1 inch = 72 points
-        const double inchToPoint = 72.0;
-        double width = 8.5 * inchToPoint;   // 612 points
-        double height = 11.0 * inchToPoint; // 792 points
+        // 8.5 x 11 inches expressed in points (1 inch = 72 points)
+        const double widthPoints = 8.5 * 72;
+        const double heightPoints = 11 * 72;
 
-        // Load the PDF from a stream (stream overload)
+        // Use stream overload to resize pages
         using (FileStream inputStream = File.OpenRead(inputPath))
-        using (Document pdf = new Document(inputStream))
+        using (FileStream outputStream = File.Create(outputPath))
         {
-            // Resize each page to 8.5 x 11 inches using PageInfo
-            foreach (Page page in pdf.Pages)
+            // Load the PDF from the input stream
+            Document pdfDocument = new Document(inputStream);
+
+            // Resize each page to the specified dimensions using PageInfo
+            foreach (Page page in pdfDocument.Pages)
             {
-                page.PageInfo.Width = width;
-                page.PageInfo.Height = height;
+                page.PageInfo.Width = widthPoints;
+                page.PageInfo.Height = heightPoints;
             }
 
-            // Save the modified PDF to an output stream
-            using (FileStream outputStream = File.Create(outputPath))
-            {
-                pdf.Save(outputStream);
-            }
+            // Save the modified PDF to the output stream
+            pdfDocument.Save(outputStream);
         }
 
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");

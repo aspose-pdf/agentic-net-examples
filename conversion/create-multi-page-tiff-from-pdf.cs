@@ -7,31 +7,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTiff = "output.tif";
+        const string inputPdfPath = "input.pdf";
+        const string outputTiffPath = "output.tif";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document; using ensures deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Define the resolution (default 300 DPI). The TiffDevice constructor expects a Resolution object.
-            Resolution resolution = new Resolution(300);
-
-            // Create a TiffDevice with default compression (LZW) using the resolution.
-            TiffDevice tiffDevice = new TiffDevice(resolution);
-
-            // Create a file stream for the TIFF output and render all pages into a multi‑page TIFF.
-            using (FileStream tiffStream = new FileStream(outputTiff, FileMode.Create, FileAccess.Write))
+            // Create the output file stream inside a using block
+            using (FileStream tiffStream = new FileStream(outputTiffPath, FileMode.Create, FileAccess.Write))
             {
+                // TiffDevice with default settings (default compression)
+                TiffDevice tiffDevice = new TiffDevice();
+
+                // Convert all pages of the PDF to a multi‑page TIFF
                 tiffDevice.Process(pdfDoc, tiffStream);
             }
         }
 
-        Console.WriteLine($"Multi‑page TIFF created at '{outputTiff}'.");
+        Console.WriteLine($"Multi‑page TIFF created at '{outputTiffPath}'.");
     }
 }

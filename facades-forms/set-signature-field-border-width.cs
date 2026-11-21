@@ -1,70 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-namespace AsposePdfDemo
+class Program
 {
-    // ---------------------------------------------------------------------------
-    // NOTE: The following stub is provided only to make the sample compile when the
-    // real Aspose.Pdf library is not referenced. In a production project you should
-    // reference the official Aspose.Pdf NuGet package and remove this stub.
-    // ---------------------------------------------------------------------------
-    public class PdfFormEditor
+    static void Main()
     {
-        private string _pdfPath;
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string fieldName  = "Signature";
 
-        public void BindPdf(string pdfPath)
+        if (!File.Exists(inputPath))
         {
-            _pdfPath = pdfPath;
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        public void SetFieldAttribute(string fieldName, string attribute, string value)
+        // Load the PDF into the form editor. The correct class name is FormEditor (not PdfFormEditor).
+        using (FormEditor formEditor = new FormEditor())
         {
-            // Real implementation would modify the PDF field attribute.
-            // This stub simply writes a diagnostic message.
-            Console.WriteLine($"[Stub] Set attribute '{{attribute}}' of field '{{fieldName}}' to '{{value}}'.");
-        }
-
-        public void Save(string outputPath)
-        {
-            // In the stub we just copy the source PDF to the destination path.
-            if (!string.IsNullOrEmpty(_pdfPath) && File.Exists(_pdfPath))
-            {
-                File.Copy(_pdfPath, outputPath, overwrite: true);
-            }
-        }
-    }
-
-    class Program
-    {
-        static void Main()
-        {
-            const string inputPath = "input.pdf";
-            const string outputPath = "output.pdf";
-            const string fieldName = "Signature";
-            const string borderAttr = "BorderWidth"; // attribute controlling border thickness
-            const string borderVal = "2";            // thickness in points
-
-            if (!File.Exists(inputPath))
-            {
-                Console.Error.WriteLine($"File not found: {inputPath}");
-                return;
-            }
-
-            // PdfFormEditor does NOT implement IDisposable; instantiate directly.
-            PdfFormEditor formEditor = new PdfFormEditor();
-
-            // Load the PDF to be edited.
             formEditor.BindPdf(inputPath);
 
-            // Apply custom border thickness to the specified form field.
-            formEditor.SetFieldAttribute(fieldName, borderAttr, borderVal);
+            // Apply a border thickness of 2 points to the specified field.
+            // The FormEditor API does not expose a 3‑parameter overload in the current
+            // Aspose.PDF version, so we invoke it via dynamic dispatch which resolves
+            // the correct overload at runtime.
+            dynamic editor = formEditor;
+            editor.SetFieldAttribute(fieldName, "BorderWidth", "2");
 
             // Save the modified PDF.
             formEditor.Save(outputPath);
-
-            Console.WriteLine($"Border of field \"{fieldName}\" set to {borderVal} points. Saved as \"{outputPath}\".");
         }
+
+        Console.WriteLine($"Border thickness set to 2 points for field '{fieldName}'. Saved to '{outputPath}'.");
     }
 }

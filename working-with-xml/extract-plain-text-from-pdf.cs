@@ -1,10 +1,3 @@
-// AsposePdfApi.GlobalUsings.g.cs
-global using System;
-global using System.IO;
-global using Aspose.Pdf;
-global using Aspose.Pdf.Text;
-
-// Program.cs
 using System;
 using System.IO;
 using Aspose.Pdf;
@@ -14,48 +7,41 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF generated from XML
-        const string pdfPath = "input.pdf";
-
-        // Optional: path to save the extracted plain text (for indexing)
-        const string txtOutputPath = "extracted.txt";
+        const string pdfPath = "input.pdf";          // PDF generated from XML
+        const string outputTextPath = "extracted.txt";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // Create a TextAbsorber to extract text from the whole document
-            TextAbsorber absorber = new TextAbsorber
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Use pure text extraction (no formatting) – suitable for indexing
-                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-            };
+                // TextAbsorber extracts plain text from the document
+                TextAbsorber absorber = new TextAbsorber();
 
-            // Apply the absorber to all pages
-            doc.Pages.Accept(absorber);
+                // Configure extraction to return pure text without formatting tags
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // The extracted plain text
-            string plainText = absorber.Text;
+                // Apply the absorber to all pages
+                pdfDoc.Pages.Accept(absorber);
 
-            // Output to console (optional)
-            Console.WriteLine("Extracted text:");
-            Console.WriteLine(plainText);
+                // Retrieve the extracted text
+                string plainText = absorber.Text;
 
-            // Save the extracted text to a file for indexing pipelines
-            try
-            {
-                File.WriteAllText(txtOutputPath, plainText);
-                Console.WriteLine($"Plain text saved to '{txtOutputPath}'.");
+                // Optionally write the text to a file for indexing
+                File.WriteAllText(outputTextPath, plainText);
+
+                Console.WriteLine($"Text extracted and saved to '{outputTextPath}'.");
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Failed to write text file: {ex.Message}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
         }
     }
 }

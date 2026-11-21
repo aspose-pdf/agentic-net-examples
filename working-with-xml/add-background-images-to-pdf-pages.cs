@@ -7,69 +7,79 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";      // source PDF
-        const string xmlPath   = "backgrounds.xml"; // XML defining background images
-        const string outputPdf = "output.pdf";     // result PDF
+        // Input PDF, XML definition and output PDF paths
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "backgrounds.xml";
+        const string outputPdfPath = "output.pdf";
 
+        // Verify files exist
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
-        // Load XML: expected format <Backgrounds><Page number="1" image="brand1.png"/></Backgrounds>
-        XDocument xDoc = XDocument.Load(xmlPath);
-        // Build a simple lookup of page number -> image path
-        var bgMap = new System.Collections.Generic.Dictionary<int, string>();
-        foreach (var elem in xDoc.Root.Elements("Page"))
-        {
-            int pageNum;
-            if (int.TryParse(elem.Attribute("number")?.Value, out pageNum) &&
-                !string.IsNullOrWhiteSpace(elem.Attribute("image")?.Value))
-            {
-                string imgPath = elem.Attribute("image").Value;
-                if (File.Exists(imgPath))
-                    bgMap[pageNum] = imgPath;
-                else
-                    Console.Error.WriteLine($"Image not found for page {pageNum}: {imgPath}");
-            }
-        }
+        // Load the XML that defines background images per page.
+        // Expected format:
+        // <Backgrounds>
+        //   <Page number="1" image="bg1.png" />
+        //   <Page number="2" image="bg2.png" />
+        //   ...
+        // </Backgrounds>
+        XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        // Process PDF
-        using (Document doc = new Document(pdfPath))
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Iterate using 1‑based page indexing
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate over each <Page> element in the XML.
+            foreach (XElement pageElem in xmlDoc.Root.Elements("Page"))
             {
-                if (!bgMap.ContainsKey(i))
-                    continue; // no background defined for this page
-
-                string imgPath = bgMap[i];
-                // Create an ImageStamp that will be placed behind page content
-                ImageStamp stamp = new ImageStamp(imgPath)
+                // Parse page number (1‑based) and image file path.
+                if (!int.TryParse(pageElem.Attribute("number")?.Value, out int pageNumber))
                 {
-                    Background = true, // render behind existing content
-                    // Stretch to fill the whole page
-                    Width = doc.Pages[i].PageInfo.Width,
-                    Height = doc.Pages[i].PageInfo.Height,
-                    LeftMargin = 0,
-                    TopMargin = 0
+                    Console.Error.WriteLine("Invalid or missing page number attribute.");
+                    continue;
+                }
+                string imagePath = pageElem.Attribute("image")?.Value;
+                if (string.IsNullOrWhiteSpace(imagePath) || !File.Exists(imagePath))
+                {
+                    Console.Error.WriteLine($"Image not found for page {pageNumber}: {imagePath}");
+                    continue;
+                }
+
+                // Ensure the requested page exists in the PDF.
+                if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Page number {pageNumber} is out of range (1‑{pdfDoc.Pages.Count}).");
+                    continue;
+                }
+
+                // Create an ImageStamp that will be placed behind existing content.
+                ImageStamp bgStamp = new ImageStamp(imagePath)
+                {
+                    // Mark as background so it does not obscure page content.
+                    Background = true,
+                    // Size the stamp to fill the entire page.
+                    Width = pdfDoc.Pages[pageNumber].PageInfo.Width,
+                    Height = pdfDoc.Pages[pageNumber].PageInfo.Height,
+                    // Position at the origin of the page.
+                    XIndent = 0,
+                    YIndent = 0
                 };
 
-                // Add the stamp to the current page
-                doc.Pages[i].AddStamp(stamp);
+                // Add the stamp to the specified page.
+                pdfDoc.Pages[pageNumber].AddStamp(bgStamp);
             }
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
-            doc.Save(outputPdf);
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Background images applied. Output saved to '{outputPdf}'.");
+        Console.WriteLine($"Background images applied. Output saved to '{outputPdfPath}'.");
     }
 }

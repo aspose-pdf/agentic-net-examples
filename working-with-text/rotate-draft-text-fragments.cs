@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +16,19 @@ class Program
             return;
         }
 
-        // Load the PDF with the core Document API (no Facades)
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Locate every text fragment that contains the word "Draft"
+            // Create a TextFragmentAbsorber that searches for the word "Draft"
             TextFragmentAbsorber absorber = new TextFragmentAbsorber("Draft");
+
+            // Apply the absorber to all pages of the document
             doc.Pages.Accept(absorber);
 
-            // Apply a 15‑degree rotation to each matching fragment
+            // Iterate over each found TextFragment and rotate it by 15 degrees
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                fragment.TextState.Rotation = 15; // degrees
+                fragment.TextState.Rotation = 15; // rotation in degrees
             }
 
             // Save the modified PDF

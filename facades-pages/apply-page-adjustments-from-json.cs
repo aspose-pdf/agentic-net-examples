@@ -1,162 +1,166 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using Aspose.Pdf.Drawing;
 
-public class PageAdjustment
+namespace PdfPageAutomation
 {
-    // 1‑based page number
-    public int PageNumber { get; set; }
-    // Rotation in degrees (0, 90, 180, 270)
-    public int? Rotation { get; set; }
-    // Width and height in points (1 point = 1/72 inch)
-    public double? Width { get; set; }
-    public double? Height { get; set; }
-    // Background color as hex "#RRGGBB" or known name (e.g., "LightGray")
-    public string? BackgroundColor { get; set; }
-}
-
-public class PdfJob
-{
-    public string InputPath { get; set; } = null!;
-    public string OutputPath { get; set; } = null!;
-    public List<PageAdjustment> Adjustments { get; set; } = null!;
-}
-
-public class ConfigRoot
-{
-    public List<PdfJob> Jobs { get; set; } = null!;
-}
-
-class Program
-{
-    static void Main(string[] args)
+    // Represents per‑page adjustments that can be applied.
+    public class PageSettings
     {
-        string configFile = args.Length > 0 ? args[0] : "config.json";
+        public int? Rotation { get; set; }               // Degrees: 0, 90, 180, 270
+        public double? MarginLeft { get; set; }          // Points
+        public double? MarginRight { get; set; }
+        public double? MarginTop { get; set; }
+        public double? MarginBottom { get; set; }
+        public string? BackgroundColor { get; set; }      // Hex string, e.g. "#FFAA00"
+    }
 
-        if (!File.Exists(configFile))
-        {
-            Console.Error.WriteLine($"Config file not found: {configFile}");
-            return;
-        }
+    // Represents a single PDF processing job.
+    public class PdfJob
+    {
+        public required string InputPath { get; set; }   // Source PDF
+        public required string OutputPath { get; set; }  // Destination PDF
+        public required List<PageSettings> Pages { get; set; } // Settings per page (1‑based order)
+    }
 
-        string json = File.ReadAllText(configFile);
-        ConfigRoot? config = JsonSerializer.Deserialize<ConfigRoot>(json, new JsonSerializerOptions
+    class Program
+    {
+        static void Main(string[] args)
         {
-            PropertyNameCaseInsensitive = true
-        });
+            const string configFile = "config.json";
 
-        if (config?.Jobs == null || config.Jobs.Count == 0)
-        {
-            Console.Error.WriteLine("No jobs defined in the configuration.");
-            return;
-        }
-
-        foreach (var job in config.Jobs)
-        {
-            if (!File.Exists(job.InputPath))
+            if (!File.Exists(configFile))
             {
-                Console.Error.WriteLine($"Input PDF not found: {job.InputPath}");
-                continue;
+                Console.Error.WriteLine($"Configuration file not found: {configFile}");
+                return;
             }
 
-            // Load the PDF document once – we will apply all adjustments (rotation, size, background) here.
-            using (Document doc = new Document(job.InputPath))
+            List<PdfJob>? jobs;
+            try
             {
-                foreach (var adj in job.Adjustments)
+                string json = File.ReadAllText(configFile);
+                jobs = JsonSerializer.Deserialize<List<PdfJob>>(json, new JsonSerializerOptions
                 {
-                    // Validate page range (Aspose.Pdf uses 1‑based indexing)
-                    if (adj.PageNumber < 1 || adj.PageNumber > doc.Pages.Count)
+                    PropertyNameCaseInsensitive = true
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Failed to parse configuration: {ex.Message}");
+                return;
+            }
+
+            if (jobs == null || jobs.Count == 0)
+            {
+                Console.WriteLine("No jobs defined in the configuration.");
+                return;
+            }
+
+            foreach (var job in jobs)
+            {
+                if (!File.Exists(job.InputPath))
+                {
+                    Console.Error.WriteLine($"Input PDF not found: {job.InputPath}");
+                    continue;
+                }
+
+                // Load the PDF document.
+                Document doc = new Document(job.InputPath);
+
+                // Apply settings page by page. Aspose.Pdf uses 1‑based page indexing.
+                for (int i = 0; i < job.Pages.Count; i++)
+                {
+                    int pageNumber = i + 1; // 1‑based index
+                    PageSettings settings = job.Pages[i];
+
+                    // Ensure the page exists.
+                    if (pageNumber > doc.Pages.Count)
                     {
-                        Console.Error.WriteLine($"Page {adj.PageNumber} out of range in {job.InputPath}");
+                        Console.Error.WriteLine($"Page {pageNumber} does not exist in '{job.InputPath}'. Skipping.");
                         continue;
                     }
 
-                    Page page = doc.Pages[adj.PageNumber];
+                    Page page = doc.Pages[pageNumber];
 
-                    // ----- Rotation -----
-                    if (adj.Rotation.HasValue)
+                    // Rotation
+                    if (settings.Rotation.HasValue)
                     {
-                        page.Rotate = adj.Rotation.Value switch
+                        page.Rotate = GetRotationEnum(settings.Rotation.Value);
+                    }
+
+                    // Margins
+                    if (settings.MarginLeft.HasValue || settings.MarginRight.HasValue ||
+                        settings.MarginTop.HasValue || settings.MarginBottom.HasValue)
+                    {
+                        double left   = settings.MarginLeft   ?? page.PageInfo.Margin?.Left   ?? 0;
+                        double right  = settings.MarginRight  ?? page.PageInfo.Margin?.Right  ?? 0;
+                        double top    = settings.MarginTop    ?? page.PageInfo.Margin?.Top    ?? 0;
+                        double bottom = settings.MarginBottom ?? page.PageInfo.Margin?.Bottom ?? 0;
+
+                        page.PageInfo.Margin = new MarginInfo
                         {
-                            0 => Rotation.None,
-                            90 => Rotation.on90,
-                            180 => Rotation.on180,
-                            270 => Rotation.on270,
-                            _ => Rotation.None
+                            Left = left,
+                            Right = right,
+                            Top = top,
+                            Bottom = bottom
                         };
                     }
 
-                    // ----- Size -----
-                    if (adj.Width.HasValue && adj.Height.HasValue)
+                    // Background color
+                    if (!string.IsNullOrWhiteSpace(settings.BackgroundColor))
                     {
-                        page.PageInfo.Width = adj.Width.Value;
-                        page.PageInfo.Height = adj.Height.Value;
-                    }
-
-                    // ----- Background color -----
-                    if (!string.IsNullOrEmpty(adj.BackgroundColor))
-                    {
-                        // Create a Graph container that covers the whole page.
-                        Graph graph = new Graph((float)page.PageInfo.Width, (float)page.PageInfo.Height);
-
-                        // Rectangle constructor expects (left, bottom, width, height) as floats.
-                        var rect = new Aspose.Pdf.Drawing.Rectangle(
-                            0f,
-                            0f,
-                            (float)page.PageInfo.Width,
-                            (float)page.PageInfo.Height)
+                        Aspose.Pdf.Color? bgColor = ParseHexColor(settings.BackgroundColor);
+                        if (bgColor != null)
                         {
-                            // Styling is done via GraphInfo, not a direct FillColor property.
-                            GraphInfo = new GraphInfo
-                            {
-                                FillColor = ParseColor(adj.BackgroundColor),
-                                // Optional: no border line.
-                                Color = Aspose.Pdf.Color.Transparent
-                            }
-                        };
-
-                        // Add the rectangle shape to the graph and then the graph to the page.
-                        graph.Shapes.Add(rect);
-                        page.Paragraphs.Add(graph);
+                            // Correct property: Page.Background (not PageInfo.BackgroundColor)
+                            page.Background = bgColor;
+                        }
                     }
                 }
 
-                // Save final output PDF
+                // Save the modified PDF.
                 doc.Save(job.OutputPath);
+                Console.WriteLine($"Processed '{job.InputPath}' → '{job.OutputPath}'.");
             }
-
-            Console.WriteLine($"Processed: {job.OutputPath}");
-        }
-    }
-
-    // Helper to convert a color string to Aspose.Pdf.Color
-    static Aspose.Pdf.Color ParseColor(string value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return Aspose.Pdf.Color.Transparent;
-
-        value = value.Trim();
-
-        // Hex format "#RRGGBB"
-        if (value.StartsWith("#") && value.Length == 7)
-        {
-            int r = Convert.ToInt32(value.Substring(1, 2), 16);
-            int g = Convert.ToInt32(value.Substring(3, 2), 16);
-            int b = Convert.ToInt32(value.Substring(5, 2), 16);
-            return Aspose.Pdf.Color.FromRgb(r / 255.0, g / 255.0, b / 255.0);
         }
 
-        // Simple named colors (case‑insensitive)
-        return value.ToLower() switch
+        // Maps integer degrees to the Aspose.Pdf.Rotation enum.
+        private static Rotation GetRotationEnum(int degrees)
         {
-            "lightgray" => Aspose.Pdf.Color.LightGray,
-            "white" => Aspose.Pdf.Color.White,
-            "black" => Aspose.Pdf.Color.Black,
-            _ => Aspose.Pdf.Color.Transparent
-        };
+            return degrees switch
+            {
+                90  => Rotation.on90,
+                180 => Rotation.on180,
+                270 => Rotation.on270,
+                _   => Rotation.None
+            };
+        }
+
+        // Parses a hex color string (e.g. "#RRGGBB") into an Aspose.Pdf.Color.
+        private static Aspose.Pdf.Color? ParseHexColor(string hex)
+        {
+            if (string.IsNullOrWhiteSpace(hex))
+                return null;
+
+            hex = hex.TrimStart('#');
+            if (hex.Length != 6)
+                return null; // Invalid format.
+
+            try
+            {
+                int r = Convert.ToInt32(hex.Substring(0, 2), 16);
+                int g = Convert.ToInt32(hex.Substring(2, 2), 16);
+                int b = Convert.ToInt32(hex.Substring(4, 2), 16);
+
+                // Aspose.Pdf.Color expects values in the range 0‑1.
+                return Aspose.Pdf.Color.FromRgb(r / 255.0, g / 255.0, b / 255.0);
+            }
+            catch
+            {
+                return null; // Parsing failed.
+            }
+        }
     }
 }

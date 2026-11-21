@@ -13,16 +13,16 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the source PDF inside a using block for deterministic disposal
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Define desired permissions (e.g., allow printing and content extraction)
+                // Define the permissions to allow for the user password
                 Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
                 // Apply encryption with user/owner passwords and AES-256 algorithm

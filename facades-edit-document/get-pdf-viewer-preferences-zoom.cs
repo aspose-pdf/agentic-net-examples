@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.CSharp.RuntimeBinder; // for RuntimeBinderException (optional, can be omitted)
 
 class Program
 {
@@ -15,33 +15,38 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // ViewerPreferences were added in later Aspose.Pdf versions.  To keep the code
+        // compilable with older versions we access the member via dynamic and handle the
+        // possible RuntimeBinderException at runtime.
+        try
         {
-            // ViewerPreferences were introduced in later Aspose.Pdf versions.
-            // To keep the source compatible with older versions we access the member
-            // via dynamic binding and handle the possible RuntimeBinderException.
-            dynamic dynDoc = doc;
-            try
-            {
-                var prefs = dynDoc.ViewerPreferences; // runtime access
-                Console.WriteLine($"Page Layout: {prefs.PageLayout}");
-                Console.WriteLine($"Zoom Mode: {prefs.Zoom}");
+            dynamic doc = pdfDocument; // bypass compile‑time member check
+            var viewer = doc.ViewerPreferences; // may throw RuntimeBinderException if not present
 
-                // When the Zoom mode is Custom, the ZoomFactor property contains the percentage.
-                // We compare the string representation to avoid compile‑time dependency on the ZoomMode enum.
-                if (prefs.Zoom != null && prefs.Zoom.ToString() == "Custom")
-                {
-                    Console.WriteLine($"Custom Zoom Factor: {prefs.ZoomFactor}%");
-                }
-            }
-            catch (RuntimeBinderException)
-            {
-                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
-            }
+            // Page layout (e.g., SinglePage, OneColumn, TwoColumnLeft, etc.)
+            Console.WriteLine($"Page Layout: {viewer.PageLayout}");
 
-            // Use the Document.Pages collection to obtain the page count (compatible with all versions).
-            Console.WriteLine($"Number of pages: {doc.Pages.Count}");
+            // Zoom factor (percentage) – some versions expose it as an integer, others as double.
+            // Use Convert.ToInt32 to normalise the output.
+            Console.WriteLine($"Zoom: {Convert.ToInt32(viewer.Zoom)}%");
+            Console.WriteLine($"Zoom Mode: {viewer.ZoomMode}");
+
+            // Additional viewer preferences (optional)
+            Console.WriteLine($"Hide Toolbar: {viewer.HideToolbar}");
+            Console.WriteLine($"Hide Menubar: {viewer.HideMenubar}");
+            Console.WriteLine($"Display Document Title: {viewer.DisplayDocTitle}");
+        }
+        catch (RuntimeBinderException)
+        {
+            Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
+        }
+        catch (Exception ex)
+        {
+            // Any other unexpected exception – log and continue.
+            Console.WriteLine($"An error occurred while reading viewer preferences: {ex.Message}");
         }
     }
 }

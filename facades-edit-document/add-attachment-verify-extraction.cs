@@ -6,13 +6,13 @@ class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string sourcePdfPath = "source.pdf";                 // original PDF
-        const string attachmentFilePath = "attachment.txt";       // file to embed
-        const string outputPdfWithAttachment = "with_attachment.pdf"; // PDF after adding attachment
-        const string extractedAttachmentPath = "extracted_attachment.txt"; // where to extract
+        // Paths for the source PDF, the file to attach, the PDF after attachment, and the extracted file
+        const string sourcePdfPath      = "input.pdf";
+        const string attachmentFilePath = "original.txt";
+        const string outputPdfPath      = "withAttachment.pdf";
+        const string extractedPath      = "extracted.txt";
 
-        // Verify input files exist
+        // Verify that the required files exist
         if (!File.Exists(sourcePdfPath))
         {
             Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
@@ -24,67 +24,87 @@ class Program
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1. Load the source PDF using Document (PdfFileEditor does not support attachments)
-        // ------------------------------------------------------------
-        Document pdfDoc = new Document(sourcePdfPath);
-
-        // ------------------------------------------------------------
-        // 2. Add the attachment to the PDF using EmbeddedFiles collection
-        // ------------------------------------------------------------
-        string attachmentName = Path.GetFileName(attachmentFilePath);
-        var fileSpec = new FileSpecification(attachmentName);
-        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
-
-        // Save the PDF that now contains the attachment
-        pdfDoc.Save(outputPdfWithAttachment);
-
-        // ------------------------------------------------------------
-        // 3. Extract the attachment back from the modified PDF
-        // ------------------------------------------------------------
-        Document pdfWithAttachment = new Document(outputPdfWithAttachment);
-        // Retrieve the attachment by its name (case‑sensitive)
-        FileSpecification extractedSpec = pdfWithAttachment.EmbeddedFiles[attachmentName];
-        if (extractedSpec == null)
+        // ---------------------------------------------------------------
+        // Add the attachment to the PDF using Document.EmbeddedFiles
+        // ---------------------------------------------------------------
+        using (var pdfDoc = new Document(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Attachment '{attachmentName}' not found in the PDF.");
-            return;
-        }
-        // Write the embedded file bytes to the extraction path
-        using (FileStream outStream = File.Create(extractedAttachmentPath))
-        {
-            extractedSpec.Contents.CopyTo(outStream);
+            // Create a FileSpecification for the attachment
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentFilePath))
+            {
+                // Description is shown in the PDF attachment list (optional)
+                Description = Path.GetFileName(attachmentFilePath)
+            };
+
+            // Provide the file data via a stream (required for EmbeddedFiles)
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentFilePath));
+
+            // Add the specification to the EmbeddedFiles collection
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // ------------------------------------------------------------
-        // 4. Verify that the extracted file matches the original attachment
-        // ------------------------------------------------------------
-        bool filesMatch = false;
-        if (File.Exists(extractedAttachmentPath))
+        // ---------------------------------------------------------------
+        // Extract the attachment back from the PDF to verify its integrity
+        // ---------------------------------------------------------------
+        using (var pdfDoc = new Document(outputPdfPath))
         {
-            byte[] originalBytes = File.ReadAllBytes(attachmentFilePath);
-            byte[] extractedBytes = File.ReadAllBytes(extractedAttachmentPath);
+            FileSpecification targetSpec = null;
+            string attachmentName = Path.GetFileName(attachmentFilePath);
+
+            foreach (FileSpecification spec in pdfDoc.EmbeddedFiles)
+            {
+                // Match by Name or Description – both are commonly used
+                if (spec.Name == attachmentName || spec.Description == attachmentName)
+                {
+                    targetSpec = spec;
+                    break;
+                }
+            }
+
+            if (targetSpec != null)
+            {
+                // Ensure the stream is positioned at the beginning
+                if (targetSpec.Contents.CanSeek)
+                    targetSpec.Contents.Position = 0;
+
+                using (var outStream = new FileStream(extractedPath, FileMode.Create, FileAccess.Write))
+                {
+                    targetSpec.Contents.CopyTo(outStream);
+                }
+            }
+            else
+            {
+                Console.Error.WriteLine($"Attachment '{attachmentName}' not found in PDF.");
+                return;
+            }
+        }
+
+        // -------------------------------------------------
+        // Compare the original and extracted attachment bytes
+        // -------------------------------------------------
+        bool contentsMatch = false;
+        if (File.Exists(extractedPath))
+        {
+            byte[] originalBytes  = File.ReadAllBytes(attachmentFilePath);
+            byte[] extractedBytes = File.ReadAllBytes(extractedPath);
+
             if (originalBytes.Length == extractedBytes.Length)
             {
-                filesMatch = true;
+                contentsMatch = true;
                 for (int i = 0; i < originalBytes.Length; i++)
                 {
                     if (originalBytes[i] != extractedBytes[i])
                     {
-                        filesMatch = false;
+                        contentsMatch = false;
                         break;
                     }
                 }
             }
         }
-        else
-        {
-            Console.Error.WriteLine("Extraction failed: extracted file not found.");
-        }
 
-        Console.WriteLine(filesMatch
-            ? "Success: extracted attachment matches the original."
-            : "Failure: extracted attachment does NOT match the original.");
+        Console.WriteLine(contentsMatch
+            ? "Attachment verified: contents match."
+            : "Attachment verification failed: contents differ.");
     }
 }

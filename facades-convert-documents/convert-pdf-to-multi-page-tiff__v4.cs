@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
-using Aspose.Pdf.Text;    // for FontRepository and SimpleFontSubstitution
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputTiffPath = "output.tiff";
+        const string outputFolder = "TiffPages";
 
         if (!File.Exists(inputPdfPath))
         {
@@ -18,38 +18,35 @@ class Program
             return;
         }
 
-        try
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Register a substitution: replace the Symbol font with Arial Unicode MS.
-            // Resolve the system path to Arial Unicode MS (ARIALUNI.TTF).
-            string arialUnicodePath = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.Fonts),
-                "ARIALUNI.TTF");
+            // Apply custom font substitution: replace Symbol with Arial Unicode MS
+            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Symbol", "Arial Unicode MS"));
 
-            if (!File.Exists(arialUnicodePath))
-                throw new FileNotFoundException("Arial Unicode MS font file not found.", arialUnicodePath);
-
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("Symbol", arialUnicodePath));
-
-            // PdfConverter implements IDisposable, so use a using block
-            using (PdfConverter converter = new PdfConverter())
+            // Convert each page to a single‑page TIFF file using PdfConverter (cross‑platform, no System.Drawing)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Load the source PDF
-                converter.BindPdf(inputPdfPath);
+                using (PdfConverter converter = new PdfConverter())
+                {
+                    converter.BindPdf(pdfDoc);
+                    // Optional: set resolution for better quality
+                    converter.Resolution = new Resolution(150);
+                    // Convert only the current page
+                    converter.StartPage = pageNumber;
+                    converter.EndPage   = pageNumber;
+                    converter.DoConvert();
 
-                // Set higher resolution for better image quality (Resolution object required)
-                converter.Resolution = new Resolution(300); // DPI
-
-                // Convert all pages and save as a multi‑page TIFF
-                converter.DoConvert();
-                converter.SaveAsTIFF(outputTiffPath);
+                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.tiff");
+                    converter.SaveAsTIFF(outputPath);
+                    Console.WriteLine($"Saved page {pageNumber} as TIFF: {outputPath}");
+                }
             }
+        }
 
-            Console.WriteLine($"PDF successfully converted to TIFF: {outputTiffPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
-        }
+        Console.WriteLine("PDF to TIFF conversion completed.");
     }
 }

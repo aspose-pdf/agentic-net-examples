@@ -8,12 +8,12 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string stampPath  = "stamp.png";
-        const string outputPath = "stamped_output.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify required files exist
+        // Verify required files exist.
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
         if (!File.Exists(stampPath))
@@ -22,10 +22,10 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document pdfDocument = new Document(inputPath))
         {
-            // Configure the image stamp
+            // Create a reusable ImageStamp.
             ImageStamp imgStamp = new ImageStamp(stampPath)
             {
                 Background          = false,
@@ -34,17 +34,21 @@ class Program
                 VerticalAlignment   = VerticalAlignment.Center
             };
 
-            // Pages are 1‑based. Apply the stamp to pages 5 through 10 (or up to the last page).
-            for (int i = 5; i <= 10 && i <= pdfDocument.Pages.Count; i++)
+            // Pages are 1‑based. Loop through pages 5‑10, respecting the actual page count.
+            int startPage = 5;
+            int endPage   = 10;
+            int maxPage   = pdfDocument.Pages.Count;
+
+            for (int i = startPage; i <= endPage && i <= maxPage; i++)
             {
                 Page page = pdfDocument.Pages[i];
-                page.AddStamp(imgStamp); // AddStamp is a method on each Page, not on the collection
+                page.AddStamp(imgStamp); // Apply the stamp to the current page.
             }
 
-            // Save the modified PDF while the Document is still alive
+            // Save while the document is still alive.
             pdfDocument.Save(outputPath);
         }
 
-        Console.WriteLine($"Stamp applied to pages 5‑10 and saved as '{outputPath}'.");
+        Console.WriteLine($"Stamp applied to pages 5‑10 and saved to '{outputPath}'.");
     }
 }

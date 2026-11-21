@@ -1,51 +1,62 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string pdfPath   = "input.pdf";
         const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure the output folder exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the PDF to know how many pages it contains
+        Document doc = new Document(pdfPath);
+        int totalPages = doc.Pages.Count;
+
+        // Process each page individually so we can embed the page number in the file name
+        for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
         {
-            // Iterate over each page (Aspose.Pdf pages are 1‑based)
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                var page = doc.Pages[pageNumber];
+                // Bind the same PDF for every page iteration
+                extractor.BindPdf(pdfPath);
+
+                // Restrict extraction to the current page only
+                extractor.StartPage = pageNumber;
+                extractor.EndPage   = pageNumber;
+
+                // Optional – extract images defined in resources as well
+                // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+
+                // Perform the image extraction for the selected page
+                extractor.ExtractImage();
+
                 int imageIndex = 1;
-
-                // Extract images from the page's resources
-                foreach (var image in page.Resources.Images)
+                while (extractor.HasNextImage())
                 {
-                    // Build the output file name: Image_Page{page}_Index{index}.png
+                    // Build the required file name pattern
                     string fileName = $"Image_Page{pageNumber}_Index{imageIndex}.png";
-                    string outPath = Path.Combine(outputDir, fileName);
+                    string outPath  = Path.Combine(outputDir, fileName);
 
-                    // Save the image to disk (Aspose.Pdf.Image implements Save(Stream))
-                    using (FileStream outFile = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                    {
-                        image.Save(outFile);
-                    }
+                    // GetNextImage requires an output path and an ImageFormat
+                    extractor.GetNextImage(outPath, ImageFormat.Png);
 
-                    Console.WriteLine($"Saved: {outPath}");
                     imageIndex++;
                 }
             }
         }
 
-        Console.WriteLine("Image extraction completed.");
+        Console.WriteLine($"Image extraction completed. Files saved to '{outputDir}'.");
     }
 }

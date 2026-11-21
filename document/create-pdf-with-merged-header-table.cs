@@ -1,72 +1,82 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // for TextFragment and TextState
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "merged_header_table.pdf";
+        const string outputPath = "TableWithMergedHeader.pdf";
+
+        // Ensure the output directory exists
+        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
+        if (!Directory.Exists(outputDir))
+            Directory.CreateDirectory(outputDir);
 
         // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Create a table with three equal‑width columns
+            // Create a table with three columns of equal width
             Table table = new Table
             {
                 ColumnWidths = "100 100 100"
             };
 
-            // ----- Header row with a merged cell spanning two columns -----
-            Row headerRow = table.Rows.Add();
-
-            // Cell that *visually* spans the first two columns (ColumnSpan not available in this version)
-            Cell mergedHeader = headerRow.Cells.Add("Merged Header");
-            mergedHeader.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            mergedHeader.DefaultCellTextState = new TextState
+            // ---------- First header row (merged cell spanning all columns) ----------
+            Row mergedHeaderRow = table.Rows.Add();
+            Cell mergedHeaderCell = mergedHeaderRow.Cells.Add("Merged Header");
+            mergedHeaderCell.ColSpan = 3; // Span across three columns
+            mergedHeaderCell.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            mergedHeaderCell.Margin = new MarginInfo { Top = 5, Bottom = 5 };
+            // Use DefaultCellTextState for alignment and font settings
+            mergedHeaderCell.DefaultCellTextState = new TextState
             {
-                Font = FontRepository.FindFont("Helvetica"),
-                FontSize = 12,
-                ForegroundColor = Aspose.Pdf.Color.Black
-            };
-            // Add a placeholder cell next to the merged header and hide its borders so the two cells appear as one
-            Cell placeholder = headerRow.Cells.Add("");
-            placeholder.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            placeholder.DefaultCellTextState = mergedHeader.DefaultCellTextState;
-            placeholder.Border = new BorderInfo(BorderSide.None);
-
-            // Cell for the third column
-            Cell headerCell3 = headerRow.Cells.Add("Third Column");
-            headerCell3.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            headerCell3.DefaultCellTextState = new TextState
-            {
+                HorizontalAlignment = HorizontalAlignment.Center,
                 Font = FontRepository.FindFont("Helvetica"),
                 FontSize = 12,
                 ForegroundColor = Aspose.Pdf.Color.Black
             };
 
-            // ----- First data row -----
-            Row dataRow1 = table.Rows.Add();
-            dataRow1.Cells.Add("Row1 Col1");
-            dataRow1.Cells.Add("Row1 Col2");
-            dataRow1.Cells.Add("Row1 Col3");
+            // ---------- Second header row (individual column titles) ----------
+            Row columnHeaderRow = table.Rows.Add();
+            columnHeaderRow.Cells.Add("Column 1");
+            columnHeaderRow.Cells.Add("Column 2");
+            columnHeaderRow.Cells.Add("Column 3");
 
-            // ----- Second data row -----
-            Row dataRow2 = table.Rows.Add();
-            dataRow2.Cells.Add("Row2 Col1");
-            dataRow2.Cells.Add("Row2 Col2");
-            dataRow2.Cells.Add("Row2 Col3");
+            // Apply styling to the second header row
+            foreach (Cell cell in columnHeaderRow.Cells)
+            {
+                cell.BackgroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.8, 0.8);
+                cell.Margin = new MarginInfo { Top = 3, Bottom = 3 };
+                cell.DefaultCellTextState = new TextState
+                {
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Font = FontRepository.FindFont("Helvetica"),
+                    FontSize = 12,
+                    ForegroundColor = Aspose.Pdf.Color.Black
+                };
+            }
 
-            // Add the constructed table to the page's paragraph collection
+            // ---------- Data rows ----------
+            for (int i = 1; i <= 5; i++)
+            {
+                Row dataRow = table.Rows.Add();
+                dataRow.Cells.Add($"Row {i} - A");
+                dataRow.Cells.Add($"Row {i} - B");
+                dataRow.Cells.Add($"Row {i} - C");
+            }
+
+            // Add the table to the page's paragraph collection
             page.Paragraphs.Add(table);
 
-            // Save the PDF to the specified path
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with merged header cells saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with merged header table saved to '{outputPath}'.");
     }
 }

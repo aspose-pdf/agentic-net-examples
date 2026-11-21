@@ -16,21 +16,20 @@ class Program
             return;
         }
 
-        // Load the PDF document; using ensures deterministic disposal of the Document.
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPath))
         {
-            // TiffDevice does not implement IDisposable, so instantiate it without a using block.
-            // The parameter‑less constructor uses the default resolution (300 DPI) and default compression.
+            // TiffDevice does not implement IDisposable – instantiate it directly
             TiffDevice tiffDevice = new TiffDevice();
 
-            // Create a FileStream for the output TIFF; the stream is disposable and therefore wrapped in a using block.
+            // Create the output stream for the TIFF file
             using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
             {
-                // Convert all pages of the PDF (from page 1 to the last page) into a multi‑page TIFF.
+                // Convert all PDF pages (1 .. Pages.Count) into a multi‑page TIFF using default settings
                 tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, tiffStream);
             }
         }
 
-        Console.WriteLine($"PDF pages have been converted to a multi‑page TIFF: {outputPath}");
+        Console.WriteLine($"PDF converted to multi‑page TIFF: {outputPath}");
     }
 }

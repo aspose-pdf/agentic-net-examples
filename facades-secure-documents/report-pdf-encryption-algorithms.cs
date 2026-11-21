@@ -1,16 +1,16 @@
 using System;
 using System.IO;
-using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class EncryptionReportGenerator
+class Program
 {
     static void Main()
     {
-        // Directory containing PDF files to analyze
-        const string pdfFolder = @"C:\PdfCollection";
-        // Output report file
-        const string reportPath = @"C:\PdfCollection\encryption_report.txt";
+        // Folder containing PDFs to inspect
+        const string pdfFolder = "pdfs";
+        // Path for the generated report
+        const string reportFile = "encryption_report.csv";
 
         if (!Directory.Exists(pdfFolder))
         {
@@ -18,47 +18,47 @@ class EncryptionReportGenerator
             return;
         }
 
-        // Gather all PDF files in the folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(pdfFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
+        // Create (or overwrite) the CSV report
+        using (StreamWriter writer = new StreamWriter(reportFile, false))
         {
-            Console.WriteLine("No PDF files found.");
-            return;
+            writer.WriteLine("File,Encrypted,Algorithm");
+
+            // Iterate over all PDF files in the folder
+            foreach (string pdfPath in Directory.GetFiles(pdfFolder, "*.pdf"))
+            {
+                bool isEncrypted = false;
+                string algorithm = "N/A"; // Aspose.PDF does not expose the algorithm directly
+
+                // Detect encryption by attempting to load the document.
+                // If the PDF is encrypted, Aspose.Pdf throws a PdfException.
+                try
+                {
+                    using (var doc = new Document(pdfPath))
+                    {
+                        // Document loaded successfully – not encrypted.
+                        isEncrypted = false;
+                    }
+                }
+                catch (PdfException)
+                {
+                    // Loading failed because the PDF is encrypted.
+                    isEncrypted = true;
+                }
+                catch (Exception ex)
+                {
+                    // Any other exception (e.g., corrupted file) is reported but does not stop processing.
+                    Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
+                    continue;
+                }
+
+                // Write CSV line
+                writer.WriteLine($"{Path.GetFileName(pdfPath)},{isEncrypted},{algorithm}");
+
+                // Optional console output for immediate feedback
+                Console.WriteLine($"{Path.GetFileName(pdfPath)}: Encrypted={isEncrypted}, Algorithm={algorithm}");
+            }
         }
 
-        // Prepare a StringBuilder for the report
-        StringBuilder reportBuilder = new StringBuilder();
-        reportBuilder.AppendLine("File Name,Encrypted,Encryption Algorithm");
-
-        // Iterate over each PDF file
-        foreach (string pdfPath in pdfFiles)
-        {
-            // Use PdfFileInfo (Facades) to read encryption details
-            PdfFileInfo fileInfo = new PdfFileInfo(pdfPath);
-
-            bool isEncrypted = fileInfo.IsEncrypted;
-            // The PdfFileInfo class in older Aspose.Pdf versions does not expose the
-            // EncryptionAlgorithm property. When the property is unavailable we fall back
-            // to a generic placeholder. If you are using a newer version that provides the
-            // property, you can uncomment the line below.
-            // var algorithm = fileInfo.EncryptionAlgorithm; // CryptoAlgorithm enum
-            // string algorithmName = isEncrypted ? algorithm.ToString() : "None";
-            string algorithmName = isEncrypted ? "Encrypted (algorithm unknown)" : "None";
-
-            // Append line to report
-            string fileName = Path.GetFileName(pdfPath);
-            reportBuilder.AppendLine($"{fileName},{isEncrypted},{algorithmName}");
-        }
-
-        // Write the report to disk
-        try
-        {
-            File.WriteAllText(reportPath, reportBuilder.ToString(), Encoding.UTF8);
-            Console.WriteLine($"Encryption report generated at: {reportPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to write report: {ex.Message}");
-        }
+        Console.WriteLine($"Encryption report saved to '{reportFile}'.");
     }
 }

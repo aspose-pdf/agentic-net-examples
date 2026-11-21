@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,22 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF, modify the radio button default value, and save.
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the radio button group named 'PaymentMethod'.
-            RadioButtonField paymentField = doc.Form["PaymentMethod"] as RadioButtonField;
-            if (paymentField != null)
+            // Retrieve the radio button group named "PaymentMethod"
+            RadioButtonField paymentMethod = doc.Form["PaymentMethod"] as RadioButtonField;
+
+            if (paymentMethod != null)
             {
-                // Set the default selected option to 'Credit'.
-                paymentField.Value = "Credit";
+                // Set the current value so the selection is visible when the PDF opens
+                // The Value property expects the export value of the option (e.g., "Credit").
+                paymentMethod.Value = "Credit";
+
+                // Optionally, set the Selected index (1‑based) if you know the position of "Credit"
+                // paymentMethod.Selected = 1; // uncomment and adjust if needed
             }
             else
             {
-                Console.Error.WriteLine("Radio button field 'PaymentMethod' not found.");
+                Console.Error.WriteLine("Radio button group 'PaymentMethod' not found.");
             }
 
-            // Save the updated PDF.
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

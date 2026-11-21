@@ -1,10 +1,10 @@
 # Working with images
 
-> **Working with images** in PDF using C# / .NET -- **69** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with images** in PDF using C# / .NET -- **69** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-images`
 - Examples: 69
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -26,10 +26,12 @@
 - [`add-subtle-background-pattern-to-pdf-pages.cs`](./add-subtle-background-pattern-to-pdf-pages.cs) -- Add subtle background pattern to pdf pages
 - [`add-texture-background-image-to-pdf-pages.cs`](./add-texture-background-image-to-pdf-pages.cs) -- Add texture background image to pdf pages
 - [`add-transparent-png-overlay-to-pdf-pages.cs`](./add-transparent-png-overlay-to-pdf-pages.cs) -- Add transparent png overlay to pdf pages
+- [`add-vector-graphics-to-pdf-page.cs`](./add-vector-graphics-to-pdf-page.cs) -- Add vector graphics to pdf page
 - [`batch-extract-vector-graphics-from-pdfs.cs`](./batch-extract-vector-graphics-from-pdfs.cs) -- Batch extract vector graphics from pdfs
 - [`collect-image-resolution-metadata.cs`](./collect-image-resolution-metadata.cs) -- Collect image resolution metadata
 - [`compress-large-images-in-pdf.cs`](./compress-large-images-in-pdf.cs) -- Compress large images in pdf
 - [`compress-pdf-images-using-optimization.cs`](./compress-pdf-images-using-optimization.cs) -- Compress pdf images using optimization
+- [`convert-even-pdf-pages-to-grayscale.cs`](./convert-even-pdf-pages-to-grayscale.cs) -- Convert even pdf pages to grayscale
 - [`convert-pdf-images-to-monochrome.cs`](./convert-pdf-images-to-monochrome.cs) -- Convert pdf images to monochrome
 - [`convert-pdf-pages-to-png-with-default-font.cs`](./convert-pdf-pages-to-png-with-default-font.cs) -- Convert pdf pages to png with default font
 - [`convert-pdf-pages-to-png-with-default-font__v2.cs`](./convert-pdf-pages-to-png-with-default-font__v2.cs) -- Convert pdf pages to png with default font  v2
@@ -40,7 +42,6 @@
 - [`export-pdf-pages-to-bmp-300-dpi.cs`](./export-pdf-pages-to-bmp-300-dpi.cs) -- Export pdf pages to bmp 300 dpi
 - [`extract-images-from-multiple-pdfs.cs`](./extract-images-from-multiple-pdfs.cs) -- Extract images from multiple pdfs
 - [`extract-images-from-pdf-preserve-format.cs`](./extract-images-from-pdf-preserve-format.cs) -- Extract images from pdf preserve format
-- [`extract-raster-images-from-pdf.cs`](./extract-raster-images-from-pdf.cs) -- Extract raster images from pdf
 - [`extract-vector-graphics-to-svg__v3.cs`](./extract-vector-graphics-to-svg__v3.cs) -- Extract vector graphics to svg  v3
 - [`generate-png-thumbnails-for-pdf-pages.cs`](./generate-png-thumbnails-for-pdf-pages.cs) -- Generate png thumbnails for pdf pages
 - [`insert-dicom-image-with-custom-size.cs`](./insert-dicom-image-with-custom-size.cs) -- Insert dicom image with custom size
@@ -49,7 +50,6 @@
 - [`remove-all-images-from-pdf.cs`](./remove-all-images-from-pdf.cs) -- Remove all images from pdf
 - [`remove-duplicate-images-from-pdf.cs`](./remove-duplicate-images-from-pdf.cs) -- Remove duplicate images from pdf
 - [`remove-low-resolution-images-from-pdf.cs`](./remove-low-resolution-images-from-pdf.cs) -- Remove low resolution images from pdf
-- [`remove-low-resolution-images-from-pdf__v2.cs`](./remove-low-resolution-images-from-pdf__v2.cs) -- Remove low resolution images from pdf  v2
 - [`remove-vector-graphic-from-pdf-page.cs`](./remove-vector-graphic-from-pdf-page.cs) -- Remove vector graphic from pdf page
 - [`render-pdf-page-to-png-with-fallback-font.cs`](./render-pdf-page-to-png-with-fallback-font.cs) -- Render pdf page to png with fallback font
 - [`render-pdf-pages-to-jpeg-with-default-font.cs`](./render-pdf-pages-to-jpeg-with-default-font.cs) -- Render pdf pages to jpeg with default font

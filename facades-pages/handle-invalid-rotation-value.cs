@@ -1,87 +1,69 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input and output PDF files
         const string inputPath = "input.pdf";
         const string outputPath = "rotated.pdf";
+        const int pageNumber = 1; // 1‑based page index
+        const int rotationValue = 45; // Example of an invalid rotation (valid: 0, 90, 180, 270)
 
-        // Example parameters (could be obtained from user input)
-        int pageNumber = 1;          // 1‑based page index
-        int rotationDegrees = 45;    // Invalid rotation for demonstration
-
-        // Verify that the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the document to obtain the page count safely
-        int pageCount;
-        using (Document doc = new Document(inputPath))
-        {
-            pageCount = doc.Pages.Count;
-        }
-
-        // Validate page number (Aspose.Pdf uses 1‑based indexing)
-        if (pageNumber < 1 || pageNumber > pageCount)
-        {
-            Console.Error.WriteLine($"Invalid page number {pageNumber}. Document contains {pageCount} pages.");
-            return;
-        }
-
-        // Map the integer rotation to the Rotation enum; only four values are allowed
-        Rotation rotationEnum;
-        bool rotationIsValid = true;
-        switch (rotationDegrees)
-        {
-            case 0:
-                rotationEnum = Rotation.None; // 0° rotation
-                break;
-            case 90:
-                rotationEnum = Rotation.on90;
-                break;
-            case 180:
-                rotationEnum = Rotation.on180;
-                break;
-            case 270:
-                rotationEnum = Rotation.on270;
-                break;
-            default:
-                rotationIsValid = false;
-                rotationEnum = Rotation.None; // placeholder, will not be used
-                break;
-        }
-
-        // If the rotation value is not one of the allowed angles, report and exit
-        if (!rotationIsValid)
-        {
-            Console.Error.WriteLine($"Invalid rotation value {rotationDegrees}. Allowed values are 0, 90, 180, 270.");
-            return;
-        }
-
-        // Perform the rotation using the Document API and handle possible exceptions
         try
         {
-            Document pdf = new Document(inputPath);
-            pdf.Pages[pageNumber].Rotate = rotationEnum; // Apply rotation to the selected page
-            pdf.Save(outputPath);
-            Console.WriteLine($"Page {pageNumber} rotated to {rotationDegrees}° and saved as '{outputPath}'.");
-        }
-        catch (ArgumentException ex)
-        {
-            // Handles cases where the API receives an out‑of‑range argument
-            Console.Error.WriteLine($"Argument error: {ex.Message}");
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Validate rotation value – if invalid, fall back to 0°
+                int validRotation = GetValidRotation(rotationValue, out bool isValid);
+                if (!isValid)
+                {
+                    Console.Error.WriteLine($"Invalid rotation value ({rotationValue}). Using default 0°.");
+                }
+
+                // Apply rotation using the Document API (PdfPageEditor has no SetPageRotation method)
+                try
+                {
+                    doc.Pages[pageNumber].Rotate = (Rotation)validRotation; // Rotation enum values are 0,90,180,270
+                }
+                catch (ArgumentException ex)
+                {
+                    Console.Error.WriteLine($"Failed to set rotation: {ex.Message}");
+                }
+
+                // Save the modified document (PDF format)
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Document saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // Catch‑all for any unexpected runtime errors
+            // Catch any unexpected errors
             Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
+    }
+
+    private static int GetValidRotation(int value, out bool isValid)
+    {
+        // Allowed rotation angles for Aspose.Pdf are 0, 90, 180, 270 degrees
+        var allowed = new HashSet<int> { 0, 90, 180, 270 };
+        if (allowed.Contains(value))
+        {
+            isValid = true;
+            return value;
+        }
+        isValid = false;
+        return 0; // default rotation
     }
 }

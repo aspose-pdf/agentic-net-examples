@@ -17,17 +17,12 @@ class Program
             return;
         }
 
-        // Load the PDF document within a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Obtain the tagged content interface
+            // Access the tagged content helper
             ITaggedContent tagged = doc.TaggedContent;
-
-            // Set the primary language of the document (helps screen readers)
+            // Set the primary language for accessibility (screen readers)
             tagged.SetLanguage(language);
-
-            // Optional: set a title (write‑only)
-            // tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Save the updated PDF
             doc.Save(outputPath);

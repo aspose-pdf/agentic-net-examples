@@ -1,128 +1,94 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Collections.Generic;
 using Aspose.Pdf;
-using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced
-namespace NUnit.Framework
+namespace AsposePdfTests.Integration
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class SetUpAttribute : Attribute { }
-
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TearDownAttribute : Attribute { }
-
-    public static class Assert
+    class Program
     {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        static void Main()
         {
-            if (!object.Equals(expected, actual))
-            {
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
-            }
-        }
-    }
-}
+            // Setup temporary working directory
+            string tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            Directory.CreateDirectory(tempDir);
 
-namespace AsposePdfAttachmentTests
-{
-    // Dummy entry point to satisfy the compiler when the project expects an executable.
-    public static class Program
-    {
-        public static void Main() { /* No‑op – tests are executed by the test runner */ }
-    }
+            string pdfPath = Path.Combine(tempDir, "test.pdf");
+            string attachment1Path = Path.Combine(tempDir, "attach1.txt");
+            string attachment2Path = Path.Combine(tempDir, "attach2.txt");
 
-    [TestFixture]
-    public class AttachmentRemovalTests
-    {
-        // Fields are initialized in SetUp; use null‑forgiving operator to silence warnings.
-        private string _tempDir = null!;
-        private string _pdfPath = null!;
-        private string _modifiedPdfPath = null!;
-        private string _attachmentPath = null!;
-
-        [SetUp]
-        public void SetUp()
-        {
-            // Create a temporary directory for test files
-            _tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-            Directory.CreateDirectory(_tempDir);
-
-            _pdfPath = Path.Combine(_tempDir, "test_document.pdf");
-            _modifiedPdfPath = Path.Combine(_tempDir, "test_document_modified.pdf");
-            _attachmentPath = Path.Combine(_tempDir, "sample.txt");
-
-            // Create a simple text file that will be attached to the PDF
-            File.WriteAllText(_attachmentPath, "Sample attachment content.");
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            // Clean up all temporary files and directory
             try
             {
-                if (File.Exists(_pdfPath)) File.Delete(_pdfPath);
-                if (File.Exists(_modifiedPdfPath)) File.Delete(_modifiedPdfPath);
-                if (File.Exists(_attachmentPath)) File.Delete(_attachmentPath);
-                if (Directory.Exists(_tempDir)) Directory.Delete(_tempDir, true);
+                // Create simple attachment files
+                File.WriteAllText(attachment1Path, "Attachment 1 content");
+                File.WriteAllText(attachment2Path, "Attachment 2 content");
+
+                // Create a minimal PDF document with a single blank page and save it
+                using (var doc = new Document())
+                {
+                    doc.Pages.Add();
+                    doc.Save(pdfPath);
+                }
+
+                // Load PDF and add two embedded files
+                using (var doc = new Document(pdfPath))
+                {
+                    AddEmbeddedFile(doc, attachment1Path);
+                    AddEmbeddedFile(doc, attachment2Path);
+
+                    // Verify that both embedded files are present
+                    if (doc.EmbeddedFiles.Count == 2)
+                        Console.WriteLine("PASS: Embedded files count is 2 after adding.");
+                    else
+                        Console.WriteLine($"FAIL: Expected 2 embedded files, found {doc.EmbeddedFiles.Count}.");
+
+                    // Remove the first embedded file by its file name (not full path)
+                    string fileNameToRemove = Path.GetFileName(attachment1Path);
+                    doc.EmbeddedFiles.Delete(fileNameToRemove);
+
+                    // Verify that the count decreased to 1
+                    if (doc.EmbeddedFiles.Count == 1)
+                        Console.WriteLine("PASS: Embedded files count is 1 after removal.");
+                    else
+                        Console.WriteLine($"FAIL: Expected 1 embedded file after removal, found {doc.EmbeddedFiles.Count}.");
+
+                    // Persist changes
+                    doc.Save(pdfPath);
+                }
+
+                // Reload the PDF to ensure the removal persisted
+                using (var doc = new Document(pdfPath))
+                {
+                    if (doc.EmbeddedFiles.Count == 1)
+                        Console.WriteLine("PASS: Embedded files count remains 1 after reloading.");
+                    else
+                        Console.WriteLine($"FAIL: Expected 1 embedded file after reload, found {doc.EmbeddedFiles.Count}.");
+                }
             }
-            catch
+            finally
             {
-                // Ignored – cleanup should not fail the test suite
+                // Clean up temporary files and directory
+                try
+                {
+                    if (Directory.Exists(tempDir))
+                        Directory.Delete(tempDir, true);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Cleanup error: {ex.Message}");
+                }
             }
         }
 
-        [Test]
-        public void RemovingEmbeddedFileUpdatesCollectionCount()
+        /// <summary>
+        /// Helper that creates a FileSpecification from a file on disk and adds it to the document's EmbeddedFiles collection.
+        /// </summary>
+        private static void AddEmbeddedFile(Document doc, string filePath)
         {
-            // ---------- Create PDF and embed a file ----------
-            using (var doc = new Document())
-            {
-                // A PDF must contain at least one page
-                doc.Pages.Add();
-
-                // Prepare the FileSpecification – the file data is supplied via a stream
-                var fileSpec = new FileSpecification(Path.GetFileName(_attachmentPath))
-                {
-                    // Load the file bytes into a MemoryStream and assign to Contents
-                    Contents = new MemoryStream(File.ReadAllBytes(_attachmentPath))
-                };
-
-                // Add the file to the EmbeddedFiles collection (the correct API for attachments)
-                doc.EmbeddedFiles.Add(fileSpec);
-
-                // Verify that the file was added
-                Assert.AreEqual(1, doc.EmbeddedFiles.Count, "Embedded file was not added correctly.");
-
-                // Persist the PDF to disk
-                doc.Save(_pdfPath);
-            }
-
-            // ---------- Load PDF, remove the embedded file, and verify count ----------
-            using (var loadedDoc = new Document(_pdfPath))
-            {
-                // Ensure the embedded file exists before removal
-                Assert.AreEqual(1, loadedDoc.EmbeddedFiles.Count, "Expected one embedded file before removal.");
-
-                // Retrieve the first (and only) embedded file – note 1‑based indexing
-                var fileSpec = loadedDoc.EmbeddedFiles[1];
-
-                // Remove the embedded file by name using the Delete method
-                loadedDoc.EmbeddedFiles.Delete(fileSpec.Name);
-
-                // Verify that the collection count is now zero
-                Assert.AreEqual(0, loadedDoc.EmbeddedFiles.Count, "Embedded file removal did not update the collection count.");
-
-                // Save the modified PDF (optional – demonstrates persistence)
-                loadedDoc.Save(_modifiedPdfPath);
-            }
+            var fileSpec = new FileSpecification(Path.GetFileName(filePath));
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
+            doc.EmbeddedFiles.Add(fileSpec);
         }
     }
 }

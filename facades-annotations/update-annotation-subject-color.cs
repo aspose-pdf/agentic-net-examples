@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,39 +17,39 @@ class Program
         }
 
         // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Ensure the document has at least one page and one annotation
-        if (doc.Pages.Count == 0 || doc.Pages[1].Annotations.Count == 0)
+        using (Document doc = new Document(inputPath))
         {
-            Console.WriteLine("No annotations found to modify.");
-            return;
+            // Ensure there is at least one page and one annotation
+            if (doc.Pages.Count < 1 || doc.Pages[1].Annotations.Count < 1)
+            {
+                Console.WriteLine("No annotations found to modify.");
+                return;
+            }
+
+            // Get the first annotation on the first page (1‑based indexing)
+            Annotation existing = doc.Pages[1].Annotations[1];
+
+            // Preserve the rectangle of the existing annotation
+            Aspose.Pdf.Rectangle rect = existing.Rect;
+
+            // Create a new TextAnnotation with the same rectangle but new subject and color
+            TextAnnotation newAnnotation = new TextAnnotation(doc.Pages[1], rect)
+            {
+                Title = "New Subject",                 // Subject / title
+                Contents = existing.Contents,           // Preserve original contents
+                Color = Aspose.Pdf.Color.FromRgb(255, 0, 0) // Red color (RGB 0‑255)
+            };
+
+            // Replace the old annotation with the new one
+            // Remove the existing annotation first
+            doc.Pages[1].Annotations.Delete(1); // 1‑based index of the annotation to delete
+            // Add the new annotation
+            doc.Pages[1].Annotations.Add(newAnnotation);
+
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        // Get the first annotation on the first page (assumed to be a TextAnnotation)
-        Page page = doc.Pages[1];
-        TextAnnotation existing = page.Annotations[1] as TextAnnotation;
-        if (existing == null)
-        {
-            Console.WriteLine("The first annotation is not a TextAnnotation.");
-            return;
-        }
-
-        // Remove the old annotation
-        page.Annotations.Delete(1);
-
-        // Create a new TextAnnotation with the same rectangle but new subject and color
-        TextAnnotation newAnno = new TextAnnotation(page, existing.Rect)
-        {
-            Subject = "Updated Subject",
-            Color   = Aspose.Pdf.Color.FromRgb(255, 0, 0) // red
-        };
-
-        // Add the new annotation to the page
-        page.Annotations.Add(newAnno);
-
-        // Save the modified document
-        doc.Save(outputPath);
         Console.WriteLine($"Annotation updated and saved to '{outputPath}'.");
     }
 }

@@ -12,65 +12,62 @@ class BatchDecrypt
         // Folder where decrypted PDFs will be saved
         const string outputFolder = @"C:\DecryptedPdfs";
 
-        // Ensure output folder exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Lookup table of possible passwords (order matters)
-        List<string> passwordList = new List<string>
+        List<string> passwordLookup = new List<string>
         {
             "password1",
-            "secret2023",
+            "secret123",
             "letmein",
             "admin",
-            "123456"
+            // add more passwords as needed
         };
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string encryptedPath in pdfFiles)
+        // Process each PDF file in the input folder
+        foreach (string encryptedPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            bool decrypted = false;
-            string fileName = Path.GetFileNameWithoutExtension(encryptedPath);
-            string decryptedPath = Path.Combine(outputFolder, fileName + "_decrypted.pdf");
+            string fileName = Path.GetFileName(encryptedPath);
+            string decryptedPath = Path.Combine(outputFolder, fileName);
 
-            foreach (string pwd in passwordList)
+            bool decrypted = false;
+
+            // Try each password until one succeeds
+            foreach (string pwd in passwordLookup)
             {
                 try
                 {
-                    // Attempt to open the document with the current password
+                    // Open the encrypted PDF with the current password
                     using (Document doc = new Document(encryptedPath, pwd))
                     {
-                        // Decrypt the document (no parameters)
+                        // Remove encryption from the document
                         doc.Decrypt();
 
-                        // Save the decrypted version
+                        // Save the decrypted PDF
                         doc.Save(decryptedPath);
                     }
 
-                    Console.WriteLine($"Decrypted '{Path.GetFileName(encryptedPath)}' using password '{pwd}'.");
+                    Console.WriteLine($"Decrypted: {fileName} using password \"{pwd}\"");
                     decrypted = true;
-                    break; // Exit password loop on success
+                    break; // stop trying passwords for this file
                 }
                 catch (InvalidPasswordException)
                 {
-                    // Wrong password – try next one
-                    continue;
+                    // Password was incorrect – try the next one
                 }
                 catch (Exception ex)
                 {
-                    // Unexpected error – report and stop trying this file
-                    Console.Error.WriteLine($"Error processing '{encryptedPath}': {ex.Message}");
+                    // Unexpected error – report and move to next file
+                    Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
                     break;
                 }
             }
 
             if (!decrypted)
             {
-                Console.Error.WriteLine($"Failed to decrypt '{Path.GetFileName(encryptedPath)}' – none of the passwords matched.");
+                Console.Error.WriteLine($"Failed to decrypt {fileName}: no matching password found.");
             }
         }
-
-        Console.WriteLine("Batch decryption completed.");
     }
 }

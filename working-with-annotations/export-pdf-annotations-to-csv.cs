@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -9,72 +7,74 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputCsv = "annotations_audit.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "annotations.csv";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Wrap Document and StreamWriter in using blocks for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        using (StreamWriter writer = new StreamWriter(csvPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // CSV header
+            writer.WriteLine("PageNumber,AnnotationType,RectLLX,RectLLY,RectURX,RectURY,Title,Contents,Author,ModifiedDate");
+
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Prepare CSV writer
-                using (StreamWriter writer = new StreamWriter(outputCsv, false, Encoding.UTF8))
+                Page page = doc.Pages[i];
+
+                // Iterate all annotations on the current page
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Write CSV header
-                    writer.WriteLine("PageNumber,AnnotationType,LLX,LLY,URX,URY,Title,Contents");
+                    // Basic details common to all annotations
+                    string typeName = annotation.GetType().Name;
+                    Aspose.Pdf.Rectangle rect = annotation.Rect;
 
-                    // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-                    for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+                    // Optional fields – initialise to empty strings
+                    string title = string.Empty;
+                    string contents = string.Empty;
+                    string author = string.Empty;
+                    string modDate = string.Empty;
+
+                    // Extract information that is available for the specific annotation type
+                    switch (annotation)
                     {
-                        Page page = doc.Pages[pageNum];
-                        // Each page has an Annotations collection
-                        foreach (Annotation annot in page.Annotations)
-                        {
-                            // Basic properties
-                            string typeName = annot.GetType().Name;
-                            Aspose.Pdf.Rectangle rect = annot.Rect;
+                        case TextAnnotation textAnno:
+                            // Title is defined on MarkupAnnotation (base of TextAnnotation)
+                            title = textAnno.Title ?? string.Empty;
+                            contents = textAnno.Contents ?? string.Empty;
+                            // TextAnnotation inherits from MarkupAnnotation – author and modification date are stored there
+                            if (textAnno is MarkupAnnotation markupAnno)
+                            {
+                                author = markupAnno.Subject ?? string.Empty;
+                                // Use the correct property for modification date
+                                modDate = markupAnno.Modified != DateTime.MinValue ? markupAnno.Modified.ToString("o") : string.Empty;
+                            }
+                            break;
 
-                            // Optional Title and Contents – use reflection to avoid missing members
-                            string title = GetPropertyValue<string>(annot, "Title");
-                            string contents = GetPropertyValue<string>(annot, "Contents");
+                        case LinkAnnotation linkAnno:
+                            // Capture URI if the link points to a web address (GoToURIAction)
+                            if (linkAnno.Action is GoToURIAction uriAction && !string.IsNullOrEmpty(uriAction.URI))
+                                contents = uriAction.URI;
+                            break;
 
-                            // Escape fields for CSV (wrap in quotes and double any internal quotes)
-                            string Escape(string s) => $"\"{s?.Replace("\"", "\"\"")}\"";
-
-                            // Write CSV line
-                            writer.WriteLine(
-                                $"{pageNum}," +
-                                $"{Escape(typeName)}," +
-                                $"{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}," +
-                                $"{Escape(title)}," +
-                                $"{Escape(contents)}");
-                        }
+                        // Add other annotation types as needed
                     }
-                }
 
-                Console.WriteLine($"Annotation audit CSV saved to '{outputCsv}'.");
+                    // Helper to escape CSV fields containing commas or quotes
+                    string Escape(string s) => $"\"{s.Replace("\"", "\"\"")}\"";
+
+                    // Write a CSV line for the current annotation
+                    writer.WriteLine($"{i},{Escape(typeName)},{rect.LLX},{rect.LLY},{rect.URX},{rect.URY},{Escape(title)},{Escape(contents)},{Escape(author)},{Escape(modDate)}");
+                }
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
 
-    // Helper to safely read a property via reflection; returns default(T) if not present
-    private static T GetPropertyValue<T>(object obj, string propertyName)
-    {
-        PropertyInfo prop = obj.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-        if (prop != null && prop.PropertyType == typeof(T))
-        {
-            return (T)prop.GetValue(obj);
-        }
-        return default;
+        Console.WriteLine($"Annotations exported to {csvPath}");
     }
 }

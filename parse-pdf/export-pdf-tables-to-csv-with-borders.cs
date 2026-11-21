@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Text.RegularExpressions;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -8,54 +8,51 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string csvPath   = "output.csv";
+        const string inputPdfPath  = "input.pdf";
+        const string outputCsvPath = "tables_with_borders.csv";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // Extract all text from the document (including tables) using TextAbsorber
+            TextAbsorber absorber = new TextAbsorber();
+            // Use Pure formatting to keep line breaks; this helps to separate rows
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            pdfDoc.Pages.Accept(absorber);
+            string fullText = absorber.Text;
+
+            // Split the extracted text into lines (each line may represent a table row)
+            string[] lines = fullText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            using (StreamWriter writer = new StreamWriter(outputCsvPath, false))
             {
-                // Extract raw text preserving layout (pure formatting)
-                TextAbsorber absorber = new TextAbsorber();
-                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-                doc.Pages.Accept(absorber);
-                string rawText = absorber.Text;
-
-                // Write CSV with delimiter markers around each cell
-                using (StreamWriter writer = new StreamWriter(csvPath))
+                foreach (string line in lines)
                 {
-                    // Split the extracted text into lines
-                    string[] lines = rawText.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string line in lines)
+                    // Simple heuristic: split by one or more whitespace characters to get cells
+                    string[] cells = line.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    // If we have more than one cell, treat it as a table row
+                    if (cells.Length > 1)
                     {
-                        // Assume table columns are separated by two or more spaces
-                        string[] cells = Regex.Split(line.Trim(), @"\s{2,}");
-
-                        // Add visual delimiter markers (e.g., |cell|) to each cell
-                        for (int i = 0; i < cells.Length; i++)
-                        {
-                            cells[i] = $"|{cells[i].Trim()}|";
-                        }
-
-                        // Join cells with commas to form a CSV line
-                        string csvLine = string.Join(",", cells);
-                        writer.WriteLine(csvLine);
+                        // Add delimiter markers (e.g., pipe symbols) around each cell for visual border reference
+                        string markedRow = string.Join(",", cells.Select(c => $"|{c}|"));
+                        writer.WriteLine(markedRow);
+                    }
+                    else
+                    {
+                        // Write non‑table lines as‑is
+                        writer.WriteLine(line);
                     }
                 }
             }
 
-            Console.WriteLine($"CSV exported to '{csvPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Table data exported with border markers to '{outputCsvPath}'.");
         }
     }
 }

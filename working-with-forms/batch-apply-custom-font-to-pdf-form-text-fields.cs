@@ -1,67 +1,62 @@
 using System;
 using System.IO;
-using System.Drawing; // kept for potential drawing needs; ambiguous types are fully qualified below
+using System.Drawing; // kept for potential other drawing needs, but Color will be fully qualified
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for DefaultAppearance
+using Aspose.Pdf.Text;        // for FontRepository and Font
 
 class BatchFontApplier
 {
     static void Main()
     {
-        // Network folder containing the PDFs
-        const string sourceFolder = @"\\SERVER\Shared\PDFs";
-        // Optional: folder to write the modified PDFs (can be the same as sourceFolder)
-        const string outputFolder = @"\\SERVER\Shared\PDFs\Processed";
-
-        // Path to the custom TrueType font to apply
-        const string customFontPath = @"C:\Fonts\CustomFont.ttf";
+        // UNC or network folder containing the PDFs
+        const string networkFolder = @"\\Server\Shared\PDFs";
+        // Path to the custom TrueType/OpenType font file
+        const string customFontPath = @"C:\Fonts\MyCustomFont.ttf";
 
         // Verify the font file exists
         if (!File.Exists(customFontPath))
         {
-            Console.Error.WriteLine($"Font file not found: {customFontPath}");
+            Console.Error.WriteLine($"Custom font not found: {customFontPath}");
             return;
         }
 
-        // Load the custom font once – fully qualify the Aspose.Pdf.Text.Font type to avoid ambiguity
-        Aspose.Pdf.Text.Font customFont = Aspose.Pdf.Text.FontRepository.OpenFont(customFontPath);
+        // Load the custom font once and reuse it for all documents
+        Aspose.Pdf.Text.Font customFont = FontRepository.OpenFont(customFontPath);
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Get all PDF files in the network folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(networkFolder, "*.pdf");
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found.");
+            return;
+        }
 
-        // Process each PDF file in the source folder
-        foreach (string pdfPath in Directory.GetFiles(sourceFolder, "*.pdf"))
+        foreach (string pdfPath in pdfFiles)
         {
             try
             {
-                // Load the PDF inside a using block for deterministic disposal
+                // Open each PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
                     // Iterate over all form fields
-                    foreach (var field in doc.Form.Fields)
+                    foreach (Field field in doc.Form.Fields)
                     {
-                        // Apply only to text box fields (including regular text fields)
-                        if (field is TextBoxField textField)
+                        // Apply the custom font only to text box fields
+                        if (field is TextBoxField textBox)
                         {
-                            // Set the default appearance for the field so that existing and newly entered text uses the custom font
-                            // Font size and colour can be adjusted as required
-                            textField.DefaultAppearance = new DefaultAppearance(
-                                customFont,               // Font object loaded from the TTF file (Aspose.Pdf.Text.Font)
-                                12,                      // Desired font size
-                                System.Drawing.Color.Black); // System.Drawing.Color is required by the constructor
+                            // Create a new DefaultAppearance with the custom font.
+                            // Size 12 and black colour are used as defaults; adjust as needed.
+                            textBox.DefaultAppearance = new DefaultAppearance(customFont, 12, System.Drawing.Color.Black);
                         }
                     }
 
-                    // Determine output path (overwrite original or write to separate folder)
-                    string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-
-                    // Save the modified PDF (Document.Save writes PDF by default)
-                    doc.Save(outputPath);
+                    // Overwrite the original PDF with the updated version
+                    doc.Save(pdfPath);
                 }
 
-                Console.WriteLine($"Processed: {pdfPath}");
+                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {

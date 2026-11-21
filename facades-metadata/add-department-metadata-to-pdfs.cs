@@ -6,49 +6,49 @@ class Program
 {
     static void Main()
     {
-        // Base directory of the executable (works for both Windows and Linux)
+        // Base directory of the application
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Resolve input and output folders relative to the base directory
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
+        // Directories for input and output PDFs (relative to the base directory)
+        string inputDir = Path.Combine(baseDir, "InputPdfs");
+        string outputDir = Path.Combine(baseDir, "OutputPdfs");
 
-        // Validate the input folder – if it does not exist, inform the user and stop.
-        if (!Directory.Exists(inputFolder))
+        // Ensure the input directory exists
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            Console.Error.WriteLine("Create the folder and place PDF files inside before running the program.");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        // Ensure the output folder exists.
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Loop through all PDF files in the input folder.
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Custom metadata value to add
+        const string department = "Finance";
+
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
             try
             {
-                // Determine output file path (same name, different folder).
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
+                string fileName = Path.GetFileName(pdfPath);
+                string outputPath = Path.Combine(outputDir, fileName);
 
-                // Use PdfFileInfo (Facades API) to bind the PDF and set custom metadata.
-                PdfFileInfo pdfInfo = new PdfFileInfo();
-                pdfInfo.BindPdf(inputPath);                     // Load the PDF
-                pdfInfo.SetMetaInfo("Department", "Finance"); // Add custom metadata field
+                // Load PDF metadata using the Facades API
+                PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath);
 
-                // Save the modified PDF to the output location.
+                // Add or update the custom "Department" metadata field
+                pdfInfo.SetMetaInfo("Department", department);
+
+                // Save the PDF with the updated metadata
                 pdfInfo.Save(outputPath);
-
-                Console.WriteLine($"Processed '{Path.GetFileName(inputPath)}' -> '{outputPath}'");
             }
             catch (Exception ex)
             {
-                // Log the error but continue processing the remaining files.
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Failed to process '{pdfPath}': {ex.Message}");
             }
         }
 
-        Console.WriteLine("All PDFs have been processed.");
+        Console.WriteLine("Custom 'Department' metadata added to all PDFs.");
     }
 }

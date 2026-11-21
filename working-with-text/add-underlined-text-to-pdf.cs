@@ -7,9 +7,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "underlined_output.pdf";
-        const string text = "Underlined text example";
+        const string sampleText = "Underlined text example";
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +17,35 @@ class Program
             return;
         }
 
-        // Load the PDF, add underlined text, and save.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a text fragment with the desired content.
-            TextFragment fragment = new TextFragment(text);
-            // Enable underline via the TextState.
-            fragment.TextState.Underline = true;
-            // Optional styling.
-            fragment.TextState.FontSize = 12;
-            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
+            {
+                // Access the first page (Aspose.Pdf uses 1‑based indexing)
+                Page page = doc.Pages[1];
 
-            // Insert the fragment into the first page (1‑based indexing).
-            Page page = doc.Pages[1];
-            page.Paragraphs.Add(fragment);
+                // Create a text fragment with the desired content
+                TextFragment fragment = new TextFragment(sampleText);
 
-            // Save the modified document.
-            doc.Save(outputPath);
+                // Enable underline via the TextState
+                fragment.TextState.Underline = true;
+
+                // Optional: set the position of the fragment on the page
+                fragment.Position = new Position(100, 700);
+
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(fragment);
+
+                // Save the modified document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Underlined text added and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Underlined text added and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

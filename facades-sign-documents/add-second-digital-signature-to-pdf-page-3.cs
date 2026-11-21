@@ -7,53 +7,46 @@ class Program
 {
     static void Main()
     {
-        // Paths to the source PDF, output PDF and the signing certificate (PFX)
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "signed_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "signed_output.pdf";
         const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "certPassword";
+        const string certificatePassword = "password";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
+
         if (!File.Exists(certificatePath))
         {
             Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPdfPath);
-
-        // First digital signature on page 3, rectangle (100,500,200,550)
-        // Aspose.Pdf.Rectangle uses (lowerLeftX, lowerLeftY, upperRightX, upperRightY)
-        SignatureField sigField1 = new SignatureField(doc, new Aspose.Pdf.Rectangle(100, 500, 200, 550))
+        // Load the existing PDF document
+        using (Document doc = new Document(inputPath))
         {
-            Name = "Signature1",
-            // Optional: set reason, location, contact info via custom properties if needed
-        };
-        doc.Form.Add(sigField1);
+            // Define a rectangle for the second signature on page 3
+            // (llx, lly, urx, ury) – lower‑left and upper‑right coordinates
+            Rectangle signatureRect = new Rectangle(100, 500, 300, 550);
 
-        // Second digital signature on page 3, rectangle (300,500,400,550)
-        SignatureField sigField2 = new SignatureField(doc, new Aspose.Pdf.Rectangle(300, 500, 400, 550))
-        {
-            Name = "Signature2",
-        };
-        doc.Form.Add(sigField2);
+            // Create a signature field bound to the document and rectangle
+            SignatureField signatureField = new SignatureField(doc, signatureRect);
 
-        // Create PKCS7 object from the certificate (used for both signatures)
-        PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword);
+            // Create a PKCS#1 digital signature using the provided certificate
+            PKCS1 pkcs1Signature = new PKCS1(certificatePath, certificatePassword);
 
-        // Sign each field
-        sigField1.Sign(pkcs7);
-        sigField2.Sign(pkcs7);
+            // Apply the digital signature to the field
+            signatureField.Sign(pkcs1Signature);
 
-        // Save the signed PDF to the output file
-        doc.Save(outputPdfPath);
+            // Add the signature field to page 3 of the document
+            doc.Form.Add(signatureField, 3);
 
-        Console.WriteLine($"PDF signed successfully. Output saved to '{outputPdfPath}'.");
+            // Save the signed PDF
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Second digital signature added on page 3 and saved to '{outputPath}'.");
     }
 }

@@ -1,77 +1,81 @@
 using System;
-using System.Data;
 using System.IO;
+using System.Data;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string templatePdfPath = "template.pdf";
-        const string outputPdfPath   = "filled_output.pdf";
+        // Paths for the PDF form, the data source and the output PDF
+        const string pdfFormPath = "form.pdf";
+        const string dataFilePath = "data.csv"; // could be XML, JSON, etc.
+        const string outputPath   = "filled_form.pdf";
 
-        // Verify template exists
-        if (!File.Exists(templatePdfPath))
+        // Verify that the required files exist
+        if (!File.Exists(pdfFormPath))
         {
-            Console.Error.WriteLine($"Template PDF not found: {templatePdfPath}");
+            Console.Error.WriteLine($"Form PDF not found: {pdfFormPath}");
+            return;
+        }
+        if (!File.Exists(dataFilePath))
+        {
+            Console.Error.WriteLine($"Data file not found: {dataFilePath}");
             return;
         }
 
-        // ------------------------------------------------------------
-        // 1. Create a DataTable that matches the PDF form fields.
-        // ------------------------------------------------------------
-        DataTable dataTable = new DataTable("FormData");
-        DataColumnCollection columns = dataTable.Columns;
+        // --------------------------------------------------------------------
+        // Create a DataTable whose column names match the PDF field names.
+        // The column values will be filled from the external data source later.
+        // --------------------------------------------------------------------
+        DataTable mappingTable = new DataTable();
 
-        // Add columns – names must exactly match the field names in the PDF form
-        columns.Add("FirstName", typeof(string));
-        columns.Add("LastName",  typeof(string));
-        columns.Add("Address",   typeof(string));
-        columns.Add("City",      typeof(string));
-        columns.Add("Country",   typeof(string));
-        columns.Add("PostalCode",typeof(string));
-        // Example of a custom column that does not exist in the original form
-        // (will be ignored by AutoFiller if no matching field)
-        columns.Add("CustomNote", typeof(string));
+        // FirstName column mapping (PDF field name: FirstNameField)
+        mappingTable.Columns.Add("FirstNameField", typeof(string));
 
-        // ------------------------------------------------------------
-        // 2. Populate the DataTable with sample data.
-        // ------------------------------------------------------------
-        DataRow row = dataTable.NewRow();
-        row["FirstName"]  = "John";
-        row["LastName"]   = "Doe";
-        row["Address"]    = "123 Main St.";
-        row["City"]       = "Metropolis";
-        row["Country"]    = "USA";
-        row["PostalCode"] = "12345";
-        row["CustomNote"] = "This column has no matching field in the PDF.";
-        dataTable.Rows.Add(row);
+        // LastName column mapping (PDF field name: LastNameField)
+        mappingTable.Columns.Add("LastNameField", typeof(string));
 
-        // ------------------------------------------------------------
-        // 3. Use AutoFiller to bind the template, import the data, and save.
-        // ------------------------------------------------------------
-        try
+        // Email column mapping (PDF field name: EmailField)
+        mappingTable.Columns.Add("EmailField", typeof(string));
+
+        // Add additional custom columns required by the PDF form here
+        // mappingTable.Columns.Add("CustomColumn", typeof(string)); // PDF field name = "CustomColumn"
+
+        // --------------------------------------------------------------------
+        // Load the external data (CSV) into the DataTable.
+        // For simplicity, this example assumes the CSV has the same column order
+        // as the DataTable defined above.
+        // --------------------------------------------------------------------
+        using (var reader = new StreamReader(dataFilePath))
         {
-            AutoFiller autoFiller = new AutoFiller();
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                // Simple CSV split – replace with a robust parser for real data.
+                var parts = line.Split(',');
+                if (parts.Length != mappingTable.Columns.Count)
+                    continue; // skip malformed rows
 
-            // Bind the PDF template
-            autoFiller.BindPdf(templatePdfPath);
-
-            // Import the DataTable – column names must match field names
-            autoFiller.ImportDataTable(dataTable);
-
-            // Save the merged result to a single PDF file
-            autoFiller.Save(outputPdfPath);
-
-            // Clean up resources used by AutoFiller
-            autoFiller.Close();
-
-            Console.WriteLine($"PDF form filled and saved to '{outputPdfPath}'.");
+                var row = mappingTable.NewRow();
+                for (int i = 0; i < parts.Length; i++)
+                    row[i] = parts[i].Trim();
+                mappingTable.Rows.Add(row);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during form filling: {ex.Message}");
-        }
+
+        // --------------------------------------------------------------------
+        // Use AutoFiller to import the DataTable into the PDF form.
+        // AutoFiller maps a column to a field when the column name equals the
+        // field's PartialName. No ImportData method exists on FormEditor.
+        // --------------------------------------------------------------------
+        var filler = new AutoFiller();
+        filler.BindPdf(pdfFormPath);
+        filler.ImportDataTable(mappingTable);
+        filler.Save(outputPath);
+        filler.Close();
+
+        Console.WriteLine($"Form filled and saved to '{outputPath}'.");
     }
 }

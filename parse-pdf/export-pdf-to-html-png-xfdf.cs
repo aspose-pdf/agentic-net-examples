@@ -1,95 +1,68 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text; // required for text-related classes if needed
 
-class ExportPdf
+class ExportExample
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the source PDF inside a using block to ensure deterministic disposal.
-        using (Document doc = new Document(inputPdfPath))
+        // Load the source PDF; the using block ensures the Document is disposed.
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // ---------- Export to HTML ----------
-            // HTML conversion requires GDI+ and must be wrapped in try‑catch on non‑Windows platforms.
-            using (FileStream htmlStream = new FileStream("output.html", FileMode.Create, FileAccess.Write))
+            // Export to HTML (Windows only; wrap in try‑catch for cross‑platform safety).
+            try
             {
                 HtmlSaveOptions htmlOpts = new HtmlSaveOptions
                 {
                     PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsPngImagesEmbeddedIntoSvg
                 };
-
-                try
+                using (FileStream htmlStream = new FileStream("output.html", FileMode.Create, FileAccess.Write))
                 {
-                    doc.Save(htmlStream, htmlOpts);
+                    pdfDoc.Save(htmlStream, htmlOpts);
                 }
-                catch (TypeInitializationException)
-                {
-                    Console.WriteLine("HTML export requires Windows (GDI+). Skipped on this platform.");
-                }
-            } // htmlStream is disposed here
+            }
+            catch (TypeInitializationException)
+            {
+                Console.WriteLine("HTML export requires Windows (GDI+). Skipped.");
+            }
 
-            // ---------- Export to SVG ----------
+            // Export to SVG.
             using (FileStream svgStream = new FileStream("output.svg", FileMode.Create, FileAccess.Write))
             {
                 SvgSaveOptions svgOpts = new SvgSaveOptions();
-                doc.Save(svgStream, svgOpts);
-            } // svgStream is disposed here
+                pdfDoc.Save(svgStream, svgOpts);
+            }
 
-            // ---------- Export to DOCX ----------
+            // Export to DOCX.
             using (FileStream docxStream = new FileStream("output.docx", FileMode.Create, FileAccess.Write))
             {
-                DocSaveOptions docxOpts = new DocSaveOptions
+                DocSaveOptions docOpts = new DocSaveOptions
                 {
                     Format = DocSaveOptions.DocFormat.DocX
                 };
-                doc.Save(docxStream, docxOpts);
-            } // docxStream is disposed here
+                pdfDoc.Save(docxStream, docOpts);
+            }
 
-            // ---------- Export to XLSX ----------
-            using (FileStream xlsxStream = new FileStream("output.xlsx", FileMode.Create, FileAccess.Write))
-            {
-                ExcelSaveOptions xlsxOpts = new ExcelSaveOptions
-                {
-                    Format = ExcelSaveOptions.ExcelFormat.XLSX
-                };
-                doc.Save(xlsxStream, xlsxOpts);
-            } // xlsxStream is disposed here
-
-            // ---------- Export to PPTX ----------
-            using (FileStream pptxStream = new FileStream("output.pptx", FileMode.Create, FileAccess.Write))
-            {
-                PptxSaveOptions pptxOpts = new PptxSaveOptions();
-                doc.Save(pptxStream, pptxOpts);
-            } // pptxStream is disposed here
-
-            // ---------- Export to EPUB ----------
+            // Export to EPUB.
             using (FileStream epubStream = new FileStream("output.epub", FileMode.Create, FileAccess.Write))
             {
                 EpubSaveOptions epubOpts = new EpubSaveOptions
                 {
                     ContentRecognitionMode = EpubSaveOptions.RecognitionMode.Flow
                 };
-                doc.Save(epubStream, epubOpts);
-            } // epubStream is disposed here
+                pdfDoc.Save(epubStream, epubOpts);
+            }
+        }
 
-            // ---------- Export to XML ----------
-            using (FileStream xmlStream = new FileStream("output.xml", FileMode.Create, FileAccess.Write))
-            {
-                XmlSaveOptions xmlOpts = new XmlSaveOptions();
-                doc.Save(xmlStream, xmlOpts);
-            } // xmlStream is disposed here
-        } // Document is disposed here
-
-        Console.WriteLine("All export operations completed. FileStreams have been closed.");
+        Console.WriteLine("Export operations completed.");
     }
 }

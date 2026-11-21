@@ -1,5 +1,5 @@
 using System;
-using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
@@ -8,41 +8,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string submitUrl = "https://example.com/submit";
+        const string outputPath = "form_with_submit.pdf";
 
-        if (!File.Exists(inputPdf))
+        // Create a new PDF document inside a using block for proper disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
-            return;
-        }
+            // Add a blank page (Pages are 1‑based)
+            Page page = doc.Pages.Add();
 
-        using (Document doc = new Document(inputPdf))
-        {
-            // Define button rectangle (avoid System.Drawing.Rectangle ambiguity)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
-
-            // Configure the submit action. SubmitFormAction only exposes the Url property.
-            // The default submit method is POST and the default format is URL‑encoded.
-            SubmitFormAction submitAction = new SubmitFormAction();
-            submitAction.Url = new FileSpecification(submitUrl);
-
-            // Create the button field and assign the action.
-            ButtonField submitBtn = new ButtonField(doc.Pages[1], rect)
+            // Create a submit button field
+            ButtonField submitBtn = new ButtonField(
+                page,
+                new Aspose.Pdf.Rectangle(100, 600, 200, 650) // fully qualified to avoid ambiguity
+            )
             {
-                PartialName = "SubmitBtn",
-                NormalCaption = "Submit",
-                OnActivated = submitAction
+                // Required name for the field
+                PartialName = "submitBtn",
+                // Define appearance to avoid NullReferenceException when setting caption
+                DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black),
+                // Set the visible label on the button
+                NormalCaption = "Submit"
             };
 
-            // Add the button to the document's form collection.
-            doc.Form.Add(submitBtn);
+            // Configure the action: HTTP POST with URL‑encoded form data
+            SubmitFormAction submitAction = new SubmitFormAction();
+            submitAction.Url = new FileSpecification("https://example.com/submit");
+            // ExportFormat posts the form fields as URL‑encoded data via HTTP POST
+            submitAction.Flags = SubmitFormAction.ExportFormat;
+            submitBtn.OnActivated = submitAction;
 
-            // Save the modified PDF.
-            doc.Save(outputPdf);
+            // Add the button to the document's AcroForm (field collection)
+            doc.Form.Add(submitBtn, 1);
+
+            // Save the PDF
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with configured submit button saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with submit button saved to '{outputPath}'.");
     }
 }

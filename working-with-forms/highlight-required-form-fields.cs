@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,6 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "highlighted.pdf";
+        const string fieldName = "RequiredField"; // name of the field to highlight
 
         if (!File.Exists(inputPath))
         {
@@ -16,41 +18,30 @@ class Program
             return;
         }
 
-        // Names of fields that are required
-        string[] requiredFields = { "FirstName", "LastName", "Email" };
-
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block (document-disposal-with-using rule)
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form
+            // Verify that the document contains a form
             if (doc.Form != null && doc.Form.Count > 0)
             {
-                foreach (string fieldName in requiredFields)
+                // Retrieve the field by name; cast to the appropriate field type (e.g., TextBoxField)
+                var field = doc.Form[fieldName] as TextBoxField;
+                if (field != null)
                 {
-                    // Retrieve the field by its name; returns null if not present
-                    var field = doc.Form[fieldName];
-                    if (field != null)
-                    {
-                        // Only TextBoxField (and similar) support a background‑like color.
-                        // In the current Aspose.PDF version the form field classes expose a
-                        // "Color" property (border color) but not a "BackgroundColor" property.
-                        // Setting the Color to a light‑yellow gives a visual highlight that
-                        // works across versions.
-                        if (field is TextBoxField textBox)
-                        {
-                            // Highlight the field with a light‑yellow color
-                            textBox.Color = Color.FromRgb(1.0, 1.0, 0.8);
-                        }
-                        else if (field is ComboBoxField comboBox)
-                        {
-                            comboBox.Color = Color.FromRgb(1.0, 1.0, 0.8);
-                        }
-                        // Add other field types that expose a Color property if needed.
-                    }
+                    // Set the background color via the field's Characteristics (System.Drawing.Color)
+                    field.Characteristics.Background = System.Drawing.Color.Yellow;
+                }
+                else
+                {
+                    Console.WriteLine($"Field '{fieldName}' not found or not a TextBoxField.");
                 }
             }
+            else
+            {
+                Console.WriteLine("The PDF does not contain any form fields.");
+            }
 
-            // Save the modified PDF (no SaveOptions needed for PDF output)
+            // Save the modified PDF (still within the using block)
             doc.Save(outputPath);
         }
 

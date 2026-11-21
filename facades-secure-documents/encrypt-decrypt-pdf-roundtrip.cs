@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Collections; // Added for StructuralComparisons
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facades namespace included as requested
 
 class Program
 {
@@ -19,52 +21,72 @@ class Program
             return;
         }
 
+        // ---------- Encrypt ----------
         try
         {
-            // ---------- Encrypt the PDF ----------
-            // Load the source PDF
-            Document doc = new Document(inputPath);
-            // Define permissions you want to allow after encryption
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-            // Apply AES‑256 encryption
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-            // Save the encrypted file
-            doc.Save(encryptedPath);
+            using (Document doc = new Document(inputPath))
+            {
+                // Permissions to allow printing and content extraction
+                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // ---------- Decrypt the PDF ----------
-            // Load the encrypted PDF providing the user password directly (no PdfLoadOptions needed)
-            Document encryptedDoc = new Document(encryptedPath, userPassword);
-            // Remove encryption (the document is now in clear text)
-            encryptedDoc.Decrypt();
-            // Save the decrypted copy
-            encryptedDoc.Save(decryptedPath);
+                // Encrypt with AES‑256 (preferred algorithm)
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // ---------- Verify round‑trip integrity ----------
-            string originalHash  = ComputeSha256(inputPath);
-            string decryptedHash = ComputeSha256(decryptedPath);
-
-            Console.WriteLine($"Original SHA‑256 : {originalHash}");
-            Console.WriteLine($"Decrypted SHA‑256: {decryptedHash}");
-
-            if (originalHash.Equals(decryptedHash, StringComparison.OrdinalIgnoreCase))
-                Console.WriteLine("Round‑trip verification succeeded: files are identical.");
-            else
-                Console.WriteLine("Round‑trip verification failed: files differ.");
+                // Save encrypted PDF
+                doc.Save(encryptedPath);
+            }
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Encryption failed: {ex.Message}");
+            return;
+        }
+
+        // ---------- Decrypt ----------
+        try
+        {
+            // Open encrypted PDF with the user password
+            using (Document encDoc = new Document(encryptedPath, userPassword))
+            {
+                // Decrypt (no parameters)
+                encDoc.Decrypt();
+
+                // Save the decrypted copy
+                encDoc.Save(decryptedPath);
+            }
+            Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Decryption failed: {ex.Message}");
+            return;
+        }
+
+        // ---------- Verify round‑trip integrity ----------
+        try
+        {
+            byte[] originalHash  = ComputeSha256(inputPath);
+            byte[] decryptedHash = ComputeSha256(decryptedPath);
+
+            bool identical = StructuralComparisons.StructuralEqualityComparer.Equals(originalHash, decryptedHash);
+            Console.WriteLine(identical
+                ? "Round‑trip verification succeeded: original and decrypted files are identical."
+                : "Round‑trip verification failed: files differ.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Verification failed: {ex.Message}");
         }
     }
 
     // Helper to compute SHA‑256 hash of a file
-    static string ComputeSha256(string filePath)
+    static byte[] ComputeSha256(string filePath)
     {
         using (FileStream stream = File.OpenRead(filePath))
         using (SHA256 sha = SHA256.Create())
         {
-            byte[] hash = sha.ComputeHash(stream);
-            return BitConverter.ToString(hash).Replace("-", string.Empty);
+            return sha.ComputeHash(stream);
         }
     }
 }

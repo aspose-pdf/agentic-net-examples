@@ -1,46 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "input.pdf";
         const string outputDir = "TiffPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Bind the PDF document to the converter
-        PdfConverter converter = new PdfConverter();
-        converter.BindPdf(inputPath);
+        // Load the PDF document.
+        Document doc = new Document(inputPdf);
 
-        // Define the page range (pages 3 through 8, inclusive)
-        int startPage = 3;
-        int endPage   = 8;
+        // Create a TiffDevice with the default resolution (96 DPI).
+        // The constructor expects a Resolution, not a file path.
+        TiffDevice tiffDevice = new TiffDevice(new Resolution(96));
 
-        // Loop through each page in the range and save it as a separate TIFF file
-        for (int pageNum = startPage; pageNum <= endPage; pageNum++)
+        // Convert pages 3 through 8 (or up to the last page if the document is shorter).
+        for (int page = 3; page <= 8 && page <= doc.Pages.Count; page++)
         {
-            // Output file name for the current page
-            string outPath = Path.Combine(outputDir, $"page_{pageNum}.tiff");
-
-            // Save the current page as TIFF.
-            // The overload SaveAsTIFF(string, int, int) uses the page's CropBox
-            // and the default resolution when no additional options are supplied.
-            converter.SaveAsTIFF(outPath, pageNum, pageNum);
+            string outPath = Path.Combine(outputDir, $"Page_{page}.tiff");
+            // Process a single page; the device uses the page's CropBox automatically.
+            tiffDevice.Process(doc, page, page, outPath);
         }
-
-        // Release any resources held by the converter
-        converter.Close();
 
         Console.WriteLine("Pages 3‑8 have been converted to TIFF images.");
     }

@@ -1,10 +1,10 @@
 # Pages
 
-> **Pages** in PDF using C# / .NET -- **95** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Pages** in PDF using C# / .NET -- **97** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `pages`
-- Examples: 95
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 97
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -12,12 +12,10 @@
 - [`add-bates-numbering-to-pdf-pages__v2.cs`](./add-bates-numbering-to-pdf-pages__v2.cs) -- Add bates numbering to pdf pages  v2
 - [`add-bates-numbering-with-custom-prefix-suffix.cs`](./add-bates-numbering-with-custom-prefix-suffix.cs) -- Add bates numbering with custom prefix suffix
 - [`add-bates-numbering-with-prefix.cs`](./add-bates-numbering-with-prefix.cs) -- Add bates numbering with prefix
-- [`add-blank-front-matter-page-roman-label.cs`](./add-blank-front-matter-page-roman-label.cs) -- Add blank front matter page roman label
 - [`add-bold-uppercase-header-to-pdf-pages.cs`](./add-bold-uppercase-header-to-pdf-pages.cs) -- Add bold uppercase header to pdf pages
 - [`add-chapter-page-numbers-to-pdf.cs`](./add-chapter-page-numbers-to-pdf.cs) -- Add chapter page numbers to pdf
 - [`add-curved-text-watermark-to-pdf-pages.cs`](./add-curved-text-watermark-to-pdf-pages.cs) -- Add curved text watermark to pdf pages
 - [`add-custom-page-numbers-to-pdf.cs`](./add-custom-page-numbers-to-pdf.cs) -- Add custom page numbers to pdf
-- [`add-diagonal-text-watermark-to-pdf-pages.cs`](./add-diagonal-text-watermark-to-pdf-pages.cs) -- Add diagonal text watermark to pdf pages
 - [`add-generation-date-footer-to-pdf-pages.cs`](./add-generation-date-footer-to-pdf-pages.cs) -- Add generation date footer to pdf pages
 - [`add-header-logo-image-to-pdf-pages.cs`](./add-header-logo-image-to-pdf-pages.cs) -- Add header logo image to pdf pages
 - [`add-header-to-first-pdf-page.cs`](./add-header-to-first-pdf-page.cs) -- Add header to first pdf page
@@ -52,7 +50,6 @@
 - [`delete-first-page-from-pdf.cs`](./delete-first-page-from-pdf.cs) -- Delete first page from pdf
 - [`delete-last-page-from-pdfs.cs`](./delete-last-page-from-pdfs.cs) -- Delete last page from pdfs
 - [`delete-last-three-pages-from-pdf.cs`](./delete-last-three-pages-from-pdf.cs) -- Delete last three pages from pdf
-- [`delete-page-range-from-pdf.cs`](./delete-page-range-from-pdf.cs) -- Delete page range from pdf
 - [`delete-pdf-pages-from-config.cs`](./delete-pdf-pages-from-config.cs) -- Delete pdf pages from config
 - [`delete-specified-pdf-pages.cs`](./delete-specified-pdf-pages.cs) -- Delete specified pdf pages
 - [`duplicate-third-page-in-pdf.cs`](./duplicate-third-page-in-pdf.cs) -- Duplicate third page in pdf
@@ -66,6 +63,7 @@
 - [`insert-empty-page-with-custom-size.cs`](./insert-empty-page-with-custom-size.cs) -- Insert empty page with custom size
 - [`insert-page-from-another-pdf.cs`](./insert-page-from-another-pdf.cs) -- Insert page from another pdf
 - [`insert-page-matching-page2-size.cs`](./insert-page-matching-page2-size.cs) -- Insert page matching page2 size
+- [`insert-page-numbers-after-toc.cs`](./insert-page-numbers-after-toc.cs) -- Insert page numbers after toc
 - [`insert-page-numbers-arial-font.cs`](./insert-page-numbers-arial-font.cs) -- Insert page numbers arial font
 - [`insert-page-numbers-leading-zeros.cs`](./insert-page-numbers-leading-zeros.cs) -- Insert page numbers leading zeros
 - [`insert-ten-empty-pages-at-pdf-midpoint.cs`](./insert-ten-empty-pages-at-pdf-midpoint.cs) -- Insert ten empty pages at pdf midpoint
@@ -98,8 +96,12 @@
 - [`rotate-pdf-pages-by-parity.cs`](./rotate-pdf-pages-by-parity.cs) -- Rotate pdf pages by parity
 - [`rotate-pdf-pages-reverse-order.cs`](./rotate-pdf-pages-reverse-order.cs) -- Rotate pdf pages reverse order
 - [`rotate-pdf-pages-using-config.cs`](./rotate-pdf-pages-using-config.cs) -- Rotate pdf pages using config
+- [`set-alternating-page-background-colors.cs`](./set-alternating-page-background-colors.cs) -- Set alternating page background colors
 - [`set-custom-size-first-pdf-page.cs`](./set-custom-size-first-pdf-page.cs) -- Set custom size first pdf page
+- [`set-page-background-color-hsl.cs`](./set-page-background-color-hsl.cs) -- Set page background color hsl
 - [`set-pdf-page-background-cmyk.cs`](./set-pdf-page-background-cmyk.cs) -- Set pdf page background cmyk
+- [`set-pdf-page-background-color-from-theme.cs`](./set-pdf-page-background-color-from-theme.cs) -- Set pdf page background color from theme
+- [`set-pdf-page-background-color.cs`](./set-pdf-page-background-color.cs) -- Set pdf page background color
 - [`set-transparent-background-for-pdf-pages.cs`](./set-transparent-background-for-pdf-pages.cs) -- Set transparent background for pdf pages
 - [`trim-white-margins-pixel-tolerance.cs`](./trim-white-margins-pixel-tolerance.cs) -- Trim white margins pixel tolerance
 - [`trim-white-space-from-pdf-pages.cs`](./trim-white-space-from-pdf-pages.cs) -- Trim white space from pdf pages

@@ -2,19 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-// Minimal stub definitions to allow compilation when the Aspose.Pdf library is not referenced.
-// Remove these stubs and reference the official Aspose.Pdf NuGet package for full functionality.
-namespace Aspose.Pdf.Facades
-{
-    public class PdfFormEditor
-    {
-        public void BindPdf(string path) { /* Stub: bind PDF */ }
-        public string[] GetFieldNames() => new string[0]; // Stub: return empty list
-        public void RenameField(string oldName, string newName) { /* Stub: rename field */ }
-        public void Save(string path) { /* Stub: save PDF */ }
-    }
-}
-
 class Program
 {
     static void Main()
@@ -30,25 +17,32 @@ class Program
 
         try
         {
-            // Load the PDF for form manipulation
-            PdfFormEditor formEditor = new PdfFormEditor();
-            formEditor.BindPdf(inputPath);
-
-            // Retrieve all field names in the document
-            string[] fieldNames = formEditor.GetFieldNames();
-
-            // Rename each field that starts with "Old_"
-            foreach (string oldName in fieldNames)
+            // 1. Retrieve all form field names using the Form facade (FieldNames property).
+            string[] fieldNames;
+            using (Form form = new Form())
             {
-                if (oldName.StartsWith("Old_"))
-                {
-                    string newName = "New_" + oldName.Substring("Old_".Length);
-                    formEditor.RenameField(oldName, newName);
-                }
+                form.BindPdf(inputPath);
+                fieldNames = form.FieldNames; // string[] of all field partial names
             }
 
-            // Save the modified PDF
-            formEditor.Save(outputPath);
+            // 2. Use FormEditor for structural operations such as renaming fields.
+            using (FormEditor editor = new FormEditor())
+            {
+                editor.BindPdf(inputPath);
+
+                foreach (string oldName in fieldNames)
+                {
+                    if (oldName.StartsWith("Old_"))
+                    {
+                        string newName = "New_" + oldName.Substring("Old_".Length);
+                        editor.RenameField(oldName, newName);
+                    }
+                }
+
+                // Persist the changes.
+                editor.Save(outputPath);
+            }
+
             Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");
         }
         catch (Exception ex)

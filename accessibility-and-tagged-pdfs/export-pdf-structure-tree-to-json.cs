@@ -4,24 +4,14 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure; // Added for completeness when using dynamic
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
-    // DTO representing a node in the PDF structure tree
-    public class StructureNode
-    {
-        public string? ElementType { get; set; }
-        public string? Text { get; set; }
-        public string? AlternativeText { get; set; }
-        public string? Language { get; set; }
-        public List<StructureNode> Children { get; set; } = new List<StructureNode>();
-    }
-
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "structure.json";
+        const string jsonPath  = "structure.json";
 
         if (!File.Exists(inputPath))
         {
@@ -29,52 +19,57 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the PDF is tagged by checking TaggedContent
+            // Verify that the PDF is tagged by checking TaggedContent (IsTagged does not exist in older versions)
             if (doc.TaggedContent == null)
             {
-                Console.WriteLine("The PDF is not tagged; no structure tree to export.");
+                Console.WriteLine("Document is not tagged. No structure tree to export.");
                 return;
             }
 
-            // Access the tagged content API
-            ITaggedContent taggedContent = doc.TaggedContent;
+            ITaggedContent tagged = doc.TaggedContent;
+            StructureElement root = tagged.RootElement; // No cast needed
 
-            // Root element of the structure tree – use dynamic to avoid compile‑time dependency on StructureElement
-            dynamic rootElement = taggedContent.RootElement;
+            // Build a serializable model of the structure tree
+            StructureNode model = BuildElementModel(root);
 
-            // Build a serializable representation of the tree
-            StructureNode rootNode = BuildNode(rootElement);
+            // Serialize to indented JSON
+            JsonSerializerOptions options = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(model, options);
 
-            // Serialize to JSON with indentation for readability
-            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-            string json = JsonSerializer.Serialize(rootNode, jsonOptions);
-
-            // Write JSON to the output file
-            File.WriteAllText(outputPath, json);
-            Console.WriteLine($"Structure tree exported to '{outputPath}'.");
+            // Write JSON to file
+            File.WriteAllText(jsonPath, json);
+            Console.WriteLine($"Structure tree exported to '{jsonPath}'.");
         }
     }
 
-    // Recursively converts a structure element (dynamic) into a StructureNode DTO
-    private static StructureNode BuildNode(dynamic element)
+    // Model class used for JSON serialization
+    class StructureNode
     {
-        StructureNode node = new StructureNode
-        {
-            // element.GetType().Name gives the concrete runtime type name (e.g., "DivElement", "SectElement", etc.)
-            ElementType = element.GetType().Name,
-            Text = element.ActualText,
-            AlternativeText = element.AlternativeText,
-            Language = element.Language
+        public string ElementType      { get; set; }
+        public string Text             { get; set; }
+        public string AlternativeText  { get; set; }
+        // Language property removed because it is not available in all Aspose.Pdf versions
+        public List<StructureNode> Children { get; set; } = new List<StructureNode>();
+    }
+
+    // Recursively convert Aspose.Pdf.LogicalStructure elements to the model
+    static StructureNode BuildElementModel(StructureElement element)
+    {
+        StructureNode node = new StructureNode {
+            ElementType      = element.GetType().Name,
+            Text             = element.ActualText,
+            AlternativeText = element.AlternativeText
+            // Language omitted for compatibility
         };
 
-        // Iterate over child elements using the ChildElements collection
-        foreach (dynamic child in element.ChildElements)
+        foreach (Element child in element.ChildElements)
         {
-            // Only process children that are structure elements (they expose the same dynamic members)
-            node.Children.Add(BuildNode(child));
+            if (child is StructureElement se)
+            {
+                node.Children.Add(BuildElementModel(se));
+            }
         }
 
         return node;

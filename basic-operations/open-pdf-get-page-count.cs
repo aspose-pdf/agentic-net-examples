@@ -8,29 +8,26 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
+        // Verify the file exists before attempting to open it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Open the PDF file using the Document constructor.
-        // Wrapped in a using block for deterministic disposal.
+        // Open the PDF using the Document constructor inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Verify the number of pages in the document.
+            // Aspose.Pdf uses 1‑based page indexing; doc.Pages.Count returns the total number of pages
             int pageCount = doc.Pages.Count;
-            Console.WriteLine($"Page count: {pageCount}");
 
-            // Simple check: ensure the document contains at least one page.
-            if (pageCount == 0)
-            {
-                Console.WriteLine("The document has no pages.");
-            }
+            Console.WriteLine($"The document contains {pageCount} page{(pageCount == 1 ? "" : "s")}.");
+
+            // Simple verification: ensure there is at least one page
+            if (pageCount > 0)
+                Console.WriteLine("Page count verification passed.");
             else
-            {
-                Console.WriteLine("Document loaded successfully.");
-            }
+                Console.WriteLine("Page count verification failed: document has no pages.");
         }
     }
 }

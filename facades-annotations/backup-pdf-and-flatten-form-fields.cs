@@ -1,32 +1,27 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "flattened.pdf";
+        const string sourcePdf = "input.pdf";
+        const string backupPdf = "input_backup.pdf";
+        const string flattenedPdf = "flattened_output.pdf";
 
-        // Verify source PDF exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
 
-        // ---------- Backup the original PDF ----------
-        // Backup file name: original name with "_backup" suffix
-        string backupPath = Path.Combine(
-            Path.GetDirectoryName(inputPath) ?? string.Empty,
-            Path.GetFileNameWithoutExtension(inputPath) + "_backup.pdf");
-
+        // Backup the original PDF before any flattening operation
         try
         {
-            // Overwrite any existing backup
-            File.Copy(inputPath, backupPath, true);
-            Console.WriteLine($"Backup created at '{backupPath}'.");
+            File.Copy(sourcePdf, backupPdf, true);
+            Console.WriteLine($"Backup created at '{backupPdf}'.");
         }
         catch (Exception ex)
         {
@@ -34,22 +29,20 @@ class Program
             return;
         }
 
-        // ---------- Flatten the PDF ----------
+        // Flatten annotations using PdfAnnotationEditor
         try
         {
-            // PdfAnnotationEditor provides the FlatteningAnnotations method.
             using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
             {
-                editor.BindPdf(inputPath);          // Load the source PDF
-                editor.FlatteningAnnotations();    // Correct method to flatten annotations
-                editor.Save(outputPath);            // Save the flattened result
+                editor.BindPdf(sourcePdf);
+                editor.FlatteningAnnotations(); // correct method name
+                editor.Save(flattenedPdf);
             }
-
-            Console.WriteLine($"Flattened PDF saved to '{outputPath}'.");
+            Console.WriteLine($"Flattened PDF saved to '{flattenedPdf}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Flattening operation failed: {ex.Message}");
+            Console.Error.WriteLine($"Flattening failed: {ex.Message}");
         }
     }
 }

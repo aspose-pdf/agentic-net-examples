@@ -7,40 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string tempPath = "temp_landscape.pdf";
-        const string outputPath = "booklet.pdf";
+        const string inputPath   = "input.pdf";
+        const string resizedPath = "resized.pdf";
+        const string bookletPath = "booklet.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF, rotate portrait pages to landscape, and save to a temporary file
-        Document doc = new Document(inputPath);
-        for (int i = 1; i <= doc.Pages.Count; i++)
+        // Resize each page to landscape orientation
+        using (Document doc = new Document(inputPath))
         {
-            Page page = doc.Pages[i];
-            // Rotate only if the page is portrait (height > width)
-            if (page.PageInfo.Height > page.PageInfo.Width)
+            // Pages are 1‑based
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                page.Rotate = Rotation.on90; // use the Rotation enum
-            }
-        }
-        doc.Save(tempPath); // Save the resized PDF
+                Page page = doc.Pages[i];
+                double width  = page.PageInfo.Width;
+                double height = page.PageInfo.Height;
 
-        // Generate a booklet from the landscape PDF using the Facades API
+                // Swap dimensions if the page is portrait
+                if (height > width)
+                {
+                    page.PageInfo.Width  = height;
+                    page.PageInfo.Height = width;
+                }
+
+                // Explicitly mark the page as landscape (optional, helps some APIs)
+                page.PageInfo.IsLandscape = true;
+            }
+
+            // Save the resized PDF (temporary file)
+            doc.Save(resizedPath);
+        }
+
+        // Generate a booklet from the resized PDF using PdfFileEditor
+        // PdfFileEditor does not implement IDisposable, so we just instantiate it
         PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.MakeBooklet(tempPath, outputPath); // correct method name
+
+        // Use the MakeBooklet overload that does not require a PageSize argument
+        bool success = editor.MakeBooklet(resizedPath, bookletPath);
         if (!success)
         {
             Console.Error.WriteLine("Failed to create booklet.");
+            return;
         }
 
-        // Clean up the temporary file
-        try { File.Delete(tempPath); } catch { }
-
-        Console.WriteLine($"Booklet created at: {outputPath}");
+        Console.WriteLine($"Booklet created at '{bookletPath}'.");
     }
 }

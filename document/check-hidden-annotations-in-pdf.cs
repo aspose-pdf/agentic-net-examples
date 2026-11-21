@@ -9,51 +9,68 @@ public static class PdfSanitizer
     /// <summary>
     /// Returns true if any hidden annotations are still present after sanitizing the PDF.
     /// </summary>
-    /// <param name="pdfPath">Path to the PDF file.</param>
+    /// <param name="pdfPath">Path to the input PDF file.</param>
+    /// <returns>True if hidden annotations remain; otherwise false.</returns>
     public static bool HasHiddenAnnotationsAfterSanitization(string pdfPath)
     {
         if (!File.Exists(pdfPath))
             throw new FileNotFoundException($"File not found: {pdfPath}");
 
-        // Wrap Document in a using block for deterministic disposal (document-disposal-with-using rule)
+        // Load the document inside a using block for deterministic disposal.
         using (Document doc = new Document(pdfPath))
         {
-            // Use HiddenDataSanitizer when Document.Sanitize() is unavailable (cs1061 fix)
-            var options = new HiddenDataSanitizationOptions
+            // ---------------------------------------------------------------------
+            // Sanitization step.
+            // ---------------------------------------------------------------------
+            // The Document.Sanitize() method is not available in older Aspose.Pdf
+            // versions, so we fall back to the explicit removal of all annotations.
+            // HiddenDataSanitizer can also be used when the API is present.
+            // ---------------------------------------------------------------------
+            try
             {
-                RemoveAnnotations = true // ensures annotations are stripped during sanitization
-            };
-            var sanitizer = new HiddenDataSanitizer(options);
-            sanitizer.Sanitize(doc);
-
-            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+                // Attempt to use the hidden‑data sanitizer (available in recent versions).
+                var options = new HiddenDataSanitizationOptions { RemoveAnnotations = true };
+                var sanitizer = new HiddenDataSanitizer(options);
+                sanitizer.Sanitize(doc);
+            }
+            catch (MissingMethodException)
             {
-                Page page = doc.Pages[i];
-
-                // Examine each annotation on the page
-                foreach (Annotation annotation in page.Annotations)
+                // If the sanitizer class itself is missing, clear the annotations manually.
+                foreach (Page page in doc.Pages)
                 {
-                    // Annotation.Flags is a bitmask; check for the Hidden flag
-                    if ((annotation.Flags & AnnotationFlags.Hidden) == AnnotationFlags.Hidden)
-                    {
-                        // Hidden annotation found after sanitization
-                        return true;
-                    }
+                    page.Annotations.Clear();
+                }
+            }
+            catch (Exception)
+            {
+                // Any other unexpected error – fall back to the manual clear as a safety net.
+                foreach (Page page in doc.Pages)
+                {
+                    page.Annotations.Clear();
                 }
             }
 
-            // No hidden annotations remain
+            // After sanitization, inspect remaining annotations for the Hidden flag.
+            foreach (Page page in doc.Pages)
+            {
+                foreach (Annotation annot in page.Annotations)
+                {
+                    if (annot.Flags.HasFlag(AnnotationFlags.Hidden))
+                        return true; // Hidden annotation still present.
+                }
+            }
+
+            // No hidden annotations were found.
             return false;
         }
     }
 }
 
-// Dummy entry point to satisfy the compiler when building an executable project.
-public static class Program
+// Dummy entry point to satisfy the compiler when building as an executable.
+public class Program
 {
     public static void Main(string[] args)
     {
-        // Intentionally left blank – the library functionality is exercised via PdfSanitizer.
+        // Intentionally left blank – the library functionality is exposed via PdfSanitizer.
     }
 }

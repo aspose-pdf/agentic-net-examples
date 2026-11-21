@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,53 +8,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
         const string fieldName = "Country";
         const string selectedValue = "United States";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Load the PDF document.
-        Document doc = new Document(inputPdf);
+        Document doc = new Document(inputPath);
 
-        // Retrieve the ComboBox field from the document's form collection.
-        if (doc.Form[fieldName] is ComboBoxField comboBox)
+        // Locate the dropdown (ComboBox) field and set its default selected value.
+        var combo = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName) as ComboBoxField;
+        if (combo != null)
         {
-            // Ensure the desired value exists in the list of options.
-            bool valueExists = false;
-            foreach (Option opt in comboBox.Options)
-            {
-                if (opt.Value == selectedValue)
-                {
-                    valueExists = true;
-                    break;
-                }
-            }
-
-            if (!valueExists)
-            {
-                // Add a new option where both the display text and the value are the same.
-                // Use the AddOption method instead of the non‑existent Option constructor.
-                comboBox.AddOption(selectedValue);
-            }
-
-            // Set the default selected value.
-            comboBox.Value = selectedValue;
+            combo.Value = selectedValue; // sets the default selected item
         }
         else
         {
-            Console.Error.WriteLine($"ComboBox field '{fieldName}' not found.");
-            return;
+            Console.Error.WriteLine($"Dropdown field '{fieldName}' not found or is not a ComboBox.");
         }
 
         // Save the modified PDF.
-        doc.Save(outputPdf);
-
-        Console.WriteLine($"Dropdown '{fieldName}' default set to '{selectedValue}'. Saved as '{outputPdf}'.");
+        doc.Save(outputPath);
+        Console.WriteLine($"Dropdown '{fieldName}' set to '{selectedValue}' and saved to '{outputPath}'.");
     }
 }

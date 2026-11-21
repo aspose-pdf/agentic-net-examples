@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - working-with-forms
 
-> **Working with forms** in PDF using C# / .NET -- **228** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with forms** in PDF using C# / .NET -- **235** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,39 +23,35 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (218/228 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (197/228 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (63/228 files)
-- `using Aspose.Pdf.Text;` (24/228 files)
-- `using Aspose.Pdf.Drawing;` (5/228 files)
-- `using Aspose.Pdf.Facades;` (2/228 files)
-- `using Aspose.Pdf.LogicalStructure;` (2/228 files)
-- `using Aspose.Pdf.Tagged;` (2/228 files)
-- `using Aspose.Pdf.Devices;` (1/228 files)
-- `using Aspose.Pdf.Security;` (1/228 files)
-- `using Aspose.Pdf.Xfa;` (1/228 files)
-- `using System;` (228/228 files)
-- `using System.IO;` (209/228 files)
-- `using System.Linq;` (35/228 files)
-- `using System.Collections.Generic;` (32/228 files)
-- `using System.Xml.Linq;` (25/228 files)
-- `using System.Text.Json;` (18/228 files)
-- `using System.Xml;` (11/228 files)
-- `using System.Text;` (10/228 files)
-- `using System.Drawing;` (8/228 files)
-- `using System.Reflection;` (8/228 files)
-- `using System.Text.RegularExpressions;` (3/228 files)
-- `using System.Threading.Tasks;` (3/228 files)
-- `using System.IO.Compression;` (2/228 files)
-- `using System.Net.Http;` (2/228 files)
-- `using System.Security.Cryptography.X509Certificates;` (2/228 files)
-- `using System.Xml.Xsl;` (2/228 files)
-- `using Microsoft.CSharp.RuntimeBinder;` (1/228 files)
-- `using System.Data;` (1/228 files)
-- `using System.Globalization;` (1/228 files)
-- `using System.Net;` (1/228 files)
-- `using System.Security.Cryptography;` (1/228 files)
-- `using System.Xml.Schema;` (1/228 files)
+- `using Aspose.Pdf;` (225/235 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (204/235 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (64/235 files)
+- `using Aspose.Pdf.Text;` (24/235 files)
+- `using Aspose.Pdf.Drawing;` (1/235 files)
+- `using Aspose.Pdf.Facades;` (1/235 files)
+- `using Aspose.Pdf.Operators;` (1/235 files)
+- `using Aspose.Pdf.Security;` (1/235 files)
+- `using System;` (235/235 files)
+- `using System.IO;` (210/235 files)
+- `using System.Collections.Generic;` (39/235 files)
+- `using System.Linq;` (37/235 files)
+- `using System.Xml.Linq;` (24/235 files)
+- `using System.Drawing;` (17/235 files)
+- `using System.Text.Json;` (14/235 files)
+- `using System.Xml;` (9/235 files)
+- `using System.Text;` (6/235 files)
+- `using System.Threading.Tasks;` (4/235 files)
+- `using System.Net.Http;` (3/235 files)
+- `using System.Text.RegularExpressions;` (3/235 files)
+- `using System.Globalization;` (2/235 files)
+- `using System.IO.Compression;` (2/235 files)
+- `using System.Xml.Xsl;` (2/235 files)
+- `using System.Collections.Specialized;` (1/235 files)
+- `using System.Net.Http.Headers;` (1/235 files)
+- `using System.Reflection;` (1/235 files)
+- `using System.Security.Cryptography;` (1/235 files)
+- `using System.Security.Cryptography.X509Certificates;` (1/235 files)
+- `using System.Xml.Schema;` (1/235 files)
 
 ## Common Code Pattern
 
@@ -73,40 +69,40 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [acroform-with-margins](./acroform-with-margins.cs) | Create PDF with AcroForm Fields Using Relative Positioning | `Document`, `Page`, `MarginInfo` | Demonstrates how to generate a PDF with AcroForm text boxes and a checkbox, positioning the field... |
-| [add-auto-updating-datetime-field-to-pdf](./add-auto-updating-datetime-field-to-pdf.cs) | Add Dynamic Date/Time Field to PDF | `Document`, `Page`, `Rectangle` | Shows how to create a text box form field in a PDF and automatically fill it with the current dat... |
-| [add-blank-page-save-as-new-pdf](./add-blank-page-save-as-new-pdf.cs) | Add Text Annotation and Save Modified PDF | `Document`, `Page`, `Rectangle` | Demonstrates loading a PDF with Aspose.Pdf, adding a text annotation to the first page, and savin... |
-| [add-blank-page-to-pdf-form](./add-blank-page-to-pdf-form.cs) | Add Blank Page to PDF Form | `Document`, `Page`, `PageInfo` | Shows how to load an existing PDF form, insert a new blank page while keeping existing fields int... |
-| [add-calculated-total-field-with-javascript](./add-calculated-total-field-with-javascript.cs) | Add Calculated Total Field with JavaScript to PDF Form | `Document`, `TextBoxField`, `DefaultAppearance` | Shows how to insert a read‑only text box into a PDF form and attach JavaScript that sums all nume... |
-| [add-calculated-total-price-field-to-pdf-form](./add-calculated-total-price-field-to-pdf-form.cs) | Add Calculated Total Price Field to PDF Form | `Document`, `Page`, `TextBoxField` | Shows how to insert Quantity and Unit Price text boxes into a PDF, add a read‑only Total Price fi... |
-| [add-calculation-button-to-pdf-form](./add-calculation-button-to-pdf-form.cs) | Add JavaScript Calculation Button to PDF Form | `Document`, `Page`, `TextBoxField` | Shows how to create a PDF form with Quantity, Unit Price, and Total fields and a button that runs... |
-| [add-checkbox-field-to-pdf-form](./add-checkbox-field-to-pdf-form.cs) | Add Checkbox Field to Existing PDF | `Document`, `Rectangle`, `CheckboxField` | Shows how to insert a new checkbox form field named 'AgreeTerms' into an existing PDF document us... |
-| [add-current-time-datefield-to-pdf](./add-current-time-datefield-to-pdf.cs) | Set Form Field Default Time on PDF Load | `Document`, `TextBoxField`, `Field` | Shows how to load a PDF with Aspose.Pdf, locate a TextBox form field, assign the current system t... |
-| [add-date-field-validation](./add-date-field-validation.cs) | Validate Date Picker Minimum Date in PDF Form | `Document`, `Field`, `TextBoxField` | Demonstrates adding JavaScript validation to a PDF date picker field to reject dates earlier than... |
-| [add-date-picker-field-current-date](./add-date-picker-field-current-date.cs) | Add Date Picker Field Defaulting to Current Date | `Document`, `Page`, `Rectangle` | Demonstrates how to add a text box field that acts as a date picker to an existing PDF and set it... |
-| [add-date-picker-field-to-pdf](./add-date-picker-field-to-pdf.cs) | Add Date Picker to PDF Form Field using JavaScript | `Document`, `TextBoxField`, `JavascriptAction` | Shows how to create a text box form field in a PDF and attach a JavaScript action that opens the ... |
-| [add-dynamic-barcode-field-to-pdf](./add-dynamic-barcode-field-to-pdf.cs) | Populate Barcode Field with Dynamic Value in PDF | `Document`, `Form`, `BarcodeField` | Demonstrates loading a PDF template, locating a BarcodeField by name, assigning a unique runtime ... |
-| [add-fallback-metadata-to-pdf](./add-fallback-metadata-to-pdf.cs) | Generate PDF from XML with Fallback Values | `Document`, `Page`, `TextFragment` | Shows how to read data from an XML file, supply default values when nodes are missing, and create... |
-| [add-gender-radio-button-group-to-pdf](./add-gender-radio-button-group-to-pdf.cs) | Create PDF with Gender Radio Button AcroForm | `Document`, `Page`, `TextFragment` | Demonstrates how to generate a PDF, add a text label, and insert a radio button group for gender ... |
-| [add-hidden-ip-field-to-pdf](./add-hidden-ip-field-to-pdf.cs) | Add Hidden IP Address Field to PDF Form | `Document`, `TextBoxField`, `Rectangle` | Demonstrates how to create a hidden text box field in a PDF, inject JavaScript that captures the ... |
-| [add-hidden-session-id-field-to-pdf](./add-hidden-session-id-field-to-pdf.cs) | Add Hidden Session Identifier Field to PDF | `Document`, `Form`, `TextBoxField` | Demonstrates how to insert a hidden text box form field into a PDF to store a session identifier ... |
-| [add-javascript-email-validation-to-pdf-form-field](./add-javascript-email-validation-to-pdf-form-field.cs) | Add JavaScript Email Validation to PDF Form Field | `Document`, `TextBoxField`, `JavascriptAction` | Shows how to load a PDF, locate the 'Email' TextBoxField, attach a JavaScript action that checks ... |
-| [add-javascript-listener-to-pdf-form-field](./add-javascript-listener-to-pdf-form-field.cs) | Add JavaScript Listener for PDF Form Field Change | `Document`, `JavascriptAction`, `TextBoxField` | Shows how to attach a JavaScript function to a PDF form field that triggers when the field's valu... |
-| [add-javascript-localization-to-pdf-form](./add-javascript-localization-to-pdf-form.cs) | Add Locale‑Based Dynamic Label to PDF | `Document`, `Page`, `ComboBoxField` | Demonstrates how to create a PDF with a combo box for selecting a locale and a read‑only label th... |
-| [add-listbox-to-pdf-form](./add-listbox-to-pdf-form.cs) | Create PDF with List Box AcroForm | `Document`, `Page`, `Rectangle` | Shows how to create a new PDF, add an AcroForm list box field, populate it with country options, ... |
-| [add-multi-select-list-box-max-3](./add-multi-select-list-box-max-3.cs) | Set Maximum Selections for a Multi‑Select List Box | `Document`, `ListBoxField`, `JavascriptAction` | Demonstrates how to enable multi‑selection on a PDF list box, limit the number of selectable item... |
-| [add-multiline-feedback-text-field](./add-multiline-feedback-text-field.cs) | Add Multiline Feedback TextBox to PDF Form | `Document`, `Rectangle`, `TextBoxField` | Shows how to insert a multiline text box field named 'Feedback' into an existing PDF document usi... |
-| [add-new-page-with-acroform-fields](./add-new-page-with-acroform-fields.cs) | Add a New Page with AcroForm Fields to a PDF | `Document`, `Page`, `Rectangle` | Shows how to load an existing PDF, append a blank page, and place new AcroForm text box and check... |
-| [add-numeric-field-with-validation](./add-numeric-field-with-validation.cs) | Numeric Range Validation Utility |  | Shows how to implement a simple validator that checks if a numeric value lies within an inclusive... |
-| [add-password-textbox-field-to-pdf](./add-password-textbox-field-to-pdf.cs) | Secure PDF Form Field by Making It Read‑Only | `Document`, `Form`, `FormField` | Demonstrates how to protect a PDF form field by setting it to read‑only using Aspose.Pdf core API... |
-| [add-paymentmethod-radio-button-group](./add-paymentmethod-radio-button-group.cs) | Create PaymentMethod Radio Button Group in PDF Form | `Document`, `Page`, `Rectangle` | Demonstrates how to add a radio button group named 'PaymentMethod' with 'Credit' and 'Debit' opti... |
-| [add-read-only-date-field-to-pdf](./add-read-only-date-field-to-pdf.cs) | Set PDF Date Field to Read‑Only | `Document`, `Save`, `TextBoxField` | Loads a PDF, fills a text box form field with the current date‑time and marks the field as read‑o... |
-| [add-reset-button-to-pdf-form](./add-reset-button-to-pdf-form.cs) | Add Reset Button to PDF Form | `Document`, `ButtonField`, `JavascriptAction` | Shows how to insert a reset button into an existing PDF form using Aspose.Pdf, which clears all u... |
-| [add-reset-button-to-pdf-form__v2](./add-reset-button-to-pdf-form__v2.cs) | Add Reset Button to PDF Form | `Document`, `ButtonField`, `JavascriptAction` | Shows how to create a button field in a PDF that clears all form fields by attaching a JavaScript... |
-| ... | | | *and 198 more files* |
+| [acroform-with-margins](./acroform-with-margins.cs) | Create PDF with AcroForm Fields Using Relative Positioning | `Document`, `Page`, `MarginInfo` | Demonstrates how to add AcroForm fields (a text box and a checkbox) to a PDF using page margins a... |
+| [add-auto-updating-datetime-field-to-pdf](./add-auto-updating-datetime-field-to-pdf.cs) | Add Auto‑Updating Date/Time Field to PDF | `Document`, `TextBoxField`, `Rectangle` | Demonstrates how to insert a text box form field into a PDF and attach document‑level JavaScript ... |
+| [add-blank-page-save-as-new-pdf](./add-blank-page-save-as-new-pdf.cs) | Add Text Annotation to PDF and Save As New File | `Document`, `Page`, `Rectangle` | Shows how to open a PDF, place a text annotation on the first page, and save the modified documen... |
+| [add-blank-page-to-pdf-form](./add-blank-page-to-pdf-form.cs) | Add Blank Page to PDF Form | `Document`, `Pages`, `Add` | Shows how to load an existing PDF form, append a new blank page, and save the document while pres... |
+| [add-calculated-total-field-with-javascript](./add-calculated-total-field-with-javascript.cs) | Add Calculated Sum Field to PDF Form | `Document`, `TextBoxField`, `Rectangle` | Shows how to create numeric text box fields and a read‑only calculated field that sums them using... |
+| [add-calculated-total-price-field-to-pdf-form](./add-calculated-total-price-field-to-pdf-form.cs) | Add Calculated Total Price Field to PDF Form | `Document`, `Page`, `Rectangle` | Demonstrates how to add Quantity, Unit Price, and a read‑only Total Price text box to a PDF form ... |
+| [add-calculation-button-to-pdf-form](./add-calculation-button-to-pdf-form.cs) | Add JavaScript to PDF Button for Total Calculation | `Document`, `ButtonField`, `JavascriptAction` | Shows how to load a PDF, locate a button form field, attach a JavaScript action that multiplies Q... |
+| [add-checkbox-field-to-pdf-form](./add-checkbox-field-to-pdf-form.cs) | Add Checkbox Field to PDF Form | `Document`, `Rectangle`, `CheckboxField` | Shows how to open an existing PDF, create a checkbox form field named 'AgreeTerms', add it to the... |
+| [add-current-time-datefield-to-pdf](./add-current-time-datefield-to-pdf.cs) | Set Form Field Default to Current Time on PDF Load | `Document`, `TextBoxField`, `Form` | Demonstrates how to set a PDF form text box field's default value to the current system time (HH:... |
+| [add-date-field-validation](./add-date-field-validation.cs) | Validate Date Picker Minimum Date in PDF Form | `Document`, `Form`, `TextBoxField` | Demonstrates adding JavaScript validation to a PDF date picker field so that dates earlier than J... |
+| [add-date-picker-field-current-date](./add-date-picker-field-current-date.cs) | Add Date Picker Field with Current Date to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to create or open a PDF, add a TextBox form field that acts as a date picker, se... |
+| [add-date-picker-field-to-pdf](./add-date-picker-field-to-pdf.cs) | Add Date Picker to PDF Form Field | `Document`, `Page`, `Rectangle` | Shows how to insert a text box form field into a PDF and attach JavaScript that opens the built‑i... |
+| [add-dynamic-barcode-field-to-pdf](./add-dynamic-barcode-field-to-pdf.cs) | Populate PDF Barcode Field with Dynamic Data | `Document`, `BarcodeField`, `Form` | Shows how to load a PDF template, generate a unique barcode value at runtime, assign it to a Barc... |
+| [add-dynamic-code128-barcode-to-pdf](./add-dynamic-code128-barcode-to-pdf.cs) | Synchronize Code128 Barcode with Text Field in PDF | `Document`, `TextBoxField`, `BarcodeField` | Shows how to set a BarcodeField to Code128 and automatically update its value whenever a linked T... |
+| [add-fallback-metadata-to-pdf](./add-fallback-metadata-to-pdf.cs) | Read XML with Default Values and Write to File |  | Shows how to load an XML document, retrieve element values with fallback defaults, and write the ... |
+| [add-gender-radio-button-group-to-pdf](./add-gender-radio-button-group-to-pdf.cs) | Create PDF with Gender Radio Button Group | `Document`, `Page`, `RadioButtonField` | Shows how to generate a new PDF, add an AcroForm radio button field for gender selection, set a d... |
+| [add-hidden-ip-field-to-pdf](./add-hidden-ip-field-to-pdf.cs) | Add Hidden IP Address Field to PDF with JavaScript | `Document`, `Form`, `TextBoxField` | Demonstrates how to insert a hidden text box form field into a PDF and attach JavaScript that ret... |
+| [add-hidden-session-id-field-to-pdf](./add-hidden-session-id-field-to-pdf.cs) | Add Hidden Session Identifier Field to PDF | `Document`, `TextBoxField`, `Rectangle` | Shows how to insert a hidden text box form field containing a session ID into an existing PDF usi... |
+| [add-javascript-email-validation-to-pdf-form-field](./add-javascript-email-validation-to-pdf-form-field.cs) | Add JavaScript Email Validation to PDF Form Field | `Document`, `Field`, `TextBoxField` | Shows how to load a PDF, locate a text box form field named "Email", and attach a JavaScript acti... |
+| [add-javascript-listener-to-pdf-form-field](./add-javascript-listener-to-pdf-form-field.cs) | Add JavaScript Listener to PDF Form Field | `Document`, `TextBoxField`, `JavascriptAction` | Shows how to attach a JavaScript action to a PDF form field using Aspose.Pdf so the script runs w... |
+| [add-javascript-localization-to-pdf-form](./add-javascript-localization-to-pdf-form.cs) | Create Localized PDF Label with JavaScript | `Document`, `Page`, `TextBoxField` | Shows how to add a hidden locale field and a read‑only label field to a PDF, embed a JavaScript d... |
+| [add-listbox-to-pdf-form](./add-listbox-to-pdf-form.cs) | Create PDF with AcroForm List Box | `Document`, `Page`, `Rectangle` | Shows how to generate a new PDF, add an AcroForm list box containing country options, and save th... |
+| [add-multi-select-list-box-max-3](./add-multi-select-list-box-max-3.cs) | Set Maximum Selections for PDF List Box | `Document`, `ListBoxField`, `JavascriptAction` | Shows how to enable multi‑select on a ListBoxField in a PDF form and enforce a limit of three sel... |
+| [add-multiline-feedback-text-field](./add-multiline-feedback-text-field.cs) | Create Multiline Feedback Text Field in PDF | `Document`, `Page`, `Rectangle` | Shows how to add a multiline TextBoxField named 'Feedback' with a 500‑character limit to a PDF do... |
+| [add-new-page-with-acroform-fields](./add-new-page-with-acroform-fields.cs) | Add New Page with AcroForm Fields to PDF | `Document`, `Page`, `Rectangle` | Demonstrates how to append a fresh page to an existing PDF and place various AcroForm fields (tex... |
+| [add-numeric-field-with-validation](./add-numeric-field-with-validation.cs) | Numeric Range Validation Utility |  | Shows a simple method that checks whether an integer is within a specified inclusive range and th... |
+| [add-password-textbox-field-to-pdf](./add-password-textbox-field-to-pdf.cs) | Protect PDF Form Field (Read‑Only) | `Document`, `Form`, `Field` | Shows how to load a PDF, locate a specific form field, set it to read‑only to protect it, and sav... |
+| [add-paymentmethod-radio-button-group](./add-paymentmethod-radio-button-group.cs) | Add PaymentMethod Radio Button Group to PDF | `Document`, `Page`, `RadioButtonField` | Demonstrates how to create a radio button group named 'PaymentMethod' with 'Credit' and 'Debit' o... |
+| [add-progress-bar-field-to-pdf-form](./add-progress-bar-field-to-pdf-form.cs) | Add a Progress Bar to a PDF Form with JavaScript | `Document`, `TextBoxField`, `Rectangle` | Demonstrates how to insert a TextBox field that acts as a progress bar in an existing PDF form an... |
+| [add-read-only-date-field-to-pdf](./add-read-only-date-field-to-pdf.cs) | Set Date‑Time Form Field to Read‑Only in PDF | `Document`, `TextBoxField`, `Form` | Loads a PDF, populates a date‑time text box form field with the current timestamp, marks the fiel... |
+| ... | | | *and 205 more files* |
 
 ## Category Statistics
-- Total examples: 228
+- Total examples: 235
 
 ## Category-Specific Tips
 
@@ -150,5 +146,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for working-with-forms patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-26 | Run: `20261026_221959_83adb1`
+Updated: 2026-11-04 | Run: `20261104_052328_6aa9c8`
 <!-- AUTOGENERATED:END -->

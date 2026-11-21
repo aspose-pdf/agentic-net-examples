@@ -7,33 +7,36 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string encryptedPdfPath = "protected.pdf";
+        const string xmlInput = "input.xml";
+        const string encryptedPdf = "protected.pdf";
         const string userPassword = "UserPass123";
         const string ownerPassword = "OwnerPass123";
 
-        if (!File.Exists(xmlPath))
+        if (!File.Exists(xmlInput))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"XML input not found: {xmlInput}");
             return;
         }
 
         try
         {
             // Load the XML representation of a PDF document
-            using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+            var loadOptions = new XmlLoadOptions();
+            using (var doc = new Document(xmlInput, loadOptions))
             {
-                // Set desired permissions (allow printing, disallow content extraction)
-                Permissions permissions = Permissions.PrintDocument;
+                // Define allowed permissions for the encrypted PDF
+                Permissions perms = Permissions.PrintDocument |
+                                    Permissions.ModifyTextAnnotations |
+                                    Permissions.ExtractContent;
 
-                // Apply encryption with a strong algorithm (AES 256‑bit)
-                doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.AESx256);
+                // Apply encryption using AES‑256 (custom algorithm per security standards)
+                doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF
-                doc.Save(encryptedPdfPath);
+                doc.Save(encryptedPdf);
             }
 
-            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdfPath}'.");
+            Console.WriteLine($"Encrypted PDF saved to '{encryptedPdf}'.");
         }
         catch (Exception ex)
         {

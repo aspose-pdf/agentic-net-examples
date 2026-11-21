@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TableAbsorber resides in this namespace
 
 class Program
 {
@@ -15,28 +15,32 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a TableAbsorber to extract tables
+            // TableAbsorber extracts tables from the document
             TableAbsorber absorber = new TableAbsorber();
 
-            // Visit each page to collect tables
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                absorber.Visit(page);
-            }
+                // Absorb tables on the current page
+                absorber.Visit(doc.Pages[pageNum]);
 
-            // Iterate over each absorbed table and output its rectangle coordinates
-            int tableIndex = 1;
-            foreach (var table in absorber.TableList)
-            {
-                // Rectangle provides the table bounds (points)
-                Aspose.Pdf.Rectangle rect = table.Rectangle;
+                // Process each extracted table
+                for (int i = 0; i < absorber.TableList.Count; i++)
+                {
+                    // The Rectangle property returns an Aspose.Pdf.Rectangle
+                    Aspose.Pdf.Rectangle rect = absorber.TableList[i].Rectangle;
 
-                Console.WriteLine(
-                    $"Table {tableIndex}: LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}");
-                tableIndex++;
+                    // Output the coordinates (lower‑left x/y and upper‑right x/y)
+                    Console.WriteLine($"Page {pageNum}, Table {i + 1}:");
+                    Console.WriteLine($"  LLX = {rect.LLX}, LLY = {rect.LLY}");
+                    Console.WriteLine($"  URX = {rect.URX}, URY = {rect.URY}");
+                }
+
+                // Clear the absorber for the next page to avoid mixing results
+                absorber.TableList.Clear();
             }
         }
     }

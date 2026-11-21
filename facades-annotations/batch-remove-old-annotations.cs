@@ -1,90 +1,80 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades; // required by task specification
 
-class BatchAnnotationCleaner
+class Program
 {
-    static void Main(string[] args)
+    // Removes annotations older than the specified number of days from all PDFs in a folder.
+    static void Main()
     {
-        // Expect: args[0] = folder containing PDFs, args[1] = age in days
-        if (args.Length < 2)
+        const string inputFolder  = @"C:\PdfBatch\Input";
+        const string outputFolder = @"C:\PdfBatch\Output";
+        const int    daysThreshold = 30; // annotations older than 30 days will be removed
+
+        if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine("Usage: BatchAnnotationCleaner <folderPath> <days>");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        string folderPath = args[0];
-        if (!Directory.Exists(folderPath))
+        Directory.CreateDirectory(outputFolder);
+
+        // Compute the cutoff date once.
+        DateTime cutoffDate = DateTime.Now.AddDays(-daysThreshold);
+
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            Console.Error.WriteLine($"Folder not found: {folderPath}");
-            return;
-        }
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath  = Path.Combine(outputFolder, fileName);
 
-        if (!int.TryParse(args[1], out int days))
-        {
-            Console.Error.WriteLine("Invalid days value.");
-            return;
-        }
-
-        DateTime cutoffDate = DateTime.Now.AddDays(-days);
-
-        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
-        {
-            string tempFile = Path.Combine(folderPath,
-                Path.GetFileNameWithoutExtension(pdfFile) + "_cleaned.pdf");
-
-            // Load the PDF to inspect annotations (Document must be disposed)
-            using (Document doc = new Document(pdfFile))
+            try
             {
-                List<string> namesToDelete = new List<string>();
-
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Load the PDF inside a using block for deterministic disposal.
+                using (Document doc = new Document(pdfPath))
                 {
-                    Page page = doc.Pages[i];
-                    foreach (Annotation annot in page.Annotations)
+                    // Iterate through all pages (1‑based indexing).
+                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                     {
-                        // Modified is a non‑nullable DateTime, so use it directly.
-                        DateTime modDate = annot.Modified;
+                        Page page = doc.Pages[pageIndex];
+                        AnnotationCollection annCollection = page.Annotations;
 
-                        if (modDate < cutoffDate)
+                        // Iterate backwards so that removal does not affect the index order.
+                        for (int i = annCollection.Count - 1; i >= 0; i--)
                         {
-                            // The editor deletes annotations by their Name (or empty string if not set).
-                            // If Name is null, we cannot delete it via the editor, so we skip it.
-                            if (!string.IsNullOrEmpty(annot.Name))
-                                namesToDelete.Add(annot.Name);
+                            // All annotation types derive from Aspose.Pdf.Annotations.Annotation.
+                            Annotation ann = annCollection[i] as Annotation;
+                            if (ann == null)
+                                continue;
+
+                            // Only markup annotations expose a modification date.
+                            if (ann is MarkupAnnotation markup)
+                            {
+                                // The Modified property holds the last modification date.
+                                DateTime modDate = markup.Modified;
+                                if (modDate < cutoffDate)
+                                {
+                                    // Delete the annotation from the collection.
+                                    annCollection.Delete(i);
+                                }
+                            }
+                            // Non‑markup annotations are left untouched (or could be removed based on other criteria).
                         }
                     }
+
+                    // Save the cleaned PDF to the output folder.
+                    doc.Save(outPath);
                 }
 
-                if (namesToDelete.Count > 0)
-                {
-                    // Use Facade API to delete annotations by Name
-                    using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
-                    {
-                        editor.BindPdf(pdfFile);
-
-                        foreach (string name in namesToDelete)
-                            editor.DeleteAnnotation(name);
-
-                        // Save the cleaned PDF
-                        editor.Save(tempFile);
-                    }
-                }
-                else
-                {
-                    // No annotations to remove; copy original
-                    File.Copy(pdfFile, tempFile, true);
-                }
+                Console.WriteLine($"Processed: {fileName}");
             }
-
-            // Replace original file with cleaned version
-            File.Delete(pdfFile);
-            File.Move(tempFile, pdfFile);
-            Console.WriteLine($"Processed: {Path.GetFileName(pdfFile)}");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
         }
+
+        Console.WriteLine("Batch cleanup completed.");
     }
 }

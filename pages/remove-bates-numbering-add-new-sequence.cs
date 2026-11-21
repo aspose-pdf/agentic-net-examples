@@ -2,12 +2,13 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_bates.pdf";
 
         if (!File.Exists(inputPath))
@@ -24,26 +25,33 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Remove any existing stamp annotations from the page
-                page.Annotations.Clear();
+                // Remove any existing stamp annotations (Bates numbers are added as stamps)
+                // Iterate backwards because we are deleting items from the collection.
+                for (int j = page.Annotations.Count; j >= 1; j--)
+                {
+                    if (page.Annotations[j] is StampAnnotation)
+                    {
+                        page.Annotations.Delete(j);
+                    }
+                }
 
                 // Create a new Bates number stamp for this page
-                TextStamp batesStamp = new TextStamp($"Bates-{i:D5}")
+                TextStamp batesStamp = new TextStamp(i.ToString())
                 {
                     // Position the stamp at the bottom‑right corner
                     HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment   = VerticalAlignment.Bottom,
-                    // Use XIndent/YIndent to provide a margin from the page edges
-                    XIndent = 20, // distance from the right edge (since Right alignment)
-                    YIndent = 20  // distance from the bottom edge
+                    // Offsets from the page edges
+                    RightMargin = 10,   // points from the right edge (when Right‑aligned)
+                    BottomMargin = 10   // points from the bottom edge (when Bottom‑aligned)
                 };
 
-                // Configure text appearance using Aspose.Pdf.Text classes
-                batesStamp.TextState.FontSize = 12;
+                // Define visual appearance – TextState is read‑only, so modify its members directly
                 batesStamp.TextState.Font = FontRepository.FindFont("Arial");
-                batesStamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                batesStamp.TextState.FontSize = 12;
+                batesStamp.TextState.ForegroundColor = Color.Black;
 
-                // Add the stamp to the current page
+                // Add the new stamp to the page
                 page.AddStamp(batesStamp);
             }
 
@@ -51,6 +59,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bates numbering applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Bates numbering updated and saved to '{outputPath}'.");
     }
 }

@@ -7,42 +7,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "output.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
-            {
-                // TextAbsorber extracts text from the document
-                TextAbsorber absorber = new TextAbsorber
-                {
-                    // Extract plain text without formatting tags
-                    ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-                };
+            // Use TextAbsorber to extract text from all pages
+            TextAbsorber absorber = new TextAbsorber();
+            // Optional: configure extraction options (e.g., pure text without formatting)
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-                // Apply the absorber to all pages
-                pdfDoc.Pages.Accept(absorber);
+            // Apply the absorber to the document's pages
+            pdfDoc.Pages.Accept(absorber);
 
-                // Concatenated text from all pages
-                string allText = absorber.Text ?? string.Empty;
+            // Concatenated text from the entire document
+            string allText = absorber.Text ?? string.Empty;
 
-                // Write the result to a .txt file
-                File.WriteAllText(outputTxt, allText);
-            }
-
-            Console.WriteLine($"Text extracted to '{outputTxt}'.");
+            // Write the extracted text to a .txt file
+            File.WriteAllText(outputTxtPath, allText);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
     }
 }

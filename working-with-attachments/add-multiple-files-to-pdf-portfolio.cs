@@ -7,10 +7,10 @@ class Program
     static void Main()
     {
         // List of files of various types to be added to the portfolio
-        string[] files = { "sample.pdf", "report.docx", "image.jpg", "data.xlsx" };
+        string[] files = { "doc1.pdf", "image1.jpg", "report.docx", "presentation.pptx" };
         const string outputPdf = "portfolio.pdf";
 
-        // Verify that each file exists before proceeding
+        // Verify that all source files exist before proceeding
         foreach (var f in files)
         {
             if (!File.Exists(f))
@@ -20,25 +20,23 @@ class Program
             }
         }
 
-        // Create a new PDF document that will serve as the portfolio container
+        // Create the PDF document that will hold the portfolio
         using (Document portfolioDoc = new Document())
         {
-            // A portfolio PDF must contain at least one page; add a blank page
+            // Portfolio requires at least one page; add a blank page
             portfolioDoc.Pages.Add();
 
-            // Ensure the Collection object exists – it holds the embedded files for a portfolio
+            // Ensure the collection for embedded files is initialized
             if (portfolioDoc.Collection == null)
                 portfolioDoc.Collection = new Collection();
 
             // Add each file to the portfolio in a single loop
-            foreach (var filePath in files)
+            foreach (string filePath in files)
             {
-                // Use the file name as a simple description for the embedded file
-                string description = Path.GetFileName(filePath);
-
-                // Create a FileSpecification for the file and load its contents into a memory stream
-                var fileSpec = new FileSpecification(filePath, description)
+                // Create a FileSpecification for the file
+                var fileSpec = new FileSpecification(filePath, Path.GetFileName(filePath))
                 {
+                    // Load the file contents into a memory stream
                     Contents = new MemoryStream(File.ReadAllBytes(filePath))
                 };
 
@@ -46,10 +44,10 @@ class Program
                 portfolioDoc.Collection.Add(fileSpec);
             }
 
-            // Save the resulting PDF portfolio
+            // Save the resulting PDF containing the embedded files
             portfolioDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Portfolio created: {outputPdf}");
+        Console.WriteLine($"Portfolio PDF created at '{outputPdf}'.");
     }
 }

@@ -1,65 +1,67 @@
 using System;
-using System.Drawing;
 using System.IO;
+using System.Drawing; // for System.Drawing.Rectangle
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // for PKCS1
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "signed_output.pdf";
-        const string certPath = "certificate.pfx";
-        const string certPassword = "password";
+        const string inputPdf      = "input.pdf";
+        const string outputPdf     = "signed_output.pdf";
+        const string certificate   = "certificate.pfx";
+        const string certPassword  = "password";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certificate))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificate}");
             return;
         }
 
-        if (!File.Exists(certPath))
+        // PdfFileSignature implements IDisposable – use a using block for deterministic cleanup
+        using (PdfFileSignature signature = new PdfFileSignature())
         {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
-            return;
-        }
+            // Bind the source PDF document to the signature object
+            signature.BindPdf(inputPdf);
 
-        // PdfFileSignature implements IDisposable; use using for deterministic disposal
-        using (PdfFileSignature signer = new PdfFileSignature())
-        {
-            // Bind the source PDF document
-            signer.BindPdf(inputPdf);
-
-            // Define signature rectangle (coordinates in points)
-            // System.Drawing.Rectangle expects (x, y, width, height) where (x, y) is the lower‑left corner.
+            // Define the visible signature rectangle on page 1 (lower‑left and upper‑right coordinates)
             double llx = 100; // lower‑left X
             double lly = 100; // lower‑left Y
-            double urx = 250; // upper‑right X
-            double ury = 150; // upper‑right Y
+            double urx = 300; // upper‑right X
+            double ury = 200; // upper‑right Y
 
-            int rectX = (int)llx;
-            int rectY = (int)lly;
-            int rectWidth = (int)(urx - llx);
-            int rectHeight = (int)(ury - lly);
-            Rectangle signatureRect = new Rectangle(rectX, rectY, rectWidth, rectHeight);
+            // Convert to System.Drawing.Rectangle (x, y, width, height)
+            Rectangle rect = new Rectangle(
+                (int)llx,
+                (int)lly,
+                (int)(urx - llx),
+                (int)(ury - lly)
+            );
 
-            // Load the certificate (PKCS#7) that will be used for signing
-            PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+            // Create the PKCS1 signature object from the certificate
+            PKCS1 pkcs = new PKCS1(certificate, certPassword);
 
-            // Sign the PDF using the overload that accepts primitive parameters.
-            // Parameters order: pageNumber, reason, contactInfo, location, isVisible, rectangle, pkcs7
-            signer.Sign(
-                1,                     // page number (1‑based)
-                "Document signed",    // reason
-                "contact@example.com", // contact info
-                "Location",           // location
-                true,                  // visible signature flag
-                signatureRect,         // signature rectangle
-                pkcs7);                // PKCS#7 certificate
+            // Add the digital signature to page 1
+            // Parameters: pageNumber, reason, contactInfo, location, isVisible, rectangle, signatureObject
+            signature.Sign(
+                1,
+                "Document signed",
+                "contact@example.com",
+                "Location",
+                true,
+                rect,
+                pkcs
+            );
 
             // Save the signed PDF to the desired output path
-            signer.Save(outputPdf);
+            signature.Save(outputPdf);
         }
 
         Console.WriteLine($"Signed PDF saved to '{outputPdf}'.");

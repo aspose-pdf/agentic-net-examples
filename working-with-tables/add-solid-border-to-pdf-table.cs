@@ -1,51 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // for BorderInfo and BorderSide
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_table.pdf";
+        const string outputPath = "TableWithBorder.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Load the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Create a simple table with two columns and apply a solid border to the whole table
+            // Create a table and set its column widths
             Table table = new Table
             {
-                // Define column widths (percentage or absolute units)
-                ColumnWidths = "200 200",
-
-                // Apply a solid black border of 1 point thickness to the entire table
-                Border = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black),
-                // Optionally set the default cell border as well
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 1f, Aspose.Pdf.Color.Black)
+                // Widths: 100, 200, 200 points respectively
+                ColumnWidths = "100 200 200"
             };
+
+            // Apply a solid border to the entire table
+            // BorderInfo defines the style, width and (optionally) color of the border
+            BorderInfo solidBorder = new BorderInfo(BorderSide.All, 1f); // 1‑point solid line on all sides
+            table.Border = solidBorder; // Set the Border property (Table has no BorderInfo property)
 
             // Add a header row
             Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
+            header.Cells.Add("ID");
+            header.Cells.Add("Name");
+            header.Cells.Add("Description");
 
-            // Add a data row
+            // Add a sample data row
             Row data = table.Rows.Add();
-            data.Cells.Add("Cell A1");
-            data.Cells.Add("Cell B1");
+            data.Cells.Add("1");
+            data.Cells.Add("Sample Item");
+            data.Cells.Add("This is a description.");
 
-            // Insert the table into the first page's paragraph collection
-            Page firstPage = doc.Pages[1];
-            firstPage.Paragraphs.Add(table);
+            // Add the table to the page's paragraphs collection
+            page.Paragraphs.Add(table);
 
-            // Save the modified PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

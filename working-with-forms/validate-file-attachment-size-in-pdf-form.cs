@@ -1,51 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 
-class Program
+class FileValidator
 {
-    // Maximum allowed file size: 5 MB (in bytes)
+    // Maximum allowed file size: 5 MB (5 * 1024 * 1024 bytes)
     private const long MaxFileSizeBytes = 5L * 1024 * 1024;
 
-    static void Main(string[] args)
+    /// <summary>
+    /// Checks whether the file at <paramref name="filePath"/> is within the allowed size limit.
+    /// </summary>
+    /// <param name="filePath">Full path to the file to validate.</param>
+    /// <returns>True if the file size is ≤ 5 MB; otherwise false.</returns>
+    /// <exception cref="FileNotFoundException">Thrown when the file does not exist.</exception>
+    public static bool ValidateFileSize(string filePath)
     {
-        // Expect a file path as the first argument
-        if (args.Length == 0)
-        {
-            Console.WriteLine("Usage: program <pdf-file-path>");
-            return;
-        }
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path must be provided.", nameof(filePath));
 
-        string filePath = args[0];
-
-        // Ensure the file exists
         if (!File.Exists(filePath))
-        {
-            Console.WriteLine($"File not found: {filePath}");
-            return;
-        }
+            throw new FileNotFoundException("File not found.", filePath);
 
-        // Validate the file size against the 5 MB limit
-        if (!IsFileSizeValid(filePath))
-        {
-            Console.WriteLine("The selected file exceeds the 5 MB size limit.");
-            return;
-        }
+        // Use FileInfo to obtain the length without loading the file into memory.
+        FileInfo info = new FileInfo(filePath);
+        long fileSize = info.Length;
 
-        // At this point the file size is acceptable; proceed with further processing
-        // Example: load the PDF with Aspose.Pdf core API and display page count
-        Document pdfDocument = new Document(filePath);
-        Console.WriteLine($"PDF loaded successfully. Page count: {pdfDocument.Pages.Count}");
-
-        // Example: save a copy of the PDF (could be any further processing)
-        string outputPath = Path.Combine(Path.GetDirectoryName(filePath) ?? string.Empty, "processed.pdf");
-        pdfDocument.Save(outputPath);
-        Console.WriteLine($"Processed file saved to: {outputPath}");
+        // Return true if size is within limit, false otherwise.
+        return fileSize <= MaxFileSizeBytes;
     }
 
-    private static bool IsFileSizeValid(string path)
+    // Example usage:
+    static void Main()
     {
-        FileInfo info = new FileInfo(path);
-        return info.Length <= MaxFileSizeBytes;
+        string path = "uploadedDocument.pdf";
+
+        try
+        {
+            bool isValid = ValidateFileSize(path);
+            if (isValid)
+            {
+                Console.WriteLine("File size is acceptable. Proceed with form submission.");
+                // TODO: Add form submission logic here.
+            }
+            else
+            {
+                Console.WriteLine("File exceeds the 5 MB size limit. Reject submission.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Validation error: {ex.Message}");
+        }
     }
 }

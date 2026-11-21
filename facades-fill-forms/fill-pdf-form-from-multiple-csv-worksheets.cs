@@ -2,108 +2,138 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Forms; // <-- added namespace for form field types
 
 class Program
 {
+    // Simple container for a sheet name and its associated DataTable
+    private class SheetData
+    {
+        // Marked as required to satisfy the non‑nullable warning (C# 11+)
+        public required string SheetName { get; set; }
+        public required DataTable Table { get; set; }
+    }
+
     static void Main()
     {
-        // NOTE: The original example used an Excel workbook. To keep the sample
-        // cross‑platform and avoid the Windows‑only System.Data.OleDb provider,
-        // the data is now read from CSV files – one CSV per logical worksheet.
-        const string csvFolder   = "CsvData";      // folder containing CSV files (one per worksheet)
-        const string templatePdf = "template.pdf"; // PDF form with fields matching column names
-        const string outputDir   = "GeneratedPdfs"; // folder for the generated PDFs
+        const string pdfTemplatePath = "template.pdf";
+        const string outputDir = "FilledPdfs";
 
-        // Ensure the output directory exists
+        if (!File.Exists(pdfTemplatePath))
+        {
+            Console.Error.WriteLine($"PDF template not found: {pdfTemplatePath}");
+            return;
+        }
+
         Directory.CreateDirectory(outputDir);
 
-        // Extract a DataTable for each CSV file (treated as a worksheet)
-        List<DataTable> worksheets = GetDataTablesFromCsv(csvFolder);
+        // ---------------------------------------------------------------------
+        // Instead of reading Excel worksheets (Aspose.Cells is not referenced),
+        // we create a few in‑memory DataTable objects that mimic separate sheets.
+        // ---------------------------------------------------------------------
+        List<SheetData> sheets = GetSampleSheets();
 
-        // Process each worksheet independently
-        for (int i = 0; i < worksheets.Count; i++)
+        foreach (var sheet in sheets)
         {
-            DataTable dt = worksheets[i];
-
-            // AutoFiller handles the mail‑merge / form‑fill operation
-            using (AutoFiller filler = new AutoFiller())
+            // Load the PDF template for each sheet – using a using‑block guarantees disposal.
+            using (Document pdfDoc = new Document(pdfTemplatePath))
             {
-                // Bind the PDF template (no need for InputFileName property)
-                filler.BindPdf(templatePdf);
+                // Fill the PDF form fields using the DataTable for the current sheet.
+                FillPdfForm(pdfDoc, sheet.Table);
 
-                // Import the data for the current worksheet
-                filler.ImportDataTable(dt);
-
-                // Generate the PDF for this worksheet – use the newer Save(string) overload
-                string outputPath = Path.Combine(outputDir, $"Result_{i}.pdf");
-                filler.Save(outputPath);
+                // Save the filled PDF; each sheet gets its own output file.
+                string outputPath = Path.Combine(outputDir, $"filled_{sheet.SheetName}.pdf");
+                pdfDoc.Save(outputPath);
+                Console.WriteLine($"Saved filled PDF for sheet '{sheet.SheetName}' to '{outputPath}'.");
             }
         }
-
-        Console.WriteLine("All worksheets processed successfully.");
     }
 
-    // Reads every CSV file from a folder and returns a list of DataTables.
-    // The first line of each CSV is treated as column headers.
-    private static List<DataTable> GetDataTablesFromCsv(string folderPath)
+    /// <summary>
+    /// Fills a PDF document's form fields using the first row of the supplied DataTable.
+    /// Each column name is treated as the field's FullName. The method supports TextBoxField
+    /// and generic fields (e.g., checkboxes) via reflection, matching the patterns recommended
+    /// in the "Fix: use-document-form-fields-instead-of-autofiller" guidance.
+    /// </summary>
+    private static void FillPdfForm(Document pdfDoc, DataTable table)
     {
-        var tables = new List<DataTable>();
-        if (!Directory.Exists(folderPath))
-        {
-            Console.WriteLine($"CSV folder '{folderPath}' does not exist. No data will be processed.");
-            return tables;
-        }
+        if (table.Rows.Count == 0)
+            return; // nothing to fill
 
-        foreach (string csvFile in Directory.GetFiles(folderPath, "*.csv"))
-        {
-            DataTable dt = LoadCsvToDataTable(csvFile);
-            dt.TableName = Path.GetFileNameWithoutExtension(csvFile);
-            tables.Add(dt);
-        }
-        return tables;
-    }
+        DataRow row = table.Rows[0]; // simple scenario – fill using the first row only
 
-    // Simple CSV parser that loads the content of a CSV file into a DataTable.
-    // It assumes commas as delimiters and does not handle quoted commas or line breaks.
-    private static DataTable LoadCsvToDataTable(string csvFilePath)
-    {
-        var table = new DataTable();
-        using (var reader = new StreamReader(csvFilePath))
+        foreach (DataColumn col in table.Columns)
         {
-            bool isFirstLine = true;
-            while (!reader.EndOfStream)
+            string fieldName = col.ColumnName;
+            object value = row[col];
+
+            // Try to locate a TextBoxField first (most common for string/numeric data)
+            var textField = pdfDoc.Form?.Fields?.FirstOrDefault(f => f.FullName == fieldName) as TextBoxField;
+            if (textField != null)
             {
-                string line = reader.ReadLine();
-                if (string.IsNullOrWhiteSpace(line))
-                    continue; // skip empty lines
+                textField.Value = value?.ToString() ?? string.Empty;
+                continue;
+            }
 
-                string[] fields = line.Split(',');
-                if (isFirstLine)
+            // If not a TextBoxField, fall back to a generic field (e.g., checkbox, radio button)
+            var genericField = pdfDoc.Form?.Fields?.FirstOrDefault(f => f.FullName == fieldName);
+            if (genericField != null)
+            {
+                // Attempt to set a "Checked" property for check‑boxes/radio‑buttons via reflection
+                var checkedProp = genericField.GetType().GetProperty("Checked");
+                if (checkedProp != null && checkedProp.CanWrite)
                 {
-                    // Create columns from the header line
-                    foreach (string header in fields)
-                    {
-                        string colName = header.Trim();
-                        if (string.IsNullOrEmpty(colName))
-                            colName = $"Column{table.Columns.Count}";
-                        // All columns are treated as string for simplicity
-                        table.Columns.Add(colName, typeof(string));
-                    }
-                    isFirstLine = false;
+                    // Treat any non‑zero / non‑false value as checked
+                    bool isChecked = Convert.ToBoolean(value);
+                    checkedProp.SetValue(genericField, isChecked);
                 }
                 else
                 {
-                    // Add a data row
-                    var row = table.NewRow();
-                    for (int i = 0; i < table.Columns.Count && i < fields.Length; i++)
-                    {
-                        row[i] = fields[i].Trim();
-                    }
-                    table.Rows.Add(row);
+                    // Fallback – set the generic Value property (works for many field types)
+                    genericField.Value = value?.ToString() ?? string.Empty;
                 }
             }
         }
-        return table;
+    }
+
+    /// <summary>
+    /// Generates a list of sample SheetData objects. Each DataTable contains a few rows
+    /// and columns that correspond to the field names expected in the PDF form.
+    /// This replaces the original Aspose.Cells Excel‑reading logic.
+    /// </summary>
+    private static List<SheetData> GetSampleSheets()
+    {
+        var sheets = new List<SheetData>();
+
+        // ----- Sheet 1 -----
+        var dt1 = new DataTable();
+        dt1.Columns.Add("Name", typeof(string));
+        dt1.Columns.Add("Date", typeof(string));
+        dt1.Rows.Add("John Doe", DateTime.Today.ToShortDateString());
+        dt1.Rows.Add("Jane Smith", DateTime.Today.AddDays(1).ToShortDateString());
+        sheets.Add(new SheetData { SheetName = "Sheet1", Table = dt1 });
+
+        // ----- Sheet 2 -----
+        var dt2 = new DataTable();
+        dt2.Columns.Add("Product", typeof(string));
+        dt2.Columns.Add("Quantity", typeof(int));
+        dt2.Columns.Add("Price", typeof(decimal));
+        dt2.Rows.Add("Widget A", 10, 2.99m);
+        dt2.Rows.Add("Widget B", 5, 5.49m);
+        sheets.Add(new SheetData { SheetName = "Sheet2", Table = dt2 });
+
+        // ----- Sheet 3 (demonstrates a different set of fields) -----
+        var dt3 = new DataTable();
+        dt3.Columns.Add("EmployeeId", typeof(string));
+        dt3.Columns.Add("HoursWorked", typeof(double));
+        dt3.Rows.Add("E001", 40.0);
+        dt3.Rows.Add("E002", 35.5);
+        sheets.Add(new SheetData { SheetName = "Sheet3", Table = dt3 });
+
+        return sheets;
     }
 }

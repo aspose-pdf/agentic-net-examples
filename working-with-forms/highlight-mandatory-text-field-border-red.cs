@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Required for Border and BorderStyle
+using Aspose.Pdf.Annotations; // required for Border class
 
 class Program
 {
@@ -19,32 +18,37 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve the text box field from the form collection safely
-            TextBoxField txtField = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName) as TextBoxField;
-            if (txtField != null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Define a solid border with a width of 2 points
-                txtField.Border = new Border(txtField)
+                // Retrieve the text box field by its name
+                TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
+
+                if (txtField != null)
                 {
-                    Style = BorderStyle.Solid,
-                    Width = 2
-                };
+                    // Set the border colour – for form fields the colour is controlled by the field's Color property
+                    txtField.Color = Aspose.Pdf.Color.Red;
 
-                // Set the border colour – the Color property of the field controls the border colour
-                txtField.Color = Aspose.Pdf.Color.Red;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a text box.");
+                    // Increase border width so the red border is noticeable
+                    // Border requires the parent annotation (the field) in its constructor
+                    txtField.Border = new Border(txtField) { Width = 2 };
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Text field '{fieldName}' not found.");
+                }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Highlighted PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

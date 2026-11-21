@@ -2,89 +2,78 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF with a form field
-        const string outputPdfPath = "output.pdf";        // PDF after applying background image
-        const string fieldName = "myButtonField";        // name of the target form field
-        const string backgroundImg = "brand_logo.png";   // image to use as background
+        const string inputPdf = "form.pdf";
+        const string outputPdf = "form_with_background.pdf";
+        const string imagePath = "logo.png";
+        const string fieldName = "myButton";
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(backgroundImg))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Background image not found: {backgroundImg}");
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Retrieve the form field by name and ensure it is a button field
-            if (pdfDoc.Form[fieldName] is ButtonField buttonField)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                // Determine the page that contains the button. ButtonField does not expose a PageNumber
-                // property, so we locate the page by checking which page rectangle fully contains the field's rectangle.
-                int pageNumber = FindPageContainingRect(pdfDoc, buttonField.Rect);
-                Page page = pdfDoc.Pages[pageNumber];
-
-                // Use the button's rectangle to position the background image
-                Aspose.Pdf.Rectangle btnRect = buttonField.Rect;
-                double btnWidth = btnRect.URX - btnRect.LLX;
-                double btnHeight = btnRect.URY - btnRect.LLY;
-
-                // Create an ImageStamp for the background image
-                ImageStamp imgStamp = new ImageStamp(backgroundImg)
+                // Verify that the form contains the target field
+                if (!doc.Form.HasField(fieldName))
                 {
-                    Width = btnWidth,
-                    Height = btnHeight,
-                    XIndent = btnRect.LLX,
-                    YIndent = btnRect.LLY
+                    Console.Error.WriteLine($"Form field '{fieldName}' does not exist.");
+                    return;
+                }
+
+                // Retrieve the field and cast to ButtonField (push‑button style)
+                ButtonField button = doc.Form[fieldName] as ButtonField;
+                if (button == null)
+                {
+                    Console.Error.WriteLine($"Field '{fieldName}' is not a button field.");
+                    return;
+                }
+
+                // Hide the button border so only the image is visible
+                button.Border = new Border(button) { Width = 0 };
+
+                // Determine the page that contains the button field.
+                // ButtonField exposes PageIndex (0‑based). Convert to 1‑based for the Pages collection.
+                int pageNumber = button.PageIndex + 1;
+                Page page = doc.Pages[pageNumber];
+
+                // Create an ImageStamp that matches the button rectangle.
+                var rect = button.Rect;
+                var imgStamp = new ImageStamp(imagePath)
+                {
+                    Width = rect.URX - rect.LLX,
+                    Height = rect.URY - rect.LLY,
+                    XIndent = rect.LLX,
+                    YIndent = rect.LLY
                 };
 
-                // Add the stamp to the page (adding before the button keeps the image underneath)
+                // Add the stamp to the page – this becomes the visual background of the button.
                 page.AddStamp(imgStamp);
 
-                // Optionally clear the button's caption so only the image is visible
-                // buttonField.NormalCaption = string.Empty;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found or not a ButtonField.");
-                return;
+                // Save the modified PDF
+                doc.Save(outputPdf);
             }
 
-            // Save the modified PDF.
-            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Background image applied and saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Background image applied to field '{fieldName}'. Saved as '{outputPdfPath}'.");
-    }
-
-    /// <summary>
-    /// Finds the page index (1‑based) that fully contains the specified rectangle.
-    /// If no page fully contains the rectangle, the method returns 1 as a fallback.
-    /// </summary>
-    private static int FindPageContainingRect(Document doc, Aspose.Pdf.Rectangle rect)
-    {
-        for (int i = 1; i <= doc.Pages.Count; i++)
+        catch (Exception ex)
         {
-            Page pg = doc.Pages[i];
-            // Compare the field rectangle with the page's media box (pg.Rect)
-            if (rect.LLX >= pg.Rect.LLX && rect.LLY >= pg.Rect.LLY &&
-                rect.URX <= pg.Rect.URX && rect.URY <= pg.Rect.URY)
-            {
-                return i;
-            }
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-        // Fallback – assume first page
-        return 1;
     }
 }

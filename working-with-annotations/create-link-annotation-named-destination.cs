@@ -2,13 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_link.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,50 +17,34 @@ class Program
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
+        // Open the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // -----------------------------------------------------------------
-            // 1. Define a named destination somewhere in the document.
-            //    Here we create a destination on page 3 that fits the whole page.
-            // -----------------------------------------------------------------
-            int targetPageNumber = 3; // 1‑based page index
+            // ------------------------------------------------------------
+            // Define a named destination called "MyTarget" on page 2.
+            // The destination points to the top‑left corner of the page.
+            // ------------------------------------------------------------
+            // XYZExplicitDestination(page, x, y, zoom)
+            // x = 0 (left), y = page height (top), zoom = 1 (100%)
+            var page2 = doc.Pages[2];
+            var topLeftDest = new XYZExplicitDestination(page2, 0, page2.MediaBox.Height, 1);
+            doc.NamedDestinations.Add("MyTarget", topLeftDest);
 
-            // Use an explicit destination that fits the page. The class lives in Aspose.Pdf.Annotations.
-            FitExplicitDestination fitDest = new FitExplicitDestination(doc.Pages[targetPageNumber]);
-
-            // Add the named destination to the document's collection
-            doc.NamedDestinations.Add("MyNamedDest", fitDest);
-
-            // -----------------------------------------------------------------
-            // 2. Create a link annotation on another page that jumps to the named destination.
-            // -----------------------------------------------------------------
-            // Choose the page where the link will appear (e.g., page 1)
-            Page linkPage = doc.Pages[1];
-
-            // Define the rectangle area for the clickable link (llx, lly, urx, ury)
-            // Use fully qualified Aspose.Pdf.Rectangle to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
-
-            // Create the link annotation
-            LinkAnnotation link = new LinkAnnotation(linkPage, linkRect)
+            // ------------------------------------------------------------
+            // Create a link annotation on page 1 that jumps to "MyTarget".
+            // ------------------------------------------------------------
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+            var link = new LinkAnnotation(doc.Pages[1], linkRect)
             {
-                // Set the action to go to the named destination defined earlier
-                Action = new GoToAction(doc, "MyNamedDest")
+                Action = new GoToAction(doc, "MyTarget"),
+                Color = Aspose.Pdf.Color.Blue // optional visual styling
             };
+            doc.Pages[1].Annotations.Add(link);
 
-            // Optionally set a border or appearance (invisible border)
-            link.Border = new Border(link) { Width = 0 };
-
-            // Add the annotation to the page's annotation collection
-            linkPage.Annotations.Add(link);
-
-            // -----------------------------------------------------------------
-            // 3. Save the modified PDF
-            // -----------------------------------------------------------------
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with link annotation saved to '{outputPath}'.");
+        Console.WriteLine($"Link annotation added. Saved to '{outputPath}'.");
     }
 }

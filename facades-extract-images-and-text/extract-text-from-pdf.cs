@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -9,7 +10,7 @@ class Program
         // Verify that a PDF path was provided
         if (args.Length == 0)
         {
-            Console.Error.WriteLine("Usage: <program> <pdf-path>");
+            Console.Error.WriteLine("Usage: ExtractText <pdf-path>");
             return;
         }
 
@@ -22,27 +23,35 @@ class Program
             return;
         }
 
-        // Use PdfExtractor from Aspose.Pdf.Facades to extract text
-        using (PdfExtractor extractor = new PdfExtractor())
+        try
         {
-            // Bind the PDF document
+            // PdfExtractor is the Facades class for extracting content
+            PdfExtractor extractor = new PdfExtractor();
+
+            // Bind the PDF document to the extractor
             extractor.BindPdf(pdfPath);
 
             // Extract text from all pages
             extractor.ExtractText();
 
-            // Retrieve the extracted text via the stream overload
+            // Retrieve the extracted text via the overload that writes to a stream
+            string extractedText;
             using (MemoryStream textStream = new MemoryStream())
             {
                 extractor.GetText(textStream); // write text to the stream
                 textStream.Position = 0; // rewind for reading
-                using (StreamReader reader = new StreamReader(textStream))
+                using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
                 {
-                    string extractedText = reader.ReadToEnd();
-                    // Output the text to the console
-                    Console.WriteLine(extractedText);
+                    extractedText = reader.ReadToEnd();
                 }
             }
+
+            // Output the text to the console
+            Console.WriteLine(extractedText);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error extracting text: {ex.Message}");
         }
     }
 }

@@ -1,51 +1,7 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-
-// -----------------------------------------------------------------------------
-// Minimal stubs for Aspose.Pdf types that may be missing in the build environment.
-// These allow the sample to compile and demonstrate the intended logic.
-// In a real project, reference the official Aspose.Pdf NuGet package instead.
-// -----------------------------------------------------------------------------
-namespace Aspose.Pdf.Facades
-{
-    /// <summary>
-    /// Stub for Aspose.Pdf.Facades.PdfFormEditor.
-    /// Provides only the members used in this example.
-    /// </summary>
-    public class PdfFormEditor : IDisposable
-    {
-        public void BindPdf(string path) { /* No‑op stub */ }
-
-        public ListField GetListField(string fieldName, int pageNumber)
-        {
-            // Return a new ListField with some dummy items for illustration.
-            var field = new ListField();
-            field.Items.AddRange(new[] { "Option A", "Option B", "Option C" });
-            return field;
-        }
-
-        public void SetListField(ListField field) { /* No‑op stub */ }
-
-        public void Save(string outputPath) { /* No‑op stub */ }
-
-        public void Dispose() { /* No‑op stub */ }
-    }
-}
-
-namespace Aspose.Pdf.Forms
-{
-    /// <summary>
-    /// Stub for Aspose.Pdf.Forms.ListField.
-    /// Only the Items collection is required for the sample.
-    /// </summary>
-    public class ListField
-    {
-        public List<string> Items { get; } = new List<string>();
-    }
-}
 
 class Program
 {
@@ -60,28 +16,60 @@ class Program
             return;
         }
 
-        // Bind the PDF, modify the list field, and save.
-        using (PdfFormEditor formEditor = new PdfFormEditor())
+        try
         {
-            formEditor.BindPdf(inputPath);
-
-            // Retrieve the list field named "Choices" on page 4.
-            ListField listField = formEditor.GetListField("Choices", 4);
-            if (listField != null)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Remove the item "Option B" if it exists.
-                if (listField.Items.Contains("Option B"))
+                // Verify that the form contains the field named "Choices"
+                if (doc.Form == null || !doc.Form.HasField("Choices"))
                 {
-                    listField.Items.Remove("Option B");
-                    // Apply the modified field back to the document.
-                    formEditor.SetListField(listField);
+                    Console.WriteLine("Form field 'Choices' not found.");
                 }
+                else
+                {
+                    // Retrieve the field and cast to ListBoxField
+                    ListBoxField listBox = doc.Form["Choices"] as ListBoxField;
+
+                    if (listBox != null)
+                    {
+                        // Check whether the option "Option B" exists (compare display name)
+                        bool optionExists = false;
+                        foreach (Option opt in listBox.Options)
+                        {
+                            if (opt.Name == "Option B")
+                            {
+                                optionExists = true;
+                                break;
+                            }
+                        }
+
+                        if (optionExists)
+                        {
+                            // Remove the option by its display name
+                            listBox.DeleteOption("Option B");
+                            Console.WriteLine("Removed 'Option B' from the 'Choices' list field.");
+                        }
+                        else
+                        {
+                            Console.WriteLine("'Option B' not found in the 'Choices' list field.");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("'Choices' is not a ListBox field.");
+                    }
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            // Save the updated PDF.
-            formEditor.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"List item \"Option B\" removed from \"Choices\" on page 4. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

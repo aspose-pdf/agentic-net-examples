@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
@@ -20,35 +21,33 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // ----- 1. Clear standard document information (metadata) -----
+            // Clear standard document information fields (use empty strings / MinValue for non‑nullable types)
             doc.Info.Title = string.Empty;
             doc.Info.Author = string.Empty;
             doc.Info.Subject = string.Empty;
             doc.Info.Keywords = string.Empty;
             doc.Info.Creator = string.Empty;
             doc.Info.Producer = string.Empty;
-            // DateTime properties are non‑nullable, use MinValue to "clear"
             doc.Info.CreationDate = DateTime.MinValue;
             doc.Info.ModDate = DateTime.MinValue;
 
-            // ----- 2. Clear XMP metadata packet if present -----
-            doc.Metadata?.Clear();
-
-            // ----- 3. Remove all JavaScript actions -----
-            if (doc.JavaScript != null)
+            // Remove hidden XMP metadata entries, if any
+            if (doc.Metadata != null)
             {
-                // JavaScriptCollection does not expose Count/Clear; iterate via Keys and remove each entry
-                var keys = doc.JavaScript.Keys.ToList();
-                foreach (var key in keys)
+                // Collect all existing keys first to avoid modifying the collection while iterating
+                List<string> keys = doc.Metadata.Keys.ToList();
+                foreach (string key in keys)
                 {
-                    doc.JavaScript.Remove(key);
+                    doc.Metadata.Remove(key);
                 }
             }
 
-            // ----- 4. Remove all embedded files (attachments) -----
+            // Remove any document‑level JavaScript (OpenAction) – there is no collection to clear
+            doc.OpenAction = null;
+
+            // Remove any embedded files (attachments) from the PDF using 1‑based indexing and Delete(name)
             if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
             {
-                // EmbeddedFileCollection is 1‑based; delete each file by name starting from the end
                 for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
                 {
                     var fileSpec = doc.EmbeddedFiles[i];
@@ -59,7 +58,7 @@ class Program
                 }
             }
 
-            // Save the cleaned PDF
+            // Save the cleaned PDF (still PDF format)
             doc.Save(outputPath);
         }
 

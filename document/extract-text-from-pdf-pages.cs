@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,55 +8,47 @@ class Program
     static void Main()
     {
         // Input PDF and output text file paths
-        const string pdfPath = "input.pdf";
-        const string txtPath = "extracted.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "extracted.txt";
 
         // Define the page range (inclusive). Aspose.Pdf uses 1‑based indexing.
-        int startPage = 2;
-        int endPage   = 5;
+        const int startPage = 2;
+        const int endPage   = 5;
 
-        if (!File.Exists(pdfPath))
+        // Verify the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Accumulate extracted text
-        StringBuilder sb = new StringBuilder();
-
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Validate page range
-            if (startPage < 1) startPage = 1;
-            if (endPage > doc.Pages.Count) endPage = doc.Pages.Count;
-            if (startPage > endPage)
+            // Validate the requested page range against the document's page count
+            if (startPage < 1 || endPage > pdfDoc.Pages.Count || startPage > endPage)
             {
-                Console.Error.WriteLine("Invalid page range.");
+                Console.Error.WriteLine("Invalid page range specified.");
                 return;
             }
 
-            // Extract text page by page
-            for (int i = startPage; i <= endPage; i++) // 1‑based loop
+            // Create a TextAbsorber to extract text
+            TextAbsorber absorber = new TextAbsorber();
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+
+            // Apply the absorber only to the desired page range by iterating manually
+            for (int pageNum = startPage; pageNum <= endPage; pageNum++)
             {
-                // Create a TextAbsorber for the current page
-                TextAbsorber absorber = new TextAbsorber();
-
-                // Optional: configure extraction options (e.g., pure text)
-                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-
-                // Apply the absorber to the specific page
-                doc.Pages[i].Accept(absorber);
-
-                // Append the extracted text, preserving page breaks
-                sb.AppendLine($"--- Page {i} ---");
-                sb.AppendLine(absorber.Text);
-                sb.AppendLine();
+                pdfDoc.Pages[pageNum].Accept(absorber);
             }
-        }
 
-        // Write the accumulated text to a plain .txt file
-        File.WriteAllText(txtPath, sb.ToString(), Encoding.UTF8);
-        Console.WriteLine($"Text extracted to '{txtPath}'.");
+            // Retrieve the extracted text (concatenated from the selected pages)
+            string extractedText = absorber.Text ?? string.Empty;
+
+            // Save the text to a plain .txt file
+            File.WriteAllText(outputTxtPath, extractedText);
+
+            Console.WriteLine($"Text from pages {startPage}-{endPage} saved to '{outputTxtPath}'.");
+        }
     }
 }

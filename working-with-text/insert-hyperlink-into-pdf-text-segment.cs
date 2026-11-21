@@ -2,54 +2,63 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // Actions and Highlighting live here
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "hyperlink.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "hyperlink_output.pdf";
 
-        // Ensure the output directory exists
-        string outDir = Path.GetDirectoryName(outputPath);
-        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
-            Directory.CreateDirectory(outDir);
-
-        // Create a new PDF document
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a single page
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a text fragment (container for text segments)
+        // Open the existing PDF (or create a new one if you prefer)
+        using (Document doc = new Document(inputPath))
+        {
+            // Ensure we have at least one page; add one if the document is empty
+            if (doc.Pages.Count == 0)
+                doc.Pages.Add();
+
+            // Use the first page (1‑based indexing)
+            Page page = doc.Pages[1];
+
+            // Create a TextFragment to hold the hyperlink text
             TextFragment fragment = new TextFragment();
 
-            // Create a text segment with the visible text
-            TextSegment segment = new TextSegment("Visit Aspose");
+            // Create a TextSegment with the visible text
+            TextSegment segment = new TextSegment("Click here to visit Aspose");
 
-            // Style the segment (blue, underlined, Arial 12pt)
-            segment.TextState.Font = FontRepository.FindFont("Arial");
-            segment.TextState.FontSize = 12;
-            segment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+            // Optional: style the hyperlink (blue and underlined)
+            segment.TextState.ForegroundColor = Color.FromRgb(0, 0, 255); // blue
             segment.TextState.Underline = true;
 
             // Add the segment to the fragment
             fragment.Segments.Add(segment);
 
-            // Add the fragment to the page (wrapped in a paragraph automatically)
+            // Position the fragment on the page (optional)
+            fragment.Position = new Position(100, 700); // X=100, Y=700
             page.Paragraphs.Add(fragment);
 
-            // Create a hyperlink annotation. A zero‑size rectangle is sufficient for external URIs.
-            LinkAnnotation link = new LinkAnnotation(page, new Aspose.Pdf.Rectangle(0, 0, 0, 0))
-            {
-                Action = new GoToURIAction("https://www.aspose.com")
-            };
+            // Define a rectangle that roughly covers the text (adjust as needed)
+            var rect = new Aspose.Pdf.Rectangle(100, 690, 300, 710); // left, bottom, right, top
+
+            // Create a link annotation and assign a URI action
+            LinkAnnotation link = new LinkAnnotation(page, rect);
+            link.Action = new GoToURIAction("https://www.aspose.com");
+            link.Contents = "Visit Aspose website"; // tooltip text
+
+            // Add the annotation to the page
             page.Annotations.Add(link);
 
-            // Save the PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with hyperlink saved to '{outputPath}'.");
+        Console.WriteLine($"Hyperlink added and saved to '{outputPath}'.");
     }
 }

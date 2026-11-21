@@ -7,8 +7,11 @@ class Program
 {
     static void Main()
     {
+        // Path to the source PDF containing attachments
         const string pdfPath = "input.pdf";
-        const string outputFolder = "Attachments";
+
+        // Folder where extracted attachments will be saved
+        const string outputFolder = "ExtractedAttachments";
 
         if (!File.Exists(pdfPath))
         {
@@ -20,29 +23,38 @@ class Program
         Directory.CreateDirectory(outputFolder);
 
         // Load the PDF document
-        Document pdfDoc = new Document(pdfPath);
+        Document pdfDoc;
+        try
+        {
+            pdfDoc = new Document(pdfPath);
+        }
+        catch (PdfException ex)
+        {
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
+            return;
+        }
 
-        // Extract all embedded attachments
+        // Extract each embedded file (attachment) and save it to the output folder
         if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
         {
-            foreach (FileSpecification spec in pdfDoc.EmbeddedFiles)
+            foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
             {
-                // Determine a safe file name for the attachment
-                string attachmentName = string.IsNullOrEmpty(spec.Name)
-                    ? Path.GetFileNameWithoutExtension(pdfPath) + "_attachment"
-                    : spec.Name;
-
-                // Replace any invalid file‑name characters
-                foreach (char c in Path.GetInvalidFileNameChars())
-                    attachmentName = attachmentName.Replace(c, '_');
-
-                string destPath = Path.Combine(outputFolder, attachmentName);
-
-                // Ensure the stream is at the beginning before copying
-                spec.Contents.Position = 0;
-                using (FileStream fileStream = new FileStream(destPath, FileMode.Create, FileAccess.Write))
+                string fileName = fileSpec.Name; // use Name property
+                string destPath = Path.Combine(outputFolder, fileName);
+                try
                 {
-                    spec.Contents.CopyTo(fileStream);
+                    using (FileStream outStream = new FileStream(destPath, FileMode.Create, FileAccess.Write))
+                    {
+                        // Ensure the stream is at the beginning
+                        if (fileSpec.Contents.CanSeek)
+                            fileSpec.Contents.Position = 0;
+                        // Copy the attachment data to disk
+                        fileSpec.Contents.CopyTo(outStream);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error saving attachment '{fileName}': {ex.Message}");
                 }
             }
         }
@@ -51,15 +63,28 @@ class Program
             Console.WriteLine("No embedded attachments found in the PDF.");
         }
 
-        // Compute SHA‑256 hash for each extracted attachment
+        // Compute SHA‑256 hash for each extracted file
         foreach (string filePath in Directory.GetFiles(outputFolder))
         {
-            using (FileStream stream = File.OpenRead(filePath))
-            using (SHA256 sha256 = SHA256.Create())
+            try
             {
-                byte[] hashBytes = sha256.ComputeHash(stream);
-                string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
-                Console.WriteLine($"{Path.GetFileName(filePath)}: {hashHex}");
+                byte[] hashBytes;
+                using (FileStream stream = File.OpenRead(filePath))
+                using (SHA256 sha256 = SHA256.Create())
+                {
+                    hashBytes = sha256.ComputeHash(stream);
+                }
+
+                // Convert hash to hexadecimal string
+                string hashString = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+
+                Console.WriteLine($"File: {Path.GetFileName(filePath)}");
+                Console.WriteLine($"SHA‑256: {hashString}");
+                Console.WriteLine();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{filePath}': {ex.Message}");
             }
         }
     }

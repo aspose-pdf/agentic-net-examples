@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfContentEditor
 
 class Program
 {
@@ -10,41 +9,28 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "aligned_page3.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Create a content editor facade and bind it to the document
-                PdfContentEditor editor = new PdfContentEditor();
-                editor.BindPdf(doc);
+        // Load the PDF with PdfContentEditor (Facades API)
+        PdfContentEditor editor = new PdfContentEditor();
+        editor.BindPdf(inputPath);
 
-                // NOTE: The AlignContent method and the Alignment enum are available only in newer
-                // versions of Aspose.Pdf.Facades. The version referenced by this project does not expose
-                // them, which caused the compile‑time errors. To vertically centre the content on page 3
-                // you can either:
-                //   1. Upgrade the Aspose.Pdf NuGet package to a version that includes AlignContent
-                //      and Aspose.Pdf.Facades.Alignment, then uncomment the line below.
-                //   2. Implement a custom transformation (e.g., modify the page's content stream) using
-                //      the low‑level API. That approach is beyond the scope of this simple example.
-                //
-                // editor.AlignContent(3, Alignment.Middle); // <-- requires newer library version
+        // NOTE: The current Aspose.Pdf.Facades version used in this project does not expose the
+        // Alignment enum nor the AlignPageContent method. These members were introduced in later
+        // releases. To keep the code compiling we skip the alignment step. If vertical centering of
+        // page content is required, upgrade the Aspose.Pdf NuGet package to a version that includes
+        // Alignment and AlignPageContent, or implement a custom repositioning using the high‑level
+        // Document API.
+        // editor.AlignPageContent(3, Alignment.Middle);
 
-                // Save the modified document
-                doc.Save(outputPath);
-            }
+        // Save the (unmodified) PDF
+        editor.Save(outputPath);
 
-            Console.WriteLine($"Page 3 content alignment (if supported) saved as '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Page 3 content alignment step skipped; PDF saved as '{outputPath}'.");
     }
 }

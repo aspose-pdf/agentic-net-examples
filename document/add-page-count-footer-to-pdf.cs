@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_footer.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,35 +21,27 @@ class Program
         {
             int totalPages = doc.Pages.Count; // total page count
 
-            // Iterate using 1‑based indexing (Aspose.Pdf pages are 1‑based)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= totalPages; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create footer text "Page X of Y"
-                string footerText = $"Page {i} of {totalPages}";
-                TextFragment tf = new TextFragment(footerText);
+                // Create a footer stamp showing "Page X of Y"
+                TextStamp footer = new TextStamp($"Page {i} of {totalPages}");
+                footer.HorizontalAlignment = HorizontalAlignment.Center;
+                footer.BottomMargin = 10;
+                // Configure the text appearance via the existing TextState instance
+                footer.TextState.FontSize = 10;
+                footer.TextState.ForegroundColor = Color.Gray;
 
-                // Style the footer (optional)
-                tf.TextState.FontSize = 9;
-                tf.TextState.Font = FontRepository.FindFont("Arial");
-                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-
-                // Position the footer near the bottom of the page
-                // y-coordinate is measured from the bottom; adjust as needed
-                tf.Position = new Position(0, 20); // 20 points from bottom, centered horizontally
-
-                // Center the text horizontally
-                tf.HorizontalAlignment = HorizontalAlignment.Center;
-
-                // Add the footer to the page's paragraphs collection
-                page.Paragraphs.Add(tf);
+                // Add the footer stamp to the current page
+                page.AddStamp(footer);
             }
 
-            // Save the modified PDF (Document.Save writes PDF regardless of extension)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with footers saved to '{outputPath}'.");
+        Console.WriteLine($"Custom footer added. Saved to '{outputPath}'.");
     }
 }

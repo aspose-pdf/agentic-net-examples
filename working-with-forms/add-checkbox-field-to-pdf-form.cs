@@ -16,35 +16,24 @@ class Program
             return;
         }
 
-        try
+        // Open the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF
-            using (Document doc = new Document(inputPath))
-            {
-                // Define the rectangle for the checkbox (lower‑left X,Y and upper‑right X,Y)
-                var rect = new Rectangle(100, 700, 120, 720);
+            // Define the position and size of the checkbox (lower‑left x,y and upper‑right x,y)
+            Rectangle rect = new Rectangle(100, 700, 120, 720);
 
-                // Create a new checkbox field on the first page
-                var checkBox = new CheckboxField(doc.Pages[1], rect)
-                {
-                    // Optional: set the initial state
-                    Checked = true
-                };
-                // Set the field name (PartialName) separately – the constructor does not accept a name argument in recent versions
-                checkBox.PartialName = "AgreeTerms";
+            // Create a new checkbox field on the first page
+            CheckboxField checkBox = new CheckboxField(doc.Pages[1], rect);
+            checkBox.PartialName = "AgreeTerms"; // field name
+            checkBox.Checked = true;               // true = checked, false = unchecked
 
-                // Add the field to the document's form collection
-                doc.Form.Add(checkBox);
+            // Add the field to the document's form collection
+            doc.Form.Add(checkBox);
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Checkbox field added and saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Checkbox field 'AgreeTerms' added and saved to '{outputPath}'.");
     }
 }

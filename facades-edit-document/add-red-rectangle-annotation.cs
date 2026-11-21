@@ -9,7 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "annotated.pdf";
-        const int pageNumber = 1; // target page (1‑based)
+        const int pageNumber = 2; // 1‑based page index
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +17,42 @@ class Program
             return;
         }
 
-        // 2 mm → points (1 pt = 1/72 in, 1 in = 25.4 mm)
-        const float mmToPt = 72f / 25.4f;
-        float borderThicknessPt = 2f * mmToPt; // ≈5.67 pt
-        // Border.Width expects an integer (points). Round to the nearest whole point.
-        int borderWidth = (int)Math.Round(borderThicknessPt);
-
-        // Load the PDF document.
+        // Load the PDF document
         Document doc = new Document(inputPath);
 
+        // Validate page number
         if (pageNumber < 1 || pageNumber > doc.Pages.Count)
         {
-            Console.Error.WriteLine($"Invalid page number {pageNumber}. Document has {doc.Pages.Count} pages.");
+            Console.Error.WriteLine($"Page {pageNumber} does not exist in the document (has {doc.Pages.Count} pages).");
             return;
         }
 
-        // Define rectangle coordinates (llx, lly, urx, ury) in points.
-        // Adjust these values as needed for your PDF.
-        Rectangle rect = new Rectangle(100, 100, 200, 200);
+        // Define rectangle (lower‑left x,y and upper‑right x,y) in points
+        var rect = new Rectangle(100, 500, 300, 700);
 
-        // Create a square (rectangle) annotation.
-        SquareAnnotation square = new SquareAnnotation(doc.Pages[pageNumber], rect);
-        square.Color = Color.Red;
-        // Set border thickness (integer value).
-        square.Border = new Border(square) { Width = borderWidth };
+        // Red border color (Aspose.Pdf.Color, not System.Drawing.Color)
+        var borderColor = Aspose.Pdf.Color.Red;
 
-        // Add the annotation to the page.
+        // Border thickness: 2 mm ≈ 5.669 points → round to nearest integer (int required)
+        int borderWidth = 6;
+
+        // Create the square (rectangle) annotation
+        var square = new SquareAnnotation(doc.Pages[pageNumber], rect)
+        {
+            Color = borderColor
+        };
+
+        // Border must be created with the owning annotation as the required parent argument
+        square.Border = new Border(square)
+        {
+            Width = borderWidth,          // int value
+            Style = BorderStyle.Solid    // optional, defaults to Solid
+        };
+
+        // Add the annotation to the page's annotation collection
         doc.Pages[pageNumber].Annotations.Add(square);
 
-        // Save the modified document.
+        // Save the modified PDF
         doc.Save(outputPath);
 
         Console.WriteLine($"Red rectangle annotation added to page {pageNumber} and saved as '{outputPath}'.");

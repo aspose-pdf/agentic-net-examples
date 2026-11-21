@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "uniform.pdf";
+        const string outputPath = "uniform_pages.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,29 +18,29 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Find the largest width and height among all pages (1‑based indexing)
             double maxWidth = 0;
             double maxHeight = 0;
 
+            // Determine the largest page dimensions using PageInfo (1‑based indexing)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                var page = doc.Pages[i];
-                if (page.PageInfo.Width > maxWidth)   maxWidth = page.PageInfo.Width;
+                Page page = doc.Pages[i];
+                if (page.PageInfo.Width > maxWidth)  maxWidth  = page.PageInfo.Width;
                 if (page.PageInfo.Height > maxHeight) maxHeight = page.PageInfo.Height;
             }
 
-            // Resize every page to the maximum dimensions
+            // Resize every page to the maximum width and height via PageInfo
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                var page = doc.Pages[i];
-                page.PageInfo.Width = maxWidth;
+                Page page = doc.Pages[i];
+                page.PageInfo.Width  = maxWidth;
                 page.PageInfo.Height = maxHeight;
             }
 
-            // Save the uniform PDF
+            // Save the modified document (PDF format)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Uniform PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Pages resized and saved to '{outputPath}'.");
     }
 }

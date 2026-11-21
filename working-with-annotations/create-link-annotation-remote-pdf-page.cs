@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_link.pdf";
-        const string externalPdfPath = "external.pdf";
-        const int externalPageNumber = 3; // page to open in the external PDF (1‑based)
+        const string inputPath   = "input.pdf";          // PDF to which the link will be added
+        const string targetPath  = "target.pdf";         // External PDF to open
+        const string outputPath  = "output_with_link.pdf";
+        const int    targetPage  = 3;                    // Page number in the external PDF (1‑based)
 
         if (!File.Exists(inputPath))
         {
@@ -18,48 +18,40 @@ class Program
             return;
         }
 
-        if (!File.Exists(externalPdfPath))
+        if (!File.Exists(targetPath))
         {
-            Console.Error.WriteLine($"External PDF not found: {externalPdfPath}");
+            Console.Error.WriteLine($"Target file not found: {targetPath}");
             return;
         }
 
-        try
+        // Wrap the Document in a using block for deterministic disposal (rule: document-disposal-with-using)
+        using (Document doc = new Document(inputPath))
         {
-            // Load the source PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Choose the page where the link annotation will be placed (first page in this example)
-                Page page = doc.Pages[1];
+            // Aspose.Pdf uses 1‑based page indexing (rule: page-indexing-one-based)
+            Page page = doc.Pages[1];
 
-                // Define the clickable rectangle (coordinates are in points; lower‑left to upper‑right)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 300, 750);
+            // Define the clickable rectangle area (coordinates in points)
+            // Fully qualify Rectangle to avoid ambiguity with System.Drawing.Rectangle
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-                // Create the link annotation on the selected page
-                LinkAnnotation link = new LinkAnnotation(page, rect);
+            // Create a link annotation on the specified rectangle
+            LinkAnnotation link = new LinkAnnotation(page, rect);
 
-                // Configure the remote go‑to action to open a specific page in another PDF
-                // GoToRemoteAction does not have a parameterless constructor nor settable properties in this API version.
-                // Use the constructor that accepts the target file path and the destination page number.
-                GoToRemoteAction remoteAction = new GoToRemoteAction(externalPdfPath, externalPageNumber);
-                link.Action = remoteAction;
+            // Optional visual styling
+            link.Border = new Border(link) { Width = 1 };
+            link.Color  = Aspose.Pdf.Color.Blue;
 
-                // Optional visual styling for the annotation
-                link.Color = Aspose.Pdf.Color.Blue;
-                link.Border = new Border(link) { Width = 1 };
+            // Create a remote-go-to action that opens the external PDF at the desired page
+            GoToRemoteAction remoteAction = new GoToRemoteAction(targetPath, targetPage);
+            link.Action = remoteAction;
 
-                // Add the annotation to the page's annotation collection
-                page.Annotations.Add(link);
+            // Add the annotation to the page
+            page.Annotations.Add(link);
 
-                // Save the modified document (PDF format by default)
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF saved with link annotation: {outputPath}");
+            // Save the modified document (no PreSave needed for annotations)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Link annotation added. Output saved to '{outputPath}'.");
     }
 }

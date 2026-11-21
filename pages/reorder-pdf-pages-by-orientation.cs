@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
@@ -16,37 +16,35 @@ class Program
             return;
         }
 
-        // Open source PDF and create an empty target PDF
+        // Load source PDF and create an empty target PDF
         using (Document src = new Document(inputPath))
-        using (Document dest = new Document())
+        using (Document dst = new Document())
         {
-            // Lists to hold page numbers (1‑based) for each orientation
-            List<int> landscapePages = new List<int>();
-            List<int> portraitPages  = new List<int>();
+            // Separate pages by orientation
+            List<Page> landscapePages = new List<Page>();
+            List<Page> portraitPages  = new List<Page>();
 
-            // Determine orientation of each page
-            for (int i = 1; i <= src.Pages.Count; i++) // 1‑based indexing
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= src.Pages.Count; i++)
             {
                 Page page = src.Pages[i];
-                double width  = page.PageInfo.Width;
-                double height = page.PageInfo.Height;
-
-                if (width > height)
-                    landscapePages.Add(i);
+                // Width > Height => landscape, otherwise portrait
+                if (page.PageInfo.Width > page.PageInfo.Height)
+                    landscapePages.Add(page);
                 else
-                    portraitPages.Add(i);
+                    portraitPages.Add(page);
             }
 
             // Add landscape pages first
-            foreach (int idx in landscapePages)
-                dest.Pages.Add(src.Pages[idx]);
+            foreach (Page page in landscapePages)
+                dst.Pages.Add(page);
 
             // Then add portrait pages
-            foreach (int idx in portraitPages)
-                dest.Pages.Add(src.Pages[idx]);
+            foreach (Page page in portraitPages)
+                dst.Pages.Add(page);
 
             // Save the reordered document
-            dest.Save(outputPath);
+            dst.Save(outputPath);
         }
 
         Console.WriteLine($"Reordered PDF saved to '{outputPath}'.");

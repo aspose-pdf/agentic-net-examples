@@ -8,47 +8,48 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_circle.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Define the circle bounds (lower‑left and upper‑right corners)
-        double llx = 100; // lower‑left X
-        double lly = 500; // lower‑left Y
-        double urx = 200; // upper‑right X
-        double ury = 600; // upper‑right Y
-
-        // Load the PDF document
-        Document pdf = new Document(inputPath);
+        // Load the existing PDF document
+        Document doc = new Document(inputPath);
 
         // Ensure the document has at least two pages
-        if (pdf.Pages.Count < 2)
+        if (doc.Pages.Count < 2)
         {
-            Console.Error.WriteLine("The PDF does not contain a page 2.");
+            Console.Error.WriteLine("The PDF does not contain a second page.");
             return;
         }
 
         // Get page 2 (1‑based indexing)
-        Page page = pdf.Pages[2];
+        Page page = doc.Pages[2];
 
-        // Create a circle annotation with green fill and 3 pt border width
-        CircleAnnotation circle = new CircleAnnotation(page, new Rectangle(llx, lly, urx, ury));
-        // Fill color for shape annotations is set via InteriorColor
-        circle.InteriorColor = Color.Green;
-        // Border must be created after the annotation instance exists
+        // Create a circle annotation on page 2
+        // Constructor requires the target page and a rectangle defining the bounds
+        CircleAnnotation circle = new CircleAnnotation(
+            page,
+            new Aspose.Pdf.Rectangle(100, 500, 200, 600) // lower‑left (100,500), upper‑right (200,600)
+        );
+
+        // Set the interior (fill) colour to green – use InteriorColor, not FillColor
+        circle.InteriorColor = Aspose.Pdf.Color.FromRgb(0, 255, 0);
+
+        // Set a solid border with a width of 3 pt
         circle.Border = new Border(circle) { Width = 3 };
+        // Optional: set border colour (default is black)
+        circle.Color = Aspose.Pdf.Color.Black;
 
         // Add the annotation to the page
         page.Annotations.Add(circle);
 
         // Save the modified PDF
-        pdf.Save(outputPath);
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Circle annotation added to page 2 and saved as '{outputPath}'.");
+        Console.WriteLine($"Circle annotation added and saved to '{outputPath}'.");
     }
 }

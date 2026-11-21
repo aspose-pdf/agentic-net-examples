@@ -1,15 +1,14 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // ImageStamp, HorizontalAlignment, VerticalAlignment
+using Aspose.Pdf; // ImageStamp is in this namespace
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "stamped_output.pdf";
-        const string stampImg = "stamp.png";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "stamp.png";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,50 +16,39 @@ class Program
             return;
         }
 
-        if (!File.Exists(stampImg))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Image stamp not found: {imagePath}");
             return;
         }
 
-        // Obtain the original image dimensions using System.Drawing.Image (fully qualified to avoid ambiguity).
-        double aspectRatio;
-        using (System.Drawing.Image sysImg = System.Drawing.Image.FromFile(stampImg))
-        {
-            // aspectRatio = height / width
-            aspectRatio = (double)sysImg.Height / sysImg.Width;
-        }
-
-        // Open the PDF document.
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Iterate through all pages (1‑based index).
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Desired stamp width = full page width.
-                double pageWidth = page.PageInfo.Width;
-                double stampWidth = pageWidth;
-                double stampHeight = stampWidth * aspectRatio; // preserve aspect ratio
-
-                // Create the image stamp and set its size and alignment.
-                ImageStamp stamp = new ImageStamp(stampImg)
+                // Create an ImageStamp for the current page
+                ImageStamp stamp = new ImageStamp(imagePath)
                 {
-                    Width = stampWidth,
-                    Height = stampHeight,
+                    // Set the stamp width to the full page width. Height is omitted so the aspect ratio is kept automatically.
+                    Width = page.PageInfo.Width,
+
+                    // Optional alignment – center horizontally, top of the page
                     HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Top
+                    VerticalAlignment   = VerticalAlignment.Top
                 };
 
-                // Add the stamp to the current page.
+                // Apply the stamp to the page
                 page.AddStamp(stamp);
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp applied to all pages and saved as '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outputPdf}'.");
     }
 }

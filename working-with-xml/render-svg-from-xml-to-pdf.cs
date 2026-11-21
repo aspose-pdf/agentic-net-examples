@@ -1,14 +1,14 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath      = "input.xml";      // XML containing <svg> elements
-        const string outputPdfPath = "output.pdf";
+        const string xmlPath   = "input.xml";      // XML containing <svg> elements
+        const string outputPdf = "output.pdf";     // Resulting PDF with vector graphics
 
         if (!File.Exists(xmlPath))
         {
@@ -17,35 +17,44 @@ class Program
         }
 
         // Load the XML document
-        XDocument xmlDoc = XDocument.Load(xmlPath);
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
 
-        // Create the target PDF that will hold all rendered SVGs
-        using (Document targetPdf = new Document())
+        // Select all <svg> nodes (namespace‑agnostic)
+        XmlNodeList svgNodes = xmlDoc.GetElementsByTagName("svg");
+        if (svgNodes.Count == 0)
         {
-            // Iterate over each <svg> element in the XML (1‑based page indexing rule applies when we later add pages)
-            foreach (XElement svgElement in xmlDoc.Descendants("svg"))
-            {
-                // Serialize the SVG element to a memory stream
-                using (MemoryStream svgStream = new MemoryStream())
-                {
-                    // Write the SVG XML (including the root <svg> tag) to the stream
-                    svgElement.Save(svgStream);
-                    svgStream.Position = 0; // Reset for reading
+            Console.WriteLine("No SVG elements found in the XML.");
+            return;
+        }
 
-                    // Load the SVG as a temporary PDF document (vector graphics are preserved)
-                    SvgLoadOptions loadOpts = new SvgLoadOptions(); // No GDI+ dependency
-                    using (Document svgPdf = new Document(svgStream, loadOpts))
+        // Create an empty PDF document that will receive the rendered SVG pages
+        using (Document pdfDoc = new Document())
+        {
+            // Iterate over each SVG node
+            foreach (XmlNode svgNode in svgNodes)
+            {
+                // Serialize the SVG node to a UTF‑8 byte array
+                string svgXml = svgNode.OuterXml;
+                byte[] svgBytes = System.Text.Encoding.UTF8.GetBytes(svgXml);
+
+                // Load the SVG as a temporary Aspose.Pdf Document (vector graphics are preserved)
+                using (MemoryStream svgStream = new MemoryStream(svgBytes))
+                using (Document svgDoc = new Document(svgStream, new SvgLoadOptions()))
+                {
+                    // Append all pages from the SVG document to the target PDF
+                    // Aspose.Pdf uses 1‑based page indexing (see global rule)
+                    for (int i = 1; i <= svgDoc.Pages.Count; i++)
                     {
-                        // Append all pages from the SVG‑derived PDF into the target PDF
-                        targetPdf.Pages.Add(svgPdf.Pages);
+                        pdfDoc.Pages.Add(svgDoc.Pages[i]);
                     }
                 }
             }
 
-            // Save the combined PDF (no special SaveOptions needed for PDF output)
-            targetPdf.Save(outputPdfPath);
+            // Save the combined PDF (no SaveOptions needed because the output is PDF)
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"SVG images rendered as vector graphics and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"SVG images rendered and saved to '{outputPdf}'.");
     }
 }

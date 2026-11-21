@@ -6,35 +6,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_no_bookmarks.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: File not found – {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // PdfBookmarkEditor provides bookmark manipulation without needing a Document instance
-            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+            // PdfBookmarkEditor implements IDisposable – use a using block
+            using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+            {
+                // Load the PDF
+                editor.BindPdf(inputPath);
 
-            // Load the PDF to be edited
-            bookmarkEditor.BindPdf(inputPath);
+                // Delete all existing bookmarks (the correct method name)
+                editor.DeleteBookmarks();
 
-            // Delete all existing bookmarks
-            bookmarkEditor.DeleteBookmarks();
-
-            // Save the modified PDF
-            bookmarkEditor.Save(outputPath);
+                // Save the PDF without bookmarks
+                editor.Save(outputPath);
+            }
 
             Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

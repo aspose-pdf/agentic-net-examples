@@ -1,38 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // Required for JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "expiring_output.pdf";
-        // Desired expiration date (year, month, day)
-        DateTime expirationDate = new DateTime(2025, 12, 31);
+        const string outputPath = "expired.pdf";
+        const string expiryDate = "2025-12-31"; // YYYY-MM-DD
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // JavaScript that checks the current date against the expiry date.
+        string js = $@"
+Date exp = new Date('{expiryDate}');
+Date now = new Date();
+if (now > exp) {{
+    app.alert('This document has expired.');
+    this.closeDoc(true);
+}}
+";
+
+        try
         {
-            // Build JavaScript that closes the document after the expiration date
-            string js = $@"var now = new Date();
-var exp = new Date('{expirationDate:yyyy-MM-dd}');
-if (now > exp) this.closeDoc();";
+            // Load the PDF, embed the JavaScript using OpenAction, and save.
+            using (Document doc = new Document(inputPath))
+            {
+                // Assign JavaScript that runs when the document is opened.
+                doc.OpenAction = new JavascriptAction(js);
+                doc.Save(outputPath);
+            }
 
-            // Attach the script to the document's OpenAction (executed when the PDF is opened)
-            doc.OpenAction = new JavascriptAction(js);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF with expiration saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with expiration date saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

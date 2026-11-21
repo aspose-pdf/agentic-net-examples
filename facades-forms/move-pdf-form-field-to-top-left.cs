@@ -1,73 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF and the output PDF
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Name of the form field to move
-        const string fieldName = "Logo";
-
-        // Desired size of the field (points)
-        const double fieldWidth = 150; // example width
-        const double fieldHeight = 50; // example height
-
-        // ---------------------------------------------------------------------
-        // Ensure the input PDF exists. If it does not, create a minimal PDF that
-        // contains a form field named "Logo" (a button field works well for a logo).
-        // ---------------------------------------------------------------------
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            using var placeholder = new Document();
-            Page page = placeholder.Pages.Add();
-
-            // Create a button field – commonly used for image/logo placeholders.
-            // ButtonField requires a Page and a Rectangle in its constructor.
-            var logoField = new ButtonField(page, new Aspose.Pdf.Rectangle(0, 0, fieldWidth, fieldHeight))
-            {
-                PartialName = fieldName
-            };
-            placeholder.Form.Add(logoField);
-            placeholder.Save(inputPdf);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPdf);
-
-        // Get the height of the first page (origin is bottom‑left)
-        double pageHeight = doc.Pages[1].PageInfo.Height;
-
-        // ---------------------------------------------------------------------
-        // Calculate rectangle for top‑left placement.
-        // lower‑left X = 0 (left margin)
-        // lower‑left Y = pageHeight - fieldHeight (top margin)
-        // upper‑right X = fieldWidth
-        // upper‑right Y = pageHeight
-        // ---------------------------------------------------------------------
-        Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(
-            0,                     // lower‑left X
-            pageHeight - fieldHeight, // lower‑left Y
-            fieldWidth,            // upper‑right X
-            pageHeight             // upper‑right Y
-        );
-
-        // Retrieve the field from the document's form collection and set the new rectangle
-        if (doc.Form != null && doc.Form[fieldName] != null)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            doc.Form[fieldName].Rect = fieldRect;
-        }
-        else
-        {
-            Console.WriteLine($"Field '{fieldName}' not found in the PDF form.");
+            // Retrieve the first page (1‑based indexing) and its height
+            Aspose.Pdf.Page firstPage = doc.Pages[1];
+            // PageInfo.Height returns double – cast to float for Aspose.Pdf APIs that expect float
+            float pageHeight = (float)firstPage.PageInfo.Height;
+
+            // Desired dimensions for the "Logo" field
+            float fieldWidth = 150f;   // example width in points
+            float fieldHeight = 50f;   // example height in points
+
+            // Calculate coordinates for the top‑left corner of the page
+            // PDF origin is bottom‑left, so Y coordinate is pageHeight - fieldHeight
+            float llx = 0f;                         // lower‑left X
+            float lly = pageHeight - fieldHeight;   // lower‑left Y
+            float urx = fieldWidth;                 // upper‑right X
+            float ury = pageHeight;                 // upper‑right Y
+
+            // Move the existing form field named "Logo" to the calculated rectangle
+            FormEditor editor = new FormEditor();
+            editor.BindPdf(doc);
+            editor.MoveField("Logo", llx, lly, urx, ury);
+
+            // Save the modified document
+            editor.Save(outputPath);
         }
 
-        // Save the modified PDF
-        doc.Save(outputPdf);
+        Console.WriteLine($"Field 'Logo' moved to top‑left corner and saved as '{outputPath}'.");
     }
 }

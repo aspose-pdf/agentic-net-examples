@@ -15,18 +15,19 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdf = new Document(inputPath))
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int i = 1; i <= pdf.Pages.Count; i++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Rotate each page 180 degrees using the Rotation enum
-                pdf.Pages[i].Rotate = Rotation.on180;
+                Page page = doc.Pages[i];
+                // Rotate each page 180 degrees using the correct enum member
+                page.Rotate = Rotation.on180;
             }
 
-            // Save the rotated document (PDF format)
-            pdf.Save(outputPath);
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
         Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");

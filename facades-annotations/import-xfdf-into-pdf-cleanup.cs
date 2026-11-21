@@ -1,144 +1,69 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Facade provides XFDF import/export
 
-// Stub implementation for missing Aspose.Pdf.Facades.PdfXfdfForm class.
-// This allows the code to compile when the actual Aspose.Pdf library is not referenced.
-// In a real project, reference the official Aspose.Pdf NuGet package which provides this class.
-namespace Aspose.Pdf.Facades
+class XfdfCleanup
 {
-    // Minimal stub that mimics the required members of the real PdfXfdfForm class.
-    public class PdfXfdfForm : IDisposable
+    /// <summary>
+    /// Imports each XFDF file into the target PDF and deletes the XFDF file
+    /// only if the import succeeded.
+    /// </summary>
+    /// <param name="pdfPath">Path to the target PDF file.</param>
+    /// <param name="xfdfFiles">Array of temporary XFDF file paths.</param>
+    public static void ImportAndClean(string pdfPath, string[] xfdfFiles)
     {
-        // Initialized to an empty string to satisfy the non‑nullable warning.
-        private string _boundPdfPath = string.Empty;
-
-        // Binds the existing PDF file. In the stub we just store the path.
-        public void BindPdf(string pdfPath)
+        if (!File.Exists(pdfPath))
         {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("PDF path cannot be null or empty.", nameof(pdfPath));
-            if (!File.Exists(pdfPath))
-                throw new FileNotFoundException("PDF file not found.", pdfPath);
-            _boundPdfPath = pdfPath;
+            Console.Error.WriteLine($"Target PDF not found: {pdfPath}");
+            return;
         }
 
-        // Imports XFDF data. The stub does not process the XFDF content; it only validates the file exists.
-        public void ImportXfdf(string xfdfPath)
+        foreach (string xfdfPath in xfdfFiles)
         {
-            if (string.IsNullOrEmpty(xfdfPath))
-                throw new ArgumentException("XFDF path cannot be null or empty.", nameof(xfdfPath));
-            if (!File.Exists(xfdfPath))
-                throw new FileNotFoundException("XFDF file not found.", xfdfPath);
-            // No actual import logic in the stub.
-        }
-
-        // Saves the PDF. The stub simply copies the original PDF to the same location (no changes).
-        public void Save(string outputPdfPath)
-        {
-            if (string.IsNullOrEmpty(_boundPdfPath))
-                throw new InvalidOperationException("No PDF has been bound. Call BindPdf first.");
-            if (string.IsNullOrEmpty(outputPdfPath))
-                throw new ArgumentException("Output PDF path cannot be null or empty.", nameof(outputPdfPath));
-
-            // In a real implementation the PDF would be updated with XFDF data.
-            // Here we just ensure the file exists; if the output path differs, copy the source.
-            if (!string.Equals(_boundPdfPath, outputPdfPath, StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrWhiteSpace(xfdfPath) || !File.Exists(xfdfPath))
             {
-                File.Copy(_boundPdfPath, outputPdfPath, overwrite: true);
-            }
-        }
-
-        public void Dispose()
-        {
-            // No unmanaged resources to release in the stub.
-        }
-    }
-}
-
-class XfdfImporter
-{
-    // Imports a list of XFDF files into the target PDF and deletes the XFDF files after successful import.
-    public static void ImportAndCleanup(string targetPdfPath, IEnumerable<string> xfdfFilePaths)
-    {
-        if (string.IsNullOrEmpty(targetPdfPath))
-            throw new ArgumentException("Target PDF path must be provided.", nameof(targetPdfPath));
-
-        // Ensure the target PDF exists before binding.
-        if (!File.Exists(targetPdfPath))
-            throw new FileNotFoundException("Target PDF not found.", targetPdfPath);
-
-        foreach (string xfdfPath in xfdfFilePaths)
-        {
-            if (string.IsNullOrEmpty(xfdfPath))
-                continue; // Skip empty entries.
-
-            if (!File.Exists(xfdfPath))
-            {
-                Console.Error.WriteLine($"XFDF file not found, skipping: {xfdfPath}");
+                Console.Error.WriteLine($"XFDF file not found or invalid: {xfdfPath}");
                 continue;
             }
 
             try
             {
-                // The real Aspose.Pdf.Facades.PdfXfdfForm implements IDisposable, so we can safely use a using block.
-                using (PdfXfdfForm xfdfForm = new PdfXfdfForm())
+                // Load the existing PDF document.
+                using (Document pdfDoc = new Document(pdfPath))
                 {
-                    // Bind the existing PDF.
-                    xfdfForm.BindPdf(targetPdfPath);
+                    // Bind the document to the Form facade.
+                    using (Form formFacade = new Form(pdfDoc))
+                    {
+                        // Import XFDF data from a stream (the facade expects a Stream, not a file path).
+                        using (FileStream xfdfStream = File.OpenRead(xfdfPath))
+                        {
+                            formFacade.ImportXfdf(xfdfStream);
+                        }
 
-                    // Import the XFDF data.
-                    xfdfForm.ImportXfdf(xfdfPath);
-
-                    // Save the updated PDF back to the same file.
-                    xfdfForm.Save(targetPdfPath);
+                        // Save the PDF back to the same path (overwrites with imported data).
+                        formFacade.Save(pdfPath);
+                    }
                 }
 
-                // Delete the temporary XFDF file only after successful import and save.
+                // Delete the temporary XFDF file only after a successful import.
                 File.Delete(xfdfPath);
-                Console.WriteLine($"Successfully imported and deleted XFDF: {xfdfPath}");
+                Console.WriteLine($"Imported and deleted XFDF: {xfdfPath}");
             }
             catch (Exception ex)
             {
-                // Log the error; do not delete the XFDF file if import failed.
+                // Log the error; the XFDF file is left untouched for troubleshooting.
                 Console.Error.WriteLine($"Error importing XFDF '{xfdfPath}': {ex.Message}");
-                // Optionally rethrow or continue with next file.
             }
         }
     }
 
-    // Example usage.
+    // Example usage
     static void Main()
     {
-        string pdfPath = "target.pdf";
+        string targetPdf = "output.pdf";
+        string[] tempXfdfFiles = { "form1.xfdf", "form2.xfdf", "form3.xfdf" };
 
-        // Ensure a placeholder PDF exists so the demo does not crash with FileNotFoundException.
-        if (!File.Exists(pdfPath))
-        {
-            // Create an empty (zero‑byte) PDF file. In a real scenario you would provide a valid PDF.
-            File.WriteAllBytes(pdfPath, new byte[0]);
-            Console.WriteLine($"Created placeholder PDF at '{pdfPath}'.");
-        }
-
-        // List of temporary XFDF files to import.
-        var xfdfFiles = new List<string>
-        {
-            "temp1.xfdf",
-            "temp2.xfdf",
-            "temp3.xfdf"
-        };
-
-        // For the purpose of this example, create empty XFDF files if they do not exist.
-        foreach (var file in xfdfFiles)
-        {
-            if (!File.Exists(file))
-            {
-                File.WriteAllText(file, "<?xml version=\"1.0\"?><xfdf></xfdf>");
-                Console.WriteLine($"Created placeholder XFDF file '{file}'.");
-            }
-        }
-
-        ImportAndCleanup(pdfPath, xfdfFiles);
+        ImportAndClean(targetPdf, tempXfdfFiles);
     }
 }

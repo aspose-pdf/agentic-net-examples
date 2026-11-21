@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,18 +15,18 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the existing PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing.
-            // Set each page's rotation to 90° so it displays portrait on landscape devices.
+            // Apply a 90‑degree rotation to every page using the correct property
+            // Aspose.Pdf uses 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-                page.Rotate = Rotation.on90; // rotate 90 degrees clockwise
+                page.Rotate = Rotation.on90; // Portrait view on landscape devices
             }
 
-            // Save the modified document
+            // Save the rotated PDF
             doc.Save(outputPath);
         }
 

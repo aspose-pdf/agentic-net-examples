@@ -1,9 +1,7 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Required for JavascriptAction
 
 class Program
 {
@@ -11,8 +9,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myTextField";
-        const int maxLength = 20;
+        const string fieldName = "myTextBox"; // name of the form field to modify
+        const int maxChars = 10; // desired maximum character length
 
         if (!File.Exists(inputPath))
         {
@@ -22,34 +20,26 @@ class Program
 
         try
         {
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Ensure the form and the specific field exist
-                if (doc.Form != null && doc.Form[fieldName] is TextBoxField textBox)
+                // Retrieve the form field by name and cast to TextBoxField
+                TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
+                if (txtField != null)
                 {
-                    // Attempt to set the MaxLength property via reflection (available in newer versions)
-                    PropertyInfo maxLenProp = textBox.GetType().GetProperty("MaxLength", BindingFlags.Public | BindingFlags.Instance);
-                    if (maxLenProp != null && maxLenProp.CanWrite)
-                    {
-                        maxLenProp.SetValue(textBox, maxLength);
-                    }
-                    else
-                    {
-                        // Fallback: enforce length with JavaScript on validation (supported across versions)
-                        string js = $"if (event.value.length > {maxLength}) event.value = event.value.substring(0, {maxLength});";
-                        // The Actions collection on a form field provides OnValidate (executed when the field loses focus)
-                        textBox.Actions.OnValidate = new JavascriptAction(js);
-                    }
+                    // Set the maximum number of characters the user can enter
+                    txtField.MaxLen = maxChars; // Correct property name
                 }
                 else
                 {
-                    Console.Error.WriteLine($"Text box field '{fieldName}' not found.");
+                    Console.Error.WriteLine($"TextBox field '{fieldName}' not found.");
                 }
 
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Form field '{fieldName}' max length set to {maxLength} and saved to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with max length {maxChars} for field '{fieldName}' at '{outputPath}'.");
         }
         catch (Exception ex)
         {

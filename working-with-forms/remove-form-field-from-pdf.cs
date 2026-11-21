@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,7 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "MyTextField";
+        const string fieldName = "myTextBox"; // name of the form field to remove
 
         if (!File.Exists(inputPath))
         {
@@ -17,25 +18,34 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // The Form indexer returns a WidgetAnnotation. Use it only to check existence.
-            var annotation = doc.Form[fieldName];
-            if (annotation != null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Delete the field by name – this removes the underlying WidgetAnnotation
-                // from the AcroForm collection.
-                doc.Form.Delete(fieldName);
-                Console.WriteLine($"Field '{fieldName}' removed.");
-            }
-            else
-            {
-                Console.WriteLine($"Field '{fieldName}' not found; no removal performed.");
+                // Check whether the form and the requested field exist
+                bool fieldExists = doc.Form?.Fields?.Any(f => f.Name == fieldName) ?? false;
+
+                if (fieldExists)
+                {
+                    // Remove the form field by its name
+                    doc.Form.Delete(fieldName);
+                    Console.WriteLine($"Form field '{fieldName}' removed.");
+                }
+                else
+                {
+                    Console.WriteLine($"Form field '{fieldName}' not found.");
+                }
+
+                // Save the modified document
+                doc.Save(outputPath);
             }
 
-            doc.Save(outputPath);
+            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

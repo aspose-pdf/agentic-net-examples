@@ -8,9 +8,9 @@ class Program
     static void Main()
     {
         // Folder containing the PDFs to process
-        const string inputFolder = @"C:\PdfFiles";
-        // Folder where the updated PDFs will be saved
-        const string outputFolder = @"C:\PdfFiles\Updated";
+        const string inputFolder = @"C:\PdfFiles\Input";
+        // Folder where modified PDFs will be saved
+        const string outputFolder = @"C:\PdfFiles\Output";
         // New author name to set for all annotations
         const string newAuthor = "John Doe";
 
@@ -24,41 +24,42 @@ class Program
 
         // Get all PDF files in the input folder (non‑recursive)
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
 
         foreach (string inputPath in pdfFiles)
         {
             try
             {
                 string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputFolder, $"{fileName}_updated.pdf");
+                string outputPath = Path.Combine(outputFolder, $"{fileName}_modified.pdf");
 
-                // Load the document to obtain page and annotation counts
-                Document doc = new Document(inputPath);
-                int pageCount = doc.Pages.Count;
+                // Determine the total number of pages using Document (PdfAnnotationEditor does not expose GetPageCount)
+                int pageCount;
+                using (Document tempDoc = new Document(inputPath))
+                {
+                    pageCount = tempDoc.Pages.Count;
+                }
 
-                // Use PdfAnnotationEditor to modify the author of every annotation
+                // Bind the PDF, modify annotation authors, and save the result.
                 using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
                 {
-                    // Bind the same PDF to the editor (the editor works on the file on disk)
+                    // Load the source PDF
                     editor.BindPdf(inputPath);
 
-                    for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
-                    {
-                        // Annotations collection is 0‑based, but ModifyAnnotationsAuthor expects 1‑based index
-                        int annotCount = doc.Pages[pageIndex].Annotations.Count;
-                        for (int annotIndex = 1; annotIndex <= annotCount; annotIndex++)
-                        {
-                            // The overload expects: pageIndex, annotIndex, sourceAuthor, destinationAuthor
-                            // Passing an empty string for sourceAuthor updates any existing author.
-                            editor.ModifyAnnotationsAuthor(pageIndex, annotIndex, string.Empty, newAuthor);
-                        }
-                    }
+                    // Modify the author of all annotations on every page.
+                    // Parameters: startPage, endPage, sourceAuthor, destinationAuthor.
+                    // An empty string for sourceAuthor matches annotations regardless of their current author.
+                    editor.ModifyAnnotationsAuthor(1, pageCount, string.Empty, newAuthor);
 
-                    // Save the modified PDF
+                    // Save the modified PDF.
                     editor.Save(outputPath);
                 }
 
-                Console.WriteLine($"Processed: {inputPath} -> {outputPath}");
+                Console.WriteLine($"Processed: {fileName}.pdf -> {Path.GetFileName(outputPath)}");
             }
             catch (Exception ex)
             {

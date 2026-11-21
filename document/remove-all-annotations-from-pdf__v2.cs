@@ -1,6 +1,7 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace
+using Aspose.Pdf;
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
@@ -15,16 +16,20 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Remove all annotations from every page
-            foreach (Page page in doc.Pages)
+            // Configure the sanitizer to remove all annotations
+            var options = new HiddenDataSanitizationOptions
             {
-                page.Annotations.Clear();
-            }
+                RemoveAnnotations = true
+            };
 
-            // Save the cleaned PDF
+            // Apply the sanitization
+            var sanitizer = new HiddenDataSanitizer(options);
+            sanitizer.Sanitize(doc);
+
+            // Save the sanitized PDF
             doc.Save(outputPath);
         }
 

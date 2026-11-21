@@ -10,27 +10,25 @@ class Program
     {
         const string outputPath = "heading.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
             // Access the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
-            // Set language (optional, improves accessibility)
-            tagged.SetLanguage("en-US");
-            // Set a title for the document
-            tagged.SetTitle("Document with Heading");
+            tagged.SetLanguage("en-US");                     // Set document language
+            tagged.SetTitle("Document with Heading");        // Set document title
 
-            // Get the root of the structure tree
+            // Get the root of the structure tree (no cast required)
             StructureElement root = tagged.RootElement;
 
-            // Create a Level 1 heading element
+            // Create a Level 1 heading element and set its text
             HeaderElement heading = tagged.CreateHeaderElement(1);
-            heading.SetText("Level 1 Heading");
+            heading.SetText("Level 1 Heading");
 
             // Attach the heading to the root element
             root.AppendChild(heading);
 
-            // Save the PDF
+            // Save the PDF file
             doc.Save(outputPath);
         }
 

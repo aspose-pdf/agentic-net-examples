@@ -17,28 +17,39 @@ class Program
         }
 
         // Load the existing PDF document
-        Document pdfDocument = new Document(inputPath);
+        Document doc = new Document(inputPath);
 
-        // Page 3 where the radio button group will be placed
-        Page page = pdfDocument.Pages[3];
+        // Page where the radio button group will be placed (1‑based index)
+        const int targetPage = 3;
+        Page page = doc.Pages[targetPage];
 
-        // Create a radio button field (group) named "PaymentMethod"
+        // Base rectangle for the first option (adjust as needed)
+        // (llx, lly, urx, ury)
+        float llx = 100f;
+        float lly = 500f;
+        float urx = 200f;
+        float ury = 550f;
+        // Vertical offset between the two options
+        float offsetY = 30f;
+
+        // Create the radio button group
         RadioButtonField paymentMethod = new RadioButtonField(page)
         {
-            PartialName = "PaymentMethod",
-            // Set a default selected value if desired
-            Value = "Credit"
+            PartialName = "PaymentMethod"
         };
 
-        // Add the individual options to the group using AddOption (export value + rectangle)
-        paymentMethod.AddOption("Credit", new Rectangle(100, 700, 120, 720));   // Credit option
-        paymentMethod.AddOption("PayPal", new Rectangle(150, 700, 170, 720)); // PayPal option
+        // Add options with their visual rectangles
+        paymentMethod.AddOption("Credit", new Rectangle(llx, lly, urx, ury));
+        paymentMethod.AddOption("PayPal", new Rectangle(llx, lly - offsetY, urx, ury - offsetY));
 
-        // Add the radio button field to the PDF form
-        pdfDocument.Form.Add(paymentMethod);
+        // Optionally set a default selected option (1‑based index). 0 means none selected.
+        // paymentMethod.Selected = 1; // Uncomment to select "Credit" by default
+
+        // Add the radio button group to the form
+        doc.Form.Add(paymentMethod);
 
         // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        doc.Save(outputPath);
 
         Console.WriteLine($"Radio button group added and saved to '{outputPath}'.");
     }

@@ -7,15 +7,10 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "restricted.pdf";
+        const string outputPath = "secured.pdf";
 
-        // Permissions: allow printing only.
-        // Do NOT include ExtractContent (copy) or ModifyAnnotations.
-        Permissions perms = Permissions.PrintDocument;
-
-        // Empty user password means anyone can open the file,
-        // but the owner password protects the permission settings.
-        const string userPassword  = "";
+        // Passwords for encryption – can be empty strings if no password is required
+        const string userPassword  = "user123";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -26,10 +21,17 @@ class Program
 
         try
         {
-            // Load the PDF, apply permissions via encryption, and save.
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
+                // Set permissions: allow printing only.
+                // Do NOT include ExtractContent (copy) or ModifyAnnotations.
+                Permissions perms = Permissions.PrintDocument;
+
+                // Encrypt the document with AES-256. This applies the permissions.
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+                // Save the encrypted PDF. Save is called inside the using block.
                 doc.Save(outputPath);
             }
 

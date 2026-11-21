@@ -7,29 +7,30 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least three pages
+            // Ensure the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
             if (doc.Pages.Count < 3)
             {
-                Console.Error.WriteLine("The document has fewer than 3 pages.");
+                Console.Error.WriteLine("The document contains fewer than 3 pages.");
                 return;
             }
 
-            // Get page three (Aspose.Pdf uses 1‑based indexing)
+            // Get page three
             Page page = doc.Pages[3];
 
-            // Define the annotation rectangle (llx, lly, urx, ury)
+            // Define the annotation rectangle (lower‑left x/y, upper‑right x/y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
             // Create a text annotation and set its properties

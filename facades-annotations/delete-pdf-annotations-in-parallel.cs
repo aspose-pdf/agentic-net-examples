@@ -1,56 +1,63 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Directory containing PDFs to process
-        const string inputFolder = @"C:\PdfFiles";
+        // Folder containing PDFs to process
+        string sourceFolder = "pdfs";
 
-        if (!Directory.Exists(inputFolder))
+        if (!Directory.Exists(sourceFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {sourceFolder}");
             return;
         }
 
-        // Gather all PDF file paths
-        List<string> pdfFiles = new List<string>(Directory.GetFiles(inputFolder, "*.pdf", SearchOption.AllDirectories));
+        // Collect all PDF files (including subfolders)
+        var pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.AllDirectories);
 
-        if (pdfFiles.Count == 0)
-        {
-            Console.WriteLine("No PDF files found.");
-            return;
-        }
-
-        // Parallel options – limit degree of parallelism if needed
-        ParallelOptions options = new ParallelOptions
-        {
-            // MaxDegreeOfParallelism = Environment.ProcessorCount
-        };
+        // Configure parallel execution (use all logical processors)
+        ParallelOptions parallelOptions = new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount };
 
         // Process each PDF concurrently
-        Parallel.ForEach(pdfFiles, options, pdfPath =>
+        Parallel.ForEach(pdfFiles, parallelOptions, pdfPath =>
         {
             try
             {
-                // Each thread uses its own PdfAnnotationEditor instance (not IDisposable)
-                PdfAnnotationEditor editor = new PdfAnnotationEditor();
+                // Determine the number of pages using Document (ensures proper disposal)
+                int pageCount;
+                using (Document doc = new Document(pdfPath))
+                {
+                    pageCount = doc.Pages.Count;
+                }
 
-                // Delete all annotations from the PDF file
-                editor.DeleteAnnotations(pdfPath);
+                // Use PdfAnnotationEditor (Aspose.Pdf.Facades) to delete annotations
+                using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+                {
+                    editor.BindPdf(pdfPath);
 
-                Console.WriteLine($"Annotations removed: {Path.GetFileName(pdfPath)}");
+                    // Delete all annotations on every page. The DeleteAnnotations method in the
+                    // version of Aspose.Pdf used here expects the page number as a string, so we
+                    // convert the integer page index to string.
+                    for (int page = 1; page <= pageCount; page++)
+                    {
+                        editor.DeleteAnnotations(page.ToString());
+                    }
+
+                    // Save changes, overwriting the original file
+                    editor.Save(pdfPath);
+                }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         });
 
-        Console.WriteLine("Processing complete.");
+        Console.WriteLine("All PDFs have been processed and annotations removed.");
     }
 }

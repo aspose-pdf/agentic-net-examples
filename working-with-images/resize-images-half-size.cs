@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "resized_output.pdf";
+        const string outputPath = "resized.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,28 +15,60 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Load the PDF with deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // The page may contain Image objects (Aspose.Pdf.Image) in its Paragraphs collection.
-                // These objects expose the ImageScale property which can be used to resize the image.
-                foreach (var paragraph in page.Paragraphs)
+                // Iterate over each page
+                foreach (Page page in doc.Pages)
                 {
-                    if (paragraph is Image imgObj)
+                    // XImageCollection uses 1‑based indexing
+                    var images = page.Resources.Images;
+                    for (int idx = 1; idx <= images.Count; idx++)
                     {
-                        // Scale the image to 50% of its original size.
-                        imgObj.ImageScale = 0.5f;
+                        XImage xImg = images[idx];
+
+                        // Export the original image to a memory stream
+                        using (MemoryStream originalStream = new MemoryStream())
+                        {
+                            // XImage can be saved to a stream via the Save method
+                            xImg.Save(originalStream);
+                            originalStream.Position = 0;
+
+                            // Load into System.Drawing for resizing (fully qualified to avoid ambiguity)
+                            using (System.Drawing.Image sysImg = System.Drawing.Image.FromStream(originalStream))
+                            {
+                                int newWidth = sysImg.Width / 2;
+                                int newHeight = sysImg.Height / 2;
+
+                                // Create a resized bitmap
+                                using (System.Drawing.Bitmap resizedBmp = new System.Drawing.Bitmap(sysImg, newWidth, newHeight))
+                                {
+                                    using (MemoryStream resizedStream = new MemoryStream())
+                                    {
+                                        // Preserve original format when saving
+                                        resizedBmp.Save(resizedStream, sysImg.RawFormat);
+                                        resizedStream.Position = 0;
+
+                                        // Replace the image in the PDF resources
+                                        images.Replace(idx, resizedStream);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

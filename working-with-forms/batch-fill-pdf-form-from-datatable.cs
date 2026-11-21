@@ -1,5 +1,5 @@
 using System;
-using System.Data;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
@@ -8,60 +8,70 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF form template (must contain form fields with matching names)
         const string templatePath = "template.pdf";
-
-        // Directory where filled PDFs will be saved
         const string outputDir = "GeneratedForms";
 
-        // ---------------------------------------------------------------------
-        // In‑memory DataTable that mimics a database result set.
-        // ---------------------------------------------------------------------
-        DataTable data = new DataTable();
-        data.Columns.Add("Id", typeof(string));
-        data.Columns.Add("Name", typeof(string));
-        data.Columns.Add("Address", typeof(string));
-        data.Columns.Add("Date", typeof(DateTime));
-
-        data.Rows.Add("001", "Alice Johnson", "123 Main St, Springfield", new DateTime(2023, 5, 12));
-        data.Rows.Add("002", "Bob Smith", "456 Oak Ave, Metropolis", new DateTime(2023, 6, 3));
-        data.Rows.Add("003", "Carol Lee", "789 Pine Rd, Gotham", new DateTime(2023, 7, 21));
-
-        // Verify that the template exists
         if (!File.Exists(templatePath))
         {
             Console.Error.WriteLine($"Template not found: {templatePath}");
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Iterate over each record and generate a filled PDF
-        foreach (DataRow row in data.Rows)
-        {
-            string id = row["Id"].ToString();
-            string name = row["Name"].ToString();
-            string address = row["Address"].ToString();
-            string date = ((DateTime)row["Date"]).ToString("yyyy-MM-dd");
+        // Simulated database records
+        List<Record> records = GetMockRecords();
 
-            // Load a fresh copy of the template for this record
+        foreach (Record record in records)
+        {
+            // Load a fresh copy of the template for each record
             using (Document pdf = new Document(templatePath))
             {
-                // Populate form fields – cast to the concrete field type that exposes the Value property.
-                if (pdf.Form["Id"] is TextBoxField idField)               idField.Value = id;
-                if (pdf.Form["Name"] is TextBoxField nameField)           nameField.Value = name;
-                if (pdf.Form["Address"] is TextBoxField addressField)     addressField.Value = address;
-                if (pdf.Form["Date"] is TextBoxField dateField)           dateField.Value = date;
+                Form form = pdf.Form;
 
-                // Make fields non‑editable in the output PDF
-                pdf.Form.Flatten();
+                // Populate known text fields; adjust field names to match the template
+                SetFieldValue(form, "FirstName", record.FirstName);
+                SetFieldValue(form, "LastName",  record.LastName);
+                SetFieldValue(form, "Email",     record.Email);
+                SetFieldValue(form, "Date",      DateTime.Now.ToShortDateString());
 
-                // Save the filled PDF
-                string outputPath = Path.Combine(outputDir, $"Form_{id}.pdf");
+                // Optional: make fields read‑only by flattening the form
+                form.Flatten();
+
+                string outputPath = Path.Combine(outputDir, $"Form_{record.Id}.pdf");
                 pdf.Save(outputPath);
                 Console.WriteLine($"Saved: {outputPath}");
             }
         }
+    }
+
+    // Safely assign a value to a TextBoxField if it exists
+    static void SetFieldValue(Form form, string fieldName, string? value)
+    {
+        // The indexer returns a generic FormField; cast to TextBoxField when appropriate
+        if (form[fieldName] is TextBoxField textBox && value != null)
+        {
+            textBox.Value = value;
+        }
+    }
+
+    // Simple POCO representing a database row
+    class Record
+    {
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Email { get; set; }
+    }
+
+    // Mock data source; replace with real DB access as needed
+    static List<Record> GetMockRecords()
+    {
+        return new List<Record>
+        {
+            new Record { Id = 1, FirstName = "Alice",   LastName = "Smith",   Email = "alice@example.com" },
+            new Record { Id = 2, FirstName = "Bob",     LastName = "Johnson", Email = "bob@example.com"   },
+            new Record { Id = 3, FirstName = "Carol",   LastName = "Williams",Email = "carol@example.com" }
+        };
     }
 }

@@ -1,29 +1,37 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file paths
-        const string firstPdf  = "file1.pdf";
-        const string secondPdf = "file2.pdf";
-        // Output merged PDF path
+        const string firstPdf = "first.pdf";
+        const string secondPdf = "second.pdf";
         const string outputPdf = "merged.pdf";
 
-        // Verify that both source files exist
-        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
+        // Verify input files exist
+        if (!File.Exists(firstPdf))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"File not found: {firstPdf}");
+            return;
+        }
+        if (!File.Exists(secondPdf))
+        {
+            Console.Error.WriteLine($"File not found: {secondPdf}");
             return;
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so do NOT wrap it in a using block
-        PdfFileEditor editor = new PdfFileEditor();
+        // Lifecycle rule: wrap Document objects in using blocks for deterministic disposal
+        using (Document target = new Document(firstPdf))
+        using (Document source = new Document(secondPdf))
+        {
+            // Append all pages from the source document to the target document
+            target.Pages.Add(source.Pages);
 
-        // Use the two‑file overload of Concatenate to merge the PDFs
-        editor.Concatenate(firstPdf, secondPdf, outputPdf);
+            // Save the merged PDF; Document.Save(string) writes PDF regardless of extension
+            target.Save(outputPdf);
+        }
 
         Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
     }

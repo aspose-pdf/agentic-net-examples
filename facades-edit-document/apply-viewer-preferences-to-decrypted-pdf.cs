@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace is available for other operations if needed
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -9,7 +9,7 @@ class Program
     {
         const string encryptedPath = "encrypted.pdf";
         const string outputPath    = "output.pdf";
-        const string userPassword  = "user123";
+        const string password      = "user123";
 
         if (!File.Exists(encryptedPath))
         {
@@ -19,30 +19,26 @@ class Program
 
         try
         {
-            // Open the encrypted PDF providing the correct user password
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(encryptedPath, userPassword))
+            // Load the encrypted PDF providing the correct password.
+            // Use dynamic to avoid compile‑time dependency on ViewerPreferences (available only in newer Aspose.Pdf versions).
+            dynamic doc = new Document(encryptedPath, password);
+
+            try
             {
-                // Decrypt the document (Decrypt takes no parameters)
-                doc.Decrypt();
-
-                // ------------------------------------------------------------
-                // Apply viewer preferences.
-                // The ViewerPreferences property exists only in newer versions
-                // of Aspose.Pdf (e.g., 20.9 or later). If your project references
-                // an older version, upgrade the NuGet package or comment out the
-                // block below.
-                // ------------------------------------------------------------
-                /*
-                doc.ViewerPreferences.HideToolbar = true;
-                doc.ViewerPreferences.FitWindow   = true;
-                doc.ViewerPreferences.CenterWindow = true;
-                */
-
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Attempt to set viewer preferences if the property exists at runtime.
+                doc.ViewerPreferences.HideToolbar    = true;
+                doc.ViewerPreferences.HideMenubar    = true;
+                doc.ViewerPreferences.CenterWindow   = true;
+                doc.ViewerPreferences.FitWindow      = true;
+                doc.ViewerPreferences.DisplayDocTitle = true;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
             }
 
-            Console.WriteLine($"Viewer preferences applied and saved to '{outputPath}'.");
+            // Save the modified PDF (now with the new viewer preferences if they were applied).
+            doc.Save(outputPath);
         }
         catch (InvalidPasswordException ex)
         {

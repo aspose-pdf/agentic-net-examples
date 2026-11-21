@@ -8,51 +8,58 @@ class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder = @"C:\PdfFolder";
-        // Suffix to add to processed files
+        // Folder containing source PDFs
+        const string inputFolder = "InputPdfs";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = "OutputPdfs";
+        // Suffix to append to processed file names
         const string suffix = "_tagged";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Process each PDF file in the folder
+        // Ensure output folder exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Enable global auto‑tagging; it will run when TaggedContent is accessed
+        AutoTaggingSettings.Default.EnableAutoTagging = true;
+
+        // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // Open the PDF document
+                // Load the PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Access the tagged content API
-                    ITaggedContent taggedContent = doc.TaggedContent;
+                    // Access tagged content (auto‑tagging occurs if the document is not already tagged)
+                    ITaggedContent tagged = doc.TaggedContent;
 
-                    // Set language and title (title derived from file name)
-                    taggedContent.SetLanguage("en-US");
-                    string title = Path.GetFileNameWithoutExtension(pdfPath);
-                    taggedContent.SetTitle(title);
+                    // Optionally set language and title metadata
+                    tagged.SetLanguage("en-US");
+                    tagged.SetTitle(Path.GetFileNameWithoutExtension(pdfPath));
 
-                    // Get the root structure element (no cast required)
-                    StructureElement root = taggedContent.RootElement;
+                    // Obtain the root structure element
+                    StructureElement root = tagged.RootElement;
 
-                    // Add a simple paragraph element if the document has no content
-                    // (this demonstrates adding a tag; in real scenarios you would
-                    //  create appropriate structure based on the PDF content)
-                    ParagraphElement para = taggedContent.CreateParagraphElement();
-                    para.SetText("Document has been auto‑tagged for accessibility.");
-                    root.AppendChild(para);
+                    // If the document has no structure children, add a simple paragraph element
+                    if (root.ChildElements.Count == 0)
+                    {
+                        ParagraphElement para = tagged.CreateParagraphElement();
+                        para.SetText("Document content (auto‑tagged).");
+                        root.AppendChild(para); // AppendChild with single argument
+                    }
 
-                    // Build output file name with suffix
-                    string dir = Path.GetDirectoryName(pdfPath);
+                    // Build output file name with the required suffix
                     string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-                    string outPath = Path.Combine(dir, $"{fileName}{suffix}.pdf");
+                    string outPath = Path.Combine(outputFolder, $"{fileName}{suffix}.pdf");
 
-                    // Save the modified PDF
+                    // Save the modified PDF (no PreSave required)
                     doc.Save(outPath);
-                    Console.WriteLine($"Tagged PDF saved: {outPath}");
+                    Console.WriteLine($"Processed: {pdfPath} -> {outPath}");
                 }
             }
             catch (Exception ex)

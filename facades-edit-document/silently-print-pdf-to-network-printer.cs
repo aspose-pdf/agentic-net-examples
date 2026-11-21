@@ -1,16 +1,16 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Printing;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
         const string pdfPath = "input.pdf";
-        // Network printer UNC path (IP address based)
-        const string printerName = @"\\192.168.1.100\Printer";
+        // UNC path to the network printer (replace "printer" with the actual share name if needed)
+        const string printerName = @"\\192.168.1.100\printer";
 
         if (!File.Exists(pdfPath))
         {
@@ -20,31 +20,29 @@ class Program
 
         try
         {
-            // Load the PDF and print silently to the specified network printer
-            using (PdfViewer viewer = new PdfViewer())
+            // Configure printer settings for the network printer
+            var printerSettings = new PrinterSettings
             {
-                // Bind directly from file path – no need to keep a Document instance
-                viewer.BindPdf(pdfPath);
+                PrinterName = printerName,
+                PrintRange = PrintRange.AllPages // print all pages silently
+            };
 
-                // Configure printer settings for the network printer
-                var printerSettings = new PrinterSettings
-                {
-                    PrinterName = printerName,
-                    PrintRange = PrintRange.AllPages // print all pages
-                };
+            // Optional page settings (paper size, margins, etc.)
+            var pageSettings = new PageSettings(printerSettings)
+            {
+                // Example: use A4 size and zero margins
+                PaperSize = PaperSizes.A4,
+                Margins = new Margins(0, 0, 0, 0)
+            };
 
-                // Page settings – use defaults (you can customise paper size, margins, etc.)
-                var pageSettings = new PageSettings(printerSettings);
-
-                // Print the document silently
-                viewer.PrintDocumentWithSettings(pageSettings, printerSettings);
-            }
+            // Print the PDF directly from the file path to the specified network printer
+            PdfViewer.PrintDocuments(printerSettings, pageSettings, pdfPath);
 
             Console.WriteLine("Print job sent successfully.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Printing failed: {ex.Message}");
         }
     }
 }

@@ -1,69 +1,49 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 using System.Text.Json;
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "formdata.json";
+        const string inputPdf = "form.pdf";
+        const string outputJson = "formData.json";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document inside a using block (lifecycle rule)
+        using (Document doc = new Document(inputPdf))
         {
-            // Prepare a dictionary to hold field names and their values
-            var formData = new Dictionary<string, object>();
+            // Check if the document contains any form fields
+            if (doc.Form == null || doc.Form.Count == 0)
+            {
+                Console.WriteLine("No form fields found in the PDF.");
+                return;
+            }
 
-            // Iterate over all form fields in the document via the Form.Fields collection
+            // Collect form field names and values into a dictionary
+            var formData = new Dictionary<string, object>();
             foreach (var field in doc.Form.Fields)
             {
-                // Extract the value based on the concrete field type
-                switch (field)
-                {
-                    case TextBoxField txt:
-                        formData[txt.PartialName] = txt.Value;
-                        break;
-                    case CheckboxField chk: // corrected class name (lowercase 'b')
-                        formData[chk.PartialName] = chk.Checked;
-                        break;
-                    case RadioButtonOptionField rad:
-                        // For radio buttons the selected value is stored in the Value property
-                        formData[rad.PartialName] = rad.Value;
-                        break;
-                    case ListBoxField list:
-                        // ListBox may have multiple selected items
-                        formData[list.PartialName] = list.SelectedItems;
-                        break;
-                    case ComboBoxField combo:
-                        formData[combo.PartialName] = combo.Value;
-                        break;
-                    case SignatureField sig:
-                        // Indicate whether a signature is present
-                        formData[sig.PartialName] = sig.Signature != null;
-                        break;
-                    default:
-                        // Fallback for any other field types
-                        formData[field.PartialName] = field.Value;
-                        break;
-                }
+                // field.Name gives the field identifier; field.Value holds its current value
+                formData[field.Name] = field.Value;
             }
 
             // Serialize the dictionary to JSON with indentation for readability
-            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions {
+                WriteIndented = true
+            };
             string json = JsonSerializer.Serialize(formData, jsonOptions);
-            File.WriteAllText(outputPath, json);
-        }
 
-        Console.WriteLine($"Form data exported to '{outputPath}'.");
+            // Write the formatted JSON to the output file
+            File.WriteAllText(outputJson, json);
+            Console.WriteLine($"Form data exported to '{outputJson}'.");
+        }
     }
 }

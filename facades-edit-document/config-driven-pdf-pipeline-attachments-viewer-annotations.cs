@@ -1,183 +1,167 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using System.Collections.Generic;
+using Microsoft.CSharp.RuntimeBinder;
 
+// Configuration models
 class AttachmentConfig
 {
     public required string FilePath { get; set; }
     public required string Description { get; set; }
 }
 
-class ViewerPreferencesConfig
+class ViewerPrefConfig
 {
     public bool HideToolbar { get; set; }
     public bool HideMenubar { get; set; }
+    public bool HideWindowUI { get; set; }
+    public bool FitWindow { get; set; }
     public bool CenterWindow { get; set; }
     public bool DisplayDocTitle { get; set; }
-    // Add other preferences as needed
+    public PageMode PageMode { get; set; } = PageMode.UseNone;
+    public PageLayout PageLayout { get; set; } = PageLayout.SinglePage;
 }
 
 class AnnotationConfig
 {
-    public int PageNumber { get; set; }          // 1‑based page index
-    public double Llx { get; set; }              // lower‑left x
-    public double Lly { get; set; }              // lower‑left y
-    public double Urx { get; set; }              // upper‑right x
-    public double Ury { get; set; }              // upper‑right y
+    public int PageNumber { get; set; }               // 1‑based page index
+    public double Llx { get; set; }                   // lower‑left X
+    public double Lly { get; set; }                   // lower‑left Y
+    public double Urx { get; set; }                   // upper‑right X
+    public double Ury { get; set; }                   // upper‑right Y
     public required string Title { get; set; }
     public required string Contents { get; set; }
+    public TextIcon Icon { get; set; } = TextIcon.Note;
+    public bool Open { get; set; } = true;
 }
 
-class PipelineConfig
-{
-    public required string InputPdf { get; set; }
-    public required string OutputPdf { get; set; }
-    public List<AttachmentConfig> Attachments { get; set; } = new List<AttachmentConfig>();
-    public ViewerPreferencesConfig ViewerPrefs { get; set; } = new ViewerPreferencesConfig();
-    public List<AnnotationConfig> Annotations { get; set; } = new List<AnnotationConfig>();
-}
-
-class Program
+// Pipeline implementation
+class PdfProcessingPipeline
 {
     static void Main()
     {
-        // -----------------------------------------------------------------
-        // Define a simple configuration (in real scenarios this could be
-        // deserialized from JSON, XML, etc.)
-        // -----------------------------------------------------------------
-        PipelineConfig config = new PipelineConfig {
-            InputPdf = "input.pdf",
-            OutputPdf = "output.pdf",
-            Attachments = new List<AttachmentConfig>
-            {
-                new AttachmentConfig { FilePath = "attachment1.txt", Description = "First attachment" },
-                new AttachmentConfig { FilePath = "attachment2.jpg", Description = "Image attachment" }
-            },
-            ViewerPrefs = new ViewerPreferencesConfig
-            {
-                HideToolbar = true,
-                HideMenubar = true,
-                CenterWindow = true,
-                DisplayDocTitle = true
-            },
-            Annotations = new List<AnnotationConfig>
-            {
-                new AnnotationConfig
-                {
-                    PageNumber = 1,
-                    Llx = 100, Lly = 500, Urx = 300, Ury = 550,
-                    Title = "Note 1",
-                    Contents = "This is a sample text annotation."
-                },
-                new AnnotationConfig
-                {
-                    PageNumber = 2,
-                    Llx = 150, Lly = 400, Urx = 350, Ury = 450,
-                    Title = "Note 2",
-                    Contents = "Another annotation on page 2."
-                }
-            }
-        };
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Validate input file existence
-        if (!File.Exists(config.InputPdf))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {config.InputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Load the PDF using the core Document API (document‑disposal‑with‑using rule)
-        // -----------------------------------------------------------------
-        using (Document doc = new Document(config.InputPdf))
+        // Copy input to output so we work on a writable file
+        File.Copy(inputPdf, outputPdf, true);
+
+        // ----- 1. Define configuration -----
+        var attachments = new[]
         {
-            // -------------------------------------------------------------
-            // Step 1: Add attachments (using EmbeddedFiles collection)
-            // -------------------------------------------------------------
-            foreach (var att in config.Attachments)
+            new AttachmentConfig { FilePath = "attachment1.txt", Description = "First attachment" },
+            new AttachmentConfig { FilePath = "attachment2.jpg", Description = "Second attachment" }
+        };
+
+        ViewerPrefConfig viewerPrefs = new ViewerPrefConfig
+        {
+            HideToolbar = true,
+            HideMenubar = true,
+            HideWindowUI = false,
+            FitWindow = true,
+            CenterWindow = true,
+            DisplayDocTitle = true,
+            PageMode = PageMode.UseOutlines,
+            PageLayout = PageLayout.TwoColumnLeft
+        };
+
+        var annotations = new[]
+        {
+            new AnnotationConfig
+            {
+                PageNumber = 1,
+                Llx = 100, Lly = 500, Urx = 300, Ury = 550,
+                Title = "Note 1",
+                Contents = "This is the first annotation.",
+                Icon = TextIcon.Comment,
+                Open = true
+            },
+            new AnnotationConfig
+            {
+                PageNumber = 2,
+                Llx = 150, Lly = 400, Urx = 350, Ury = 450,
+                Title = "Note 2",
+                Contents = "Second page annotation.",
+                Icon = TextIcon.Key,
+                Open = false
+            }
+        };
+
+        try
+        {
+            // Load the PDF document (Aspose.Pdf.Document works with all operations we need)
+            Document doc = new Document(outputPdf);
+
+            // ----- 2. Add attachments (embedded files) -----
+            foreach (var att in attachments)
             {
                 if (!File.Exists(att.FilePath))
                 {
                     Console.Error.WriteLine($"Attachment not found: {att.FilePath}");
-                    continue; // skip missing attachments
-                }
-
-                // Create a FileSpecification with the file name and description.
-                var fileSpec = new FileSpecification(Path.GetFileName(att.FilePath))
-                {
-                    Description = att.Description,
-                    // Embed the actual file bytes.
-                    Contents = new MemoryStream(File.ReadAllBytes(att.FilePath))
-                };
-                doc.EmbeddedFiles.Add(fileSpec);
-            }
-
-            // -------------------------------------------------------------
-            // Step 2: Set viewer preferences – use reflection to stay
-            //         compatible with older Aspose.Pdf versions that may not
-            //         expose the ViewerPreferences type.
-            // -------------------------------------------------------------
-            ApplyViewerPreferences(doc, config.ViewerPrefs);
-
-            // -------------------------------------------------------------
-            // Step 3: Insert annotations using the core Document API.
-            // -------------------------------------------------------------
-            foreach (var ann in config.Annotations)
-            {
-                if (ann.PageNumber < 1 || ann.PageNumber > doc.Pages.Count)
-                {
-                    Console.Error.WriteLine($"Invalid page number {ann.PageNumber} for annotation.");
                     continue;
                 }
 
-                var rect = new Aspose.Pdf.Rectangle(ann.Llx, ann.Lly, ann.Urx, ann.Ury);
-                var txtAnn = new TextAnnotation(doc.Pages[ann.PageNumber], rect)
+                // Create a FileSpecification with a stream containing the file data and add it to EmbeddedFiles.
+                var fileSpec = new FileSpecification(Path.GetFileName(att.FilePath), att.Description);
+                fileSpec.Contents = new MemoryStream(File.ReadAllBytes(att.FilePath));
+                doc.EmbeddedFiles.Add(fileSpec);
+            }
+
+            // ----- 3. Set viewer preferences (guarded for older Aspose.Pdf versions) -----
+            try
+            {
+                dynamic dynDoc = doc; // use dynamic to avoid compile‑time binding if the property is missing
+                dynDoc.ViewerPreferences.HideToolbar = viewerPrefs.HideToolbar;
+                dynDoc.ViewerPreferences.HideMenubar = viewerPrefs.HideMenubar;
+                dynDoc.ViewerPreferences.HideWindowUI = viewerPrefs.HideWindowUI;
+                dynDoc.ViewerPreferences.FitWindow = viewerPrefs.FitWindow;
+                dynDoc.ViewerPreferences.CenterWindow = viewerPrefs.CenterWindow;
+                dynDoc.ViewerPreferences.DisplayDocTitle = viewerPrefs.DisplayDocTitle;
+                dynDoc.ViewerPreferences.PageMode = viewerPrefs.PageMode;
+                dynDoc.ViewerPreferences.PageLayout = viewerPrefs.PageLayout;
+            }
+            catch (RuntimeBinderException)
+            {
+                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Skipping viewer‑preference configuration.");
+            }
+
+            // ----- 4. Insert annotations -----
+            foreach (var ann in annotations)
+            {
+                if (ann.PageNumber < 1 || ann.PageNumber > doc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Invalid page number for annotation: {ann.PageNumber}");
+                    continue;
+                }
+
+                Page page = doc.Pages[ann.PageNumber];
+                var rect = new Rectangle(ann.Llx, ann.Lly, ann.Urx, ann.Ury);
+                var textAnnot = new TextAnnotation(page, rect)
                 {
                     Title = ann.Title,
                     Contents = ann.Contents,
-                    Open = true,
-                    Icon = TextIcon.Note
+                    Open = ann.Open,
+                    Icon = ann.Icon
                 };
-                doc.Pages[ann.PageNumber].Annotations.Add(txtAnn);
+                page.Annotations.Add(textAnnot);
             }
 
-            // Save the final result
-            doc.Save(config.OutputPdf);
+            // Save the modified document
+            doc.Save(outputPdf);
+
+            Console.WriteLine($"Processing completed. Output saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Pipeline completed. Output saved to '{config.OutputPdf}'.");
-    }
-
-    /// <summary>
-    /// Applies viewer preferences to a Document using reflection. This avoids a hard
-    /// compile‑time dependency on the ViewerPreferences type, which may be absent in
-    /// older Aspose.Pdf releases.
-    /// </summary>
-    private static void ApplyViewerPreferences(Document doc, ViewerPreferencesConfig cfg)
-    {
-        // Try to get the "ViewerPreferences" property (it may not exist).
-        var vpProp = doc.GetType().GetProperty("ViewerPreferences");
-        if (vpProp == null) return; // Property not available – nothing to set.
-
-        var vpInstance = vpProp.GetValue(doc);
-        if (vpInstance == null) return;
-
-        // Helper to set a boolean property if it exists.
-        void SetBool(string name, bool value)
+        catch (Exception ex)
         {
-            var prop = vpInstance.GetType().GetProperty(name);
-            if (prop != null && prop.CanWrite)
-            {
-                prop.SetValue(vpInstance, value);
-            }
+            Console.Error.WriteLine($"Error during processing: {ex.Message}");
         }
-
-        SetBool("HideToolbar", cfg.HideToolbar);
-        SetBool("HideMenubar", cfg.HideMenubar);
-        SetBool("CenterWindow", cfg.CenterWindow);
-        SetBool("DisplayDocTitle", cfg.DisplayDocTitle);
-        // Add more preferences here following the same pattern.
     }
 }

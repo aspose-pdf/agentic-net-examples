@@ -1,42 +1,55 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCsvPath = "page_dimensions.csv";
+        const string inputPath = "input.pdf";
+        const string csvPath   = "pages_dimensions.csv";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Prepare CSV content with a header row
-            StringBuilder csvBuilder = new StringBuilder();
-            csvBuilder.AppendLine("PageNumber,Width,Height");
-
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Page page = doc.Pages[i];
-                // Width and Height are measured in points (1 point = 1/72 inch)
-                double width = page.PageInfo.Width;
-                double height = page.PageInfo.Height;
+                // Create (or overwrite) the CSV file
+                using (StreamWriter writer = new StreamWriter(csvPath, false))
+                {
+                    // CSV header
+                    writer.WriteLine("PageNumber,WidthPoints,HeightPoints,WidthInches,HeightInches");
 
-                csvBuilder.AppendLine($"{i},{width},{height}");
+                    // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+                    for (int i = 1; i <= doc.Pages.Count; i++)
+                    {
+                        Page page = doc.Pages[i];
+
+                        // Page dimensions are stored in points (1 point = 1/72 inch)
+                        double widthPts  = page.PageInfo.Width;
+                        double heightPts = page.PageInfo.Height;
+
+                        // Convert points to inches for easier analysis
+                        double widthIn  = widthPts / 72.0;
+                        double heightIn = heightPts / 72.0;
+
+                        // Write a CSV line for the current page
+                        writer.WriteLine($"{i},{widthPts},{heightPts},{widthIn:F2},{heightIn:F2}");
+                    }
+                }
             }
 
-            // Write the CSV data to the output file
-            File.WriteAllText(outputCsvPath, csvBuilder.ToString(), Encoding.UTF8);
-            Console.WriteLine($"Page dimensions exported to '{outputCsvPath}'.");
+            Console.WriteLine($"Page dimensions exported to '{csvPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -1,13 +1,14 @@
 using System;
-using System.IO;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "form.pdf";
+        const string outputPath = "form_with_readonly.pdf";
 
         // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
@@ -16,21 +17,31 @@ class Program
             Page page = doc.Pages.Add();
 
             // Define the field rectangle (lower‑left x/y, upper‑right x/y)
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
 
-            // Create a text box form field
-            TextBoxField textField = new TextBoxField(page, fieldRect);
-            textField.PartialName = "MyTextField";   // field identifier
-            textField.Value = "Default text";        // default value displayed in the field
-            textField.ReadOnly = true;               // make the field read‑only by default
+            // Create a text box field with a default value and read‑only state
+            TextBoxField txtField = new TextBoxField(page, rect);
+            txtField.PartialName = "MyTextField";
+            txtField.Value = "Default text";   // default content
+            txtField.ReadOnly = true;           // make the field read‑only
 
-            // Add the field to the document's form collection (page index is 1‑based)
-            doc.Form.Add(textField, 1);
+            // ---- Decoration (background, border, appearance) ----
+            // Background colour (System.Drawing.Color)
+            txtField.Characteristics.Background = System.Drawing.Color.LightGray;
+            // Border colour (System.Drawing.Color)
+            txtField.Characteristics.Border = System.Drawing.Color.Black;
+            // Border width and style (requires Aspose.Pdf.Annotations.Border)
+            txtField.Border = new Border(txtField) { Width = 1, Style = BorderStyle.Solid };
+            // Text appearance (font, size, colour) – DefaultAppearance expects System.Drawing.Color
+            txtField.DefaultAppearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Save the PDF with the read‑only text field
+            // Add the field to the document's form collection
+            doc.Form.Add(txtField);
+
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with read‑only text field saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

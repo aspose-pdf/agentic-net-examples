@@ -1,29 +1,34 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Collections.Generic;
 using System.Reflection;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder;
+using Aspose.Pdf.Facades; // required by task specification
+using Microsoft.CSharp.RuntimeBinder; // for RuntimeBinderException
 
-class ViewerPreferencesConfig
+// Model representing viewer preference settings in the JSON file
+public class ViewerPreferencesConfig
 {
-    public bool HideToolbar { get; set; }
-    public bool HideMenubar { get; set; }
-    public bool CenterWindow { get; set; }
-    public bool DisplayDocTitle { get; set; }
-    public bool HideWindowUI { get; set; }
-    public bool FitWindow { get; set; }
-    public bool PrintScaling { get; set; }
-    // Add other viewer preference properties as needed, matching the JSON structure.
+    public bool? HideToolbar { get; set; }
+    public bool? HideMenubar { get; set; }
+    public bool? HideWindowUI { get; set; }
+    public bool? FitWindow { get; set; }
+    public bool? CenterWindow { get; set; }
+    public bool? DisplayDocTitle { get; set; }
+    // Made nullable to satisfy the non‑nullable warning (CS8618)
+    public string? NonFullScreenPageMode { get; set; }
+    public string? PageLayout { get; set; }
+    public string? PageMode { get; set; }
 }
 
 class Program
 {
     static void Main()
     {
-        const string configPath = "viewerPreferences.json";   // JSON file with the settings
-        const string inputFolder = "InputPdfs";              // Folder containing PDFs to process
-        const string outputFolder = "OutputPdfs";            // Folder to write modified PDFs
+        const string configPath   = "viewerPreferences.json"; // JSON configuration file
+        const string inputFolder  = "InputPdfs";              // Folder containing source PDFs
+        const string outputFolder = "OutputPdfs";             // Folder for processed PDFs
 
         if (!File.Exists(configPath))
         {
@@ -31,90 +36,131 @@ class Program
             return;
         }
 
-        // Deserialize JSON configuration into a strongly‑typed object
-        ViewerPreferencesConfig? config = JsonSerializer.Deserialize<ViewerPreferencesConfig>(File.ReadAllText(configPath));
-        if (config == null)
+        // Deserialize JSON configuration
+        ViewerPreferencesConfig? config;
+        try
         {
-            Console.Error.WriteLine("Failed to parse configuration.");
+            string json = File.ReadAllText(configPath);
+            config = JsonSerializer.Deserialize<ViewerPreferencesConfig>(json);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        if (config == null)
         {
-            string fileName = Path.GetFileName(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
-            {
-                // -----------------------------------------------------------------
-                // Apply viewer preferences – use reflection so the code compiles with
-                // older Aspose.Pdf versions that do not expose the ViewerPreferences
-                // property. If the property (or the individual preference members) is
-                // missing, we simply skip the setting and write a diagnostic message.
-                // -----------------------------------------------------------------
-                try
-                {
-                    PropertyInfo? viewerPrefProp = doc.GetType().GetProperty("ViewerPreferences");
-                    if (viewerPrefProp != null)
-                    {
-                        object? prefs = viewerPrefProp.GetValue(doc);
-                        if (prefs != null)
-                        {
-                            SetPreference(prefs, "HideToolbar", config.HideToolbar);
-                            SetPreference(prefs, "HideMenubar", config.HideMenubar);
-                            SetPreference(prefs, "CenterWindow", config.CenterWindow);
-                            SetPreference(prefs, "DisplayDocTitle", config.DisplayDocTitle);
-                            SetPreference(prefs, "HideWindowUI", config.HideWindowUI);
-                            SetPreference(prefs, "FitWindow", config.FitWindow);
-                            SetPreference(prefs, "PrintScaling", config.PrintScaling);
-                            // Add additional preferences here as needed.
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version.");
-                    }
-                }
-                catch (RuntimeBinderException ex)
-                {
-                    // This catch is a safety net for dynamic access scenarios; it should not be hit
-                    // when using reflection, but we keep it for completeness.
-                    Console.WriteLine($"Runtime binder error while setting viewer preferences: {ex.Message}");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Unexpected error while applying viewer preferences: {ex.Message}");
-                }
-
-                // Save the modified PDF (overwrites or creates a new file)
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Processed: {fileName}");
+            Console.Error.WriteLine("Configuration deserialized to null.");
+            return;
         }
 
-        Console.WriteLine("All PDFs have been updated with viewer preferences where supported.");
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
+
+        Directory.CreateDirectory(outputFolder);
+
+        // Gather all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
+        if (pdfFiles.Length == 0)
+        {
+            Console.WriteLine("No PDF files found to process.");
+            return;
+        }
+
+        foreach (string pdfPath in pdfFiles)
+        {
+            string fileName   = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
+
+            try
+            {
+                // Load PDF as dynamic to avoid compile‑time dependency on ViewerPreferences (may be missing in older Aspose.Pdf versions)
+                dynamic doc = new Document(pdfPath);
+
+                try
+                {
+                    // Attempt to access ViewerPreferences at runtime
+                    dynamic prefs = doc.ViewerPreferences;
+
+                    // Boolean preferences – set only when a value is supplied in the JSON
+                    if (config.HideToolbar.HasValue)    prefs.HideToolbar    = config.HideToolbar.Value;
+                    if (config.HideMenubar.HasValue)    prefs.HideMenubar    = config.HideMenubar.Value;
+                    if (config.HideWindowUI.HasValue)   prefs.HideWindowUI   = config.HideWindowUI.Value;
+                    if (config.FitWindow.HasValue)      prefs.FitWindow      = config.FitWindow.Value;
+                    if (config.CenterWindow.HasValue)   prefs.CenterWindow   = config.CenterWindow.Value;
+                    if (config.DisplayDocTitle.HasValue)prefs.DisplayDocTitle = config.DisplayDocTitle.Value;
+
+                    // Enum‑based preferences – use reflection so the code compiles even if the enum types are absent in the referenced Aspose.Pdf version.
+                    // NonFullScreenPageMode
+                    if (!string.IsNullOrWhiteSpace(config.NonFullScreenPageMode))
+                    {
+                        TrySetEnumPreference(prefs, "NonFullScreenPageModeEnum", config.NonFullScreenPageMode, "NonFullScreenPageMode");
+                    }
+
+                    // PageLayout
+                    if (!string.IsNullOrWhiteSpace(config.PageLayout))
+                    {
+                        TrySetEnumPreference(prefs, "PageLayoutEnum", config.PageLayout, "PageLayout");
+                    }
+
+                    // PageMode
+                    if (!string.IsNullOrWhiteSpace(config.PageMode))
+                    {
+                        TrySetEnumPreference(prefs, "PageModeEnum", config.PageMode, "PageMode");
+                    }
+                }
+                catch (RuntimeBinderException)
+                {
+                    // ViewerPreferences property does not exist in the referenced Aspose.Pdf version.
+                    Console.WriteLine($"ViewerPreferences not supported for '{fileName}'. Skipping preference application.");
+                }
+
+                // Save the (potentially) modified PDF
+                doc.Save(outputPath);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
+        }
+
+        Console.WriteLine("All files processed.");
     }
 
     /// <summary>
-    /// Sets a boolean viewer‑preference property via reflection if the property exists.
+    /// Attempts to set an enum‑based viewer preference using reflection. If the enum type or the property does not exist,
+    /// the method silently does nothing – this mirrors the dynamic‑fallback strategy used for older Aspose.Pdf versions.
     /// </summary>
-    private static void SetPreference(object prefsObject, string propertyName, bool value)
+    private static void TrySetEnumPreference(dynamic prefs, string enumTypeName, string stringValue, string propertyName)
     {
-        PropertyInfo? prop = prefsObject.GetType().GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
-        if (prop != null && prop.CanWrite)
+        try
         {
-            prop.SetValue(prefsObject, value);
+            // Obtain the runtime type of the prefs object (ViewerPreferences implementation)
+            Type prefsType = ((object)prefs).GetType();
+            // Look for a nested enum with the supplied name (e.g., "NonFullScreenPageModeEnum")
+            Type? enumType = prefsType.GetNestedType(enumTypeName, BindingFlags.Public | BindingFlags.NonPublic);
+            if (enumType == null)
+                return; // Enum not present – nothing to set.
+
+            // Parse the string value to the enum (ignore case)
+            if (Enum.TryParse(enumType, stringValue, true, out object? enumValue))
+            {
+                // Use reflection to set the property (e.g., prefs.NonFullScreenPageMode = enumValue)
+                PropertyInfo? prop = prefsType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
+                if (prop != null && prop.CanWrite)
+                {
+                    prop.SetValue(prefs, enumValue);
+                }
+            }
         }
-        else
+        catch
         {
-            // Property not found – most likely the running Aspose.Pdf version does not support it.
-            // We silently ignore it to keep the program robust.
+            // Swallow any exception – the goal is to keep the program running even if the current Aspose.Pdf version
+            // does not support the particular enum or property.
         }
     }
 }

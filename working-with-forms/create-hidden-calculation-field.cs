@@ -3,59 +3,55 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "form_with_hidden_sum.pdf";
+        const string outputPath = "FormWithCalculation.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document inside a using block for deterministic disposal.
         using (Document doc = new Document())
         {
-            // Add a single page (pages are 1‑based)
+            // Add a single blank page.
             Page page = doc.Pages.Add();
 
-            // Define rectangles for the fields (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle rectItem1 = new Aspose.Pdf.Rectangle(100, 700, 200, 720);
-            Aspose.Pdf.Rectangle rectItem2 = new Aspose.Pdf.Rectangle(100, 650, 200, 670);
-            Aspose.Pdf.Rectangle rectTotal = new Aspose.Pdf.Rectangle(100, 600, 200, 620);
-
-            // Create Item1 text box field
-            TextBoxField item1 = new TextBoxField(page, rectItem1)
+            // ----- Create visible input fields: Item1 and Item2 -----
+            // Position and size are arbitrary for demonstration.
+            TextBoxField item1 = new TextBoxField(page, new Rectangle(100, 700, 250, 720))
             {
                 PartialName = "Item1",
                 Value = "0"
             };
+            doc.Form.Add(item1);
 
-            // Create Item2 text box field
-            TextBoxField item2 = new TextBoxField(page, rectItem2)
+            TextBoxField item2 = new TextBoxField(page, new Rectangle(100, 650, 250, 670))
             {
                 PartialName = "Item2",
                 Value = "0"
             };
-
-            // Create hidden total field
-            TextBoxField total = new TextBoxField(page, rectTotal)
-            {
-                PartialName = "Total",
-                Value = "0"
-            };
-            // Hide the field from the viewer using annotation flags
-            total.Flags = AnnotationFlags.Hidden;
-
-            // JavaScript that calculates the sum of Item1 and Item2
-            // Number() ensures string values are treated as numbers
-            string js = "event.value = Number(this.getField('Item1').value) + Number(this.getField('Item2').value);";
-            total.Actions.OnCalculate = new JavascriptAction(js);
-
-            // Add fields to the document's form collection
-            doc.Form.Add(item1);
             doc.Form.Add(item2);
-            doc.Form.Add(total);
 
-            // Save the PDF
+            // ----- Create hidden calculation field -----
+            // The field is not visible in the PDF viewer.
+            TextBoxField sumField = new TextBoxField(page, new Rectangle(0, 0, 0, 0))
+            {
+                PartialName = "Sum",
+                ReadOnly = true,          // User cannot edit the result.
+                Flags = AnnotationFlags.Hidden // Hide the field.
+            };
+            doc.Form.Add(sumField);
+
+            // Attach JavaScript that runs when the field needs to be calculated.
+            // The script reads the values of Item1 and Item2, converts them to numbers,
+            // adds them, and assigns the result to the current field (event.value).
+            sumField.Actions.OnCalculate = new JavascriptAction(
+                "var v1 = parseFloat(this.getField('Item1').value) || 0;" +
+                "var v2 = parseFloat(this.getField('Item2').value) || 0;" +
+                "event.value = (v1 + v2).toString();"
+            );
+
+            // Save the PDF. No SaveOptions are required because we are saving to PDF format.
             doc.Save(outputPath);
         }
 

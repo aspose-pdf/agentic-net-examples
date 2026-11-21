@@ -6,51 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string attachmentFilePath = "attachment.txt";
-        const string outputPdfPath      = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string attachmentFile = "attachment.txt";
+        const string outputPdf = "output_with_attachment.pdf";
 
-        // Verify input files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(attachmentFilePath))
+        if (!File.Exists(attachmentFile))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFilePath}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Load the existing PDF.
+            Document pdfDoc = new Document(inputPdf);
+
+            // Create a FileSpecification for the attachment.
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentFile))
             {
-                // Open the attachment file stream
-                using (FileStream attStream = File.OpenRead(attachmentFilePath))
-                {
-                    // Create a FileSpecification for the attachment
-                    var fileSpec = new FileSpecification(
-                        attStream,
-                        Path.GetFileName(attachmentFilePath), // file name as it will appear in the PDF
-                        "Embedded attachment")                // description
-                    {
-                        // Set MIME type (optional, generic binary here)
-                        MIMEType = "application/octet-stream",
-                        // Set the relationship type to Data as required
-                        AFRelationship = AFRelationship.Data
-                    };
+                Description = "Data attachment",
+                MIMEType = "application/octet-stream",
+                AFRelationship = AFRelationship.Data,
+                // Load the file data into the specification.
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentFile))
+            };
 
-                    // Add the attachment to the PDF's EmbeddedFiles collection
-                    pdfDoc.EmbeddedFiles.Add(fileSpec);
-                }
+            // Add the file specification to the EmbeddedFiles collection.
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-                // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
-            }
+            // Save the modified PDF.
+            pdfDoc.Save(outputPdf);
 
-            Console.WriteLine($"Attachment added successfully. Saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdf}'.");
         }
         catch (Exception ex)
         {

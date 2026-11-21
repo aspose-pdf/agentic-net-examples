@@ -6,8 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "rotated.pdf";
+        const int    pageNumber = 1;   // 1‑based page index to rotate
+        const int    rotation   = 90;  // allowed values: 0, 90, 180, 270
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +17,18 @@ class Program
             return;
         }
 
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            // Load the PDF into the editor
-            editor.BindPdf(inputPath);
+        // PdfPageEditor does NOT implement IDisposable, so we instantiate it directly.
+        var editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
 
-            // Specify which page(s) to rotate (1‑based indexing)
-            editor.ProcessPages = new int[] { 1 };
+        // Specify which page(s) the editor should affect.
+        editor.ProcessPages = new[] { pageNumber };
+        // Set the rotation for the selected page(s). Accepted values are 0, 90, 180, 270.
+        editor.Rotation = rotation;
 
-            // Set rotation angle in degrees. Allowed values are 0, 90, 180, or 270.
-            editor.Rotation = 90;
+        // Save the modified PDF.
+        editor.Save(outputPath);
 
-            // Save the rotated PDF
-            editor.Save(outputPath);
-        }
-
-        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Page {pageNumber} rotated to {rotation}° and saved as '{outputPath}'.");
     }
 }

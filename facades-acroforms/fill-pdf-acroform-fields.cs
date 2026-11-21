@@ -1,91 +1,92 @@
 using System;
 using System.Collections.Generic;
-using Aspose.Pdf.Facades;
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
-public static class PdfFieldHelper
+namespace AsposePdfApi
 {
-    /// <summary>
-    /// Fills form fields in a PDF using Aspose.Pdf.Facades and saves the result.
-    /// </summary>
-    /// <param name="inputPdfPath">Path to the source PDF containing form fields.</param>
-    /// <param name="fieldValues">Dictionary where key = field name, value = text to set.</param>
-    /// <param name="outputPdfPath">Path where the filled PDF will be saved.</param>
-    public static void FillFields(string inputPdfPath, Dictionary<string, string> fieldValues, string outputPdfPath)
+    public static class PdfFormHelper
     {
-        if (string.IsNullOrWhiteSpace(inputPdfPath))
-            throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
-
-        if (string.IsNullOrWhiteSpace(outputPdfPath))
-            throw new ArgumentException("Output PDF path must be provided.", nameof(outputPdfPath));
-
-        if (fieldValues == null)
-            throw new ArgumentNullException(nameof(fieldValues));
-
-        // FormFiller implements IDisposable, so wrap it in a using block for deterministic disposal.
-        using (FormFiller filler = new FormFiller())
+        /// <summary>
+        /// Fills the form fields of a PDF using Aspose.Pdf.Document.
+        /// </summary>
+        /// <param name="inputPdfPath">Path to the source PDF containing form fields.</param>
+        /// <param name="fieldValues">Dictionary where key = field name, value = text to set.</param>
+        /// <param name="outputPdfPath">Path where the filled PDF will be saved.</param>
+        public static void FillPdfFields(string inputPdfPath, Dictionary<string, string> fieldValues, string outputPdfPath)
         {
-            // Bind the source PDF document.
-            filler.BindPdf(inputPdfPath);
+            if (string.IsNullOrWhiteSpace(inputPdfPath))
+                throw new ArgumentException("Input PDF path must be provided.", nameof(inputPdfPath));
 
-            // Iterate over the supplied field/value pairs and set each field.
+            if (string.IsNullOrWhiteSpace(outputPdfPath))
+                throw new ArgumentException("Output PDF path must be provided.", nameof(outputPdfPath));
+
+            if (!File.Exists(inputPdfPath))
+                throw new FileNotFoundException("Input PDF not found.", inputPdfPath);
+
+            // Load the PDF document.
+            Document pdfDocument = new Document(inputPdfPath);
+
+            // Ensure the document actually contains a form.
+            if (pdfDocument.Form == null || pdfDocument.Form.Count == 0)
+                throw new InvalidOperationException("The PDF does not contain any form fields.");
+
+            // Fill each field supplied in the dictionary.
             foreach (KeyValuePair<string, string> kvp in fieldValues)
             {
-                // SetField will create the field if it does not exist; otherwise it overwrites the existing value.
-                filler.SetField(kvp.Key, kvp.Value);
+                // Use HasField to check existence – Form does not have Contains.
+                if (pdfDocument.Form.HasField(kvp.Key))
+                {
+                    // The indexer returns a WidgetAnnotation; cast to Field to access Value.
+                    Field field = pdfDocument.Form[kvp.Key] as Field;
+                    if (field != null)
+                    {
+                        field.Value = kvp.Value;
+                    }
+                }
+                else
+                {
+                    // Field not found – ignore or log as needed.
+                    // throw new KeyNotFoundException($"Field '{kvp.Key}' not found in the PDF form.");
+                }
             }
 
-            // Save the modified PDF to the desired output location.
-            filler.Save(outputPdfPath);
+            // Save the modified PDF to the specified output path.
+            pdfDocument.Save(outputPdfPath);
         }
     }
-}
 
-public class Program
-{
-    public static void Main(string[] args)
+    class Program
     {
-        // Example usage – replace with real paths and values in production.
-        var values = new Dictionary<string, string>
+        static void Main(string[] args)
         {
-            { "Name", "John Doe" },
-            { "Date", DateTime.Today.ToShortDateString() }
-        };
+            // Expected arguments: <inputPdfPath> <outputPdfPath>
+            if (args.Length < 2)
+            {
+                Console.WriteLine("Usage: AsposePdfApi <inputPdfPath> <outputPdfPath>");
+                return;
+            }
 
-        string inputPdf = "template.pdf";
-        string outputPdf = "filled.pdf";
+            string inputPdfPath = args[0];
+            string outputPdfPath = args[1];
 
-        PdfFieldHelper.FillFields(inputPdf, values, outputPdf);
-        Console.WriteLine("PDF fields have been filled and saved to " + outputPdf);
-    }
-}
+            // Example field values – replace with real data as needed.
+            var fieldValues = new Dictionary<string, string>
+            {
+                { "FirstName", "John" },
+                { "LastName", "Doe" }
+            };
 
-// ---------------------------------------------------------------------------
-// Minimal stub for Aspose.Pdf.Facades.FormFiller when the real Aspose.Pdf library
-// is not referenced. This allows the project to compile and run the example
-// without requiring the commercial NuGet package.
-// ---------------------------------------------------------------------------
-namespace Aspose.Pdf.Facades
-{
-    public class FormFiller : IDisposable
-    {
-        public void BindPdf(string path)
-        {
-            // Stub implementation – in a real scenario the Aspose library would load the PDF.
-        }
-
-        public void SetField(string name, string value)
-        {
-            // Stub implementation – in a real scenario the field would be set on the PDF.
-        }
-
-        public void Save(string path)
-        {
-            // Stub implementation – in a real scenario the modified PDF would be written to disk.
-        }
-
-        public void Dispose()
-        {
-            // Stub implementation – release any resources if needed.
+            try
+            {
+                PdfFormHelper.FillPdfFields(inputPdfPath, fieldValues, outputPdfPath);
+                Console.WriteLine($"PDF successfully filled and saved to '{outputPdfPath}'.");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error: {ex.Message}");
+            }
         }
     }
 }

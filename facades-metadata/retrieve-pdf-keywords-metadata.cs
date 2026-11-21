@@ -8,27 +8,22 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
+        // Verify the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // PdfFileInfo gives access to document metadata without loading the full PDF.
+        // It implements IDisposable, so wrap it in a using block.
+        using (PdfFileInfo info = new PdfFileInfo(pdfPath))
         {
-            // PdfFileInfo implements IDisposable, so wrap it in a using block.
-            using (PdfFileInfo info = new PdfFileInfo(pdfPath))
-            {
-                // Retrieve the Keywords metadata from the PDF.
-                string keywords = info.Keywords ?? string.Empty;
+            // Retrieve the Keywords metadata field
+            string keywords = info.Keywords;
 
-                // Display the value.
-                Console.WriteLine($"Keywords: {keywords}");
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error retrieving keywords: {ex.Message}");
+            // Display the value (empty string if not set)
+            Console.WriteLine($"Keywords: {keywords}");
         }
     }
 }

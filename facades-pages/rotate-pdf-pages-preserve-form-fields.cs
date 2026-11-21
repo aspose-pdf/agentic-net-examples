@@ -7,7 +7,9 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "rotated_output.pdf";
+        const string outputPath = "rotated.pdf";
+        // 90° clockwise rotation
+        const Rotation rotateAngle = Rotation.on90;
 
         if (!File.Exists(inputPath))
         {
@@ -15,26 +17,18 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document. Form fields are preserved automatically.
+        Document pdfDocument = new Document(inputPath);
+
+        // Rotate each page individually while keeping the interactive form fields intact.
+        for (int pageNum = 1; pageNum <= pdfDocument.Pages.Count; pageNum++)
         {
-            // Load the PDF document. The Document class preserves form fields and their values.
-            Document pdfDocument = new Document(inputPath);
-
-            // Rotate each page 90 degrees clockwise.
-            // The Rotation enum values are: on0, on90, on180, on270.
-            for (int i = 1; i <= pdfDocument.Pages.Count; i++)
-            {
-                pdfDocument.Pages[i].Rotate = Rotation.on90;
-            }
-
-            // Save the rotated PDF. Form fields remain intact and retain their data.
-            pdfDocument.Save(outputPath);
-
-            Console.WriteLine($"Pages rotated successfully. Output saved to '{outputPath}'.");
+            pdfDocument.Pages[pageNum].Rotate = rotateAngle;
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Save the rotated PDF.
+        pdfDocument.Save(outputPath);
+
+        Console.WriteLine($"Rotated PDF saved to '{outputPath}'.");
     }
 }

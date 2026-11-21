@@ -7,76 +7,61 @@ class Program
     static void Main()
     {
         const string inputPath = "encrypted_input.pdf";
-        const string outputPdfPath = "reencrypted_output.pdf";
-        const string imagesOutputDir = "ExtractedImages";
+        const string outputPath = "re_encrypted_output.pdf";
+        const string imagesDir = "ExtractedImages";
 
         const string userPassword = "user123";
-        const string newOwnerPassword = "newOwner456";
+        const string newOwnerPassword = "newowner";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        Directory.CreateDirectory(imagesOutputDir);
+        Directory.CreateDirectory(imagesDir);
 
         try
         {
-            // Open the encrypted PDF using the user password.
-            using (Document doc = new Document(inputPath, userPassword))
+            // Open the encrypted PDF using the user password
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath, userPassword))
             {
-                // Decrypt the document.
+                // Decrypt the document (no parameters required)
                 doc.Decrypt();
 
-                // Extract all images from each page.
-                int imgCounter = 1;
-                for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+                // Extract all images from the PDF
+                int imgIndex = 0;
+                foreach (Aspose.Pdf.Page page in doc.Pages)
                 {
-                    Page page = doc.Pages[i];
-                    foreach (XImage img in page.Resources.Images)
+                    foreach (Aspose.Pdf.XImage img in page.Resources.Images)
                     {
-                        // Determine a safe file extension (default to png).
-                        string ext = GetImageExtension(img);
-                        string imgPath = Path.Combine(imagesOutputDir, $"image_{imgCounter}.{ext}");
-
-                        // Save the image to a file via a FileStream (XImage.Save expects a Stream).
+                        string imgPath = Path.Combine(imagesDir, $"page{page.Number}_img{imgIndex}.png");
                         using (FileStream fs = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
                         {
                             img.Save(fs);
                         }
-
-                        Console.WriteLine($"Saved image {imgCounter} to {imgPath}");
-                        imgCounter++;
+                        imgIndex++;
                     }
                 }
+                Console.WriteLine($"Extracted {imgIndex} images to '{imagesDir}'.");
 
-                // Re‑encrypt with the same user password and a new owner password.
-                Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-                doc.Encrypt(userPassword, newOwnerPassword, perms, CryptoAlgorithm.AESx256);
+                // Re‑encrypt the PDF with a new owner password (keep the same user password)
+                Aspose.Pdf.Permissions perms = Aspose.Pdf.Permissions.PrintDocument | Aspose.Pdf.Permissions.ExtractContent;
+                doc.Encrypt(userPassword, newOwnerPassword, perms, Aspose.Pdf.CryptoAlgorithm.AESx256);
 
-                // Save the re‑encrypted PDF.
-                doc.Save(outputPdfPath);
+                // Save the re‑encrypted PDF
+                doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Re‑encrypted PDF saved to '{outputPdfPath}'.");
+            Console.WriteLine($"Re‑encrypted PDF saved to '{outputPath}'.");
         }
-        catch (InvalidPasswordException ex)
+        catch (Aspose.Pdf.InvalidPasswordException ex)
         {
-            Console.Error.WriteLine($"Invalid password: {ex.Message}");
+            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
         }
-    }
-
-    // Helper that returns a default image file extension.
-    // Aspose.Pdf's XImage does not expose format information in older versions,
-    // so we default to PNG which works for the majority of raster images.
-    private static string GetImageExtension(XImage img)
-    {
-        // If future versions expose format info, this method can be extended.
-        return "png";
     }
 }

@@ -1,10 +1,10 @@
 # Conversion
 
-> **Conversion** in PDF using C# / .NET -- **101** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Conversion** in PDF using C# / .NET -- **99** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `conversion`
-- Examples: 101
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 99
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -78,7 +78,6 @@
 - [`convert-pdf-to-pptx-slidesasimages-high-dpi.cs`](./convert-pdf-to-pptx-slidesasimages-high-dpi.cs) -- Convert pdf to pptx slidesasimages high dpi
 - [`convert-pdf-to-pptx-with-annotation-notes.cs`](./convert-pdf-to-pptx-with-annotation-notes.cs) -- Convert pdf to pptx with annotation notes
 - [`convert-pdf-to-pptx-with-logo.cs`](./convert-pdf-to-pptx-with-logo.cs) -- Convert pdf to pptx with logo
-- [`convert-pdf-to-pptx-with-progress-handler.cs`](./convert-pdf-to-pptx-with-progress-handler.cs) -- Convert pdf to pptx with progress handler
 - [`convert-pdf-to-pptx.cs`](./convert-pdf-to-pptx.cs) -- Convert pdf to pptx
 - [`convert-pdf-to-pptx__v2.cs`](./convert-pdf-to-pptx__v2.cs) -- Convert pdf to pptx  v2
 - [`convert-pdf-to-pptx__v3.cs`](./convert-pdf-to-pptx__v3.cs) -- Convert pdf to pptx  v3
@@ -86,7 +85,6 @@
 - [`convert-pdf-to-pptx__v5.cs`](./convert-pdf-to-pptx__v5.cs) -- Convert pdf to pptx  v5
 - [`convert-pdf-to-single-page-html.cs`](./convert-pdf-to-single-page-html.cs) -- Convert pdf to single page html
 - [`convert-pdf-to-svg-custom-output.cs`](./convert-pdf-to-svg-custom-output.cs) -- Convert pdf to svg custom output
-- [`convert-pdf-to-svg.cs`](./convert-pdf-to-svg.cs) -- Convert pdf to svg
 - [`convert-pdf-to-svg__v2.cs`](./convert-pdf-to-svg__v2.cs) -- Convert pdf to svg  v2
 - [`convert-pdf-to-text.cs`](./convert-pdf-to-text.cs) -- Convert pdf to text
 - [`convert-pdf-to-xps-custom-page-size.cs`](./convert-pdf-to-xps-custom-page-size.cs) -- Convert pdf to xps custom page size

@@ -1,14 +1,21 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName  = "CustomerName";
+
+        // Rectangle coordinates (lower‑left x,y and upper‑right x,y)
+        const float llx = 100f; // adjust as needed
+        const float lly = 500f;
+        const float urx = 300f;
+        const float ury = 550f;
 
         if (!File.Exists(inputPath))
         {
@@ -16,34 +23,20 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // FormEditor (Facades API) handles PDF form operations.
+        using (FormEditor editor = new FormEditor())
         {
-            // Define rectangle coordinates for the text field (replace with actual values)
-            double llx = 100; // lower‑left X
-            double lly = 500; // lower‑left Y
-            double urx = 300; // upper‑right X
-            double ury = 550; // upper‑right Y
+            // Load the source PDF.
+            editor.BindPdf(inputPath);
 
-            // Create a rectangle that Aspose.Pdf expects (llx, lly, urx, ury)
-            Rectangle rect = new Rectangle(llx, lly, urx, ury);
+            // Add a text field named "CustomerName" on page 1.
+            // FormEditor does not expose AddTextField; use AddField with FieldType.Text.
+            editor.AddField(FieldType.Text, fieldName, 1, llx, lly, urx, ury);
 
-            // Create a text box field (TextBoxField) on page 1
-            TextBoxField txtField = new TextBoxField(doc.Pages[1], rect)
-            {
-                PartialName = "CustomerName",
-                // Optional: set default value, font, etc.
-                // Value = "",
-                // TextState = new TextState { Font = FontRepository.FindFont("Helvetica"), FontSize = 12 }
-            };
-
-            // Add the field to the document form (page numbers are 1‑based)
-            doc.Form.Add(txtField, 1);
-
-            // Save the modified document
-            doc.Save(outputPath);
+            // Save the modified PDF.
+            editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Text field added and saved to '{outputPath}'.");
+        Console.WriteLine($"Text field '{fieldName}' added to page 1 and saved as '{outputPath}'.");
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -8,57 +9,66 @@ class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";   // source XML
-        const string pdfPath = "output.pdf";  // result PDF
-        const int lengthThresh = 1000;         // characters per page
+        const string inputPdf = "template.pdf";   // existing PDF to use as a base
+        const string xmlPath = "data.xml";        // source XML containing content
+        const string outputPdf = "result.pdf";    // destination PDF
+        const int charThreshold = 1000;           // max characters per page before a break
 
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Missing PDF template: {inputPdf}");
+            return;
+        }
         if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML file not found: {xmlPath}");
+            Console.Error.WriteLine($"Missing XML file: {xmlPath}");
             return;
         }
 
         // Load XML document
-        XDocument xDoc = XDocument.Load(xmlPath);
+        XDocument xmlDoc = XDocument.Load(xmlPath);
 
-        // Disable Aspose.Pdf native helper executables (prevents missing‑exe runtime errors in restricted environments)
-        // This must be set before any Aspose.Pdf API is used.
-        Environment.SetEnvironmentVariable("Aspose.Pdf.DisableNative", "true");
+        // Extract paragraphs (or any repeatable text node) from XML
+        var paragraphs = xmlDoc.Descendants("Paragraph")
+                               .Select(p => (string)p.Value)
+                               .Where(t => !string.IsNullOrWhiteSpace(t));
 
-        // Create a new PDF document
-        using (Document pdfDoc = new Document())
+        // Load the PDF inside a using block (deterministic disposal)
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Add the first page (Pages collection is 1‑based)
-            pdfDoc.Pages.Add();
+            // Start with the first page (Aspose.Pdf uses 1‑based indexing)
+            int currentPageNumber = 1;
+            Page currentPage = pdfDoc.Pages[currentPageNumber];
+            int accumulatedLength = 0; // characters added to the current page
 
-            int currentLength = 0; // accumulated text length on the current page
-
-            // Iterate over XML elements that contain text (example: <Paragraph> nodes)
-            foreach (XElement elem in xDoc.Descendants("Paragraph"))
+            foreach (var para in paragraphs)
             {
-                string text = (elem.Value ?? string.Empty).Trim();
-                if (string.IsNullOrEmpty(text))
-                    continue;
+                int paraLength = para.Length;
 
-                // If adding this text exceeds the threshold, start a new page
-                if (currentLength + text.Length > lengthThresh)
+                // If adding this paragraph would exceed the threshold, insert a new page
+                if (accumulatedLength + paraLength > charThreshold)
                 {
-                    pdfDoc.Pages.Add();
-                    currentLength = 0;
+                    pdfDoc.Pages.Add(); // adds a new page at the end
+                    currentPageNumber = pdfDoc.Pages.Count; // new page becomes the last one
+                    currentPage = pdfDoc.Pages[currentPageNumber];
+                    accumulatedLength = 0; // reset counter for the new page
                 }
 
-                // Add the text fragment to the current (last) page
-                TextFragment tf = new TextFragment(text);
-                pdfDoc.Pages[pdfDoc.Pages.Count].Paragraphs.Add(tf);
+                // Add the paragraph text to the current page
+                TextFragment tf = new TextFragment(para)
+                {
+                    Margin = new MarginInfo(20, 20, 20, 20),
+                    TextState = { FontSize = 12 }
+                };
+                currentPage.Paragraphs.Add(tf);
 
-                // Update accumulated length
-                currentLength += text.Length;
+                accumulatedLength += paraLength;
             }
 
-            // Save the PDF
-            pdfDoc.Save(pdfPath);
+            // Save the modified PDF (Document.Save without options writes PDF)
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF generated at '{pdfPath}'.");
+        Console.WriteLine($"PDF with conditional page breaks saved to '{outputPdf}'.");
     }
 }

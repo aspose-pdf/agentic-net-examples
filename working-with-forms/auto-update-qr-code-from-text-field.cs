@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for JavascriptAction
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
-        const string outputPath = "form_with_qr_update.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,31 +17,33 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF containing the form fields
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the text field and the QR code barcode field by their names
-            TextBoxField txtField = doc.Form["txtData"] as TextBoxField;
-            BarcodeField qrField = doc.Form["qrCode"] as BarcodeField;
+            // Retrieve the text field that will drive the QR code
+            TextBoxField textField = doc.Form["TextField"] as TextBoxField;
+            // Retrieve the QR‑code field – it is also a TextBoxField because QR codes are drawn into a text field
+            TextBoxField qrField = doc.Form["QrCodeField"] as TextBoxField;
 
-            if (txtField == null || qrField == null)
+            if (textField == null || qrField == null)
             {
-                Console.Error.WriteLine("Required fields 'txtData' or 'qrCode' not found in the form.");
+                Console.Error.WriteLine("Required form fields not found.");
                 return;
             }
 
-            // The barcode field is expected to be pre‑configured as a QR code in the source PDF.
-            // Add JavaScript that updates the QR code value whenever the form is recalculated.
-            qrField.Actions.OnCalculate = new JavascriptAction("event.value = this.getField('txtData').value;");
+            // Make the QR field a calculated field that mirrors the text field's value.
+            // The calculation script runs in the PDF viewer and updates the field value.
+            string calcScript = $"event.value = this.getField('{textField.Name}').value;";
+            qrField.Actions.OnCalculate = new JavascriptAction(calcScript);
 
-            // Enable automatic recalculation of form fields. When the PDF is opened
-            // the JavaScript will run and the QR code will reflect the current text.
-            doc.Form.AutoRecalculate = true;
+            // Add QR‑code rendering to the QR field. The barcode will be generated from the field's value
+            // each time the field is displayed.
+            qrField.AddBarcode(qrField.Value ?? string.Empty);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with auto‑updating QR code: {outputPath}");
     }
 }

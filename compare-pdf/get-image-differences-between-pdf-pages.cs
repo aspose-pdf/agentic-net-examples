@@ -1,83 +1,60 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using System.Linq;
+using System.Drawing;
 using Aspose.Pdf;
+using Aspose.Pdf.Comparison;
 
 class Program
 {
     static void Main()
     {
-        const string firstPdfPath  = "first.pdf";
-        const string secondPdfPath = "second.pdf";
+        const string pdfPath1 = "first.pdf";
+        const string pdfPath2 = "second.pdf";
 
-        if (!File.Exists(firstPdfPath))
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
-            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            Console.Error.WriteLine("One or both PDF files not found.");
             return;
         }
 
-        if (!File.Exists(secondPdfPath))
+        // Load both PDFs with deterministic disposal
+        using (Document doc1 = new Document(pdfPath1))
+        using (Document doc2 = new Document(pdfPath2))
         {
-            Console.Error.WriteLine($"File not found: {secondPdfPath}");
-            return;
-        }
-
-        try
-        {
-            // Load both documents using the core Document API
-            using (Document firstDoc = new Document(firstPdfPath))
-            using (Document secondDoc = new Document(secondPdfPath))
+            // GraphicalPdfComparer is the correct API for visual (pixel) differences
+            var comparer = new GraphicalPdfComparer
             {
-                int pageCount = Math.Min(firstDoc.Pages.Count, secondDoc.Pages.Count);
+                Threshold = 1.0, // percent of changed pixels to ignore
+                // Convert System.Drawing.Color to Aspose.Pdf.Color using FromRgb
+                Color = Aspose.Pdf.Color.FromRgb(System.Drawing.Color.Red),
+                Resolution = new Aspose.Pdf.Devices.Resolution(100)
+            };
 
-                for (int i = 1; i <= pageCount; i++)
+            int pageCount = Math.Min(doc1.Pages.Count, doc2.Pages.Count);
+            bool anyDifference = false;
+
+            for (int i = 1; i <= pageCount; i++)
+            {
+                // GetDifference works on Page objects, not on Document objects
+                using (ImagesDifference diff = comparer.GetDifference(doc1.Pages[i], doc2.Pages[i]))
                 {
-                    var firstPage  = firstDoc.Pages[i];
-                    var secondPage = secondDoc.Pages[i];
+                    // Count changed pixels
+                    int changedPixels = 0;
+                    foreach (int v in diff.Difference)
+                        if (v != 0) changedPixels++;
 
-                    // Get image collections from each page (core API, no Comparison namespace)
-                    var firstImages  = firstPage.Resources.Images;
-                    var secondImages = secondPage.Resources.Images;
-
-                    int imageCount = Math.Max(firstImages.Count, secondImages.Count);
-
-                    for (int imgIdx = 1; imgIdx <= imageCount; imgIdx++)
+                    if (changedPixels > 0)
                     {
-                        // Retrieve images if they exist on the respective pages
-                        var firstImg  = imgIdx <= firstImages.Count  ? firstImages[imgIdx]  : null;
-                        var secondImg = imgIdx <= secondImages.Count ? secondImages[imgIdx] : null;
-
-                        // If one of the images is missing, report a difference
-                        if (firstImg == null || secondImg == null)
-                        {
-                            Console.WriteLine($"Image difference on page {i}, image index {imgIdx}: " +
-                                              (firstImg == null ? "missing in first PDF" : "missing in second PDF"));
-                            continue;
-                        }
-
-                        // Compare the raw image bytes
-                        using (var msFirst = new MemoryStream())
-                        using (var msSecond = new MemoryStream())
-                        {
-                            firstImg.Save(msFirst);
-                            secondImg.Save(msSecond);
-
-                            byte[] firstBytes  = msFirst.ToArray();
-                            byte[] secondBytes = msSecond.ToArray();
-
-                            if (!firstBytes.SequenceEqual(secondBytes))
-                            {
-                                Console.WriteLine($"Image difference on page {i}, image index {imgIdx}: content differs.");
-                            }
-                        }
+                        anyDifference = true;
+                        Console.WriteLine($"Page {i}: {changedPixels} changed pixel(s) (height: {diff.Height}, width: {diff.Stride / 4}).");
+                        // Optional: save a visual diff image
+                        // diff.DifferenceToImage(System.Drawing.Color.Red, System.Drawing.Color.Transparent).Save($"page_{i}_diff.png");
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during comparison: {ex.Message}");
+
+            if (!anyDifference)
+                Console.WriteLine("No image differences found.");
         }
     }
 }

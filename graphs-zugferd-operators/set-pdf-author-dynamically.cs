@@ -15,19 +15,19 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF, set the Author to the current system user, and save.
         using (Document doc = new Document(inputPath))
         {
-            // Get the current system user name
+            // Get the current Windows/OS user name.
             string currentUser = Environment.UserName;
 
-            // Set the PDF author property dynamically
+            // Set the Author metadata property.
             doc.Info.Author = currentUser;
 
-            // Save the modified PDF
+            // Save the modified PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Author set to current user and saved as '{outputPath}'.");
+        Console.WriteLine($"Author set to '{Environment.UserName}' and saved to '{outputPath}'.");
     }
 }

@@ -6,54 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "landscape_output.pdf";
+        const string inputPath = "portrait.pdf";
+        const string outputPath = "landscape.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // -----------------------------------------------------------------
-        // Step 1: Load the document and convert portrait pages to landscape.
-        // -----------------------------------------------------------------
-        Document doc = new Document(inputPath);
+        // Load the PDF document
+        Document pdf = new Document(inputPath);
 
-        for (int i = 1; i <= doc.Pages.Count; i++)
-        {
-            Page page = doc.Pages[i];
-            double width = page.PageInfo.Width;
-            double height = page.PageInfo.Height;
+        // Work with the first page (1‑based index)
+        int pageNumber = 1;
+        Page page = pdf.Pages[pageNumber];
 
-            // If the page is portrait (height > width) swap dimensions and rotate.
-            if (height > width)
-            {
-                // Swap width and height.
-                page.PageInfo.Width = height;
-                page.PageInfo.Height = width;
+        // Original dimensions
+        double originalWidth = page.PageInfo.Width;
+        double originalHeight = page.PageInfo.Height;
+        Console.WriteLine($"Original size – Width: {originalWidth}, Height: {originalHeight}");
 
-                // Rotate the page content 90 degrees clockwise.
-                page.Rotate = Rotation.on90; // Aspose.Pdf.Rotation enum uses the "on" prefix.
-            }
-        }
+        // Swap width and height to obtain landscape orientation
+        page.PageInfo.Width = originalHeight;
+        page.PageInfo.Height = originalWidth;
+        page.PageInfo.IsLandscape = true; // optional flag indicating landscape
 
-        // Save the modified PDF.
-        doc.Save(outputPath);
+        // Verify new dimensions
+        double newWidth = page.PageInfo.Width;
+        double newHeight = page.PageInfo.Height;
+        Console.WriteLine($"New size – Width: {newWidth}, Height: {newHeight}");
 
-        // -----------------------------------------------------------------
-        // Step 2: Verify dimensions after conversion.
-        // -----------------------------------------------------------------
-        using (Document resultDoc = new Document(outputPath))
-        {
-            Console.WriteLine($"Verification of '{outputPath}':");
-            for (int i = 1; i <= resultDoc.Pages.Count; i++)
-            {
-                Page page = resultDoc.Pages[i];
-                double w = page.PageInfo.Width;
-                double h = page.PageInfo.Height;
-                Console.WriteLine($"Page {i}: Width = {w:F2}, Height = {h:F2}, Rotation = {page.Rotate}");
-            }
-        }
+        // Optional visual rotation (90°) – rotates the page content
+        page.Rotate = Rotation.on90;
+
+        // Save the modified PDF
+        pdf.Save(outputPath);
+        Console.WriteLine($"Landscape PDF saved to '{outputPath}'.");
     }
 }

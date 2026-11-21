@@ -1,76 +1,50 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-
-// -----------------------------------------------------------------------------
-// Minimal stub definitions for Aspose.Pdf classes that may be missing at compile‑time.
-// In a real project you should reference the official Aspose.Pdf NuGet package.
-// -----------------------------------------------------------------------------
-namespace Aspose.Pdf.Facades
-{
-    // Stub for the PdfFormEditor class used to export form fields.
-    // The real class provides many more members – this stub only implements the
-    // members required by the sample program so that the code compiles when the
-    // Aspose.Pdf assembly is not available.
-    public class PdfFormEditor
-    {
-        // Binds the editor to a PDF file. The stub simply checks that the file
-        // exists; the real implementation loads the document into memory.
-        public void BindPdf(string pdfPath)
-        {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("pdfPath cannot be null or empty.", nameof(pdfPath));
-            if (!File.Exists(pdfPath))
-                throw new FileNotFoundException($"PDF file not found: {pdfPath}", pdfPath);
-            // No further action – this is only a placeholder.
-        }
-
-        // Exports all form fields to an XML file. The stub creates an empty XML
-        // document with a root element <FormFields/> so that the sample runs
-        // without the real library.
-        public void ExportFormFields(string xmlPath)
-        {
-            if (string.IsNullOrEmpty(xmlPath))
-                throw new ArgumentException("xmlPath cannot be null or empty.", nameof(xmlPath));
-
-            // Create a very simple XML representation of an empty form.
-            var xmlContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<FormFields/>";
-            File.WriteAllText(xmlPath, xmlContent);
-        }
-    }
-}
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";        // source PDF containing form fields
-        const string xmlPath = "form_fields.xml"; // destination XML file
+        // Input PDF containing form fields
+        const string inputPdfPath = "input.pdf";
 
-        // Verify source PDF exists
-        if (!File.Exists(pdfPath))
+        // Output file – Aspose.Pdf provides ExportToJson for form data.
+        // There is no ExportToXml method in the documented API, so we use JSON export.
+        // The resulting JSON can be stored for archival and later re‑imported.
+        const string outputJsonPath = "form_fields.json";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // PdfFormEditor is a Facades class for working with PDF forms.
-            // It does NOT implement IDisposable, so no using block is required.
-            PdfFormEditor formEditor = new PdfFormEditor();
+            // Load the PDF document
+            using (Document pdfDocument = new Document(inputPdfPath))
+            {
+                // Ensure the document actually contains a form
+                if (pdfDocument.Form == null || pdfDocument.Form.Count == 0)
+                {
+                    Console.WriteLine("The PDF does not contain any form fields.");
+                    return;
+                }
 
-            // Bind the PDF document to the editor.
-            formEditor.BindPdf(pdfPath);
+                // Export form fields to JSON (the only supported export format in the API)
+                using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+                {
+                    pdfDocument.Form.ExportToJson(jsonStream);
+                }
 
-            // Export all form fields to an XML file for archival.
-            formEditor.ExportFormFields(xmlPath);
-
-            Console.WriteLine($"Form fields exported successfully to '{xmlPath}'.");
+                Console.WriteLine($"Form fields exported to JSON file: {outputJsonPath}");
+            }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Export failed: {ex.Message}");
+            Console.Error.WriteLine($"Error during export: {ex.Message}");
         }
     }
 }

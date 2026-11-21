@@ -2,67 +2,67 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class BatchResizePdf
+class Program
 {
     static void Main()
     {
-        // Use the application's base directory to build input/output paths.
+        // Use the application's base directory to build relative paths – this works on any platform
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
+        // Input and output folders (relative to the base directory)
         string sourceFolder = Path.Combine(baseDir, "SourcePdfs");
         string targetFolder = Path.Combine(baseDir, "ResizedPdfs");
 
-        // Validate source folder – if it does not exist, create it and inform the user.
+        // Validate that the source folder exists before proceeding
         if (!Directory.Exists(sourceFolder))
         {
-            Console.WriteLine($"Source folder not found: '{sourceFolder}'. Creating an empty folder.");
-            Directory.CreateDirectory(sourceFolder);
-            Console.WriteLine("Place PDF files into the source folder and re‑run the program.");
+            Console.Error.WriteLine($"Source folder not found: {sourceFolder}");
             return;
         }
 
-        // Ensure the target directory exists.
+        // Ensure the target directory exists
         Directory.CreateDirectory(targetFolder);
 
-        // Get all PDF files in the source folder.
+        // Retrieve all PDF files in the source folder
         string[] pdfFiles = Directory.GetFiles(sourceFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
-            Console.WriteLine($"No PDF files found in '{sourceFolder}'." );
+            Console.WriteLine("No PDF files found in the source folder.");
             return;
         }
 
-        foreach (string pdfPath in pdfFiles)
+        // A4 size in points (1 point = 1/72 inch)
+        const double a4Width = 595; // 210 mm
+        const double a4Height = 842; // 297 mm
+
+        // Process each PDF file
+        foreach (string inputPath in pdfFiles)
         {
             try
             {
-                // Verify the file still exists before loading.
-                if (!File.Exists(pdfPath))
-                {
-                    Console.Error.WriteLine($"File not found: {pdfPath}");
-                    continue;
-                }
+                string fileName = Path.GetFileName(inputPath);
+                string outputPath = Path.Combine(targetFolder, fileName);
 
-                // Load the PDF document inside a using block to ensure proper disposal.
-                using (Document pdfDoc = new Document(pdfPath))
+                // Load the PDF document inside a using block to guarantee disposal
+                using (var pdfDoc = new Document(inputPath))
                 {
-                    // Resize each page to A4 size.
+                    // Resize every page to A4 (portrait)
                     foreach (Page page in pdfDoc.Pages)
                     {
-                        page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                        page.PageInfo.Width = a4Width;
+                        page.PageInfo.Height = a4Height;
+                        page.PageInfo.IsLandscape = false;
                     }
 
-                    // Build the output file path.
-                    string outputPath = Path.Combine(targetFolder, Path.GetFileName(pdfPath));
-
-                    // Save the resized PDF.
+                    // Save the resized PDF
                     pdfDoc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Resized: {Path.GetFileName(pdfPath)} → {targetFolder}");
+                Console.WriteLine($"Resized: {fileName} → {outputPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
 

@@ -9,7 +9,7 @@ class Program
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "custom_tagged.pdf";
+        const string outputPath = "output_custom_tag.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,35 +17,31 @@ class Program
             return;
         }
 
-        // Open the PDF and obtain the tagged content interface
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            ITaggedContent taggedContent = doc.TaggedContent;
+            // Access the tagged content interface
+            ITaggedContent tagged = doc.TaggedContent;
 
-            // Set language and title for the tagged PDF (optional)
-            taggedContent.SetLanguage("en-US");
-            taggedContent.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
-
-            // Get the root structure element (no cast required)
-            StructureElement root = taggedContent.RootElement;
+            // Get the root of the structure tree (no cast needed)
+            StructureElement root = tagged.RootElement;
 
             // Create a new paragraph element via the factory
-            ParagraphElement paragraph = taggedContent.CreateParagraphElement();
+            ParagraphElement para = tagged.CreateParagraphElement();
 
-            // Assign a custom tag name to represent a specialized content type
-            // Use SetTag method because Tag is a method group, not a property
-            paragraph.SetTag("MyCustomTag");
+            // Assign a custom tag name to represent specialized content
+            para.SetTag("MySpecialParagraph");
 
             // Set the visible text of the paragraph
-            paragraph.SetText("This paragraph uses a custom tag name for specialized content.");
+            para.SetText("This paragraph uses a custom tag.");
 
-            // Attach the paragraph to the document's structure tree
-            root.AppendChild(paragraph);
+            // Attach the paragraph to the root element
+            root.AppendChild(para);
 
-            // Save the modified PDF (no PreSave call required)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with custom tagged paragraph saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom tag to '{outputPath}'.");
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
 class Program
 {
@@ -17,32 +16,44 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageNumber];
+                Page page = doc.Pages[i];
 
-                // Define a rectangle that spans the width of the page and sits at the bottom (footer area)
-                // llx = 0, lly = 0, urx = page width, ury = 30 (30 points high footer)
-                var footerRect = new Rectangle(0, 0, page.PageInfo.Width, 30);
+                // Determine page dimensions
+                double pageWidth = page.PageInfo.Width;
+                double pageHeight = page.PageInfo.Height;
 
-                // Create a WatermarkAnnotation for this page
-                var watermark = new WatermarkAnnotation(page, footerRect)
+                // Define a rectangle at the bottom of the page (footer area)
+                // Here we use a height of 30 points for the watermark
+                Aspose.Pdf.Rectangle footerRect = new Aspose.Pdf.Rectangle(
+                    llx: 0,
+                    lly: 0,
+                    urx: pageWidth,
+                    ury: 30);
+
+                // Create a unique identifier for this page
+                string watermarkText = $"Page {i} - ID: {Guid.NewGuid()}";
+
+                // Create the WatermarkAnnotation
+                WatermarkAnnotation watermark = new WatermarkAnnotation(page, footerRect)
                 {
-                    // Unique identifier: page number + GUID
-                    Contents = $"Page {pageNumber} – ID: {Guid.NewGuid()}",
-                    // Optional styling
+                    // Set the displayed text via the Contents property
+                    Contents = watermarkText,
+                    // Optional visual settings
                     Opacity = 0.5,
-                    Color = Color.Gray,
-                    // Align text to the center of the rectangle
-                    TextHorizontalAlignment = HorizontalAlignment.Center,
+                    // Align the text to the center of the rectangle
+                    HorizontalAlignment = HorizontalAlignment.Center,
                     VerticalAlignment = VerticalAlignment.Center
+                    // Note: The annotation is added to the page's annotation collection.
+                    // If a background‑layer watermark is required, consider using a StampAnnotation.
                 };
 
-                // Add the annotation to the page's annotation collection
+                // Add the annotation to the page
                 page.Annotations.Add(watermark);
             }
 

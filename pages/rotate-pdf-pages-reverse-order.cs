@@ -7,22 +7,23 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "rotated.pdf";
+        const string outputPath = "rotated_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages in reverse order (Aspose.Pdf uses 1‑based indexing)
+            // Pages are 1‑based; iterate from the last page to the first
             for (int i = doc.Pages.Count; i >= 1; i--)
             {
-                // Apply a 90° clockwise rotation to each page using the correct enum
-                doc.Pages[i].Rotate = Rotation.on90;
+                Page page = doc.Pages[i];
+                // Rotate each page 90 degrees clockwise using the correct property
+                page.Rotate = Rotation.on90;
             }
 
             // Save the modified PDF

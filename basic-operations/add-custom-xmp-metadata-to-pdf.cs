@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_with_xmp.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,20 +15,20 @@ class Program
             return;
         }
 
-        // Load PDF, add custom XMP metadata, and save preserving metadata
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Register the Dublin Core namespace (dc) used in the example XMP block
-            doc.Metadata.RegisterNamespaceUri("dc", "http://purl.org/dc/elements/1.1/");
+            // Add a custom metadata entry. Use a prefixed key to represent a custom namespace.
+            const string customKey = "my:MyCustomProperty"; // "my" is an arbitrary prefix for the custom namespace
+            const string propertyValue = "CustomValue";
 
-            // Add the desired XMP properties – these will be written into the XMP packet automatically.
-            doc.Metadata["dc:creator"] = "John Doe";
-            doc.Metadata["dc:title"]   = "Sample PDF";
+            // Document.Metadata is a read‑only dictionary; we modify it via its indexer.
+            doc.Metadata[customKey] = propertyValue;
 
-            // Save the document – metadata is preserved automatically.
+            // Save the document; this preserves all existing metadata and adds the new entry.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with custom XMP metadata to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with custom metadata to '{outputPath}'.");
     }
 }

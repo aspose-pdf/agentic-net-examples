@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Facades; // Facades namespace included as requested
+using Aspose.Pdf.Facades;          // Facades API for PDF manipulation
+using Aspose.Pdf.Text;            // TextAbsorber and TextFragment types
 
 class Program
 {
@@ -11,7 +11,7 @@ class Program
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
         const string oldPhrase  = "old phrase";
-        const string newPhrase  = "new phrase";
+        const string newPhrase  = "new bold phrase";
 
         if (!File.Exists(inputPath))
         {
@@ -22,22 +22,25 @@ class Program
         // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Locate all occurrences of the phrase to be replaced
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldPhrase);
-            doc.Pages.Accept(absorber);
+            // ---------- Replace the phrase using TextFragmentAbsorber (avoids signature mismatch) ----------
+            // Find all occurrences of the old phrase
+            TextFragmentAbsorber oldAbsorber = new TextFragmentAbsorber(oldPhrase);
+            doc.Pages.Accept(oldAbsorber);
 
-            // Iterate over each found fragment, replace text and apply bold style
-            foreach (TextFragment tf in absorber.TextFragments)
+            // Replace each occurrence with the new phrase and apply bold style while preserving font size
+            foreach (TextFragment fragment in oldAbsorber.TextFragments)
             {
-                tf.Text = newPhrase;                                 // replace the phrase
-                tf.TextState.FontStyle = FontStyles.Bold;            // apply bold while keeping other style unchanged
-                // Font size is left as is; no assignment needed
+                // FontSize property expects a float, so cast the double value explicitly
+                float currentSize = (float)fragment.TextState.FontSize; // keep existing size
+                fragment.Text = newPhrase;                               // replace text
+                fragment.TextState.FontSize = currentSize;               // assign back as float
+                fragment.TextState.FontStyle = FontStyles.Bold;          // apply bold style
             }
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

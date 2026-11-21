@@ -2,14 +2,14 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf.LogicalStructure; // for structure types if needed
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "tagged_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,19 +17,20 @@ class Program
             return;
         }
 
-        // Enable automatic tagging globally
-        AutoTaggingSettings.Default.EnableAutoTagging = true;
-        // Optional: configure heading detection strategy if needed
-        // AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
-
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access tagged content and set basic metadata
+            // Enable automatic tagging (PDF/UA conversion)
+            AutoTaggingSettings.Default.EnableAutoTagging = true;
+            // Optional: configure heading detection strategy
+            // AutoTaggingSettings.Default.HeadingRecognitionStrategy = HeadingRecognitionStrategy.Auto;
+
+            // Set language and title via the tagged content API
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
             tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-            // Save the document; auto‑tagging creates the PDF/UA structure
+            // Save the document; the auto‑tagging process runs during Save()
             doc.Save(outputPath);
         }
 

@@ -12,7 +12,7 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
@@ -21,25 +21,19 @@ class Program
             // Load the source PDF
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/A‑1b, skipping any elements that cannot be converted.
-                // Older Aspose.PDF versions do not expose ConvertErrorAction.Skip; they provide Delete instead.
-                // The conditional compilation symbol CONVERT_ERROR_ACTION_SKIP_AVAILABLE should be defined
-                // when the library version contains the Skip member.
-#if CONVERT_ERROR_ACTION_SKIP_AVAILABLE
-                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Skip);
-#else
+                // Convert to PDF/A‑1b, skipping elements that cannot be converted.
+                // ConvertErrorAction.Skip does not exist in older Aspose.PDF versions; use Delete as the fallback.
                 doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-#endif
 
                 // Save the converted PDF/A‑1b document
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF successfully converted to PDF/A‑1b: {outputPath}");
+            Console.WriteLine($"Conversion completed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Conversion error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

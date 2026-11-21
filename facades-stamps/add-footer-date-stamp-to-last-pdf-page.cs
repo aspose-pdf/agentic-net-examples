@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_footer.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,33 @@ class Program
             return;
         }
 
-        // Load the PDF document using Document (lifecycle managed via using)
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Determine the last page (1‑based indexing)
-            int lastPageNumber = doc.Pages.Count;
+            // Determine the last page number
+            int lastPage = doc.Pages.Count;
 
-            // Create a TextStamp with the current date formatted as MM-dd-yyyy
+            // Create a text stamp with the current date (MM-dd-yyyy)
             string dateText = DateTime.Now.ToString("MM-dd-yyyy");
             TextStamp dateStamp = new TextStamp(dateText)
             {
-                BottomMargin = 10,                     // distance from bottom edge
-                HorizontalAlignment = HorizontalAlignment.Center
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                BottomMargin        = 10,
+                Background          = false
             };
 
-            // TextStamp.TextState is read‑only; modify its members directly
+            // TextState is read‑only – modify the existing instance instead of assigning a new one
             dateStamp.TextState.FontSize = 12;
-            dateStamp.TextState.FontStyle = FontStyles.Bold;
-            // Optional styling (uncomment if needed)
-            // dateStamp.TextState.Font = FontRepository.FindFont("Arial");
-            // dateStamp.TextState.ForegroundColor = Color.Black;
+            dateStamp.TextState.ForegroundColor = Color.Black;
 
             // Apply the stamp only to the last page
-            Page lastPage = doc.Pages[lastPageNumber];
-            lastPage.AddStamp(dateStamp);
+            doc.Pages[lastPage].AddStamp(dateStamp);
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
-
-            Console.WriteLine($"Footer stamp added to page {lastPageNumber}. Saved as '{outputPath}'.");
         }
+
+        Console.WriteLine($"Footer date stamp added to page {new Document(inputPath).Pages.Count}. Saved as '{outputPath}'.");
     }
 }

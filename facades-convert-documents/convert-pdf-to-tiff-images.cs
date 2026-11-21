@@ -2,49 +2,56 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Devices; // Added for Resolution
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
         const string outputDir = "TiffPages";
 
-        if (!File.Exists(inputPdf))
+        // Verify input PDF exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document once using the cross‑platform Document class
-        using (Document pdfDocument = new Document(inputPdf))
+        // Load the PDF document (deterministic disposal)
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            int pageCount = pdfDocument.Pages.Count;
-
-            // Convert each page to a separate TIFF file
-            for (int i = 1; i <= pageCount; i++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                using (PdfConverter converter = new PdfConverter(pdfDocument))
+                // Create a new converter for each page to keep the workflow simple
+                using (PdfConverter converter = new PdfConverter())
                 {
-                    // Set the page range to a single page
-                    converter.StartPage = i;
-                    converter.EndPage   = i;
+                    // Bind the PDF document
+                    converter.BindPdf(pdfDoc);
 
-                    // Optional: set resolution (default is 96 DPI)
-                    // converter.Resolution = new Resolution(150);
+                    // Convert only the current page
+                    converter.StartPage = pageNumber;
+                    converter.EndPage   = pageNumber;
 
-                    // Prepare conversion and write the TIFF file
+                    // Optional: set resolution (default is 96 DPI). Adjust if higher quality is needed.
+                    converter.Resolution = new Resolution(150);
+
+                    // Prepare the conversion
                     converter.DoConvert();
-                    string outPath = Path.Combine(outputDir, $"Page_{i}.tiff");
+
+                    // Build the output file name with .tiff extension
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.tiff");
+
+                    // Save the single‑page TIFF image
                     converter.SaveAsTIFF(outPath);
-                    converter.Close();
                 }
             }
-
-            Console.WriteLine($"Converted {pageCount} pages to TIFF images in '{outputDir}'.");
         }
+
+        Console.WriteLine("PDF successfully converted to TIFF images.");
     }
 }

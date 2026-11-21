@@ -8,63 +8,68 @@ class Program
 {
     static void Main()
     {
-        // Local PDF file to process
-        const string pdfPath = @"C:\Docs\input.pdf";
+        // Path to the source PDF containing AcroForm fields
+        const string inputPdfPath = @"C:\Docs\input.pdf";
 
-        // UNC network share where the XML will be saved
-        const string xmlNetworkPath = @"\\fileserver\shared\AcroFormData.xml";
+        // UNC path to the network share where the XML will be saved
+        const string outputXmlPath = @"\\fileserver\share\AcroFormData.xml";
 
-        // Validate input PDF existence
-        if (!File.Exists(pdfPath))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the target directory on the network share exists
         try
         {
-            string? networkDir = Path.GetDirectoryName(xmlNetworkPath);
-            if (string.IsNullOrEmpty(networkDir))
-                throw new InvalidOperationException("Invalid network path.");
+            // Load the PDF document
+            using (Document pdfDocument = new Document(inputPdfPath))
+            {
+                // Build an XML representation of the AcroForm fields using the core API
+                XDocument xmlDoc = new XDocument(new XElement("AcroFormData"));
 
-            if (!Directory.Exists(networkDir))
-                Directory.CreateDirectory(networkDir);
+                if (pdfDocument.Form != null && pdfDocument.Form.Fields != null)
+                {
+                    foreach (Field field in pdfDocument.Form.Fields)
+                    {
+                        // Field name – use Name if available, otherwise FullName
+                        string fieldName = field.Name ?? field.FullName ?? "UnnamedField";
+
+                        // Field value – most field types expose a Value property that can be converted to string
+                        string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                        // Create an element for the field
+                        XElement fieldElement = new XElement("Field",
+                            new XAttribute("Name", fieldName),
+                            new XAttribute("Type", field.GetType().Name),
+                            new XAttribute("Value", fieldValue)
+                        );
+
+                        xmlDoc.Root.Add(fieldElement);
+                    }
+                }
+
+                // Ensure the directory for the UNC path exists (optional, but safe)
+                string directory = Path.GetDirectoryName(outputXmlPath);
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                // Save the XML to the network share
+                using (FileStream fs = new FileStream(outputXmlPath, FileMode.Create, FileAccess.Write))
+                {
+                    xmlDoc.Save(fs);
+                }
+            }
+
+            Console.WriteLine($"AcroForm XML successfully saved to: {outputXmlPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Failed to prepare network directory: {ex.Message}");
-            return;
+            // Handle any errors (e.g., I/O issues, permission problems)
+            Console.Error.WriteLine($"Error extracting AcroForm XML: {ex.Message}");
         }
-
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
-        {
-            // Check whether the PDF contains an AcroForm
-            if (doc.Form == null || doc.Form.Count == 0)
-            {
-                Console.WriteLine("No AcroForm fields found in the PDF.");
-                return;
-            }
-
-            // Build an XML representation of the form fields
-            XDocument xmlDoc = new XDocument(new XElement("AcroForm"));
-            XElement root = xmlDoc.Root!;
-
-            foreach (Field field in doc.Form.Fields)
-            {
-                string name = field.Name ?? field.FullName ?? string.Empty;
-                string value = field.Value?.ToString() ?? string.Empty;
-                XElement fieldElement = new XElement("Field",
-                    new XAttribute("name", name),
-                    new XAttribute("value", value));
-                root.Add(fieldElement);
-            }
-
-            // Save the XML to the network share
-            xmlDoc.Save(xmlNetworkPath);
-        }
-
-        Console.WriteLine($"AcroForm XML exported to: {xmlNetworkPath}");
     }
 }

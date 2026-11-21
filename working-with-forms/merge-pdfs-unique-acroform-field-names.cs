@@ -1,48 +1,63 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Forms; // needed for Field and concrete form field types
 
 class Program
 {
     static void Main()
     {
-        const string firstPdf = "first.pdf";
-        const string secondPdf = "second.pdf";
-        const string outputPdf = "merged.pdf";
+        const string targetPath = "target.pdf";   // PDF with its own AcroForm fields
+        const string sourcePath = "source.pdf";   // PDF whose fields must be kept unique
+        const string mergedPath = "merged.pdf";
 
-        if (!File.Exists(firstPdf) || !File.Exists(secondPdf))
+        if (!File.Exists(targetPath) || !File.Exists(sourcePath))
         {
             Console.Error.WriteLine("One or both input files are missing.");
             return;
         }
 
-        // Load documents
-        using (Document target = new Document(firstPdf))
-        using (Document source = new Document(secondPdf))
+        // Wrap both documents in using blocks as required by the lifecycle rule
+        using (Document target = new Document(targetPath))
+        using (Document source = new Document(sourcePath))
         {
-            // Prefix all field names in the source document to avoid name clashes
-            string prefix = Path.GetFileNameWithoutExtension(secondPdf) + "_";
+            // Build a set of field names already present in the target document
+            var existingNames = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var tgtField in target.Form.Fields)
+                existingNames.Add(tgtField.PartialName);
 
-            foreach (var field in source.Form.Fields)
+            // Ensure source fields have unique names before merging
+            foreach (var srcField in source.Form.Fields)
             {
-                field.Name = prefix + field.Name;
+                string originalName = srcField.PartialName;
+                if (existingNames.Contains(originalName))
+                {
+                    // Generate a new name that does not clash
+                    int suffix = 1;
+                    string newName;
+                    do
+                    {
+                        newName = $"{originalName}_{suffix}";
+                        suffix++;
+                    } while (existingNames.Contains(newName));
+
+                    srcField.PartialName = newName;   // rename the field in the source document
+                    existingNames.Add(newName);
+                }
+                else
+                {
+                    existingNames.Add(originalName);
+                }
             }
 
-            // Append source pages to target
+            // Merge pages (including form definitions) from source into target
             target.Pages.Add(source.Pages);
 
-            // Copy renamed fields into target form
-            foreach (var field in source.Form.Fields)
-            {
-                // The Form.Add method clones the field into the target document.
-                target.Form.Add(field);
-            }
-
-            // Save merged document
-            target.Save(outputPdf);
+            // Save the merged PDF
+            target.Save(mergedPath);
         }
 
-        Console.WriteLine($"Merged PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Merged PDF saved to '{mergedPath}'.");
     }
 }

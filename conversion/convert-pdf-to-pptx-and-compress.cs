@@ -17,51 +17,31 @@ class Program
             return;
         }
 
-        // Convert PDF to PPTX
+        // Convert PDF to PPTX using PptxSaveOptions (non‑PDF format requires explicit options)
         using (Document pdfDoc = new Document(pdfPath))
         {
-            // PptxSaveOptions resides directly in Aspose.Pdf namespace.
             PptxSaveOptions pptxOptions = new PptxSaveOptions();
             pdfDoc.Save(pptxPath, pptxOptions);
         }
 
-        // Re‑compress the generated PPTX (which is a ZIP package) with optimal compression.
-        CompressPptx(pptxPath, compressedPptxPath);
-
-        Console.WriteLine($"Conversion complete. Compressed PPTX saved to '{compressedPptxPath}'.");
-    }
-
-    /// <summary>
-    /// Reads an existing PPTX file (ZIP package) and writes a new PPTX with optimal compression.
-    /// </summary>
-    static void CompressPptx(string sourcePath, string destinationPath)
-    {
-        // Ensure the source file exists.
-        if (!File.Exists(sourcePath))
-        {
-            Console.Error.WriteLine($"Source PPTX not found: {sourcePath}");
-            return;
-        }
-
-        // Create the destination file; overwrite if it already exists.
-        using (FileStream sourceStream = new FileStream(sourcePath, FileMode.Open, FileAccess.Read, FileShare.Read))
-        using (ZipArchive sourceArchive = new ZipArchive(sourceStream, ZipArchiveMode.Read, leaveOpen: true))
-        using (FileStream destStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write, FileShare.None))
-        using (ZipArchive destArchive = new ZipArchive(destStream, ZipArchiveMode.Create))
+        // Re‑compress the PPTX (PPTX is a ZIP archive) to reduce size
+        // Extract each entry from the original PPTX and add it to a new archive with optimal compression
+        using (FileStream originalPptxStream = new FileStream(pptxPath, FileMode.Open, FileAccess.Read))
+        using (ZipArchive sourceArchive = new ZipArchive(originalPptxStream, ZipArchiveMode.Read, leaveOpen: true))
+        using (FileStream compressedPptxStream = new FileStream(compressedPptxPath, FileMode.Create, FileAccess.Write))
+        using (ZipArchive destArchive = new ZipArchive(compressedPptxStream, ZipArchiveMode.Create))
         {
             foreach (ZipArchiveEntry entry in sourceArchive.Entries)
             {
-                // Preserve directory structure and file names.
                 ZipArchiveEntry newEntry = destArchive.CreateEntry(entry.FullName, CompressionLevel.Optimal);
-                using (Stream entryInput = entry.Open())
-                using (Stream entryOutput = newEntry.Open())
+                using (Stream sourceStream = entry.Open())
+                using (Stream destStream = newEntry.Open())
                 {
-                    entryInput.CopyTo(entryOutput);
+                    sourceStream.CopyTo(destStream);
                 }
             }
         }
 
-        // Optionally delete the uncompressed intermediate file.
-        try { File.Delete(sourcePath); } catch { /* ignore cleanup errors */ }
+        Console.WriteLine($"PDF converted to PPTX and compressed: {compressedPptxPath}");
     }
 }

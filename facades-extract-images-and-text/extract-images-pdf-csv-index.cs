@@ -3,64 +3,86 @@ using System.IO;
 using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string pdfPath = "input.pdf";
         const string csvPath = "images.csv";
+        const string imagesDir = "ExtractedImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output folder exists
+        Directory.CreateDirectory(imagesDir);
 
-        // CSV header
-        var csvBuilder = new StringBuilder();
+        // Prepare CSV header
+        StringBuilder csvBuilder = new StringBuilder();
         csvBuilder.AppendLine("Filename,PageNumber,Width,Height");
 
-        // Facades class usage (required by task)
-        PdfFileEditor _ = new PdfFileEditor();
-
-        // Open the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Get total page count
+        int totalPages;
+        try
         {
-            int imageCounter = 1;
-
-            // Iterate pages (1‑based indexing)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            using (var doc = new Document(pdfPath))
             {
-                Aspose.Pdf.Page page = doc.Pages[pageIndex];
+                totalPages = doc.Pages.Count;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to open PDF: {ex.Message}");
+            return;
+        }
 
-                // Iterate all images on the page
-                foreach (Aspose.Pdf.XImage img in page.Resources.Images)
+        // Loop through each page and extract images
+        for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+        {
+            using (PdfExtractor extractor = new PdfExtractor())
+            {
+                extractor.BindPdf(pdfPath);
+                // Restrict extraction to the current page
+                extractor.StartPage = pageNumber;
+                extractor.EndPage = pageNumber;
+                // Extract images defined in resources
+                extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
+                extractor.ExtractImage();
+
+                int imageIndex = 1;
+                while (extractor.HasNextImage())
                 {
-                    string fileName = $"image_{imageCounter}.png";
-                    string filePath = Path.Combine(outputDir, fileName);
+                    // Build a unique filename for the image
+                    string fileName = $"image_page{pageNumber}_{imageIndex}.png";
+                    string outPath = Path.Combine(imagesDir, fileName);
 
-                    // Save the image to a file using a FileStream (XImage.Save expects a Stream)
-                    using (var fs = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    // Save the image to disk
+                    extractor.GetNextImage(outPath, ImageFormat.Png);
+
+                    // Retrieve image dimensions by loading the saved file
+                    int width, height;
+                    using (System.Drawing.Image img = System.Drawing.Image.FromFile(outPath))
                     {
-                        img.Save(fs);
+                        width = img.Width;
+                        height = img.Height;
                     }
 
-                    // Record image details in CSV
-                    csvBuilder.AppendLine($"{fileName},{pageIndex},{img.Width},{img.Height}");
+                    // Append information to CSV
+                    csvBuilder.AppendLine($"{fileName},{pageNumber},{width},{height}");
 
-                    imageCounter++;
+                    imageIndex++;
                 }
             }
         }
 
         // Write CSV file
         File.WriteAllText(csvPath, csvBuilder.ToString(), Encoding.UTF8);
-
-        Console.WriteLine($"Extraction complete. Images saved to '{outputDir}'. CSV saved to '{csvPath}'.");
+        Console.WriteLine($"Images extracted to '{imagesDir}'. CSV report saved to '{csvPath}'.");
     }
 }

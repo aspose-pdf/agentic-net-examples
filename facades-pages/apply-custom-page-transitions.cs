@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // required for PdfPageEditor
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,39 +16,37 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
-
-        int pageCount = pdfDocument.Pages.Count; // 1‑based collection
+        // Load the PDF document (Document implements IDisposable but we keep it alive for the whole operation)
+        Document doc = new Document(inputPath);
 
         // Apply a custom transition to each page based on its index using PdfPageEditor
-        using (PdfPageEditor editor = new PdfPageEditor(pdfDocument))
+        for (int i = 1; i <= doc.Pages.Count; i++)
         {
-            for (int i = 1; i <= pageCount; i++)
+            using (PdfPageEditor editor = new PdfPageEditor(doc))
             {
-                // Select the current page
+                // Target only the current page
                 editor.ProcessPages = new int[] { i };
 
-                // Choose transition type and duration
-                if (i % 2 == 0) // even pages → Box transition (integer value 3)
+                if (i % 2 == 1)
                 {
-                    editor.TransitionType = 3; // Box
-                    editor.TransitionDuration = 2; // 2 seconds
+                    // Odd pages – Dissolve transition (enum value 5)
+                    editor.TransitionType = 5; // TransitionType.Dissolve
                 }
-                else // odd pages → Fly transition (integer value 7)
+                else
                 {
-                    editor.TransitionType = 7; // Fly
-                    editor.TransitionDuration = 1; // 1 second
+                    // Even pages – Split transition (enum value 1)
+                    editor.TransitionType = 1; // TransitionType.Split
+                    // Horizontal split is the default; if a direction property exists it can be set here.
                 }
 
-                // Apply the changes for the selected page
+                // Duration is expressed in seconds
+                editor.TransitionDuration = 1;
                 editor.ApplyChanges();
             }
         }
 
-        // Save the modified PDF with the applied transitions
-        pdfDocument.Save(outputPath);
-
+        // Save the modified PDF to a new file
+        doc.Save(outputPath);
         Console.WriteLine($"PDF with page transitions saved to '{outputPath}'.");
     }
 }

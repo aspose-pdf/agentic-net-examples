@@ -1,59 +1,37 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
-using Aspose.Pdf;
+using System.Linq;
 using Aspose.Pdf.Facades;
-
-// ---------------------------------------------------------------------------
-// Minimal stub for PdfFormEditor when the Aspose.Pdf library is not available.
-// This allows the sample to compile and run (the stub does not perform real
-// PDF manipulation). In a real project reference the official Aspose.Pdf
-// NuGet package instead of this stub.
-// ---------------------------------------------------------------------------
-namespace Aspose.Pdf.Facades
-{
-    public class PdfFormEditor
-    {
-        private string _boundPath;
-
-        // Binds the PDF file to the editor. In the stub we just store the path.
-        public void BindPdf(string pdfPath)
-        {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("pdfPath cannot be null or empty", nameof(pdfPath));
-            _boundPath = pdfPath;
-        }
-
-        // Returns an empty list of field names. Real implementation would inspect the PDF.
-        public string[] GetFieldNames()
-        {
-            // Stub: return an empty array. Replace with real logic when using Aspose.Pdf.
-            return Array.Empty<string>();
-        }
-
-        // Renames a field. Stub does nothing.
-        public void RenameField(string oldName, string newName)
-        {
-            // No‑op in stub.
-        }
-
-        // Saves the edited PDF. Stub copies the original file to the destination.
-        public void Save(string outputPath)
-        {
-            if (string.IsNullOrEmpty(_boundPath))
-                throw new InvalidOperationException("No PDF has been bound. Call BindPdf first.");
-            // Simple copy to emulate a save operation.
-            File.Copy(_boundPath, outputPath, overwrite: true);
-        }
-    }
-}
 
 class Program
 {
+    // Convert a field name to camelCase (e.g., "First_Name" -> "firstName")
+    static string ToCamelCase(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return name;
+
+        // Split on underscores, spaces and hyphens
+        var parts = name.Split(new[] { '_', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length == 0)
+            return name;
+
+        // First part lowercased, subsequent parts capitalized
+        var result = parts[0].ToLowerInvariant();
+        for (int i = 1; i < parts.Length; i++)
+        {
+            var part = parts[i];
+            if (part.Length == 0) continue;
+            result += char.ToUpperInvariant(part[0]) + part.Substring(1).ToLowerInvariant();
+        }
+        return result;
+    }
+
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_renamed.pdf";
+        const string outputPath = "renamed_fields.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -61,54 +39,39 @@ class Program
             return;
         }
 
-        // PdfFormEditor does not implement IDisposable, so no using block
-        PdfFormEditor formEditor = new PdfFormEditor();
+        // First, read the existing field names using the Form facade (not FormEditor)
+        string[] fieldNames;
+        using (var formReader = new Form())
+        {
+            formReader.BindPdf(inputPath);
+            fieldNames = formReader.FieldNames; // FieldNames property returns string[]
+        }
 
-        // Load the PDF document
-        formEditor.BindPdf(inputPath);
-
-        // Get all form field names
-        string[] fieldNames = formEditor.GetFieldNames();
-
+        // Build a map of old name -> new camelCase name
+        var renameMap = new Dictionary<string, string>();
         foreach (string oldName in fieldNames)
         {
-            // Convert the field name to camelCase
             string newName = ToCamelCase(oldName);
-            if (!oldName.Equals(newName, StringComparison.Ordinal))
+            if (!string.Equals(oldName, newName, StringComparison.Ordinal))
             {
-                // Rename the field
-                formEditor.RenameField(oldName, newName);
+                renameMap[oldName] = newName;
             }
         }
 
-        // Save the updated PDF
-        formEditor.Save(outputPath);
-
-        Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");
-    }
-
-    // Converts a string to camelCase (e.g., "First_Name" -> "firstName")
-    static string ToCamelCase(string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        // Split on any non‑alphanumeric characters
-        string[] parts = Regex.Split(input, @"[^A-Za-z0-9]+");
-        if (parts.Length == 0)
-            return input;
-
-        // Lowercase first part, capitalize subsequent parts
-        string result = parts[0].Length > 0
-            ? char.ToLowerInvariant(parts[0][0]) + parts[0].Substring(1)
-            : string.Empty;
-
-        for (int i = 1; i < parts.Length; i++)
+        // Perform renames using FormEditor (one call per field)
+        using (FormEditor editor = new FormEditor())
         {
-            if (parts[i].Length == 0) continue;
-            result += char.ToUpperInvariant(parts[i][0]) + parts[i].Substring(1);
+            editor.BindPdf(inputPath);
+
+            foreach (var kvp in renameMap)
+            {
+                // RenameField(oldName, newName) is the correct method name
+                editor.RenameField(kvp.Key, kvp.Value);
+            }
+
+            editor.Save(outputPath);
         }
 
-        return result;
+        Console.WriteLine($"Fields renamed and saved to '{outputPath}'.");
     }
 }

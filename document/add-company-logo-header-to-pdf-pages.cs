@@ -6,55 +6,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath  = "input.pdf";
         const string logoImagePath = "logo.png";
-        const string outputPdfPath = "output_with_header.pdf";
+        const string outputPdfPath = "output.pdf";
 
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(logoImagePath))
         {
             Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the existing PDF inside a using block (deterministic disposal)
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate over all pages (1‑based indexing).
-            for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+            // Iterate through each page and add the logo as a stamp positioned in the header area
+            foreach (Page page in doc.Pages)
             {
-                Page page = pdfDoc.Pages[i];
-
-                // Create an ImageStamp for the logo.
+                // Create a fresh ImageStamp for each page (stamp objects are mutable after being added)
                 ImageStamp logoStamp = new ImageStamp(logoImagePath)
                 {
-                    // Position the stamp at the top of the page.
-                    // Origin (0,0) is bottom‑left, so TopMargin = page height - desired height.
-                    TopMargin    = page.PageInfo.Height - 50, // 50 points height for the header
-                    LeftMargin   = 0,
-                    Width        = page.PageInfo.Width,
-                    Height       = 50,
-                    // Align the image within the stamp rectangle.
+                    // Center the logo horizontally
                     HorizontalAlignment = HorizontalAlignment.Center,
+                    // Align the logo to the top of the page (header region)
                     VerticalAlignment   = VerticalAlignment.Top,
-                    // Ensure the stamp is drawn over the page content.
-                    Background = false
-                    // BackgroundColor property does not exist on ImageStamp; omitted.
+                    // Small top margin inside the header
+                    TopMargin           = 5,
+                    // Desired height (width scales to keep aspect ratio)
+                    Height              = 50
                 };
 
-                // Add the stamp to the current page.
                 page.AddStamp(logoStamp);
             }
 
-            // Save the modified PDF.
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Header with logo added to all pages. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Custom header with logo added to every page: {outputPdfPath}");
     }
 }

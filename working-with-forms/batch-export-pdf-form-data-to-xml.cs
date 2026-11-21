@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,19 +9,18 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the source PDF files
+        // Folder containing the source PDFs
         const string inputFolder = "InputPdfs";
         // Folder where the XML files will be written
         const string outputFolder = "FormXml";
 
-        // Verify input folder exists
         if (!Directory.Exists(inputFolder))
         {
             Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Ensure output folder exists
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder (non‑recursive)
@@ -34,59 +33,64 @@ class Program
                 // Load each PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Skip files that do not contain any form fields
-                    if (doc.Form == null || doc.Form.Count == 0)
+                    // Export only if the document contains a form with at least one field
+                    if (doc.Form != null && doc.Form.Fields != null && doc.Form.Fields.Count() > 0)
                     {
-                        Console.WriteLine($"No form fields in '{Path.GetFileName(pdfPath)}'. Skipping.");
-                        continue;
+                        // Build the XML file name based on the PDF name
+                        string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
+                        string xmlPath = Path.Combine(outputFolder, xmlFileName);
+
+                        // Export the form data to XML using a custom serializer
+                        ExportFormToXml(doc, xmlPath);
+
+                        Console.WriteLine($"Exported: {xmlPath}");
                     }
-
-                    // Build the output XML file name (same base name as PDF)
-                    string xmlFileName = Path.GetFileNameWithoutExtension(pdfPath) + ".xml";
-                    string xmlPath = Path.Combine(outputFolder, xmlFileName);
-
-                    // Export the form data to XML (custom implementation – ExportToXml does not exist in core API)
-                    ExportFormToXml(doc, xmlPath);
-
-                    Console.WriteLine($"Exported form data to '{xmlPath}'.");
+                    else
+                    {
+                        Console.WriteLine($"No form fields in: {pdfPath}");
+                    }
                 }
             }
             catch (Exception ex)
             {
-                // Log any errors but continue processing remaining files
                 Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch export of form data completed.");
     }
 
     /// <summary>
-    /// Serialises the AcroForm fields of a PDF document to a simple XML representation.
-    /// The XML structure is:
+    /// Serialises the AcroForm fields of a PDF document to a simple XML structure.
+    /// The XML format is:
     ///   <FormData>
-    ///       <Field name="fieldName">fieldValue</Field>
+    ///       <Field name=\"fieldName\">fieldValue</Field>
     ///       ...
     ///   </FormData>
     /// </summary>
     /// <param name="doc">The loaded PDF document.</param>
-    /// <param name="outputPath">Full path where the XML file will be saved.</param>
-    private static void ExportFormToXml(Document doc, string outputPath)
+    /// <param name="xmlPath">The full path where the XML file will be written.</param>
+    private static void ExportFormToXml(Document doc, string xmlPath)
     {
-        // Guard against a missing Form object – though callers already check Count > 0.
-        if (doc?.Form?.Fields == null)
+        var settings = new XmlWriterSettings { Indent = true, Encoding = System.Text.Encoding.UTF8 };
+        using (XmlWriter writer = XmlWriter.Create(xmlPath, settings))
         {
-            // Create an empty XML file to keep the contract consistent.
-            new XDocument(new XElement("FormData")).Save(outputPath);
-            return;
+            writer.WriteStartDocument();
+            writer.WriteStartElement("FormData");
+
+            foreach (Field field in doc.Form.Fields)
+            {
+                string fieldName = field.Name ?? field.FullName ?? string.Empty;
+                string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                writer.WriteStartElement("Field");
+                writer.WriteAttributeString("name", fieldName);
+                writer.WriteString(fieldValue);
+                writer.WriteEndElement(); // Field
+            }
+
+            writer.WriteEndElement(); // FormData
+            writer.WriteEndDocument();
         }
-
-        var fieldElements = doc.Form.Fields
-            .Select(field => new XElement(
-                "Field",
-                new XAttribute("name", field.Name ?? field.FullName ?? string.Empty),
-                field.Value?.ToString() ?? string.Empty));
-
-        var root = new XElement("FormData", fieldElements);
-        var xDoc = new XDocument(root);
-        xDoc.Save(outputPath);
     }
 }

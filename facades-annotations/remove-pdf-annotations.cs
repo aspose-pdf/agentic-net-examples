@@ -1,60 +1,36 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main(string[] args)
     {
-        // Simple console usage: PdfCleaner <input.pdf> [output.pdf]
-        if (args.Length == 0)
+        // Expect two arguments: input PDF path and output PDF path.
+        if (args.Length < 2)
         {
-            Console.WriteLine("Usage: PdfCleaner <input.pdf> [output.pdf]");
+            Console.WriteLine("Usage: AsposePdfCleaner <input-pdf> <output-pdf>");
             return;
         }
 
         string inputPath = args[0];
-        string outputPath = args.Length > 1 ? args[1] : Path.Combine(Path.GetDirectoryName(inputPath) ?? ".", "cleaned.pdf");
+        string outputPath = args[1];
 
-        // Open the source PDF, clean it, and write the result.
-        using (FileStream inputFile = File.OpenRead(inputPath))
-        using (MemoryStream cleanedStream = CleanPdf(inputFile))
-        using (FileStream outputFile = File.Create(outputPath))
-        {
-            cleanedStream.CopyTo(outputFile);
-        }
+        // Load the incoming PDF into a stream.
+        using var inputStream = new FileStream(inputPath, FileMode.Open, FileAccess.Read);
+        var doc = new Document(inputStream);
 
-        Console.WriteLine($"Cleaned PDF saved to {outputPath}");
-    }
+        // Remove all annotations using Aspose.Pdf.Facades.
+        var annotationEditor = new PdfAnnotationEditor();
+        annotationEditor.BindPdf(doc);
+        annotationEditor.DeleteAnnotations();               // delete all annotations
+        annotationEditor.FlatteningAnnotations();           // flatten any remaining annotation objects
 
-    /// <summary>
-    /// Removes all annotations from a PDF stream and returns a new stream containing the cleaned PDF.
-    /// </summary>
-    /// <param name="pdfStream">A readable stream that contains the original PDF.</param>
-    /// <returns>A MemoryStream positioned at the beginning, holding the cleaned PDF.</returns>
-    public static MemoryStream CleanPdf(Stream pdfStream)
-    {
-        // Aspose.Pdf.Facades requires a seek‑able stream, so copy the incoming stream into a MemoryStream.
-        MemoryStream inputMemory = new MemoryStream();
-        pdfStream.CopyTo(inputMemory);
-        inputMemory.Position = 0;
+        // Save the cleaned PDF to the output stream.
+        using var outputStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+        doc.Save(outputStream);
 
-        // PdfAnnotationEditor implements IDisposable, so use a using block.
-        using (PdfAnnotationEditor annotationEditor = new PdfAnnotationEditor())
-        {
-            annotationEditor.BindPdf(inputMemory);
-
-            // Delete every annotation in the document. The Facade provides DeleteAnnotations() for this purpose.
-            annotationEditor.DeleteAnnotations();
-
-            // Optionally flatten any remaining annotation appearance (not required for pure removal).
-            // annotationEditor.FlatteningAnnotations();
-
-            // Save the cleaned document into a new MemoryStream.
-            MemoryStream outputMemory = new MemoryStream();
-            annotationEditor.Save(outputMemory);
-            outputMemory.Position = 0; // Reset for the caller.
-            return outputMemory;
-        }
+        Console.WriteLine($"Cleaned PDF saved to '{outputPath}'.");
     }
 }

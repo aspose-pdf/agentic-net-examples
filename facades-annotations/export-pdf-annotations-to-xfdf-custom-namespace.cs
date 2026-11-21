@@ -1,56 +1,57 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputXfdf = "annotations.xfdf";
-        const string customNs   = "http://enterprise.example.com/xfdf";
+        const string pdfPath = "input.pdf";          // source PDF with annotations
+        const string xfdfPath = "annotations.xfdf";   // output XFDF file
+        const string customNs = "http://example.com/customxfdf"; // enterprise namespace
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal.
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Export annotations to XFDF using the filename‑only overload.
-                // This works with older Aspose.Pdf versions that do not expose SaveFormat.Xfdf.
-                string tempXfdfPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".xfdf");
-                doc.Save(tempXfdfPath); // format inferred from .xfdf extension
+                // PdfAnnotationEditor does not implement IDisposable, so a plain instance is fine
+                PdfAnnotationEditor editor = new PdfAnnotationEditor();
+                editor.BindPdf(doc);
 
-                // Load the generated XFDF XML.
-                XDocument xfdfDoc = XDocument.Load(tempXfdfPath);
-
-                // Replace the default XFDF namespace with the custom namespace required by the enterprise standard.
-                XNamespace custom = customNs;
-                XElement oldRoot = xfdfDoc.Root;
-                if (oldRoot != null)
+                // Export all annotations to a memory stream using the overload that accepts a string[]
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    // Preserve existing attributes (except the old xmlns) and child nodes.
-                    var newRoot = new XElement(custom + oldRoot.Name.LocalName,
-                                               // Keep all attributes that are not the default xmlns.
-                                               oldRoot.Attributes(),
-                                               oldRoot.Nodes());
-                    xfdfDoc.Root.ReplaceWith(newRoot);
+                    int startPage = 1;
+                    int endPage   = doc.Pages.Count;
+                    // Pass a null cast to string[] to select the correct overload (all annotation types)
+                    editor.ExportAnnotationsXfdf(ms, startPage, endPage, (string[])null);
+                    ms.Position = 0;
+
+                    // Load the generated XFDF, inject the custom namespace, and write to file
+                    XmlDocument xml = new XmlDocument();
+                    xml.Load(ms);
+
+                    XmlElement root = xml.DocumentElement;
+                    if (root != null && string.IsNullOrEmpty(root.NamespaceURI))
+                    {
+                        // Add the custom namespace as the default xmlns attribute
+                        root.SetAttribute("xmlns", customNs);
+                    }
+
+                    xml.Save(xfdfPath);
                 }
-
-                // Save the modified XFDF to the target file.
-                xfdfDoc.Save(outputXfdf);
-
-                // Clean up the temporary file.
-                File.Delete(tempXfdfPath);
             }
 
-            Console.WriteLine($"Annotations exported to XFDF with custom namespace: {outputXfdf}");
+            Console.WriteLine($"Annotations exported to '{xfdfPath}' with namespace '{customNs}'.");
         }
         catch (Exception ex)
         {

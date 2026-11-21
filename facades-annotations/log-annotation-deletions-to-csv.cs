@@ -1,71 +1,70 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_cleaned.pdf";
-        const string logFile = "annotation_deletions.log";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string logFilePath = "annotation_deletions.log";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Prepare the log file (CSV header)
-        using (var logWriter = new StreamWriter(logFile, false))
+        try
         {
-            logWriter.WriteLine("PageNumber,AnnotationName,AnnotationType");
-        }
-
-        // Load the PDF document (Aspose.Pdf.Document provides full annotation API)
-        Document pdfDoc = new Document(inputPdf);
-        int pageCount = pdfDoc.Pages.Count; // 1‑based page indexing
-
-        // Iterate through all pages
-        for (int pageNum = 1; pageNum <= pageCount; pageNum++)
-        {
-            Page page = pdfDoc.Pages[pageNum];
-            if (page == null || page.Annotations == null || page.Annotations.Count == 0)
-                continue;
-
-            // Collect annotations to delete after logging (cannot modify collection while iterating)
-            var toDelete = new List<Annotation>();
-
-            foreach (Annotation annotation in page.Annotations)
+            // Load the PDF document to obtain page count and existing annotations
+            using (Document doc = new Document(inputPdfPath))
             {
-                // Log deletion details before removing the annotation
-                using (var logWriter = new StreamWriter(logFile, true))
+                int pageCount = doc.Pages.Count;
+
+                // Bind the PDF to the annotation editor (PdfAnnotationEditor does NOT implement IDisposable)
+                PdfAnnotationEditor annotEditor = new PdfAnnotationEditor();
+                annotEditor.BindPdf(inputPdfPath);
+
+                // Open the log file (CSV format) and write a header line
+                using (StreamWriter logWriter = new StreamWriter(logFilePath, false, Encoding.UTF8))
                 {
-                    // Some annotation types expose a Name property; fallback to empty string if not available
-                    string name = string.Empty;
-                    try { name = annotation.Name ?? string.Empty; } catch { /* ignore if property not present */ }
+                    logWriter.WriteLine("Name,Type,PageNumber");
 
-                    // Use the concrete annotation type name for readability (e.g., TextAnnotation, LinkAnnotation)
-                    string type = annotation.GetType().Name;
+                    // Iterate through each page and delete its annotations while logging the details
+                    for (int pageNum = 1; pageNum <= pageCount; pageNum++)
+                    {
+                        // Retrieve all annotations on the current page using the Document API
+                        var pageAnnotations = doc.Pages[pageNum].Annotations;
 
-                    logWriter.WriteLine($"{pageNum},{name},{type}");
+                        foreach (Annotation annotation in pageAnnotations)
+                        {
+                            // Log the deletion action (sanitize commas for CSV safety)
+                            string safeName = annotation.Name?.Replace(",", " ") ?? "<no-name>";
+                            string safeType = annotation.GetType().Name?.Replace(",", " ");
+                            logWriter.WriteLine($"{safeName},{safeType},{pageNum}");
+
+                            // Delete the annotation by its name using the editor (current API overload takes only the name)
+                            if (!string.IsNullOrEmpty(annotation.Name))
+                            {
+                                annotEditor.DeleteAnnotation(annotation.Name);
+                            }
+                        }
+                    }
                 }
 
-                toDelete.Add(annotation);
-            }
-
-            // Delete the collected annotations
-            foreach (var ann in toDelete)
-            {
-                page.Annotations.Delete(ann);
+                // Save the modified PDF to the output path
+                annotEditor.Save(outputPdfPath);
+                Console.WriteLine($"Annotations deleted and logged to '{logFilePath}'. Output PDF saved as '{outputPdfPath}'.");
             }
         }
-
-        // Save the cleaned PDF
-        pdfDoc.Save(outputPdf);
-
-        Console.WriteLine($"Annotations removed. Log written to '{logFile}'. Output PDF saved as '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

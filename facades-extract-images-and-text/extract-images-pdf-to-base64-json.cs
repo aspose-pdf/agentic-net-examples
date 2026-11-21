@@ -2,74 +2,78 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
-class Program
+namespace AsposePdfImageExtraction
 {
-    static void Main()
+    // Model for JSON output
+    public class ImageInfo
     {
-        string pdfPath = "input.pdf";
-        string jsonPath = "images.json";
+        // Initialized to avoid nullable warnings
+        public string Base64 { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public long FileSize { get; set; }
+    }
 
-        if (!File.Exists(pdfPath))
+    class Program
+    {
+        static void Main()
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
-            return;
-        }
+            const string inputPdfPath = "input.pdf";
+            const string tempImageDir = "extracted_images";
 
-        var images = new List<Dictionary<string, object>>();
-        int imageIndex = 0;
-
-        // Load the document to know the total page count
-        Document doc = new Document(pdfPath);
-        int totalPages = doc.Pages.Count;
-
-        // Use a single extractor instance; we will set the page range for each iteration
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(pdfPath);
-
-            for (int pageNumber = 1; pageNumber <= totalPages; pageNumber++)
+            // Validate input PDF
+            if (!File.Exists(inputPdfPath))
             {
-                // Restrict extraction to the current page only
-                extractor.StartPage = pageNumber;
-                extractor.EndPage   = pageNumber;
+                Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+                return;
+            }
+
+            // Ensure temporary directory exists
+            Directory.CreateDirectory(tempImageDir);
+
+            // List to hold image metadata
+            List<ImageInfo> images = new List<ImageInfo>();
+
+            // Use PdfExtractor to pull images from the PDF
+            using (Aspose.Pdf.Facades.PdfExtractor extractor = new Aspose.Pdf.Facades.PdfExtractor())
+            {
+                extractor.BindPdf(inputPdfPath);
                 extractor.ExtractImage();
 
+                int imageIndex = 1;
                 while (extractor.HasNextImage())
                 {
-                    using (MemoryStream imgStream = new MemoryStream())
+                    // Save each image as PNG to a temporary file
+                    string tempFileName = $"image_{imageIndex}.png";
+                    string tempFilePath = Path.Combine(tempImageDir, tempFileName);
+
+                    // GetNextImage requires an ImageFormat from System.Drawing.Imaging
+                    extractor.GetNextImage(tempFilePath, ImageFormat.Png);
+
+                    // Read the saved image bytes
+                    byte[] imageBytes = File.ReadAllBytes(tempFilePath);
+                    string base64String = Convert.ToBase64String(imageBytes);
+
+                    // Populate metadata object
+                    ImageInfo info = new ImageInfo
                     {
-                        // Retrieve the next image into the stream
-                        extractor.GetNextImage(imgStream);
-                        imgStream.Position = 0;
-                        byte[] imgBytes = imgStream.ToArray();
-                        string base64 = Convert.ToBase64String(imgBytes);
+                        Base64 = base64String,
+                        FileName = tempFileName,
+                        FileSize = imageBytes.Length
+                    };
 
-                        // Since PdfExtractor no longer provides GetImageInfo or GetImagePageNumber,
-                        // we use the loop variables for page number and leave format/size as null.
-                        var imgObj = new Dictionary<string, object>
-                        {
-                            ["index"]   = imageIndex,
-                            ["page"]    = pageNumber,
-                            ["base64"]  = base64,
-                            ["format"]  = null,   // format information not directly available
-                            ["width"]   = null,   // width information not directly available
-                            ["height"]  = null    // height information not directly available
-                        };
-
-                        images.Add(imgObj);
-                        imageIndex++;
-                    }
+                    images.Add(info);
+                    imageIndex++;
                 }
             }
-        }
 
-        // Serialize the list to JSON
-        var options = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(images, options);
-        File.WriteAllText(jsonPath, json);
-        Console.WriteLine($"Extracted {images.Count} images to {jsonPath}");
+            // Serialize the list to JSON
+            string jsonOutput = JsonSerializer.Serialize(images, new JsonSerializerOptions { WriteIndented = true });
+
+            // Output JSON to console (or write to a file if desired)
+            Console.WriteLine(jsonOutput);
+        }
     }
 }

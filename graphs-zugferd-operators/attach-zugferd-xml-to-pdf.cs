@@ -6,49 +6,41 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string zugferdXml = "invoice.xml";
-        const string outputPdf = "output_with_zugferd.pdf";
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "invoice.xml";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(zugferdXml))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"ZUGFeRD XML not found: {zugferdXml}");
+            Console.Error.WriteLine($"ZUGFeRD XML not found: {xmlPath}");
             return;
         }
 
-        try
+        using (Document doc = new Document(pdfPath))
         {
-            using (Document doc = new Document(inputPdf))
+            // Embed the ZUGFeRD XML as an embedded file (AFRelationship.Data).
+            using (FileStream xmlStream = File.OpenRead(xmlPath))
             {
-                // Embed the ZUGFeRD XML as an embedded file (AFRelationship.Data).
-                using (FileStream xmlStream = File.OpenRead(zugferdXml))
+                var fileSpec = new FileSpecification(xmlStream, Path.GetFileName(xmlPath), "ZUGFeRD Invoice XML")
                 {
-                    var fileSpec = new FileSpecification(xmlStream, Path.GetFileName(zugferdXml), "ZUGFeRD Invoice XML")
-                    {
-                        MIMEType = "application/xml",
-                        AFRelationship = AFRelationship.Data
-                    };
-                    doc.EmbeddedFiles.Add(fileSpec);
-                }
-
-                // Convert the document to PDF/A‑3B which is required for ZUGFeRD compliance.
-                string logPath = "convert.log"; // optional conversion log
-                doc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
-
-                // Save the resulting PDF.
-                doc.Save(outputPdf);
+                    MIMEType = "application/xml",
+                    AFRelationship = AFRelationship.Data
+                };
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
-            Console.WriteLine($"ZUGFeRD attached and saved to '{outputPdf}'.");
+            // Convert the document to PDF/A‑3B which is required for ZUGFeRD compliance.
+            doc.Convert("log.xml", PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+
+            // Save the resulting PDF.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"ZUGFeRD XML attached and saved to '{outputPath}'.");
     }
 }

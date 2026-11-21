@@ -4,103 +4,95 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 
-class Program
+namespace DiscountCalculator
 {
-    // Represents a line item in an order
-    class OrderItem
+    // Represents a discount entry from the XML file
+    class DiscountRate
     {
-        public string Name { get; set; }
-        public decimal UnitPrice { get; set; }
-        public int Quantity { get; set; }
+        public string Code { get; set; }      // e.g., "SUMMER"
+        public decimal Rate { get; set; }     // e.g., 0.10 for 10%
     }
 
-    static void Main()
+    class Program
     {
-        const string discountsXmlPath = "discounts.xml";
-
-        if (!File.Exists(discountsXmlPath))
+        static void Main()
         {
-            Console.Error.WriteLine($"Discount file not found: {discountsXmlPath}");
-            return;
-        }
+            // Path to the XML file containing discount definitions
+            const string discountXmlPath = "discounts.xml";
 
-        // Load discount rates from XML into a dictionary: code => rate (e.g., 0.10 for 10%)
-        Dictionary<string, decimal> discountRates = LoadDiscountRates(discountsXmlPath);
-
-        // Example order items
-        List<OrderItem> items = new List<OrderItem>
-        {
-            new OrderItem { Name = "Widget A", UnitPrice = 25.00m, Quantity = 2 },
-            new OrderItem { Name = "Widget B", UnitPrice = 15.50m, Quantity = 3 },
-            new OrderItem { Name = "Service C", UnitPrice = 100.00m, Quantity = 1 }
-        };
-
-        // Prompt user for a discount code (optional)
-        Console.Write("Enter discount code (or press Enter for none): ");
-        string inputCode = Console.ReadLine()?.Trim().ToUpperInvariant();
-
-        decimal discountRate = 0m;
-        if (!string.IsNullOrEmpty(inputCode) && discountRates.TryGetValue(inputCode, out decimal rate))
-        {
-            discountRate = rate;
-            Console.WriteLine($"Applying discount code '{inputCode}' with rate {discountRate:P0}.");
-        }
-        else if (!string.IsNullOrEmpty(inputCode))
-        {
-            Console.WriteLine($"Discount code '{inputCode}' not found. No discount will be applied.");
-        }
-
-        // Calculate subtotal
-        decimal subtotal = items.Sum(i => i.UnitPrice * i.Quantity);
-        // Apply discount dynamically
-        decimal discountAmount = subtotal * discountRate;
-        decimal total = subtotal - discountAmount;
-
-        // Output results
-        Console.WriteLine("\nOrder Summary:");
-        foreach (var item in items)
-        {
-            Console.WriteLine($"{item.Quantity} x {item.Name} @ {item.UnitPrice:C} = {(item.UnitPrice * item.Quantity):C}");
-        }
-        Console.WriteLine($"Subtotal: {subtotal:C}");
-        Console.WriteLine($"Discount ({discountRate:P0}): -{discountAmount:C}");
-        Console.WriteLine($"Total: {total:C}");
-    }
-
-    // Loads discount rates from an XML file.
-    // Expected XML format:
-    // <Discounts>
-    //   <Discount>
-    //     <Code>SUMMER</Code>
-    //     <Rate>0.10</Rate>
-    //   </Discount>
-    //   ...
-    // </Discounts>
-    static Dictionary<string, decimal> LoadDiscountRates(string xmlPath)
-    {
-        var rates = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-
-        // Use a using block to ensure the file stream is disposed promptly.
-        using (FileStream stream = File.OpenRead(xmlPath))
-        {
-            XDocument doc = XDocument.Load(stream);
-            foreach (XElement discountElem in doc.Root.Elements("Discount"))
+            if (!File.Exists(discountXmlPath))
             {
-                string code = discountElem.Element("Code")?.Value?.Trim().ToUpperInvariant();
-                string rateStr = discountElem.Element("Rate")?.Value?.Trim();
+                Console.Error.WriteLine($"Discount file not found: {discountXmlPath}");
+                return;
+            }
 
-                if (string.IsNullOrEmpty(code) || string.IsNullOrEmpty(rateStr))
-                    continue; // Skip malformed entries
+            // Load discount rates from XML into a dictionary for fast lookup
+            Dictionary<string, DiscountRate> discounts = LoadDiscounts(discountXmlPath);
+
+            // Example list of item prices (could be loaded from elsewhere)
+            List<decimal> itemPrices = new List<decimal> { 49.99m, 19.95m, 5.00m, 120.00m };
+
+            // Compute the subtotal
+            decimal subtotal = itemPrices.Sum();
+            Console.WriteLine($"Subtotal: {subtotal:C}");
+
+            // Ask user for a discount code (optional)
+            Console.Write("Enter discount code (or press Enter for none): ");
+            string inputCode = Console.ReadLine()?.Trim().ToUpperInvariant();
+
+            // Determine applicable discount rate
+            decimal discountRate = 0m;
+            if (!string.IsNullOrEmpty(inputCode) && discounts.TryGetValue(inputCode, out DiscountRate dr))
+            {
+                discountRate = dr.Rate;
+                Console.WriteLine($"Applying discount '{dr.Code}' at {dr.Rate:P0}");
+            }
+            else if (!string.IsNullOrEmpty(inputCode))
+            {
+                Console.WriteLine($"Discount code '{inputCode}' not recognized. No discount applied.");
+            }
+
+            // Apply discount dynamically
+            decimal discountAmount = subtotal * discountRate;
+            decimal total = subtotal - discountAmount;
+
+            Console.WriteLine($"Discount amount: {discountAmount:C}");
+            Console.WriteLine($"Total after discount: {total:C}");
+        }
+
+        // Loads discount definitions from an XML file into a dictionary keyed by discount code
+        static Dictionary<string, DiscountRate> LoadDiscounts(string xmlPath)
+        {
+            // Expected XML format:
+            // <Discounts>
+            //   <Discount>
+            //     <Code>SUMMER</Code>
+            //     <Rate>0.10</Rate>
+            //   </Discount>
+            //   ...
+            // </Discounts>
+
+            XDocument doc = XDocument.Load(xmlPath);
+            var discountElements = doc.Root?.Elements("Discount") ?? Enumerable.Empty<XElement>();
+
+            var dict = new Dictionary<string, DiscountRate>(StringComparer.OrdinalIgnoreCase);
+            foreach (var elem in discountElements)
+            {
+                string code = (string)elem.Element("Code");
+                string rateStr = (string)elem.Element("Rate");
+
+                if (string.IsNullOrWhiteSpace(code) || string.IsNullOrWhiteSpace(rateStr))
+                    continue; // skip malformed entries
 
                 if (decimal.TryParse(rateStr, out decimal rate))
                 {
-                    // Ensure rate is between 0 and 1 (e.g., 0.15 for 15%)
-                    if (rate >= 0m && rate <= 1m)
-                        rates[code] = rate;
+                    // Ensure rate is between 0 and 1
+                    rate = Math.Clamp(rate, 0m, 1m);
+                    dict[code.Trim()] = new DiscountRate { Code = code.Trim(), Rate = rate };
                 }
             }
-        }
 
-        return rates;
+            return dict;
+        }
     }
 }

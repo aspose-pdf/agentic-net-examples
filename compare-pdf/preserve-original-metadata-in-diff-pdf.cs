@@ -1,54 +1,126 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
+using Aspose.Pdf.Text;
 
-class Program
+class PdfComparer
 {
     static void Main()
     {
-        const string sourcePath = "source.pdf";
-        const string targetPath = "target.pdf";
-        const string diffPath   = "diff.pdf";
+        const string pdfPath1 = "original.pdf";
+        const string pdfPath2 = "modified.pdf";
+        const string diffPath = "diff.pdf";
 
-        if (!File.Exists(sourcePath) || !File.Exists(targetPath))
+        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
         {
-            Console.Error.WriteLine("Source or target PDF not found.");
+            Console.Error.WriteLine("One or both input PDF files are missing.");
             return;
         }
 
-        // Load source and target documents
-        using (Document sourceDoc = new Document(sourcePath))
-        using (Document targetDoc = new Document(targetPath))
+        // Load the two PDFs to be compared
+        using (Aspose.Pdf.Document doc1 = new Aspose.Pdf.Document(pdfPath1))
+        using (Aspose.Pdf.Document doc2 = new Aspose.Pdf.Document(pdfPath2))
+        // Create a new PDF that will contain the comparison results
+        using (Aspose.Pdf.Document diffDoc = new Aspose.Pdf.Document())
         {
-            // Perform side‑by‑side visual comparison using the static comparer
-            var options = new SideBySideComparisonOptions();
-            SideBySidePdfComparer.Compare(sourceDoc, targetDoc, diffPath, options);
-        }
+            // ------------------------------------------------------------
+            // Preserve original metadata (copy from the first document)
+            // ------------------------------------------------------------
+            diffDoc.Info.Title = doc1.Info.Title;
+            diffDoc.Info.Author = doc1.Info.Author;
+            diffDoc.Info.Subject = doc1.Info.Subject;
+            diffDoc.Info.Keywords = doc1.Info.Keywords;
+            diffDoc.Info.Creator = doc1.Info.Creator;
+            diffDoc.Info.Producer = doc1.Info.Producer;
+            diffDoc.Info.CreationDate = doc1.Info.CreationDate;
+            // Use the correct property name for modification date
+            diffDoc.Info.ModDate = doc1.Info.ModDate;
 
-        // Copy metadata from source to the generated diff PDF
-        using (Document sourceDoc = new Document(sourcePath))
-        using (Document diffDoc = new Document(diffPath))
-        {
-            // Standard metadata fields
-            diffDoc.Info.Title        = sourceDoc.Info.Title;
-            diffDoc.Info.Author       = sourceDoc.Info.Author;
-            diffDoc.Info.Subject      = sourceDoc.Info.Subject;
-            diffDoc.Info.Keywords     = sourceDoc.Info.Keywords;
-            diffDoc.Info.Creator      = sourceDoc.Info.Creator;
-            diffDoc.Info.Producer     = sourceDoc.Info.Producer;
-            diffDoc.Info.CreationDate = sourceDoc.Info.CreationDate;
-            diffDoc.Info.ModDate      = sourceDoc.Info.ModDate;
+            // ------------------------------------------------------------
+            // Compare page counts
+            // ------------------------------------------------------------
+            int count1 = doc1.Pages.Count;
+            int count2 = doc2.Pages.Count;
 
-            // Custom metadata – use the indexer provided by DocumentInfo
-            foreach (var name in sourceDoc.Info.Keys)
+            if (count1 != count2)
             {
-                diffDoc.Info[name] = sourceDoc.Info[name];
+                Aspose.Pdf.Page summaryPage = diffDoc.Pages.Add();
+                Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment(
+                    $"Page count differs: Original={count1}, Modified={count2}");
+                tf.Position = new Aspose.Pdf.Text.Position(50, 750);
+                tf.TextState.FontSize = 14;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Red;
+                summaryPage.Paragraphs.Add(tf);
             }
 
-            diffDoc.Save(diffPath);
-        }
+            // ------------------------------------------------------------
+            // Compare each page's textual content
+            // ------------------------------------------------------------
+            int maxPages = Math.Max(count1, count2);
+            for (int i = 1; i <= maxPages; i++)
+            {
+                bool hasPage1 = i <= count1;
+                bool hasPage2 = i <= count2;
 
-        Console.WriteLine($"Comparison completed. Diff PDF saved to '{diffPath}' with original metadata preserved.");
+                if (!hasPage1 || !hasPage2)
+                {
+                    // One document lacks this page – already noted in page‑count diff
+                    continue;
+                }
+
+                // Extract text from page i of both documents
+                Aspose.Pdf.Text.TextAbsorber absorber1 = new Aspose.Pdf.Text.TextAbsorber();
+                doc1.Pages[i].Accept(absorber1);
+                string text1 = absorber1.Text ?? string.Empty;
+
+                Aspose.Pdf.Text.TextAbsorber absorber2 = new Aspose.Pdf.Text.TextAbsorber();
+                doc2.Pages[i].Accept(absorber2);
+                string text2 = absorber2.Text ?? string.Empty;
+
+                if (!string.Equals(text1, text2, StringComparison.Ordinal))
+                {
+                    // Text differs – create a diff page describing the change
+                    Aspose.Pdf.Page diffPage = diffDoc.Pages.Add();
+
+                    // Header
+                    Aspose.Pdf.Text.TextFragment header = new Aspose.Pdf.Text.TextFragment(
+                        $"Differences found on page {i}");
+                    header.Position = new Aspose.Pdf.Text.Position(50, 770);
+                    header.TextState.FontSize = 16;
+                    header.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+                    diffPage.Paragraphs.Add(header);
+
+                    // Original text
+                    Aspose.Pdf.Text.TextFragment original = new Aspose.Pdf.Text.TextFragment("Original:");
+                    original.Position = new Aspose.Pdf.Text.Position(50, 730);
+                    original.TextState.FontSize = 12;
+                    original.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    diffPage.Paragraphs.Add(original);
+
+                    Aspose.Pdf.Text.TextFragment origContent = new Aspose.Pdf.Text.TextFragment(text1);
+                    origContent.Position = new Aspose.Pdf.Text.Position(50, 710);
+                    origContent.TextState.FontSize = 10;
+                    origContent.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                    diffPage.Paragraphs.Add(origContent);
+
+                    // Modified text
+                    Aspose.Pdf.Text.TextFragment modified = new Aspose.Pdf.Text.TextFragment("Modified:");
+                    modified.Position = new Aspose.Pdf.Text.Position(50, 650);
+                    modified.TextState.FontSize = 12;
+                    modified.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    diffPage.Paragraphs.Add(modified);
+
+                    Aspose.Pdf.Text.TextFragment modContent = new Aspose.Pdf.Text.TextFragment(text2);
+                    modContent.Position = new Aspose.Pdf.Text.Position(50, 630);
+                    modContent.TextState.FontSize = 10;
+                    modContent.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
+                    diffPage.Paragraphs.Add(modContent);
+                }
+            }
+
+            // Save the diff PDF
+            diffDoc.Save(diffPath);
+            Console.WriteLine($"Comparison completed. Diff PDF saved to '{diffPath}'.");
+        }
     }
 }

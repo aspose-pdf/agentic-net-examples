@@ -16,28 +16,35 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document doc = new Document(inputPath);
+        // Get the first page (or any page you need)
+        Page page = doc.Pages[1];
+
+        // Define the rectangle where the annotation will appear (llx, lly, urx, ury)
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+        // Create a TextAnnotation bound to the page and rectangle
+        TextAnnotation annotation = new TextAnnotation(page, rect)
         {
-            // Get the first page
-            Page page = doc.Pages[1];
+            Title    = "Note",
+            Contents = "This is a custom annotation with a thick border.",
+            Icon     = TextIcon.Note,
+            // Optional: set the annotation's background color for better visibility
+            Color    = Color.Yellow
+        };
 
-            // Define the annotation rectangle
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Set a solid border with a thickness of 3 points.
+        // Border requires the parent annotation in its constructor.
+        annotation.Border = new Border(annotation)
+        {
+            Style = BorderStyle.Solid,
+            Width = 3
+        };
 
-            // Create a square annotation on the first page
-            SquareAnnotation square = new SquareAnnotation(page, rect);
-            // Set the border color (the annotation's Color property controls border color)
-            square.Color = Aspose.Pdf.Color.Red;
-            // Set a custom border thickness of three points – Border requires the parent annotation
-            square.Border = new Border(square) { Width = 3 };
-
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(square);
-
-            // Save the modified document
-            doc.Save(outputPath);
-        }
+        // Add the annotation to the page and save the document
+        page.Annotations.Add(annotation);
+        doc.Save(outputPath);
 
         Console.WriteLine($"Annotation added and saved to '{outputPath}'.");
     }

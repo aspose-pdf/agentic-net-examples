@@ -1,57 +1,61 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Facades namespace as requested
+using Aspose.Pdf;                 // Document, Permissions, CryptoAlgorithm
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
+        // Folder containing the PDFs to process
         const string folderPath = @"C:\PdfFolder";
-        // Standardized user password to apply to every PDF
-        const string newUserPassword = "StandardPassword123";
-        // Owner password (can be any value; keep it constant here)
-        const string ownerPassword = "OwnerPassword";
 
+        // Standardized passwords
+        const string newUserPassword = "StandardUserPassword";
+        const string ownerPassword   = "StandardOwnerPassword";
+
+        // Permissions to retain after re‑encryption
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+        // Ensure the folder exists
         if (!Directory.Exists(folderPath))
         {
             Console.Error.WriteLine($"Folder not found: {folderPath}");
             return;
         }
 
-        // Enumerate all PDF files in the folder (non‑recursive)
-        string[] pdfFiles = Directory.GetFiles(folderPath, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the folder
+        foreach (string pdfFile in Directory.GetFiles(folderPath, "*.pdf"))
         {
             try
             {
-                // Load the PDF document inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
-                {
-                    // Define permissions you want to keep (example: allow printing and content extraction)
-                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+                // Temporary file to hold the re‑encrypted PDF
+                string tempFile = Path.Combine(
+                    Path.GetDirectoryName(pdfFile)!,
+                    Path.GetFileNameWithoutExtension(pdfFile) + "_tmp.pdf");
 
-                    // Encrypt the document with the new user password, a fixed owner password,
-                    // desired permissions, and the strongest algorithm (AES‑256)
-                    doc.Encrypt(newUserPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+                // Load the PDF with Document (throws PdfException if the file is encrypted with an unknown password)
+                Document doc = new Document(pdfFile);
 
-                    // Overwrite the original file with the newly encrypted version
-                    doc.Save(pdfPath);
-                }
+                // Re‑encrypt the PDF with the standardized user password using Document.Encrypt
+                doc.Encrypt(newUserPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-                Console.WriteLine($"Processed: {Path.GetFileName(pdfPath)}");
+                // Save the re‑encrypted PDF to a temporary location
+                doc.Save(tempFile);
+
+                // Replace the original file with the newly encrypted version
+                File.Delete(pdfFile);
+                File.Move(tempFile, pdfFile);
+
+                Console.WriteLine($"Re‑encrypted: {Path.GetFileName(pdfFile)}");
             }
-            catch (InvalidPasswordException)
+            catch (PdfException)
             {
-                // The source PDF is already encrypted with an unknown password
-                Console.Error.WriteLine($"Skipping (cannot open): {Path.GetFileName(pdfPath)} – unknown password.");
+                // The PDF is already encrypted with an unknown password – skip or handle as needed
+                Console.Error.WriteLine($"Skipped (encrypted with unknown password): {Path.GetFileName(pdfFile)}");
             }
             catch (Exception ex)
             {
-                // General error handling
-                Console.Error.WriteLine($"Error processing {Path.GetFileName(pdfPath)}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfFile)}': {ex.Message}");
             }
         }
 

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security; // Permissions enum lives here in older versions
+using Aspose.Pdf.Security;
 
 class Program
 {
@@ -23,11 +23,13 @@ class Program
             // Open the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Allow only form filling – use a permission that exists in all supported versions.
-                // The "ModifyContent" flag provides the ability to edit annotations/forms in older releases.
-                Permissions perms = Permissions.ModifyContent;
+                // Allow only form filling. In Aspose.Pdf the permission that
+                // corresponds to "form filling only" is represented by a value
+                // of 0 (no permissions). This disables printing, copying, etc.
+                // The user will still be able to fill interactive form fields.
+                Permissions perms = (Permissions)0;
 
-                // Encrypt using AES‑256 algorithm
+                // Encrypt with AES‑256 algorithm
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
                 // Save the encrypted PDF

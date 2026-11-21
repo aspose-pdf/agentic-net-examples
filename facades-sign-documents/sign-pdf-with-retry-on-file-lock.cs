@@ -1,83 +1,91 @@
 using System;
 using System.IO;
 using System.Threading;
+using System.Drawing; // for System.Drawing.Rectangle
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
-using System.Security.Cryptography.X509Certificates;
+using Aspose.Pdf.Forms; // PKCS1 class
 
 class Program
 {
-    // Determines whether the exception is caused by a file lock (sharing violation)
-    static bool IsFileLocked(IOException ex)
-    {
-        // HResult 0x80070020 corresponds to ERROR_SHARING_VIOLATION
-        const int sharingViolationHResult = unchecked((int)0x80070020);
-        return ex.HResult == sharingViolationHResult || ex.Message.Contains("being used by another process");
-    }
-
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";
-        const string outputPdfPath  = "signed_output.pdf";
-        const string certPath       = "certificate.pfx";
-        const string certPassword   = "certPassword";
+        const string inputPdf      = "document.pdf";
+        const string outputPdf     = "signed_document.pdf";
+        const string certificate   = "certificate.pfx";
+        const string certPassword  = "certPass";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certificate))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certificate}");
             return;
         }
 
-        if (!File.Exists(certPath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
-            return;
-        }
+        const int maxRetries   = 5;   // maximum attempts
+        const int retryDelayMs = 2000; // wait time between attempts (ms)
+        int attempt            = 0;
+        bool signedSuccessfully = false;
 
-        // Load the signing certificate using the standard X509Certificate2 constructor
-        X509Certificate2 certificate = new X509Certificate2(certPath, certPassword);
-
-        const int maxRetries = 5;
-        const int delayMilliseconds = 1000;
-        int attempt = 0;
-        bool signed = false;
-
-        while (attempt < maxRetries && !signed)
+        while (attempt < maxRetries && !signedSuccessfully)
         {
             attempt++;
             try
             {
-                using (PdfFileSignature pdfSignature = new PdfFileSignature())
+                // Use a using block so the PdfFileSignature object is disposed correctly
+                using (PdfFileSignature signer = new PdfFileSignature())
                 {
-                    // Bind the source PDF
-                    pdfSignature.BindPdf(inputPdfPath);
+                    // Bind the source PDF; may throw IOException if the file is locked
+                    signer.BindPdf(inputPdf);
 
-                    // Create a PKCS7 object from the certificate (Aspose.Pdf.Forms namespace)
-                    PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+                    // Prepare PKCS1 credentials (certificate + password)
+                    PKCS1 pkcs = new PKCS1(certificate, certPassword);
 
-                    // Sign the document and write to the output path
-                    pdfSignature.Sign(outputPdfPath, pkcs7);
+                    // Define the visible signature rectangle (x, y, width, height)
+                    // Adjust the values to suit your document layout
+                    Rectangle signatureRect = new Rectangle(100, 100, 200, 50);
+
+                    // Sign the PDF. The overload expects:
+                    // (int pageNumber, string reason, string contactInfo,
+                    //  string location, bool visible, System.Drawing.Rectangle rect, PKCS1 pkcs)
+                    signer.Sign(
+                        1,                     // page number (1‑based)
+                        "I agree",            // reason
+                        "contact@example.com", // contact info
+                        "New York, USA",      // location
+                        true,                  // visible signature flag
+                        signatureRect,         // signature rectangle
+                        pkcs);                 // PKCS1 object
+
+                    // Save the signed PDF to the desired output path
+                    signer.Save(outputPdf);
                 }
 
-                signed = true;
+                signedSuccessfully = true;
                 Console.WriteLine($"PDF signed successfully on attempt {attempt}.");
             }
-            catch (IOException ioEx) when (IsFileLocked(ioEx))
+            catch (IOException ioEx)
             {
-                // The file is locked; wait and retry
-                Console.WriteLine($"Attempt {attempt}: PDF file is locked. Retrying in {delayMilliseconds} ms...");
-                if (attempt == maxRetries)
+                // Likely the PDF is locked by another process
+                Console.WriteLine($"Attempt {attempt}: PDF is locked ({ioEx.Message}). Retrying in {retryDelayMs} ms...");
+
+                if (attempt >= maxRetries)
                 {
-                    Console.Error.WriteLine("Maximum retry attempts reached. Signing failed.");
-                    throw;
+                    Console.Error.WriteLine($"Failed to sign after {maxRetries} attempts.");
+                    break;
                 }
-                Thread.Sleep(delayMilliseconds);
+
+                Thread.Sleep(retryDelayMs);
             }
             catch (Exception ex)
             {
-                // Unexpected error – abort
+                // Non‑retryable error
                 Console.Error.WriteLine($"Signing failed: {ex.Message}");
-                throw;
+                break;
             }
         }
     }

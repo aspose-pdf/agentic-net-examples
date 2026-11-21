@@ -11,20 +11,21 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // PdfPageEditor does not implement IDisposable, so we instantiate it directly.
-        var pageEditor = new PdfPageEditor();
-        pageEditor.BindPdf(inputPath);
+        // Load the PDF using PdfPageEditor (does not implement IDisposable)
+        var editor = new PdfPageEditor();
+        editor.BindPdf(inputPath);
 
-        // Target page 4 (1‑based indexing) and set its rotation to 180°.
-        pageEditor.ProcessPages = new int[] { 4 };
-        pageEditor.Rotation = 180; // allowed values: 0, 90, 180, 270
+        // Specify the page(s) to affect – PdfPageEditor uses 1‑based indexing
+        editor.ProcessPages = new int[] { 4 };
+        // Set the rotation angle (allowed values: 0, 90, 180, 270)
+        editor.Rotation = 180;
 
-        // Save the modified PDF.
-        pageEditor.Save(outputPath);
+        // Save the modified PDF
+        editor.Save(outputPath);
 
         Console.WriteLine($"Page 4 rotated and saved to '{outputPath}'.");
     }

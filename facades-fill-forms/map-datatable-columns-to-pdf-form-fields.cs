@@ -1,131 +1,123 @@
 using System;
 using System.Data;
-using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // Added for Border and BorderStyle
 
 class Program
 {
     static void Main()
     {
-        // Paths to the template PDF and the resulting filled PDF
-        const string templatePdfPath = "template.pdf";
-        const string outputPdfPath   = "filled_output.pdf";
+        const string pdfTemplatePath = "template.pdf";   // PDF with form fields
+        const string outputPdfPath   = "filled.pdf";    // Resulting PDF
+        const string dataTableCsv    = "data.csv";      // Example source for DataTable
 
-        // -----------------------------------------------------------------
-        // 1. Prepare a DataTable with data (in real scenarios this would come
-        //    from a database, CSV, etc.).  Column names may NOT match the
-        //    PDF field identifiers.
-        // -----------------------------------------------------------------
-        DataTable dataTable = new DataTable("FormData");
-        dataTable.Columns.Add("ColFirstName", typeof(string));
-        dataTable.Columns.Add("ColLastName",  typeof(string));
-        dataTable.Columns.Add("ColAddress",   typeof(string));
-
-        // Sample data rows
-        dataTable.Rows.Add("John",  "Doe",   "123 Main St");
-        dataTable.Rows.Add("Jane",  "Smith", "456 Oak Ave");
-
-        // -----------------------------------------------------------------
-        // 2. Ensure a PDF template with the required form fields exists.
-        //    If it does not, create it on‑the‑fly.  The field PartialName must
-        //    match the final column names that will be used for AutoFiller.
-        // -----------------------------------------------------------------
-        if (!File.Exists(templatePdfPath))
+        if (!File.Exists(pdfTemplatePath))
         {
-            // The final column names after mapping (see step 4).
-            var requiredFieldNames = new[] { "FirstName", "LastName", "Address" };
-
-            using (Document templateDoc = new Document())
-            {
-                Page page = templateDoc.Pages.Add();
-                float yPos = 750;
-                const float left = 100, width = 300, height = 20, verticalSpacing = 30;
-
-                foreach (string fieldName in requiredFieldNames)
-                {
-                    Rectangle rect = new Rectangle(left, yPos, left + width, yPos + height);
-                    // Create the field first, then set its properties (cannot use the field
-                    // inside its own initializer because the variable is not yet assigned).
-                    TextBoxField txtField = new TextBoxField(page, rect);
-                    txtField.PartialName = fieldName;
-                    txtField.Value = string.Empty;
-                    txtField.Border = new Border(txtField) { Style = BorderStyle.Solid, Width = 1 };
-                    txtField.Color = Color.Black;
-                    templateDoc.Form.Add(txtField);
-                    yPos -= verticalSpacing;
-                }
-
-                templateDoc.Save(templatePdfPath);
-            }
+            Console.Error.WriteLine($"Template PDF not found: {pdfTemplatePath}");
+            return;
         }
 
-        // -----------------------------------------------------------------
-        // 3. Retrieve the field names from the PDF template.
-        //    Document.Form provides the collection of fields.
-        // -----------------------------------------------------------------
+        // Load data into a DataTable (replace with actual data source as needed)
+        DataTable table = LoadCsvToDataTable(dataTableCsv);
+        if (table == null)
+        {
+            Console.Error.WriteLine("Failed to load data.");
+            return;
+        }
+
+        // 1. Retrieve all field identifiers from the PDF using the Form facade
         string[] pdfFieldNames;
-        using (Document tmplDoc = new Document(templatePdfPath))
+        using (var formFacade = new Form(pdfTemplatePath))
         {
-            pdfFieldNames = tmplDoc.Form.Fields.Select(f => f.PartialName).ToArray();
+            pdfFieldNames = formFacade.FieldNames; // Property, not a method
         }
 
-        // -----------------------------------------------------------------
-        // 4. Define a mapping from DataTable column names to PDF field names.
-        //    This mapping should be built according to your business logic.
-        // -----------------------------------------------------------------
-        var columnToFieldMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "ColFirstName", "FirstName" },
-            { "ColLastName",  "LastName"  },
-            { "ColAddress",   "Address"   }
-        };
+        // 2. Adjust DataTable column names to exactly match PDF field identifiers
+        AdjustColumnNames(table, pdfFieldNames);
 
-        // -----------------------------------------------------------------
-        // 5. Rename DataTable columns so that they exactly match the PDF
-        //    field identifiers.  AutoFiller.ImportDataTable requires an
-        //    exact case‑sensitive match.
-        // -----------------------------------------------------------------
-        foreach (var kvp in columnToFieldMap)
+        // 3. Fill the form using AutoFiller (the correct API for DataTable import)
+        using (var filler = new AutoFiller())
         {
-            if (dataTable.Columns.Contains(kvp.Key))
+            filler.BindPdf(pdfTemplatePath);
+            // Keep fields editable after filling (optional). By default AutoFiller flattens fields.
+            filler.UnFlattenFields = pdfFieldNames; // preserve editability for all fields
+            filler.ImportDataTable(table);
+
+            // Save directly to a file stream (preferred over the obsolete overloads)
+            using (var outStream = new FileStream(outputPdfPath, FileMode.Create, FileAccess.Write))
             {
-                dataTable.Columns[kvp.Key].ColumnName = kvp.Value;
+                filler.Save(outStream);
             }
+            filler.Close();
         }
 
-        // Optional sanity check: ensure every required PDF field has a matching column.
-        if (pdfFieldNames != null)
+        Console.WriteLine($"Form filled PDF saved to '{outputPdfPath}'.");
+    }
+
+    // Loads a CSV file into a DataTable (simple implementation; adapt as needed)
+    static DataTable LoadCsvToDataTable(string csvPath)
+    {
+        if (!File.Exists(csvPath))
         {
-            foreach (string fieldName in pdfFieldNames)
+            Console.Error.WriteLine($"CSV file not found: {csvPath}");
+            return null;
+        }
+
+        var dt = new DataTable();
+        using (var reader = new StreamReader(csvPath))
+        {
+            bool isFirstLine = true;
+            while (!reader.EndOfStream)
             {
-                if (!dataTable.Columns.Contains(fieldName))
+                var line = reader.ReadLine();
+                if (line == null) continue;
+                var values = line.Split(',');
+
+                if (isFirstLine)
                 {
-                    Console.WriteLine($"Warning: No data column found for PDF field '{fieldName}'.");
+                    // First line contains column headers
+                    foreach (var header in values)
+                        dt.Columns.Add(header.Trim(), typeof(string)); // treat all as string for simplicity
+                    isFirstLine = false;
+                }
+                else
+                {
+                    // Subsequent lines contain data rows
+                    // Ensure the row has the same number of columns as the header
+                    var row = dt.NewRow();
+                    for (int i = 0; i < dt.Columns.Count && i < values.Length; i++)
+                    {
+                        // Trim and keep as string; format numbers/dates beforehand if needed
+                        row[i] = values[i].Trim();
+                    }
+                    dt.Rows.Add(row);
                 }
             }
         }
+        return dt;
+    }
 
-        // -----------------------------------------------------------------
-        // 6. Use AutoFiller to bind the template, import the adjusted DataTable,
-        //    and save the filled PDF.
-        // -----------------------------------------------------------------
-        using (AutoFiller autoFiller = new AutoFiller())
+    // Renames DataTable columns to match PDF field names when possible
+    static void AdjustColumnNames(DataTable table, string[] pdfFieldNames)
+    {
+        // Build a lookup for PDF fields (case‑insensitive, ignoring spaces)
+        var pdfLookup = new System.Collections.Generic.Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var field in pdfFieldNames)
         {
-            // Bind the template PDF.
-            autoFiller.BindPdf(templatePdfPath);
-
-            // Import the DataTable with correctly named columns.
-            autoFiller.ImportDataTable(dataTable);
-
-            // Save the resulting PDF (single merged document).
-            autoFiller.Save(outputPdfPath);
+            string key = field.Replace(" ", string.Empty).ToLowerInvariant();
+            pdfLookup[key] = field; // store the exact field name
         }
 
-        Console.WriteLine($"PDF form filled and saved to '{outputPdfPath}'.");
+        foreach (DataColumn column in table.Columns)
+        {
+            string colKey = column.ColumnName.Replace(" ", string.Empty).ToLowerInvariant();
+            if (pdfLookup.TryGetValue(colKey, out string matchingPdfField))
+            {
+                // Rename column to the exact PDF field identifier
+                column.ColumnName = matchingPdfField;
+            }
+            // If no match is found, the column name is left unchanged; it will be ignored during ImportDataTable.
+        }
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 
 class Program
@@ -8,6 +7,7 @@ class Program
     static void Main()
     {
         const string pdfPath = "invoice.pdf";
+        const string logPath = "zugferd_validation_report.xml";
 
         if (!File.Exists(pdfPath))
         {
@@ -15,72 +15,22 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF to ensure it is a valid PDF document.
         using (Document doc = new Document(pdfPath))
         {
-            // Locate an embedded ZUGFeRD XML file (standard name contains .xml)
-            FileSpecification zugferdFile = null;
-            foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
-            {
-                // The correct property for the original file name is "Name"
-                if (!string.IsNullOrEmpty(fileSpec.Name) &&
-                    fileSpec.Name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-                {
-                    zugferdFile = fileSpec;
-                    break;
-                }
-            }
-
-            if (zugferdFile == null)
-            {
-                Console.WriteLine("The PDF does not contain ZUGFeRD data.");
-                return;
-            }
-
-            // Simple validation: read the XML and look for a known root element.
-            // A full ZUGFeRD validation would require a schema validator, which is
-            // beyond the scope of this example and would need additional libraries.
-            bool isValid = false;
-            try
-            {
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    // The Contents property holds the raw bytes of the embedded file.
-                    // Use the Contents stream directly – the older FileData property does not exist.
-                    if (zugferdFile.Contents != null)
-                    {
-                        zugferdFile.Contents.CopyTo(ms);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Unable to read embedded ZUGFeRD XML content.");
-                        return;
-                    }
-
-                    // Ensure the stream is read from the beginning.
-                    ms.Position = 0;
-                    string xmlContent = Encoding.UTF8.GetString(ms.ToArray());
-
-                    // Very basic check for the ZUGFeRD root element.
-                    if (xmlContent.Contains("<rsm:CrossIndustryInvoice") || xmlContent.Contains("<Invoice"))
-                    {
-                        isValid = true;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error while reading ZUGFeRD data: {ex.Message}");
-                return;
-            }
+            // ZUGFeRD is based on PDF/A‑3. Use Document.Validate with the PDF/A‑3 format.
+            // The method returns a bool indicating whether the document conforms to the format.
+            // An XML report is written to the supplied log file.
+            bool isValid = doc.Validate(logPath, PdfFormat.PDF_A_3U);
 
             if (isValid)
             {
-                Console.WriteLine("ZUGFeRD validation succeeded. The PDF appears to contain a valid ZUGFeRD XML payload.");
+                Console.WriteLine("The PDF conforms to the ZUGFeRD specification.");
             }
             else
             {
-                Console.WriteLine("ZUGFeRD validation failed. The embedded XML does not match expected ZUGFeRD structure.");
+                Console.WriteLine("The PDF does NOT conform to the ZUGFeRD specification.");
+                Console.WriteLine($"See validation report for details: {logPath}");
             }
         }
     }

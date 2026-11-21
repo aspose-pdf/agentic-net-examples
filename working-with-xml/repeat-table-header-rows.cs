@@ -7,56 +7,71 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "table_with_repeating_header.pdf";
 
-        // Load existing PDF if it exists; otherwise create a new document with a blank page.
-        Document doc;
-        if (File.Exists(inputPath))
-        {
-            doc = new Document(inputPath);
-        }
-        else
-        {
-            doc = new Document();
-            doc.Pages.Add(); // ensure at least one page
-        }
+        // Ensure output directory exists
+        string outDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
 
-        // Ensure deterministic disposal of the Document.
-        using (doc)
+        // Create a new PDF document
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
         {
-            // Create a table that will span multiple pages.
-            Table table = new Table
+            // Add a page (pages are 1‑based)
+            Aspose.Pdf.Page page = doc.Pages.Add();
+
+            // Create a table and set the number of header rows to repeat on each page
+            Aspose.Pdf.Table table = new Aspose.Pdf.Table
             {
-                // Define three equal-width columns.
-                ColumnWidths = "100 100 100",
-                // Repeat the first row (header) on every new page.
-                RepeatingRowsCount = 1
+                RepeatingRowsCount = 1,          // repeat first row on every page
+                ColumnWidths = "100 200 150"    // optional column widths
             };
 
-            // Header row – this row will be repeated on each page because of RepeatingRowsCount.
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
+            // Add header row
+            Aspose.Pdf.Row header = table.Rows.Add();
+            AddCell(header, "ID", true);
+            AddCell(header, "Name", true);
+            AddCell(header, "Description", true);
 
-            // Add many data rows to force the table to flow onto subsequent pages.
+            // Add many data rows to force pagination
             for (int i = 1; i <= 100; i++)
             {
-                Row dataRow = table.Rows.Add();
-                dataRow.Cells.Add($"Item {i}A");
-                dataRow.Cells.Add($"Item {i}B");
-                dataRow.Cells.Add($"Item {i}C");
+                Aspose.Pdf.Row row = table.Rows.Add();
+                AddCell(row, i.ToString(), false);
+                AddCell(row, $"Item {i}", false);
+                AddCell(row, $"This is a description for item {i}. It may be long enough to wrap onto multiple lines.", false);
             }
 
-            // Insert the table into the first page's paragraph collection.
-            Page firstPage = doc.Pages[1];
-            firstPage.Paragraphs.Add(table);
+            // Add the table to the page
+            page.Paragraphs.Add(table);
 
-            // Save the modified PDF.
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with repeating table header saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'. Header rows will repeat on each page.");
+    }
+
+    // Helper to add a cell with optional header styling
+    static void AddCell(Aspose.Pdf.Row row, string text, bool isHeader)
+    {
+        Aspose.Pdf.Cell cell = row.Cells.Add();
+        Aspose.Pdf.Text.TextFragment tf = new Aspose.Pdf.Text.TextFragment(text);
+
+        if (isHeader)
+        {
+            tf.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica-Bold");
+            tf.TextState.FontSize = 12;
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            tf.TextState.BackgroundColor = Aspose.Pdf.Color.LightGray;
+        }
+        else
+        {
+            tf.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Helvetica");
+            tf.TextState.FontSize = 10;
+            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+        }
+
+        cell.Paragraphs.Add(tf);
     }
 }

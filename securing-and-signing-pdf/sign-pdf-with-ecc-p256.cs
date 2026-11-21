@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,57 +7,54 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "signed_output.pdf";
-        const string certPath = "ecc_cert.pfx";
-        const string certPassword = "pfxPassword";
+        const string inputPdfPath  = "input.pdf";
+        const string outputPdfPath = "signed.pdf";
+        const string certPath      = "ecc_cert.pfx";
+        const string certPassword  = "password";
 
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
         if (!File.Exists(certPath))
         {
             Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the ECC certificate (P‑256) containing the private key.
-        X509Certificate2 eccCert = new X509Certificate2(
-            certPath,
-            certPassword,
-            X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.Exportable);
+        // Load the source PDF into an expandable memory stream.
+        byte[] pdfBytes = File.ReadAllBytes(inputPdfPath);
+        using var sourceStream = new MemoryStream();
+        sourceStream.Write(pdfBytes, 0, pdfBytes.Length);
+        sourceStream.Position = 0;
 
-        if (!eccCert.HasPrivateKey)
+        // Open the document from the expandable stream.
+        using var pdfDoc = new Document(sourceStream);
+
+        // Create a signature field on the first page (adjust rectangle as needed).
+        // Use the Aspose.Pdf.Rectangle type for annotation bounds.
+        var rect = new Aspose.Pdf.Rectangle(100, 100, 300, 200); // lower‑left X,Y, upper‑right X,Y
+        var signatureField = new SignatureField(pdfDoc.Pages[1], rect)
         {
-            Console.Error.WriteLine("The certificate does not contain a private key.");
-            return;
-        }
+            PartialName = "ECCSignature"
+        };
+        pdfDoc.Form.Add(signatureField, 1);
 
-        // Load the PDF document.
-        Document pdfDoc = new Document(inputPdfPath);
+        // Prepare PKCS#7 signature using the ECC P‑256 certificate.
+        var pkcs7 = new PKCS7(certPath, certPassword)
+        {
+            Reason      = "Signed with ECC P‑256",
+            Location    = "My Office",
+            ContactInfo = "john.doe@example.com"
+        };
 
-        // Define the rectangle for the visible signature field (llx, lly, urx, ury).
-        Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+        // Sign the field. The signature is written directly into the source stream.
+        signatureField.Sign(pkcs7);
 
-        // Create a signature field and add it to the document's form.
-        SignatureField sigField = new SignatureField(pdfDoc, sigRect);
-        pdfDoc.Form.Add(sigField);
+        // After signing, the source stream now contains the signed PDF.
+        File.WriteAllBytes(outputPdfPath, sourceStream.ToArray());
 
-        // Optional: give the field a name (visual text is supplied by the signature appearance).
-        sigField.Name = "ECCSignature";
-
-        // Create a PKCS1 signature handler using the certificate file path.
-        PKCS1 pkcs1 = new PKCS1(certPath, certPassword);
-
-        // Apply the digital signature.
-        sigField.Sign(pkcs1);
-
-        // Save the signed PDF.
-        pdfDoc.Save(outputPdfPath);
-
-        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF signed successfully: {outputPdfPath}");
     }
 }

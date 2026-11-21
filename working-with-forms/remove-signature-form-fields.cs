@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_no_signature.pdf";
 
         if (!File.Exists(inputPath))
@@ -20,22 +20,22 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Collect all signature fields first (cannot modify collection while iterating)
-            List<Field> signatureFields = new List<Field>();
+            // Collect the full names of all signature fields
+            List<string> fieldsToRemove = new List<string>();
             foreach (Field field in doc.Form)
             {
+                // Signature fields are represented by SignatureField class
                 if (field is SignatureField)
                 {
-                    signatureFields.Add(field);
+                    fieldsToRemove.Add(field.FullName);
                 }
             }
 
-            // Remove each signature field from the form
-            foreach (Field sigField in signatureFields)
+            // Remove the collected signature fields from the form collection
+            foreach (string name in fieldsToRemove)
             {
-                // Form.Delete correctly removes a field from the AcroForm collection.
-                // The overload that accepts a Field instance is used here.
-                doc.Form.Delete(sigField);
+                // The Form class provides a Delete method for removing fields
+                doc.Form.Delete(name);
             }
 
             // Save the modified PDF

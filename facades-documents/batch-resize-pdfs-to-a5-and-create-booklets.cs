@@ -3,69 +3,62 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class BatchResizeAndBooklet
+class Program
 {
     static void Main()
     {
+        // Base directory of the application (cross‑platform safe)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+
         // Folder containing source PDFs
-        const string sourceFolder = @"C:\PdfSource";
-        // Folder where final booklets will be saved
-        const string outputFolder = @"C:\PdfBooklets";
-        // Temporary folder for intermediate resized PDFs
-        string tempFolder = Path.Combine(Path.GetTempPath(), "PdfResizeTemp");
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        // Folder where resized PDFs will be placed
+        string resizedFolder = Path.Combine(baseDir, "ResizedA5");
+        // Folder where booklet PDFs will be placed
+        string bookletFolder = Path.Combine(baseDir, "Booklets");
 
-        // Ensure output and temp directories exist
-        Directory.CreateDirectory(outputFolder);
-        Directory.CreateDirectory(tempFolder);
+        // Ensure folders exist (creates them if missing)
+        Directory.CreateDirectory(inputFolder);
+        Directory.CreateDirectory(resizedFolder);
+        Directory.CreateDirectory(bookletFolder);
 
-        // Process each PDF file in the source folder
-        foreach (string pdfPath in Directory.GetFiles(sourceFolder, "*.pdf"))
+        // A5 page size in points (1 point = 1/72 inch)
+        // Width = 148 mm, Height = 210 mm
+        const double a5Width = 148.0 / 25.4 * 72.0;   // ≈ 419.53
+        const double a5Height = 210.0 / 25.4 * 72.0;  // ≈ 595.28
+
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-                string resizedPath = Path.Combine(tempFolder, fileNameWithoutExt + "_A5.pdf");
-                string bookletPath = Path.Combine(outputFolder, fileNameWithoutExt + "_booklet.pdf");
+                string fileName = Path.GetFileNameWithoutExtension(pdfPath);
+                string resizedPath = Path.Combine(resizedFolder, fileName + "_A5.pdf");
+                string bookletPath = Path.Combine(bookletFolder, fileName + "_Booklet.pdf");
 
                 // ---------- Resize to A5 ----------
-                using (Document pdfDoc = new Document(pdfPath))
+                using (var document = new Document(pdfPath))
                 {
-                    // Set each page size to A5
-                    for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+                    foreach (Page page in document.Pages)
                     {
-                        pdfDoc.Pages[i].SetPageSize(PageSize.A5.Width, PageSize.A5.Height);
+                        page.PageInfo.Width = a5Width;
+                        page.PageInfo.Height = a5Height;
                     }
-
-                    // Save the resized PDF to a temporary file
-                    pdfDoc.Save(resizedPath);
+                    document.Save(resizedPath);
                 }
 
-                // ---------- Create Booklet ----------
-                // PdfFileEditor does NOT implement IDisposable, so do NOT use a using block.
-                PdfFileEditor fileEditor = new PdfFileEditor();
-                bool success = fileEditor.MakeBooklet(resizedPath, bookletPath);
-                if (!success)
-                {
-                    Console.Error.WriteLine($"Failed to create booklet for '{pdfPath}'.");
-                }
+                // ---------- Create booklet ----------
+                var fileEditor = new PdfFileEditor();
+                fileEditor.MakeBooklet(resizedPath, bookletPath);
 
-                // Clean up the intermediate resized file
-                File.Delete(resizedPath);
-
-                Console.WriteLine($"Processed '{pdfPath}' -> booklet saved as '{bookletPath}'.");
+                Console.WriteLine($"Processed '{fileName}': resized -> '{resizedPath}', booklet -> '{bookletPath}'");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing file '{pdfPath}': {ex.Message}");
             }
         }
 
-        // Optionally remove the temporary folder if empty
-        try
-        {
-            if (Directory.Exists(tempFolder) && Directory.GetFiles(tempFolder).Length == 0)
-                Directory.Delete(tempFolder);
-        }
-        catch { /* ignore cleanup errors */ }
+        Console.WriteLine("Batch operation completed.");
     }
 }

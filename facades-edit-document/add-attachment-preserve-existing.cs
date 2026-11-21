@@ -6,38 +6,35 @@ class Program
 {
     static void Main()
     {
-        const string sourcePdf = "input.pdf";          // existing PDF
-        const string attachmentFile = "newAttachment.txt";  // file to attach
-        const string outputPdf = "output.pdf";         // PDF with new attachment
+        const string inputPdf = "input.pdf";
+        const string newAttachment = "newAttachment.txt";
+        const string outputPdf = "output.pdf";
 
-        // Verify that source files exist
-        if (!File.Exists(sourcePdf))
+        // Validate input files
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {sourcePdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(attachmentFile))
+        if (!File.Exists(newAttachment))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
+            Console.Error.WriteLine($"Attachment file not found: {newAttachment}");
             return;
         }
 
-        // Load the existing PDF using Document (PdfFileEditor does not support AddAttachment)
-        Document pdfDoc = new Document(sourcePdf);
-
-        // Create a FileSpecification for the new attachment
-        var fileSpec = new FileSpecification(Path.GetFileName(attachmentFile))
+        // Load the existing PDF
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            Description = Path.GetFileName(attachmentFile),
-            // Load the file data into the specification
-            Contents = new MemoryStream(File.ReadAllBytes(attachmentFile))
-        };
+            // Create a FileSpecification for the new file
+            var fileSpec = new FileSpecification(Path.GetFileName(newAttachment), "Additional attachment");
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(newAttachment));
 
-        // Add the attachment – existing embedded files are preserved automatically
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Add the new file to the EmbeddedFiles collection – existing embedded files are kept automatically
+            pdfDoc.EmbeddedFiles.Add(fileSpec);
 
-        // Save the result to a new file (original PDF remains unchanged)
-        pdfDoc.Save(outputPdf);
+            // Save the result to a new file
+            pdfDoc.Save(outputPdf);
+        }
 
         Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdf}'.");
     }

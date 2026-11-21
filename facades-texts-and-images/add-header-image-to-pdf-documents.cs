@@ -1,64 +1,82 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
+    // Path to the header image that will be placed on each page
+    private const string HeaderImagePath = "header.png";
+
     static void Main(string[] args)
     {
-        // Path to the header image that will be placed on each page.
-        const string headerImagePath = "header.png";
-
-        if (!File.Exists(headerImagePath))
+        // Expect a list of PDF file paths as command‑line arguments
+        if (args.Length == 0)
         {
-            Console.Error.WriteLine($"Header image not found: {headerImagePath}");
+            Console.Error.WriteLine("Usage: AddHeaderImage <pdf1> <pdf2> ...");
             return;
         }
 
-        // List of PDF files to process. If command‑line arguments are supplied, use them;
-        // otherwise, process all PDFs in the current directory.
-        string[] pdfFiles = args.Length > 0
-            ? args
-            : Directory.GetFiles(Directory.GetCurrentDirectory(), "*.pdf");
+        // Verify the header image exists once, before processing any PDF
+        if (!File.Exists(HeaderImagePath))
+        {
+            Console.Error.WriteLine($"Header image not found: {HeaderImagePath}");
+            return;
+        }
 
-        foreach (string pdfPath in pdfFiles)
+        // Directory where processed PDFs will be written
+        string outputDir = "Processed";
+        Directory.CreateDirectory(outputDir);
+
+        foreach (string pdfPath in args)
         {
             if (!File.Exists(pdfPath))
             {
-                Console.Error.WriteLine($"PDF not found: {pdfPath}");
+                Console.Error.WriteLine($"File not found: {pdfPath}");
                 continue;
             }
 
-            // Build output file name by appending "_header" before the extension.
-            string outputPath = Path.Combine(
-                Path.GetDirectoryName(pdfPath) ?? string.Empty,
-                Path.GetFileNameWithoutExtension(pdfPath) + "_header.pdf");
-
-            // Load the PDF inside a using block to ensure deterministic disposal.
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // Create an image stamp for the header.
-                ImageStamp headerStamp = new ImageStamp(headerImagePath)
+                // Load the PDF using the high‑level Document API
+                using (Document doc = new Document(pdfPath))
                 {
-                    // Place the image at the top centre of each page.
-                    Background = false,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Top,
-                    // Distance from the top edge of the page.
-                    TopMargin = 10
-                };
+                    int pageCount = doc.Pages.Count;
+                    // Assume all pages have the same size as the first page
+                    double pageWidth  = doc.Pages[1].PageInfo.Width;
+                    double pageHeight = doc.Pages[1].PageInfo.Height;
 
-                // Apply the stamp to every page (Aspose.Pdf uses 1‑based indexing).
-                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
-                {
-                    doc.Pages[pageNumber].AddStamp(headerStamp);
+                    // Define the header image size (full width, fixed height)
+                    double headerHeight = 50; // points
+                    double headerWidth  = pageWidth;
+
+                    // Create an ImageStamp – this is the modern way to place an image on a page
+                    ImageStamp headerStamp = new ImageStamp(HeaderImagePath)
+                    {
+                        Width       = headerWidth,
+                        Height      = headerHeight,
+                        LeftMargin  = 0,                     // X coordinate (lower‑left)
+                        BottomMargin = pageHeight - headerHeight // Y coordinate (lower‑left)
+                    };
+
+                    // Add the stamp to every page
+                    for (int i = 1; i <= pageCount; i++)
+                    {
+                        doc.Pages[i].AddStamp(headerStamp);
+                    }
+
+                    // Save the modified PDF to the output directory
+                    string outputPath = Path.Combine(outputDir,
+                        Path.GetFileNameWithoutExtension(pdfPath) + "_header.pdf");
+                    doc.Save(outputPath);
+
+                    Console.WriteLine($"Processed: {outputPath}");
                 }
-
-                // Save the modified PDF.
-                doc.Save(outputPath);
             }
-
-            Console.WriteLine($"Processed '{pdfPath}' → '{outputPath}'");
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+            }
         }
     }
 }

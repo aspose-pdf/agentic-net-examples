@@ -6,45 +6,53 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF and the result PDF
-        const string sourcePdf = "source.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(sourcePdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Prompt user for custom page dimensions (points; 1 inch = 72 points)
-        Console.Write("Enter page width (points): ");
-        if (!double.TryParse(Console.ReadLine(), out double width) || width <= 0)
+        // Collect custom page dimensions from the user (points)
+        double width = PromptForPositiveDouble("Enter page width (points): ");
+        double height = PromptForPositiveDouble("Enter page height (points): ");
+
+        try
         {
-            Console.Error.WriteLine("Invalid width.");
-            return;
-        }
+            // Open the existing PDF inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+            {
+                // Add a new empty page at the end of the document
+                Aspose.Pdf.Page newPage = doc.Pages.Add();
 
-        Console.Write("Enter page height (points): ");
-        if (!double.TryParse(Console.ReadLine(), out double height) || height <= 0)
+                // Apply the custom size to the newly added page
+                newPage.SetPageSize(width, height);
+
+                // Save the modified document
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"Empty page added (size: {width}×{height} points). Saved to '{outputPath}'.");
+        }
+        catch (Exception ex)
         {
-            Console.Error.WriteLine("Invalid height.");
-            return;
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
+    }
 
-        // Open the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(sourcePdf))
+    // Helper method to read a positive double value from the console
+    static double PromptForPositiveDouble(string prompt)
+    {
+        while (true)
         {
-            // Add a new empty page at the end of the document
-            Page newPage = doc.Pages.Add();
+            Console.Write(prompt);
+            string? input = Console.ReadLine();
+            if (double.TryParse(input, out double value) && value > 0)
+                return value;
 
-            // Set the custom size for the new page
-            newPage.PageInfo.Width = width;
-            newPage.PageInfo.Height = height;
-
-            // Save the modified document
-            doc.Save(outputPdf);
+            Console.WriteLine("Invalid input. Please enter a positive numeric value.");
         }
-
-        Console.WriteLine($"Empty page of size {width}x{height} points added. Saved to '{outputPdf}'.");
     }
 }

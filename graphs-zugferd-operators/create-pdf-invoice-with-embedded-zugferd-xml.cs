@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text;
 using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
@@ -8,96 +9,92 @@ class Program
 {
     static void Main()
     {
-        // Sample order data
-        var order = new Order
+        // Mock order data
+        Order order = new Order
         {
-            Id = "ORD-001",
+            OrderId = "INV-1001",
             IssueDate = DateTime.Today,
-            Buyer = "Acme Corp",
-            Seller = "Widget Ltd",
-            TotalAmount = 1234.56m
+            CustomerName = "Acme Corp",
+            CustomerId = "123456789",
+            TotalAmount = 199.99m
         };
 
-        // Generate ZUGFeRD XML from the order
-        XDocument zugferdXml = GenerateZugferdXml(order);
+        // Generate ZUGFeRD XML (simplified representation)
+        string zugferdXml = GenerateZugferdXml(order);
 
-        // Write XML into a memory stream
-        using (MemoryStream xmlStream = new MemoryStream())
+        const string pdfPath = "Invoice.pdf";
+
+        // Create PDF invoice and embed the ZUGFeRD XML
+        using (Document pdf = new Document())
         {
-            zugferdXml.Save(xmlStream);
-            xmlStream.Position = 0;
+            // Add a page with basic invoice information
+            Page page = pdf.Pages.Add();
+            TextFragment title = new TextFragment($"Invoice {order.OrderId}");
+            title.TextState.FontSize = 20;
+            title.Position = new Position(50, 750);
+            page.Paragraphs.Add(title);
 
-            // Create a new PDF invoice
-            using (Document pdfDoc = new Document())
+            // Embed the ZUGFeRD XML as an embedded file (PDF/A‑3 requirement)
+            using (MemoryStream xmlStream = new MemoryStream(Encoding.UTF8.GetBytes(zugferdXml)))
             {
-                // Add a page to the document
-                Page page = pdfDoc.Pages.Add();
-
-                // Invoice title
-                TextFragment title = new TextFragment("Invoice");
-                title.Position = new Position(50, 750);
-                title.TextState.FontSize = 24;
-                title.TextState.Font = FontRepository.FindFont("Helvetica");
-                title.TextState.ForegroundColor = Color.Black;
-                page.Paragraphs.Add(title);
-
-                // Order details
-                TextFragment details = new TextFragment(
-                    $"Order ID: {order.Id}\nDate: {order.IssueDate:yyyy-MM-dd}\nBuyer: {order.Buyer}\nSeller: {order.Seller}\nTotal: {order.TotalAmount:C}");
-                details.Position = new Position(50, 700);
-                details.TextState.FontSize = 12;
-                details.TextState.Font = FontRepository.FindFont("Helvetica");
-                page.Paragraphs.Add(details);
-
-                // Attach the ZUGFeRD XML as an embedded file (PDF/A‑3B compliant)
-                var fileSpec = new FileSpecification(xmlStream, "ZUGFeRD.xml", "ZUGFeRD Invoice XML")
-                {
-                    MIMEType = "application/xml",
-                    AFRelationship = AFRelationship.Data
-                };
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
-
-                // Convert to PDF/A‑3B (required for ZUGFeRD compliance)
-                pdfDoc.Convert("conversion_log.xml", PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
-
-                // Save the PDF
-                pdfDoc.Save("Invoice_With_ZUGFeRD.pdf");
+                // Create a FileSpecification for the XML file
+                var fileSpec = new FileSpecification("ZUGFeRD-invoice.xml", "ZUGFeRD Invoice");
+                fileSpec.Contents = xmlStream; // set the file data
+                // MimeType property does not exist in the current Aspose.Pdf version; it is optional.
+                pdf.EmbeddedFiles.Add(fileSpec); // add to the PDF portfolio
             }
+
+            // Convert to PDF/A‑3 (required for ZUGFeRD compliance)
+            pdf.Convert("conversion_log.xml", PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
+
+            // Save the final PDF
+            pdf.Save(pdfPath);
         }
 
-        Console.WriteLine("PDF invoice with ZUGFeRD XML created.");
+        Console.WriteLine($"PDF invoice with embedded ZUGFeRD XML saved to {pdfPath}");
     }
 
-    // Generates a minimal ZUGFeRD XML document for the given order
-    static XDocument GenerateZugferdXml(Order order)
+    // Generates a minimal ZUGFeRD XML document from the order data
+    static string GenerateZugferdXml(Order order)
     {
-        XNamespace ns = "urn:ferd:CrossIndustryDocument:invoice:1p0";
-        return new XDocument(
-            new XElement(ns + "CrossIndustryDocument",
-                new XElement(ns + "Header",
-                    new XElement(ns + "ID", order.Id),
-                    new XElement(ns + "IssueDateTime", order.IssueDate.ToString("yyyy-MM-dd"))
+        XNamespace rsm = "urn:un:unece:uncefact:data:standard:CrossIndustryInvoice:100";
+        XNamespace udt = "urn:un:unece:uncefact:data:standard:UnqualifiedDataType:100";
+
+        XDocument doc = new XDocument(
+            new XDeclaration("1.0", "UTF-8", "yes"),
+            new XElement(rsm + "CrossIndustryInvoice",
+                new XElement(rsm + "ExchangedDocument",
+                    new XElement(rsm + "ID", order.OrderId),
+                    new XElement(rsm + "IssueDateTime",
+                        new XElement(udt + "DateTimeString",
+                            new XAttribute("format", "102"),
+                            order.IssueDate.ToString("yyyyMMdd"))
+                    )
                 ),
-                new XElement(ns + "SellerTradeParty",
-                    new XElement(ns + "Name", order.Seller)
+                new XElement(rsm + "ApplicableHeaderTradeAgreement",
+                    new XElement(rsm + "SellerTradeParty",
+                        new XElement(rsm + "Name", order.CustomerName),
+                        new XElement(rsm + "ID", order.CustomerId)
+                    )
                 ),
-                new XElement(ns + "BuyerTradeParty",
-                    new XElement(ns + "Name", order.Buyer)
-                ),
-                new XElement(ns + "SpecifiedTradeSettlementHeaderMonetarySummation",
-                    new XElement(ns + "GrandTotalAmount", order.TotalAmount)
+                new XElement(rsm + "ApplicableHeaderTradeSettlement",
+                    new XElement(rsm + "InvoiceCurrencyCode", "EUR"),
+                    new XElement(rsm + "GrandTotalAmount", order.TotalAmount)
                 )
             )
         );
+
+        // Return the XML including the declaration
+        return doc.Declaration?.ToString() + doc.ToString();
     }
 
-    // Simple POCO representing an order
+    // Simple order representation
     class Order
     {
-        public string Id { get; set; }
+        public string OrderId { get; set; }
         public DateTime IssueDate { get; set; }
-        public string Buyer { get; set; }
-        public string Seller { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerId { get; set; }
         public decimal TotalAmount { get; set; }
     }
 }

@@ -1,49 +1,38 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "signed.pdf";
-        const string outputPath = "clean.pdf";
+        const string inputPath = "signed.pdf";
+        const string outputPath = "unsigned.pdf";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPath))
+            // PdfFileSignature implements IDisposable, so use a using block
+            using (PdfFileSignature pdfSignature = new PdfFileSignature())
             {
-                // Initialize the signature handler for the loaded document
-                PdfFileSignature pdfSignature = new PdfFileSignature(doc);
+                // Bind the PDF that contains signatures
+                pdfSignature.BindPdf(inputPath);
 
-                // Retrieve all signature names present in the document
-                IList<SignatureName> signatureNames = pdfSignature.GetSignatureNames();
-
-                // Remove each signature one by one
-                foreach (SignatureName sigName in signatureNames)
-                {
-                    // RemoveSignature expects the signature name as a string
-                    pdfSignature.RemoveSignature(sigName.Name);
-                }
-
-                // Save the cleaned document to a new file
-                doc.Save(outputPath);
+                // Remove all digital signatures and save a clean copy
+                pdfSignature.RemoveSignature(outputPath);
             }
 
-            Console.WriteLine($"Clean PDF saved to '{outputPath}'.");
+            Console.WriteLine($"All signatures removed. Clean PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during signature removal: {ex.Message}");
         }
     }
 }

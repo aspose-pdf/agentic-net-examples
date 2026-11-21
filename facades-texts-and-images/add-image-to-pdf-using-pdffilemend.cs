@@ -15,26 +15,35 @@ class Program
             return;
         }
 
-        // PdfFileMend does NOT implement IDisposable, so we use try‑finally.
+        // PdfFileMend does not implement IDisposable, so we manage its lifetime manually.
         PdfFileMend mend = new PdfFileMend();
 
         try
         {
-            // Load the source PDF.
+            // Load the source PDF into the Mend object.
             mend.BindPdf(inputPath);
 
-            // Perform any desired modifications here.
-            // Example: (no modification) just save the bound document.
+            // -----------------------------------------------------------------
+            // Perform PDF modifications here.
+            // Example: add a text stamp (uncomment and adjust as needed).
+            // TextStamp txtStamp = new TextStamp("Confidential")
+            // {
+            //     HorizontalAlignment = HorizontalAlignment.Center,
+            //     VerticalAlignment   = VerticalAlignment.Middle,
+            //     Opacity             = 0.5
+            // };
+            // mend.AddStamp(txtStamp);
+            // -----------------------------------------------------------------
 
-            // Save the (potentially) modified PDF.
+            // Save the modified PDF.
             mend.Save(outputPath);
         }
         finally
         {
-            // Ensure that all resources are released and changes are flushed.
+            // Ensure resources are released and changes are flushed.
             mend.Close();
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

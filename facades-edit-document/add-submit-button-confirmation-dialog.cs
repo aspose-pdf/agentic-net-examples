@@ -1,85 +1,41 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-
-// Stub definitions for missing Aspose.Pdf.Facades types (remove when the real library is referenced)
-namespace Aspose.Pdf.Facades
-{
-    // Minimal stub for PdfFormEditor – provides only the members used in this sample.
-    // In a real project, reference the Aspose.Pdf.Facades NuGet package instead of this stub.
-    public class PdfFormEditor : IDisposable
-    {
-        private string _boundPdfPath;
-
-        public void BindPdf(string pdfPath)
-        {
-            // In the real implementation this would load the PDF for editing.
-            // Here we just store the path for demonstration purposes.
-            _boundPdfPath = pdfPath;
-        }
-
-        public void AddJavaScript(string jsCode)
-        {
-            // Real implementation would embed the JavaScript at the document level.
-            // This stub does nothing.
-        }
-
-        public void Save(string outputPath)
-        {
-            // Real implementation would write the modified PDF to disk.
-            // For the stub we simply copy the original file if it exists.
-            if (!string.IsNullOrEmpty(_boundPdfPath) && File.Exists(_boundPdfPath))
-            {
-                File.Copy(_boundPdfPath, outputPath, overwrite: true);
-            }
-        }
-
-        public void Dispose()
-        {
-            // No resources to release in the stub.
-        }
-    }
-}
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_js.pdf";
+        const string inputPdf = "form_input.pdf";
+        const string outputPdf = "form_with_js.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
         // JavaScript that shows a confirmation dialog before submitting the form.
-        // app.alert returns 4 for "Yes" when using a 3‑button dialog.
-        string js = @"
-if (app.alert('Are you sure you want to submit the form?', 3) == 4) {
-    this.submitForm();
-}
-";
+        // If the user clicks "Yes", the form is submitted; otherwise the submission is cancelled.
+        string js = @"var response = app.alert({
+                cMsg: 'Do you want to submit the form?',
+                nIcon: 2,               // Question icon
+                nType: 2                // Yes/No buttons
+            });
+            if (response == 4) {      // 4 = Yes
+                this.submitForm();    // Adjust parameters as needed (e.g., URL, format)
+            }";
 
-        try
-        {
-            // Bind the existing PDF to the FormEditor.
-            using PdfFormEditor formEditor = new PdfFormEditor();
-            formEditor.BindPdf(inputPath);
+        // Load the existing PDF document.
+        Document doc = new Document(inputPdf);
 
-            // Add the JavaScript at the document level.
-            formEditor.AddJavaScript(js);
+        // Attach the JavaScript to be executed when the document is opened.
+        doc.OpenAction = new JavascriptAction(js);
 
-            // Save the modified PDF.
-            formEditor.Save(outputPath);
+        // Save the modified PDF.
+        doc.Save(outputPdf);
 
-            Console.WriteLine($"PDF saved with JavaScript action: {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"JavaScript added and PDF saved to '{outputPdf}'.");
     }
 }

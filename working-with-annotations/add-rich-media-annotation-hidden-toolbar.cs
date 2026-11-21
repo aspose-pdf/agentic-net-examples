@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -10,14 +9,13 @@ class Program
     {
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
-        const string mediaFile = "sample.mp4"; // path to the media file to embed
+        const string mediaFile = "media.swf"; // replace with your media file
 
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
         if (!File.Exists(mediaFile))
         {
             Console.Error.WriteLine($"Media file not found: {mediaFile}");
@@ -27,49 +25,83 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPdf))
         {
-            // Choose the page where the annotation will be placed (first page in this example)
+            // Choose the page to place the annotation (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (left, bottom, right, top)
+            // Define the annotation rectangle (llx, lly, urx, ury)
             Rectangle rect = new Rectangle(100, 500, 400, 800);
 
             // Create the RichMediaAnnotation
             RichMediaAnnotation richMedia = new RichMediaAnnotation(page, rect);
 
-            // ---------- Attach media (if RichMediaContent type exists) ----------
-            Type richMediaContentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
-            if (richMediaContentType != null)
+            // -----------------------------------------------------------------
+            // The Rich Media API (RichMediaContent, RichMediaActivation, etc.)
+            // is not available in older Aspose.Pdf versions. To keep the code
+            // compilable across all versions we use reflection to add the media
+            // only when the required types exist at runtime.
+            // -----------------------------------------------------------------
+            try
             {
-                // Instantiate RichMediaContent
-                object richMediaContent = Activator.CreateInstance(richMediaContentType);
-                // Call AddFile(string)
-                MethodInfo addFileMethod = richMediaContentType.GetMethod("AddFile", new[] { typeof(string) });
-                addFileMethod?.Invoke(richMediaContent, new object[] { mediaFile });
-                // Assign to annotation
-                PropertyInfo contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
-                contentProp?.SetValue(richMedia, richMediaContent);
-            }
-
-            // ---------- Configure playback settings (hide toolbar) ----------
-            Type richMediaSettingsType = Type.GetType("Aspose.Pdf.Annotations.RichMediaSettings, Aspose.Pdf");
-            if (richMediaSettingsType != null)
-            {
-                object richMediaSettings = Activator.CreateInstance(richMediaSettingsType);
-                // Set Toolbar = false if the property exists
-                PropertyInfo toolbarProp = richMediaSettingsType.GetProperty("Toolbar");
-                if (toolbarProp != null && toolbarProp.CanWrite)
+                // RichMediaContent
+                Type contentType = Type.GetType("Aspose.Pdf.Annotations.RichMediaContent, Aspose.Pdf");
+                if (contentType != null)
                 {
-                    toolbarProp.SetValue(richMediaSettings, false);
+                    object contentInstance = Activator.CreateInstance(contentType);
+                    // AddFile(string fileName, Stream stream, string mimeType)
+                    var addFileMethod = contentType.GetMethod("AddFile", new[] { typeof(string), typeof(Stream), typeof(string) });
+                    if (addFileMethod != null)
+                    {
+                        using (FileStream mediaStream = File.OpenRead(mediaFile))
+                        {
+                            addFileMethod.Invoke(contentInstance, new object[] { mediaFile, mediaStream, "application/x-shockwave-flash" });
+                        }
+                    }
+                    // Assign to annotation
+                    var contentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                    contentProp?.SetValue(richMedia, contentInstance);
                 }
-                // Assign to annotation
-                PropertyInfo settingsProp = typeof(RichMediaAnnotation).GetProperty("RichMediaSettings");
-                settingsProp?.SetValue(richMedia, richMediaSettings);
+
+                // RichMediaActivation
+                Type activationType = Type.GetType("Aspose.Pdf.Annotations.RichMediaActivation, Aspose.Pdf");
+                if (activationType != null)
+                {
+                    object activationInstance = Activator.CreateInstance(activationType);
+                    // Set Condition = RichMediaActivationCondition.EvenPageOpen
+                    Type conditionEnum = Type.GetType("Aspose.Pdf.Annotations.RichMediaActivationCondition, Aspose.Pdf");
+                    var conditionProp = activationType.GetProperty("Condition");
+                    if (conditionEnum != null && conditionProp != null)
+                    {
+                        object evenOpen = Enum.Parse(conditionEnum, "EvenPageOpen");
+                        conditionProp.SetValue(activationInstance, evenOpen);
+                    }
+                    var activationProp = typeof(RichMediaAnnotation).GetProperty("RichMediaActivation");
+                    activationProp?.SetValue(richMedia, activationInstance);
+                }
+
+                // RichMediaToolbar (to hide the playback toolbar)
+                Type toolbarType = Type.GetType("Aspose.Pdf.Annotations.RichMediaToolbar, Aspose.Pdf");
+                if (toolbarType != null)
+                {
+                    object toolbarInstance = Activator.CreateInstance(toolbarType);
+                    var showProp = toolbarType.GetProperty("ShowToolbar");
+                    if (showProp != null)
+                    {
+                        showProp.SetValue(toolbarInstance, false);
+                    }
+                    var toolbarProp = typeof(RichMediaAnnotation).GetProperty("RichMediaToolbar");
+                    toolbarProp?.SetValue(richMedia, toolbarInstance);
+                }
+            }
+            catch (Exception ex)
+            {
+                // If any reflection step fails, we simply continue without rich media content.
+                Console.Error.WriteLine($"Rich media setup failed: {ex.Message}");
             }
 
             // Add the annotation to the page
             page.Annotations.Add(richMedia);
 
-            // Save the modified PDF
+            // Save the modified PDF (inside the using block)
             doc.Save(outputPdf);
         }
 

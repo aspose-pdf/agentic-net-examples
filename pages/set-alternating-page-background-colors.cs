@@ -1,12 +1,37 @@
-// URL-STABILITY STUB
-//
-// Set alternating page background colors
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.9.0/pages/AGENTS.md
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "alternating_background.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
+
+        using (Document doc = new Document(inputPath))
+        {
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+
+                // Set background colour directly on the Page object (PageInfo does not expose colours)
+                if (i % 2 == 1) // odd pages → LightGray
+                    page.Background = Color.LightGray;
+                else // even pages → White
+                    page.Background = Color.White;
+            }
+
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved with alternating page backgrounds to '{outputPath}'.");
+    }
+}

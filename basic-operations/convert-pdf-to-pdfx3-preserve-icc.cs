@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfx3.pdf";
-        const string logPath    = "conversion_log.xml";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -18,22 +18,22 @@ class Program
 
         try
         {
-            // Load the source PDF
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Convert to PDF/X‑3. The conversion retains any embedded ICC color profiles,
-                // ensuring accurate color reproduction for printing.
+                // Convert the document to PDF/X‑3. Existing ICC profiles are retained automatically.
+                // The Convert overload that accepts a log file, target format and error‑action is used.
                 doc.Convert(logPath, PdfFormat.PDF_X_3, ConvertErrorAction.Delete);
 
-                // Save the converted PDF/X‑3 document
-                doc.Save(outputPath);
+                // Save the converted PDF/X‑3 document. SaveFormat.Pdf is the correct enum for a normal PDF save.
+                doc.Save(outputPath, SaveFormat.Pdf);
             }
 
-            Console.WriteLine($"PDF/X‑3 file saved to '{outputPath}'.");
+            Console.WriteLine($"Conversion successful: {outputPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Conversion failed: {ex.Message}");
         }
     }
 }

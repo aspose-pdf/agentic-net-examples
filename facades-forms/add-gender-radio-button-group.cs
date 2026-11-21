@@ -1,46 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-
-// Stub implementation for missing Aspose.Pdf.Facades types (remove when the real library is referenced)
-namespace Aspose.Pdf.Facades
-{
-    /// <summary>
-    /// Minimal stub of the PdfFormEditor class required for compilation.
-    /// Provides only the members used in this sample. Replace with the real
-    /// Aspose.Pdf.Facades.PdfFormEditor when the Aspose.Pdf NuGet package is
-    /// referenced.
-    /// </summary>
-    public class PdfFormEditor : IDisposable
-    {
-        public void BindPdf(string path)
-        {
-            // In the real implementation this loads the PDF document.
-        }
-
-        public void AddRadioButtonGroup(string fieldName, string[] options, int defaultIndex, int pageNumber,
-                                         double llx, double lly, double urx, double ury)
-        {
-            // In the real implementation this adds a radio‑button group to the form.
-        }
-
-        public void Save(string outputPath)
-        {
-            // In the real implementation this writes the modified PDF to disk.
-        }
-
-        public void Close()
-        {
-            // In the real implementation this releases internal resources.
-        }
-
-        public void Dispose()
-        {
-            Close();
-        }
-    }
-}
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -49,29 +10,62 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Create a simple PDF with one blank page if it doesn't exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
+            using (var tempDoc = new Document())
+            {
+                tempDoc.Pages.Add(); // add a blank page
+                tempDoc.Save(inputPath);
+            }
         }
 
-        // Bind the existing PDF to the form editor.
-        using var formEditor = new PdfFormEditor();
-        formEditor.BindPdf(inputPath);
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Radio button options and default selection (index 0 = "Male").
+        // Define the radio button group properties
+        string fieldName = "Gender";
         string[] options = new[] { "Male", "Female", "Other" };
-        int defaultIndex = 0;
+        int defaultSelectionIndex = 0; // 0‑based index, will be converted to 1‑based for Selected
 
-        // Add the radio button group on page 1.
-        // Coordinates are in points (1/72 inch). Adjust as needed.
-        // Parameters: field name, options, default index, page number, llx, lly, urx, ury.
-        formEditor.AddRadioButtonGroup("Gender", options, defaultIndex, 1, 100, 600, 200, 650);
+        // Get the page where the field will be placed
+        Page page = doc.Pages[1]; // first page (Aspose pages are 1‑based)
 
-        // Save the modified PDF.
-        formEditor.Save(outputPath);
+        // Create the radio button field (constructor takes a Page)
+        RadioButtonField radio = new RadioButtonField(page)
+        {
+            PartialName = fieldName
+        };
 
-        // Resources are released by the using statement.
-        Console.WriteLine($"Radio button group added and saved to '{outputPath}'.");
+        // Add each option. Use the overload that accepts a Rectangle to position the button.
+        // Here we place the options vertically with a small gap.
+        float startX = 100f;
+        float startY = 700f;
+        float btnWidth = 20f;
+        float btnHeight = 20f;
+        float verticalGap = 30f;
+
+        for (int i = 0; i < options.Length; i++)
+        {
+            Rectangle optRect = new Rectangle(
+                startX,
+                startY - i * verticalGap,
+                startX + btnWidth,
+                startY - i * verticalGap + btnHeight);
+
+            // AddOption(string optionName, Rectangle rect) adds the visual button for the option.
+            radio.AddOption(options[i], optRect);
+        }
+
+        // Set the default selected option. Selected is 1‑based.
+        radio.Selected = defaultSelectionIndex + 1;
+
+        // Add the completed field to the document's form collection.
+        doc.Form.Add(radio, 1);
+
+        // Save the modified PDF
+        doc.Save(outputPath);
+
+        Console.WriteLine($"Radio button group '{fieldName}' added. Output saved to '{outputPath}'.");
     }
 }

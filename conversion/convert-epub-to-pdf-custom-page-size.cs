@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string epubPath   = "input.epub";
-        const string pdfPath    = "output.pdf";
+        const string epubPath = "input.epub";
+        const string pdfPath  = "output.pdf";
 
         if (!File.Exists(epubPath))
         {
@@ -15,19 +15,20 @@ class Program
             return;
         }
 
-        // Load the EPUB using EpubLoadOptions
+        // Load the EPUB file with explicit load options
         EpubLoadOptions loadOptions = new EpubLoadOptions();
+
+        // Wrap the Document in a using block for deterministic disposal
         using (Document doc = new Document(epubPath, loadOptions))
         {
-            // Set a custom page size (width and height are in points)
-            // Example: 600 x 800 points
-            doc.PageInfo.Width  = 600;
-            doc.PageInfo.Height = 800;
+            // Set a custom page size (example: 6 x 9 inches, 1 inch = 72 points)
+            doc.PageInfo.Width  = 6 * 72; // 432 points
+            doc.PageInfo.Height = 9 * 72; // 648 points
 
-            // Save the document as PDF (extension .pdf forces PDF output)
+            // Save the document as PDF (Document.Save without SaveOptions writes PDF)
             doc.Save(pdfPath);
         }
 
-        Console.WriteLine($"EPUB converted to PDF with custom page size: {pdfPath}");
+        Console.WriteLine($"EPUB successfully converted to PDF with custom page size: {pdfPath}");
     }
 }

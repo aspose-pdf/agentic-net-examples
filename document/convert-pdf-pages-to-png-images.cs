@@ -2,17 +2,18 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
+using Aspose.Pdf.Security.HiddenDataSanitization;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "Images";
+        const string inputPath = "input.pdf";
+        const string outputDir = "SanitizedImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -21,41 +22,32 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Convert every page to an image using core Aspose.Pdf APIs
-                ConvertAllPagesToImages(doc, outputDir);
+                // ---------- Hidden data sanitization ----------
+                // Use the modern HiddenDataSanitizer API (Aspose.Pdf.Security.HiddenDataSanitization)
+                var sanitizationOptions = new HiddenDataSanitizationOptions();
+                // Options can be tweaked here, e.g. sanitizationOptions.RemoveMetadata = false;
+                var sanitizer = new HiddenDataSanitizer(sanitizationOptions);
+                sanitizer.Sanitize(doc);
+
+                // ---------- Convert each page to an image ----------
+                // PngDevice (or any other ImageDevice) is the recommended way to render pages to images.
+                var resolution = new Resolution(300); // 300 DPI – adjust as needed
+                for (int i = 1; i <= doc.Pages.Count; i++)
+                {
+                    var pngDevice = new PngDevice(resolution);
+                    string outPath = Path.Combine(outputDir, $"page_{i}.png");
+                    pngDevice.Process(doc.Pages[i], outPath);
+                }
             }
 
-            Console.WriteLine($"All pages have been saved as images in '{outputDir}'.");
+            Console.WriteLine($"Sanitized images have been saved to '{outputDir}'.");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Renders each page of the supplied PDF document to a separate PNG image file.
-    /// </summary>
-    /// <param name="doc">The loaded PDF document.</param>
-    /// <param name="outputDir">Directory where image files will be written.</param>
-    private static void ConvertAllPagesToImages(Document doc, string outputDir)
-    {
-        // Define the resolution for the output images (e.g., 300 DPI)
-        var resolution = new Resolution(300);
-        // Choose the image format – here we use PNG. You can switch to JpegDevice, etc.
-        var device = new PngDevice(resolution);
-
-        for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
-        {
-            var page = doc.Pages[pageNumber];
-            string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-            using (var stream = new FileStream(outPath, FileMode.Create))
-            {
-                device.Process(page, stream);
-            }
         }
     }
 }

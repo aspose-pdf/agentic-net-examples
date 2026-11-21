@@ -1,15 +1,18 @@
 using System;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";          // source PDF
-        const string outputDir  = "ExtractedImages";   // folder for images
-        const string keyword    = "YOUR_KEYWORD";      // word to search for (case‑insensitive)
+        const string inputPdf = "input.pdf";
+        const string keyword = "YOUR_KEYWORD"; // keyword to search for
+        const string imagesDir = "ExtractedImages";
 
         if (!File.Exists(inputPdf))
         {
@@ -17,63 +20,56 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(imagesDir);
 
-        // Load the document to obtain the total page count (PdfExtractor does not expose PageCount)
-        Document pdfDocument = new Document(inputPdf);
-        int pageCount = pdfDocument.Pages.Count;
+        // 1. Determine which pages contain the keyword
+        List<int> pagesWithKeyword = new List<int>();
 
-        // PdfExtractor implements IDisposable – wrap it in a using block
+        using (Document doc = new Document(inputPdf))
+        {
+            // Pages are 1‑based in Aspose.Pdf
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                TextAbsorber absorber = new TextAbsorber();
+                // Extract text only from the current page
+                doc.Pages[i].Accept(absorber);
+                if (!string.IsNullOrEmpty(absorber.Text) &&
+                    absorber.Text.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    pagesWithKeyword.Add(i);
+                }
+            }
+        }
+
+        if (pagesWithKeyword.Count == 0)
+        {
+            Console.WriteLine("No pages contain the specified keyword.");
+            return;
+        }
+
+        // 2. Extract images only from the identified pages
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document once – we will change the page range for each operation
             extractor.BindPdf(inputPdf);
+            // Optional: define the extraction mode (resource‑based images)
+            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
 
-            // Iterate through each page
-            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
+            int imageIndex = 1;
+            foreach (int pageNumber in pagesWithKeyword)
             {
-                // -------------------------------------------------------------
-                // 1. Extract text from the current page to decide whether to keep it
-                // -------------------------------------------------------------
-                extractor.StartPage = pageNumber;   // set page range for text extraction
+                // Limit extraction to a single page
+                extractor.StartPage = pageNumber;
                 extractor.EndPage   = pageNumber;
-                extractor.ExtractText();
 
-                string pageText;
-                using (MemoryStream textStream = new MemoryStream())
-                {
-                    // GetText writes the extracted text into the supplied stream
-                    extractor.GetText(textStream);
-                    textStream.Position = 0;
-                    using (StreamReader reader = new StreamReader(textStream))
-                    {
-                        pageText = reader.ReadToEnd();
-                    }
-                }
-
-                if (string.IsNullOrEmpty(pageText) ||
-                    pageText.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) < 0)
-                {
-                    // Keyword not found – skip image extraction for this page
-                    continue;
-                }
-
-                // ---------------------------------------------------------------
-                // 2. Keyword found – now extract all images from this page
-                // ---------------------------------------------------------------
-                extractor.StartPage = pageNumber;   // set page range for image extraction
-                extractor.EndPage   = pageNumber;
-                // No ExtractImageMode property in the current library version – default behaviour extracts all images
+                // Perform the extraction for the current page
                 extractor.ExtractImage();
 
-                int imageIndex = 1;
                 while (extractor.HasNextImage())
                 {
-                    string outPath = Path.Combine(outputDir,
-                        $"page_{pageNumber}_img_{imageIndex}.png");
-                    extractor.GetNextImage(outPath);
-                    Console.WriteLine($"Saved image: {outPath}");
+                    string imagePath = Path.Combine(imagesDir, $"Image_Page{pageNumber}_{imageIndex}.png");
+                    extractor.GetNextImage(imagePath, ImageFormat.Png);
+                    Console.WriteLine($"Saved image: {imagePath}");
                     imageIndex++;
                 }
             }

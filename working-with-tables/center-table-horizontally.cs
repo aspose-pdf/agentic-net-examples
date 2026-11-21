@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -7,58 +6,51 @@ class Program
 {
     static void Main()
     {
-        // Paths for the output PDF
-        const string outputPath = "table_centered.pdf";
+        const string outputPath = "centered_table.pdf";
 
-        // Create a new PDF document
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
+            // Add a new page (Pages.Add returns the newly created page)
             Page page = doc.Pages.Add();
 
-            // Create a table
-            Table table = new Table
-            {
-                // Set column widths (example: three equal columns)
-                ColumnWidths = "100 100 100",
+            // Define the table rectangle (full page width, positioned near the top)
+            double llx = 0;
+            double lly = page.PageInfo.Height - 100; // lower‑left Y (from bottom)
+            double urx = page.PageInfo.Width;
+            double ury = page.PageInfo.Height - 20;  // upper‑right Y (from bottom)
 
-                // Center the table horizontally on the page
-                HorizontalAlignment = HorizontalAlignment.Center,
+            // Create the table (parameterless constructor)
+            Table table = new Table();
 
-                // Optional: set default border and padding for all cells
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f),
-                DefaultCellPadding = new MarginInfo(5, 5, 5, 5),
+            // Position the table using Left/Top properties (Aspose.Pdf.Table does not have SetPosition)
+            table.Left = (float)llx;
+            table.Top = (float)lly;
 
-                // Optional: set default text formatting for all cells
-                DefaultCellTextState = new TextState
-                {
-                    FontSize = 12,
-                    Font = FontRepository.FindFont("Arial")
-                }
-            };
+            // Align the table horizontally to the center of the page
+            table.HorizontalAlignment = HorizontalAlignment.Center;
 
-            // Add header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Header 1");
-            header.Cells.Add("Header 2");
-            header.Cells.Add("Header 3");
+            // Define column widths (two equal columns covering the table width)
+            double columnWidth = (urx - llx) / 2;
+            // ColumnWidths expects a space‑separated string, not a double array
+            table.ColumnWidths = $"{columnWidth} {columnWidth}";
 
-            // Add a data row
-            Row data = table.Rows.Add();
-            data.Cells.Add("Cell A1");
-            data.Cells.Add("Cell A2");
-            data.Cells.Add("Cell A3");
+            // Optional: auto‑fit columns to content (helps when text is longer than the preset width)
+            table.ColumnAdjustment = ColumnAdjustment.AutoFitToContent;
 
-            // Add another data row
-            Row data2 = table.Rows.Add();
-            data2.Cells.Add("Cell B1");
-            data2.Cells.Add("Cell B2");
-            data2.Cells.Add("Cell B3");
+            // Add a sample row with two cells
+            Row row = table.Rows.Add();
+            Cell cell1 = row.Cells.Add("Header 1");
+            Cell cell2 = row.Cells.Add("Header 2");
 
-            // Add the table to the page
+            // Optional styling (using Aspose.Pdf.Color to avoid System.Drawing)
+            cell1.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            cell2.BackgroundColor = Aspose.Pdf.Color.LightGray;
+
+            // Insert the table into the page's content
             page.Paragraphs.Add(table);
 
-            // Save the PDF
+            // Save the PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 

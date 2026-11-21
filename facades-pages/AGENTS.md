@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-pages
 
-> **Facades pages** in PDF using C# / .NET -- **114** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades pages** in PDF using C# / .NET -- **114** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,16 +23,17 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (105/114 files) ← category-specific
-- `using Aspose.Pdf.Facades;` (71/114 files) ← category-specific
-- `using Aspose.Pdf.Text;` (6/114 files)
-- `using Aspose.Pdf.Devices;` (5/114 files)
-- `using Aspose.Pdf.Annotations;` (2/114 files)
-- `using Aspose.Pdf.Drawing;` (1/114 files)
+- `using Aspose.Pdf;` (97/114 files) ← category-specific
+- `using Aspose.Pdf.Facades;` (79/114 files) ← category-specific
+- `using Aspose.Pdf.Text;` (10/114 files)
+- `using Aspose.Pdf.Annotations;` (3/114 files)
+- `using Aspose.Pdf.Devices;` (2/114 files)
 - `using System;` (114/114 files)
-- `using System.IO;` (111/114 files)
+- `using System.IO;` (112/114 files)
 - `using System.Linq;` (17/114 files)
-- `using System.Collections.Generic;` (9/114 files)
+- `using System.Collections.Generic;` (7/114 files)
+- `using System.Drawing;` (1/114 files)
+- `using System.Text;` (1/114 files)
 - `using System.Text.Json;` (1/114 files)
 
 ## Common Code Pattern
@@ -50,36 +51,36 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-10-percent-margins-to-pdf-pages](./add-10-percent-margins-to-pdf-pages.cs) | Resize PDF Pages with Uniform Margin | `Document`, `PdfPageEditor`, `BindPdf` | Shows how to apply a uniform 80% zoom to all pages of a PDF using PdfPageEditor, creating a 10% m... |
-| [add-15-percent-margins-to-pdf-pages](./add-15-percent-margins-to-pdf-pages.cs) | Apply 15% Margin Resize to Selected PDF Pages for Booklet La... | `Document`, `Page`, `PageInfo` | Loads a PDF, selects specific pages, applies a 15 % margin on all sides to improve readability fo... |
-| [add-20-percent-margins-to-pdf-pages](./add-20-percent-margins-to-pdf-pages.cs) | Add 20% Margin to PDF Pages | `Document`, `Page`, `PageInfo` | Demonstrates how to increase each PDF page's size and add a uniform 20% whitespace margin around ... |
-| [add-5-percent-margins-and-print-pdf](./add-5-percent-margins-and-print-pdf.cs) | Add 5% Margin to PDF Pages | `Document`, `PdfPageEditor`, `BindPdf` | Demonstrates how to enlarge each PDF page by 5 % to create a white margin and then scale the orig... |
-| [add-fade-transition-to-pdf-page](./add-fade-transition-to-pdf-page.cs) | Apply Fade Transition to First PDF Page | `Document`, `PdfPageEditor`, `ProcessPages` | Demonstrates how to add a 2‑second Fade (Dissolve) transition to the first page of a PDF using As... |
-| [adjust-page-zoom-based-on-word-count](./adjust-page-zoom-based-on-word-count.cs) | Adjust PDF Page Zoom Based on Word Count | `Document`, `Page`, `TextAbsorber` | The example loads a PDF, extracts the plain text of each page to count words, and then scales the... |
-| [align-page-three-vertically-top](./align-page-three-vertically-top.cs) | Align Page 3 Vertically to Top | `PdfPageEditor`, `BindPdf`, `ProcessPages` | Shows how to use PdfPageEditor to align the content of page 3 to the top of the page in a PDF doc... |
-| [align-page-two-left](./align-page-two-left.cs) | Left Align Content of PDF Page Using PdfPageEditor | `PdfPageEditor`, `BindPdf`, `Save` | Demonstrates how to left‑justify the content of a specific PDF page (page 2) using Aspose.Pdf's P... |
-| [apply-custom-page-transitions](./apply-custom-page-transitions.cs) | Apply Custom Page Transitions Based on Index | `Document`, `PdfPageEditor`, `ProcessPages` | Shows how to assign different transition effects to each PDF page using PdfPageEditor, varying th... |
-| [apply-different-zoom-levels-to-pdf-pages](./apply-different-zoom-levels-to-pdf-pages.cs) | Apply Different Zoom Levels to PDF Pages and Convert to TIFF | `Document`, `PdfPageEditor`, `PdfConverter` | Demonstrates iterating through each PDF page, applying a unique zoom factor with PdfPageEditor, a... |
-| [apply-dissolve-transition-to-pdf-page](./apply-dissolve-transition-to-pdf-page.cs) | Apply Dissolve Transition to PDF Page | `Document`, `PdfPageEditor`, `ApplyChanges` | Shows how to set a Dissolve page transition with a 3‑second duration on a specific page using Asp... |
-| [apply-fade-transition-to-all-pdf-pages](./apply-fade-transition-to-all-pdf-pages.cs) | Apply Fade Transition to All PDF Pages | `Document`, `PdfPageEditor`, `TransitionType` | Demonstrates how to set a Fade page transition for every page in a PDF using Aspose.Pdf's PdfPage... |
-| [apply-horizontal-alignment-to-pdf-pages](./apply-horizontal-alignment-to-pdf-pages.cs) | Left‑justify Text on All PDF Pages | `PdfPageEditor`, `BindPdf`, `Save` | Shows how to use PdfPageEditor to iterate through each page of a PDF, set the HorizontalAlignment... |
-| [apply-page-adjustments-from-json](./apply-page-adjustments-from-json.cs) | Apply Page Adjustments from JSON Config to PDFs | `Document`, `Page`, `Rotation` | Shows how to read a JSON configuration file and programmatically rotate, resize, and set backgrou... |
-| [apply-page-transitions-by-index](./apply-page-transitions-by-index.cs) | Apply Rotating Page Transitions with PdfPageEditor | `Document`, `PdfPageEditor`, `BindPdf` | Demonstrates loading a PDF, iterating through its pages, and assigning different transition effec... |
-| [apply-rotation-size-zoom-to-pdf-pages](./apply-rotation-size-zoom-to-pdf-pages.cs) | Rotate, Resize, and Zoom PDF Pages | `Document`, `PageInfo`, `Rotation` | Shows how to rotate all pages, set a custom page size, and apply a uniform zoom factor to a PDF u... |
-| [apply-transition-to-odd-pages](./apply-transition-to-odd-pages.cs) | Apply Fade Transition to Odd Pages in PDF | `Document`, `PdfPageEditor`, `BindPdf` | Shows how to apply a Fade page transition only to odd‑numbered pages of a PDF using Aspose.Pdf.Fa... |
-| [apply-vertical-alignment-to-selected-pdf-pages](./apply-vertical-alignment-to-selected-pdf-pages.cs) | Apply Vertical Alignment to Selected PDF Pages | `PdfPageEditor`, `BindPdf`, `VerticalAlignmentType` | Demonstrates how to align specific pages of a PDF to the top using PdfPageEditor’s VerticalAlignm... |
-| [apply-zoom-to-non-consecutive-pdf-pages](./apply-zoom-to-non-consecutive-pdf-pages.cs) | Select Non-Consecutive PDF Pages and Apply Common Zoom | `Document`, `Add`, `Save` | Demonstrates how to extract specific non‑consecutive pages from a PDF, combine them into a new do... |
-| [assign-page-transitions-by-content](./assign-page-transitions-by-content.cs) | Set Individual Page Transitions in PDF | `Document`, `PdfPageEditor`, `ProcessPages` | Shows how to assign different transition effects to specific PDF pages using Aspose.Pdf's PdfPage... |
-| [audit-pdf-page-dimensions-rotation](./audit-pdf-page-dimensions-rotation.cs) | Audit PDF Page Dimensions and Rotation Before and After Edit... | `Document`, `Page`, `PageInfo` | Demonstrates how to log each page's width, height, and rotation angle before and after applying a... |
-| [batch-adjust-pdf-page-size](./batch-adjust-pdf-page-size.cs) | Batch Set Individual Page Sizes in PDFs | `Document`, `PageInfo`, `Save` | Demonstrates how to process all PDF files in a folder, iterate through each page, assign differen... |
-| [batch-convert-pdfs-to-a4](./batch-convert-pdfs-to-a4.cs) | Batch Resize PDFs to A4 Page Size | `Document`, `Page`, `PageInfo` | Shows how to process all PDF files in a folder, load each with Aspose.Pdf, change every page's di... |
-| [batch-rotate-first-page-pdfs](./batch-rotate-first-page-pdfs.cs) | Batch Rotate First Page of PDFs | `Document`, `Save`, `Pages` | Shows how to loop through a directory of PDF files, rotate the first page of each document by 90 ... |
-| [batch-set-fade-transition-pdf-slideshow](./batch-set-fade-transition-pdf-slideshow.cs) | Batch Apply Fade Transition to PDF Pages | `Document`, `BindPdf`, `ProcessPages` | Demonstrates how to load a PDF and use PdfPageEditor to set a Fade slide transition with a two‑se... |
-| [center-page-content-horizontally](./center-page-content-horizontally.cs) | Center Text Horizontally on PDF Page 2 | `Document`, `TextFragment`, `FindFont` | Shows how to load a PDF, create a TextFragment, set its HorizontalAlignment to Center, and add it... |
-| [center-page-content-set-display-duration](./center-page-content-set-display-duration.cs) | Center Align Page and Set Display Duration in PDF | `PdfPageEditor`, `BindPdf`, `ProcessPages` | Shows how to center‑align the content of a specific PDF page and set its automatic display durati... |
-| [chain-page-rotation-size-zoom-modifications](./chain-page-rotation-size-zoom-modifications.cs) | Rotate, Resize and Zoom PDF Pages | `Document`, `Page`, `Rotation` | Demonstrates how to chain multiple page modifications—rotation, size change, and a simulated zoom... |
-| [change-pdf-page-size-and-undo](./change-pdf-page-size-and-undo.cs) | Change PDF Page Size and Undo to Original Dimensions | `Document`, `PageInfo`, `Save` | Demonstrates how to record original page dimensions, apply a custom size to all pages, save the m... |
-| [change-pdf-page-size-to-a3](./change-pdf-page-size-to-a3.cs) | Resize PDF Pages to A3 Size | `Document`, `Page`, `PageInfo` | Shows how to load a PDF with Aspose.Pdf, set each page's dimensions to A3, and save the modified ... |
+| [add-10-percent-margins-to-pdf-pages](./add-10-percent-margins-to-pdf-pages.cs) | Batch Resize PDF Pages by 10% Margin | `Document`, `PdfPageEditor`, `Pages` | Demonstrates how to use Aspose.Pdf's PdfPageEditor to scale the content of every page in a PDF to... |
+| [add-15-percent-margins-to-pdf-pages](./add-15-percent-margins-to-pdf-pages.cs) | Apply 15% Margin Resize for Booklet Layout | `Document`, `PageInfo`, `MarginInfo` | Shows how to add a 15% margin on each side of selected PDF pages to create a booklet‑friendly lay... |
+| [add-20-percent-margins-to-pdf-pages](./add-20-percent-margins-to-pdf-pages.cs) | Add 20% Margin to PDF Pages | `Document`, `PdfPageEditor`, `BindPdf` | Shows how to create uniform 20% whitespace margins around every page of a PDF by scaling the page... |
+| [add-5-percent-margins-and-print-pdf](./add-5-percent-margins-and-print-pdf.cs) | Resize PDF Pages by 5% to Add White Margin | `Document`, `PageInfo`, `Save` | Shows how to increase each PDF page size by 5 % using Aspose.Pdf, creating extra white space arou... |
+| [add-fade-transition-to-pdf-page](./add-fade-transition-to-pdf-page.cs) | Apply Fade Transition to PDF Page | `Document`, `PdfPageEditor`, `BindPdf` | Shows how to set a fade transition and a two‑second duration for a specific page in a PDF using A... |
+| [adjust-page-zoom-based-on-word-count](./adjust-page-zoom-based-on-word-count.cs) | Adjust Page Zoom Based on Word Count | `Document`, `PdfPageEditor`, `TextFragmentAbsorber` | Demonstrates how to extract text from each PDF page, compute a zoom factor from the word count, a... |
+| [align-page-three-vertically-top](./align-page-three-vertically-top.cs) | Align Page 3 Content to Top Using PdfContentEditor | `PdfContentEditor`, `BindPdf`, `AlignPageContent` | Demonstrates loading a PDF with PdfContentEditor, aligning the content of page 3 to the top using... |
+| [align-page-two-left](./align-page-two-left.cs) | Left‑justify Text on Second PDF Page | `Document`, `Page`, `TextFragment` | Demonstrates how to add a left‑aligned text fragment to the second page of a PDF using Aspose.Pdf... |
+| [apply-custom-page-transitions](./apply-custom-page-transitions.cs) | Apply Custom Page Transitions Based on Index | `Document`, `PdfPageEditor`, `ApplyChanges` | Shows how to assign different transition effects to each PDF page using Aspose.Pdf.Facades.PdfPag... |
+| [apply-different-zoom-levels-to-pdf-pages](./apply-different-zoom-levels-to-pdf-pages.cs) | Apply Per-Page Zoom Levels to PDF Using PdfPageEditor | `Document`, `PdfPageEditor`, `Save` | Shows how to set a different zoom factor for each page of a PDF by iterating through pages with P... |
+| [apply-dissolve-transition-to-pdf-page](./apply-dissolve-transition-to-pdf-page.cs) | Apply Dissolve Transition to a PDF Page | `PdfPageEditor`, `BindPdf`, `ProcessPages` | Demonstrates how to set a Dissolve page transition with a three‑second duration on page 5 of a PD... |
+| [apply-fade-transition-to-all-pdf-pages](./apply-fade-transition-to-all-pdf-pages.cs) | Set Fade Transition for All PDF Pages | `Document`, `PdfPageEditor`, `BindPdf` | Demonstrates how to apply a Fade page transition to every page of a PDF using Aspose.Pdf's PdfPag... |
+| [apply-horizontal-alignment-to-pdf-pages](./apply-horizontal-alignment-to-pdf-pages.cs) | Apply Left Horizontal Alignment to All PDF Pages | `Document`, `PdfPageEditor`, `BindPdf` | Shows how to left‑justify the content of every page in a PDF using Aspose.Pdf's PdfPageEditor and... |
+| [apply-page-adjustments-from-json](./apply-page-adjustments-from-json.cs) | Apply Page Settings from JSON to PDF | `Document`, `Page`, `PageInfo` | Loads a JSON configuration that defines rotation, margins, and background color per page, then ap... |
+| [apply-page-transitions-by-index](./apply-page-transitions-by-index.cs) | Apply Page Transitions Based on Index Modulo Three | `Document`, `PdfPageEditor`, `BindPdf` | Shows how to assign different page transition effects to each PDF page using PdfPageEditor, selec... |
+| [apply-rotation-size-zoom-to-pdf-pages](./apply-rotation-size-zoom-to-pdf-pages.cs) | Apply Rotation, Resize, and Zoom to PDF Pages | `Document`, `Page`, `PdfPageEditor` | Shows how to rotate pages, change their dimensions, and zoom the page content of a PDF using Aspo... |
+| [apply-transition-to-odd-pages](./apply-transition-to-odd-pages.cs) | Apply Transition to Odd Pages in PDF | `PdfPageEditor`, `BindPdf`, `ProcessPages` | Shows how to add a page transition effect only to odd‑numbered pages of a PDF using Aspose.Pdf.Fa... |
+| [apply-vertical-alignment-to-selected-pdf-pages](./apply-vertical-alignment-to-selected-pdf-pages.cs) | Apply Vertical Alignment to Selected PDF Pages | `PdfPageEditor`, `BindPdf`, `VerticalAlignmentType` | Shows how to set the vertical alignment of specific pages in a PDF to top using Aspose.Pdf's PdfP... |
+| [apply-zoom-to-non-consecutive-pdf-pages](./apply-zoom-to-non-consecutive-pdf-pages.cs) | Apply Zoom to Selected PDF Pages | `PdfPageEditor`, `BindPdf`, `ProcessPages` | Shows how to specify non‑consecutive pages with the ProcessPages array and apply a common zoom fa... |
+| [assign-page-transitions-by-content](./assign-page-transitions-by-content.cs) | Set Page Transitions Based on Content Type | `Document`, `PdfPageEditor`, `Page` | The example loads a PDF, detects whether each page contains only images, only text, or a mix, and... |
+| [audit-pdf-page-dimensions-rotation](./audit-pdf-page-dimensions-rotation.cs) | Log PDF Page Dimensions and Rotation Before and After Editin... | `Document`, `Page`, `PageInfo` | Demonstrates how to record each page's width, height, and rotation before and after adding a text... |
+| [batch-adjust-pdf-page-size](./batch-adjust-pdf-page-size.cs) | Batch Set Individual Page Sizes for PDFs | `Document`, `PageInfo`, `Page` | Demonstrates how to process a folder of PDF files and assign a specific page size to each page of... |
+| [batch-convert-pdfs-to-a4](./batch-convert-pdfs-to-a4.cs) | Batch Convert PDFs to A4 Page Size | `PdfPageEditor`, `BindPdf`, `PageSize` | Shows how to iterate over PDF files in a directory and resize each document to A4 dimensions usin... |
+| [batch-rotate-first-page-pdfs](./batch-rotate-first-page-pdfs.cs) | Rotate First Page of PDFs in a Folder | `Document`, `Rotation`, `Page` | Demonstrates how to batch‑process PDF files in a directory, rotating the first page of each docum... |
+| [batch-set-fade-transition-pdf-slideshow](./batch-set-fade-transition-pdf-slideshow.cs) | Set Fade Transition for All PDF Pages | `Document`, `PdfPageEditor`, `ProcessPages` | Demonstrates how to apply a 2‑second Fade transition to every page of a PDF using Aspose.Pdf's Pd... |
+| [center-page-content-horizontally](./center-page-content-horizontally.cs) | Center Text on Second PDF Page | `Document`, `Page`, `TextFragment` | Shows how to load a PDF, access the second page, and add a text fragment that is horizontally cen... |
+| [center-page-content-set-display-duration](./center-page-content-set-display-duration.cs) | Center Page Content and Set Display Duration on PDF Page | `Document`, `PdfPageEditor`, `BindPdf` | Demonstrates how to center the content of a specific PDF page and set its display duration to fou... |
+| [chain-page-rotation-size-zoom-modifications](./chain-page-rotation-size-zoom-modifications.cs) | Chain Page Rotation, Resize, and Zoom before Saving PDF | `Document`, `Page`, `PageInfo` | Shows how to rotate pages, change their size, and apply a viewer zoom using Aspose.Pdf Document a... |
+| [change-pdf-page-size-and-undo](./change-pdf-page-size-and-undo.cs) | Change PDF Page Size and Revert to Original | `Document`, `Page`, `PageInfo` | Demonstrates how to capture a PDF page's original dimensions, apply a custom page size, and then ... |
+| [change-pdf-page-size-to-a3](./change-pdf-page-size-to-a3.cs) | Resize PDF Pages to A3 Size | `Document`, `Page`, `PageInfo` | Shows how to load a PDF with Aspose.Pdf, set each page's width and height to A3 dimensions, and s... |
 | ... | | | *and 84 more files* |
 
 ## Category Statistics
@@ -116,5 +117,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-pages patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-26 | Run: `20261026_001223_9dc44d`
+Updated: 2026-11-11 | Run: `20261111_025854_ab1c98`
 <!-- AUTOGENERATED:END -->

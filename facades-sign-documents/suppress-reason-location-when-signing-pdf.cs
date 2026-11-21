@@ -2,52 +2,61 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // required for PKCS7 and SignatureCustomAppearance
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
+        // Paths for source PDF, signed output, and signing certificate
         const string inputPath = "input.pdf";
         const string outputPath = "signed.pdf";
-        const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
+        // Validate required files exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        if (!File.Exists(certificatePath))
-        {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
-            return;
-        }
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Bind the PDF to the signature facade
-        var signature = new PdfFileSignature();
-        signature.BindPdf(inputPath);
-
-        // Create a PKCS7 signature object and suppress location/reason/contact text
-        var pkcs = new PKCS7(certificatePath, certificatePassword)
+        // Create a signature field (invisible) and add it to the form collection
+        // Rectangle with zero size makes the field invisible; you can also omit the rectangle and set Visible = false later.
+        var sigField = new SignatureField(doc, new Aspose.Pdf.Rectangle(0, 0, 0, 0))
         {
-            Location = string.Empty,   // suppress location
-            Reason = string.Empty,     // suppress reason
-            ContactInfo = string.Empty // suppress contact info
+            Name = "Signature1"
+        };
+        doc.Form.Add(sigField);
+
+        // Create a PKCS7 signature object with empty Reason, Location and ContactInfo to suppress those texts
+        var pkcs7 = new PKCS7(certPath, certPassword)
+        {
+            Reason = string.Empty,
+            Location = string.Empty,
+            ContactInfo = string.Empty,
+            // Optional: hide all labels via custom appearance (not required for an invisible field)
+            CustomAppearance = new SignatureCustomAppearance
+            {
+                ShowReason = false,
+                ShowLocation = false,
+                ShowContactInfo = false
+            }
         };
 
-        // Optional: hide the labels on the appearance as well
-        pkcs.CustomAppearance = new SignatureCustomAppearance
-        {
-            ShowLocation = false,
-            ShowReason = false,
-            ShowContactInfo = false
-        };
+        // Sign the field with the PKCS7 object
+        sigField.Sign(pkcs7);
 
-        // Sign the PDF using the PKCS7 object. The overload without SignatureFieldInfo
-        // signs the whole document with a default signature field.
-        signature.Sign(outputPath, pkcs);
+        // Save the signed document
+        doc.Save(outputPath);
 
         Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }

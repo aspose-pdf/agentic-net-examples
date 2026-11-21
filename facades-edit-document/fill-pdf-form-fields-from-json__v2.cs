@@ -1,102 +1,84 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using System.Text.Json;
-using Aspose.Pdf.Facades;
-
-// Minimal stub for Aspose.Pdf.Facades.PdfFormEditor when the real library is not referenced.
-// This allows the sample to compile and run (the stub does not actually modify PDFs).
-namespace Aspose.Pdf.Facades
-{
-    public class PdfFormEditor : IDisposable
-    {
-        private string _boundPdfPath;
-        public void BindPdf(string pdfPath)
-        {
-            // In a real implementation this would load the PDF.
-            // Here we just store the path for demonstration purposes.
-            _boundPdfPath = pdfPath;
-        }
-
-        public void SetField(string fieldName, string value)
-        {
-            // Stub: no real PDF manipulation.
-            // In production this would set the form field value.
-        }
-
-        public void Save(string outputPath)
-        {
-            // Stub: simply copy the source PDF to the destination if it exists.
-            if (!string.IsNullOrEmpty(_boundPdfPath) && File.Exists(_boundPdfPath))
-            {
-                File.Copy(_boundPdfPath, outputPath, overwrite: true);
-            }
-        }
-
-        public void Dispose()
-        {
-            // No unmanaged resources in the stub.
-        }
-    }
-}
+using System.IO;
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the configuration file and the output PDF
-        const string pdfPath = "input_form.pdf";
-        const string configPath = "defaults.json";
-        const string outputPdfPath = "filled_form.pdf";
+        const string inputPdf = "form.pdf";
+        const string outputPdf = "filled_form.pdf";
+        const string configPath = "defaults.cfg";
 
-        // Verify that the required files exist
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(configPath))
         {
-            Console.Error.WriteLine($"Configuration file not found: {configPath}");
+            Console.Error.WriteLine($"Config file not found: {configPath}");
             return;
         }
 
-        // Load default field values from a simple JSON file:
-        // { "FieldName1": "DefaultValue1", "FieldName2": "DefaultValue2", ... }
-        Dictionary<string, string> fieldDefaults = new();
-        try
-        {
-            string json = File.ReadAllText(configPath);
-            fieldDefaults = JsonSerializer.Deserialize<Dictionary<string, string>>(json) ?? new Dictionary<string, string>();
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
-            return;
-        }
+        // Load default field values from a simple key=value file
+        Dictionary<string, string> defaults = LoadDefaults(configPath);
 
-        // Use PdfFormEditor (Facades API) to bind the PDF and set field values.
-        // PdfFormEditor does NOT implement IDisposable in older versions, but our stub does, so we can use a using block.
-        using PdfFormEditor formEditor = new();
-        try
+        // Load the PDF inside a using block for proper disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Bind the source PDF
-            formEditor.BindPdf(pdfPath);
-
-            // Set each field to its default value
-            foreach (KeyValuePair<string, string> kvp in fieldDefaults)
+            // Fill each form field with its default value using the Document.Form API
+            foreach (KeyValuePair<string, string> kvp in defaults)
             {
-                // SetField will create the field if it does not exist; otherwise it overwrites the value.
-                formEditor.SetField(kvp.Key, kvp.Value);
+                // Check if the field exists in the PDF form
+                if (doc.Form.HasField(kvp.Key))
+                {
+                    // The indexer returns a WidgetAnnotation; cast it to Field (or a concrete field type)
+                    Field field = doc.Form[kvp.Key] as Field;
+                    if (field != null)
+                    {
+                        // All field types expose a Value property
+                        field.Value = kvp.Value;
+                    }
+                    else
+                    {
+                        // This should not happen for standard form fields, but we guard against it
+                        Console.Error.WriteLine($"Warning: field '{kvp.Key}' exists but is not a standard form field.");
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Warning: field '{kvp.Key}' not found in the PDF form.");
+                }
             }
 
-            // Save the modified PDF with defaults applied
-            formEditor.Save(outputPdfPath);
-            Console.WriteLine($"Form fields populated and saved to '{outputPdfPath}'.");
+            // Save the updated PDF
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
+
+        Console.WriteLine($"Form fields populated and saved to '{outputPdf}'.");
+    }
+
+    // Reads a configuration file where each line is "FieldName=Value"
+    static Dictionary<string, string> LoadDefaults(string path)
+    {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (string line in File.ReadAllLines(path))
         {
-            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
+            // Ignore empty lines and comments
+            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
+                continue;
+
+            int sep = line.IndexOf('=');
+            if (sep <= 0)
+                continue; // malformed line
+
+            string key = line.Substring(0, sep).Trim();
+            string value = line.Substring(sep + 1).Trim();
+            dict[key] = value;
         }
+        return dict;
     }
 }

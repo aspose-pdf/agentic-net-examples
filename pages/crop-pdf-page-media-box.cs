@@ -18,30 +18,33 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Verify that the document contains at least one page
-            if (doc.Pages.Count < 1)
+            // Ensure the document has at least one page
+            if (doc.Pages.Count == 0)
             {
-                Console.Error.WriteLine("Document contains no pages.");
+                Console.Error.WriteLine("The document contains no pages.");
                 return;
             }
 
-            // Choose the page to modify (1‑based indexing)
-            int pageNumber = 1;
-            Page page = doc.Pages[pageNumber];
+            // Page indexing in Aspose.Pdf is 1‑based
+            Page page = doc.Pages[1];
 
-            // Calculate a new MediaBox that crops 50 points from each side
-            double llx = page.MediaBox.LLX + 50; // lower‑left X
-            double lly = page.MediaBox.LLY + 50; // lower‑left Y
-            double urx = page.MediaBox.URX - 50; // upper‑right X
-            double ury = page.MediaBox.URY - 50; // upper‑right Y
+            // Define the new MediaBox (crop region) in points (1/72 inch)
+            // lower‑left X, lower‑left Y, upper‑right X, upper‑right Y
+            double llx = 50;   // left margin
+            double lly = 50;   // bottom margin
+            double urx = 500;  // right margin
+            double ury = 700;  // top margin
 
-            // Assign the new MediaBox using a fully qualified Rectangle type
-            page.MediaBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle newMediaBox = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Save the modified PDF (output format is PDF by default)
+            // Apply the custom cropping region without altering page content
+            page.MediaBox = newMediaBox;
+
+            // Save the modified PDF (PDF format by default)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Cropped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"MediaBox updated. Output saved to '{outputPath}'.");
     }
 }

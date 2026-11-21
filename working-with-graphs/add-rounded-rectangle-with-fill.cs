@@ -1,48 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "rounded_rectangle.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "rounded_rect.pdf";
 
-        // Ensure the output directory exists
-        string outputDir = System.IO.Path.GetDirectoryName(outputPath);
-        if (!string.IsNullOrEmpty(outputDir) && !Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
-
-        // Create a new PDF document inside a using block (document-disposal-with-using rule)
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page (first page)
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a Graph container that will hold drawing shapes
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+        // Open the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Define the rectangle bounds (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 600);
 
-            // Create a rectangle shape with rounded corners
-            // Parameters: left, bottom, width, height
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(100f, 300f, 200f, 200f);
-            rectShape.RoundedCornerRadius = 20f; // radius for all four corners
+            // Create a SquareAnnotation which can represent a rectangle with rounded corners
+            SquareAnnotation roundedRect = new SquareAnnotation(doc.Pages[1], rect)
+            {
+                // Border colour (stroke)
+                Color = Aspose.Pdf.Color.Black,
+                // Fill colour (solid fill)
+                InteriorColor = Aspose.Pdf.Color.LightBlue
+            };
 
-            // Apply a solid fill color (use Aspose.Pdf.Color)
-            rectShape.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(0.2f, 0.6f, 0.8f); // light teal
+            // Set border width and corner radius (both horizontal and vertical)
+            roundedRect.Border = new Border(roundedRect)
+            {
+                Width = 1,
+                HCornerRadius = 20,
+                VCornerRadius = 20
+            };
 
-            // Optionally set a border (stroke) color and width
-            rectShape.GraphInfo.Color = Aspose.Pdf.Color.Black;
-            rectShape.GraphInfo.LineWidth = 1f;
+            // Add the annotation to the first page
+            doc.Pages[1].Annotations.Add(roundedRect);
 
-            // Add the rectangle to the graph, then add the graph to the page
-            graph.Shapes.Add(rectShape);
-            page.Paragraphs.Add(graph);
-
-            // Save the PDF (PDF format, so no SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with rounded rectangle saved to '{outputPath}'.");
+        Console.WriteLine($"Saved PDF with rounded rectangle to '{outputPath}'.");
     }
 }

@@ -1,45 +1,33 @@
 using System;
-using System.Reflection;
+using System.IO;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path where exported annotations would be written (not actually created)
-        const string outputPath = "exported_annotations.xfdf";
-
-        // Create a PdfAnnotationEditor instance without binding any PDF document
-        Aspose.Pdf.Facades.PdfAnnotationEditor editor = new Aspose.Pdf.Facades.PdfAnnotationEditor();
+        // Instantiate PdfAnnotationEditor without binding it to any PDF document.
+        PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
         try
         {
-            // Use reflection to obtain the ExportAnnotations method (signature: ExportAnnotations(string))
-            MethodInfo exportMethod = typeof(Aspose.Pdf.Facades.PdfAnnotationEditor)
-                .GetMethod("ExportAnnotations", new[] { typeof(string) });
-
-            if (exportMethod == null)
+            // ExportAnnotationsXfdf should throw because the editor is unbound.
+            // Use a dummy file stream; the method signature requires a stream, page range and annotation types.
+            using (FileStream fs = File.Create("unbound_annotations.xfdf"))
             {
-                // The method does not exist in the loaded Aspose.Pdf version
-                Console.WriteLine("ExportAnnotations method not found in this Aspose.Pdf version.");
-                return;
+                int startPage = 1;
+                int endPage = 1; // dummy range
+                string[] annotationTypes = null; // null means all types
+                editor.ExportAnnotationsXfdf(fs, startPage, endPage, annotationTypes);
             }
 
-            // Invoke the method – it should throw because the editor is not bound to a PDF
-            exportMethod.Invoke(editor, new object[] { outputPath });
-
-            // If no exception is thrown, the test has failed
-            Console.WriteLine("ExportAnnotations completed without exception (unexpected).");
-        }
-        catch (TargetInvocationException tie) when (tie.InnerException != null)
-        {
-            // Expected path: the underlying method throws an exception for an unbound editor
-            Console.WriteLine($"Expected exception caught: {tie.InnerException.GetType().Name} - {tie.InnerException.Message}");
+            // If no exception is thrown, the test has failed.
+            Console.WriteLine("Test Failed: No exception was thrown.");
         }
         catch (Exception ex)
         {
-            // Any other exception indicates an unexpected failure
-            Console.WriteLine($"Unexpected exception: {ex.GetType().Name} - {ex.Message}");
+            // Expected path: an exception is thrown.
+            Console.WriteLine($"Test Passed: Caught expected exception -> {ex.GetType().Name}: {ex.Message}");
         }
     }
 }

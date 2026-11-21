@@ -9,30 +9,27 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "encrypted.pdf";
         const string userPassword = "user123";
-        // Owner password is intentionally left undefined (null)
-        const string ownerPassword = null;
+        const string ownerPassword = ""; // leave owner password undefined
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document
+            // Load the source PDF.
             Document doc = new Document(inputPath);
 
-            // Define desired permissions (e.g., allow printing and content extraction)
+            // Define the permissions you want to allow.
             Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-            // Encrypt using only a user password; owner password is null
+            // Encrypt the document with only a user password (owner password is empty).
             doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
 
-            // Save the encrypted PDF
+            // Save the encrypted PDF.
             doc.Save(outputPath);
-
-            Console.WriteLine($"PDF encrypted successfully: {outputPath}");
         }
         catch (Exception ex)
         {

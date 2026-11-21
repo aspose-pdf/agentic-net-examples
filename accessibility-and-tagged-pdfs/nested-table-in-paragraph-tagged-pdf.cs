@@ -8,8 +8,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_tagged.pdf";
+        const string inputPath  = "input.pdf";          // existing PDF (can be empty)
+        const string outputPath = "nested_table_tagged.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,90 +17,141 @@ class Program
             return;
         }
 
+        // Load the document and work with its tagged content
         using (Document doc = new Document(inputPath))
         {
-            // Set language and title for the tagged PDF
             ITaggedContent tagged = doc.TaggedContent;
             tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            tagged.SetTitle("Nested Table Example");
 
-            // Root of the structure tree
+            // Root of the tagging tree
             StructureElement root = tagged.RootElement;
 
-            // Paragraph that will contain the nested table
+            // -------------------------------------------------
+            // 1. Create a paragraph element
+            // -------------------------------------------------
             ParagraphElement paragraph = tagged.CreateParagraphElement();
-            paragraph.SetText("This paragraph contains a nested table:");
-            root.AppendChild(paragraph);
+            paragraph.SetText("Paragraph containing a table:");
+            root.AppendChild(paragraph); // attach paragraph to root
 
-            // Outer table
+            // -------------------------------------------------
+            // 2. Create the outer table and attach it to the paragraph
+            // -------------------------------------------------
             TableElement outerTable = tagged.CreateTableElement();
-            outerTable.AlternativeText = "Outer table with nested table inside first cell.";
-            paragraph.AppendChild(outerTable); // Attach table to paragraph
+            outerTable.AlternativeText = "Outer table";
+            paragraph.AppendChild(outerTable);
 
-            // Header for outer table
-            TableTHeadElement thead = tagged.CreateTableTHeadElement();
-            outerTable.AppendChild(thead);
-            TableTRElement headerRow = tagged.CreateTableTRElement();
-            thead.AppendChild(headerRow);
-            TableTHElement thHeader = tagged.CreateTableTHElement();
-            thHeader.SetText("Header");
-            headerRow.AppendChild(thHeader);
-            TableTHElement thData = tagged.CreateTableTHElement();
-            thData.SetText("Data");
-            headerRow.AppendChild(thData);
+            // Header row for outer table
+            TableTHeadElement outerHead = tagged.CreateTableTHeadElement();
+            outerTable.AppendChild(outerHead);
+            TableTRElement outerHeaderRow = tagged.CreateTableTRElement();
+            outerHead.AppendChild(outerHeaderRow);
+            TableTHElement outerTh1 = tagged.CreateTableTHElement();
+            outerTh1.SetText("Header 1");
+            outerHeaderRow.AppendChild(outerTh1);
+            TableTHElement outerTh2 = tagged.CreateTableTHElement();
+            outerTh2.SetText("Header 2");
+            outerHeaderRow.AppendChild(outerTh2);
 
-            // Body of outer table
-            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
-            outerTable.AppendChild(tbody);
-            TableTRElement bodyRow = tagged.CreateTableTRElement();
-            tbody.AppendChild(bodyRow);
+            // Body row for outer table
+            TableTBodyElement outerBody = tagged.CreateTableTBodyElement();
+            outerTable.AppendChild(outerBody);
+            TableTRElement outerBodyRow = tagged.CreateTableTRElement();
+            outerBody.AppendChild(outerBodyRow);
+            TableTDElement outerTd1 = tagged.CreateTableTDElement();
+            outerTd1.SetText("Cell 1");
+            outerBodyRow.AppendChild(outerTd1);
+            TableTDElement outerTd2 = tagged.CreateTableTDElement();
+            outerTd2.SetText("Cell 2 with nested table");
+            outerBodyRow.AppendChild(outerTd2);
 
-            // First cell will hold a nested table
-            TableTDElement tdNested = tagged.CreateTableTDElement();
-
-            // Nested table
+            // -------------------------------------------------
+            // 3. Create a nested table inside the second cell (outerTd2)
+            // -------------------------------------------------
             TableElement nestedTable = tagged.CreateTableElement();
-            nestedTable.AlternativeText = "Nested table inside outer table cell.";
+            nestedTable.AlternativeText = "Nested table";
+            outerTd2.AppendChild(nestedTable);
+
+            // Header for nested table
+            TableTHeadElement nestedHead = tagged.CreateTableTHeadElement();
+            nestedTable.AppendChild(nestedHead);
+            TableTRElement nestedHeaderRow = tagged.CreateTableTRElement();
+            nestedHead.AppendChild(nestedHeaderRow);
+            TableTHElement nestedTh = tagged.CreateTableTHElement();
+            nestedTh.SetText("NHeader");
+            nestedHeaderRow.AppendChild(nestedTh);
+
+            // Body for nested table
             TableTBodyElement nestedBody = tagged.CreateTableTBodyElement();
             nestedTable.AppendChild(nestedBody);
-            TableTRElement nestedRow = tagged.CreateTableTRElement();
-            nestedBody.AppendChild(nestedRow);
-            TableTDElement nestedCell1 = tagged.CreateTableTDElement();
-            nestedCell1.SetText("Nested 1");
-            nestedRow.AppendChild(nestedCell1);
-            TableTDElement nestedCell2 = tagged.CreateTableTDElement();
-            nestedCell2.SetText("Nested 2");
-            nestedRow.AppendChild(nestedCell2);
+            TableTRElement nestedBodyRow = tagged.CreateTableTRElement();
+            nestedBody.AppendChild(nestedBodyRow);
+            TableTDElement nestedTd = tagged.CreateTableTDElement();
+            nestedTd.SetText("Nested cell");
+            nestedBodyRow.AppendChild(nestedTd);
 
-            // Attach nested table to the first cell
-            tdNested.AppendChild(nestedTable);
-            bodyRow.AppendChild(tdNested);
-
-            // Second cell with regular text
-            TableTDElement tdRegular = tagged.CreateTableTDElement();
-            tdRegular.SetText("Regular cell");
-            bodyRow.AppendChild(tdRegular);
-
-            // Validate hierarchy by walking the structure tree
-            Console.WriteLine("Tagging hierarchy:");
-            WalkStructure(root, 0);
-
-            // Save the modified PDF
+            // -------------------------------------------------
+            // 4. Save the modified document
+            // -------------------------------------------------
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Tagged PDF saved to '{outputPath}'.");
+        // -------------------------------------------------
+        // 5. Validation: walk the tagging hierarchy and
+        //    verify that we have exactly two tables, the
+        //    outer one under the paragraph and the inner
+        //    one under a table cell.
+        // -------------------------------------------------
+        using (Document doc = new Document(outputPath))
+        {
+            ITaggedContent tagged = doc.TaggedContent;
+            StructureElement root = tagged.RootElement;
+
+            // Count all TableElement instances
+            var allTables = root.FindElements<TableElement>(true);
+            Console.WriteLine($"Total tables found: {allTables.Count}");
+            if (allTables.Count != 2)
+            {
+                Console.WriteLine("Validation failed: expected 2 tables.");
+                return;
+            }
+
+            // Identify outer and inner tables by their parent types
+            TableElement outer = null;
+            TableElement inner = null;
+            foreach (var tbl in allTables)
+            {
+                // Parent can be obtained via the ParentElement property (available on Element)
+                var parent = tbl.ParentElement;
+                if (parent is ParagraphElement)
+                    outer = tbl;
+                else if (parent is TableTDElement)
+                    inner = tbl;
+            }
+
+            if (outer == null || inner == null)
+            {
+                Console.WriteLine("Validation failed: could not locate outer or inner table correctly.");
+                return;
+            }
+
+            Console.WriteLine("Validation succeeded: outer table is child of ParagraphElement, inner table is child of TableTDElement.");
+
+            // Optional: print the full hierarchy for visual inspection
+            Console.WriteLine("\nTagging hierarchy:");
+            PrintStructure(root, 0);
+        }
     }
 
-    // Recursive walk to display element types and hierarchy depth
-    static void WalkStructure(StructureElement element, int depth)
+    // Recursive helper to print the structure tree
+    static void PrintStructure(StructureElement element, int depth)
     {
         string indent = new string(' ', depth * 2);
-        Console.WriteLine($"{indent}{element.GetType().Name}");
+        Console.WriteLine($"{indent}{element.GetType().Name}: {element.ActualText ?? "(no text)"}");
         foreach (Element child in element.ChildElements)
         {
             if (child is StructureElement se)
-                WalkStructure(se, depth + 1);
+                PrintStructure(se, depth + 1);
         }
     }
 }

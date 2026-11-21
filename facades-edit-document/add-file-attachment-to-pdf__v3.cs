@@ -1,23 +1,23 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Included as requested
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string outputPdfPath     = "output.pdf";
-        const string attachmentPath    = "Terms.pdf";
-        const string attachmentDesc    = "Contract Terms";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string attachmentPath = "Terms.pdf";
+        const string attachmentDescription = "Contract Terms";
 
-        // Verify that the source PDF and the attachment file exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
+
         if (!File.Exists(attachmentPath))
         {
             Console.Error.WriteLine($"Attachment file not found: {attachmentPath}");
@@ -25,26 +25,29 @@ class Program
         }
 
         // Load the existing PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        Document pdfDocument = new Document(inputPdf);
+
+        // Define the rectangle where the attachment icon will appear on the first page.
+        // (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
+        var rect = new Aspose.Pdf.Rectangle(50, 750, 70, 770);
+
+        // Create a FileSpecification for the attachment.
+        // The constructor accepts the file path and an optional description.
+        FileSpecification fileSpec = new FileSpecification(attachmentPath, attachmentDescription);
+
+        // Create the file attachment annotation, passing the page, rectangle, and FileSpecification.
+        FileAttachmentAnnotation fileAttachment = new FileAttachmentAnnotation(pdfDocument.Pages[1], rect, fileSpec)
         {
-            // Create a FileSpecification for the attachment
-            using (FileStream attachStream = File.OpenRead(attachmentPath))
-            {
-                // Constructor with stream and file name
-                FileSpecification fileSpec = new FileSpecification(attachStream, Path.GetFileName(attachmentPath));
+            // The name that appears in the attachment list.
+            Name = Path.GetFileName(attachmentPath)
+        };
 
-                // Set optional properties
-                fileSpec.Description   = attachmentDesc;          // Human‑readable description
-                fileSpec.AFRelationship = AFRelationship.Data;    // Relationship type (optional)
+        // Add the annotation to the first page.
+        pdfDocument.Pages[1].Annotations.Add(fileAttachment);
 
-                // Add the attachment to the PDF's EmbeddedFiles collection
-                pdfDoc.EmbeddedFiles.Add(fileSpec);
-            }
+        // Save the updated PDF.
+        pdfDocument.Save(outputPdf);
 
-            // Save the modified PDF
-            pdfDoc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"Attachment '{attachmentPath}' added with description '{attachmentDesc}'. Saved as '{outputPdfPath}'.");
+        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
     }
 }

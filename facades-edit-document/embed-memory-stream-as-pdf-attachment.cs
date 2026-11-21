@@ -6,37 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output_with_attachment.pdf";
+        const string sourcePdfPath = "source.pdf";
+        const string outputPdfPath = "output_with_attachment.pdf";
 
-        // Verify that the source PDF exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
             return;
         }
 
-        // Prepare the attachment content in a memory stream
-        byte[] attachmentBytes = System.Text.Encoding.UTF8.GetBytes("This is the content of the attachment.");
-        using (MemoryStream attachmentStream = new MemoryStream(attachmentBytes))
+        // Example data to embed as an attachment (in‑memory)
+        byte[] attachmentData = System.Text.Encoding.UTF8.GetBytes("This is the content of the attachment.");
+        using (MemoryStream attachmentStream = new MemoryStream(attachmentData))
         {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPdf);
+            // Load the PDF
+            Document pdf = new Document(sourcePdfPath);
 
-            // Create a file specification for the attachment
-            var fileSpec = new FileSpecification("Attachment.txt", "Attachment created from a memory stream")
-            {
-                // Assign the memory stream as the file content
-                Contents = attachmentStream
-            };
+            // Create a FileSpecification for the embedded file
+            var fileSpec = new FileSpecification("MyAttachment.txt");
+            fileSpec.Contents = attachmentStream; // assign the in‑memory stream
 
             // Add the file specification to the EmbeddedFiles collection
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
+            pdf.EmbeddedFiles.Add(fileSpec);
 
-            // Save the resulting PDF with the embedded attachment
-            pdfDoc.Save(outputPdf);
+            // Save the modified PDF
+            pdf.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Attachment added and PDF saved to '{outputPdfPath}'.");
     }
 }

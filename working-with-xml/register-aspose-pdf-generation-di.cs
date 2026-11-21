@@ -1,150 +1,113 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 
-namespace PdfGenerationExample
+namespace PdfGenerationDemo
 {
-    // Service contract for PDF generation
-    public interface IPdfGenerationService
+    /// <summary>
+    /// Service contract for PDF generation.
+    /// </summary>
+    public interface IPdfGenerator
     {
-        Aspose.Pdf.Document CreateEmptyDocument();
-        void AddText(Aspose.Pdf.Document document, string text, int pageNumber);
-        void Encrypt(Aspose.Pdf.Document document, string userPassword, string ownerPassword, Aspose.Pdf.Permissions permissions);
-        Aspose.Pdf.Document Decrypt(string encryptedPath, string userPassword);
-        void Save(Aspose.Pdf.Document document, string outputPath);
+        /// <summary>
+        /// Generates a simple PDF document at the specified path.
+        /// </summary>
+        /// <param name="outputPath">File system path where the PDF will be saved.</param>
+        void Generate(string outputPath);
     }
 
-    // Concrete implementation using core Aspose.Pdf APIs only
-    public class AsposePdfGenerationService : IPdfGenerationService
+    /// <summary>
+    /// Implementation that uses Aspose.Pdf to create PDFs.
+    /// </summary>
+    public class AsposePdfGenerator : IPdfGenerator
     {
-        // Creates a new PDF with a single blank page
-        public Aspose.Pdf.Document CreateEmptyDocument()
+        public void Generate(string outputPath)
         {
-            var doc = new Aspose.Pdf.Document();
-            doc.Pages.Add(); // add first page
-            return doc;
-        }
-
-        // Adds a simple text fragment to the specified page
-        public void AddText(Aspose.Pdf.Document document, string text, int pageNumber)
-        {
-            if (document == null) throw new ArgumentNullException(nameof(document));
-            if (pageNumber < 1 || pageNumber > document.Pages.Count)
-                throw new ArgumentOutOfRangeException(nameof(pageNumber));
-
-            Aspose.Pdf.Page page = document.Pages[pageNumber];
-            var textFragment = new Aspose.Pdf.Text.TextFragment(text)
+            // Document creation must be wrapped in a using block for deterministic disposal.
+            using (Document doc = new Document())
             {
-                TextState =
-                {
-                    // Use a concrete font from the repository instead of the abstract Font constructor
-                    Font = FontRepository.FindFont("Arial"),
-                    FontSize = 12,
-                    ForegroundColor = Aspose.Pdf.Color.Black
-                }
-            };
-            page.Paragraphs.Add(textFragment);
-        }
+                // Add a new page to the document.
+                Page page = doc.Pages.Add();
 
-        // Encrypts the document with AES‑256
-        public void Encrypt(Aspose.Pdf.Document document, string userPassword, string ownerPassword, Aspose.Pdf.Permissions permissions)
-        {
-            if (document == null) throw new ArgumentNullException(nameof(document));
-            document.Encrypt(userPassword, ownerPassword, permissions, Aspose.Pdf.CryptoAlgorithm.AESx256);
-        }
+                // Create a text fragment and add it to the page.
+                TextFragment text = new TextFragment("Hello from Aspose.Pdf");
+                page.Paragraphs.Add(text);
 
-        // Opens an encrypted PDF and removes protection
-        public Aspose.Pdf.Document Decrypt(string encryptedPath, string userPassword)
-        {
-            if (!File.Exists(encryptedPath))
-                throw new FileNotFoundException($"File not found: {encryptedPath}");
-
-            var encryptedDoc = new Aspose.Pdf.Document(encryptedPath, userPassword);
-            encryptedDoc.Decrypt(); // no parameters
-            return encryptedDoc;
-        }
-
-        // Saves the document to the given file path
-        public void Save(Aspose.Pdf.Document document, string outputPath)
-        {
-            if (document == null) throw new ArgumentNullException(nameof(document));
-
-            string directory = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-                Directory.CreateDirectory(directory);
-
-            document.Save(outputPath);
-        }
-    }
-
-    // Minimal DI helper to avoid missing BuildServiceProvider extension in the current project setup
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceProvider BuildServiceProvider(this IServiceCollection services)
-        {
-            return new SimpleServiceProvider(services);
-        }
-    }
-
-    // Very small ServiceProvider implementation that supports only singleton registrations used in this example
-    internal class SimpleServiceProvider : IServiceProvider
-    {
-        private readonly Dictionary<Type, object> _singletons = new();
-
-        public SimpleServiceProvider(IServiceCollection services)
-        {
-            foreach (var descriptor in services)
-            {
-                if (descriptor.Lifetime == ServiceLifetime.Singleton)
-                {
-                    var implementationType = descriptor.ImplementationType ?? descriptor.ServiceType;
-                    // Assume a parameter‑less constructor for the implementation type
-                    var instance = Activator.CreateInstance(implementationType);
-                    _singletons[descriptor.ServiceType] = instance;
-                }
+                // Save the document as PDF.
+                doc.Save(outputPath);
             }
         }
+    }
+
+    /// <summary>
+    /// Extension methods for registering PDF services in the DI container.
+    /// </summary>
+    public static class ServiceCollectionExtensions
+    {
+        /// <summary>
+        /// Registers the PDF generation service as a singleton.
+        /// </summary>
+        /// <param name="services">The IServiceCollection to add the service to.</param>
+        /// <returns>The same IServiceCollection instance for chaining.</returns>
+        public static IServiceCollection AddPdfGeneration(this IServiceCollection services)
+        {
+            services.AddSingleton<IPdfGenerator, AsposePdfGenerator>();
+            return services;
+        }
+    }
+
+    /// <summary>
+    /// A very small, self‑contained service provider used when the standard
+    /// BuildServiceProvider extension is unavailable (e.g., missing package).
+    /// It resolves only the services that are registered in this demo.
+    /// </summary>
+    public class SimpleServiceProvider : IServiceProvider
+    {
+        private readonly IServiceCollection _services;
+        public SimpleServiceProvider(IServiceCollection services) => _services = services;
 
         public object GetService(Type serviceType)
         {
-            _singletons.TryGetValue(serviceType, out var instance);
-            return instance;
+            // Resolve the IPdfGenerator singleton manually.
+            if (serviceType == typeof(IPdfGenerator))
+            {
+                // The singleton registration ensures a single instance.
+                // For simplicity we create a new instance here; in a real app you would
+                // store and reuse the instance according to the lifetime.
+                return new AsposePdfGenerator();
+            }
+            return null;
         }
     }
 
+    /// <summary>
+    /// Console entry point that demonstrates DI registration and PDF generation.
+    /// </summary>
     class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-            // Register the PDF generation service in the DI container
-            var services = new ServiceCollection();
-            services.AddSingleton<IPdfGenerationService, AsposePdfGenerationService>();
-            var serviceProvider = services.BuildServiceProvider();
+            // Build a service collection and register the PDF generator.
+            var services = new ServiceCollection()
+                .AddPdfGeneration();
 
-            // Resolve the service
-            var pdfService = (IPdfGenerationService)serviceProvider.GetService(typeof(IPdfGenerationService));
+            // Use the custom SimpleServiceProvider to resolve services without
+            // requiring Microsoft.Extensions.DependencyInjection's BuildServiceProvider.
+            var serviceProvider = new SimpleServiceProvider(services);
 
-            // Create a new PDF, add text, encrypt, save, then decrypt and save again
-            var doc = pdfService.CreateEmptyDocument();
-            pdfService.AddText(doc, "Hello, Aspose.Pdf!", 1);
+            // Resolve the generator from the container.
+            var generator = (IPdfGenerator)serviceProvider.GetService(typeof(IPdfGenerator));
 
-            // Define permissions (example: allow printing and content extraction)
-            Aspose.Pdf.Permissions perms = Aspose.Pdf.Permissions.PrintDocument | Aspose.Pdf.Permissions.ExtractContent;
-            pdfService.Encrypt(doc, "user123", "owner123", perms);
-            string encryptedPath = "encrypted.pdf";
-            pdfService.Save(doc, encryptedPath);
+            // Define an output path (temporary location).
+            string outputPath = System.IO.Path.Combine(
+                System.IO.Path.GetTempPath(),
+                $"AsposeDemo_{Guid.NewGuid():N}.pdf");
 
-            // Decrypt and save the clear PDF
-            var decryptedDoc = pdfService.Decrypt(encryptedPath, "user123");
-            string decryptedPath = "decrypted.pdf";
-            pdfService.Save(decryptedDoc, decryptedPath);
+            // Generate the PDF.
+            generator.Generate(outputPath);
 
-            Console.WriteLine("PDF creation, encryption, and decryption completed successfully.");
+            Console.WriteLine($"PDF generated at: {outputPath}");
         }
     }
 }

@@ -7,45 +7,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "PageImages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "Pages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Set desired image resolution (dpi)
-            var resolution = new Resolution(300);
+            // Load the PDF document
+            Document pdfDocument = new Document(inputPdf);
+            int pageCount = pdfDocument.Pages.Count;
 
-            // Create a PNG device that will render each page
-            var pngDevice = new PngDevice(resolution);
+            // Define the resolution for the PNG images (e.g., 150 DPI)
+            var resolution = new Resolution(150);
 
-            // Iterate through all pages (1‑based indexing as required by Aspose.Pdf)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            for (int pageNumber = 1; pageNumber <= pageCount; pageNumber++)
             {
-                // Render the current page to a memory stream
-                using (var imgStream = new MemoryStream())
+                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
                 {
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], imgStream);
-
-                    // Build output file name with sequential numbering
-                    string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
-
-                    // Write the PNG bytes to disk
-                    File.WriteAllBytes(outputPath, imgStream.ToArray());
+                    // Convert the specific page to PNG using PngDevice
+                    var pngDevice = new PngDevice(resolution);
+                    pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
                 }
+                Console.WriteLine($"Saved page {pageNumber} → {outPath}");
             }
         }
-
-        Console.WriteLine("PDF has been converted to PNG images successfully.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

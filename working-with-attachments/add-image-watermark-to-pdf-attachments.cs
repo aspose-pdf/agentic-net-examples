@@ -16,66 +16,57 @@ class Program
             return;
         }
 
-        // Load the main PDF document inside a using block for deterministic disposal
+        // Load the main PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Work with the collection of embedded files (1‑based indexing)
-            EmbeddedFileCollection attachments = doc.EmbeddedFiles;
-
-            // Iterate backwards so we can safely replace items
-            for (int idx = attachments.Count; idx >= 1; idx--)
+            // Iterate over all embedded file attachments
+            foreach (FileSpecification attachment in doc.EmbeddedFiles)
             {
-                FileSpecification spec = attachments[idx];
-                string name = spec.Name; // use Name property (not FileName)
-
-                // Process only PDF attachments (by file extension)
-                if (!name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                // Read the original attachment into a memory stream
-                using (MemoryStream originalStream = new MemoryStream())
+                // Process only PDF attachments
+                if (attachment.MIMEType != null &&
+                    attachment.MIMEType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
                 {
-                    spec.Contents.CopyTo(originalStream);
-                    originalStream.Position = 0;
-
-                    // Load the attached PDF
-                    using (Document attachedDoc = new Document(originalStream))
+                    // Extract the attachment content into a memory stream
+                    using (MemoryStream originalStream = new MemoryStream())
                     {
-                        // Prepare a text watermark stamp
-                        TextStamp watermark = new TextStamp("CONFIDENTIAL");
-                        // TextState is read‑only; modify its properties instead of assigning a new instance
-                        watermark.TextState.FontSize = 72;
-                        watermark.TextState.FontStyle = FontStyles.Bold;
-                        watermark.TextState.ForegroundColor = Color.FromRgb(0.8, 0.8, 0.8);
-                        watermark.Opacity = 0.3;
-                        watermark.RotateAngle = 45;
-                        watermark.HorizontalAlignment = HorizontalAlignment.Center;
-                        watermark.VerticalAlignment = VerticalAlignment.Center;
-                        watermark.Background = false;
-
-                        // Apply the watermark to every page of the attached PDF
-                        for (int i = 1; i <= attachedDoc.Pages.Count; i++)
+                        // "Contents" returns a Stream with the embedded file data
+                        using (Stream src = attachment.Contents)
                         {
-                            attachedDoc.Pages[i].AddStamp(watermark);
+                            src.CopyTo(originalStream);
                         }
+                        originalStream.Position = 0;
 
-                        // Save the modified attachment to a new memory stream
-                        using (MemoryStream updatedStream = new MemoryStream())
+                        // Load the attached PDF
+                        using (Document attachDoc = new Document(originalStream))
                         {
-                            attachedDoc.Save(updatedStream);
-                            updatedStream.Position = 0;
-
-                            // Remove the old attachment (by name, not by index)
-                            attachments.Delete(name);
-
-                            // Create a new FileSpecification from the updated stream
-                            FileSpecification newSpec = new FileSpecification(updatedStream, name)
+                            // Create a text stamp to serve as the watermark
+                            TextStamp watermark = new TextStamp("CONFIDENTIAL")
                             {
-                                Description = spec.Description
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                VerticalAlignment   = VerticalAlignment.Center,
+                                Opacity             = 0.3,
+                                RotateAngle         = 45f // rotation in degrees
                             };
+                            // TextState is read‑only; modify the existing instance
+                            watermark.TextState.FontSize        = 72;
+                            watermark.TextState.FontStyle       = FontStyles.Bold;
+                            watermark.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // Red
 
-                            // Add the new specification back to the collection
-                            attachments.Add(newSpec);
+                            // Apply the watermark to every page of the attachment
+                            for (int i = 1; i <= attachDoc.Pages.Count; i++)
+                            {
+                                attachDoc.Pages[i].AddStamp(watermark);
+                            }
+
+                            // Save the modified attachment back to a memory stream
+                            using (MemoryStream modifiedStream = new MemoryStream())
+                            {
+                                attachDoc.Save(modifiedStream);
+                                modifiedStream.Position = 0;
+
+                                // Replace the original attachment content with the watermarked version
+                                attachment.Contents = modifiedStream;
+                            }
                         }
                     }
                 }

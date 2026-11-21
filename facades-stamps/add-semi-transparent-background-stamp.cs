@@ -1,48 +1,53 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string stampImg  = "stamp.png";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string stampPath = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
-        if (!File.Exists(stampImg))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Create an ImageStamp with 30% opacity and set it as a background element.
-        ImageStamp imgStamp = new ImageStamp(stampImg)
+        // Load the PDF document.
+        using (Document doc = new Document(inputPath))
         {
-            Opacity = 0.3,                 // 30% opacity
-            Background = true,             // place behind existing page content
-            HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment   = VerticalAlignment.Center
-        };
+            // Create an image stamp with 30% opacity and set it as a background.
+            ImageStamp stamp = new ImageStamp(stampPath)
+            {
+                Opacity = 0.3f,          // 30% opacity
+                Background = true       // place behind existing content
+            };
 
-        // Load the source PDF using Document (avoids PdfStampFacade which may be unavailable).
-        Document pdfDocument = new Document(inputPdf);
+            // Apply the stamp to every page.
+            foreach (Page page in doc.Pages)
+            {
+                // Optionally make the stamp cover the whole page.
+                stamp.Width = page.PageInfo.Width;
+                stamp.Height = page.PageInfo.Height;
+                stamp.XIndent = 0;      // left offset
+                stamp.YIndent = 0;      // bottom offset
 
-        // Apply the stamp to every page (pages are 1‑based in Aspose.Pdf).
-        for (int pageNum = 1; pageNum <= pdfDocument.Pages.Count; pageNum++)
-        {
-            pdfDocument.Pages[pageNum].AddStamp(imgStamp);
+                page.AddStamp(stamp);
+            }
+
+            // Save the modified PDF.
+            doc.Save(outputPath);
         }
 
-        // Save the stamped PDF.
-        pdfDocument.Save(outputPdf);
-
-        Console.WriteLine($"Background stamp applied with 30% opacity. Saved to '{outputPdf}'.");
+        Console.WriteLine($"Background stamp applied and saved to '{outputPath}'.");
     }
 }

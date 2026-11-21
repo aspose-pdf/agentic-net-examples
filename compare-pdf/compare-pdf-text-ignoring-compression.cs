@@ -7,49 +7,65 @@ class Program
 {
     static void Main()
     {
-        // Paths to the two PDFs that have the same content but different compression settings
-        const string pdfPath1 = "doc_compressed1.pdf";
-        const string pdfPath2 = "doc_compressed2.pdf";
+        const string pdfPathA = "documentA.pdf"; // PDF with one compression setting
+        const string pdfPathB = "documentB.pdf"; // Same content, different compression
 
-        // Verify that both files exist before proceeding
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        if (!File.Exists(pdfPathA) || !File.Exists(pdfPathB))
         {
-            Console.Error.WriteLine("One or both PDF files were not found.");
+            Console.Error.WriteLine("One or both PDF files are missing.");
             return;
         }
 
-        // Extract textual content from each PDF
-        string text1 = ExtractText(pdfPath1);
-        string text2 = ExtractText(pdfPath2);
-
-        // Compare the extracted texts; compression should not affect the result
-        bool textsAreIdentical = string.Equals(text1, text2, StringComparison.Ordinal);
-
-        Console.WriteLine(textsAreIdentical
-            ? "Texts are identical; compression differences do not affect textual content."
-            : "Texts differ; compression may have altered content or extraction differs.");
-
-        // Optional diagnostics: show lengths of extracted text
-        Console.WriteLine($"Length of PDF1 text: {text1.Length}");
-        Console.WriteLine($"Length of PDF2 text: {text2.Length}");
-    }
-
-    // Helper method that extracts pure text from a PDF using TextAbsorber
-    static string ExtractText(string pdfPath)
-    {
-        // Document is wrapped in a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load first PDF and extract its textual content
+        string textA;
+        using (Document docA = new Document(pdfPathA))
         {
-            TextAbsorber absorber = new TextAbsorber();
+            TextAbsorber absorberA = new TextAbsorber
+            {
+                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+            };
+            docA.Pages.Accept(absorberA);
+            textA = absorberA.Text;
+        }
 
-            // Use pure text formatting mode to ignore layout and formatting differences
-            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+        // Load second PDF and extract its textual content
+        string textB;
+        using (Document docB = new Document(pdfPathB))
+        {
+            TextAbsorber absorberB = new TextAbsorber
+            {
+                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
+            };
+            docB.Pages.Accept(absorberB);
+            textB = absorberB.Text;
+        }
 
-            // Apply the absorber to all pages (pages are 1‑based internally)
-            doc.Pages.Accept(absorber);
-
-            // Return the concatenated text from the entire document
-            return absorber.Text;
+        // Compare the extracted texts
+        if (string.Equals(textA, textB, StringComparison.Ordinal))
+        {
+            Console.WriteLine("The PDFs contain identical text. Compression differences do not affect the textual diff.");
+        }
+        else
+        {
+            Console.WriteLine("Textual differences detected between the PDFs.");
+            // Simple diff output (show first differing line)
+            using (StringReader readerA = new StringReader(textA))
+            using (StringReader readerB = new StringReader(textB))
+            {
+                string lineA, lineB;
+                int lineNumber = 1;
+                while ((lineA = readerA.ReadLine()) != null && (lineB = readerB.ReadLine()) != null)
+                {
+                    if (!string.Equals(lineA, lineB, StringComparison.Ordinal))
+                    {
+                        Console.WriteLine($"Difference at line {lineNumber}:");
+                        Console.WriteLine($"PDF A: {lineA}");
+                        Console.WriteLine($"PDF B: {lineB}");
+                        break;
+                    }
+                    lineNumber++;
+                }
+            }
         }
     }
 }

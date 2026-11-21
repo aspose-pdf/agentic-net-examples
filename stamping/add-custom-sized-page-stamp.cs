@@ -6,49 +6,56 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string stampPath  = "stamp.png";
-        const string outputPath = "stamped_output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";   // image to use as stamp
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
-
-        if (!File.Exists(stampPath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDocument = new Document(inputPath))
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            // Create an ImageStamp with custom dimensions
-            ImageStamp imgStamp = new ImageStamp(stampPath)
+            // Create an ImageStamp and configure its size (custom width & height)
+            ImageStamp stamp = new ImageStamp(stampImg)
             {
-                Width  = 200,   // custom width in points
-                Height = 100,   // custom height in points
-                // Position the stamp within the page region
-                LeftMargin = 50,   // distance from the left edge
-                TopMargin  = 700,  // distance from the bottom edge
-                Background = false, // place stamp over page content
-                HorizontalAlignment = HorizontalAlignment.None,
-                VerticalAlignment   = VerticalAlignment.None
+                // Desired dimensions in points (1 point = 1/72 inch)
+                Width  = 150,   // custom width
+                Height = 100,   // custom height
+
+                // Position the stamp relative to the page's lower‑left corner
+                // (TopMargin and LeftMargin are measured from the bottom‑left origin)
+                TopMargin  = 200,   // distance from bottom edge
+                LeftMargin = 50,    // distance from left edge
+
+                // Ensure the stamp is placed on top of existing content
+                Background = false
             };
 
-            // Target a specific page (e.g., page 2)
+            // Target a specific page (e.g., page 2). Aspose.Pdf uses 1‑based indexing.
             int targetPageNumber = 2;
-            if (targetPageNumber >= 1 && targetPageNumber <= pdfDocument.Pages.Count)
+            if (targetPageNumber <= pdfDoc.Pages.Count)
             {
-                pdfDocument.Pages[targetPageNumber].AddStamp(imgStamp);
+                Page targetPage = pdfDoc.Pages[targetPageNumber];
+                targetPage.AddStamp(stamp);   // Apply the stamp to the chosen page
+            }
+            else
+            {
+                Console.Error.WriteLine($"Page {targetPageNumber} does not exist in the document.");
             }
 
             // Save the modified PDF
-            pdfDocument.Save(outputPath);
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamp applied and saved to '{outputPath}'.");
+        Console.WriteLine($"Stamp applied and saved to '{outputPdf}'.");
     }
 }

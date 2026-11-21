@@ -1,15 +1,15 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // needed for AFRelationship enum
 
-class Program
+class ZugferdBatchGenerator
 {
     static void Main()
     {
-        const string csvPath = "invoices.csv";          // CSV with invoice data
-        const string outputDir = "GeneratedInvoices";   // Folder for PDFs
+        const string csvPath = "invoices.csv";          // CSV source
+        const string outputFolder = "GeneratedInvoices"; // Output folder for PDFs
 
         if (!File.Exists(csvPath))
         {
@@ -17,24 +17,36 @@ class Program
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputFolder);
 
-        // Expected CSV columns: InvoiceNumber,CustomerName,Amount,XmlFilePath
-        foreach (var line in File.ReadLines(csvPath))
+        // Read all lines, skip header
+        string[] lines = File.ReadAllLines(csvPath);
+        if (lines.Length <= 1)
         {
-            if (string.IsNullOrWhiteSpace(line)) continue;
+            Console.WriteLine("CSV contains no data rows.");
+            return;
+        }
+
+        // Expected CSV columns: InvoiceNumber,Date,CustomerName,TotalAmount,XmlFilePath
+        for (int i = 1; i < lines.Length; i++)
+        {
+            string line = lines[i];
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
 
             string[] parts = line.Split(',');
-            if (parts.Length < 4)
+
+            if (parts.Length < 5)
             {
-                Console.Error.WriteLine($"Invalid line (expected 4 columns): {line}");
+                Console.Error.WriteLine($"Invalid CSV format at line {i + 1}");
                 continue;
             }
 
             string invoiceNumber = parts[0].Trim();
-            string customerName  = parts[1].Trim();
-            string amountStr     = parts[2].Trim();
-            string xmlPath       = parts[3].Trim();
+            string invoiceDate   = parts[1].Trim();
+            string customerName  = parts[2].Trim();
+            string totalAmount   = parts[3].Trim();
+            string xmlPath       = parts[4].Trim();
 
             if (!File.Exists(xmlPath))
             {
@@ -42,39 +54,46 @@ class Program
                 continue;
             }
 
-            string outputPdfPath = Path.Combine(outputDir, $"Invoice_{invoiceNumber}.pdf");
+            string pdfFileName = $"Invoice_{invoiceNumber}.pdf";
+            string pdfPath = Path.Combine(outputFolder, pdfFileName);
+            string logPath = Path.Combine(outputFolder, $"convert_{invoiceNumber}.log");
 
-            // Create PDF, add simple invoice content
-            using (Document doc = new Document())
+            // Create PDF/A-3 (ZUGFeRD) document
+            using (Document pdfDoc = new Document())
             {
-                // Add a page
-                Page page = doc.Pages.Add();
+                // Add a single page
+                Page page = pdfDoc.Pages.Add();
 
-                // Build invoice text
-                TextFragment tf = new TextFragment($"Invoice Number: {invoiceNumber}\nCustomer: {customerName}\nAmount: {amountStr}");
+                // Build simple invoice content
+                TextFragment tf = new TextFragment($"Invoice #: {invoiceNumber}\nDate: {invoiceDate}\nCustomer: {customerName}\nTotal: {totalAmount}");
+                tf.Position = new Position(50, 750);
                 tf.TextState.FontSize = 12;
-                tf.TextState.Font = FontRepository.FindFont("Arial");
                 page.Paragraphs.Add(tf);
 
-                // Convert to PDF/A-3U (required for ZUGFeRD)
-                // Simple overload is sufficient; no need for PUA strategy
-                doc.Convert("conversion_log.xml", PdfFormat.PDF_A_3U, ConvertErrorAction.Delete);
+                // Embed the ZUGFeRD XML as an embedded file (AFRelationship.Data)
+                var xmlSpec = new FileSpecification(xmlPath, "ZUGFeRD Invoice XML")
+                {
+                    MIMEType = "application/xml",
+                    AFRelationship = AFRelationship.Data,
+                    Contents = new MemoryStream(File.ReadAllBytes(xmlPath))
+                };
+                pdfDoc.EmbeddedFiles.Add(xmlSpec);
 
-                // Embed the ZUGFeRD XML file
-                FileSpecification xmlFileSpec = new FileSpecification(xmlPath);
-                doc.EmbeddedFiles.Add(xmlFileSpec);
+                // Convert to PDF/A-3B (required for ZUGFeRD)
+                // Use the overload that accepts a log file path and an error‑handling action.
+                bool conversionResult = pdfDoc.Convert(logPath, PdfFormat.PDF_A_3B, ConvertErrorAction.Delete);
+                if (!conversionResult)
+                {
+                    Console.Error.WriteLine($"PDF/A conversion failed for invoice {invoiceNumber}. See log: {logPath}");
+                }
 
-                // Add ZUGFeRD-specific metadata (minimal set)
-                doc.Info["ZUGFeRDVersion"] = "1.0";
-                doc.Info["DocumentType"]   = "INVOICE";
-                doc.Info["Profile"]        = "ZUGFeRD";
-                doc.Info["CreatorTool"]    = "Aspose.Pdf";
-
-                // Save the PDF/A-3U document (extension .pdf is fine)
-                doc.Save(outputPdfPath);
+                // Save the resulting PDF
+                pdfDoc.Save(pdfPath);
             }
 
-            Console.WriteLine($"Generated ZUGFeRD PDF: {outputPdfPath}");
+            Console.WriteLine($"Generated ZUGFeRD PDF: {pdfPath}");
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }

@@ -1,12 +1,15 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "input_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -14,27 +17,44 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document that contains a form
+        using (Document doc = new Document(inputPath))
         {
-            // Access the AcroForm of the document
-            var form = pdfDoc.Form;
-
-            // Export the form fields to JSON directly into a MemoryStream
-            using (MemoryStream ms = new MemoryStream())
+            // Verify that the document actually has form fields
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // ExportToJson writes the JSON representation of the form fields into the stream
-                form.ExportToJson(ms);
+                Console.WriteLine("No form fields found in the document.");
+                return;
+            }
 
-                // Reset the stream position to the beginning for reading
-                ms.Position = 0;
+            // Manually build an XML representation of the form data
+            XDocument xmlDoc = new XDocument(
+                new XElement("FormData",
+                    doc.Form.Fields.Select(f =>
+                        new XElement("Field",
+                            new XAttribute("Name", f.Name ?? f.FullName ?? string.Empty),
+                            new XAttribute("Value", f.Value?.ToString() ?? string.Empty)
+                        )
+                    )
+                )
+            );
 
-                // Example: read and display the exported JSON
-                using (StreamReader reader = new StreamReader(ms))
+            // Export the XML to a MemoryStream
+            using (MemoryStream xmlStream = new MemoryStream())
+            {
+                // Save the XDocument into the stream (UTF‑8 without BOM)
+                using (StreamWriter writer = new StreamWriter(xmlStream, new System.Text.UTF8Encoding(false), 1024, true))
                 {
-                    string json = reader.ReadToEnd();
-                    Console.WriteLine("Form fields exported as JSON:");
-                    Console.WriteLine(json);
+                    xmlDoc.Save(writer);
+                }
+
+                // Reset the stream position to read the XML content
+                xmlStream.Position = 0;
+                using (StreamReader reader = new StreamReader(xmlStream))
+                {
+                    string xmlContent = reader.ReadToEnd();
+                    Console.WriteLine("Exported Form XML:");
+                    Console.WriteLine(xmlContent);
                 }
             }
         }

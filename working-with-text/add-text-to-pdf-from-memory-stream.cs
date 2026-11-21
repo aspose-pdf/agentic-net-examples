@@ -7,46 +7,47 @@ class Program
 {
     static void Main()
     {
-        // ------------------------------------------------------------
-        // 1. Create a minimal PDF in memory (acts as the source PDF).
-        // ------------------------------------------------------------
-        byte[] pdfBytes;
-        using (var seedDoc = new Document())
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+
+        // Ensure the input PDF exists – create a minimal one if it does not.
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page so the document is valid.
-            seedDoc.Pages.Add();
-            using (var ms = new MemoryStream())
-            {
-                seedDoc.Save(ms);
-                pdfBytes = ms.ToArray();
-            }
+            using var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPath);
         }
 
-        // ------------------------------------------------------------
-        // 2. Load the PDF from a MemoryStream, modify it, and write back.
-        // ------------------------------------------------------------
+        // Load PDF bytes from the file (or any other source).
+        byte[] pdfBytes = File.ReadAllBytes(inputPath);
+
+        // Wrap the byte array in a MemoryStream for loading.
         using (var inputStream = new MemoryStream(pdfBytes))
-        using (var outputStream = new MemoryStream())
         {
-            // Load PDF from the input stream.
+            // Load the PDF document from the memory stream.
             using (var doc = new Document(inputStream))
             {
+                // Aspose.Pdf uses 1‑based page indexing.
+                var page = doc.Pages[1];
+
                 // Create a text fragment to add.
-                var fragment = new TextFragment("Added text")
+                var tf = new TextFragment("Hello from Aspose.Pdf!");
+                // Optional: set the position of the text on the page.
+                tf.Position = new Position(100, 700);
+
+                // Add the text fragment to the page's paragraph collection.
+                page.Paragraphs.Add(tf);
+
+                // Prepare an output memory stream to receive the modified PDF.
+                using (var outputStream = new MemoryStream())
                 {
-                    // Optional: set the position on the page.
-                    Position = new Position(100, 700)
-                };
+                    // Save the modified document into the output stream (PDF format).
+                    doc.Save(outputStream);
 
-                // Add the fragment to the first page (pages are 1‑based).
-                doc.Pages[1].Paragraphs.Add(fragment);
-
-                // Save the modified PDF into the output stream.
-                doc.Save(outputStream);
+                    // Write the resulting PDF bytes to a file.
+                    File.WriteAllBytes(outputPath, outputStream.ToArray());
+                }
             }
-
-            // Example: write the result to a file (optional).
-            File.WriteAllBytes("output.pdf", outputStream.ToArray());
         }
     }
 }

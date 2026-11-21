@@ -1,49 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // for TiffDevice and Resolution
+using Aspose.Pdf.Devices;
 
 class PdfToTiffConverter
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";          // source PDF
-        const string outputFolder = "TiffPages";         // folder for TIFF images
-        const int dpi = 300;                              // desired resolution
+        // Input PDF file
+        const string inputPdf = "input.pdf";
+        // Folder where TIFF images will be saved
+        const string outputFolder = "TiffPages";
+        // Desired resolution in DPI
+        const int dpi = 300;
 
-        // Ensure the output directory exists
+        if (!File.Exists(inputPdf))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // If the input PDF does not exist, create a minimal placeholder PDF
-        if (!File.Exists(inputPdfPath))
+        try
         {
-            using var placeholder = new Document();
-            placeholder.Pages.Add();
-            placeholder.Save(inputPdfPath);
-        }
-
-        // Load the PDF inside a using block for deterministic disposal (document-disposal-with-using rule)
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Iterate pages using 1‑based indexing (page-indexing-one-based rule)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Load PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Build the output file name for the current page
-                string tiffPath = Path.Combine(outputFolder, $"Page_{pageNumber}.tiff");
+                // Create a TiffDevice with the required DPI. TiffDevice does NOT implement IDisposable,
+                // so we instantiate it without a using statement.
+                var tiffDevice = new TiffDevice(new Resolution(dpi));
 
-                // Create a TiffDevice with the required DPI. The constructor that accepts only Resolution
-                // uses DPI as the default unit, so we avoid the missing ResolutionUnit enum.
-                var resolution = new Resolution(dpi);
-                var tiffDevice = new TiffDevice(resolution);
-
-                // Save the individual page as a high‑resolution TIFF image
-                using (FileStream imageStream = new FileStream(tiffPath, FileMode.Create))
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
-                    tiffDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
+                    // Build output file name for each page
+                    string tiffPath = Path.Combine(outputFolder, $"page_{pageNum}.tiff");
+
+                    // Convert the current page to a TIFF file
+                    tiffDevice.Process(pdfDoc.Pages[pageNum], tiffPath);
+
+                    Console.WriteLine($"Saved page {pageNum} as TIFF → {tiffPath}");
                 }
             }
-        }
 
-        Console.WriteLine("Conversion completed. TIFF files are located in: " + Path.GetFullPath(outputFolder));
+            Console.WriteLine("All pages converted successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

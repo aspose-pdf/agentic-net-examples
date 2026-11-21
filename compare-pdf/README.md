@@ -1,10 +1,10 @@
 # Compare PDF
 
-> **Compare PDF** in PDF using C# / .NET -- **27** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Compare PDF** in PDF using C# / .NET -- **29** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `compare-pdf`
-- Examples: 27
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 29
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -15,6 +15,7 @@
 - [`compare-pdfs-detect-font-differences.cs`](./compare-pdfs-detect-font-differences.cs) -- Compare pdfs detect font differences
 - [`compare-pdfs-different-page-sizes.cs`](./compare-pdfs-different-page-sizes.cs) -- Compare pdfs different page sizes
 - [`compare-pdfs-generate-json-diff-report.cs`](./compare-pdfs-generate-json-diff-report.cs) -- Compare pdfs generate json diff report
+- [`compare-pdfs-ignore-signature-fields.cs`](./compare-pdfs-ignore-signature-fields.cs) -- Compare pdfs ignore signature fields
 - [`compare-pdfs-log-differences.cs`](./compare-pdfs-log-differences.cs) -- Compare pdfs log differences
 - [`compare-pdfs-unicode-text-differences.cs`](./compare-pdfs-unicode-text-differences.cs) -- Compare pdfs unicode text differences
 - [`compare-pdfs-with-form-fields.cs`](./compare-pdfs-with-form-fields.cs) -- Compare pdfs with form fields
@@ -35,6 +36,7 @@
 - [`preserve-original-metadata-in-diff-pdf.cs`](./preserve-original-metadata-in-diff-pdf.cs) -- Preserve original metadata in diff pdf
 - [`replace-text-using-diffoperation.cs`](./replace-text-using-diffoperation.cs) -- Replace text using diffoperation
 - [`set-custom-image-similarity-tolerance-pdf-comparison.cs`](./set-custom-image-similarity-tolerance-pdf-comparison.cs) -- Set custom image similarity tolerance pdf comparison
+- [`write-pdf-comparison-diff-to-http-response.cs`](./write-pdf-comparison-diff-to-http-response.cs) -- Write pdf comparison diff to http response
 
 ## See Also
 

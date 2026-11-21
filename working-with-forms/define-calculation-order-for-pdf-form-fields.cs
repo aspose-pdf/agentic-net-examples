@@ -1,15 +1,16 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // JavascriptAction resides here
+using Aspose.Pdf.Annotations; // JavaScript actions live here
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "form.pdf";
-        const string outputPath = "form_updated.pdf";
+        const string inputPath = "input_form.pdf";
+        const string outputPath = "output_form.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,51 +18,62 @@ class Program
             return;
         }
 
+        // Load the PDF containing form fields
         using (Document doc = new Document(inputPath))
         {
-            Form form = doc.Form;
-
-            // Item1 field
-            TextBoxField item1 = form["Item1"] as TextBoxField;
-            if (item1 == null)
+            // Ensure the document has a form
+            if (doc.Form == null)
             {
-                item1 = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 700, 200, 720))
-                { PartialName = "Item1" };
-                form.Add(item1);
+                Console.Error.WriteLine("The PDF does not contain any form fields.");
+                return;
             }
 
-            // Item2 field
-            TextBoxField item2 = form["Item2"] as TextBoxField;
-            if (item2 == null)
+            // ------------------------------------------------------------
+            // 1. Ensure the fields exist (price, quantity, total)
+            // ------------------------------------------------------------
+            // Helper to create a TextBoxField if it does not exist
+            TextBoxField EnsureTextBox(Document d, string name, double llx, double lly, double urx, double ury)
             {
-                item2 = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 660, 200, 680))
-                { PartialName = "Item2" };
-                form.Add(item2);
+                var field = d.Form[name] as TextBoxField;
+                if (field == null)
+                {
+                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+                    field = new TextBoxField(d.Pages[1], rect) { PartialName = name };
+                    d.Form.Add(field);
+                }
+                return field;
             }
 
-            // Total field
-            TextBoxField total = form["Total"] as TextBoxField;
-            if (total == null)
-            {
-                total = new TextBoxField(doc.Pages[1], new Aspose.Pdf.Rectangle(100, 620, 200, 640))
-                { PartialName = "Total" };
-                form.Add(total);
-            }
+            // Create or retrieve the three fields
+            var priceField = EnsureTextBox(doc, "price", 100, 560, 200, 580);
+            var quantityField = EnsureTextBox(doc, "quantity", 100, 540, 200, 560);
+            var totalField = EnsureTextBox(doc, "total", 100, 520, 200, 540);
 
-            // NOTE: The CalcOrder property is not available in the referenced Aspose.Pdf version.
-            // Calculation order is handled automatically when AutoRecalculate is enabled.
+            // ------------------------------------------------------------
+            // 2. Define the calculation order for dependent fields.
+            // ------------------------------------------------------------
+            // The CalculatedFields property expects an IEnumerable<Field>.
+            // Provide the fields in the order they should be evaluated.
+            doc.Form.CalculatedFields = new Field[] { priceField, quantityField, totalField };
 
-            // JavaScript that calculates the total (correct class name is JavascriptAction)
-            total.Actions.OnCalculate = new JavascriptAction(
-                "event.value = Number(this.getField('Item1').value) + Number(this.getField('Item2').value);"
-            );
+            // Enable automatic recalculation when field values change.
+            doc.Form.AutoRecalculate = true;
 
-            // Enable automatic recalculation of fields
-            form.AutoRecalculate = true;
+            // ------------------------------------------------------------
+            // 3. Add a JavaScript calculation script to the dependent field.
+            // ------------------------------------------------------------
+            string js = "var p = this.getField('price').value;" +
+                        "var q = this.getField('quantity').value;" +
+                        "event.value = (p && q) ? (p * q).toString() : '';";
+            // The correct class name is JavascriptAction (lower‑case 's')
+            totalField.Actions.OnCalculate = new JavascriptAction(js);
 
+            // ------------------------------------------------------------
+            // 4. Save the updated PDF.
+            // ------------------------------------------------------------
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Form PDF saved with calculation order to '{outputPath}'.");
     }
 }

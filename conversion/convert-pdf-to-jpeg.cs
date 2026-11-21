@@ -1,43 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // Required for JpegDevice
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "JpegPages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "Images";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Use JpegDevice which applies the default JPEG quality settings.
-            // This replaces JpegSaveOptions (which was not available in the referenced assembly).
-            var jpegDevice = new JpegDevice(); // default quality, default resolution
-
-            // Iterate through each page and save it as a separate JPEG file.
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Aspose.Pdf uses 1‑based page indexing for the Pages collection
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create))
+                string outPath = Path.Combine(outputDir, $"page_{i}.jpg");
+
+                // Convert each page to JPEG using JpegDevice (default quality)
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
                 {
-                    jpegDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
+                    JpegDevice jpegDevice = new JpegDevice(); // default quality settings
+                    jpegDevice.Process(doc.Pages[i], imageStream);
                 }
             }
         }
 
-        Console.WriteLine($"PDF pages have been saved as JPEG images in '{outputFolder}'.");
+        Console.WriteLine("PDF successfully converted to JPEG images.");
     }
 }

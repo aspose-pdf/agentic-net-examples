@@ -6,36 +6,32 @@ class Program
 {
     static void Main()
     {
-        // Input and output file paths
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "encrypted.pdf";
-
-        // Passwords for encryption
+        const string inputPath = "input.pdf";
+        const string outputPath = "encrypted.pdf";
         const string userPassword = "user123";
         const string ownerPassword = "owner123";
 
-        // Verify input file exists
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         try
         {
             // Load the PDF document
-            Document doc = new Document(inputPdf);
+            Document doc = new Document(inputPath);
 
-            // Combine privilege settings: allow printing and editing (modify content)
+            // Combine privileges: allow printing and editing (modify content)
             Permissions permissions = Permissions.PrintDocument | Permissions.ModifyContent;
 
             // Encrypt using RC4‑128 algorithm
             doc.Encrypt(userPassword, ownerPassword, permissions, CryptoAlgorithm.RC4x128);
 
             // Save the encrypted PDF
-            doc.Save(outputPdf);
+            doc.Save(outputPath);
 
-            Console.WriteLine($"PDF encrypted successfully and saved to '{outputPdf}'.");
+            Console.WriteLine($"PDF encrypted and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

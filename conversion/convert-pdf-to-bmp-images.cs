@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputFolder = "BmpPages";
+        const string outputDir = "BmpPages";
 
         if (!File.Exists(inputPdf))
         {
@@ -16,28 +16,38 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Load PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // BmpDevice with default settings:
-                // - page number is supplied via the Process method, not the constructor
-                // - default resolution is 300 DPI when not specified
+                // BmpDevice does NOT implement IDisposable – instantiate directly
                 BmpDevice bmpDevice = new BmpDevice();
 
-                // Build output file name for each page
-                string outputPath = Path.Combine(outputFolder, $"Page_{pageNum}.bmp");
+                // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+                for (int i = 1; i <= pdfDoc.Pages.Count; i++)
+                {
+                    Page page = pdfDoc.Pages[i];
+                    string outPath = Path.Combine(outputDir, $"page_{i}.bmp");
 
-                // Convert the current page to BMP
-                bmpDevice.Process(pdfDoc.Pages[pageNum], outputPath);
+                    // Save each page as a BMP image
+                    using (FileStream outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                    {
+                        bmpDevice.Process(page, outStream);
+                    }
+
+                    Console.WriteLine($"Saved page {i} as BMP → {outPath}");
+                }
             }
-        }
 
-        Console.WriteLine($"PDF pages have been converted to BMP images in '{outputFolder}'.");
+            Console.WriteLine("PDF to BMP conversion completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

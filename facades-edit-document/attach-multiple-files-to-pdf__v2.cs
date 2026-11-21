@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 
@@ -7,56 +6,60 @@ class Program
 {
     static void Main()
     {
-        // Input PDF to which files will be attached
+        // Path to the original PDF that will receive the attachments
         const string basePdfPath = "base.pdf";
 
-        // Output PDF after all attachments are added
-        const string finalPdfPath = "output.pdf";
+        // Directory containing files to attach
+        const string attachmentsDir = "attachments";
 
-        // Collection of files to attach
-        List<string> filesToAttach = new List<string>
-        {
-            "attachment1.docx",
-            "attachment2.xlsx",
-            "attachment3.jpg"
-        };
+        // Final output PDF with all attachments
+        const string finalPdfPath = "result.pdf";
 
-        // Verify that the base PDF exists
         if (!File.Exists(basePdfPath))
         {
             Console.Error.WriteLine($"Base PDF not found: {basePdfPath}");
             return;
         }
 
-        // Verify that each attachment exists
-        foreach (string attachPath in filesToAttach)
+        if (!Directory.Exists(attachmentsDir))
         {
-            if (!File.Exists(attachPath))
-            {
-                Console.Error.WriteLine($"Attachment not found: {attachPath}");
-                return;
-            }
+            Console.Error.WriteLine($"Attachments directory not found: {attachmentsDir}");
+            return;
         }
 
-        // Load the base PDF once
+        // Collect all files to be attached
+        string[] filesToAttach = Directory.GetFiles(attachmentsDir);
+        if (filesToAttach.Length == 0)
+        {
+            Console.WriteLine("No files to attach.");
+            return;
+        }
+
+        // Load the base PDF using Document (PdfFileEditor does not support AttachFile)
         Document pdfDoc = new Document(basePdfPath);
 
-        // Attach each file using the EmbeddedFiles collection
-        foreach (string attachPath in filesToAttach)
+        // Attach each file as an embedded file using FileSpecification
+        foreach (string attachmentPath in filesToAttach)
         {
-            // Create a FileSpecification for the attachment
-            var fileSpec = new FileSpecification(attachPath, Path.GetFileName(attachPath))
-            {
-                // Optional: set a description or MIME type if needed
-                Description = $"Embedded attachment: {Path.GetFileName(attachPath)}"
-            };
+            // The file name that will appear inside the PDF
+            string attachmentName = Path.GetFileName(attachmentPath);
 
-            // Add the file specification to the document's embedded files collection
+            // Create a FileSpecification for the attachment
+            FileSpecification fileSpec = new FileSpecification(attachmentPath, attachmentName);
+            // Optional: set modification date (helps with PDF/A compliance)
+            fileSpec.Params.ModDate = DateTime.UtcNow;
+
+            // Add the specification to the document's EmbeddedFiles collection
             pdfDoc.EmbeddedFiles.Add(fileSpec);
         }
 
-        // Save the updated document to the desired output location
+        // Save the result
+        if (File.Exists(finalPdfPath))
+        {
+            File.Delete(finalPdfPath);
+        }
         pdfDoc.Save(finalPdfPath);
-        Console.WriteLine($"All files attached. Result saved to '{finalPdfPath}'.");
+
+        Console.WriteLine($"All files attached. Output saved to '{finalPdfPath}'.");
     }
 }

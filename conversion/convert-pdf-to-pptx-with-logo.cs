@@ -1,17 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF, temporary PPTX (after conversion), final PPTX (with logo), and logo image paths
-        const string inputPdfPath   = "input.pdf";
-        const string tempPptxPath   = "temp_output.pptx";
-        const string finalPptxPath  = "output_with_logo.pptx";
-        const string logoImagePath  = "company_logo.png";
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
+        const string logoImagePath = "logo.png";
 
         // Verify required files exist
         if (!File.Exists(inputPdfPath))
@@ -25,62 +23,30 @@ class Program
             return;
         }
 
-        // -------------------------------------------------
-        // 1. Load PDF and stamp the logo on every page
-        // -------------------------------------------------
+        // Load the PDF document
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Logo dimensions (points) and margins
-            const float logoWidth   = 100f; // width of logo
-            const float logoHeight  = 50f;  // height of logo
-            const float marginRight = 20f; // distance from right edge
-            const float marginTop   = 20f; // distance from top edge
-
+            // Add the logo to every page before conversion
             foreach (Page page in pdfDoc.Pages)
             {
-                // Create an image stamp for the logo
-                ImageStamp logoStamp = new ImageStamp(logoImagePath)
+                var logoStamp = new ImageStamp(logoImagePath)
                 {
-                    Width  = logoWidth,
-                    Height = logoHeight,
-                    // Align to the top‑right corner
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment   = VerticalAlignment.Top,
-                    // Offsets from the chosen edges
-                    XIndent = marginRight,
-                    YIndent = marginTop,
-                    // Ensure the stamp is placed over page content
-                    Background = false
+                    // Position (points) – adjust as needed
+                    XIndent = 10,
+                    YIndent = 10,
+                    Width = 100,
+                    Height = 50,
+                    // Align top‑left corner
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top
                 };
-
-                // Add the stamp to the current page
                 page.AddStamp(logoStamp);
             }
 
-            // -------------------------------------------------
-            // 2. Convert the stamped PDF to PPTX
-            // -------------------------------------------------
-            var pptxOptions = new PptxSaveOptions();
-            pdfDoc.Save(tempPptxPath, pptxOptions);
+            // Convert the PDF (now containing the logo) to PPTX directly using Aspose.Pdf
+            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        // -------------------------------------------------
-        // 3. The PPTX already contains the logo (added before conversion).
-        //    If you still need to rename or move the file, do it here.
-        // -------------------------------------------------
-        try
-        {
-            // Move the temporary PPTX to the final destination name
-            if (File.Exists(finalPptxPath))
-                File.Delete(finalPptxPath);
-            File.Move(tempPptxPath, finalPptxPath);
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error finalising PPTX: {ex.Message}");
-            // If moving fails, keep the temporary file for debugging
-        }
-
-        Console.WriteLine($"Conversion complete. PPTX with logo saved to '{finalPptxPath}'.");
+        Console.WriteLine($"Conversion completed. Logo added to each slide in '{outputPptxPath}'.");
     }
 }

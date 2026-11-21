@@ -1,64 +1,63 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class Program
+class PdfEncryptionHelper
 {
-    static void Main()
+    /// <summary>
+    /// Loads a PDF, encrypts it, and returns the encrypted content in a MemoryStream.
+    /// The stream is positioned at the beginning and can be sent over a network.
+    /// </summary>
+    /// <param name="inputPdfPath">Path to the source PDF file.</param>
+    /// <param name="userPassword">Password required to open the PDF.</param>
+    /// <param name="ownerPassword">Owner password with full permissions.</param>
+    /// <returns>MemoryStream containing the encrypted PDF.</returns>
+    public static MemoryStream GetEncryptedPdfStream(string inputPdfPath, string userPassword, string ownerPassword)
     {
-        const string inputPath = "input.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
+        if (!File.Exists(inputPdfPath))
+            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
 
-        if (!File.Exists(inputPath))
+        // Permissions to allow printing and content extraction; adjust as needed.
+        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
+
+        // MemoryStream will hold the encrypted PDF.
+        MemoryStream encryptedStream = new MemoryStream();
+
+        // Load the source PDF using the Document class (the primary API).
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
+            // Apply encryption. AES‑256 is recommended for strong security.
+            pdfDoc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+
+            // Save the encrypted PDF directly into the MemoryStream.
+            pdfDoc.Save(encryptedStream, SaveFormat.Pdf);
         }
 
-        // Temporary file to hold the encrypted PDF
-        string encryptedTempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        // Reset the stream position so that consumers can read from the beginning.
+        encryptedStream.Position = 0;
+        return encryptedStream; // Caller is responsible for disposing the stream.
+    }
+
+    // Example usage:
+    static void Main()
+    {
+        const string sourcePdf = "input.pdf";
+        const string userPwd   = "user123";
+        const string ownerPwd  = "owner123";
 
         try
         {
-            // Load the PDF document
-            Document doc = new Document(inputPath);
-
-            // Define permissions and encrypt the document using AES‑256
-            Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-            doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-            // Save the encrypted PDF to a temporary file
-            doc.Save(encryptedTempPath);
-
-            // Load the encrypted PDF into a memory stream for network transmission
-            using (MemoryStream pdfStream = new MemoryStream())
+            using (MemoryStream stream = GetEncryptedPdfStream(sourcePdf, userPwd, ownerPwd))
             {
-                using (FileStream fileStream = new FileStream(encryptedTempPath, FileMode.Open, FileAccess.Read))
-                {
-                    fileStream.CopyTo(pdfStream);
-                }
-                pdfStream.Position = 0; // reset stream position
-
-                // At this point 'pdfStream' contains the encrypted PDF bytes and can be sent over the network
-                Console.WriteLine($"Encrypted PDF prepared in memory stream (Length: {pdfStream.Length} bytes).");
+                Console.WriteLine($"Encrypted PDF size: {stream.Length} bytes");
+                // Optional: write to a file for verification.
+                File.WriteAllBytes("encrypted_output.pdf", stream.ToArray());
             }
-        }
-        catch (InvalidPasswordException ex)
-        {
-            Console.Error.WriteLine($"Password error: {ex.Message}");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-        finally
-        {
-            // Clean up the temporary encrypted file
-            if (File.Exists(encryptedTempPath))
-            {
-                try { File.Delete(encryptedTempPath); } catch { /* ignore cleanup errors */ }
-            }
         }
     }
 }

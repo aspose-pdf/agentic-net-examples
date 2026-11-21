@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -8,47 +9,49 @@ class Program
     {
         const string outputPath = "ellipse_gradient.pdf";
 
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph that spans the page (size can be the page size or any container size you need)
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
-
-            // Ellipse bounds (left, bottom, width, height)
-            double left   = 100;   // LLX
-            double bottom = 500;   // LLY
-            double width  = 200;   // URX - LLX (300 - 100)
-            double height = 200;   // URY - LLY (700 - 500)
-
-            // Define an axial gradient shading from blue to green
-            GradientAxialShading axialShading = new GradientAxialShading(
-                Color.FromRgb(0f, 0f, 1f), // Blue
-                Color.FromRgb(0f, 1f, 0f)  // Green
-            );
-            axialShading.Start = new Point(left, bottom);
-            axialShading.End   = new Point(left + width, bottom + height);
-
-            // Wrap the shading in a Color object that can be used as a fill
-            Color gradientFill = new Color
+            // Create a Graph container. The constructor takes only width and height.
+            // Position the graph on the page by setting Left and Top.
+            var graph = new Graph(500, 300)   // width = 550-50, height = 800-500
             {
-                PatternColorSpace = axialShading
+                Left = 50,
+                Top = 500,
+                Border = new BorderInfo(BorderSide.All, 1f, Color.Black)
             };
 
-            // Create the ellipse shape and apply styling
-            Ellipse ellipse = new Ellipse(left, bottom, width, height);
-            ellipse.GraphInfo.FillColor = gradientFill;   // gradient fill
-            ellipse.GraphInfo.Color = Color.Black;        // stroke color
-            ellipse.GraphInfo.LineWidth = 1f;             // stroke width
+            // Define an ellipse inside the graph.
+            // Ellipse(left, bottom, width, height) – width/height are the size of the bounding rectangle.
+            var ellipse = new Ellipse(100, 550, 400, 200);
 
-            // Add the ellipse to the graph, then add the graph to the page
+            // Apply a linear gradient fill from blue (left) to green (right).
+            // Gradient is expressed via a Color whose PatternColorSpace is a GradientAxialShading.
+            ellipse.GraphInfo.FillColor = new Color
+            {
+                PatternColorSpace = new GradientAxialShading(Color.Blue, Color.Green)
+                {
+                    Start = new Point(100, 550),   // left‑bottom of the ellipse
+                    End   = new Point(500, 750)    // right‑top of the ellipse
+                }
+            };
+
+            // Optionally set a stroke color for the ellipse outline.
+            ellipse.GraphInfo.Color = Color.Black;
+
+            // Add the ellipse to the graph.
             graph.Shapes.Add(ellipse);
+
+            // Add the graph to the page.
             page.Paragraphs.Add(graph);
 
-            // Save the document
+            // Save the PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with gradient ellipse saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

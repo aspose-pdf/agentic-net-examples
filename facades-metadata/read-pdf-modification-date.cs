@@ -8,37 +8,34 @@ class Program
     {
         const string pdfPath = "input.pdf";
 
-        // Verify the file exists before attempting to read it
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // PdfFileInfo provides access to PDF file metadata, including ModDate.
+        using (PdfFileInfo info = new PdfFileInfo(pdfPath))
         {
-            // PdfFileInfo implements IDisposable, so wrap it in a using block
-            using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+            // ModDate is returned as a string (PDF date format). Convert it to DateTime.
+            string modDateString = info.ModDate;
+            DateTime modDate;
+            // Try to parse using the standard PDF date format "D:yyyyMMddHHmmssK".
+            // If parsing fails, fall back to DateTime.TryParse which handles many formats.
+            if (!DateTime.TryParseExact(modDateString,
+                                         "'D:'yyyyMMddHHmmssK",
+                                         System.Globalization.CultureInfo.InvariantCulture,
+                                         System.Globalization.DateTimeStyles.None,
+                                         out modDate))
             {
-                // ModDate is returned as a string by Aspose.Pdf.Facades.PdfFileInfo.
-                // Convert the string to a DateTime before formatting.
-                string modDateString = info.ModDate;
-                if (DateTime.TryParse(modDateString, out DateTime modDate))
-                {
-                    // Format the date as desired (e.g., "2023-08-15 14:30:00")
-                    string formattedDate = modDate.ToString("yyyy-MM-dd HH:mm:ss");
-                    Console.WriteLine($"Modification Date: {formattedDate}");
-                }
-                else
-                {
-                    Console.Error.WriteLine($"Unable to parse modification date: '{modDateString}'");
-                }
+                // Fallback to a more permissive parse.
+                DateTime.TryParse(modDateString, out modDate);
             }
-        }
-        catch (Exception ex)
-        {
-            // Handle any errors that may occur while reading the PDF
-            Console.Error.WriteLine($"Error: {ex.Message}");
+
+            // Format the date as desired, e.g., "yyyy-MM-dd HH:mm:ss".
+            string formattedDate = modDate.ToString("yyyy-MM-dd HH:mm:ss");
+
+            Console.WriteLine($"Modification Date: {formattedDate}");
         }
     }
 }

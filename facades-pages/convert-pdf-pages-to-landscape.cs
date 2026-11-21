@@ -1,12 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_landscape.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,25 +16,27 @@ class Program
             return;
         }
 
-        // Load the PDF document (Aspose.Pdf.Document provides full page manipulation capabilities)
-        Document pdfDocument = new Document(inputPath);
-
-        // A4 size in points (portrait). For landscape we swap width/height.
-        float a4Width  = PageSize.A4.Width;   // 595.2756 pt
-        float a4Height = PageSize.A4.Height;  // 841.8898 pt
-
-        // Apply landscape A4 dimensions to every page
-        foreach (Page page in pdfDocument.Pages)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // Set width to the original portrait height and height to the original portrait width
-            page.PageInfo.Width  = a4Height; // landscape width
-            page.PageInfo.Height = a4Width;  // landscape height
-            // Optional flag – makes the orientation explicit
-            page.PageInfo.IsLandscape = true;
+            // A4 portrait size (points). Landscape is obtained by swapping width/height.
+            var a4 = PageSize.A4;
+            double landscapeWidth = a4.Height;   // width becomes original height
+            double landscapeHeight = a4.Width;   // height becomes original width
+
+            // Apply the landscape size to every page via PageInfo
+            foreach (Page page in doc.Pages)
+            {
+                page.PageInfo.Width = landscapeWidth;
+                page.PageInfo.Height = landscapeHeight;
+                // Optional: explicitly mark the page as landscape
+                page.PageInfo.IsLandscape = true;
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
         Console.WriteLine($"Landscape PDF saved to '{outputPath}'.");
     }
 }

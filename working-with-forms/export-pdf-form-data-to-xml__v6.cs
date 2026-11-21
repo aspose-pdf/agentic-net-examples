@@ -1,72 +1,129 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Text.Json;
-using System.Xml.Linq;
+using System.Xml;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
+// ---------------------------------------------------------------------------
+// Minimal stubs that emulate the parts of Microsoft.AspNetCore.Http we need.
+// This allows the example to compile as a console application without pulling
+// in the full ASP.NET Core package.
+// ---------------------------------------------------------------------------
+namespace Microsoft.AspNetCore.Http
+{
+    // HTTP status code constants used in the example.
+    public static class StatusCodes
+    {
+        public const int Status404NotFound = 404;
+    }
+
+    // Simple header dictionary – a thin wrapper around Dictionary<string,string>.
+    public interface IHeaderDictionary : IDictionary<string, string> { }
+    public class HeaderDictionary : Dictionary<string, string>, IHeaderDictionary { }
+
+    // Very small HttpResponse stub exposing only the members used by the sample.
+    public class HttpResponse
+    {
+        // Initialise to a non‑null default to satisfy the non‑nullable warning.
+        public string ContentType { get; set; } = string.Empty;
+        public IHeaderDictionary Headers { get; } = new HeaderDictionary();
+        public Stream Body { get; set; } = new MemoryStream();
+        public int StatusCode { get; set; }
+    }
+}
+
+public class FormDataExporter
+{
+    /// <summary>
+    /// Streams an XML representation of PDF form fields directly to the provided
+    /// HttpResponse (stub) for immediate download.
+    /// </summary>
+    /// <param name="response">A minimal HttpResponse implementation.</param>
+    /// <param name="pdfFilePath">Path to the source PDF file.</param>
+    public static void ExportFormData(Microsoft.AspNetCore.Http.HttpResponse response, string pdfFilePath)
+    {
+        if (!File.Exists(pdfFilePath))
+        {
+            response.StatusCode = Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound;
+            return;
+        }
+
+        // Set response headers for file download.
+        response.ContentType = "application/xml";
+        var fileName = Path.GetFileNameWithoutExtension(pdfFilePath) + "_FormData.xml";
+        response.Headers["Content-Disposition"] = $"attachment; filename=\"{fileName}\"";
+
+        // Load the PDF document.
+        using (Document doc = new Document(pdfFilePath))
+        {
+            // Write a simple XML document that lists each form field name/value.
+            // This avoids the need for the Facade API (ExportXml) which is not
+            // allowed by the hard namespace restriction.
+            using (XmlWriter writer = XmlWriter.Create(response.Body, new XmlWriterSettings { Indent = true, Encoding = System.Text.Encoding.UTF8 }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("FormData");
+
+                if (doc?.Form?.Fields != null)
+                {
+                    foreach (Field field in doc.Form.Fields)
+                    {
+                        string fieldName = field?.Name ?? field?.FullName ?? "UnnamedField";
+                        string fieldValue = field?.Value?.ToString() ?? string.Empty;
+
+                        writer.WriteStartElement("Field");
+                        writer.WriteAttributeString("Name", fieldName);
+                        writer.WriteString(fieldValue);
+                        writer.WriteEndElement(); // Field
+                    }
+                }
+
+                writer.WriteEndElement(); // FormData
+                writer.WriteEndDocument();
+                writer.Flush();
+            }
+        }
+
+        // Reset the stream position so that callers can read from the beginning.
+        if (response.Body.CanSeek)
+        {
+            response.Body.Position = 0;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Example console driver – demonstrates how the ExportFormData method can be
+// invoked and the resulting XML saved to a file for verification.
+// ---------------------------------------------------------------------------
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        const string pdfPath = "input.pdf";
-        const string outputXmlPath = "formdata.xml";
-
-        // Verify the source PDF exists
-        if (!File.Exists(pdfPath))
+        if (args.Length == 0)
         {
-            Console.Error.WriteLine($"File '{pdfPath}' not found.");
+            Console.WriteLine("Usage: dotnet run <pdf-file-path>");
             return;
         }
 
-        // Load the PDF document
-        using var doc = new Document(pdfPath);
+        string pdfPath = args[0];
+        var response = new Microsoft.AspNetCore.Http.HttpResponse();
+        FormDataExporter.ExportFormData(response, pdfPath);
 
-        // Ensure the PDF contains a form
-        if (doc.Form == null || doc.Form.Count == 0)
+        // If the export succeeded, write the in‑memory response to a physical file.
+        if (response.StatusCode != Microsoft.AspNetCore.Http.StatusCodes.Status404NotFound)
         {
-            Console.Error.WriteLine("The PDF does not contain any form fields.");
-            return;
-        }
-
-        // -------------------------------------------------------------------
-        // 1. Export the form data to JSON (the only export method available on
-        //    Aspose.Pdf.Forms.Form in the core API).
-        // -------------------------------------------------------------------
-        using var jsonStream = new MemoryStream();
-        doc.Form.ExportToJson(jsonStream);
-        jsonStream.Position = 0; // rewind for reading
-
-        // -------------------------------------------------------------------
-        // 2. Convert the JSON payload to a simple XML representation.
-        //    The conversion is performed in‑memory – no temporary files are
-        //    created – and the resulting XML is written to a file.
-        // -------------------------------------------------------------------
-        string json;
-        using (var reader = new StreamReader(jsonStream, Encoding.UTF8))
-            json = reader.ReadToEnd();
-
-        using var jsonDoc = JsonDocument.Parse(json);
-        var xmlRoot = new XElement("FormData");
-        foreach (var property in jsonDoc.RootElement.EnumerateObject())
-        {
-            var fieldValue = property.Value.ValueKind switch
+            string outPath = Path.Combine(Path.GetDirectoryName(pdfPath) ?? ".", "FormData.xml");
+            using (var fileStream = File.Create(outPath))
             {
-                JsonValueKind.String => property.Value.GetString(),
-                JsonValueKind.Number => property.Value.GetRawText(),
-                JsonValueKind.True => "true",
-                JsonValueKind.False => "false",
-                _ => string.Empty
-            };
-            xmlRoot.Add(new XElement(property.Name, fieldValue));
+                response.Body.CopyTo(fileStream);
+            }
+            Console.WriteLine($"Form data exported to: {outPath}");
         }
-
-        // -------------------------------------------------------------------
-        // 3. Write the XML to a file (could be streamed to a response in a web
-        //    scenario). The file is UTF‑8 encoded.
-        // -------------------------------------------------------------------
-        File.WriteAllText(outputXmlPath, xmlRoot.ToString(), Encoding.UTF8);
-        Console.WriteLine($"Form data exported to '{outputXmlPath}'.");
+        else
+        {
+            Console.WriteLine("PDF file not found.");
+        }
     }
 }

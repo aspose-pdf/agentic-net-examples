@@ -1,45 +1,46 @@
 using System;
 using System.IO;
 using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "extracted.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "extracted.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Initialize the PdfExtractor (Aspose.Pdf.Facades)
-        PdfExtractor extractor = new PdfExtractor();
-
-        // Load the PDF document
-        extractor.BindPdf(inputPdf);
-
-        // Extract all text from the document
-        extractor.ExtractText();
-
-        // Retrieve the extracted text via a stream (required overload)
-        string extractedText;
-        using (MemoryStream textStream = new MemoryStream())
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            extractor.GetText(textStream); // write text to the stream
-            textStream.Position = 0; // rewind for reading
-            using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
+            // Use PdfExtractor from Aspose.Pdf.Facades to extract text
+            PdfExtractor extractor = new PdfExtractor();
+            extractor.BindPdf(doc);
+            extractor.ExtractText();
+
+            // Retrieve the extracted text via the stream overload
+            string extractedText;
+            using (MemoryStream textStream = new MemoryStream())
             {
-                extractedText = reader.ReadToEnd();
+                extractor.GetText(textStream); // write text to the stream
+                textStream.Position = 0;        // rewind for reading
+                using (StreamReader reader = new StreamReader(textStream, Encoding.UTF8))
+                {
+                    extractedText = reader.ReadToEnd();
+                }
             }
+
+            // Write the text to a file with UTF‑8 encoding to preserve international characters
+            File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
         }
 
-        // Save the text to a file using UTF‑8 encoding for international characters
-        File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
-
-        Console.WriteLine($"Text successfully extracted to '{outputTxt}'.");
+        Console.WriteLine($"Text extracted and saved to '{outputTxtPath}'.");
     }
 }

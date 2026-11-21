@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
-
-#pragma warning disable CS8618 // Suppress non‑nullable field warnings for generated classes
 
 class Program
 {
@@ -17,53 +14,30 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // List to hold resolution info for each image
-            var imageInfos = new List<ImageResolutionInfo>();
-
-            // Iterate over all pages (pages are 1‑based)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
             {
-                Page page = doc.Pages[i];
-
-                // Iterate the XImage collection directly (not a dictionary)
-                foreach (XImage img in page.Resources.Images)
+                // Aspose.Pdf uses 1‑based page indexing
+                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                 {
-                    // Width and Height are in points (1/72 inch). Convert to pixels if needed.
-                    // Older Aspose.Pdf versions do not expose DPI via ImageInfo, so we default to 0.
-                    var info = new ImageResolutionInfo
+                    Aspose.Pdf.Page page = doc.Pages[pageIndex];
+
+                    // Iterate over the image resources on the page
+                    foreach (Aspose.Pdf.XImage img in page.Resources.Images)
                     {
-                        PageNumber = i,
-                        WidthPoints = img.Width,
-                        HeightPoints = img.Height,
-                        DpiX = 0, // DPI not available in this API version
-                        DpiY = 0  // DPI not available in this API version
-                    };
-                    imageInfos.Add(info);
+                        // Width and Height are expressed in points (1 point = 1/72 inch)
+                        // For reporting we output these values directly
+                        Console.WriteLine(
+                            $"Page {pageIndex}: Image - Width = {img.Width} pt, Height = {img.Height} pt");
+                    }
                 }
             }
-
-            // Report the collected metadata
-            Console.WriteLine("Image Resolution Report:");
-            foreach (var info in imageInfos)
-            {
-                Console.WriteLine(
-                    $"Page {info.PageNumber}: Width={info.WidthPoints}pt, Height={info.HeightPoints}pt, " +
-                    $"DPI X={info.DpiX}, DPI Y={info.DpiY}");
-            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
-
-    // Simple DTO to hold image resolution data
-    private class ImageResolutionInfo
-    {
-        public int PageNumber { get; set; }
-        public double WidthPoints { get; set; }
-        public double HeightPoints { get; set; }
-        public int DpiX { get; set; }
-        public int DpiY { get; set; }
-    }
 }
-#pragma warning restore CS8618 // Re‑enable the warning for the rest of the project

@@ -6,81 +6,80 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";          // source PDF
-        const string htmlPath = "output.html";        // generated HTML file
-        const string imagesFolder = "html_images";    // desired folder for SVG/PNG images
+        const string pdfPath = "input.pdf";
+        const string htmlPath = "output.html";
+        const string svgFolder = "svg_images";
 
-        // Verify source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the target images folder exists
-        Directory.CreateDirectory(imagesFolder);
+        // Ensure the folder for SVG images exists
+        Directory.CreateDirectory(svgFolder);
 
         try
         {
-            // Load PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(pdfPath))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(pdfPath))
             {
-                // Configure HTML save options – use members that exist in all supported Aspose.Pdf versions
-                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                // Configure HTML conversion options – use members that exist in the
+                // Aspose.Pdf version referenced by the project.
+                var htmlOpts = new HtmlSaveOptions
                 {
-                    // Do not embed resources; let Aspose create external files (default folder handling)
-                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.NoEmbedding,
-                    // Save raster images as external PNG files referenced via SVG (keeps vector quality)
+                    // Store raster images as external PNG files referenced via SVG
                     RasterImagesSavingMode = HtmlSaveOptions.RasterImagesSavingModes.AsExternalPngFilesReferencedViaSvg,
-                    // Produce a single HTML file (images will be external)
+
+                    // Do not embed resources into the HTML; keep them as external files
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.NoEmbedding,
+
+                    // Keep the whole document in a single HTML file
                     SplitIntoPages = false
                 };
 
-                // Save PDF as HTML
-                pdfDoc.Save(htmlPath, htmlOpts);
+                // Perform the conversion; on non‑Windows platforms this may throw
+                // TypeInitializationException because GDI+ is required.
+                doc.Save(htmlPath, htmlOpts);
+
                 Console.WriteLine($"HTML saved to '{htmlPath}'.");
             }
 
-            // After conversion Aspose creates a folder named "<htmlFileName>_files" next to the HTML file.
-            // Move its contents (SVG, PNG, CSS, etc.) to the user‑specified images folder.
-            string defaultImagesFolder = Path.Combine(
+            // After conversion, move the generated SVG files to the user‑specified folder.
+            // Aspose.Pdf creates a folder named "<htmlFileName>_files" next to the HTML file.
+            string defaultResourcesFolder = Path.Combine(
                 Path.GetDirectoryName(htmlPath) ?? string.Empty,
                 Path.GetFileNameWithoutExtension(htmlPath) + "_files");
 
-            if (Directory.Exists(defaultImagesFolder))
+            if (Directory.Exists(defaultResourcesFolder))
             {
-                foreach (string filePath in Directory.GetFiles(defaultImagesFolder))
+                foreach (string svgFile in Directory.GetFiles(defaultResourcesFolder, "*.svg"))
                 {
-                    string destPath = Path.Combine(imagesFolder, Path.GetFileName(filePath));
-                    // Overwrite if a file with the same name already exists in the target folder
-                    File.Copy(filePath, destPath, overwrite: true);
+                    string destPath = Path.Combine(svgFolder, Path.GetFileName(svgFile));
+                    // Overwrite if a file with the same name already exists.
+                    if (File.Exists(destPath))
+                        File.Delete(destPath);
+                    File.Move(svgFile, destPath);
                 }
 
-                // Optionally clean up the temporary folder created by Aspose
-                try
-                {
-                    Directory.Delete(defaultImagesFolder, recursive: true);
-                }
-                catch (Exception cleanupEx)
-                {
-                    Console.Error.WriteLine($"Could not delete temporary image folder: {cleanupEx.Message}");
-                }
+                // Optionally clean up the now‑empty resources folder.
+                try { Directory.Delete(defaultResourcesFolder, true); } catch { }
 
-                Console.WriteLine($"Images moved to '{imagesFolder}'.");
+                Console.WriteLine($"Generated SVG images are stored in '{svgFolder}'.");
             }
             else
             {
-                Console.WriteLine("No separate image folder was created by Aspose; all resources are embedded in the HTML.");
+                Console.WriteLine("No SVG resources folder was created by Aspose.Pdf.");
             }
         }
-        // HTML conversion relies on GDI+ and is Windows‑only
         catch (TypeInitializationException)
         {
-            Console.WriteLine("HTML conversion requires GDI+ and is only supported on Windows.");
+            // HTML conversion is Windows‑only (requires GDI+)
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Conversion error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

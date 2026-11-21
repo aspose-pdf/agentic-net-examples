@@ -7,45 +7,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "ExportedPages";
+        const string inputPath = "input.pdf";
+        const string outputDir = "PageImages";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Convert pages 2‑4 to PNG with 200 DPI and transparent background
+        for (int pageNumber = 2; pageNumber <= 4 && pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Set the desired resolution (200 DPI)
+            // Set resolution (DPI)
             Resolution resolution = new Resolution(200);
 
-            // Create a PNG device with transparent background
+            // Create a PNG device with the required resolution
             PngDevice pngDevice = new PngDevice(resolution)
             {
-                TransparentBackground = true // <-- correct property for transparency
+                TransparentBackground = true
             };
 
-            // Convert pages 2 through 4 (inclusive)
-            for (int pageNumber = 2; pageNumber <= 4; pageNumber++)
+            string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
+            using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
             {
-                // Ensure the page exists in the source document
-                if (pageNumber > doc.Pages.Count)
-                {
-                    Console.WriteLine($"Page {pageNumber} does not exist. Skipping.");
-                    continue;
-                }
-
-                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-
-                // Render the specific page to PNG using the configured device
-                pngDevice.Process(doc.Pages[pageNumber], outputPath);
-                Console.WriteLine($"Page {pageNumber} saved as {outputPath}");
+                // Render the specific page to the PNG stream
+                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
             }
         }
+
+        Console.WriteLine("Selected pages have been converted to PNG images.");
     }
 }

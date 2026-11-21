@@ -1,18 +1,19 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
         const string logoPath = "logo.png";
-        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(logoPath))
@@ -21,43 +22,45 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdf))
+        // Load the PDF inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Iterate through all pages (Aspose.Pdf pages are 1‑based)
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing).
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[pageNum];
 
-                // Replace every image on the page with the new logo.
-                // The page's Paragraphs collection contains Image objects that represent
-                // raster images placed on the page.
-                for (int i = 0; i < page.Paragraphs.Count; i++)
+                // Locate existing images on the page.
+                ImagePlacementAbsorber imgAbsorber = new ImagePlacementAbsorber();
+                page.Accept(imgAbsorber);
+
+                // Replace each found image with the new logo.
+                foreach (ImagePlacement placement in imgAbsorber.ImagePlacements)
                 {
-                    if (page.Paragraphs[i] is Image img)
+                    // Create a stamp that uses the logo image.
+                    ImageStamp logoStamp = new ImageStamp(logoPath)
                     {
-                        // Preserve the original dimensions (FixWidth / FixHeight) if they are set.
-                        // If they are not set, the image will be rendered using its intrinsic size.
-                        double? originalWidth = img.FixWidth;
-                        double? originalHeight = img.FixHeight;
+                        // Position the logo exactly where the original image was.
+                        // ImageStamp uses XIndent/YIndent for placement and Width/Height for size.
+                        XIndent = placement.Rectangle.LLX,
+                        YIndent = placement.Rectangle.LLY,
+                        Width = placement.Rectangle.Width,
+                        Height = placement.Rectangle.Height,
 
-                        // Load the logo image stream.
-                        using (FileStream logoStream = new FileStream(logoPath, FileMode.Open, FileAccess.Read))
-                        {
-                            img.ImageStream = logoStream;
-                        }
+                        // Ensure the logo fully covers the original image area.
+                        // Set Background = false to draw the logo over the page content.
+                        Background = false
+                    };
 
-                        // Re‑apply the original dimensions (if any) so the logo occupies the same space.
-                        if (originalWidth.HasValue) img.FixWidth = originalWidth.Value;
-                        if (originalHeight.HasValue) img.FixHeight = originalHeight.Value;
-                    }
+                    // Add the stamp to the page. This overlays the logo on the original image.
+                    page.AddStamp(logoStamp);
                 }
             }
 
             // Save the modified PDF.
-            doc.Save(outputPdf);
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Images replaced and saved to '{outputPdf}'.");
+        Console.WriteLine($"Images replaced with logo and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,63 +1,58 @@
 using System;
 using System.IO;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
-class Program
+class SignPdf
 {
     static void Main()
     {
+        // Paths – adjust as needed
         const string inputPdfPath = "input.pdf";
         const string outputPdfPath = "signed_output.pdf";
-        const string certPath = "certificate.pfx"; // RSA 4096‑bit private key in PKCS#12 container
-        const string certPassword = "yourPfxPassword";
+        const string certificatePath = "certificate.pfx";   // RSA 4096‑bit private key in PKCS#12 container
+        const string certificatePassword = "pfxPassword";
 
+        // Verify files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
-
-        if (!File.Exists(certPath))
+        if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
             return;
         }
 
-        try
+        // Open the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the RSA certificate using the standard X509Certificate2 constructor.
-            X509Certificate2 rsaCert = new X509Certificate2(certPath, certPassword);
-
-            // Open the PDF document inside a using block for deterministic disposal.
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Create a visible signature field on the first page
+            var signatureRect = new Aspose.Pdf.Rectangle(100, 100, 250, 150);
+            var signatureField = new SignatureField(pdfDoc.Pages[1], signatureRect)
             {
-                // Define a rectangle where the visual signature appearance will be placed (page 1 in this example).
-                var signatureRect = new Rectangle(100, 100, 200, 150);
+                PartialName = "Signature1"
+            };
 
-                // Create a signature field and add it to the document's form collection.
-                var signatureField = new SignatureField(pdfDoc.Pages[1], signatureRect)
-                {
-                    PartialName = "Signature1"
-                };
-                pdfDoc.Form.Add(signatureField);
+            // Add the signature field to the document's form collection
+            pdfDoc.Form.Add(signatureField);
 
-                // NOTE:
-                // The Signature property of SignatureField is read‑only in the core API.
-                // To apply a real digital signature you would need the Aspose.Pdf.Signatures
-                // package and use PKCS7Signature (or PKCS7) from that assembly.
-                // This example demonstrates a compilable placeholder field.
+            // Create a PKCS#7 signature using the loaded certificate (SHA‑256 hash algorithm)
+            var pkcs7 = new PKCS7(certificatePath, certificatePassword)
+            {
+                Reason = "Document approval",
+                Location = "New York, USA",
+                ContactInfo = "contact@example.com"
+            };
 
-                // Save the PDF (the field will be visible but not cryptographically signed).
-                pdfDoc.Save(outputPdfPath);
-            }
+            // Sign the field – the Signature property is read‑only, so we invoke Sign()
+            signatureField.Sign(pkcs7);
 
-            Console.WriteLine($"PDF processed successfully and saved to '{outputPdfPath}'.");
+            // Save the signed PDF
+            pdfDoc.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during processing: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF signed successfully and saved to '{outputPdfPath}'.");
     }
 }

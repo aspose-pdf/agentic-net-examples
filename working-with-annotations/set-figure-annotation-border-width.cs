@@ -16,31 +16,35 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (pages are 1‑based)
+            // Work with the first page (adjust as needed)
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (lower‑left X/Y, upper‑right X/Y)
+            // Define the annotation rectangle (lower‑left x/y, upper‑right x/y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
 
-            // Create a SquareAnnotation (a generic figure) on the first page
-            SquareAnnotation squareAnno = new SquareAnnotation(page, rect);
+            // Create a square annotation which serves as a visual "figure" annotation
+            SquareAnnotation figureAnno = new SquareAnnotation(page, rect)
+            {
+                Title = "Figure",
+                Contents = "Figure annotation with thicker border",
+                // Border colour is set via the annotation's Color property
+                Color = Aspose.Pdf.Color.Black
+            };
 
-            // Set the annotation's color (this controls the border color for figure annotations)
-            squareAnno.Color = Aspose.Pdf.Color.Blue;
+            // Set the line thickness (border width) to 2 points
+            // Border constructor requires the owning annotation as argument
+            figureAnno.Border = new Border(figureAnno) { Width = 2 };
 
-            // Set the border (line) thickness – Border requires the parent annotation in its constructor
-            squareAnno.Border = new Border(squareAnno) { Width = 2 };
-
-            // Add the annotation to the page's annotation collection
-            page.Annotations.Add(squareAnno);
+            // Add the annotation to the page
+            page.Annotations.Add(figureAnno);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with figure annotation to '{outputPath}'.");
+        Console.WriteLine($"Figure annotation saved with 2 pt border to '{outputPath}'.");
     }
 }

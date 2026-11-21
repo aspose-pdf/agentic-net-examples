@@ -7,40 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "slideshow.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document with the core API (Document)
-        using (Document doc = new Document(inputPath))
+        // Load the source PDF
+        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
         {
-            // -------------------------------------------------------------------
-            // 1. Set a page‑transition (e.g., Fade) and display duration for **all** pages
-            //    using PdfPageEditor (the correct way to set these properties).
-            // -------------------------------------------------------------------
-            using (PdfPageEditor editor = new PdfPageEditor(doc))
+            // Create a PdfPageEditor to modify page transition settings
+            using (Aspose.Pdf.Facades.PdfPageEditor editor = new Aspose.Pdf.Facades.PdfPageEditor(doc))
             {
-                // Prepare an array with all page numbers (1‑based indexing)
-                int[] allPages = new int[doc.Pages.Count];
-                for (int i = 0; i < allPages.Length; i++)
-                    allPages[i] = i + 1;
+                // Apply a transition to each page.
+                // TransitionType values are integer codes defined by the PDF spec.
+                // Example: 4 = Cover transition, 2 = Dissolve, etc.
+                // TransitionDuration is expressed in seconds.
+                for (int pageNumber = 1; pageNumber <= doc.Pages.Count; pageNumber++)
+                {
+                    editor.ProcessPages = new int[] { pageNumber };   // 1‑based page index
+                    editor.TransitionType = 4;                       // Cover transition
+                    editor.TransitionDuration = 2;                   // 2‑second duration
+                    editor.ApplyChanges();                           // Apply to the current page
+                }
 
-                editor.ProcessPages = allPages;
-                editor.TransitionType = 11;          // 11 = Fade (PDF spec value)
-                editor.TransitionDuration = 2;      // transition duration in seconds
-                editor.DisplayDuration = 5;         // how long each page stays visible (seconds)
-                editor.ApplyChanges();               // apply the settings
+                // Save the modified document with transitions applied
+                editor.Save(outputPath);
             }
-
-            // Save the modified PDF – it now behaves as a slideshow
-            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Slideshow PDF created: {outputPath}");
+        Console.WriteLine($"Slideshow PDF saved to '{outputPath}'.");
     }
 }

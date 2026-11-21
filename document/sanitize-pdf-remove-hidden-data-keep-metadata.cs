@@ -19,13 +19,15 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Configure hidden‑data sanitization: keep metadata, remove all other hidden content
-            var options = new HiddenDataSanitizationOptions
-            {
-                RemoveMetadata = false // Preserve document metadata (title, author, etc.)
-                // All other hidden‑data removal flags retain their default values (true)
-            };
+            // Configure the sanitizer: keep document metadata, remove all other hidden data
+            var options = new HiddenDataSanitizationOptions();
+            // Remove JavaScript actions (metadata is kept by default)
+            options.RemoveJavaScriptsAndActions = true;
 
+            // Delete any embedded files (they are considered hidden data)
+            doc.EmbeddedFiles.Delete();
+
+            // Apply the sanitization using the HiddenDataSanitizer
             var sanitizer = new HiddenDataSanitizer(options);
             sanitizer.Sanitize(doc);
 

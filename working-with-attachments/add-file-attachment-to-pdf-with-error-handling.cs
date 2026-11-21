@@ -6,55 +6,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output_with_attachments.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_attachments.pdf";
 
         // List of files to attach
-        string[] attachmentFiles = new[]
-        {
-            "attachment1.docx",
-            "attachment2.jpg",
-            "missing_file.txt"   // example of a missing file
-        };
+        string[] filesToAttach = { "attachment1.docx", "attachment2.jpg", "missingfile.txt" };
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Error: PDF file not found – '{inputPdfPath}'.");
+            Console.Error.WriteLine($"Error: Input PDF not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                foreach (string filePath in attachmentFiles)
+                foreach (string filePath in filesToAttach)
                 {
                     if (!File.Exists(filePath))
                     {
-                        // Handle missing attachment file – log and skip
-                        Console.Error.WriteLine($"Warning: Attachment file not found – '{filePath}'. Skipping.");
+                        // Handle missing file: log and skip this attachment
+                        Console.Error.WriteLine($"Warning: Attachment file not found and will be skipped: {filePath}");
                         continue;
                     }
 
-                    // Create a FileSpecification for the attachment.
-                    // The file name shown in the PDF is the simple name, the description is optional.
-                    var fileSpec = new FileSpecification(Path.GetFileName(filePath))
-                    {
-                        // Optional description – you can customize as needed
-                        Description = $"Embedded attachment: {Path.GetFileName(filePath)}",
-                        // Embed the file content via a memory stream
-                        Contents = new MemoryStream(File.ReadAllBytes(filePath))
-                    };
+                    // Create a FileSpecification for the attachment
+                    var fileSpec = new FileSpecification(Path.GetFileName(filePath));
+                    fileSpec.Contents = new MemoryStream(File.ReadAllBytes(filePath));
 
-                    // Add the specification to the EmbeddedFiles collection (the correct API for attachments).
-                    pdfDoc.EmbeddedFiles.Add(fileSpec);
+                    // Add the file specification to the PDF's embedded files collection
+                    doc.EmbeddedFiles.Add(fileSpec);
                 }
 
                 // Save the modified PDF
-                pdfDoc.Save(outputPdfPath);
-                Console.WriteLine($"PDF saved with attachments to '{outputPdfPath}'.");
+                doc.Save(outputPdf);
+                Console.WriteLine($"PDF saved with attachments to '{outputPdf}'.");
             }
         }
         catch (Exception ex)

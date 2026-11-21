@@ -1,45 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
-using System.Drawing.Imaging;
+using Aspose.Pdf.Devices;   // BmpDevice and Resolution are defined here
 
-class Program
+class ExportPdfPagesToBmp
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "BmpPages";
+        const string inputPdfPath  = "input.pdf";
+        const string outputFolder  = "BmpPages";
 
+        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Load the PDF inside a using block for deterministic disposal
         using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create a BMP device with 300 DPI resolution (no using – BmpDevice is not IDisposable)
-            var bmpDevice = new BmpDevice(new Resolution(300));
+            // Set rendering resolution to 300 DPI for high‑quality output
+            Resolution renderResolution = new Resolution(300);
 
-            // Aspose.Pdf uses 1‑based page indexing
+            // Iterate pages using 1‑based indexing (Aspose.Pdf convention)
             for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
             {
-                // Build the output file name for the current page
                 string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
 
-                // Render the specific page to the BMP file via a FileStream
-                using (FileStream outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                // Create a file stream for the BMP image
+                using (FileStream bmpStream = new FileStream(outputPath, FileMode.Create))
                 {
-                    bmpDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                    // BmpDevice renders a page to BMP using the specified resolution
+                    BmpDevice bmpDevice = new BmpDevice(renderResolution);
+                    bmpDevice.Process(pdfDoc.Pages[pageNumber], bmpStream);
                 }
+
+                Console.WriteLine($"Exported page {pageNumber} to {outputPath}");
             }
         }
 
-        Console.WriteLine($"All pages exported to BMP at 300 DPI in folder: {outputFolder}");
+        Console.WriteLine("All pages have been exported as BMP images at 300 DPI.");
     }
 }

@@ -1,15 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Vector;
 
-class Program
+class BatchVectorGraphicsExtractor
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Input folder containing PDF files (default: "InputPdfs")
-        string inputFolder = args.Length > 0 ? args[0] : "InputPdfs";
-        // Output base folder where each PDF gets its own sub‑folder (default: "ExtractedVectors")
-        string outputBaseFolder = args.Length > 1 ? args[1] : "ExtractedVectors";
+        // Folder containing the source PDF files
+        const string inputFolder = @"C:\PdfInput";
+
+        // Root folder where extracted SVGs will be stored
+        const string outputRoot = @"C:\PdfVectorGraphics";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -17,54 +19,59 @@ class Program
             return;
         }
 
-        Directory.CreateDirectory(outputBaseFolder);
+        // Ensure the output root exists
+        Directory.CreateDirectory(outputRoot);
 
-        // Process every PDF file in the input folder
+        // Process each PDF file in the input folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string pdfFileName = Path.GetFileNameWithoutExtension(pdfPath);
-            string pdfOutputFolder = Path.Combine(outputBaseFolder, pdfFileName);
+            string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
+            string pdfOutputFolder = Path.Combine(outputRoot, pdfName);
+
+            // Create a dedicated folder for this PDF's vector graphics
             Directory.CreateDirectory(pdfOutputFolder);
 
             try
             {
-                // Load the PDF document inside a using block (deterministic disposal)
+                // Load the PDF document inside a using block for deterministic disposal
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Pages are 1‑based in Aspose.Pdf
-                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                    // Iterate through each page and extract its vector graphics as SVG files
+                    for (int pageNo = 1; pageNo <= doc.Pages.Count; pageNo++)
                     {
-                        // Create a temporary document that contains only the current page
-                        using (Document singlePageDoc = new Document())
+                        var page = doc.Pages[pageNo];
+
+                        // SvgExtractor (and the underlying GDI calls) work only on Windows
+                        if (!OperatingSystem.IsWindows())
                         {
-                            singlePageDoc.Pages.Add(doc.Pages[pageIndex]);
-
-                            // Build the SVG file name for this page
-                            string svgPath = Path.Combine(pdfOutputFolder, $"Page_{pageIndex}.svg");
-
-                            // Save the single‑page document as SVG (vector graphics)
-                            // Explicitly pass SvgSaveOptions – otherwise a PDF would be written
-                            try
-                            {
-                                singlePageDoc.Save(svgPath, new SvgSaveOptions());
-                                Console.WriteLine($"Extracted SVG: {svgPath}");
-                            }
-                            catch (TypeInitializationException)
-                            {
-                                // SVG conversion relies on GDI+ and is Windows‑only
-                                Console.WriteLine("SVG conversion requires Windows (GDI+). Skipping remaining pages.");
-                                break;
-                            }
+                            Console.WriteLine($"Skipping SVG extraction for page {pageNo} of '{pdfName}.pdf' (non‑Windows platform).");
+                            continue;
                         }
+
+                        // Options: extract every sub‑path to its own SVG file (optional, can be omitted)
+                        var options = new SvgExtractionOptions
+                        {
+                            ExtractEverySubPathToSvg = true,
+                            MinStrokeWidth = 0.5
+                        };
+
+                        var extractor = new SvgExtractor(options);
+
+                        // Create a sub‑folder for this page's SVG files
+                        string pageFolder = Path.Combine(pdfOutputFolder, $"Page_{pageNo}");
+                        Directory.CreateDirectory(pageFolder);
+
+                        // Perform the extraction; each sub‑path becomes a separate SVG file inside pageFolder
+                        extractor.Extract(page, pageFolder);
                     }
                 }
+
+                Console.WriteLine($"Extracted vector graphics from '{pdfName}.pdf' to '{pdfOutputFolder}'.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{pdfName}.pdf': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Vector graphic extraction completed.");
     }
 }

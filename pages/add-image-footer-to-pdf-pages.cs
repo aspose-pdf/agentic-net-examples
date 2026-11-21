@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // for ImageStamp if needed (ImageStamp is in Aspose.Pdf)
 
 class Program
 {
@@ -29,16 +28,18 @@ class Program
             // Create an ImageStamp for the footer image
             ImageStamp footerStamp = new ImageStamp(footerPath)
             {
-                // 30% opacity (0.0 = fully transparent, 1.0 = fully opaque)
+                // 30 percent opacity
                 Opacity = 0.3,
-                // Position the stamp at the bottom center of each page
+
+                // Place at the bottom of the page
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment   = VerticalAlignment.Bottom,
-                // Ensure the stamp is placed on top of page content
-                Background = false
+
+                // Optional: adjust margins if needed
+                BottomMargin = 10
             };
 
-            // Apply the stamp to every page individually
+            // Apply the stamp to every page
             foreach (Page page in doc.Pages)
             {
                 page.AddStamp(footerStamp);

@@ -1,48 +1,44 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for ImageStamp (inherits from StampAnnotation)
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
-        const string imagePath = "newImage.jpg";
-        const string altText = "Diagram showing sales growth over 2023";
+        const string imagePath = "photo.jpg";   // image to add
+        const string outputPdf = "output.pdf"; // result PDF
 
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
+        // Ensure the image file exists
         if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            Console.Error.WriteLine($"Image not found: {imagePath}");
             return;
         }
 
-        // Open the existing PDF document
-        using (Document doc = new Document(inputPdf))
+        // Create a new PDF document
+        using (Document doc = new Document())
         {
-            // Add a new page to host the image (optional; you can use an existing page)
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create an ImageStamp, set its alternative text and positioning, then add it to the page
+            // Create an ImageStamp directly from the image file (or stream)
             ImageStamp stamp = new ImageStamp(imagePath)
             {
-                Background = false,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                AlternativeText = altText // <-- set descriptive alt text for assistive technologies
+                XIndent = 100,                     // horizontal position
+                YIndent = 500,                     // vertical position
+                // Assign alternative (alt) text for assistive technologies
+                AlternativeText = "A scenic mountain view with a lake in the foreground."
             };
+
+            // Add the stamp to the page
             page.AddStamp(stamp);
 
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image added with alt text and saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF with image and alt text saved to '{outputPdf}'.");
     }
 }

@@ -6,58 +6,163 @@ using Aspose.Pdf.Annotations;
 
 class Program
 {
+    // Simple representation of an annotation extracted from an FDF file
+    private class SimpleAnnotation
+    {
+        public int PageNumber { get; set; }               // 1‑based page index
+        public string Type { get; set; }                  // e.g., "Text", "Highlight"
+        public Aspose.Pdf.Rectangle Rect { get; set; }    // annotation rectangle
+        public string Contents { get; set; }              // annotation text
+    }
+
     static void Main()
     {
-        // Input FDF files (replace with actual paths)
-        string[] fdfFiles = { "annotations1.fdf", "annotations2.fdf", "annotations3.fdf" };
-        // Output PDF that will contain the consolidated annotations
-        const string outputPdf = "consolidated_annotations.pdf";
+        const string inputPdfPath = "source.pdf";                 // PDF to receive annotations
+        const string outputPdfPath = "consolidated.pdf";          // Resulting PDF
+        string[] fdfFiles = { "ann1.fdf", "ann2.fdf", "ann3.fdf" }; // FDF sources
 
-        // Create a new PDF document with a single blank page
-        using (Document pdfDoc = new Document())
+        if (!File.Exists(inputPdfPath))
         {
-            // Add a blank page (size A4)
-            Page page = pdfDoc.Pages.Add();
+            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            return;
+        }
 
-            // Consolidate annotations from each FDF file
+        // Load the target PDF
+        using (Document pdfDoc = new Document(inputPdfPath))
+        {
+            // Collect all annotations from all FDF files
+            List<SimpleAnnotation> allAnnotations = new List<SimpleAnnotation>();
+
             foreach (string fdfPath in fdfFiles)
             {
                 if (!File.Exists(fdfPath))
                 {
-                    Console.Error.WriteLine($"FDF file not found: {fdfPath}");
+                    Console.Error.WriteLine($"FDF not found: {fdfPath}");
                     continue;
                 }
 
-                // NOTE: Aspose.Pdf core library does not provide direct FDF parsing.
-                // As a placeholder, we read the file bytes and create a simple
-                // TextAnnotation for each FDF file to demonstrate consolidation.
-                // In a real scenario, you would parse the FDF content and create
-                // appropriate annotation objects (TextAnnotation, HighlightAnnotation, etc.).
-                byte[] fdfData = File.ReadAllBytes(fdfPath);
-                string annotationContent = $"Imported from {Path.GetFileName(fdfPath)} (size {fdfData.Length} bytes)";
-
-                // Define annotation rectangle (positioned sequentially down the page)
-                // Using fully‑qualified Aspose.Pdf.Rectangle to avoid ambiguity.
-                float yPos = 800 - (pdfDoc.Pages[1].Annotations.Count * 50);
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, yPos, 400, yPos + 40);
-
-                // Create the TextAnnotation and set its properties
-                TextAnnotation txtAnn = new TextAnnotation(page, rect)
+                try
                 {
-                    Title = "FDF Import",
-                    Contents = annotationContent,
-                    Color = Aspose.Pdf.Color.Yellow,
-                    Open = true,
-                    Icon = TextIcon.Note
-                };
+                    allAnnotations.AddRange(ParseFdfFile(fdfPath));
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"Error parsing '{fdfPath}': {ex.Message}");
+                }
+            }
 
-                // Add the annotation to the page
-                page.Annotations.Add(txtAnn);
+            // Add each annotation to the appropriate page
+            foreach (SimpleAnnotation ann in allAnnotations)
+            {
+                // Validate page number
+                if (ann.PageNumber < 1 || ann.PageNumber > pdfDoc.Pages.Count)
+                {
+                    Console.Error.WriteLine($"Invalid page {ann.PageNumber} for annotation; skipping.");
+                    continue;
+                }
+
+                // Retrieve the target page
+                Page targetPage = pdfDoc.Pages[ann.PageNumber];
+
+                // Currently only TextAnnotation is demonstrated.
+                // Additional types can be added with similar logic.
+                if (string.Equals(ann.Type, "Text", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Create a TextAnnotation using the core API
+                    TextAnnotation txtAnn = new TextAnnotation(targetPage, ann.Rect)
+                    {
+                        Title    = "Note",
+                        Contents = ann.Contents,
+                        Open     = true,
+                        Icon     = TextIcon.Note
+                    };
+
+                    targetPage.Annotations.Add(txtAnn);
+                }
+                else if (string.Equals(ann.Type, "Highlight", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Example of a HighlightAnnotation
+                    HighlightAnnotation hlAnn = new HighlightAnnotation(targetPage, ann.Rect)
+                    {
+                        Color = Aspose.Pdf.Color.Yellow,
+                        Contents = ann.Contents
+                    };
+
+                    targetPage.Annotations.Add(hlAnn);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Unsupported annotation type '{ann.Type}'; skipping.");
+                }
             }
 
             // Save the consolidated PDF
-            pdfDoc.Save(outputPdf);
-            Console.WriteLine($"Consolidated annotations saved to '{outputPdf}'.");
+            pdfDoc.Save(outputPdfPath);
+            Console.WriteLine($"Consolidated PDF saved to '{outputPdfPath}'.");
         }
+    }
+
+    // Parses a very simple custom FDF-like text file.
+    // Expected line format (semicolon‑separated key/value pairs):
+    // Page=1;Type=Text;Rect=100,200,300,400;Contents=Sample note
+    private static IEnumerable<SimpleAnnotation> ParseFdfFile(string fdfPath)
+    {
+        List<SimpleAnnotation> result = new List<SimpleAnnotation>();
+
+        foreach (string rawLine in File.ReadAllLines(fdfPath))
+        {
+            string line = rawLine.Trim();
+            if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                continue; // Skip empty lines and comments
+
+            Dictionary<string, string> dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            string[] parts = line.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string part in parts)
+            {
+                string[] kv = part.Split(new[] { '=' }, 2);
+                if (kv.Length == 2)
+                    dict[kv[0].Trim()] = kv[1].Trim();
+            }
+
+            // Required fields
+            if (!dict.TryGetValue("Page", out string pageStr) ||
+                !dict.TryGetValue("Type", out string type) ||
+                !dict.TryGetValue("Rect", out string rectStr) ||
+                !dict.TryGetValue("Contents", out string contents))
+            {
+                Console.Error.WriteLine($"Incomplete annotation definition in '{fdfPath}': {line}");
+                continue;
+            }
+
+            if (!int.TryParse(pageStr, out int pageNum))
+            {
+                Console.Error.WriteLine($"Invalid page number '{pageStr}' in '{fdfPath}'.");
+                continue;
+            }
+
+            // Parse rectangle: llx,lly,urx,ury
+            string[] rectVals = rectStr.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (rectVals.Length != 4 ||
+                !double.TryParse(rectVals[0], out double llx) ||
+                !double.TryParse(rectVals[1], out double lly) ||
+                !double.TryParse(rectVals[2], out double urx) ||
+                !double.TryParse(rectVals[3], out double ury))
+            {
+                Console.Error.WriteLine($"Invalid rectangle '{rectStr}' in '{fdfPath}'.");
+                continue;
+            }
+
+            SimpleAnnotation ann = new SimpleAnnotation
+            {
+                PageNumber = pageNum,
+                Type       = type,
+                Rect       = new Aspose.Pdf.Rectangle(llx, lly, urx, ury),
+                Contents   = contents
+            };
+
+            result.Add(ann);
+        }
+
+        return result;
     }
 }

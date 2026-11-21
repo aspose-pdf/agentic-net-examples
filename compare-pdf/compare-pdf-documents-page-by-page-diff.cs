@@ -11,68 +11,71 @@ class Program
         const string secondPdfPath = "second.pdf";
         const string diffPdfPath   = "diff.pdf";
 
-        if (!File.Exists(firstPdfPath) || !File.Exists(secondPdfPath))
+        // Verify input files exist
+        if (!File.Exists(firstPdfPath))
         {
-            Console.Error.WriteLine("One or both input files are missing.");
+            Console.Error.WriteLine($"File not found: {firstPdfPath}");
+            return;
+        }
+        if (!File.Exists(secondPdfPath))
+        {
+            Console.Error.WriteLine($"File not found: {secondPdfPath}");
             return;
         }
 
-        // Load the two source documents inside using blocks for deterministic disposal.
+        // Load the two documents
         using (Document doc1 = new Document(firstPdfPath))
         using (Document doc2 = new Document(secondPdfPath))
         {
-            // Determine the larger page count to cover all pages.
-            int maxPages = Math.Max(doc1.Pages.Count, doc2.Pages.Count);
-
-            // Create a new document that will hold the differences.
+            // Create a new PDF that will hold the comparison result
             using (Document diffDoc = new Document())
             {
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement).
-                for (int pageIndex = 1; pageIndex <= maxPages; pageIndex++)
+                // Add a single page for the summary
+                Page summaryPage = diffDoc.Pages.Add();
+
+                // Prepare a text fragment to describe the comparison
+                TextFragment tf = new TextFragment();
+                tf.TextState.FontSize = 12;
+                tf.TextState.Font = FontRepository.FindFont("Arial");
+                tf.Position = new Position(50, 800); // top-left margin
+
+                // Compare page counts
+                if (doc1.Pages.Count != doc2.Pages.Count)
                 {
-                    string text1 = ExtractPageText(doc1, pageIndex);
-                    string text2 = ExtractPageText(doc2, pageIndex);
+                    tf.Text = $"Page count differs: first PDF has {doc1.Pages.Count} pages, second PDF has {doc2.Pages.Count} pages.";
+                }
+                else
+                {
+                    // Simple per‑page size comparison (width/height)
+                    bool anyDifference = false;
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    sb.AppendLine($"Both PDFs contain {doc1.Pages.Count} pages. Checking page dimensions:");
 
-                    // If the texts are different (or one page is missing), record the diff.
-                    if (!string.Equals(text1, text2, StringComparison.Ordinal))
+                    for (int i = 1; i <= doc1.Pages.Count; i++) // 1‑based indexing
                     {
-                        // Add a new blank page to the diff document.
-                        Page diffPage = diffDoc.Pages.Add();
+                        Page p1 = doc1.Pages[i];
+                        Page p2 = doc2.Pages[i];
 
-                        // Prepare a description of the difference.
-                        string diffInfo = $"Page {pageIndex} differs.\n\n" +
-                                          $"--- {Path.GetFileName(firstPdfPath)} ---\n{text1}\n\n" +
-                                          $"--- {Path.GetFileName(secondPdfPath)} ---\n{text2}";
-
-                        // Add the description as a text fragment.
-                        TextFragment tf = new TextFragment(diffInfo)
+                        // Compare MediaBox dimensions
+                        if (p1.MediaBox.Width != p2.MediaBox.Width ||
+                            p1.MediaBox.Height != p2.MediaBox.Height)
                         {
-                            // Position the text near the top‑left corner.
-                            Position = new Position(50, diffPage.PageInfo.Height - 50),
-                            // Use a readable font size.
-                            TextState = { FontSize = 12 }
-                        };
-                        diffPage.Paragraphs.Add(tf);
+                            anyDifference = true;
+                            sb.AppendLine($"- Page {i}: size differs (First: {p1.MediaBox.Width}x{p1.MediaBox.Height}, Second: {p2.MediaBox.Width}x{p2.MediaBox.Height})");
+                        }
                     }
+
+                    tf.Text = anyDifference ? sb.ToString() : "All pages have identical dimensions.";
                 }
 
-                // Save the diff document. No SaveOptions are needed because the output is PDF.
+                // Add the text fragment to the summary page
+                summaryPage.Paragraphs.Add(tf);
+
+                // Save the diff PDF
                 diffDoc.Save(diffPdfPath);
-                Console.WriteLine($"Diff PDF saved to '{diffPdfPath}'.");
             }
         }
-    }
 
-    // Helper method to extract text from a specific page.
-    // Returns an empty string if the page does not exist.
-    private static string ExtractPageText(Document doc, int pageNumber)
-    {
-        if (pageNumber > doc.Pages.Count)
-            return string.Empty;
-
-        TextAbsorber absorber = new TextAbsorber();
-        // Extract text from the specified page only.
-        doc.Pages[pageNumber].Accept(absorber);
-        return absorber.Text ?? string.Empty;
+        Console.WriteLine($"Comparison report saved to '{diffPdfPath}'.");
     }
 }

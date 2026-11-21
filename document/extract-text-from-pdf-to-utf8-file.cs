@@ -8,30 +8,40 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputTxt = "output.txt";
+        const string inputPdfPath  = "input.pdf";
+        const string outputTxtPath = "output.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        try
         {
-            // Use TextAbsorber to extract all text from the document
-            TextAbsorber absorber = new TextAbsorber
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure)
-            };
-            pdfDoc.Pages.Accept(absorber);
-            string extractedText = absorber.Text ?? string.Empty;
+                // Use TextAbsorber to extract all text from the document
+                TextAbsorber absorber = new TextAbsorber();
+                // Optional: configure extraction options (e.g., pure text without formatting)
+                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
 
-            // Write the extracted text to a UTF‑8 encoded file
-            File.WriteAllText(outputTxt, extractedText, Encoding.UTF8);
+                // Apply the absorber to all pages
+                pdfDoc.Pages.Accept(absorber);
+
+                // Retrieve the extracted text
+                string extractedText = absorber.Text ?? string.Empty;
+
+                // Write the text to a UTF-8 encoded file
+                File.WriteAllText(outputTxtPath, extractedText, Encoding.UTF8);
+            }
+
+            Console.WriteLine($"Text extracted to '{outputTxtPath}'.");
         }
-
-        Console.WriteLine($"Text extracted to '{outputTxt}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

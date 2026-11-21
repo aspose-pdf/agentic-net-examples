@@ -1,77 +1,75 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Base directory of the executable (works on any platform)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Input and output directories
+        const string inputDir = "InputPdfs";
+        const string outputDir = "OutputPdfs";
 
-        // Resolve input / output folders relative to the base directory
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
-
-        // Ensure the folders exist so the sample can run out‑of‑the‑box
-        Directory.CreateDirectory(inputFolder);
-        Directory.CreateDirectory(outputFolder);
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        // Verify input directory exists
+        if (!Directory.Exists(inputDir))
         {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'. Place PDFs there and rerun the program.");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
 
-        // Bates‑numbering configuration (shared across the whole batch)
-        int increment = 5;               // increment of 5 as required
-        int numberOfDigits = 5;          // zero‑pad to 5 digits
-        string prefix = "Bates-";       // optional prefix
-        string suffix = string.Empty;    // optional suffix
-        int nextNumber = 1;              // first number for the first document
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
+
+        // Get all PDF files in the input folder
+        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
+
+        // Bates numbering settings
+        const int startNumber = 1;          // starting number
+        const int increment = 5;            // increment per page
+        const int numberOfDigits = 5;       // zero‑padded digits
+        const string prefix = "BN";        // prefix (without separator)
+        const string separator = "-";      // separator between prefix and number
 
         foreach (string inputPath in pdfFiles)
         {
+            string fileName   = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputDir, $"{fileName}_bates.pdf");
+
             try
             {
-                string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                string outputPath = Path.Combine(outputFolder, fileName + "_bates.pdf");
-
+                // Load the PDF inside a using block for deterministic disposal
                 using (Document doc = new Document(inputPath))
                 {
-                    int pageIndex = 0;
-                    foreach (Page page in doc.Pages)
+                    // Apply Bates numbering using TextStamp on each page
+                    for (int i = 1; i <= doc.Pages.Count; i++)
                     {
-                        int currentNumber = nextNumber + pageIndex * increment;
-                        string numberStr = currentNumber.ToString().PadLeft(numberOfDigits, '0');
-                        string stampText = $"{prefix}{numberStr}{suffix}";
+                        int currentNumber = startNumber + (i - 1) * increment;
+                        string formattedNumber = currentNumber.ToString().PadLeft(numberOfDigits, '0');
+                        string stampText = $"{prefix}{separator}{formattedNumber}";
 
-                        // Create a text stamp for the current page
+                        // Create a text stamp
                         TextStamp stamp = new TextStamp(stampText)
                         {
+                            // Position the stamp at the bottom‑right corner
                             HorizontalAlignment = HorizontalAlignment.Right,
-                            VerticalAlignment = VerticalAlignment.Bottom,
-                            RightMargin = 20,
-                            BottomMargin = 20
+                            VerticalAlignment   = VerticalAlignment.Bottom,
+                            // Small margins from the edges
+                            BottomMargin = 10,
+                            RightMargin  = 10
                         };
-                        // Configure appearance
+
+                        // Configure the visual style via the read‑only TextState object
                         stamp.TextState.Font = FontRepository.FindFont("Arial");
                         stamp.TextState.FontSize = 12;
                         stamp.TextState.FontStyle = FontStyles.Bold;
                         stamp.TextState.ForegroundColor = Color.Black;
 
-                        page.AddStamp(stamp);
-                        pageIndex++;
+                        // Add the stamp to the current page
+                        doc.Pages[i].AddStamp(stamp);
                     }
 
-                    // Update the nextNumber for the following document
-                    nextNumber += doc.Pages.Count * increment;
-
-                    // Save the modified PDF
+                    // Save the modified PDF; extension .pdf ensures PDF output
                     doc.Save(outputPath);
                 }
 

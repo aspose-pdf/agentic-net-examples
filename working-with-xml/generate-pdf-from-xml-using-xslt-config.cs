@@ -1,38 +1,63 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Xml;
-using System.Xml.Xsl;
+using System.Text.Json;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
 
 class Program
 {
+    // Classes that map to the JSON structure in appsettings.json
+    private class Settings
+    {
+        public PathsConfig Paths { get; set; }
+    }
+
+    private class PathsConfig
+    {
+        public string Xml { get; set; }
+        public string Xslt { get; set; }
+        public string OutputPdf { get; set; }
+    }
+
     static void Main()
     {
-        // Path to the simple key=value configuration file
-        const string configPath = "config.txt";
-
+        // ------------------------------------------------------------
+        // Load configuration from appsettings.json using System.Text.Json
+        // ------------------------------------------------------------
+        string configPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.json");
         if (!File.Exists(configPath))
         {
             Console.Error.WriteLine($"Configuration file not found: {configPath}");
             return;
         }
 
-        // Load configuration entries
-        var config = LoadConfig(configPath);
-
-        // Required configuration keys
-        if (!config.TryGetValue("XmlPath", out string xmlPath) ||
-            !config.TryGetValue("XsltPath", out string xsltPath) ||
-            !config.TryGetValue("PdfOutput", out string pdfOutput))
+        Settings config;
+        try
         {
-            Console.Error.WriteLine("Missing required entries in config: XmlPath, XsltPath, PdfOutput");
+            string json = File.ReadAllText(configPath);
+            config = JsonSerializer.Deserialize<Settings>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to read configuration: {ex.Message}");
             return;
         }
 
-        // Verify that source files exist
+        if (config?.Paths == null)
+        {
+            Console.Error.WriteLine("Invalid configuration format – missing 'Paths' section.");
+            return;
+        }
+
+        string xmlPath   = config.Paths.Xml;      // e.g., "data/input.xml"
+        string xsltPath  = config.Paths.Xslt;     // e.g., "templates/transform.xslt"
+        string outputPdf = config.Paths.OutputPdf; // e.g., "output/result.pdf"
+
+        // ------------------------------------------------------------
+        // Validate input files existence
+        // ------------------------------------------------------------
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
@@ -44,64 +69,18 @@ class Program
             return;
         }
 
-        try
+        // ------------------------------------------------------------
+        // Generate PDF using Aspose.Pdf core API (no Facades, no prohibited namespaces)
+        // ------------------------------------------------------------
+        using (Document pdfDoc = new Document())
         {
-            // Transform the XML using the XSLT into an intermediate HTML stream
-            using (var htmlStream = TransformXmlToHtml(xmlPath, xsltPath))
-            {
-                // Load the generated HTML into an Aspose.Pdf Document
-                var htmlLoadOptions = new HtmlLoadOptions();
-                using (Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(htmlStream, htmlLoadOptions))
-                {
-                    // Save the result as PDF (extension is ignored, always PDF)
-                    pdfDoc.Save(pdfOutput);
-                }
-            }
+            // BindXml applies the XSLT transformation and populates the PDF structure
+            pdfDoc.BindXml(xmlPath, xsltPath);
 
-            Console.WriteLine($"PDF generated successfully: {pdfOutput}");
+            // Save the generated PDF; the target format is PDF by default
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during PDF generation: {ex.Message}");
-        }
-    }
 
-    // Transforms the XML file with the provided XSLT and returns a MemoryStream containing HTML
-    private static MemoryStream TransformXmlToHtml(string xmlPath, string xsltPath)
-    {
-        var xslt = new XslCompiledTransform();
-        xslt.Load(xsltPath);
-
-        var memoryStream = new MemoryStream();
-        // Use the XSLT's output settings to ensure correct encoding
-        var settings = xslt.OutputSettings ?? new XmlWriterSettings { Encoding = System.Text.Encoding.UTF8 };
-        using (var writer = XmlWriter.Create(memoryStream, settings))
-        {
-            xslt.Transform(xmlPath, writer);
-        }
-        memoryStream.Position = 0; // Reset stream position for reading
-        return memoryStream;
-    }
-
-    // Parses a simple configuration file where each line is "key=value"
-    // Lines starting with '#' are treated as comments and ignored
-    static Dictionary<string, string> LoadConfig(string path)
-    {
-        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var line in File.ReadAllLines(path))
-        {
-            string trimmed = line.Trim();
-            if (string.IsNullOrEmpty(trimmed) || trimmed.StartsWith("#"))
-                continue;
-
-            int separatorIndex = trimmed.IndexOf('=');
-            if (separatorIndex <= 0)
-                continue; // skip malformed lines
-
-            string key = trimmed.Substring(0, separatorIndex).Trim();
-            string value = trimmed.Substring(separatorIndex + 1).Trim();
-            dict[key] = value;
-        }
-        return dict;
+        Console.WriteLine($"PDF generated successfully at: {outputPdf}");
     }
 }

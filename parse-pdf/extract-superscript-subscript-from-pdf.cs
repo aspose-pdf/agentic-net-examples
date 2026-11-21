@@ -1,7 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
@@ -9,77 +10,78 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTxtPath = "extracted.txt";
+        const string inputPdf = "input.pdf";
+        const string outputTxt = "extracted.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(inputPdfPath))
+        // Load PDF
+        using (Document doc = new Document(inputPdf))
         {
-            // Collect all text fragments from every page.
-            List<TextFragment> allFragments = new List<TextFragment>();
-            foreach (Page page in pdfDoc.Pages)
+            // Collect all text fragments from all pages
+            List<TextFragment> fragments = new List<TextFragment>();
+            foreach (Page page in doc.Pages)
             {
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber();
-                // Use Pure mode to get formatting information (font size, etc.).
                 absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
                 page.Accept(absorber);
-                allFragments.AddRange(absorber.TextFragments);
+                fragments.AddRange(absorber.TextFragments);
             }
 
-            if (allFragments.Count == 0)
+            if (fragments.Count == 0)
             {
-                Console.WriteLine("No text fragments found.");
+                Console.WriteLine("No text found in the document.");
                 return;
             }
 
-            // Compute average font size and average baseline Y position across all fragments.
-            double totalFontSize = 0;
-            double totalY = 0;
-            foreach (TextFragment frag in allFragments)
-            {
-                totalFontSize += frag.TextState.FontSize;
-                // Use the lower‑left Y coordinate of the fragment's rectangle as its baseline.
-                totalY += frag.Rectangle.LLY;
-            }
+            // Compute average font size (reference for normal text)
+            double avgFontSize = fragments.Average(f => f.TextState.FontSize);
 
-            double avgFontSize = totalFontSize / allFragments.Count;
-            double avgY = totalY / allFragments.Count;
+            // Determine a baseline Y coordinate using fragments close to average size
+            double baselineY = fragments
+                .Where(f => Math.Abs(f.TextState.FontSize - avgFontSize) < avgFontSize * 0.1)
+                .Select(f => f.Rectangle.LLY) // lower‑left Y of the fragment's bounding box
+                .DefaultIfEmpty(0)
+                .Average();
 
-            // Thresholds for detecting superscript/subscript.
-            double sizeThreshold = avgFontSize * 0.8;               // significantly smaller than average
-            double ySupThreshold = avgY + avgFontSize * 0.2;       // noticeably higher
-            double ySubThreshold = avgY - avgFontSize * 0.2;       // noticeably lower
+            // Offsets for superscript/subscript detection (tuned as 20% of avg font size)
+            double yOffset = avgFontSize * 0.2;
+            double sizeThreshold = avgFontSize * 0.8; // smaller than 80% of avg considered a script
 
-            // Build the output with annotations.
             StringBuilder sb = new StringBuilder();
 
-            foreach (TextFragment frag in allFragments)
+            foreach (TextFragment frag in fragments)
             {
-                string annotation = string.Empty;
-                double fragSize = frag.TextState.FontSize;
-                double fragY = frag.Rectangle.LLY;
+                string text = frag.Text;
+                double fontSize = frag.TextState.FontSize;
+                double yPos = frag.Rectangle.LLY; // vertical position of the fragment
 
-                if (fragSize < sizeThreshold && fragY > ySupThreshold)
-                {
-                    annotation = "[Superscript] ";
-                }
-                else if (fragSize < sizeThreshold && fragY < ySubThreshold)
-                {
-                    annotation = "[Subscript] ";
-                }
+                bool isSuperscript = fontSize < sizeThreshold && yPos > baselineY + yOffset;
+                bool isSubscript = fontSize < sizeThreshold && yPos < baselineY - yOffset;
 
-                sb.AppendLine($"{annotation}{frag.Text}");
+                if (isSuperscript)
+                {
+                    // Annotate superscript with ^{...}
+                    sb.Append($"^{{{text}}}");
+                }
+                else if (isSubscript)
+                {
+                    // Annotate subscript with _{...}
+                    sb.Append($"_{{{text}}}");
+                }
+                else
+                {
+                    sb.Append(text);
+                }
             }
 
-            // Write the annotated text to a plain .txt file.
-            File.WriteAllText(outputTxtPath, sb.ToString());
-            Console.WriteLine($"Extraction complete. Output written to '{outputTxtPath}'.");
+            // Write annotated text to output file
+            File.WriteAllText(outputTxt, sb.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Extraction complete. Output written to '{outputTxt}'.");
         }
     }
 }

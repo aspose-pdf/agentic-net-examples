@@ -1,83 +1,100 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Path to the source PDF
-        const string inputPdfPath = "input.pdf";
+        // ---------------------------------------------------------------------
+        // 1. Prepare a self‑contained input PDF (the sandbox has no files).
+        // ---------------------------------------------------------------------
+        const string pdfPath = "input.pdf";
+        const string sampleAttachmentPath = "sample.txt";
 
-        // Root folder where attachments will be organized
-        const string outputRootFolder = "Attachments";
+        // Create a tiny text file that will be embedded as an attachment.
+        File.WriteAllText(sampleAttachmentPath, "This is a sample attachment created for the demo.");
 
-        // Verify the PDF exists
-        if (!File.Exists(inputPdfPath))
+        // Build a minimal PDF and embed the text file.
+        using (var doc = new Document())
         {
-            Console.Error.WriteLine($"Error: PDF file not found at '{inputPdfPath}'.");
-            return;
-        }
+            // Add a single blank page – the PDF must contain at least one page.
+            doc.Pages.Add();
 
-        // Ensure the root output folder exists
-        Directory.CreateDirectory(outputRootFolder);
-
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPdfPath);
-
-        // If there are no embedded files, exit early
-        if (pdfDoc.EmbeddedFiles == null || pdfDoc.EmbeddedFiles.Count == 0)
-        {
-            Console.WriteLine("No attachments found in the PDF.");
-            return;
-        }
-
-        // Iterate over each embedded file and save it to the appropriate folder
-        foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
-        {
-            // The name stored in the PDF (may include extension)
-            string originalFileName = fileSpec.Name ?? "unnamed";
-
-            // Determine the file extension (e.g., ".png", ".txt")
-            string extension = Path.GetExtension(originalFileName);
-            string extensionFolderName = string.IsNullOrEmpty(extension)
-                ? "no_extension"
-                : extension.TrimStart('.').ToLowerInvariant();
-
-            // Build the target directory path and ensure it exists
-            string targetFolder = Path.Combine(outputRootFolder, extensionFolderName);
-            Directory.CreateDirectory(targetFolder);
-
-            // Destination file path (handle possible name collisions)
-            string destinationPath = Path.Combine(targetFolder, originalFileName);
-            int duplicateIndex = 1;
-            while (File.Exists(destinationPath))
+            // Create a FileSpecification for the attachment.
+            using (FileStream attStream = File.OpenRead(sampleAttachmentPath))
             {
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(originalFileName);
-                string newFileName = $"{fileNameWithoutExt}_{duplicateIndex}{extension}";
-                destinationPath = Path.Combine(targetFolder, newFileName);
-                duplicateIndex++;
+                var fileSpec = new FileSpecification(attStream, Path.GetFileName(sampleAttachmentPath))
+                {
+                    // Optional: set a description and MIME type.
+                    Description = "Sample text attachment",
+                    MIMEType = "text/plain",
+                    // Mark the relationship as Data (generic attachment).
+                    AFRelationship = AFRelationship.Data
+                };
+                // Add the attachment to the PDF.
+                doc.EmbeddedFiles.Add(fileSpec);
             }
 
-            // Write the attachment contents to disk
-            using (Stream contentStream = fileSpec.Contents)
-            {
-                if (contentStream == null)
-                {
-                    Console.WriteLine($"Warning: Attachment '{originalFileName}' has no content and will be skipped.");
-                    continue;
-                }
-                // Ensure the stream is positioned at the beginning
-                if (contentStream.CanSeek)
-                    contentStream.Position = 0;
+            // Save the PDF so the later extraction code can load it.
+            doc.Save(pdfPath);
+        }
 
-                using (FileStream fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
+        // ---------------------------------------------------------------------
+        // 2. Extract attachments and organise them by file extension.
+        // ---------------------------------------------------------------------
+        const string tempFolder = "Attachments";
+        const string organizedFolder = "AttachmentsOrganized";
+
+        Directory.CreateDirectory(tempFolder);
+        Directory.CreateDirectory(organizedFolder);
+
+        // Load the PDF that now definitely exists.
+        Document pdfDoc = new Document(pdfPath);
+
+        // Extract all embedded file attachments.
+        if (pdfDoc.EmbeddedFiles != null && pdfDoc.EmbeddedFiles.Count > 0)
+        {
+            foreach (FileSpecification fileSpec in pdfDoc.EmbeddedFiles)
+            {
+                // Preserve the original attachment name; fall back to a GUID if missing.
+                string attachmentName = string.IsNullOrEmpty(fileSpec.Name) ? Guid.NewGuid().ToString() : fileSpec.Name;
+                string destPath = Path.Combine(tempFolder, attachmentName);
+
+                // Write the attachment stream to the temporary folder.
+                using (FileStream outStream = new FileStream(destPath, FileMode.Create, FileAccess.Write))
                 {
-                    contentStream.CopyTo(fileStream);
+                    if (fileSpec.Contents.CanSeek)
+                        fileSpec.Contents.Position = 0;
+                    fileSpec.Contents.CopyTo(outStream);
                 }
             }
         }
+        else
+        {
+            Console.WriteLine("No embedded attachments found in the PDF.");
+        }
 
-        Console.WriteLine("All attachments have been extracted and organized by file extension.");
+        // Move each extracted file into a sub‑folder named after its extension.
+        foreach (string filePath in Directory.GetFiles(tempFolder))
+        {
+            string ext = Path.GetExtension(filePath).TrimStart('.').ToLowerInvariant();
+            if (string.IsNullOrEmpty(ext))
+                ext = "no_ext";
+
+            string destDir = Path.Combine(organizedFolder, ext);
+            Directory.CreateDirectory(destDir);
+
+            string destPath = Path.Combine(destDir, Path.GetFileName(filePath));
+            // Overwrite if a file with the same name already exists.
+            File.Move(filePath, destPath, true);
+        }
+
+        // Clean up the now‑empty temporary folder.
+        if (Directory.GetFiles(tempFolder).Length == 0 && Directory.GetDirectories(tempFolder).Length == 0)
+            Directory.Delete(tempFolder, true);
+
+        Console.WriteLine("Attachments have been extracted and organized.");
     }
 }

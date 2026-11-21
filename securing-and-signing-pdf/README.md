@@ -1,10 +1,10 @@
 # Securing and signing PDF
 
-> **Securing and signing PDF** in PDF using C# / .NET -- **82** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Securing and signing PDF** in PDF using C# / .NET -- **87** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `securing-and-signing-pdf`
-- Examples: 82
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 87
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -22,7 +22,10 @@
 - [`batch-sign-pdfs-title-based-certificate-selection.cs`](./batch-sign-pdfs-title-based-certificate-selection.cs) -- Batch sign pdfs title based certificate selection
 - [`batch-sign-pdfs-with-certificate-per-document-type.cs`](./batch-sign-pdfs-with-certificate-per-document-type.cs) -- Batch sign pdfs with certificate per document type
 - [`batch-sign-pdfs-with-certificate.cs`](./batch-sign-pdfs-with-certificate.cs) -- Batch sign pdfs with certificate
+- [`batch-sign-pdfs-with-unique-visible-signature-images.cs`](./batch-sign-pdfs-with-unique-visible-signature-images.cs) -- Batch sign pdfs with unique visible signature images
+- [`certified-pdf-signature-allow-add-pages.cs`](./certified-pdf-signature-allow-add-pages.cs) -- Certified pdf signature allow add pages
 - [`compute-verify-pdf-hash-before-after-signing.cs`](./compute-verify-pdf-hash-before-after-signing.cs) -- Compute verify pdf hash before after signing
+- [`create-readonly-secured-signed-pdf.cs`](./create-readonly-secured-signed-pdf.cs) -- Create readonly secured signed pdf
 - [`custom-security-handler-logging-pdf-access.cs`](./custom-security-handler-logging-pdf-access.cs) -- Custom security handler logging pdf access
 - [`custom-security-handler-warning-overlay.cs`](./custom-security-handler-warning-overlay.cs) -- Custom security handler warning overlay
 - [`decrypt-pdf-extract-embedded-images.cs`](./decrypt-pdf-extract-embedded-images.cs) -- Decrypt pdf extract embedded images
@@ -32,6 +35,7 @@
 - [`decrypt-pdf-with-certificate-token.cs`](./decrypt-pdf-with-certificate-token.cs) -- Decrypt pdf with certificate token
 - [`decrypt-pdf-with-owner-password.cs`](./decrypt-pdf-with-owner-password.cs) -- Decrypt pdf with owner password
 - [`disable-content-extraction-form-filling.cs`](./disable-content-extraction-form-filling.cs) -- Disable content extraction form filling
+- [`download-sign-pdf-azure-blob.cs`](./download-sign-pdf-azure-blob.cs) -- Download sign pdf azure blob
 - [`encrypt-pdf-aes256-user-owner-passwords.cs`](./encrypt-pdf-aes256-user-owner-passwords.cs) -- Encrypt pdf aes256 user owner passwords
 - [`encrypt-pdf-allow-copy-block-print.cs`](./encrypt-pdf-allow-copy-block-print.cs) -- Encrypt pdf allow copy block print
 - [`encrypt-pdf-disable-content-extraction.cs`](./encrypt-pdf-disable-content-extraction.cs) -- Encrypt pdf disable content extraction
@@ -55,6 +59,7 @@
 - [`extract-signature-field-names-and-page-numbers.cs`](./extract-signature-field-names-and-page-numbers.cs) -- Extract signature field names and page numbers
 - [`extract-signature-image-to-png.cs`](./extract-signature-image-to-png.cs) -- Extract signature image to png
 - [`extract-signature-images.cs`](./extract-signature-images.cs) -- Extract signature images
+- [`list-signature-dictionaries-object-ids.cs`](./list-signature-dictionaries-object-ids.cs) -- List signature dictionaries object ids
 - [`pdf-with-encrypted-attachment-and-signature.cs`](./pdf-with-encrypted-attachment-and-signature.cs) -- Pdf with encrypted attachment and signature
 - [`remove-digital-signature-from-pdf.cs`](./remove-digital-signature-from-pdf.cs) -- Remove digital signature from pdf
 - [`restrict-copy-paste-in-pdf.cs`](./restrict-copy-paste-in-pdf.cs) -- Restrict copy paste in pdf
@@ -68,15 +73,14 @@
 - [`sign-pdf-flatten-signature.cs`](./sign-pdf-flatten-signature.cs) -- Sign pdf flatten signature
 - [`sign-pdf-hardware-token-pkcs11.cs`](./sign-pdf-hardware-token-pkcs11.cs) -- Sign pdf hardware token pkcs11
 - [`sign-pdf-lock-specific-form-fields.cs`](./sign-pdf-lock-specific-form-fields.cs) -- Sign pdf lock specific form fields
-- [`sign-pdf-prevent-additional-signatures.cs`](./sign-pdf-prevent-additional-signatures.cs) -- Sign pdf prevent additional signatures
 - [`sign-pdf-remove-annotations.cs`](./sign-pdf-remove-annotations.cs) -- Sign pdf remove annotations
 - [`sign-pdf-with-4096-rsa-certificate.cs`](./sign-pdf-with-4096-rsa-certificate.cs) -- Sign pdf with 4096 rsa certificate
 - [`sign-pdf-with-certificate.cs`](./sign-pdf-with-certificate.cs) -- Sign pdf with certificate
 - [`sign-pdf-with-custom-image-appearance.cs`](./sign-pdf-with-custom-image-appearance.cs) -- Sign pdf with custom image appearance
+- [`sign-pdf-with-digital-signature.cs`](./sign-pdf-with-digital-signature.cs) -- Sign pdf with digital signature
 - [`sign-pdf-with-ecc-p256.cs`](./sign-pdf-with-ecc-p256.cs) -- Sign pdf with ecc p256
 - [`sign-pdf-with-incremental-updates.cs`](./sign-pdf-with-incremental-updates.cs) -- Sign pdf with incremental updates
 - [`sign-pdf-with-invisible-certification.cs`](./sign-pdf-with-invisible-certification.cs) -- Sign pdf with invisible certification
-- [`sign-pdf-with-pkcs7-and-custom-xml.cs`](./sign-pdf-with-pkcs7-and-custom-xml.cs) -- Sign pdf with pkcs7 and custom xml
 - [`sign-pdf-with-reason-contact-location.cs`](./sign-pdf-with-reason-contact-location.cs) -- Sign pdf with reason contact location
 - [`sign-pdf-with-sha384-digest.cs`](./sign-pdf-with-sha384-digest.cs) -- Sign pdf with sha384 digest
 - [`sign-pdf-with-sha512.cs`](./sign-pdf-with-sha512.cs) -- Sign pdf with sha512
@@ -88,6 +92,7 @@
 - [`validate-pdf-digital-signature__v2.cs`](./validate-pdf-digital-signature__v2.cs) -- Validate pdf digital signature  v2
 - [`validate-pdf-signature-crl.cs`](./validate-pdf-signature-crl.cs) -- Validate pdf signature crl
 - [`validate-pdf-signature-extract-san.cs`](./validate-pdf-signature-extract-san.cs) -- Validate pdf signature extract san
+- [`validate-pdf-signature-ocsp.cs`](./validate-pdf-signature-ocsp.cs) -- Validate pdf signature ocsp
 - [`validate-pdf-signature-timestamp.cs`](./validate-pdf-signature-timestamp.cs) -- Validate pdf signature timestamp
 - [`validate-pdf-signature.cs`](./validate-pdf-signature.cs) -- Validate pdf signature
 

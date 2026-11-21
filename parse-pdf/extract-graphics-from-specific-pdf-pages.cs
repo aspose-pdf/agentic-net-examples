@@ -15,40 +15,31 @@ class Program
             return;
         }
 
-        // Define the page numbers to process (1‑based indexing)
-        int[] pagesToExtract = { 2, 4, 5 };
+        // Pages (1‑based) from which graphics will be extracted
+        int[] selectedPages = { 1, 3, 5 };
 
         try
         {
-            // Document must be disposed deterministically
+            // Document must be wrapped in a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Ensure requested pages exist
-                foreach (int pageNum in pagesToExtract)
+                // Iterate over the requested page numbers
+                foreach (int pageNumber in selectedPages)
                 {
-                    if (pageNum < 1 || pageNum > doc.Pages.Count)
+                    // Validate page number using 1‑based indexing
+                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
                     {
-                        Console.WriteLine($"Page {pageNum} is out of range. Skipping.");
+                        Console.WriteLine($"Page {pageNumber} is out of range, skipping.");
                         continue;
                     }
 
-                    // CORRECT: 1‑based page indexing
-                    Page page = doc.Pages[pageNum];
-
-                    // GraphicsAbsorber extracts vector graphics from a page
+                    // Create a fresh GraphicsAbsorber for each page and visit the page
                     using (GraphicsAbsorber absorber = new GraphicsAbsorber())
                     {
-                        // Visit the page with the absorber (GraphicsAbsorber implements IVisitor)
-                        absorber.Visit(page);
+                        absorber.Visit(doc.Pages[pageNumber]);
 
-                        // Report how many graphics were found
-                        Console.WriteLine($"Page {pageNum}: extracted {absorber.Elements.Count} graphics.");
-
-                        // Example: iterate over extracted graphics (optional)
-                        // foreach (var element in absorber.Elements)
-                        // {
-                        //     // Process each GraphicElement as needed
-                        // }
+                        // Output basic information about the extracted graphics
+                        Console.WriteLine($"Page {pageNumber}: {absorber.Elements.Count} graphic objects extracted.");
                     }
                 }
             }

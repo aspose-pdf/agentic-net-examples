@@ -7,66 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
         const string outputPath = "clipped_shapes.pdf";
 
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+        // Ensure the output directory exists
+        string outDir = System.IO.Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
 
-        // Wrap Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Create a new PDF document and ensure deterministic disposal
+        using (Document doc = new Document())
         {
-            // Add a new page to draw on
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Define the clipping rectangle (lower‑left x, y, width, height)
-            // Desired area: (100,100) to (400,400) => width = 300, height = 300
-            Aspose.Pdf.Drawing.Rectangle clipRect = new Aspose.Pdf.Drawing.Rectangle(100, 100, 300, 300);
+            // Define the clipping rectangle (the area where drawing is allowed)
+            // Note: Graph does not expose a Clip property; this rectangle is kept for reference.
+            Aspose.Pdf.Rectangle clipRect = new Aspose.Pdf.Rectangle(100f, 100f, 300f, 300f);
 
-            // Create a Graph that covers the whole page (width, height)
+            // Create a Graph that covers the whole page (Graph(width, height))
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            graph.Left = 0;               // position on the page
+            graph.Top = 0;
+            // graph.Clip = clipRect; // Graph has no Clip property – omitted
 
-            // NOTE: If a newer Aspose.Pdf version provides GraphInfo.Clip, you can enable clipping like this:
-            // graph.GraphInfo = new GraphInfo { Clip = new ClipInfo(clipRect) };
+            // Draw a large rectangle that exceeds the clip area
+            Aspose.Pdf.Drawing.Rectangle largeRect = new Aspose.Pdf.Drawing.Rectangle(50f, 50f, 500f, 500f);
+            largeRect.GraphInfo.FillColor = Aspose.Pdf.Color.LightGray;
+            largeRect.GraphInfo.Color = Aspose.Pdf.Color.Black;
+            largeRect.GraphInfo.LineWidth = 2f;
+            graph.Shapes.Add(largeRect);
 
-            // Optional visual aid – draw the clipping rectangle border (red, no fill)
-            var clipBorder = new Aspose.Pdf.Drawing.Rectangle(100, 100, 300, 300);
-            clipBorder.GraphInfo = new GraphInfo
-            {
-                Color = Color.Red,
-                LineWidth = 1,
-                FillColor = Color.Transparent
-            };
-            graph.Shapes.Add(clipBorder);
-
-            // Rectangle that exceeds the clip bounds – only the part inside the clip will appear
-            Aspose.Pdf.Drawing.Rectangle rectShape = new Aspose.Pdf.Drawing.Rectangle(50, 50, 350, 350);
-            rectShape.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.LightGray,
-                Color = Color.Black,
-                LineWidth = 2
-            };
-            graph.Shapes.Add(rectShape);
-
-            // Ellipse that also exceeds the clip bounds
-            Ellipse ellipseShape = new Ellipse(150, 150, 350, 350);
-            ellipseShape.GraphInfo = new GraphInfo
-            {
-                FillColor = Color.FromRgb(0.2f, 0.6f, 0.9f),
-                Color = Color.DarkBlue,
-                LineWidth = 1,
-                DashArray = new int[] { 6, 3 }
-            };
-            graph.Shapes.Add(ellipseShape);
+            // Draw an ellipse that also extends beyond the clip area
+            Aspose.Pdf.Drawing.Ellipse ellipse = new Aspose.Pdf.Drawing.Ellipse(200.0, 200.0, 600.0, 600.0);
+            ellipse.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(0.2f, 0.6f, 0.8f);
+            ellipse.GraphInfo.Color = Aspose.Pdf.Color.DarkBlue;
+            ellipse.GraphInfo.LineWidth = 1f;
+            graph.Shapes.Add(ellipse);
 
             // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 

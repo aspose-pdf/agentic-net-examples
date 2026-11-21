@@ -2,45 +2,62 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "form_with_signature.pdf";
+        const string outputPdfPath = "form_with_signature.pdf";
+        const string certPath = "signer_certificate.pfx";   // path to the signing certificate
+        const string certPassword = "certPassword";         // password for the .pfx file
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        // Verify that the certificate file exists before proceeding
+        if (!File.Exists(certPath))
         {
-            // Add a single page
-            Page page = doc.Pages.Add();
-
-            // Add instruction text to the page
-            TextFragment instruction = new TextFragment("Please sign below:");
-            instruction.Position = new Position(100, 700);
-            page.Paragraphs.Add(instruction);
-
-            // Define the rectangle where the signature field will be placed
-            Rectangle signatureRect = new Rectangle(100, 600, 300, 650);
-
-            // Create a signature field on page 1 and add it to the document's form collection
-            SignatureField sigField = new SignatureField(doc.Pages[1], signatureRect)
-            {
-                PartialName = "Signature1",
-                // Mark the field as required – the property name is "Required" in the core API
-                Required = true
-                // Visual styling such as background color is not directly exposed via the core API;
-                // it can be customized through the field's appearance if needed.
-            };
-
-            // Add the field to the form (page index is 1‑based)
-            doc.Form.Add(sigField, 1);
-
-            // Save the PDF document
-            doc.Save(outputPath);
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
+            return;
         }
 
-        Console.WriteLine($"PDF form with signature field saved to '{outputPath}'.");
+        // Create a new PDF document and wrap it in a using block for deterministic disposal
+        using (Document doc = new Document())
+        {
+            // Add a blank page to host the form fields
+            Page page = doc.Pages.Add();
+
+            // ------------------------------------------------------------
+            // 1. Create a digital signature field
+            // ------------------------------------------------------------
+            Aspose.Pdf.Rectangle sigRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            SignatureField signatureField = new SignatureField(doc, sigRect)
+            {
+                PartialName = "DigitalSignature1"   // internal name of the field
+            };
+
+            // Add the signature field to the form (page 1)
+            doc.Form.Add(signatureField, 1);
+
+            // ------------------------------------------------------------
+            // 2. Configure the PKCS7 digital signature
+            // ------------------------------------------------------------
+            // Load the signing certificate via PKCS7 helper class
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+            {
+                Reason = "Document approval",
+                Location = "Office",
+                ContactInfo = "signer@example.com"
+                // Note: Aspose.Pdf does not expose a ValidateCertificate property.
+                // Validation is performed by PDF viewers based on the embedded certificate chain.
+            };
+
+            // Sign the field – the Signature property is read‑only, so we use the Sign method
+            signatureField.Sign(pkcs7);
+
+            // ------------------------------------------------------------
+            // 3. Save the PDF form
+            // ------------------------------------------------------------
+            doc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"PDF form with digital signature field saved to '{outputPdfPath}'.");
     }
 }

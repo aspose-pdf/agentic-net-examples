@@ -1,8 +1,10 @@
 using System;
 using System.IO;
-using System.Drawing;                     // for Color (fully qualified when used)
+using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;               // FormEditor, FontStyle, FormFieldFacade
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -11,29 +13,47 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // Verify input file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Bind the PDF to the form editor (Facades API)
-        using (FormEditor editor = new FormEditor())
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            editor.BindPdf(inputPath);
+            // Retrieve the form field named "Footer"
+            // The Form indexer returns a WidgetAnnotation; cast it to Field.
+            Field field = doc.Form["Footer"] as Field;
+            if (field == null)
+            {
+                Console.Error.WriteLine("Field 'Footer' not found or is not a form field.");
+                return;
+            }
 
-            // Configure the appearance for the field "Footer"
-            editor.Facade.Font = Aspose.Pdf.Facades.FontStyle.TimesItalic;   // italic font (fully qualified)
-            editor.Facade.BackgroundColor = System.Drawing.Color.LightGray; // light‑gray background (fully qualified)
+            // The Footer field is expected to be a text box (TextBoxField)
+            if (field is TextBoxField textBox)
+            {
+                // Load an italic version of Arial using FontRepository overload that accepts FontStyles
+                Aspose.Pdf.Text.Font italicFont = FontRepository.FindFont("Arial", FontStyles.Italic);
 
-            // Apply the configured appearance to the specific field
-            editor.DecorateField("Footer");
+                // Apply the italic font via DefaultAppearance (size 12, black text color)
+                // DefaultAppearance expects System.Drawing.Color for the text colour.
+                textBox.DefaultAppearance = new DefaultAppearance(italicFont, 12, System.Drawing.Color.Black);
+
+                // Set a light gray background – Characteristics.Background expects System.Drawing.Color
+                textBox.Characteristics.Background = System.Drawing.Color.LightGray;
+            }
+            else
+            {
+                Console.Error.WriteLine("Field 'Footer' is not a text box field and cannot be styled as requested.");
+                return;
+            }
 
             // Save the modified PDF
-            editor.Save(outputPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field \"Footer\" styled and saved to '{outputPath}'.");
+        Console.WriteLine($"Footer field styled and saved to '{outputPath}'.");
     }
 }

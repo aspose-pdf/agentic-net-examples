@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,42 +8,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "filled_form.pdf";
-        const string outputPath = "updated_form.pdf";
+        const string inputPdf = "filled_form.pdf";
+        const string outputPdf = "updated_form.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        // Load the completed PDF document.
+        Document doc = new Document(inputPdf);
 
-        // Retrieve the value from the "Notes" field (assumed to be a TextBoxField)
-        string notesText = string.Empty;
-        if (pdfDocument.Form["Notes"] is TextBoxField notesField)
+        // Retrieve the value of the "Notes" field.
+        string notesValue = GetFieldValue(doc, "Notes");
+
+        if (!string.IsNullOrEmpty(notesValue))
         {
-            notesText = notesField.Value;
+            // Copy the value to the "Summary" field.
+            bool setResult = SetFieldValue(doc, "Summary", notesValue);
+            if (!setResult)
+                Console.WriteLine("Field 'Summary' not found.");
         }
         else
         {
-            Console.Error.WriteLine("'Notes' field not found or is not a text box.");
+            Console.WriteLine("Field 'Notes' not found or empty.");
         }
 
-        // Copy the text to the "Summary" field (also assumed to be a TextBoxField)
-        if (pdfDocument.Form["Summary"] is TextBoxField summaryField)
+        // Save the updated PDF.
+        doc.Save(outputPdf);
+        Console.WriteLine($"Copied 'Notes' to 'Summary' and saved as '{outputPdf}'.");
+    }
+
+    /// <summary>
+    /// Gets the string value of a form field by its name.
+    /// </summary>
+    private static string GetFieldValue(Document doc, string fieldName)
+    {
+        var field = doc?.Form?.Fields?.FirstOrDefault(f =>
+            string.Equals(f.FullName, fieldName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(f.Name, fieldName, StringComparison.OrdinalIgnoreCase));
+        return field?.Value?.ToString();
+    }
+
+    /// <summary>
+    /// Sets the string value of a form field by its name.
+    /// Returns true if the field was found and updated.
+    /// </summary>
+    private static bool SetFieldValue(Document doc, string fieldName, string value)
+    {
+        var field = doc?.Form?.Fields?.FirstOrDefault(f =>
+            string.Equals(f.FullName, fieldName, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(f.Name, fieldName, StringComparison.OrdinalIgnoreCase));
+        if (field != null)
         {
-            summaryField.Value = notesText;
+            field.Value = value;
+            return true;
         }
-        else
-        {
-            Console.Error.WriteLine("'Summary' field not found or is not a text box.");
-        }
-
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
-
-        Console.WriteLine($"Copied 'Notes' to 'Summary' and saved as '{outputPath}'.");
+        return false;
     }
 }

@@ -1,7 +1,7 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations; // needed for possible actions, not required for printing titles
 
 class Program
 {
@@ -15,35 +15,34 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal.
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // The outline (bookmark) hierarchy is stored in doc.Outlines.
-            // If there are no outlines, inform the user.
+            // The document outline (bookmarks) is accessed via the Outlines collection
             if (doc.Outlines == null || doc.Outlines.Count == 0)
             {
-                Console.WriteLine("The document does not contain any outlines.");
+                Console.WriteLine("No outline (bookmark) hierarchy found in the PDF.");
                 return;
             }
 
-            Console.WriteLine("Outline hierarchy:");
-            PrintOutlineItems(doc.Outlines, string.Empty);
+            Console.WriteLine("PDF Outline Hierarchy:");
+            foreach (OutlineItemCollection rootItem in doc.Outlines)
+            {
+                PrintOutlineItem(rootItem, 0);
+            }
         }
     }
 
-    // Recursively prints outline items with indentation to visualize the tree.
-    static void PrintOutlineItems(IEnumerable<OutlineItemCollection> items, string indent)
+    // Recursively prints an outline item and its children with indentation
+    static void PrintOutlineItem(OutlineItemCollection item, int depth)
     {
-        foreach (OutlineItemCollection item in items)
-        {
-            // Display the title of the outline entry.
-            Console.WriteLine($"{indent}- {item.Title}");
+        string indent = new string(' ', depth * 2);
+        Console.WriteLine($"{indent}- {item.Title}");
 
-            // If the item has child outlines, recurse with increased indentation.
-            if (item.Count > 0)
-            {
-                PrintOutlineItems(item, indent + "  ");
-            }
+        // Child items are enumerated directly because OutlineItemCollection *is* its own collection
+        foreach (OutlineItemCollection child in item)
+        {
+            PrintOutlineItem(child, depth + 1);
         }
     }
 }

@@ -6,8 +6,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "invoice_zugferd.pdf";
-        const string outputPath = "invoice_zugferd_custom.pdf";
+        const string inputPath = "input_zugferd.pdf";
+        const string outputPath = "output_zugferd_with_metadata.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -22,7 +22,10 @@ class Program
             doc.Info["ProjectCode"] = "PRJ-2023-001";
             doc.Info["Department"] = "Finance";
 
-            // Save the PDF; the ZUGFeRD attachment remains intact
+            // Optionally update the modification date to reflect the change
+            doc.Info.ModDate = DateTime.Now;
+
+            // Save the PDF; the ZUGFeRD attachment and existing structure are preserved.
             doc.Save(outputPath);
         }
 

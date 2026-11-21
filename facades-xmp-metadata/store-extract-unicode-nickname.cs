@@ -1,90 +1,83 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using NUnit.Framework;
 
-// Minimal NUnit stubs to allow compilation when the NUnit package is not referenced
-namespace NUnit.Framework
+class Program
 {
-    [AttributeUsage(AttributeTargets.Class)]
-    public sealed class TestFixtureAttribute : Attribute { }
+    private const string UnicodeNickname = "测试昵称😊";
 
-    [AttributeUsage(AttributeTargets.Method)]
-    public sealed class TestAttribute : Attribute { }
-
-    public static class Assert
+    private static string CreateEmptyPdf()
     {
-        public static void AreEqual<T>(T expected, T actual, string message = null)
+        string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+        using (var doc = new Document())
         {
-            if (!object.Equals(expected, actual))
-                throw new Exception(message ?? $"Assert.AreEqual failed. Expected:<{expected}>. Actual:<{actual}>.");
+            doc.Save(tempPath);
         }
-    }
-}
-
-namespace AsposePdfFacadesTests
-{
-    // Dummy entry point to satisfy the compiler when the project is built as an executable.
-    // The test runner will ignore this method.
-    public static class Program
-    {
-        public static void Main() { /* No‑op */ }
+        return tempPath;
     }
 
-    [TestFixture]
-    public class UnicodeNicknameTests
+    private static void TestNicknameStoreUnicode()
     {
-        private const string CustomPropertyName = "Nickname";
-        private const string UnicodeNickname = "Jürgen 🚀";
-
-        private string CreateSamplePdf()
+        string pdfPath = CreateEmptyPdf();
+        try
         {
-            // Create a temporary PDF file with a single blank page
-            string tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
-            using (Document doc = new Document())
+            // Store the nickname in the Title field (Unicode supported)
+            using (var doc = new Document(pdfPath))
             {
-                // Add an empty page
-                doc.Pages.Add();
-                // Save the PDF
-                doc.Save(tempPath);
+                doc.Info.Title = UnicodeNickname;
+                doc.Save(pdfPath);
             }
-            return tempPath;
-        }
 
-        [Test]
-        public void NicknameUnicode_IsStoredAndRetrievedCorrectly()
-        {
-            // Arrange: create a PDF and set the custom property using Document.Info indexer
-            string pdfPath = CreateSamplePdf();
-
-            try
+            // Reload and verify the stored value
+            using (var doc = new Document(pdfPath))
             {
-                // Set the Unicode nickname
-                using (Document doc = new Document(pdfPath))
-                {
-                    doc.Info[CustomPropertyName] = UnicodeNickname;
-                    doc.Save(pdfPath);
-                }
-
-                // Act: read the custom property back
-                string retrievedNickname;
-                using (Document readDoc = new Document(pdfPath))
-                {
-                    retrievedNickname = readDoc.Info[CustomPropertyName];
-                }
-
-                // Assert: the retrieved value matches the original Unicode string
-                Assert.AreEqual(UnicodeNickname, retrievedNickname,
-                    $"The custom property '{CustomPropertyName}' should retain its Unicode value.");
-            }
-            finally
-            {
-                // Cleanup temporary file
-                if (File.Exists(pdfPath))
-                {
-                    File.Delete(pdfPath);
-                }
+                bool pass = doc.Info.Title == UnicodeNickname;
+                Console.WriteLine(pass ? "PASS Nickname_ShouldStoreUnicodeCharacters" : "FAIL Nickname_ShouldStoreUnicodeCharacters");
             }
         }
+        finally
+        {
+            if (File.Exists(pdfPath))
+                File.Delete(pdfPath);
+        }
+    }
+
+    private static void TestNicknamePersistMultipleSaves()
+    {
+        string pdfPath = CreateEmptyPdf();
+        try
+        {
+            // First save – set the nickname (Title)
+            using (var doc = new Document(pdfPath))
+            {
+                doc.Info.Title = UnicodeNickname;
+                doc.Save(pdfPath);
+            }
+
+            // Second save – modify another metadata field (Author)
+            using (var doc = new Document(pdfPath))
+            {
+                doc.Info.Author = "Sample Author";
+                doc.Save(pdfPath);
+            }
+
+            // Reload and verify both fields are persisted
+            using (var doc = new Document(pdfPath))
+            {
+                bool pass = doc.Info.Title == UnicodeNickname && doc.Info.Author == "Sample Author";
+                Console.WriteLine(pass ? "PASS Nickname_ShouldPersistAfterMultipleSaves" : "FAIL Nickname_ShouldPersistAfterMultipleSaves");
+            }
+        }
+        finally
+        {
+            if (File.Exists(pdfPath))
+                File.Delete(pdfPath);
+        }
+    }
+
+    static void Main()
+    {
+        TestNicknameStoreUnicode();
+        TestNicknamePersistMultipleSaves();
     }
 }

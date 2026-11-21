@@ -5,57 +5,51 @@ using Aspose.Pdf.Forms;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // Expected arguments:
-        // args[0] - input PDF path
-        // args[1] - output PDF path
-        // args[2] - name of the radio button field
-        // args[3] - value of the option to select
-        if (args.Length < 4)
-        {
-            Console.Error.WriteLine("Usage: <inputPdf> <outputPdf> <radioFieldName> <optionValue>");
-            return;
-        }
-
-        string inputPath = args[0];
-        string outputPath = args[1];
-        string fieldName = args[2];
-        string optionValue = args[3];
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string radioFieldName = "myRadioGroup"; // name of the radio button field
+        const string optionToSelect = "Option2";      // option to be selected (can be passed as a parameter)
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // The Form indexer returns a WidgetAnnotation; cast it to Field safely.
-                Field? field = doc.Form[fieldName] as Field;
-                if (field == null)
+                // Retrieve the radio button field from the form
+                RadioButtonField radioField = doc.Form[radioFieldName] as RadioButtonField;
+                if (radioField == null)
                 {
-                    Console.Error.WriteLine($"Form field '{fieldName}' not found or is not a form field.");
-                    return;
+                    Console.Error.WriteLine($"Radio button field '{radioFieldName}' not found.");
                 }
-
-                // Ensure the field is a radio button
-                if (field is not RadioButtonField radio)
+                else
                 {
-                    Console.Error.WriteLine($"Form field '{fieldName}' is not a radio button.");
-                    return;
+                    // Get the option by its name. The Options collection returns a RadioButtonOption.
+                    var option = radioField.Options[optionToSelect];
+                    if (option != null)
+                    {
+                        // The Selected property expects the option index (int).
+                        radioField.Selected = option.Index;
+                        Console.WriteLine($"Selected option '{optionToSelect}'.");
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine($"Option '{optionToSelect}' not found in radio group '{radioFieldName}'.");
+                    }
                 }
-
-                // Set the desired option. Aspose.Pdf will ignore an invalid value, so we set it directly.
-                radio.Value = optionValue;
 
                 // Save the modified PDF
                 doc.Save(outputPath);
-                Console.WriteLine($"Radio button '{fieldName}' set to '{optionValue}'. Saved to '{outputPath}'.");
             }
+
+            Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

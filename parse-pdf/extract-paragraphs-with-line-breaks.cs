@@ -1,43 +1,38 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // TextAbsorber, TextExtractionOptions, etc.
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "extracted.txt";
+        const string inputPdfPath = "input.pdf";
+        const string outputTxtPath = "extracted_paragraphs.txt";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF document inside a using block for proper disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // TextAbsorber extracts text; set options to preserve line breaks
-                TextAbsorber absorber = new TextAbsorber();
-                absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            // Configure TextAbsorber to preserve physical line breaks.
+            TextAbsorber absorber = new TextAbsorber();
+            // Use the constructor that accepts a TextFormattingMode enum value.
+            absorber.ExtractionOptions = new TextExtractionOptions(
+                TextExtractionOptions.TextFormattingMode.Pure);
 
-                // Apply absorber to all pages
-                doc.Pages.Accept(absorber);
-                string extractedText = absorber.Text;
+            // Extract text from all pages.
+            pdfDoc.Pages.Accept(absorber);
+            string extractedText = absorber.Text; // Contains line breaks as in the PDF.
 
-                // Write the extracted text (including paragraph breaks) to a .txt file
-                File.WriteAllText(outputPath, extractedText);
-            }
-
-            Console.WriteLine($"Paragraph text extracted to '{outputPath}'.");
+            // Write the extracted text to a .txt file.
+            File.WriteAllText(outputTxtPath, extractedText);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Paragraphs extracted and saved to '{outputTxtPath}'.");
     }
 }

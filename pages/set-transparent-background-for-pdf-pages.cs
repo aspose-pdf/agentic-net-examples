@@ -15,22 +15,21 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; ensure each page has no explicit background color.
-            // In Aspose.Pdf the default page background is transparent, so we simply skip setting it.
-            // If a future version provides PageInfo.BackgroundColor, the following line can be uncommented:
-            // doc.Pages[i].PageInfo.BackgroundColor = Aspose.Pdf.Color.Transparent;
+            // Pages are 1‑based; iterate accordingly
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // No action needed – default is transparent.
+                Page page = doc.Pages[i];
+                // Set the page background to fully transparent via Page.Background
+                page.Background = Color.Transparent;
             }
 
-            // Save the updated PDF
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved PDF with transparent page backgrounds to '{outputPath}'.");
+        Console.WriteLine($"Transparent background PDF saved to '{outputPath}'.");
     }
 }

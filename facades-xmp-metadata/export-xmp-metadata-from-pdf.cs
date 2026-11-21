@@ -1,46 +1,34 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using System.Text;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXmp = "output.xmp";
+        const string inputPdfPath = "input.pdf";
+        const string outputXmpPath = "output.xmp";
 
-        if (!File.Exists(inputPdf))
+        // Verify that the source PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
             return;
         }
 
-        try
-        {
-            // Load the PDF document
-            Document doc = new Document(inputPdf);
+        // Bind the PDF to the XMP metadata facade
+        PdfXmpMetadata xmpFacade = new PdfXmpMetadata();
+        xmpFacade.BindPdf(inputPdfPath);
 
-            // Use the PdfXmpMetadata facade to retrieve the raw XMP packet
-            using (PdfXmpMetadata xmpFacade = new PdfXmpMetadata(doc))
-            {
-                byte[] xmpData = xmpFacade.GetXmpMetadata();
+        // Retrieve the XMP packet as a byte array (may be null if none exists)
+        byte[] xmpBytes = xmpFacade.GetXmpMetadata();
 
-                if (xmpData == null || xmpData.Length == 0)
-                {
-                    Console.WriteLine("No XMP metadata found in the PDF.");
-                }
-                else
-                {
-                    // Write the XMP side‑car file
-                    File.WriteAllBytes(outputXmp, xmpData);
-                    Console.WriteLine($"XMP metadata exported to '{outputXmp}'.");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Convert the byte array to a UTF‑8 string; if null, use an empty string
+        string xmpContent = xmpBytes != null ? Encoding.UTF8.GetString(xmpBytes) : string.Empty;
+
+        // Write the XMP data to a side‑car file
+        File.WriteAllText(outputXmpPath, xmpContent);
+        Console.WriteLine($"XMP metadata exported to '{outputXmpPath}'.");
     }
 }

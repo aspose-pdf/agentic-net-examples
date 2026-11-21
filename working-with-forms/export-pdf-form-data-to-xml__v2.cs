@@ -1,70 +1,35 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputXmlPath = "formdata.xml";
+        const string pdfPath   = "input.pdf";          // source PDF with form fields
+        const string xmlPath   = "formData.xml";       // destination XML file
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
             return;
         }
 
         try
         {
             // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            using (Document doc = new Document(pdfPath))
             {
-                // Serialize the current form fields to an XML file
-                ExportFormDataToXml(pdfDoc, outputXmlPath);
-                Console.WriteLine($"Form data successfully exported to '{outputXmlPath}'.");
+                // Export the current form data (and other interactive elements) to XML
+                XmlSaveOptions xmlOptions = new XmlSaveOptions();
+                doc.Save(xmlPath, xmlOptions);
             }
+
+            Console.WriteLine($"Form data exported to XML: {xmlPath}");
         }
         catch (Exception ex)
         {
             Console.Error.WriteLine($"Error during export: {ex.Message}");
         }
-    }
-
-    /// <summary>
-    /// Exports the values of all form fields in the given PDF document to an XML file.
-    /// The XML structure is:
-    /// <FormData>
-    ///   <Field name="fieldName" value="fieldValue" />
-    ///   ...
-    /// </FormData>
-    /// </summary>
-    private static void ExportFormDataToXml(Document pdfDocument, string xmlFilePath)
-    {
-        // Ensure the document actually contains a form
-        if (pdfDocument?.Form?.Fields == null)
-        {
-            // Create an empty XML file to indicate no form data
-            new XDocument(new XElement("FormData")).Save(xmlFilePath);
-            return;
-        }
-
-        var root = new XElement("FormData");
-        foreach (Field field in pdfDocument.Form.Fields)
-        {
-            // Some fields may have complex values (e.g., list boxes). Use ToString() for a simple representation.
-            string fieldName = field?.Name ?? field?.FullName ?? string.Empty;
-            string fieldValue = field?.Value?.ToString() ?? string.Empty;
-
-            var fieldElement = new XElement("Field",
-                new XAttribute("name", fieldName),
-                new XAttribute("value", fieldValue));
-            root.Add(fieldElement);
-        }
-
-        var doc = new XDocument(root);
-        doc.Save(xmlFilePath);
     }
 }

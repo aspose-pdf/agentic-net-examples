@@ -1,81 +1,64 @@
 using System;
-using System.IO;
 using System.Diagnostics;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
 {
-    // Memory limit in bytes (e.g., 200 MB)
-    const long MemoryLimit = 200L * 1024 * 1024;
-
     static void Main()
     {
-        const string pdfPath = "sample.pdf";
-        const string attachmentPath = "largeAttachment.bin";
-        const string outputPath = "sample_with_attachment.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string largeAttachmentPath = "largeAttachment.bin"; // must be >10 MB
+        const string outputPdfPath = "output_with_attachment.pdf";
 
-        // Ensure a sample PDF exists
-        if (!File.Exists(pdfPath))
+        // Verify source files exist
+        if (!File.Exists(inputPdfPath))
         {
-            using (Document doc = new Document())
-            {
-                // Add a blank page
-                doc.Pages.Add();
-                doc.Save(pdfPath);
-            }
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
         }
-
-        // Ensure a large attachment (>10 MB) exists
-        const long desiredSize = 12L * 1024 * 1024; // 12 MB
-        if (!File.Exists(attachmentPath) || new FileInfo(attachmentPath).Length < desiredSize)
+        if (!File.Exists(largeAttachmentPath))
         {
-            // Create a dummy file filled with zeros
-            using (FileStream fs = new FileStream(attachmentPath, FileMode.Create, FileAccess.Write, FileShare.None))
-            {
-                fs.SetLength(desiredSize);
-            }
+            Console.Error.WriteLine($"Attachment file not found: {largeAttachmentPath}");
+            return;
         }
 
         // Record memory usage before the operation
-        long memoryBefore = GetCurrentProcessMemory();
-        Console.WriteLine($"Memory before attachment: {memoryBefore / (1024 * 1024)} MB");
+        Process proc = Process.GetCurrentProcess();
+        long memoryBefore = proc.PrivateMemorySize64;
+        Console.WriteLine($"Memory before attachment: {memoryBefore / (1024 * 1024)} MB");
 
-        // Add the attachment using Document (PdfFileEditor does not support AddAttachment)
-        using (Document pdfDoc = new Document(pdfPath))
+        // Add the attachment using the EmbeddedFiles collection (Attachments property does not exist)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            FileSpecification fileSpec = new FileSpecification(attachmentPath, "Large binary attachment");
-            pdfDoc.EmbeddedFiles.Add(fileSpec);
-            pdfDoc.Save(outputPath);
+            // Create a FileSpecification for the attachment. Use a stream to avoid loading the whole file into memory at once.
+            var fileSpec = new FileSpecification(Path.GetFileName(largeAttachmentPath));
+            using (FileStream attachmentStream = new FileStream(largeAttachmentPath, FileMode.Open, FileAccess.Read))
+            {
+                fileSpec.Contents = attachmentStream; // assign the stream as the file content
+                pdfDoc.EmbeddedFiles.Add(fileSpec);
+                // Save while the stream is still open – Aspose.Pdf reads the stream during Save.
+                pdfDoc.Save(outputPdfPath);
+            }
         }
 
         // Record memory usage after the operation
-        long memoryAfter = GetCurrentProcessMemory();
-        Console.WriteLine($"Memory after attachment: {memoryAfter / (1024 * 1024)} MB");
+        proc.Refresh(); // ensure latest stats
+        long memoryAfter = proc.PrivateMemorySize64;
+        Console.WriteLine($"Memory after attachment: {memoryAfter / (1024 * 1024)} MB");
 
-        // Verify memory usage is within the defined limit
-        if (memoryAfter - memoryBefore <= MemoryLimit)
+        // Simple verification that memory increase stays within a reasonable limit (e.g., 100 MB)
+        const long maxIncreaseBytes = 100L * 1024 * 1024; // 100 MB
+        long increase = memoryAfter - memoryBefore;
+        if (increase > maxIncreaseBytes)
         {
-            Console.WriteLine("Memory usage is within acceptable limits.");
+            Console.WriteLine($"Warning: Memory increased by {increase / (1024 * 1024)} MB, which exceeds the limit of {maxIncreaseBytes / (1024 * 1024)} MB.");
         }
         else
         {
-            Console.WriteLine("Warning: Memory usage exceeded the defined limit.");
+            Console.WriteLine($"Memory increase of {increase / (1024 * 1024)} MB is within acceptable limits.");
         }
 
-        // Optional: verify that the attachment was added
-        using (Document resultDoc = new Document(outputPath))
-        {
-            // Attachments are stored in the Document's EmbeddedFiles collection
-            int attachmentCount = resultDoc.EmbeddedFiles.Count;
-            Console.WriteLine($"Number of attachments in the PDF: {attachmentCount}");
-        }
-    }
-
-    // Helper to get the current process's private memory size
-    static long GetCurrentProcessMemory()
-    {
-        Process proc = Process.GetCurrentProcess();
-        proc.Refresh();
-        return proc.PrivateMemorySize64;
+        Console.WriteLine($"Attachment added successfully. Output saved to '{outputPdfPath}'.");
     }
 }

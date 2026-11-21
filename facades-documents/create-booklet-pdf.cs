@@ -5,55 +5,56 @@ using Aspose.Pdf.Facades;
 public static class BookletCreator
 {
     /// <summary>
-    /// Creates a booklet PDF from the provided PDF stream using Aspose.Pdf.Facades.
-    /// The result is returned as a MemoryStream positioned at the beginning.
+    /// Creates a booklet PDF from the provided input PDF stream.
+    /// The result is returned as a MemoryStream.
     /// </summary>
     /// <param name="inputPdfStream">Stream containing the source PDF.</param>
     /// <returns>MemoryStream with the booklet PDF.</returns>
     public static MemoryStream CreateBookletPdf(Stream inputPdfStream)
     {
-        // Ensure the input stream is at the beginning
+        if (inputPdfStream == null)
+            throw new ArgumentNullException(nameof(inputPdfStream));
+
+        // Ensure the input stream is positioned at the beginning.
         if (inputPdfStream.CanSeek)
             inputPdfStream.Position = 0;
 
-        // Temporary file paths for the source and the generated booklet
+        // Write the incoming stream to a temporary file because PdfFileEditor works with file paths.
         string tempInputPath = Path.GetTempFileName();
-        string tempOutputPath = Path.GetTempFileName();
-
-        // Write the input PDF stream to a temporary file
-        using (FileStream tempInputFile = new FileStream(tempInputPath, FileMode.Create, FileAccess.Write))
+        using (FileStream tempInputFile = File.Create(tempInputPath))
         {
             inputPdfStream.CopyTo(tempInputFile);
         }
 
-        // PdfFileEditor does NOT implement IDisposable, so no using block is required
+        // Prepare a temporary file for the booklet output.
+        string tempOutputPath = Path.GetTempFileName();
+
+        // PdfFileEditor does NOT implement IDisposable, so we do NOT wrap it in a using block.
         PdfFileEditor editor = new PdfFileEditor();
 
-        // Create the booklet PDF; use the correct MakeBooklet overload (no PageSize argument)
+        // Use the overload that accepts file paths (no PageSize argument required).
         bool success = editor.MakeBooklet(tempInputPath, tempOutputPath);
         if (!success)
             throw new InvalidOperationException("Failed to create booklet PDF.");
 
-        // Read the generated booklet into a MemoryStream
-        MemoryStream bookletStream = new MemoryStream();
-        using (FileStream tempOutputFile = new FileStream(tempOutputPath, FileMode.Open, FileAccess.Read))
+        // Load the generated booklet into a MemoryStream to return to the caller.
+        MemoryStream outputStream = new MemoryStream();
+        using (FileStream tempOutputFile = File.OpenRead(tempOutputPath))
         {
-            tempOutputFile.CopyTo(bookletStream);
+            tempOutputFile.CopyTo(outputStream);
         }
+        outputStream.Position = 0;
 
-        // Reset the position so the caller can read from the start
-        bookletStream.Position = 0;
+        // Clean up temporary files.
+        try { File.Delete(tempInputPath); } catch { /* ignore */ }
+        try { File.Delete(tempOutputPath); } catch { /* ignore */ }
 
-        // Clean up temporary files
-        try { File.Delete(tempInputPath); } catch { /* ignore cleanup errors */ }
-        try { File.Delete(tempOutputPath); } catch { /* ignore cleanup errors */ }
-
-        return bookletStream;
+        return outputStream;
     }
 }
 
-// Dummy entry point to satisfy the compiler when building as an executable.
-public class Program
+// Dummy entry point to satisfy the compiler when building an executable project.
+public static class Program
 {
     public static void Main(string[] args)
     {

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_sound_adjusted.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -21,44 +21,44 @@ class Program
             // Load the PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Pages are 1‑based in Aspose.Pdf
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                // Iterate through all pages
+                foreach (Page page in doc.Pages)
                 {
-                    Page page = doc.Pages[i];
-
-                    // Iterate over all annotations on the page
-                    foreach (Annotation annot in page.Annotations)
+                    // Iterate through all annotations on the page
+                    for (int i = 0; i < page.Annotations.Count; i++)
                     {
-                        // Process only SoundAnnotation instances
-                        if (annot is SoundAnnotation soundAnnot)
+                        // Process only SoundAnnotation objects
+                        if (page.Annotations[i] is SoundAnnotation soundAnn)
                         {
-                            // Use the correct property 'Rect' for annotation bounds
-                            Aspose.Pdf.Rectangle rect = soundAnnot.Rect;
+                            // Current rectangle of the annotation
+                            Aspose.Pdf.Rectangle rect = soundAnn.Rect;
 
-                            double width = rect.URX - rect.LLX;
-                            double height = rect.URY - rect.LLY;
+                            double llx = rect.LLX;
+                            double lly = rect.LLY;
+                            double urx = rect.URX;
+                            double ury = rect.URY;
 
-                            // Increase clickable area by 20%
-                            double newWidth = width * 1.20;
+                            double width  = urx - llx;
+                            double height = ury - lly;
+                            double centerX = llx + width  / 2.0;
+                            double centerY = lly + height / 2.0;
+
+                            // Increase size by 20%
+                            double newWidth  = width  * 1.20;
                             double newHeight = height * 1.20;
 
-                            double deltaW = (newWidth - width) / 2.0;
-                            double deltaH = (newHeight - height) / 2.0;
+                            double newLLX = centerX - newWidth  / 2.0;
+                            double newLLY = centerY - newHeight / 2.0;
+                            double newURX = centerX + newWidth  / 2.0;
+                            double newURY = centerY + newHeight / 2.0;
 
-                            // Create a new rectangle centered on the original
-                            Aspose.Pdf.Rectangle enlarged = new Aspose.Pdf.Rectangle(
-                                rect.LLX - deltaW,
-                                rect.LLY - deltaH,
-                                rect.URX + deltaW,
-                                rect.URY + deltaH);
-
-                            // Apply the enlarged rectangle back to the annotation
-                            soundAnnot.Rect = enlarged;
+                            // Assign the enlarged rectangle back to the annotation
+                            soundAnn.Rect = new Aspose.Pdf.Rectangle(newLLX, newLLY, newURX, newURY);
                         }
                     }
                 }
 
-                // Save the modified document
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 

@@ -7,35 +7,34 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source portfolio PDF and the compressed output PDF.
-        const string inputPath  = "portfolio_input.pdf";
-        const string outputPath = "portfolio_compressed.pdf";
+        const string inputPath = "portfolio.pdf";          // existing PDF Portfolio
+        const string outputPath = "portfolio_compressed.pdf"; // destination with compression
 
-        // Verify that the source file exists.
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the existing PDF Portfolio.
-        Document portfolio = new Document(inputPath);
+        // Load the PDF Portfolio inside a using block for deterministic disposal
+        using (Document portfolio = new Document(inputPath))
+        {
+            // Configure optimization options to enable compression of objects, streams, and images
+            OptimizationOptions opt = OptimizationOptions.All();
+            opt.CompressObjects = true;
+            opt.RemoveUnusedObjects = true;
+            opt.RemoveUnusedStreams = true;
+            opt.LinkDuplicateStreams = true;
+            // Optional image compression settings (adjust quality as needed)
+            opt.CompressImages = true;
+            opt.ImageQuality = 50; // 0‑100, lower = higher compression
 
-        // Configure optimization options to achieve compression.
-        OptimizationOptions opt = OptimizationOptions.All();
-        opt.CompressImages = true;          // compress embedded images
-        opt.ImageQuality = 50;              // optional: set image quality (0‑100)
-        opt.RemoveUnusedObjects = true;    // drop objects that are not referenced
-        opt.RemoveUnusedStreams = true;    // drop unused streams
+            // Apply the optimization to the document
+            portfolio.OptimizeResources(opt);
 
-        // Apply the optimization to the document.
-        portfolio.OptimizeResources(opt);
-
-        // Save the optimized (compressed) PDF Portfolio.
-        portfolio.Save(outputPath);
-
-        // Clean up.
-        portfolio.Dispose();
+            // Save the compressed portfolio; Document.Save writes PDF by default
+            portfolio.Save(outputPath);
+        }
 
         Console.WriteLine($"Compressed PDF Portfolio saved to '{outputPath}'.");
     }

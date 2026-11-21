@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Drawing.Imaging;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -10,25 +10,25 @@ class Program
     {
         // List of PDF files to process
         string[] pdfFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-
         // Root folder where extracted images will be saved
         string outputRoot = "ExtractedImages";
+
         Directory.CreateDirectory(outputRoot);
 
-        var tasks = new List<Task>();
-
         // Create a task for each PDF file
-        foreach (var pdfPath in pdfFiles)
+        Task[] tasks = new Task[pdfFiles.Length];
+        for (int i = 0; i < pdfFiles.Length; i++)
         {
-            tasks.Add(Task.Run(() => ExtractImagesFromPdf(pdfPath, outputRoot)));
+            string pdfPath = pdfFiles[i];
+            tasks[i] = Task.Run(() => ExtractImages(pdfPath, outputRoot));
         }
 
         // Wait for all extraction tasks to complete
         await Task.WhenAll(tasks);
-        Console.WriteLine("Image extraction completed for all PDFs.");
+        Console.WriteLine("Image extraction completed.");
     }
 
-    static void ExtractImagesFromPdf(string pdfPath, string outputRoot)
+    static void ExtractImages(string pdfPath, string outputRoot)
     {
         if (!File.Exists(pdfPath))
         {
@@ -38,26 +38,25 @@ class Program
 
         // Create a subdirectory for images of this PDF
         string pdfName = Path.GetFileNameWithoutExtension(pdfPath);
-        string pdfOutputDir = Path.Combine(outputRoot, pdfName);
-        Directory.CreateDirectory(pdfOutputDir);
+        string outDir = Path.Combine(outputRoot, pdfName);
+        Directory.CreateDirectory(outDir);
 
-        // Use Aspose.Pdf.Facades.PdfExtractor to extract images
+        // Use PdfExtractor to extract images
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF document
+            // Load the PDF document
             extractor.BindPdf(pdfPath);
-
-            // Extract all images from the document
+            // No need to set ExtractImageMode – the default extracts all images.
+            // Extract images from the whole document (no page range set)
             extractor.ExtractImage();
 
-            int imageIndex = 1;
-            // Iterate through extracted images
+            int index = 1;
+            // Iterate through all extracted images
             while (extractor.HasNextImage())
             {
-                string imageFile = Path.Combine(pdfOutputDir, $"image_{imageIndex}.png");
-                extractor.GetNextImage(imageFile);
-                Console.WriteLine($"Extracted: {imageFile}");
-                imageIndex++;
+                string imgPath = Path.Combine(outDir, $"Image_{index}.png");
+                extractor.GetNextImage(imgPath, ImageFormat.Png);
+                index++;
             }
         }
     }

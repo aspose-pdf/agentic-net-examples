@@ -3,15 +3,13 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades; // Bookmark, Bookmarks are in this namespace
 
-// Model that matches the JSON structure
-public class BookmarkEntry
+class BookmarkEntry
 {
-    // Mark as required to satisfy non‑nullable analysis
-    public required string Title { get; set; }
-    public int Page { get; set; }
-    // Optional nested bookmarks – not required for the basic example
+    // Title may be missing in the JSON, so make it nullable to silence CS8618
+    public string? Title { get; set; }
+    public int PageNumber { get; set; }
     public List<BookmarkEntry>? Children { get; set; }
 }
 
@@ -19,48 +17,75 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "bookmarked.pdf";
         const string jsonPath = "bookmarks.json";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_bookmarked.pdf";
 
-        // Validate input files
-        if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
         if (!File.Exists(jsonPath))
         {
             Console.Error.WriteLine($"JSON file not found: {jsonPath}");
             return;
         }
-
-        // Load bookmark definitions from JSON
-        string jsonContent = File.ReadAllText(jsonPath);
-        List<BookmarkEntry> bookmarks = JsonSerializer.Deserialize<List<BookmarkEntry>>(jsonContent);
-
-        // Use PdfBookmarkEditor (facade) to add bookmarks
-        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        if (!File.Exists(inputPdf))
         {
-            bookmarkEditor.BindPdf(inputPdfPath);
-
-            foreach (BookmarkEntry entry in bookmarks)
-            {
-                // Create a Facade Bookmark and set its properties
-                Bookmark pdfBookmark = new Bookmark
-                {
-                    Title = entry.Title,
-                    PageNumber = entry.Page // 1‑based page index
-                };
-
-                // Add the bookmark as a top‑level entry
-                bookmarkEditor.CreateBookmarks(pdfBookmark);
-            }
-
-            // Save the PDF with the new bookmarks
-            bookmarkEditor.Save(outputPdfPath);
+            Console.Error.WriteLine($"PDF file not found: {inputPdf}");
+            return;
         }
 
-        Console.WriteLine($"Bookmarks successfully added. Output saved to '{outputPdfPath}'.");
+        // Deserialize JSON into a list of bookmark entries
+        List<BookmarkEntry>? entries = JsonSerializer.Deserialize<List<BookmarkEntry>>(File.ReadAllText(jsonPath));
+
+        if (entries == null || entries.Count == 0)
+        {
+            Console.Error.WriteLine("No bookmarks found in JSON.");
+            return;
+        }
+
+        // Build a single root Bookmark that contains the whole hierarchy.
+        Bookmark rootBookmark = new Bookmark
+        {
+            Title = "Root",
+            Action = "GoTo", // required for facade bookmarks
+            // The root itself does not need a page number; children will have theirs.
+        };
+        rootBookmark.ChildItems.AddRange(BuildBookmarksCollection(entries));
+
+        // Use PdfBookmarkEditor (Facades API) to add the bookmarks to the PDF
+        using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+        {
+            editor.BindPdf(inputPdf);
+            // The facade API creates bookmarks from a SINGLE Bookmark instance.
+            editor.CreateBookmarks(rootBookmark);
+            editor.Save(outputPdf);
+        }
+
+        Console.WriteLine($"Bookmarks imported and saved to '{outputPdf}'.");
+    }
+
+    // Recursively creates a Bookmarks collection from the custom BookmarkEntry hierarchy
+    static Bookmarks BuildBookmarksCollection(List<BookmarkEntry> entries)
+    {
+        var result = new Bookmarks();
+        if (entries == null) return result;
+
+        foreach (var entry in entries)
+        {
+            // Guard against null titles – the facade allows null titles.
+            var bookmark = new Bookmark
+            {
+                Title = entry.Title,
+                PageNumber = entry.PageNumber,
+                Action = "GoTo"
+            };
+
+            // Recursively add child bookmarks, if any
+            if (entry.Children != null && entry.Children.Count > 0)
+            {
+                bookmark.ChildItems.AddRange(BuildBookmarksCollection(entry.Children));
+            }
+
+            result.Add(bookmark);
+        }
+        return result;
     }
 }

@@ -1,49 +1,46 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
+using Aspose.Pdf; // Core PDF types
+using Aspose.Pdf.LogicalStructure; // Tagged‑content table elements
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_mincolwidth.pdf";
+        const string outputPath = "TableWithMinWidth.pdf";
 
-        if (!File.Exists(inputPath))
+        // Ensure the output directory exists
+        string outDir = Path.GetDirectoryName(outputPath);
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
+            Directory.CreateDirectory(outDir);
+
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
+            // Add a page to the document
+            Page page = doc.Pages.Add();
 
-        // Open the source PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Access the tagged content (creates a tagged PDF if not already tagged)
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
-
-            // Root element of the structure tree
-            StructureElement root = tagged.RootElement;
+            // Access the tagged‑content API (core API, no Facades)
+            var tagged = doc.TaggedContent; // Use var to avoid direct ITaggedContent reference
+            var root = tagged.RootElement;
 
             // Create a table element
             TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table with minimum column widths";
 
-            // Set a description for accessibility
-            table.AlternativeText = "Sample data table with minimum column width";
+            // Define the desired column widths (in points) as a space‑separated string
+            // The ColumnWidths property expects a string, not a float array.
+            table.ColumnWidths = "120 150 180";
 
-            // Define explicit column widths (in points).
-            // Aspose.Pdf.Tagged.TableElement does not expose a direct "minimum width" property.
-            // To emulate a minimum width, we set the initial widths to the desired values.
-            // These values act as the smallest width the columns will have unless the content forces a larger width.
-            table.ColumnWidths = "120 120 120";   // initial widths (points)
+            // Define the minimum column widths (in points) to prevent columns from becoming narrower.
+            // The ColumnWidthsMin property is only available in newer Aspose.Pdf versions.
+            // If the property does not exist in the referenced version, keep it commented out.
+            // table.ColumnWidthsMin = "80 80 80"; // string format, similar to ColumnWidths
 
-            // Attach the table to the document structure
+            // Attach the table to the root element of the tagged‑content hierarchy
             root.AppendChild(table);
 
-            // ----- Header row -----
+            // ----- Build table header -----
             TableTHeadElement thead = tagged.CreateTableTHeadElement();
             table.AppendChild(thead);
 
@@ -62,30 +59,33 @@ class Program
             th3.SetText("Price");
             headerRow.AppendChild(th3);
 
-            // ----- Body rows -----
+            // ----- Build table body -----
             TableTBodyElement tbody = tagged.CreateTableTBodyElement();
             table.AppendChild(tbody);
 
-            // Example data row
-            TableTRElement dataRow = tagged.CreateTableTRElement();
-            tbody.AppendChild(dataRow);
+            // Add a few data rows
+            for (int i = 1; i <= 3; i++)
+            {
+                TableTRElement dataRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
 
-            TableTDElement td1 = tagged.CreateTableTDElement();
-            td1.SetText("Widget A");
-            dataRow.AppendChild(td1);
+                TableTDElement td1 = tagged.CreateTableTDElement();
+                td1.SetText($"Item {i}");
+                dataRow.AppendChild(td1);
 
-            TableTDElement td2 = tagged.CreateTableTDElement();
-            td2.SetText("150");
-            dataRow.AppendChild(td2);
+                TableTDElement td2 = tagged.CreateTableTDElement();
+                td2.SetText((i * 10).ToString());
+                dataRow.AppendChild(td2);
 
-            TableTDElement td3 = tagged.CreateTableTDElement();
-            td3.SetText("$12.99");
-            dataRow.AppendChild(td3);
+                TableTDElement td3 = tagged.CreateTableTDElement();
+                td3.SetText($"${i * 5}.00");
+                dataRow.AppendChild(td3);
+            }
 
-            // Save the modified PDF (no PreSave call required)
+            // Save the PDF (no PreSave call required)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with minimum column widths saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

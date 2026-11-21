@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -17,35 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
-
-        // JavaScript that validates the field value:
-        // - Allows only digits with an optional decimal point
-        // - Limits to two digits after the decimal
-        string js = @"
-if (event.value) {
-    var re = /^\d+(\.\d{1,2})?$/;
-    if (!re.test(event.value)) {
-        app.alert('Please enter a numeric value with up to two decimal places.');
-        event.rc = false;
-    }
-}";
-
-        // Retrieve the "Discount" field and attach the validation script
-        var field = pdfDocument.Form["Discount"] as TextBoxField;
-        if (field != null)
+        // Load the PDF with FormEditor (Facades API)
+        using (FormEditor editor = new FormEditor())
         {
-            // Use the correct Aspose class name (lower‑case 's') from the Annotations namespace
-            field.Actions.OnValidate = new JavascriptAction(js);
-        }
-        else
-        {
-            Console.Error.WriteLine("Field 'Discount' not found.");
+            editor.BindPdf(inputPath);
+
+            // Set a reasonable maximum length (e.g., 6 characters for values like 9999.99)
+            // FormEditor uses SetFieldLimit to define the maximum number of characters.
+            editor.SetFieldLimit("Discount", 6);
+
+            // JavaScript validation: numeric value with up to two decimal places.
+            // FormEditor applies a script to a field via SetFieldScript.
+            string jsValidate = @"if (event.value.match(/^\\d+(\\.\\d{1,2})?$/) == null) {\n    app.alert('Please enter a numeric value with up to two decimal places.');\n    event.rc = false;\n}";
+            editor.SetFieldScript("Discount", jsValidate);
+
+            // Save the modified PDF
+            editor.Save(outputPath);
         }
 
-        // Save the updated PDF
-        pdfDocument.Save(outputPath);
-        Console.WriteLine($"Saved PDF with numeric validation on 'Discount' field to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with numeric validation on 'Discount' field: {outputPath}");
     }
 }

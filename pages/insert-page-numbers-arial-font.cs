@@ -19,20 +19,28 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
+            // Obtain the Arial font from the system font repository
+            Font arial = FontRepository.FindFont("Arial");
+
+            // Iterate over pages using 1‑based indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a text fragment containing the page number
-                TextFragment tf = new TextFragment(i.ToString());
+                // Prepare the page number text
+                string pageNumber = i.ToString();
 
-                // Set custom font Arial, size 14 points
-                tf.TextState.Font = FontRepository.FindFont("Arial");
+                // Position the number near the bottom‑right corner (adjust margins as needed)
+                double x = page.PageInfo.Width - 50; // horizontal offset from right edge
+                double y = 20;                       // vertical offset from bottom edge
+
+                TextFragment tf = new TextFragment(pageNumber)
+                {
+                    Position = new Position(x, y)
+                };
+                tf.TextState.Font = arial;
                 tf.TextState.FontSize = 14;
-
-                // Position the page number (example: 20 points from bottom, 50 points from right)
-                tf.Position = new Position(page.PageInfo.Width - 50, 20);
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
 
                 // Add the text fragment to the page
                 page.Paragraphs.Add(tf);

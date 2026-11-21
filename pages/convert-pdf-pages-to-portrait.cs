@@ -1,7 +1,6 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // Required for text-related types (if needed)
+using Aspose.Pdf;
 
 class Program
 {
@@ -16,31 +15,41 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based (rule: page-indexing-one-based)
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Get current MediaBox dimensions
+                // MediaBox defines the page size: lower‑left (llx,lly) and upper‑right (urx,ury)
                 Aspose.Pdf.Rectangle mediaBox = page.MediaBox;
+
                 double width  = mediaBox.URX - mediaBox.LLX;
                 double height = mediaBox.URY - mediaBox.LLY;
 
                 // If the page is landscape (width > height), swap dimensions to make it portrait
                 if (width > height)
                 {
-                    // Create a new rectangle with swapped width/height while keeping the lower‑left corner unchanged
-                    double newURX = mediaBox.LLX + height; // new width = old height
-                    double newURY = mediaBox.LLY + width;  // new height = old width
-                    page.MediaBox = new Aspose.Pdf.Rectangle(mediaBox.LLX, mediaBox.LLY, newURX, newURY);
+                    // New MediaBox with height as the new width and width as the new height
+                    double newWidth  = height;
+                    double newHeight = width;
+
+                    // Preserve the lower‑left corner position
+                    double llx = mediaBox.LLX;
+                    double lly = mediaBox.LLY;
+
+                    // Set the adjusted MediaBox
+                    page.MediaBox = new Aspose.Pdf.Rectangle(
+                        llx,
+                        lly,
+                        llx + newWidth,
+                        lly + newHeight);
                 }
-                // If already portrait, no change needed
             }
 
-            // Save the modified document (rule: document-disposal-with-using ensures target stays alive until Save)
+            // Save the modified document
             doc.Save(outputPath);
         }
 

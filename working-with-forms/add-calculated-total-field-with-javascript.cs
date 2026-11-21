@@ -1,9 +1,8 @@
 using System;
 using System.IO;
-using System.Drawing; // Needed for System.Drawing.Color
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // Required for JavascriptAction
 
 class Program
 {
@@ -18,56 +17,56 @@ class Program
             return;
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document has at least one page
-            if (doc.Pages.Count == 0)
-                doc.Pages.Add();
+            // No need to assign a new Form – doc.Form is created lazily when a field is added.
 
-            // Define the rectangle where the calculated total field will appear
-            // Fully qualified Rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle totalRect = new Aspose.Pdf.Rectangle(50, 750, 200, 770);
+            // Create first numeric text box field
+            TextBoxField field1 = new TextBoxField(
+                doc.Pages[1],
+                new Aspose.Pdf.Rectangle(100, 700, 200, 720))
+            {
+                PartialName = "field1",
+                Value = "0"
+            };
+            doc.Form.Add(field1);
 
-            // Create a read‑only text box that will hold the running total
-            TextBoxField totalField = new TextBoxField(doc.Pages[1], totalRect);
-            totalField.PartialName = "TotalSum";
-            totalField.Value = "0";
-            totalField.ReadOnly = true;
+            // Create second numeric text box field
+            TextBoxField field2 = new TextBoxField(
+                doc.Pages[1],
+                new Aspose.Pdf.Rectangle(100, 660, 200, 680))
+            {
+                PartialName = "field2",
+                Value = "0"
+            };
+            doc.Form.Add(field2);
 
-            // Set the default appearance (font, size, color) for the text box
-            // DefaultAppearance constructor expects (string fontName, double fontSize, System.Drawing.Color)
-            totalField.DefaultAppearance = new DefaultAppearance(
-                "Helvetica",
-                12,
-                System.Drawing.Color.Black);
+            // Create a calculated field that sums field1 and field2
+            TextBoxField totalField = new TextBoxField(
+                doc.Pages[1],
+                new Aspose.Pdf.Rectangle(100, 620, 200, 640))
+            {
+                PartialName = "total",
+                ReadOnly = true // user cannot edit the calculated field
+            };
 
-            // JavaScript that iterates over all form fields, sums numeric values,
-            // and assigns the result to this field (event.value)
-            string jsCalculate = @"
-                var sum = 0;
-                for (var i = 0; i < this.numFields; i++) {
-                    var f = this.getField(this.getFieldName(i));
-                    if (f && f.type == 'text' && f !== this) {
-                        var v = parseFloat(f.value);
-                        if (!isNaN(v)) {
-                            sum += v;
-                        }
-                    }
-                }
-                event.value = sum.toString();
+            // JavaScript that computes the running total
+            string js = @"
+                var f1 = this.getField('field1').value;
+                var f2 = this.getField('field2').value;
+                var n1 = isNaN(parseFloat(f1)) ? 0 : parseFloat(f1);
+                var n2 = isNaN(parseFloat(f2)) ? 0 : parseFloat(f2);
+                event.value = (n1 + n2).toString();
             ";
 
-            // Attach the JavaScript to the OnCalculate action of the total field
-            totalField.Actions.OnCalculate = new JavascriptAction(jsCalculate);
+            totalField.Actions.OnCalculate = new JavascriptAction(js);
+            doc.Form.Add(totalField);
 
-            // Add the field to the page's annotations collection
-            doc.Form.Add(totalField, 1);
-
-            // Save the modified PDF; Document.Save writes PDF regardless of extension
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Calculated total field added. Output saved to '{outputPath}'.");
+        Console.WriteLine($"PDF with calculated field saved to '{outputPath}'.");
     }
 }

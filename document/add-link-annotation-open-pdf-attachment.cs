@@ -7,45 +7,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string attachmentPath = "attachment.pdf";
-        const string outputPdf = "output.pdf";
+        const string sourcePdfPath   = "source.pdf";          // PDF to which we add the annotation
+        const string attachmentPath  = "attachment.pdf";      // PDF file to embed
+        const string outputPdfPath   = "output_with_link.pdf";
 
-        if (!File.Exists(inputPdf) || !File.Exists(attachmentPath))
+        if (!File.Exists(sourcePdfPath))
         {
-            Console.Error.WriteLine("Input PDF or attachment file not found.");
+            Console.Error.WriteLine($"Source PDF not found: {sourcePdfPath}");
+            return;
+        }
+        if (!File.Exists(attachmentPath))
+        {
+            Console.Error.WriteLine($"Attachment PDF not found: {attachmentPath}");
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        // Load the main document
+        using (Document doc = new Document(sourcePdfPath))
         {
-            // Embed the PDF attachment into the document using the EmbeddedFiles collection
-            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
-            {
-                Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
-            };
+            // ------------------------------------------------------------
+            // Embed the attachment PDF into the document
+            // ------------------------------------------------------------
+            // Create a FileSpecification for the attachment and add it to the
+            // document's EmbeddedFiles collection.
+            FileSpecification fileSpec = new FileSpecification(attachmentPath, "Embedded PDF attachment");
+            fileSpec.Params.ModDate = DateTime.UtcNow;
             doc.EmbeddedFiles.Add(fileSpec);
 
-            // Define the clickable area (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
+            // ------------------------------------------------------------
+            // Create an annotation that opens the embedded PDF when clicked
+            // ------------------------------------------------------------
+            // A FileAttachmentAnnotation displays an attachment icon; clicking it
+            // opens the embedded file. This satisfies the requirement of a clickable
+            // element that opens the attached PDF.
+            Page page = doc.Pages[1]; // first page (1‑based indexing)
 
-            // Create a link annotation that will launch the attachment file when clicked
-            LinkAnnotation link = new LinkAnnotation(doc.Pages[1], rect);
-            // LaunchAction expects a string (file path). Use the attachment path directly.
-            link.Action = new LaunchAction(attachmentPath);
+            // Define the clickable rectangle (llx, lly, urx, ury) in points.
+            // Adjust coordinates as needed for your layout.
+            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 700, 300, 720);
 
-            // Optional: make the link invisible (no border, transparent)
-            link.Border = new Border(link) { Width = 0 };
-            link.Color = Aspose.Pdf.Color.Transparent;
+            // Create the file‑attachment annotation.
+            FileAttachmentAnnotation attachmentAnn = new FileAttachmentAnnotation(page, linkRect, fileSpec)
+            {
+                Title    = "Open attached PDF",
+                Contents = "Click to open the embedded PDF document.",
+                // Use the FileIcon enum instead of a raw string.
+                Icon = FileIcon.Paperclip
+            };
 
-            // Add the annotation to the first page (adjust page index as needed)
-            doc.Pages[1].Annotations.Add(link);
+            // Add the annotation to the page.
+            page.Annotations.Add(attachmentAnn);
 
+            // ------------------------------------------------------------
             // Save the modified PDF
-            doc.Save(outputPdf);
+            // ------------------------------------------------------------
+            doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF with link annotation saved to '{outputPdf}'.");
+        Console.WriteLine($"PDF saved with attachment annotation: {outputPdfPath}");
     }
 }

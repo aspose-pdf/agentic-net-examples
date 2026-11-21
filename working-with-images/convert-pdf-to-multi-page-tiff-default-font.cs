@@ -17,26 +17,46 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Apply a default font substitution for rendering (e.g., map any missing font to Arial)
-            // This ensures that text is rendered even if the original font is unavailable.
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("*", "Arial"));
-
-            // Define the resolution for the TIFF output (300 DPI)
-            Resolution resolution = new Resolution(300);
-
-            // Create a TiffDevice. The overload without explicit compression uses CCITT Group4 by default.
-            TiffDevice tiffDevice = new TiffDevice(resolution);
-
-            // Convert the entire PDF to a multi‑page TIFF
-            using (FileStream outStream = new FileStream(outputPath, FileMode.Create))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                tiffDevice.Process(doc, outStream);
-            }
-        }
+                // Set a default font substitution for missing fonts.
+                // Map common PDF base fonts to Arial (or any font that exists on the system).
+                Font defaultFont = FontRepository.FindFont("Arial");
+                if (defaultFont != null)
+                {
+                    FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", defaultFont.FontName));
+                    FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times-Roman", defaultFont.FontName));
+                    FontRepository.Substitutions.Add(new SimpleFontSubstitution("Courier", defaultFont.FontName));
+                }
 
-        Console.WriteLine($"PDF successfully converted to TIFF: {outputPath}");
+                // Configure TIFF settings – use CCITT Group 4 compression (optional)
+                TiffSettings tiffSettings = new TiffSettings
+                {
+                    Compression = CompressionType.CCITT4,
+                    // You can adjust other settings such as Depth, Shape, SkipBlankPages, etc.
+                };
+
+                // Create a TiffDevice with desired resolution (e.g., 300 DPI) and the settings above
+                TiffDevice tiffDevice = new TiffDevice(new Resolution(300), tiffSettings);
+
+                // Apply rendering options – set the default font name for rendering
+                tiffDevice.RenderingOptions = new RenderingOptions
+                {
+                    DefaultFontName = "Arial"
+                };
+
+                // Process the whole document (from first to last page) and save as a multi‑page TIFF
+                tiffDevice.Process(doc, 1, doc.Pages.Count, outputPath);
+            }
+
+            Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+        }
     }
 }

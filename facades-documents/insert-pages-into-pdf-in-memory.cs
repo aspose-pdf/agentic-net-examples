@@ -1,57 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // Facades namespace is available as requested
 
 class Program
 {
     static void Main()
     {
-        // ------------------------------------------------------------
-        // 1. Create sample PDFs entirely in memory (no file I/O).
-        // ------------------------------------------------------------
-        Document sourceDoc = CreateSamplePdf("Source", 2);      // 2 pages source
-        Document destDoc   = CreateSamplePdf("Destination", 3); // 3 pages destination
+        // Paths to the source and destination PDF files
+        const string destinationPath = "destination.pdf";
+        const string sourcePath      = "source.pdf";
 
-        // ------------------------------------------------------------
-        // 2. Insert all pages from the source PDF after the first page
-        //    of the destination PDF (1‑based index).
-        // ------------------------------------------------------------
-        int insertAt = 2; // position after page 1
-        for (int i = 1; i <= sourceDoc.Pages.Count; i++)
+        // Verify that both files exist
+        if (!File.Exists(destinationPath))
         {
-            destDoc.Pages.Insert(insertAt, sourceDoc.Pages[i]);
-            insertAt++; // advance insertion point for the next page
+            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
+            return;
+        }
+        if (!File.Exists(sourcePath))
+        {
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            return;
         }
 
-        // ------------------------------------------------------------
-        // 3. Save the merged document to a MemoryStream.
-        // ------------------------------------------------------------
-        using (MemoryStream resultStream = new MemoryStream())
-        {
-            destDoc.Save(resultStream);
-            resultStream.Position = 0; // reset for downstream consumption
+        // Load both PDFs completely into memory
+        byte[] destBytes = File.ReadAllBytes(destinationPath);
+        byte[] srcBytes  = File.ReadAllBytes(sourcePath);
 
-            // (Optional) write the result to a file so you can verify it.
-            File.WriteAllBytes("merged_output.pdf", resultStream.ToArray());
-        }
-    }
-
-    /// <summary>
-    /// Helper that creates a simple PDF with the specified title and page count.
-    /// Each page contains a single TextFragment indicating its origin.
-    /// </summary>
-    static Document CreateSamplePdf(string title, int pageCount)
-    {
-        Document doc = new Document();
-        for (int i = 1; i <= pageCount; i++)
+        // Use nested using blocks for deterministic disposal (global rule)
+        using (MemoryStream destStream = new MemoryStream(destBytes))
+        using (MemoryStream srcStream  = new MemoryStream(srcBytes))
+        using (Aspose.Pdf.Document destDoc = new Aspose.Pdf.Document(destStream))
+        using (Aspose.Pdf.Document srcDoc  = new Aspose.Pdf.Document(srcStream))
         {
-            Page page = doc.Pages.Add();
-            TextFragment tf = new TextFragment($"{title} – Page {i}");
-            tf.TextState.FontSize = 14;
-            tf.Position = new Position(100, 700);
-            page.Paragraphs.Add(tf);
+            // Insert all pages of the source document at the end of the destination document
+            // Pages are 1‑based; inserting at Count+1 appends the pages.
+            int insertPosition = destDoc.Pages.Count + 1;
+            destDoc.Pages.Insert(insertPosition, srcDoc.Pages); // Correct overload: Insert(int, PageCollection)
+
+            // Save the combined PDF into a MemoryStream
+            using (MemoryStream outputStream = new MemoryStream())
+            {
+                destDoc.Save(outputStream);
+                // Reset position so the stream can be read from the beginning by the caller
+                outputStream.Position = 0;
+
+                // Example: write the result to a file (optional)
+                File.WriteAllBytes("combined.pdf", outputStream.ToArray());
+
+                Console.WriteLine("Pages inserted and PDF saved to 'combined.pdf'.");
+            }
         }
-        return doc;
     }
 }

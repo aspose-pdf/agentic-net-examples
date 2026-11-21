@@ -6,49 +6,52 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf   = "input.pdf";
-        const string outputPdf  = "output_stamped.pdf";
-        const string stampImage = "stamp.png";
+        const string inputPath  = "input.pdf";
+        const string stampPath  = "stamp.png";
+        const string outputPath = "output.pdf";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(stampImage))
+        if (!File.Exists(stampPath))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImage}");
+            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
             return;
         }
 
-        // Load the PDF document using the high‑level API (Document)
-        Document pdfDocument = new Document(inputPdf);
-
-        // Apply the rotated image stamp to each page
-        for (int pageNum = 1; pageNum <= pdfDocument.Pages.Count; pageNum++)
+        try
         {
-            ImageStamp imgStamp = new ImageStamp(stampImage)
+            // Load the PDF with the high‑level Document API (cross‑platform and fully featured)
+            using (Document doc = new Document(inputPath))
             {
-                // Rotate the stamp 30 degrees
-                RotateAngle = 30,
+                // Create the image stamp with the required rotation and alignment
+                ImageStamp imgStamp = new ImageStamp(stampPath)
+                {
+                    RotateAngle        = 30,                     // 30° rotation
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment   = VerticalAlignment.Bottom,
+                    BottomMargin        = 10,
+                    RightMargin         = 10
+                };
 
-                // Align to bottom‑right corner
-                HorizontalAlignment = HorizontalAlignment.Right,
-                VerticalAlignment   = VerticalAlignment.Bottom,
+                // Apply the stamp to every page
+                foreach (Page page in doc.Pages)
+                {
+                    page.AddStamp(imgStamp);
+                }
 
-                // Optional margins from the edges
-                BottomMargin = 10,
-                RightMargin  = 10
-            };
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
 
-            // Add the stamp to the current page
-            pdfDocument.Pages[pageNum].AddStamp(imgStamp);
+            Console.WriteLine($"Rotated image stamp applied to all pages. Saved as '{outputPath}'.");
         }
-
-        // Save the modified PDF
-        pdfDocument.Save(outputPdf);
-
-        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -7,35 +7,37 @@ class Program
 {
     static void Main()
     {
-        // Path to the PDF containing the form
-        const string pdfPath = "input.pdf";
-
-        // Name of the form field to extract
+        const string inputPath = "input.pdf";
         const string fieldName = "myField";
 
-        // Verify the file exists before proceeding
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        try
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field.
-            Field? field = doc.Form[fieldName] as Field;
-
-            if (field == null)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                Console.WriteLine($"Form field '{fieldName}' not found.");
-                return;
+                // Retrieve the form field by its name as a Field object (not WidgetAnnotation)
+                Field field = doc.Form[fieldName] as Field;
+                if (field == null)
+                {
+                    Console.WriteLine($"Form field '{fieldName}' not found.");
+                }
+                else
+                {
+                    // Use the Field.Value property to get the field's content safely
+                    string value = field.Value?.ToString() ?? string.Empty;
+                    Console.WriteLine($"Value of field '{fieldName}': {value}");
+                }
             }
-
-            // The Value property holds the field's data for all field types.
-            string fieldValue = field.Value?.ToString() ?? string.Empty;
-
-            Console.WriteLine($"Field '{fieldName}' value: {fieldValue}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

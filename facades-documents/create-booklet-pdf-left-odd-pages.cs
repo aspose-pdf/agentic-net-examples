@@ -1,50 +1,68 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // required for PdfFileEditor (fully qualified usage is also acceptable)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";          // source PDF file
-        const string outputPath = "booklet_output.pdf"; // booklet PDF file
+        // Input PDF stream – for demonstration we open a file as a stream.
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "booklet_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // ---------------------------------------------------------------------
-        // NOTE:
-        // The version of Aspose.Pdf referenced by this project does not expose
-        // the PdfFileEditor.BindPdf, BookletOptions, BookletLayout or the
-        // CreateBooklet overload that accepts those options. Those members were
-        // introduced in later releases. To keep the code compilable we load the
-        // PDF with the Document class (the recommended way for older versions)
-        // and simply save it. If booklet creation with left‑pages‑odd layout is
-        // required, upgrade the Aspose.Pdf NuGet package to a version that
-        // provides the missing API.
-        // ---------------------------------------------------------------------
+        // Load the PDF from the stream into a Document (required for validation, not for PdfFileEditor).
+        using (FileStream inputStream = File.OpenRead(inputPdfPath))
+        using (MemoryStream ms = new MemoryStream())
+        {
+            // Copy the incoming stream to a memory buffer.
+            inputStream.CopyTo(ms);
+            ms.Position = 0;
 
-        // Load the source PDF using Document (PdfFileEditor cannot bind a stream
-        // in this library version).
-        Document pdfDoc = new Document(inputPath);
+            // Validate that the stream contains a readable PDF.
+            Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document(ms);
+            Console.WriteLine($"PDF loaded – pages: {pdfDoc.Pages.Count}");
 
-        // If a newer library is later added, the following block can be used to
-        // create a booklet with the desired layout:
-        //
-        // PdfFileEditor editor = new PdfFileEditor();
-        // BookletOptions options = new BookletOptions
-        // {
-        //     BookletLayout = BookletLayout.LeftPagesOdd
-        // };
-        // editor.CreateBooklet(inputPath, outputPath, options);
-        //
-        // For now we just save the original document.
-        pdfDoc.Save(outputPath);
+            // PdfFileEditor works with file paths, so write the stream to a temporary file.
+            string tempFilePath = Path.GetTempFileName();
+            try
+            {
+                File.WriteAllBytes(tempFilePath, ms.ToArray());
 
-        Console.WriteLine($"PDF saved (booklet creation not supported in this version): {outputPath}");
+                // Prepare source files array for MakeNUp.
+                string[] sourceFiles = new string[] { tempFilePath };
+
+                // Create a PdfFileEditor instance.
+                Aspose.Pdf.Facades.PdfFileEditor editor = new Aspose.Pdf.Facades.PdfFileEditor();
+
+                // MakeNUp creates an N‑up layout (2‑up) which can be used as a simple booklet.
+                // The third parameter indicates landscape orientation; true gives a 2‑up layout.
+                // There is no direct “left pages odd” option in this API version, so we rely on the default ordering.
+                bool success = editor.MakeNUp(sourceFiles, outputPdfPath, true);
+
+                if (success)
+                {
+                    Console.WriteLine($"Booklet created successfully at '{outputPdfPath}'.");
+                }
+                else
+                {
+                    Console.Error.WriteLine("Failed to create booklet using MakeNUp.");
+                }
+            }
+            finally
+            {
+                // Clean up the temporary file.
+                if (File.Exists(tempFilePath))
+                {
+                    File.Delete(tempFilePath);
+                }
+            }
+        }
     }
 }

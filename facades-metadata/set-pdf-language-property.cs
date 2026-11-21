@@ -1,36 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;          // Facades namespace included as requested
-using Aspose.Pdf.Tagged;           // ITaggedContent interface
-using Aspose.Pdf.LogicalStructure; // Structure element types (not used directly here)
+using Aspose.Pdf.Facades;          // PdfFileInfo resides here
+using Aspose.Pdf.Tagged;          // ITaggedContent interface
+using Aspose.Pdf.LogicalStructure; // StructureElement, etc.
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_language_set.pdf";
 
-        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // ------------------------------------------------------------
+        // Use PdfFileInfo (from Aspose.Pdf.Facades) to read existing metadata.
+        // PdfFileInfo does NOT provide a SetInfo method, so we only read here.
+        // ------------------------------------------------------------
+        PdfFileInfo fileInfo = new PdfFileInfo(inputPath);
+        Console.WriteLine($"Title : {fileInfo.Title}");
+        Console.WriteLine($"Author: {fileInfo.Author}");
+        // Note: PdfFileInfo does not expose a Language property.
+
+        // ------------------------------------------------------------
+        // Load the PDF document, set the language via the tagged content API,
+        // and save the changes.
+        // ------------------------------------------------------------
         using (Document doc = new Document(inputPath))
         {
-            // PdfFileInfo does NOT expose a Language property.
-            // The correct way to set the document language is via the TaggedContent API.
-            ITaggedContent taggedContent = doc.TaggedContent;
-            taggedContent.SetLanguage("en-US");   // Set /Lang entry to "en-US"
+            // Ensure the document has a TaggedContent object (creates one if missing)
+            ITaggedContent tagged = doc.TaggedContent;
+
+            // Set the document language to "en-US"
+            tagged.SetLanguage("en-US");
+
+            // Optionally set a title for the tagged content
+            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF language set to \"en-US\" and saved as '{outputPath}'.");
+        Console.WriteLine($"Language set to \"en-US\" and saved to '{outputPath}'.");
     }
 }

@@ -1,57 +1,67 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Forms; // Form field types and BarcodeType
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "form_with_barcode.pdf";
+        const string outputPath = "FormWithBarcode.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page (pages are 1‑based)
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // ----- Create text fields -----
-            // First name field
-            TextBoxField firstName = new TextBoxField(page, new Aspose.Pdf.Rectangle(50, 750, 250, 730));
-            firstName.PartialName = "FirstName";
-            firstName.Value = "John";
-            doc.Form.Add(firstName);
+            // Define positions for the form fields (llx, lly, urx, ury)
+            Aspose.Pdf.Rectangle rectFirstName = new Aspose.Pdf.Rectangle(50, 750, 250, 770);
+            Aspose.Pdf.Rectangle rectLastName  = new Aspose.Pdf.Rectangle(50, 720, 250, 740);
+            Aspose.Pdf.Rectangle rectId        = new Aspose.Pdf.Rectangle(50, 690, 250, 710);
+            Aspose.Pdf.Rectangle rectBarcode   = new Aspose.Pdf.Rectangle(50, 620, 300, 660);
 
-            // Last name field
-            TextBoxField lastName = new TextBoxField(page, new Aspose.Pdf.Rectangle(50, 710, 250, 690));
-            lastName.PartialName = "LastName";
-            lastName.Value = "Doe";
-            doc.Form.Add(lastName);
+            // Create TextBox fields for First Name, Last Name and ID
+            TextBoxField firstNameField = new TextBoxField(page, rectFirstName);
+            firstNameField.PartialName = "FirstName";
+            firstNameField.Value = ""; // initial empty value
+            doc.Form.Add(firstNameField, 1);
 
-            // ID field
-            TextBoxField idField = new TextBoxField(page, new Aspose.Pdf.Rectangle(50, 670, 250, 650));
+            TextBoxField lastNameField = new TextBoxField(page, rectLastName);
+            lastNameField.PartialName = "LastName";
+            lastNameField.Value = "";
+            doc.Form.Add(lastNameField, 1);
+
+            TextBoxField idField = new TextBoxField(page, rectId);
             idField.PartialName = "ID";
+            idField.Value = "";
+            doc.Form.Add(idField, 1);
+
+            // Create a Barcode field
+            BarcodeField barcodeField = new BarcodeField(page, rectBarcode);
+            barcodeField.PartialName = "MyBarcode";
+            // The BarcodeField.Type property does not exist in the current Aspose.Pdf version.
+            // If a specific symbology is required, use the BarcodeField.BarcodeType property where available.
+            // For maximum compatibility we rely on the default symbology (Code128) or set it conditionally:
+            // if (barcodeField.GetType().GetProperty("BarcodeType") != null)
+            //     barcodeField.BarcodeType = BarcodeType.Code128;
+            barcodeField.Value = ""; // will be set after concatenation
+            doc.Form.Add(barcodeField, 1);
+
+            // ----- Populate the text fields (simulating user input) -----
+            firstNameField.Value = "John";
+            lastNameField.Value = "Doe";
             idField.Value = "12345";
-            doc.Form.Add(idField);
 
-            // ----- Generate concatenated data for the barcode -----
-            string barcodeData = $"{firstName.Value}{lastName.Value}{idField.Value}";
+            // Concatenate the values of the three text fields
+            string concatenatedValue = firstNameField.Value + lastNameField.Value + idField.Value;
 
-            // NOTE: The Aspose.Pdf.Barcode namespace is not available in the current
-            // library reference. As a fallback, we place the concatenated string into
-            // a read‑only text field that can later be replaced with an actual barcode
-            // image by a post‑processing step if required.
-            TextBoxField barcodeField = new TextBoxField(page, new Aspose.Pdf.Rectangle(50, 620, 250, 580));
-            barcodeField.PartialName = "BarcodeField";
-            barcodeField.Value = barcodeData;
-            barcodeField.ReadOnly = true; // make it behave like a barcode placeholder
-            doc.Form.Add(barcodeField);
+            // Assign the concatenated string to the barcode field
+            barcodeField.Value = concatenatedValue;
 
-            // Save the PDF form
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form with barcode placeholder saved to '{outputPath}'.");
+        Console.WriteLine($"PDF form with barcode saved to '{outputPath}'.");
     }
 }

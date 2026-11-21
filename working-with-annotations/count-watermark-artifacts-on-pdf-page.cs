@@ -15,21 +15,24 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based
+            int totalWatermarks = 0;
+
+            // Pages are 1‑based in Aspose.Pdf
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Count only WatermarkArtifact objects on the page
-                int watermarkCount = page.Artifacts
-                                          .OfType<WatermarkArtifact>()
-                                          .Count();
+                // Count only WatermarkArtifact instances on the page
+                int pageWatermarks = page.Artifacts.OfType<WatermarkArtifact>().Count();
 
-                Console.WriteLine($"Page {i}: {watermarkCount} watermark artifact(s)");
+                Console.WriteLine($"Page {i}: {pageWatermarks} watermark artifact(s)");
+                totalWatermarks += pageWatermarks;
             }
+
+            Console.WriteLine($"Total watermark artifacts in document: {totalWatermarks}");
         }
     }
 }

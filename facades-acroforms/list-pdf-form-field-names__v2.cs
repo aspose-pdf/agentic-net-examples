@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,27 +14,26 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Retrieve all form fields from the document's Form collection
-        var fields = doc.Form?.Fields;
-
-        Console.WriteLine("Form field names:");
-        if (fields != null && fields.Count() > 0)
+        try
         {
-            foreach (var field in fields)
+            // Form (not FormEditor) provides access to existing form data.
+            using (Form form = new Form())
             {
-                // The field name is stored in the PartialName property
-                Console.WriteLine(field.PartialName);
+                form.BindPdf(inputPath);
+
+                // Retrieve all form field names via the FieldNames property.
+                string[] fieldNames = form.FieldNames;
+
+                Console.WriteLine($"Form fields in '{Path.GetFileName(inputPath)}':");
+                foreach (string name in fieldNames)
+                {
+                    Console.WriteLine($"- {name}");
+                }
             }
         }
-        else
+        catch (Exception ex)
         {
-            Console.WriteLine("No form fields found.");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
-
-        // No modifications are made, so no need to save the document.
-        // The Document instance will be released when the program ends.
     }
 }

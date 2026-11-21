@@ -1,47 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_numbered.pdf";
 
-        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF using Document (PdfFileEditor does not support BindPdf)
-        using (Document pdfDoc = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Create a page‑number stamp with leading zeros (e.g., 01, 02, …)
-            PageNumberStamp pageNumberStamp = new PageNumberStamp("00")
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                StartingNumber = 1,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Bottom,
-                // Use individual margin properties – PageNumberStamp has no combined Margin property
-                BottomMargin = 10,
-                LeftMargin = 0,
-                RightMargin = 0,
-                TopMargin = 0
-            };
+                // Format page number with leading zeros (e.g., 001, 002, …)
+                string pageNumberText = i.ToString("D3");
 
-            // Apply the stamp to every page in the document
-            foreach (Page page in pdfDoc.Pages)
-            {
-                page.AddStamp(pageNumberStamp);
+                // Create a text stamp for the current page number
+                TextStamp stamp = new TextStamp(pageNumberText);
+
+                // Position the stamp at the bottom‑right corner
+                stamp.HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Right;
+                stamp.VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Bottom;
+                stamp.RightMargin         = 20;   // distance from right edge
+                stamp.BottomMargin        = 20;   // distance from bottom edge
+
+                // Set visual appearance of the stamp
+                stamp.TextState.Font      = FontRepository.FindFont("Arial");
+                stamp.TextState.FontSize  = 12;
+                stamp.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Apply the stamp to the current page
+                Page page = doc.Pages[i];
+                page.AddStamp(stamp);
             }
 
-            // Save the stamped PDF
-            pdfDoc.Save(outputPath);
+            // Save the modified document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page‑number stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Page‑numbered PDF saved to '{outputPath}'.");
     }
 }

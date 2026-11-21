@@ -17,33 +17,38 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Retrieve the form field by its name (replace "myField" with the actual field name)
-            if (doc.Form["myField"] is TextBoxField field)
+            // Retrieve an existing text box field or create a new one
+            TextBoxField calcField = doc.Form["CalcField"] as TextBoxField;
+            if (calcField == null)
             {
-                // JavaScript that runs when the field loses focus (OnBlur event)
-                // Example: calculate the sum of two other fields (fieldA and fieldB) and set the result in this field
-                string jsCode = @"
-                    var a = this.getField('fieldA').value;
-                    var b = this.getField('fieldB').value;
-                    var sum = Number(a) + Number(b);
-                    this.getField('myField').value = sum;
-                ";
+                calcField = new TextBoxField(
+                    doc.Pages[1],
+                    new Aspose.Pdf.Rectangle(100, 700, 250, 720))
+                {
+                    PartialName = "CalcField",
+                    Value = "0"
+                };
+                doc.Form.Add(calcField);
+            }
 
-                // Assign the JavaScript action to the OnLostFocus event (blur)
-                field.Actions.OnLostFocus = new JavascriptAction(jsCode);
-            }
-            else
-            {
-                Console.Error.WriteLine("Form field 'myField' not found or is not a TextBoxField.");
-            }
+            // JavaScript to calculate the sum of two other fields (Field1 and Field2)
+            // and assign the result to this field when it loses focus (OnLostFocus event)
+            string js = @"
+                var f1 = this.getField('Field1').value;
+                var f2 = this.getField('Field2').value;
+                var sum = Number(f1) + Number(f2);
+                this.value = sum;
+            ";
+
+            // Assign the JavaScript action to the OnLostFocus event of the field
+            calcField.Actions.OnLostFocus = new JavascriptAction(js);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with JavaScript action to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with JavaScript action: {outputPath}");
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,6 +9,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
+        const string fieldName = "DateField";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +17,25 @@ class Program
             return;
         }
 
+        // Load the PDF and bind it to FormEditor
         using (Document doc = new Document(inputPath))
+        using (FormEditor editor = new FormEditor())
         {
-            // Retrieve the form field and cast it to Aspose.Pdf.Forms.Field
-            Field? field = doc.Form["DateField"] as Field;
-            if (field == null)
-            {
-                Console.Error.WriteLine("Field 'DateField' not found or is not a form field.");
-                return;
-            }
+            editor.BindPdf(doc);
 
-            // Define the new rectangle: lower‑left (100,200), upper‑right (250,220)
-            var newRect = new Rectangle(100, 200, 250, 220); // width = 150, height = 20
+            // Desired position: lower‑left (100,200), width 150, height 20
+            float llx = 100f;
+            float lly = 200f;
+            float urx = llx + 150f; // 250
+            float ury = lly + 20f;  // 220
 
-            // Apply the new rectangle to the field
-            field.Rect = newRect;
+            // Move the field to the new rectangle
+            editor.MoveField(fieldName, llx, lly, urx, ury);
 
-            // Move the field to page 2 – use AddFieldAppearance because Field has no PageNumber property
-            doc.Form.AddFieldAppearance(field, 2, newRect);
-
-            // Save the modified document
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Field moved and saved to '{outputPath}'.");
+        Console.WriteLine($"Field '{fieldName}' moved and saved to '{outputPath}'.");
     }
 }

@@ -10,42 +10,43 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Regular expression defining allowed metadata format (alphanumeric and spaces, 1‑100 chars)
-        const string pattern = @"^[A-Za-z0-9\s]{1,100}$";
+        // Regular expression that metadata must satisfy (example: alphanumeric, spaces, max 100 chars)
+        const string pattern = @"^[\w\s]{0,100}$";
+        Regex regex = new Regex(pattern, RegexOptions.Compiled);
 
-        // Example metadata values to be set
+        // Metadata values to set
         string title   = "Sample Document Title";
         string author  = "John Doe";
         string subject = "Demo Subject";
 
         // Validate each metadata value against the regex
-        if (!Regex.IsMatch(title, pattern))
+        if (!regex.IsMatch(title))
         {
-            Console.Error.WriteLine("Invalid title format.");
+            Console.Error.WriteLine("Title does not match the required pattern.");
             return;
         }
-        if (!Regex.IsMatch(author, pattern))
+        if (!regex.IsMatch(author))
         {
-            Console.Error.WriteLine("Invalid author format.");
+            Console.Error.WriteLine("Author does not match the required pattern.");
             return;
         }
-        if (!Regex.IsMatch(subject, pattern))
+        if (!regex.IsMatch(subject))
         {
-            Console.Error.WriteLine("Invalid subject format.");
+            Console.Error.WriteLine("Subject does not match the required pattern.");
             return;
         }
 
-        // Load PDF file information using Aspose.Pdf.Facades
-        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
-
-        // Set metadata after successful validation
-        pdfInfo.Title   = title;
+        // Load the PDF and set metadata using PdfFileInfo (Facades API)
+        PdfFileInfo pdfInfo = new PdfFileInfo();
+        pdfInfo.BindPdf(inputPath);   // Load existing PDF
+        pdfInfo.Title   = title;      // Set validated metadata
         pdfInfo.Author  = author;
         pdfInfo.Subject = subject;
 

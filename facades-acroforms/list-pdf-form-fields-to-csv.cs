@@ -7,62 +7,43 @@ class Program
 {
     static void Main()
     {
-        // Input PDF containing form fields
-        const string inputPdf = "form_document.pdf";
-        // Output CSV report
+        const string inputPdf = "input.pdf";          // PDF containing form fields
         const string outputCsv = "form_fields_report.csv";
 
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Error: File not found – {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document.
-            using (Document pdfDocument = new Document(inputPdf))
+            // Load the PDF document using the high‑level Document API.
+            Document doc = new Document(inputPdf);
+
+            // Write the report to a CSV file.
+            using (StreamWriter writer = new StreamWriter(outputCsv))
             {
-                // Ensure the document actually contains a form.
-                if (pdfDocument.Form == null || pdfDocument.Form.Fields == null)
+                // CSV header
+                writer.WriteLine("FieldName,FieldType");
+
+                // Iterate over each form field using the correct Field type.
+                foreach (Field field in doc.Form.Fields)
                 {
-                    Console.WriteLine("No form fields found in the PDF.");
-                    return;
+                    // field.PartialName is the field's name.
+                    // The concrete runtime type (TextBoxField, CheckboxField, etc.)
+                    // tells us the field type.
+                    string fieldName = field.PartialName;
+                    string fieldType = field.GetType().Name; // e.g., "TextBoxField"
+                    writer.WriteLine($"{fieldName},{fieldType}");
                 }
-
-                // Prepare the CSV file.
-                using (StreamWriter writer = new StreamWriter(outputCsv, false))
-                {
-                    // Write CSV header.
-                    writer.WriteLine("FieldName,FieldType");
-
-                    // Iterate over each field and write its name and type.
-                    foreach (Field field in pdfDocument.Form.Fields)
-                    {
-                        string fieldName = field.PartialName ?? string.Empty;
-                        string fieldType = field.GetType().Name; // e.g., TextBoxField, CheckBoxField, etc.
-                        string line = $"{EscapeCsv(fieldName)},{EscapeCsv(fieldType)}";
-                        writer.WriteLine(line);
-                    }
-                }
-
-                Console.WriteLine($"Form field report written to '{outputCsv}'.");
             }
+
+            Console.WriteLine($"Form field report generated: {outputCsv}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
         }
-    }
-
-    // Helper to escape CSV values that may contain commas or quotes.
-    static string EscapeCsv(string value)
-    {
-        if (value == null) return string.Empty;
-        if (value.Contains('"'))
-            value = value.Replace("\"", "\"\"");
-        if (value.Contains(',') || value.Contains('"') || value.Contains('\n') || value.Contains('\r'))
-            return $"\"{value}\"";
-        return value;
     }
 }

@@ -1,15 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // for Resolution
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
+        // Input PDF file
         const string inputPdf = "input.pdf";
+
+        // Directory where TIFF images will be saved
         const string outputDir = "TiffPages";
-        const string outputTiff = "output.tiff"; // multi‑page TIFF
 
         if (!File.Exists(inputPdf))
         {
@@ -17,30 +19,34 @@ class Program
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
-        string outPath = Path.Combine(outputDir, outputTiff);
 
-        // PdfConverter implements IDisposable, so wrap it in a using block.
+        // PdfConverter is a Facades class that converts PDF pages to images
         using (PdfConverter converter = new PdfConverter())
         {
-            // Bind the source PDF.
+            // Bind the PDF document to the converter
             converter.BindPdf(inputPdf);
 
-            // Set the page range – from first to last page.
-            converter.StartPage = 1;
-            converter.EndPage   = converter.PageCount; // total pages in the document
-
-            // Set the desired resolution (300 DPI). The default coordinate type is used automatically.
+            // Set the desired resolution (300 DPI) for high‑quality output
             converter.Resolution = new Resolution(300);
 
-            // Perform the conversion.
+            // Define the page range to convert (all pages)
+            converter.StartPage = 1;
+            converter.EndPage   = converter.PageCount; // total pages after binding
+
+            // Prepare the conversion
             converter.DoConvert();
 
-            // Save all pages as a single multi‑page TIFF image.
-            converter.SaveAsTIFF(outPath);
+            // Iterate through each page and save it as a TIFF image
+            for (int pageNumber = converter.StartPage; pageNumber <= converter.EndPage; pageNumber++)
+            {
+                string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.tiff");
+                // Save the current page as TIFF; format is inferred from the file extension
+                converter.GetNextImage(outputPath);
+            }
         }
 
-        Console.WriteLine($"PDF has been converted to TIFF: {outPath}");
-        Console.WriteLine("PDF to TIFF conversion completed.");
+        Console.WriteLine($"PDF pages have been converted to TIFF images in '{outputDir}'.");
     }
 }

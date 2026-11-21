@@ -1,44 +1,47 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Define the dropdown options
-        string[] colors = { "Red", "Green", "Blue", "Yellow", "Black" };
+        const string outputPath = "form_dropdown.pdf";
+        string[] options = { "Option A", "Option B", "Option C", "Option D" };
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to host the form field
+            // Add a new page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Define the rectangle where the dropdown will appear (llx, lly, urx, ury)
-            // Fully qualified to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle comboRect = new Aspose.Pdf.Rectangle(100, 600, 300, 620);
+            // Define the rectangle for the dropdown (lower‑left x/y, upper‑right x/y)
+            Aspose.Pdf.Rectangle comboRect = new Aspose.Pdf.Rectangle(100, 600, 300, 630);
 
             // Create a ComboBox (dropdown) form field
-            ComboBoxField comboBox = new ComboBoxField(page, comboRect)
-            {
-                PartialName = "ColorSelection",   // internal name of the field
-                Value = colors[0]                 // default selected value
-            };
+            ComboBoxField combo = new ComboBoxField(page, comboRect);
+            combo.PartialName = "SampleCombo";
+            // Tooltip is set via AlternateName
+            combo.AlternateName = "Select an option";
 
-            // Populate the dropdown list with the array values using AddOption
-            foreach (string color in colors)
+            // Populate the dropdown list from the array using AddOption
+            foreach (string opt in options)
             {
-                comboBox.AddOption(color);
+                combo.AddOption(opt);
             }
 
-            // Add the ComboBox to the document's form collection
-            doc.Form.Add(comboBox, 1);
+            // Set the default selected item (1‑based index)
+            combo.Selected = 1; // selects the first option
 
-            // Save the PDF to disk
-            doc.Save("form_dropdown.pdf");
+            // Add the field to the document's form collection (page index is 1‑based)
+            doc.Form.Add(combo, 1);
+
+            // Save the PDF document
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine("PDF with dropdown list created: form_dropdown.pdf");
+        Console.WriteLine($"PDF with dropdown saved to '{outputPath}'.");
     }
 }

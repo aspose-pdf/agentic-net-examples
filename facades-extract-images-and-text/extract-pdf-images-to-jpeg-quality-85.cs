@@ -1,67 +1,43 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
-using System.Drawing;
-using System.Drawing.Imaging;
+using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";
-        const string outputDir = "ExtractedImages";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ExportedImages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Initialize the Facades extractor and bind the PDF file
-        PdfExtractor extractor = new PdfExtractor();
-        extractor.BindPdf(pdfPath);
-
-        // Extract all images from the PDF
-        extractor.ExtractImage();
-
-        int imageIndex = 1;
-        while (extractor.HasNextImage())
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Retrieve the next image into a memory stream (original format)
-            using (MemoryStream imgStream = new MemoryStream())
+            // JpegDevice with 300 DPI resolution and quality set to 85
+            // Devices are concrete, not disposable, so we instantiate once and reuse.
+            JpegDevice jpegDevice = new JpegDevice(300, 85);
+
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                extractor.GetNextImage(imgStream);
-                imgStream.Position = 0;
-
-                // Load the image using System.Drawing (Windows‑only)
-                using (Image img = Image.FromStream(imgStream))
+                // Convert the current page to a JPEG image
+                using (MemoryStream imgStream = new MemoryStream())
                 {
-                    // Configure JPEG encoder with quality = 85
-                    ImageCodecInfo jpegCodec = GetEncoder(ImageFormat.Jpeg);
-                    EncoderParameters encoderParams = new EncoderParameters(1);
-                    encoderParams.Param[0] = new EncoderParameter(Encoder.Quality, 85L);
-
-                    string outPath = Path.Combine(outputDir, $"Image_{imageIndex}.jpg");
-                    img.Save(outPath, jpegCodec, encoderParams);
-                    Console.WriteLine($"Saved: {outPath}");
+                    jpegDevice.Process(doc.Pages[pageNum], imgStream);
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.jpg");
+                    File.WriteAllBytes(outPath, imgStream.ToArray());
+                    Console.WriteLine($"Saved page {pageNum} as JPEG to {outPath}");
                 }
             }
-            imageIndex++;
         }
-
-        Console.WriteLine("Image extraction completed.");
-    }
-
-    // Helper method to obtain the JPEG encoder
-    private static ImageCodecInfo GetEncoder(ImageFormat format)
-    {
-        foreach (ImageCodecInfo codec in ImageCodecInfo.GetImageDecoders())
-        {
-            if (codec.FormatID == format.Guid)
-                return codec;
-        }
-        return null;
     }
 }

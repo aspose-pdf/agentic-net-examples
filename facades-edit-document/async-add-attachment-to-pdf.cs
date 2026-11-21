@@ -5,36 +5,27 @@ using Aspose.Pdf;
 
 class Program
 {
-    // Async entry point – works for console apps (C# 7.1+)
     static async Task Main(string[] args)
     {
-        const string inputPdf   = "source.pdf";
-        const string outputPdf  = "source_with_attachment.pdf";
-        const string attachment = "attachment.txt";
-        const string description = "Sample attachment";
+        const string inputPdf = "input.pdf";
+        const string attachmentFile = "attachment.txt";
+        const string outputPdf = "output.pdf";
 
-        // Validate files before proceeding
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Source PDF not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(attachment))
+        if (!File.Exists(attachmentFile))
         {
-            Console.Error.WriteLine($"Attachment file not found: {attachment}");
+            Console.Error.WriteLine($"Attachment file not found: {attachmentFile}");
             return;
         }
 
         try
         {
-            // Run the potentially long‑running PDF work on a background thread so the UI (or console) stays responsive
-            await Task.Run(() => AddAttachment(
-                srcPdf: inputPdf,
-                destPdf: outputPdf,
-                attachmentPath: attachment,
-                description: description));
-
-            Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
+            await AddAttachmentAsync(inputPdf, attachmentFile, outputPdf);
+            Console.WriteLine($"Attachment added successfully. Saved as '{outputPdf}'.");
         }
         catch (Exception ex)
         {
@@ -42,25 +33,25 @@ class Program
         }
     }
 
-    /// <summary>
-    /// Adds an embedded file attachment to a PDF using Aspose.Pdf.Document.
-    /// This method is synchronous; callers should invoke it via Task.Run for async behaviour.
-    /// </summary>
-    private static void AddAttachment(string srcPdf, string destPdf, string attachmentPath, string description)
+    // Asynchronous wrapper that runs the blocking Aspose.Pdf API on a background thread
+    private static Task AddAttachmentAsync(string sourcePdf, string attachmentPath, string resultPdf)
     {
-        // Load the source PDF
-        var pdfDoc = new Document(srcPdf);
+        return Task.Run(() =>
+        {
+            using var doc = new Document(sourcePdf);
 
-        // Create a FileSpecification for the attachment.
-        // Use the file name (not the full path) as the specification name.
-        var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath), description);
-        // Populate the file data – Aspose requires the Contents stream to be set explicitly.
-        fileSpec.Contents = new MemoryStream(File.ReadAllBytes(attachmentPath));
+            // Create a FileSpecification for the attachment. Use only the file name for the specification
+            // and provide the file data via a MemoryStream.
+            var fileSpec = new FileSpecification(Path.GetFileName(attachmentPath))
+            {
+                Contents = new MemoryStream(File.ReadAllBytes(attachmentPath))
+            };
 
-        // Add the file specification to the document's EmbeddedFiles collection.
-        pdfDoc.EmbeddedFiles.Add(fileSpec);
+            // Add the file specification to the EmbeddedFiles collection (Attachments property does not exist).
+            doc.EmbeddedFiles.Add(fileSpec);
 
-        // Save the modified PDF to the destination path
-        pdfDoc.Save(destPdf);
+            // Save the modified PDF.
+            doc.Save(resultPdf);
+        });
     }
 }

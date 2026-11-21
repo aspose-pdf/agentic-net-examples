@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_bleed.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,7 +15,7 @@ class Program
             return;
         }
 
-        // Load PDF with deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Pages are 1‑based in Aspose.Pdf
@@ -23,20 +23,21 @@ class Program
             {
                 Page page = doc.Pages[i];
 
-                // Current CropBox
+                // Get the existing CropBox
                 Aspose.Pdf.Rectangle crop = page.CropBox;
 
-                // BleedBox extends 5 points beyond each side of CropBox
+                // Create a BleedBox that extends 5 points beyond each side of the CropBox
                 Aspose.Pdf.Rectangle bleed = new Aspose.Pdf.Rectangle(
                     crop.LLX - 5,
                     crop.LLY - 5,
                     crop.URX + 5,
                     crop.URY + 5);
 
+                // Assign the new BleedBox to the page
                 page.BleedBox = bleed;
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

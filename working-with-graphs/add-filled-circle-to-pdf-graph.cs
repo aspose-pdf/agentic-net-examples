@@ -6,42 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "graph_with_circle.pdf";
+        const string outputPath = "circle_graph.pdf";
 
-        // Create a new PDF document and ensure proper disposal
+        // Circle parameters
+        double centerX = 200;   // X coordinate of center
+        double centerY = 300;   // Y coordinate of center
+        double radius  = 50;    // Radius of the circle
+
+        // Calculate bounding rectangle for the circle (ellipse with equal radii)
+        double llx = centerX - radius; // lower‑left X
+        double lly = centerY - radius; // lower‑left Y
+        double urx = centerX + radius; // upper‑right X
+        double ury = centerY + radius; // upper‑right Y
+
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a page (pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Circle parameters (coordinates are in points)
-            double centerX = 200;   // X coordinate of the circle center
-            double centerY = 400;   // Y coordinate of the circle center
-            double radius  = 50;    // Radius of the circle
-
-            // Create a Graph container that covers the whole page
+            // Create a Graph container – a Graph is a paragraph that can hold drawing shapes
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // Create a filled ellipse (circle) shape.
-            // Ellipse constructor: left, bottom, width, height
-            Ellipse circle = new Ellipse(
-                (float)(centerX - radius),   // left (lower‑left X)
-                (float)(centerY - radius),   // bottom (lower‑left Y)
-                (float)(radius * 2),         // width
-                (float)(radius * 2)          // height
-            );
+            // Create an ellipse shape using the bounding rectangle
+            // Since width and height are equal, this renders as a circle
+            Ellipse circle = new Ellipse(llx, lly, urx, ury);
 
-            // Style the circle via its GraphInfo
-            // Use normalized RGB values (0..1) or predefined colors to avoid range errors
-            circle.GraphInfo.FillColor = Aspose.Pdf.Color.Blue; // solid blue fill
-            circle.GraphInfo.Color = Aspose.Pdf.Color.Black;   // outline color
-            circle.GraphInfo.LineWidth = 1;                     // outline width
+            // Style the circle via its GraphInfo (fill, stroke, line width)
+            circle.GraphInfo.FillColor = Aspose.Pdf.Color.LightBlue; // fill colour
+            circle.GraphInfo.Color = Aspose.Pdf.Color.Black;        // border colour
+            circle.GraphInfo.LineWidth = 1;                         // border width
 
-            // Add the circle to the graph, then add the graph to the page
+            // Add the shape to the graph, then add the graph to the page
             graph.Shapes.Add(circle);
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
+            // Save the PDF
             doc.Save(outputPath);
         }
 

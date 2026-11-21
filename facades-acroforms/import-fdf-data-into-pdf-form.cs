@@ -7,39 +7,45 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "data.fdf";
+        const string pdfPath    = "input.pdf";
+        const string fdfPath    = "data.fdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
         if (!File.Exists(fdfPath))
         {
-            Console.Error.WriteLine($"FDF not found: {fdfPath}");
+            Console.Error.WriteLine($"FDF file not found: {fdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // Create a Form facade bound to the loaded document
-            using (Form formFacade = new Form(pdfDoc))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Open the FDF file as a stream
-                using (FileStream fdfStream = File.OpenRead(fdfPath))
+                // Use the Form facade to import FDF data
+                using (Aspose.Pdf.Facades.Form pdfForm = new Aspose.Pdf.Facades.Form(pdfDoc))
                 {
-                    // Import form data from the FDF stream into the PDF
-                    formFacade.ImportFdf(fdfStream);
+                    using (FileStream fdfStream = File.OpenRead(fdfPath))
+                    {
+                        // Import form data from the FDF stream (ImportFdf, not ImportDataFromFDF)
+                        pdfForm.ImportFdf(fdfStream);
+                    }
                 }
+
+                // Save the updated PDF
+                pdfDoc.Save(outputPath);
             }
 
-            // Save the updated PDF document
-            pdfDoc.Save(outputPath);
+            Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

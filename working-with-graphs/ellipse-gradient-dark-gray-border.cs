@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
 
@@ -9,50 +8,34 @@ class Program
     {
         const string outputPath = "ellipse_gradient.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // ------------------------------------------------------------
-            // 1. Create a Graph container – all drawing objects must be
-            //    added to a Graph before they can be placed on a page.
-            // ------------------------------------------------------------
+            // Create a Graph container for drawing primitives
             Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // ------------------------------------------------------------
-            // 2. Define the ellipse.
-            //    The Ellipse constructor expects (left, bottom, width, height).
-            // ------------------------------------------------------------
-            float left   = 100f;   // X‑coordinate of the lower‑left corner
-            float bottom = 300f;   // Y‑coordinate of the lower‑left corner
-            float width  = 200f;   // Width of the ellipse
-            float height = 200f;   // Height of the ellipse
-            Ellipse ellipse = new Ellipse(left, bottom, width, height);
+            // Ellipse: left, bottom, width, height
+            Ellipse ellipse = new Ellipse(100, 500, 300, 300);
 
-            // ------------------------------------------------------------
-            // 3. Styling – border (stroke) and fill.
-            //    The API exposes a GraphInfo object for each shape.
-            //    A true radial gradient is not available in the core API of
-            //    older Aspose.Pdf versions, therefore we use a solid light‑gray
-            //    fill that approximates the requested visual. The border is set
-            //    to dark gray with a thickness of 2 points.
-            // ------------------------------------------------------------
-            ellipse.GraphInfo.Color = Color.DarkGray;          // Stroke color
-            ellipse.GraphInfo.LineWidth = 2;                  // Stroke thickness
-            ellipse.GraphInfo.FillColor = Color.LightGray;    // Fill (solid – gradient not supported in this version)
+            // Radial gradient fill (outer -> inner)
+            GradientRadialShading radial = new GradientRadialShading(
+                Aspose.Pdf.Color.FromRgb(0.9, 0.9, 0.9),   // light outer color
+                Aspose.Pdf.Color.FromRgb(0.4, 0.4, 0.8)    // darker inner color
+            );
+            ellipse.GraphInfo.FillColor = new Aspose.Pdf.Color { PatternColorSpace = radial };
 
-            // ------------------------------------------------------------
-            // 4. Add the ellipse to the graph and the graph to the page.
-            // ------------------------------------------------------------
+            // Border (stroke) color and width
+            ellipse.GraphInfo.Color = Aspose.Pdf.Color.DarkGray;
+            ellipse.GraphInfo.LineWidth = 2;
+
+            // Add the ellipse to the graph and the graph to the page
             graph.Shapes.Add(ellipse);
             page.Paragraphs.Add(graph);
 
-            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with ellipse saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

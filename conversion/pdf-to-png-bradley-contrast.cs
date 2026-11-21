@@ -3,138 +3,110 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Imaging;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // PngDevice, Resolution
 
 class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "PngPages";
+        const string outputFolder = "png_output";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        try
+        // -----------------------------------------------------------------
+        // 1. Convert each PDF page to a PNG image using Aspose.Pdf.
+        // -----------------------------------------------------------------
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdfPath))
+            // Use PngDevice (core API) instead of ImageSaveOptions (facade‑style).
+            var resolution = new Resolution(300);
+            var pngDevice = new PngDevice(resolution);
+
+            int pageNumber = 1;
+            foreach (Page page in pdfDoc.Pages)
             {
-                // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-                for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+                string outPath = Path.Combine(outputFolder, $"output_{pageNumber}.png");
+                using (FileStream imageStream = new FileStream(outPath, FileMode.Create))
                 {
-                    string outPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
-
-                    // Render the current page to a PNG stream first
-                    using (MemoryStream pngStream = new MemoryStream())
-                    {
-                        var pngDevice = new PngDevice(new Resolution(300))
-                        {
-                            TransparentBackground = true
-                        };
-                        pngDevice.Process(pdfDoc.Pages[pageNumber], pngStream);
-                        pngStream.Position = 0;
-
-                        // Load the rendered PNG into a Bitmap
-                        using (Bitmap originalBmp = new Bitmap(pngStream))
-                        {
-                            // Apply Bradley contrast‑enhancement (binarization) algorithm
-                            using (Bitmap enhancedBmp = ApplyBradleyBinarization(originalBmp, 0.5))
-                            {
-                                // Save the enhanced bitmap as PNG
-                                enhancedBmp.Save(outPath, ImageFormat.Png);
-                            }
-                        }
-                    }
-
-                    Console.WriteLine($"Page {pageNumber} saved as PNG: {outPath}");
+                    pngDevice.Process(page, imageStream);
                 }
+                pageNumber++;
             }
         }
-        // HTML‑to‑image conversions rely on GDI+, which is Windows‑only
-        catch (TypeInitializationException)
+
+        // -----------------------------------------------------------------
+        // 2. Apply a simple Bradley local contrast enhancement to each PNG.
+        //    Implemented manually using System.Drawing to avoid the Aspose.Imaging
+        //    dependency.
+        // -----------------------------------------------------------------
+        foreach (string pngPath in Directory.GetFiles(outputFolder, "*.png"))
         {
-            Console.WriteLine("PDF‑to‑PNG conversion requires GDI+ and is only supported on Windows.");
+            using (Bitmap bitmap = new Bitmap(pngPath))
+            {
+                ApplyBradleyContrast(bitmap, 0.5f, 8);
+                // Overwrite the original file with the enhanced image.
+                bitmap.Save(pngPath, ImageFormat.Png);
+            }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+
+        Console.WriteLine("PDF to PNG conversion completed with Bradley contrast enhancement.");
     }
 
     /// <summary>
-    /// Applies the Bradley binarization (local contrast enhancement) algorithm to a bitmap.
+    /// Applies a basic Bradley local contrast enhancement algorithm.
     /// </summary>
-    /// <param name="source">Source bitmap (any pixel format).</param>
-    /// <param name="threshold">Threshold factor between 0.0 and 1.0 (commonly 0.5).</param>
-    /// <returns>A new binarized bitmap.</returns>
-    private static Bitmap ApplyBradleyBinarization(Bitmap source, double threshold)
+    /// <param name="src">Source bitmap (will be modified in‑place).</param>
+    /// <param name="threshold">Threshold in the range (0‑1). Typical values: 0.5‑0.7.</param>
+    /// <param name="windowSize">Half‑size of the square window used for local averaging.</param>
+    private static void ApplyBradleyContrast(Bitmap src, float threshold, int windowSize)
     {
-        int width = source.Width;
-        int height = source.Height;
-
-        // Convert source to 8‑bpp grayscale for easier processing
-        Bitmap grayBmp = new Bitmap(width, height, PixelFormat.Format8bppIndexed);
-        // Set grayscale palette
-        ColorPalette palette = grayBmp.Palette;
-        for (int i = 0; i < 256; i++)
-            palette.Entries[i] = System.Drawing.Color.FromArgb(i, i, i);
-        grayBmp.Palette = palette;
-
-        // Populate grayscale bitmap using GetPixel (no unsafe code)
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                System.Drawing.Color pixel = source.GetPixel(x, y);
-                byte gray = (byte)((pixel.R * 0.299) + (pixel.G * 0.587) + (pixel.B * 0.114));
-                grayBmp.SetPixel(x, y, System.Drawing.Color.FromArgb(gray, gray, gray));
-            }
-        }
-
-        // Build integral image for fast local sum calculation
+        int width = src.Width;
+        int height = src.Height;
+        // Build integral image for fast local mean calculation (grayscale).
         long[,] integral = new long[height + 1, width + 1];
-        for (int y = 1; y <= height; y++)
+        for (int y = 0; y < height; y++)
         {
             long rowSum = 0;
-            for (int x = 1; x <= width; x++)
+            for (int x = 0; x < width; x++)
             {
-                byte gray = grayBmp.GetPixel(x - 1, y - 1).R;
-                rowSum += gray;
-                integral[y, x] = integral[y - 1, x] + rowSum;
+                System.Drawing.Color c = src.GetPixel(x, y);
+                // Convert to luminance using Rec. 601 coefficients.
+                int lum = (int)(0.299 * c.R + 0.587 * c.G + 0.114 * c.B);
+                rowSum += lum;
+                integral[y + 1, x + 1] = integral[y, x + 1] + rowSum;
             }
         }
 
-        // Determine window size – typical choice is width/8
-        int windowSize = Math.Max(1, width / 8);
-        int half = windowSize / 2;
-        long windowArea = (long)windowSize * windowSize;
-
-        // Result bitmap – use 24‑bpp for easy SetPixel
-        Bitmap result = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-
+        // Process each pixel.
         for (int y = 0; y < height; y++)
         {
             for (int x = 0; x < width; x++)
             {
-                int x1 = Math.Max(0, x - half);
-                int x2 = Math.Min(width - 1, x + half);
-                int y1 = Math.Max(0, y - half);
-                int y2 = Math.Min(height - 1, y + half);
+                // Define window bounds.
+                int x1 = Math.Max(x - windowSize, 0);
+                int y1 = Math.Max(y - windowSize, 0);
+                int x2 = Math.Min(x + windowSize, width - 1);
+                int y2 = Math.Min(y + windowSize, height - 1);
 
+                int area = (x2 - x1 + 1) * (y2 - y1 + 1);
                 long sum = integral[y2 + 1, x2 + 1] - integral[y1, x2 + 1] - integral[y2 + 1, x1] + integral[y1, x1];
-                byte current = grayBmp.GetPixel(x, y).R;
-                bool isBlack = current * windowArea < sum * (1.0 - threshold);
-                result.SetPixel(x, y, isBlack ? System.Drawing.Color.Black : System.Drawing.Color.White);
+                int localMean = (int)(sum / area);
+
+                System.Drawing.Color orig = src.GetPixel(x, y);
+                int lumOrig = (int)(0.299 * orig.R + 0.587 * orig.G + 0.114 * orig.B);
+                // If pixel is darker than (threshold * localMean) make it black, else white.
+                int newLum = (lumOrig < localMean * threshold) ? 0 : 255;
+                System.Drawing.Color newColor = System.Drawing.Color.FromArgb(newLum, newLum, newLum);
+                src.SetPixel(x, y, newColor);
             }
         }
-
-        grayBmp.Dispose();
-        return result;
     }
 }

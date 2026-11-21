@@ -1,67 +1,48 @@
 using System;
 using System.IO;
-using System.Linq; // Needed for Count() extension method
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // List of PDF files to analyse
-        string[] pdfFiles = new string[]
-        {
-            "input1.pdf",
-            "input2.pdf"
-            // add more file names as needed
-        };
+        // Accept PDF file paths via command‑line arguments; if none provided, use a default placeholder.
+        string[] pdfFiles = args.Length > 0 ? args : new[] { "input.pdf" };
 
         foreach (string filePath in pdfFiles)
         {
             if (!File.Exists(filePath))
             {
-                Console.WriteLine($"File not found: {filePath}");
+                Console.Error.WriteLine($"File not found: {filePath}");
                 continue;
             }
 
-            // Open the PDF document inside a using block for deterministic disposal
+            // Ensure deterministic disposal of the Document object.
             using (Document doc = new Document(filePath))
             {
-                // ---------- Count fonts ----------
-                int fontCount = 0;
-                foreach (Page page in doc.Pages)
-                {
-                    // Each page has a Resources.Fonts collection
-                    fontCount += page.Resources.Fonts.Count;
-                }
+                // Number of fonts used in the document – retrieved via FontUtilities.
+                Aspose.Pdf.Text.Font[] fonts = doc.FontUtilities.GetAllFonts();
+                int fontCount = fonts?.Length ?? 0;
 
-                // ---------- Count tables ----------
+                // Number of form fields (AcroForm fields) in the document.
+                int formFieldCount = doc.Form?.Count ?? 0;
+
+                // Number of tables – only available when the PDF is tagged.
                 int tableCount = 0;
-                foreach (Page page in doc.Pages)
+                if (doc.TaggedContent != null)
                 {
-                    // Tables are stored as Paragraph objects of type Aspose.Pdf.Table
-                    foreach (var paragraph in page.Paragraphs)
-                    {
-                        if (paragraph is Table)
-                        {
-                            tableCount++;
-                        }
-                    }
+                    ITaggedContent taggedContent = doc.TaggedContent;
+                    var tables = taggedContent.RootElement.FindElements<TableElement>(true);
+                    tableCount = tables?.Count ?? 0;
                 }
 
-                // ---------- Count form fields ----------
-                int formFieldCount = 0;
-                if (doc.Form != null && doc.Form.Fields != null)
-                {
-                    // Form.Fields implements IEnumerable, use LINQ Count() extension
-                    formFieldCount = doc.Form.Fields.Count();
-                }
-
-                // Output the statistics for the current document
+                // Log the statistics.
                 Console.WriteLine($"Document: {Path.GetFileName(filePath)}");
                 Console.WriteLine($"  Fonts       : {fontCount}");
-                Console.WriteLine($"  Tables      : {tableCount}");
                 Console.WriteLine($"  Form fields : {formFieldCount}");
+                Console.WriteLine($"  Tables      : {tableCount}");
                 Console.WriteLine();
             }
         }

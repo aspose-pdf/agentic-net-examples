@@ -7,63 +7,52 @@ class Program
 {
     static void Main()
     {
-        // Folder containing the PDFs to process
+        // Folder containing source PDFs
         const string inputFolder = "Input";
+        // Folder where annotated PDFs will be saved
+        const string outputFolder = "Output";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
             return;
         }
 
-        // Get all PDF files in the folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the input folder.");
-            return;
-        }
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        foreach (string pdfPath in pdfFiles)
+        // Define the rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y) in points
+        var rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+        // Red border color
+        var borderColor = Color.Red;
+        // Border width in points
+        const int borderWidth = 2;
+
+        // Process each PDF file in the input folder
+        foreach (string sourcePath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            try
+            string fileName   = Path.GetFileName(sourcePath);
+            string targetPath = Path.Combine(outputFolder, fileName);
+
+            // Load the PDF document
+            using (var doc = new Document(sourcePath))
             {
-                // Load the PDF document
-                Document doc = new Document(pdfPath);
-
-                // Define the rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-                // Create a square (rectangular) annotation on the first page
-                SquareAnnotation squareAnn = new SquareAnnotation(doc.Pages[1], rect)
+                // Add the rectangle annotation to the first page (pages are 1‑based)
+                Page page = doc.Pages[1];
+                var square = new SquareAnnotation(page, rect)
                 {
-                    // Set the border color to red (annotation color is the border color)
-                    Color = Aspose.Pdf.Color.Red
+                    // Border colour (Fill colour is not supported in this version, so we omit it)
+                    Color = borderColor
                 };
-
-                // Set the border width – Border requires the owning annotation in its constructor
-                squareAnn.Border = new Border(squareAnn)
-                {
-                    Width = 1
-                };
-
-                // Add the annotation to the page's annotation collection
-                doc.Pages[1].Annotations.Add(squareAnn);
-
-                // Build the output file name (preserves the original)
-                string outputPath = Path.Combine(
-                    Path.GetDirectoryName(pdfPath) ?? string.Empty,
-                    Path.GetFileNameWithoutExtension(pdfPath) + "_annotated.pdf");
+                // Border must be created with the owning annotation instance
+                square.Border = new Border(square) { Width = borderWidth };
+                page.Annotations.Add(square);
 
                 // Save the annotated PDF
-                doc.Save(outputPath);
-
-                Console.WriteLine($"Annotated PDF saved: {outputPath}");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                doc.Save(targetPath);
             }
         }
+
+        Console.WriteLine("Red rectangle annotations added to all PDFs in the Input folder.");
     }
 }

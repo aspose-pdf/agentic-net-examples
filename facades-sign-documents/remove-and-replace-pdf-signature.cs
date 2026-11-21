@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Drawing;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Forms;
 
@@ -9,14 +8,19 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed_input.pdf";
-        const string outputPdf = "resigned_output.pdf";
-        const string certPath = "new_certificate.pfx";
+        // Paths for the original PDF, a temporary PDF without signatures, and the final signed PDF
+        const string inputPdf   = "input.pdf";
+        const string tempPdf    = "temp_no_sig.pdf";
+        const string signedPdf  = "signed_output.pdf";
+
+        // Path to the updated certificate (PFX) and its password
+        const string certPath     = "updated_cert.pfx";
         const string certPassword = "certPassword";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
         if (!File.Exists(certPath))
@@ -25,51 +29,68 @@ class Program
             return;
         }
 
+        // ---------------------------------------------------------------------
+        // 1. Remove the first existing signature (if any) and save to a temp file
+        // ---------------------------------------------------------------------
         try
         {
-            // Bind the PDF to the signature facade
-            using (PdfFileSignature pdfSignature = new PdfFileSignature())
+            using (var remover = new PdfFileSignature())
             {
-                pdfSignature.BindPdf(inputPdf);
-
-                // Remove all existing signatures (if any)
-                var existingSignatures = pdfSignature.GetSignatureNames(true);
-                foreach (var sigName in existingSignatures)
+                remover.BindPdf(inputPdf);
+                var signatures = remover.GetSignatureNames(true);
+                if (signatures != null && signatures.Count > 0)
                 {
-                    pdfSignature.RemoveSignature(sigName);
+                    // Remove the first signature (index 0)
+                    remover.RemoveSignature(signatures[0]);
                 }
-
-                // Create PKCS7 signature object with the new certificate
-                PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
-                {
-                    Reason = "Document updated",
-                    ContactInfo = "contact@example.com",
-                    Location = "New York"
-                };
-
-                // Optional: customise visual appearance of the signature
-                SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
-                {
-                    ShowContactInfo = true,
-                    ShowLocation = true
-                };
-                pkcs7.CustomAppearance = customAppearance;
-
-                // Sign the PDF on the first page at the desired rectangle.
-                // System.Drawing.Rectangle uses (x, y, width, height).
-                // The original Aspose rectangle (100,100,250,150) translates to width=150, height=50.
-                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(100, 100, 150, 50);
-                pdfSignature.Sign(1, true, rect, pkcs7);
-
-                // Save the updated PDF
-                pdfSignature.Save(outputPdf);
+                // Save the PDF that now has no signatures
+                remover.Save(tempPdf);
             }
-
-            Console.WriteLine($"PDF re-signed successfully: {outputPdf}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error removing signature: {ex.Message}");
+            return;
         }
+
+        // ---------------------------------------------------------------------
+        // 2. Sign the PDF (now without signatures) using the updated certificate
+        // ---------------------------------------------------------------------
+        try
+        {
+            // Create a PKCS#7 signature object from the PFX file
+            var pkcs7 = new PKCS7(certPath, certPassword)
+            {
+                Reason = "Document updated",
+                Location = "",
+                ContactInfo = ""
+                // CustomAppearance can be set here if a visible appearance is required
+            };
+
+            using (var signer = new PdfFileSignature())
+            {
+                signer.BindPdf(tempPdf);
+                // Sign on the first page, invisible appearance (visible = false)
+                // Rectangle values are ignored when visible = false, but a dummy rectangle is required.
+                var dummyRect = new Rectangle(0, 0, 0, 0);
+                signer.Sign(1, pkcs7.Reason, pkcs7.ContactInfo, pkcs7.Location, false, dummyRect, pkcs7);
+                signer.Save(signedPdf);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error signing PDF: {ex.Message}");
+            return;
+        }
+        finally
+        {
+            // Delete the temporary file used for the unsigned PDF.
+            if (File.Exists(tempPdf))
+            {
+                try { File.Delete(tempPdf); } catch { /* ignore cleanup errors */ }
+            }
+        }
+
+        Console.WriteLine($"Signed PDF saved to '{signedPdf}'.");
     }
 }

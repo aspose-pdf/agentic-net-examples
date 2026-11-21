@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,34 +15,26 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure the document has at least 8 pages
-            if (doc.Pages.Count < 8)
-            {
-                Console.Error.WriteLine("Document does not contain page 8.");
-                return;
-            }
+        // Load the PDF document (Document API provides page size manipulation)
+        Document pdfDocument = new Document(inputPath);
 
-            // Store the original dimensions of page 8 (width and height in points)
-            double originalWidth  = doc.Pages[8].PageInfo.Width;
-            double originalHeight = doc.Pages[8].PageInfo.Height;
+        const int targetPage = 8; // page number to work with (1‑based)
 
-            // Example modification: change page 8 size to A4 (595 x 842 points)
-            doc.Pages[8].PageInfo.Width  = 595;
-            doc.Pages[8].PageInfo.Height = 842;
+        // Store the original page dimensions before any modification
+        Page page = pdfDocument.Pages[targetPage];
+        double originalWidth = page.PageInfo.Width;
+        double originalHeight = page.PageInfo.Height;
 
-            // ... any other operations could be performed here ...
+        // Example modification: change the page size to A4 dimensions (595 x 842 points)
+        // Use the overload that accepts width and height as doubles.
+        page.SetPageSize(595, 842);
 
-            // Revert page 8 back to its original dimensions using the stored values
-            doc.Pages[8].PageInfo.Width  = originalWidth;
-            doc.Pages[8].PageInfo.Height = originalHeight;
+        // Revert the page size back to the originally stored dimensions
+        page.SetPageSize(originalWidth, originalHeight);
 
-            // Save the resulting PDF
-            doc.Save(outputPath);
-        }
+        // Save the modified PDF to a new file
+        pdfDocument.Save(outputPath);
 
-        Console.WriteLine($"Page 8 size reverted and saved to '{outputPath}'.");
+        Console.WriteLine($"Page {targetPage} size reverted and saved to '{outputPath}'.");
     }
 }

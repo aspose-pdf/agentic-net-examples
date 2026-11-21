@@ -9,8 +9,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string sourceFieldName = "TextField1"; // name of the field to clone
-        const int targetPageNumber = 2; // page where the clone will be placed
 
         if (!File.Exists(inputPath))
         {
@@ -20,44 +18,57 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the source PDF inside a using block for deterministic disposal
             using (Document doc = new Document(inputPath))
             {
-                // Retrieve the original form field and cast it to Field
-                Field sourceField = doc.Form[sourceFieldName] as Field;
-                if (sourceField == null)
+                // Verify that the document contains at least one form field
+                if (doc.Form == null || doc.Form.Count == 0)
                 {
-                    Console.Error.WriteLine($"Form field '{sourceFieldName}' not found or is not a form field.");
+                    Console.WriteLine("No form fields present in the document.");
                     return;
                 }
 
-                // Clone the field (deep copy). The Clone method returns a WidgetAnnotation, so cast it back to Field.
-                Field clonedField = sourceField.Clone() as Field;
-                if (clonedField == null)
+                // Retrieve the first form field (assumed to be a TextBoxField for this example)
+                TextBoxField originalField = doc.Form[0] as TextBoxField;
+                if (originalField == null)
                 {
-                    Console.Error.WriteLine("Failed to clone the form field.");
+                    Console.WriteLine("The first form field is not a TextBoxField.");
                     return;
                 }
 
-                // Modify properties of the cloned field
-                clonedField.PartialName = "Cloned_" + sourceFieldName; // give it a unique name
-                clonedField.Value = "Cloned value"; // set a new default value
+                // Clone the original field (deep copy of its settings)
+                TextBoxField clonedTemplate = (TextBoxField)originalField.Clone();
+
+                // Determine the target page (page numbers are 1‑based)
+                int targetPageNumber = 2;
+                if (doc.Pages.Count < targetPageNumber)
+                {
+                    // Add a blank page if the target page does not exist
+                    doc.Pages.Add();
+                }
 
                 // Define the rectangle where the cloned field will appear
-                Rectangle rect = new Rectangle(100, 500, 200, 550);
-                clonedField.Rect = rect;
+                // (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+                Rectangle rect = new Rectangle(100, 500, 300, 550);
 
-                // Add the cloned field to the form collection
+                // Create a new TextBoxField on the target page using the rectangle.
+                // This effectively places the cloned field on a different page.
+                TextBoxField clonedField = new TextBoxField(doc.Pages[targetPageNumber], rect)
+                {
+                    // Copy desired properties from the cloned template
+                    PartialName = "ClonedField",          // New field name
+                    Value = "Cloned value",               // Default value
+                    // You can copy additional settings here, e.g., Font, FontSize, etc.
+                };
+
+                // Add the cloned field to the document's form collection
                 doc.Form.Add(clonedField);
 
-                // Place the cloned field on the target page using AddFieldAppearance
-                doc.Form.AddFieldAppearance(clonedField, targetPageNumber, rect);
-
-                // Save the updated PDF
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Cloned field saved to '{outputPath}'.");
+            Console.WriteLine($"Cloned form field added and saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

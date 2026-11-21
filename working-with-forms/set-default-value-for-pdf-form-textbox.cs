@@ -7,10 +7,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string fieldName = "myTextField";
-        const string defaultValue = "Enter your name";
+        const string fieldName  = "myTextField";   // name of the form field to modify
+        const string defaultValue = "Enter your name here";
 
         if (!File.Exists(inputPath))
         {
@@ -18,25 +18,34 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the form field by its name
-            TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
-            if (txtField != null)
+            // Ensure the document contains a form
+            if (doc.Form == null || doc.Form.Count == 0)
             {
-                // Set the value that will appear when the PDF is opened
-                txtField.Value = defaultValue;
-            }
-            else
-            {
-                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
+                Console.Error.WriteLine("No form fields found in the document.");
+                return;
             }
 
-            // Save the updated PDF
+            // Retrieve the field by its partial name
+            TextBoxField field = doc.Form[fieldName] as TextBoxField;
+            if (field == null)
+            {
+                Console.Error.WriteLine($"TextBoxField '{fieldName}' not found.");
+                return;
+            }
+
+            // Set the default value that appears when the PDF is opened
+            field.Value = defaultValue;
+
+            // Optionally, make the field read‑only or set other properties here
+            // field.ReadOnly = false;
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with default field value to '{outputPath}'.");
+        Console.WriteLine($"Default value set and saved to '{outputPath}'.");
     }
 }

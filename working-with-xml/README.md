@@ -1,14 +1,15 @@
 # Working with XML
 
-> **Working with XML** in PDF using C# / .NET -- **73** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with XML** in PDF using C# / .NET -- **76** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-xml`
-- Examples: 73
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 76
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-background-images-to-pdf-pages.cs`](./add-background-images-to-pdf-pages.cs) -- Add background images to pdf pages
+- [`add-custom-page-borders-to-pdf.cs`](./add-custom-page-borders-to-pdf.cs) -- Add custom page borders to pdf
 - [`add-header-footer-to-pdf-using-xml-templates.cs`](./add-header-footer-to-pdf-using-xml-templates.cs) -- Add header footer to pdf using xml templates
 - [`add-javascript-actions-to-pdf-from-xml.cs`](./add-javascript-actions-to-pdf-from-xml.cs) -- Add javascript actions to pdf from xml
 - [`add-page-transitions-to-pdf-from-xml.cs`](./add-page-transitions-to-pdf-from-xml.cs) -- Add page transitions to pdf from xml
@@ -28,6 +29,7 @@
 - [`convert-xml-to-pdf-with-xslt.cs`](./convert-xml-to-pdf-with-xslt.cs) -- Convert xml to pdf with xslt
 - [`convert-xml-to-pdf.cs`](./convert-xml-to-pdf.cs) -- Convert xml to pdf
 - [`convert-xml-to-pdfa-2b-and-validate.cs`](./convert-xml-to-pdfa-2b-and-validate.cs) -- Convert xml to pdfa 2b and validate
+- [`create-barcodes-pdf-from-xml.cs`](./create-barcodes-pdf-from-xml.cs) -- Create barcodes pdf from xml
 - [`create-hierarchical-pdf-outline-from-xml.cs`](./create-hierarchical-pdf-outline-from-xml.cs) -- Create hierarchical pdf outline from xml
 - [`create-pdf-from-xsl-fo-memory-stream.cs`](./create-pdf-from-xsl-fo-memory-stream.cs) -- Create pdf from xsl fo memory stream
 - [`create-pdf-outline-from-xml.cs`](./create-pdf-outline-from-xml.cs) -- Create pdf outline from xml
@@ -54,6 +56,7 @@
 - [`generate-pdf-from-xml-using-xslt-config.cs`](./generate-pdf-from-xml-using-xslt-config.cs) -- Generate pdf from xml using xslt config
 - [`generate-pdf-from-xsl-fo.cs`](./generate-pdf-from-xsl-fo.cs) -- Generate pdf from xsl fo
 - [`generate-pdf-table-from-xml.cs`](./generate-pdf-table-from-xml.cs) -- Generate pdf table from xml
+- [`generate-qr-codes-from-xml-to-pdf.cs`](./generate-qr-codes-from-xml-to-pdf.cs) -- Generate qr codes from xml to pdf
 - [`handle-malformed-xml-pdf-conversion.cs`](./handle-malformed-xml-pdf-conversion.cs) -- Handle malformed xml pdf conversion
 - [`handle-xslfo-parsing-errors-pdf-generation.cs`](./handle-xslfo-parsing-errors-pdf-generation.cs) -- Handle xslfo parsing errors pdf generation
 - [`insert-automatic-page-numbers-pdf-xslt.cs`](./insert-automatic-page-numbers-pdf-xslt.cs) -- Insert automatic page numbers pdf xslt

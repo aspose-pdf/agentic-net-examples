@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,126 +7,107 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_modified.pdf";
         const string logPath = "field_modifications.log";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
         // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
-        // Open the log file inside its own using block
-        using (StreamWriter logWriter = new StreamWriter(logPath, false))
+        using (Document doc = new Document(inputPath))
         {
-            // Ensure the document actually contains a form
-            if (doc.Form == null || doc.Form.Fields == null || doc.Form.Fields.Count() == 0)
+            // Open the log file for appending; each modification will be written here
+            using (StreamWriter log = new StreamWriter(logPath, append: true))
             {
-                Console.WriteLine("No form fields found in the document.");
-                doc.Save(outputPdf); // Save unchanged document
-                return;
-            }
-
-            // Iterate over each form field
-            foreach (Field field in doc.Form.Fields)
-            {
-                string fieldName = field.FullName ?? field.PartialName ?? "(unnamed)";
-                string oldValue = GetFieldValue(field);
-                string newValue = oldValue; // default to unchanged
-
-                // Apply modifications based on field type
-                if (field is TextBoxField txt)
+                // Iterate over all form fields in the document
+                foreach (Field field in doc.Form)
                 {
-                    newValue = "Updated Text";
-                    txt.Value = newValue;
-                }
-                else
-                {
-                    // Use runtime type inspection for field types that may not be present in all Aspose.Pdf versions
-                    string typeName = field.GetType().Name;
+                    // Capture the original value of the field
+                    string oldValue = GetFieldValue(field);
+                    string newValue = oldValue;
+                    bool modified = false;
 
-                    if (typeName == "CheckBoxField")
+                    // Example modification logic for different field types
+                    if (field is TextBoxField txt)
                     {
-                        dynamic chk = field;
-                        chk.Checked = !chk.Checked; // toggle
+                        txt.Value = "Sample Text";
+                        newValue = txt.Value ?? string.Empty;
+                        modified = true;
+                    }
+                    else if (field is CheckboxField chk)
+                    {
+                        chk.Checked = true;
                         newValue = chk.Checked.ToString();
+                        modified = true;
                     }
-                    else if (typeName == "RadioButtonListField" || typeName == "RadioButtonOptionField")
+                    else if (field is RadioButtonField radGroup)
                     {
-                        dynamic rbl = field;
-                        if (rbl.Options != null && rbl.Options.Count > 0)
+                        // Select the first option if any are defined (Options collection is 1‑based)
+                        if (radGroup.Options.Count > 0)
                         {
-                            rbl.Selected = rbl.Options[0];
-                            newValue = rbl.Selected ?? string.Empty;
+                            radGroup.Selected = 1; // 1‑based index
+                            newValue = radGroup.Value ?? string.Empty;
+                            modified = true;
                         }
                     }
-                    else if (typeName == "ListBoxField")
+                    else if (field is ListBoxField list)
                     {
-                        dynamic lst = field;
-                        if (lst.Options != null && lst.Options.Count > 0)
+                        if (list.Options.Count > 0)
                         {
-                            // Assign a new array containing the first option
-                            lst.SelectedItems = new string[] { lst.Options[0] };
-                            newValue = string.Join(", ", lst.SelectedItems);
+                            // SelectedItems is an int[] of 1‑based indices
+                            list.SelectedItems = new[] { 1 };
+                            newValue = string.Join(", ", list.SelectedItems);
+                            modified = true;
                         }
                     }
-                    else if (typeName == "ComboBoxField")
+                    else if (field is ComboBoxField combo)
                     {
-                        dynamic cmb = field;
-                        if (cmb.Options != null && cmb.Options.Count > 0)
+                        if (combo.Options.Count > 0)
                         {
-                            cmb.Selected = cmb.Options[0];
-                            newValue = cmb.Selected ?? string.Empty;
+                            combo.Selected = 1; // 1‑based index
+                            newValue = combo.Value ?? string.Empty;
+                            modified = true;
                         }
                     }
-                    // Add other field types as needed using the same pattern
-                }
 
-                // Log the modification (only if value changed)
-                if (!string.Equals(oldValue, newValue, StringComparison.Ordinal))
-                {
-                    logWriter.WriteLine($"{DateTime.UtcNow:u} | Field: {fieldName} | Old Value: \"{oldValue}\" | New Value: \"{newValue}\"");
+                    // If the field was changed, write an audit entry
+                    if (modified)
+                    {
+                        string logEntry = $"{DateTime.UtcNow:O}\tFieldName: {field.FullName}\tOldValue: {oldValue}\tNewValue: {newValue}";
+                        log.WriteLine(logEntry);
+                    }
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdf);
+            // Save the modified PDF; Save() is called inside the using block
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processing complete. Modified PDF saved to '{outputPdf}'. Log written to '{logPath}'.");
+        Console.WriteLine($"Processing completed. Modified PDF saved to '{outputPath}'. Log written to '{logPath}'.");
     }
 
-    // Helper method to retrieve a field's current value as string
-    private static string GetFieldValue(Field field)
+    // Helper method to obtain a string representation of a field's current value
+    static string GetFieldValue(Field field)
     {
-        if (field is TextBoxField txt)
-            return txt.Value ?? string.Empty;
-
-        string typeName = field.GetType().Name;
-        if (typeName == "CheckBoxField")
+        switch (field)
         {
-            dynamic chk = field;
-            return chk.Checked.ToString();
+            case TextBoxField txt:
+                return txt.Value ?? string.Empty;
+            case CheckboxField chk:
+                return chk.Checked.ToString();
+            case RadioButtonField rad:
+                return rad.Value ?? string.Empty;
+            case ListBoxField list:
+                // ListBoxField does not expose selected text directly; use SelectedItems indices
+                return string.Join(", ", list.SelectedItems);
+            case ComboBoxField combo:
+                return combo.Value ?? string.Empty;
+            default:
+                return string.Empty;
         }
-        if (typeName == "RadioButtonListField" || typeName == "RadioButtonOptionField")
-        {
-            dynamic rbl = field;
-            return rbl.Selected ?? string.Empty;
-        }
-        if (typeName == "ListBoxField")
-        {
-            dynamic lst = field;
-            var items = lst.SelectedItems as string[];
-            return items != null ? string.Join(", ", items) : string.Empty;
-        }
-        if (typeName == "ComboBoxField")
-        {
-            dynamic cmb = field;
-            return cmb.Selected ?? string.Empty;
-        }
-        return string.Empty;
     }
 }

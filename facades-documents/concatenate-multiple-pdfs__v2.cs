@@ -3,46 +3,80 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-class Program
+namespace AsposePdfConcatConsole
 {
-    static void Main(string[] args)
+    class Program
     {
-        // The console version expects file paths as arguments.
-        // Example: dotnet run file1.pdf file2.pdf [file3.pdf ...]
-        if (args.Length < 2)
+        /// <summary>
+        /// Entry point for the console application.
+        /// The program expects one or more file paths to PDF files as command‑line arguments.
+        /// It concatenates the PDFs and writes the result to "concatenated.pdf" in the current directory.
+        /// This mimics the behaviour of the original HTTP service, but is implemented as a pure console app
+        /// because the project does not reference Microsoft.AspNetCore assemblies.
+        /// </summary>
+        static void Main(string[] args)
         {
-            Console.WriteLine("Usage: <exe> <pdf1> <pdf2> [<pdf3> ...]");
-            return;
-        }
+            if (args.Length == 0)
+            {
+                Console.WriteLine("Usage: AsposePdfConcatConsole <pdf1> <pdf2> [<pdf3> ...]");
+                return;
+            }
 
-        var inputPaths = new List<string>();
-        foreach (var arg in args)
-        {
-            if (File.Exists(arg))
-                inputPaths.Add(arg);
-            else
-                Console.WriteLine($"Warning: file not found '{arg}' – ignored.");
-        }
+            // Validate that all supplied files exist and have a .pdf extension.
+            var inputFiles = new List<string>();
+            foreach (var path in args)
+            {
+                if (!File.Exists(path))
+                {
+                    Console.WriteLine($"Error: File not found – {path}");
+                    return;
+                }
+                if (!path.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine($"Error: File is not a PDF – {path}");
+                    return;
+                }
+                inputFiles.Add(path);
+            }
 
-        if (inputPaths.Count < 2)
-        {
-            Console.WriteLine("At least two existing PDF files are required.");
-            return;
-        }
+            // Open each PDF as a read‑only stream. Streams are disposed in the finally block.
+            var inputStreams = new List<Stream>();
+            try
+            {
+                foreach (var file in inputFiles)
+                {
+                    // OpenRead returns a FileStream that must be disposed.
+                    var stream = File.OpenRead(file);
+                    inputStreams.Add(stream);
+                }
 
-        // Create a temporary file for the merged PDF.
-        string outputPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".pdf");
+                // Prepare an output stream that will hold the concatenated PDF.
+                using var outputStream = new MemoryStream();
 
-        try
-        {
-            // PdfFileEditor does not implement IDisposable, so no using block is needed.
-            var editor = new PdfFileEditor();
-            editor.Concatenate(inputPaths.ToArray(), outputPath);
-            Console.WriteLine($"Merged PDF created at: {outputPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error during concatenation: {ex.Message}");
+                // PdfFileEditor does not implement IDisposable, so we instantiate it directly.
+                var editor = new PdfFileEditor();
+
+                // Concatenate the PDFs. The API expects an array of streams for the source PDFs.
+                editor.Concatenate(inputStreams.ToArray(), outputStream);
+
+                // Reset the position to the beginning before saving.
+                outputStream.Position = 0;
+
+                // Write the concatenated PDF to a file (simulating an HTTP response body).
+                const string outputPath = "concatenated.pdf";
+                using var fileStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write);
+                outputStream.CopyTo(fileStream);
+
+                Console.WriteLine($"Successfully concatenated {inputFiles.Count} PDF(s) to '{outputPath}'.");
+            }
+            finally
+            {
+                // Ensure all input streams are disposed to release file handles.
+                foreach (var s in inputStreams)
+                {
+                    s.Dispose();
+                }
+            }
         }
     }
 }

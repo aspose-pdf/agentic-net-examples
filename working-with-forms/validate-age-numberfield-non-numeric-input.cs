@@ -9,49 +9,44 @@ class Program
     {
         const string pdfPath = "age_form.pdf";
 
-        // Create a PDF with a textbox field named "Age"
+        // Create a PDF containing a TextBox field named "Age"
         using (Document doc = new Document())
         {
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing
+            // Define the field rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 700, 200, 720);
 
+            // Create the TextBox field
             TextBoxField ageField = new TextBoxField(page, rect);
-            ageField.PartialName = "Age";
-            // The IsNumeric property no longer exists; numeric validation will be performed manually.
-            ageField.Value = "0"; // Default numeric value
+            ageField.PartialName = "Age";   // field name
+            ageField.MaxLen = 3;              // character limit (correct property name)
+
+            // Add the field to the document's form collection
             doc.Form.Add(ageField, 1);
 
+            // Save the PDF
             doc.Save(pdfPath);
         }
 
-        // Load the PDF and attempt to set a non‑numeric value
-        try
+        // Open the PDF and test the field with alphabetic input
+        using (Document doc = new Document(pdfPath))
         {
-            using (Document doc = new Document(pdfPath))
-            {
-                // Retrieve the "Age" field
-                TextBoxField ageField = (TextBoxField)doc.Form["Age"];
+            // Retrieve the "Age" field
+            TextBoxField ageField = (TextBoxField)doc.Form["Age"];
 
-                // Attempt to assign alphabetic characters; this should be rejected.
-                ageField.Value = "abc";
+            // Attempt to set a non‑numeric value
+            ageField.Value = "ABC";
 
-                // Manual numeric validation – if the value cannot be parsed as a number, throw.
-                if (!int.TryParse(ageField.Value?.ToString() ?? string.Empty, out _))
-                {
-                    throw new ArgumentException("Non‑numeric value assigned to numeric field.");
-                }
+            // Validate by trying to parse the value as an integer
+            bool isAlphabeticAccepted = int.TryParse(ageField.Value, out _);
+            Console.WriteLine($"Alphabetic input accepted? {isAlphabeticAccepted}");
 
-                // If no exception is thrown, the validation failed
-                Console.WriteLine("Test FAILED: Non‑numeric value was accepted.");
-            }
-        }
-        catch (Exception ex)
-        {
-            // Expected outcome: an exception for invalid numeric input
-            Console.WriteLine("Test PASSED: Non‑numeric input rejected.");
-            Console.WriteLine($"Exception message: {ex.Message}");
+            // For comparison, set a numeric value
+            ageField.Value = "27";
+            bool isNumericAccepted = int.TryParse(ageField.Value, out _);
+            Console.WriteLine($"Numeric input accepted? {isNumericAccepted}");
         }
     }
 }

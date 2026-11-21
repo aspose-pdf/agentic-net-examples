@@ -1,89 +1,66 @@
 using System;
 using System.IO;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+
+// Suppress known NuGet vulnerability warnings (NU1902, NU1903)
+#pragma warning disable NU1902, NU1903
 
 class AnnotationRemovalReport
 {
     static void Main()
     {
-        // ---------------------------------------------------------------------
-        // Resolve folders in a safe, OS‑agnostic way.
-        // ---------------------------------------------------------------------
+        // Resolve base directory to make the sample portable
         string baseDir = AppDomain.CurrentDomain.BaseDirectory;
         string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        string outputFolder = Path.Combine(baseDir, "OutputPdfs");
-        const string reportFileName = "annotation_report.txt";
+        string outputFolder = Path.Combine(baseDir, "CleanedPdfs");
+        string reportPath = Path.Combine(baseDir, "AnnotationRemovalReport.txt");
 
-        // If the expected InputPdfs folder does not exist, fall back to the current
-        // working directory and inform the user. This prevents DirectoryNotFoundException
-        // at runtime when the sample is executed out‑of‑the‑box.
+        // Ensure folders exist
         if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input folder '{inputFolder}' not found. Using current directory as fallback.");
-            inputFolder = Directory.GetCurrentDirectory();
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
         }
-
-        // Ensure the output folder exists – CreateDirectory is a no‑op if it already does.
         Directory.CreateDirectory(outputFolder);
 
-        // ---------------------------------------------------------------------
-        // Build the CSV report in memory.
-        // ---------------------------------------------------------------------
-        using (StringWriter reportWriter = new StringWriter())
+        StringBuilder reportBuilder = new StringBuilder();
+        reportBuilder.AppendLine("FileName,AnnotationsRemoved");
+
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            reportWriter.WriteLine("FileName,AnnotationsRemoved");
+            string fileName = Path.GetFileName(pdfPath);
+            string cleanedPath = Path.Combine(outputFolder, fileName);
 
-            string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-            if (pdfFiles.Length == 0)
+            int annotationCount = 0;
+
+            // Count existing annotations (deterministic disposal via using)
+            using (Document doc = new Document(pdfPath))
             {
-                Console.WriteLine($"No PDF files found in '{inputFolder}'.");
-            }
-
-            foreach (string inputFile in pdfFiles)
-            {
-                try
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    string fileName = Path.GetFileName(inputFile);
-                    string outputFile = Path.Combine(outputFolder, fileName);
-
-                    // -----------------------------------------------------------------
-                    // 1. Count existing annotations using the high‑level Document API.
-                    // -----------------------------------------------------------------
-                    int removedCount = 0;
-                    using (Document pdfDoc = new Document(inputFile))
-                    {
-                        foreach (Page page in pdfDoc.Pages)
-                        {
-                            removedCount += page.Annotations.Count;
-                        }
-                    }
-
-                    // -----------------------------------------------------------------
-                    // 2. Delete all annotations and save the cleaned PDF.
-                    // -----------------------------------------------------------------
-                    using (PdfAnnotationEditor annotEditor = new PdfAnnotationEditor())
-                    {
-                        annotEditor.BindPdf(inputFile);
-                        annotEditor.DeleteAnnotations();
-                        annotEditor.Save(outputFile);
-                    }
-
-                    // Record the result in the CSV report.
-                    reportWriter.WriteLine($"{fileName},{removedCount}");
-                }
-                catch (Exception ex)
-                {
-                    // Log the error but continue processing the remaining files.
-                    Console.Error.WriteLine($"Error processing '{inputFile}': {ex.Message}");
+                    Page page = doc.Pages[i];
+                    annotationCount += page.Annotations.Count;
                 }
             }
 
-            // Write the report next to the executable (or wherever the base directory points).
-            string reportPath = Path.Combine(baseDir, reportFileName);
-            File.WriteAllText(reportPath, reportWriter.ToString());
+            // Delete all annotations using PdfAnnotationEditor (Facades API)
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                editor.BindPdf(pdfPath);
+                editor.DeleteAnnotations();
+                editor.Save(cleanedPath);
+            }
+
+            // Append result to the report
+            reportBuilder.AppendLine($"{fileName},{annotationCount}");
         }
 
-        Console.WriteLine("Annotation removal completed. Report saved to 'annotation_report.txt'.");
+        // Write the report to disk
+        File.WriteAllText(reportPath, reportBuilder.ToString());
+        Console.WriteLine($"Annotation removal report written to: {reportPath}");
     }
 }
+#pragma warning restore NU1902, NU1903

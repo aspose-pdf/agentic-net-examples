@@ -3,95 +3,142 @@ using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added for TextFragment and related types
 
-class PdfAnnotationExtractor
+public static class AnnotationExtractor
 {
     /// <summary>
-    /// Extracts every annotation rectangle from the input PDF and creates a separate
-    /// one‑page PDF for each rectangle. The generated pages are then concatenated
-    /// into a single PDF for visual inspection.
+    /// Extracts all annotation rectangles from the input PDF and creates a new PDF where each
+    /// annotation is visualised on its own page as a red rectangle (with optional type label).
     /// </summary>
     /// <param name="inputPdfPath">Path to the source PDF.</param>
-    /// <param name="outputPdfPath">Path where the result PDF will be saved.</param>
-    public static void ExtractAnnotationsToPages(string inputPdfPath, string outputPdfPath)
+    /// <param name="outputPdfPath">Path where the visualisation PDF will be saved.</param>
+    public static void ExtractAnnotationRectangles(string inputPdfPath, string outputPdfPath)
     {
         if (!File.Exists(inputPdfPath))
-        {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
-            return;
-        }
+            throw new FileNotFoundException($"Input file not found: {inputPdfPath}");
 
-        // List to hold temporary one‑page PDFs.
-        List<string> tempFiles = new List<string>();
-
-        // Load the source document.
-        using (Document srcDoc = new Document(inputPdfPath))
+        // --------------------------------------------------------------------
+        // 1. Load the source PDF and retrieve annotation information using the
+        //    Document API (recommended over PdfAnnotationEditor for newer versions).
+        // --------------------------------------------------------------------
+        Document srcDoc = new Document(inputPdfPath);
+        var annotationInfos = new List<(Aspose.Pdf.Rectangle Rect, string Type)>( );
+        foreach (Page page in srcDoc.Pages)
         {
-            // Iterate through all pages (Aspose.Pdf uses 1‑based indexing).
-            for (int pageIndex = 1; pageIndex <= srcDoc.Pages.Count; pageIndex++)
+            foreach (Annotation annot in page.Annotations)
             {
-                Page srcPage = srcDoc.Pages[pageIndex];
+                // Guard against missing rectangle (should not happen)
+                if (annot.Rect == null)
+                    continue;
 
-                // Iterate over each annotation on the current page.
-                foreach (Annotation annot in srcPage.Annotations)
-                {
-                    // Create a temporary one‑page document that will contain a visual
-                    // representation of the annotation rectangle.
-                    using (Document tempDoc = new Document())
-                    {
-                        // Add a new page with the same size as the source page.
-                        Page newPage = tempDoc.Pages.Add();
-                        newPage.PageInfo.Width = srcPage.PageInfo.Width;
-                        newPage.PageInfo.Height = srcPage.PageInfo.Height;
-
-                        // The annotation rectangle is an Aspose.Pdf.Rectangle.
-                        // Use the fully qualified name to avoid ambiguity.
-                        Aspose.Pdf.Rectangle rect = annot.Rect; // <-- Fixed property name
-
-                        // Add a square annotation (red border) to visualize the rectangle.
-                        SquareAnnotation visual = new SquareAnnotation(newPage, rect);
-                        visual.Color = Aspose.Pdf.Color.Red;
-                        visual.Opacity = 0.5; // semi‑transparent for easier viewing
-                        newPage.Annotations.Add(visual);
-
-                        // Save the temporary one‑page PDF to a unique file.
-                        string tempPath = Path.Combine(Path.GetTempPath(),
-                                                       Guid.NewGuid().ToString() + ".pdf");
-                        tempDoc.Save(tempPath);
-                        tempFiles.Add(tempPath);
-                    }
-                }
+                // Annotation.Type returns an enum; we store its name for the label.
+                string typeName = annot.AnnotationType.ToString();
+                annotationInfos.Add((annot.Rect, typeName));
             }
         }
 
-        // If no annotations were found, inform the user and exit.
-        if (tempFiles.Count == 0)
+        // --------------------------------------------------------------------
+        // 2. Create a new PDF document that will hold the visualisation pages.
+        //    The document is wrapped in a using block as required by the
+        //    document-disposal-with-using rule.
+        // --------------------------------------------------------------------
+        using (Document outDoc = new Document())
         {
-            Console.WriteLine("No annotations found in the source PDF.");
+            const double margin = 20.0; // margin around the extracted rectangle
+
+            // If there are no annotations, create an empty document with a single page
+            // indicating that no annotations were found.
+            if (annotationInfos.Count == 0)
+            {
+                Page emptyPage = outDoc.Pages.Add();
+                emptyPage.PageInfo.Width = 300;
+                emptyPage.PageInfo.Height = 100;
+                TextFragment tf = new TextFragment("No annotations found in the source PDF.");
+                tf.TextState.FontSize = 12;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                tf.Position = new Position(10, 80);
+                emptyPage.Paragraphs.Add(tf);
+            }
+            else
+            {
+                // ----------------------------------------------------------------
+                // 3. For each annotation, create a new page that visualises the
+                //    annotation rectangle.
+                // ----------------------------------------------------------------
+                foreach (var info in annotationInfos)
+                {
+                    // Create a new page
+                    Page page = outDoc.Pages.Add();
+
+                    // Compute rectangle dimensions
+                    double rectWidth = info.Rect.URX - info.Rect.LLX;
+                    double rectHeight = info.Rect.URY - info.Rect.LLY;
+
+                    // Set page size (rectangle + margins + space for label)
+                    page.PageInfo.Width = rectWidth + 2 * margin;
+                    page.PageInfo.Height = rectHeight + 2 * margin + 30; // extra space for label
+
+                    // Translate the original rectangle to page coordinates (origin at margin)
+                    Aspose.Pdf.Rectangle pageRect = new Aspose.Pdf.Rectangle(
+                        margin,
+                        margin,
+                        margin + rectWidth,
+                        margin + rectHeight);
+
+                    // ----------------------------------------------------------------
+                    // 4. Add a red rectangle annotation to visualise the bounds.
+                    // ----------------------------------------------------------------
+                    // NOTE: Aspose.Pdf uses SquareAnnotation for rectangular shapes.
+                    SquareAnnotation rectAnnot = new SquareAnnotation(page, pageRect);
+                    rectAnnot.Color = Aspose.Pdf.Color.Red;                     // border color
+                    rectAnnot.Border = new Border(rectAnnot) { Width = 2 };     // thicker border
+                    page.Annotations.Add(rectAnnot);
+
+                    // ----------------------------------------------------------------
+                    // 5. Optionally add a text annotation above the rectangle showing the type.
+                    // ----------------------------------------------------------------
+                    Aspose.Pdf.Rectangle labelRect = new Aspose.Pdf.Rectangle(
+                        margin,
+                        margin + rectHeight + 5,
+                        margin + rectWidth,
+                        margin + rectHeight + 25);
+
+                    TextAnnotation labelAnnot = new TextAnnotation(page, labelRect);
+                    labelAnnot.Title = "Annotation";
+                    labelAnnot.Contents = $"Type: {info.Type}";
+                    labelAnnot.Color = Aspose.Pdf.Color.LightGray;
+                    page.Annotations.Add(labelAnnot);
+                }
+            }
+
+            // --------------------------------------------------------------------
+            // 6. Save the resulting PDF.
+            // --------------------------------------------------------------------
+            outDoc.Save(outputPdfPath);
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    // Entry point required for a console‑application build. It simply forwards
+    // the command‑line arguments to the extractor method.
+    // ------------------------------------------------------------------------
+    public static void Main(string[] args)
+    {
+        if (args.Length != 2)
+        {
+            Console.WriteLine("Usage: AnnotationExtractor <inputPdfPath> <outputPdfPath>");
             return;
         }
 
-        // Use Aspose.Pdf.Facades.PdfFileEditor to concatenate all temporary PDFs
-        // into the final output PDF.
-        PdfFileEditor editor = new PdfFileEditor();
-        editor.Concatenate(tempFiles.ToArray(), outputPdfPath);
-
-        // Clean up temporary files.
-        foreach (string file in tempFiles)
+        try
         {
-            try { File.Delete(file); } catch { /* ignore cleanup errors */ }
+            ExtractAnnotationRectangles(args[0], args[1]);
+            Console.WriteLine($"Annotation visualisation PDF saved to: {args[1]}");
         }
-
-        Console.WriteLine($"Annotation pages saved to: {outputPdfPath}");
-    }
-
-    // Example usage.
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "annotations_visual.pdf";
-
-        ExtractAnnotationsToPages(inputPath, outputPath);
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

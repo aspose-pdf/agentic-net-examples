@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,45 +8,48 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmlPath = "barcode_values.xml";
+        const string inputPdfPath = "input.pdf";
+        const string outputXmlPath = "barcodes.xml";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Create an XML writer to generate the output file
-            using (XmlWriter writer = XmlWriter.Create(xmlPath, new XmlWriterSettings { Indent = true }))
-            {
-                writer.WriteStartDocument();
-                writer.WriteStartElement("Barcodes");
+            // Prepare an XML document to hold barcode values
+            XDocument xmlDoc = new XDocument(new XElement("Barcodes"));
 
-                // Iterate over all form fields in the PDF
-                foreach (Field field in doc.Form.Fields)
+            // Ensure the PDF actually contains a form with fields
+            var form = pdfDoc.Form;
+            if (form != null && form.Fields != null)
+            {
+                foreach (var field in form.Fields)
                 {
-                    // Process only barcode fields
+                    // Identify barcode fields by type (BarcodeField)
                     if (field is BarcodeField barcodeField)
                     {
-                        string fieldName = barcodeField.FullName; // name of the barcode field
-                        string barcodeValue = barcodeField.Value; // extracted barcode value
+                        // Use the field's name as an identifier
+                        string fieldName = barcodeField.Name ?? "UnnamedBarcode";
 
-                        writer.WriteStartElement("Barcode");
-                        writer.WriteAttributeString("Name", fieldName);
-                        writer.WriteString(barcodeValue ?? string.Empty);
-                        writer.WriteEndElement(); // </Barcode>
+                        // Retrieve the barcode value (as string). The Value property may be null.
+                        string barcodeValue = barcodeField.Value?.ToString() ?? string.Empty;
+
+                        // Add an element to the XML
+                        XElement barcodeElement = new XElement("Barcode",
+                            new XAttribute("name", fieldName),
+                            barcodeValue);
+                        xmlDoc.Root.Add(barcodeElement);
                     }
                 }
-
-                writer.WriteEndElement(); // </Barcodes>
-                writer.WriteEndDocument();
             }
-        }
 
-        Console.WriteLine($"Barcode values exported to '{xmlPath}'.");
+            // Save the XML file
+            xmlDoc.Save(outputXmlPath);
+            Console.WriteLine($"Exported barcode values to '{outputXmlPath}'.");
+        }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Reflection;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -17,57 +16,42 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document with deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPath);
-
-            // Attempt to set continuous view mode using ViewerPreferences.
-            // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
-            // Access it via dynamic to keep the code compilable with older versions.
-            try
+            // Try to configure viewer preferences via reflection – this works with newer
+            // Aspose.Pdf versions that expose the ViewerPreferences property and safely
+            // degrades when the property is absent (e.g., older library versions).
+            PropertyInfo viewerPrefsProp = typeof(Document).GetProperty("ViewerPreferences");
+            if (viewerPrefsProp != null)
             {
-                dynamic docDyn = pdfDocument;
-
-                // Ensure the ViewerPreferences object exists (newer versions create it lazily).
-                if (docDyn.ViewerPreferences == null)
+                object viewerPrefs = viewerPrefsProp.GetValue(doc);
+                if (viewerPrefs != null)
                 {
-                    // Use reflection to avoid a compile‑time dependency on the ViewerPreferences type.
-                    // This works even if the type is absent in older library versions.
-                    const string vpFullName = "Aspose.Pdf.ViewerPreferences, Aspose.Pdf";
-                    Type vpType = Type.GetType(vpFullName);
-                    if (vpType != null)
+                    // Set PageLayout = OneColumn (continuous scrolling)
+                    PropertyInfo pageLayoutProp = viewerPrefs.GetType().GetProperty("PageLayout");
+                    if (pageLayoutProp != null && pageLayoutProp.CanWrite)
                     {
-                        docDyn.ViewerPreferences = Activator.CreateInstance(vpType);
+                        pageLayoutProp.SetValue(viewerPrefs, PageLayout.OneColumn);
                     }
-                    else
+
+                    // Optional: keep default page mode (UseNone)
+                    PropertyInfo pageModeProp = viewerPrefs.GetType().GetProperty("PageMode");
+                    if (pageModeProp != null && pageModeProp.CanWrite)
                     {
-                        // If the type cannot be found, we simply skip setting preferences.
-                        Console.WriteLine("ViewerPreferences type is not available in the current Aspose.Pdf library version. Continuous view mode will not be applied.");
+                        pageModeProp.SetValue(viewerPrefs, PageMode.UseNone);
                     }
                 }
-
-                // Set continuous scrolling (OneColumn layout) if the property is present.
-                // This will be a runtime operation; if the property does not exist, a RuntimeBinderException is thrown.
-                docDyn.ViewerPreferences.PageLayout = PageLayout.OneColumn;
             }
-            catch (RuntimeBinderException)
+            else
             {
-                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version. Continuous view mode will not be applied.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Unexpected error while configuring viewer preferences: {ex.Message}");
+                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf version. The PDF will be saved without explicit viewer preferences.");
             }
 
-            // Save the modified PDF
-            pdfDocument.Save(outputPath);
+            // Save the (potentially) modified PDF
+            doc.Save(outputPath);
+        }
 
-            Console.WriteLine($"Continuous view mode applied (if supported). Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"PDF saved with continuous view mode (if supported): '{outputPath}'.");
     }
 }

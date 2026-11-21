@@ -18,10 +18,10 @@ class Program
             return;
         }
 
-        // List to hold extracted stamp texts
+        // Collect all stamp texts (or icon names) from the PDF
         List<string> stampTexts = new List<string>();
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Document must be wrapped in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Pages are 1‑based in Aspose.Pdf
@@ -32,13 +32,16 @@ class Program
                 // Iterate over all annotations on the page
                 foreach (Annotation annotation in page.Annotations)
                 {
-                    // StampAnnotation represents a PDF stamp
-                    if (annotation is StampAnnotation stampAnno)
+                    // StampAnnotation represents both text and image stamps
+                    if (annotation is StampAnnotation stamp)
                     {
-                        // The textual content of the stamp is stored in the Contents property
-                        if (!string.IsNullOrEmpty(stampAnno.Contents))
+                        // The StampIcon enum does not contain a "None" member.
+                        // For built‑in stamp types the enum value is defined, for custom
+                        // image stamps the value is undefined (usually 0). We therefore
+                        // add the icon name only when the enum value is a defined member.
+                        if (Enum.IsDefined(typeof(StampIcon), stamp.Icon))
                         {
-                            stampTexts.Add(stampAnno.Contents);
+                            stampTexts.Add(stamp.Icon.ToString());
                         }
                     }
                 }
@@ -50,7 +53,6 @@ class Program
 
         // Write JSON to file
         File.WriteAllText(outputJsonPath, json);
-
         Console.WriteLine($"Extracted {stampTexts.Count} stamp text(s) to '{outputJsonPath}'.");
     }
 }

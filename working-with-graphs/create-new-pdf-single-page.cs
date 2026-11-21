@@ -7,16 +7,16 @@ class Program
     {
         const string outputPath = "single_page.pdf";
 
-        // Wrap Document in a using block for deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single default‑size page (A4 by default)
+            // Add a default‑size page to the document
             doc.Pages.Add();
 
-            // Save the PDF document
+            // Save the document as a PDF file
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF created at: {outputPath}");
     }
 }

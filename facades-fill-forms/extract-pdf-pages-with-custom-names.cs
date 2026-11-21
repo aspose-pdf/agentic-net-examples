@@ -2,81 +2,68 @@ using System;
 using System.Data;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Create a minimal template PDF that the example can work with.
-        // The number of pages is based on the maximum page index required by the naming table.
-        DataTable namingTable = GetNamingTable();
-        int maxPage = GetMaxPageNumber(namingTable);
-        const string templatePath = "template.pdf";
-        CreateTemplatePdf(templatePath, maxPage);
+        // Prepare a DataTable with a column that will be used for naming PDF pages/files
+        DataTable table = new DataTable();
+        table.Columns.Add("PageName", typeof(string));
+        table.Rows.Add("Introduction");
+        table.Rows.Add("Chapter1");
+        table.Rows.Add("Chapter2");
+        table.Rows.Add("Conclusion");
 
-        // PdfFileEditor provides page‑level operations without needing a Document instance.
-        PdfFileEditor editor = new PdfFileEditor();
+        // Path for the temporary combined PDF that will hold all pages
+        string combinedPdfPath = Path.Combine(Path.GetTempPath(), "combined.pdf");
 
-        // Ensure the output folder exists once.
-        const string outputFolder = "Output";
-        Directory.CreateDirectory(outputFolder);
-
-        foreach (DataRow row in namingTable.Rows)
-        {
-            // Safely retrieve the page number and the custom file name.
-            int pageNumber = row.Field<int>("Page");
-            string customFileName = row.Field<string>("FileName") ?? $"Page_{pageNumber}.pdf";
-
-            // Build a full output path.
-            string outputPath = Path.Combine(outputFolder, customFileName);
-
-            // Extract the specified page and save it using the custom file name.
-            // PdfFileEditor.Extract(string inputFile, int[] pages, string outputFile)
-            editor.Extract(templatePath, new int[] { pageNumber }, outputPath);
-        }
-
-        Console.WriteLine("All pages have been extracted with custom names.");
-    }
-
-    // Creates a PDF with the requested number of blank pages.
-    private static void CreateTemplatePdf(string path, int pageCount)
-    {
+        // Create a PDF document and add one page per DataRow, inserting the column value as text
         using (Document doc = new Document())
         {
-            for (int i = 0; i < pageCount; i++)
+            foreach (DataRow row in table.Rows)
             {
-                doc.Pages.Add();
-            }
-            doc.Save(path);
-        }
-    }
+                // Add a new blank page
+                Page page = doc.Pages.Add();
 
-    // Returns the highest page number present in the naming table (defaults to 1).
-    private static int GetMaxPageNumber(DataTable table)
-    {
-        int max = 1;
+                // Create a text fragment with the column value
+                string pageTitle = row["PageName"].ToString();
+                TextFragment tf = new TextFragment(pageTitle);
+                tf.Position = new Position(100, 700); // place text near top‑left
+                tf.TextState.FontSize = 24;
+                tf.TextState.FontStyle = FontStyles.Bold;
+
+                // Add the text to the page
+                page.Paragraphs.Add(tf);
+            }
+
+            // Save the combined PDF to the temporary location
+            doc.Save(combinedPdfPath);
+        }
+
+        // Use Aspose.Pdf.Facades.PdfFileEditor to extract each page into a separate PDF file
+        // named according to the DataTable column value.
+        PdfFileEditor editor = new PdfFileEditor();
+
+        int pageIndex = 1; // Aspose.Pdf uses 1‑based page indexing
         foreach (DataRow row in table.Rows)
         {
-            int page = row.Field<int>("Page");
-            if (page > max) max = page;
+            string pageName = row["PageName"].ToString();
+            string outputPath = $"{pageName}.pdf";
+
+            // Correct overload: Extract(sourcePdf, startPage, endPage, outputPdf)
+            editor.Extract(combinedPdfPath, pageIndex, pageIndex, outputPath);
+
+            Console.WriteLine($"Created '{outputPath}' from page {pageIndex}.");
+            pageIndex++;
         }
-        return max;
-    }
 
-    // Example method that creates a DataTable with page‑to‑file‑name mappings.
-    // Replace this with actual data retrieval logic as needed.
-    static DataTable GetNamingTable()
-    {
-        DataTable table = new DataTable();
-        table.Columns.Add("Page", typeof(int));
-        table.Columns.Add("FileName", typeof(string));
-
-        // Sample rows – adjust to match your real data source.
-        table.Rows.Add(1, "Invoice_001.pdf");
-        table.Rows.Add(2, "Invoice_002.pdf");
-        table.Rows.Add(3, "Invoice_003.pdf");
-
-        return table;
+        // Optionally delete the temporary combined PDF
+        if (File.Exists(combinedPdfPath))
+        {
+            File.Delete(combinedPdfPath);
+        }
     }
 }

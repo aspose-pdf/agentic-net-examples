@@ -6,9 +6,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "signed.pdf";
+        const string inputPath  = "signed_input.pdf";
         const string outputPath = "signed_without_usage_rights.pdf";
 
+        // Verify the source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"Input file not found: {inputPath}");
@@ -17,23 +18,23 @@ class Program
 
         try
         {
-            // PdfFileSignature is a facade class; it does not implement IDisposable.
-            PdfFileSignature signature = new PdfFileSignature();
+            // Create a PdfFileSignature facade to work with signatures and usage rights
+            PdfFileSignature pdfSignature = new PdfFileSignature();
 
-            // Load the signed PDF.
-            signature.BindPdf(inputPath);
+            // Load the signed PDF
+            pdfSignature.BindPdf(inputPath);
 
-            // Remove any extended usage rights that were added to the document.
-            signature.RemoveUsageRights();
+            // Remove any extended usage rights that may be present
+            pdfSignature.RemoveUsageRights();
 
-            // Save the modified PDF.
-            signature.Save(outputPath);
+            // Save the modified PDF (usage rights removed)
+            pdfSignature.Save(outputPath);
 
-            Console.WriteLine($"Extended usage rights removed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Usage rights removed successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

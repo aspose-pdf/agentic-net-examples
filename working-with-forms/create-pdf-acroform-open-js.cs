@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 using Aspose.Pdf.Annotations;
@@ -17,21 +16,26 @@ class Program
             Page page = doc.Pages.Add();
 
             // Create a text box field (AcroForm) on the page
-            TextBoxField txtField = new TextBoxField(page, new Aspose.Pdf.Rectangle(100, 700, 300, 730));
-            txtField.PartialName = "NameField";
-            txtField.Value = "Enter name";
-            doc.Form.Add(txtField);
+            // Constructor takes (Page, Rectangle). The field name is set via PartialName.
+            var textRect = new Rectangle(100, 700, 300, 720);
+            TextBoxField nameField = new TextBoxField(page, textRect);
+            nameField.PartialName = "NameField";
+            nameField.Value = "Enter name";
+            doc.Form.Add(nameField);
 
-            // Create a check box field (AcroForm) on the page
-            CheckboxField chkField = new CheckboxField(page, new Aspose.Pdf.Rectangle(100, 650, 120, 670));
-            chkField.PartialName = "AgreeCheck";
-            chkField.Checked = false;
-            doc.Form.Add(chkField);
+            // Create a checkbox field (AcroForm) on the page
+            // Correct class name is "CheckboxField" (lower‑case 'b') and uses the same constructor pattern.
+            var checkRect = new Rectangle(100, 650, 120, 670);
+            CheckboxField agreeField = new CheckboxField(page, checkRect);
+            agreeField.PartialName = "AgreeCheck";
+            agreeField.Checked = false;
+            doc.Form.Add(agreeField);
 
             // Set a document‑level JavaScript that runs when the PDF is opened
+            // The class name is "JavascriptAction" (lower‑case 's') in Aspose.Pdf.Annotations.
             doc.OpenAction = new JavascriptAction("app.alert('Document opened');");
 
-            // Save the PDF file
+            // Save the PDF document
             doc.Save(outputPath);
         }
 

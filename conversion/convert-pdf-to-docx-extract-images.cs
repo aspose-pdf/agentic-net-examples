@@ -1,65 +1,65 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
+        const string inputPdfPath   = "input.pdf";
         const string outputDocxPath = "output.docx";
-        const string imagesOutputDir = "ExtractedImages";
+        const string imagesDir      = "ExtractedImages";
 
-        // Verify input file exists
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Ensure the images directory exists
-        Directory.CreateDirectory(imagesOutputDir);
+        // Ensure the images output directory exists
+        Directory.CreateDirectory(imagesDir);
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the PDF document inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPdfPath))
             {
                 // ---------- Convert PDF to DOCX ----------
-                // Must pass a DocSaveOptions instance; otherwise the file is saved as PDF regardless of extension
-                DocSaveOptions docOptions = new DocSaveOptions
+                // Must use explicit DocSaveOptions; otherwise the file extension is ignored.
+                DocSaveOptions docxOptions = new DocSaveOptions
                 {
                     Format = DocSaveOptions.DocFormat.DocX
                 };
-                pdfDoc.Save(outputDocxPath, docOptions);
-                Console.WriteLine($"PDF successfully converted to DOCX: {outputDocxPath}");
+                pdfDoc.Save(outputDocxPath, docxOptions);
+                Console.WriteLine($"PDF converted to DOCX: {outputDocxPath}");
 
-                // ---------- Extract embedded images ----------
-                int imageIndex = 1; // simple counter to create unique filenames
+                // ---------- Extract all embedded images ----------
+                int imageCounter = 1; // simple counter to generate unique file names
 
-                // Aspose.Pdf uses 1‑based page indexing
+                // Pages are 1‑based in Aspose.Pdf
                 for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
                 {
                     Page page = pdfDoc.Pages[pageNum];
 
-                    // XImageCollection is not a dictionary; iterate directly
+                    // Iterate over images in the page resources
                     foreach (XImage img in page.Resources.Images)
                     {
-                        // Aspose.Pdf's XImage does not expose an ImageFormat property.
-                        // Default to PNG which works for the majority of extracted images.
-                        const string ext = "png";
+                        // Default to PNG extension – Aspose.Pdf does not expose the original format via XImage
+                        string extension = ".png";
 
-                        string imageFileName = $"image_page{pageNum}_{imageIndex}.{ext}";
-                        string imagePath = Path.Combine(imagesOutputDir, imageFileName);
+                        string imagePath = System.IO.Path.Combine(
+                            imagesDir,
+                            $"Image_{pageNum}_{imageCounter}{extension}");
 
-                        // Save the image to the designated file
+                        // Save the image to a file using a FileStream (XImage.Save accepts a Stream)
                         using (FileStream fs = new FileStream(imagePath, FileMode.Create, FileAccess.Write))
                         {
                             img.Save(fs);
                         }
 
-                        Console.WriteLine($"Extracted image saved to: {imagePath}");
-                        imageIndex++;
+                        Console.WriteLine($"Saved image: {imagePath}");
+                        imageCounter++;
                     }
                 }
             }

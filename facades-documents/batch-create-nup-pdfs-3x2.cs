@@ -1,122 +1,51 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf;
-
-// -----------------------------------------------------------------------------
-// Minimal stubs for Aspose.Pdf.Facades types that may be missing in the referenced
-// Aspose.Pdf version. These stubs provide just enough functionality for the sample
-// program to compile and run (they perform a simple file copy). If the real
-// Aspose.Pdf library is referenced, the compiler will use the actual implementations
-// and these stubs will be ignored.
-// -----------------------------------------------------------------------------
-namespace Aspose.Pdf.Facades
-{
-    /// <summary>
-    /// Stub for the N‑up PDF processor. In a full Aspose.Pdf installation this class
-    /// performs layout of multiple pages onto a single page. The stub simply copies
-    /// the source PDF to the destination path.
-    /// </summary>
-    public class NUpPdfProcessor
-    {
-        private string _sourcePath;
-
-        /// <summary>
-        /// Binds the source PDF file.
-        /// </summary>
-        public void BindPdf(string pdfPath)
-        {
-            if (string.IsNullOrEmpty(pdfPath) || !File.Exists(pdfPath))
-                throw new FileNotFoundException($"Source PDF not found: {pdfPath}");
-            _sourcePath = pdfPath;
-        }
-
-        /// <summary>
-        /// Processes the PDF with the supplied N‑up options. The stub does nothing.
-        /// </summary>
-        public void Process(NUpOptions options)
-        {
-            // No‑op – real implementation would rearrange pages.
-        }
-
-        /// <summary>
-        /// Saves the (processed) PDF. The stub copies the original file.
-        /// </summary>
-        public void Save(string outputPath)
-        {
-            if (string.IsNullOrEmpty(_sourcePath))
-                throw new InvalidOperationException("BindPdf must be called before Save.");
-            // Ensure the output directory exists.
-            var dir = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
-                Directory.CreateDirectory(dir);
-            File.Copy(_sourcePath, outputPath, overwrite: true);
-        }
-    }
-
-    /// <summary>
-    /// Stub for N‑up options. Only the properties used in the sample are defined.
-    /// </summary>
-    public class NUpOptions
-    {
-        public int Columns { get; set; }
-        public int Rows { get; set; }
-        // Additional properties (e.g., PageSize) can be added if needed.
-    }
-}
 
 class Program
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        string inputFolder = "InputPdfs";
-        // Folder where N‑up PDFs will be saved
-        string outputFolder = "NupPdfs";
-
-        if (!Directory.Exists(inputFolder))
+        // Array of source PDF file paths to be processed
+        string[] inputFiles = new string[]
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
-        }
+            "doc1.pdf",
+            "doc2.pdf",
+            "doc3.pdf"
+        };
 
-        Directory.CreateDirectory(outputFolder);
+        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in a using block
+        PdfFileEditor editor = new PdfFileEditor();
 
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
-        if (pdfFiles.Length == 0)
+        foreach (string inputPath in inputFiles)
         {
-            Console.WriteLine("No PDF files found to process.");
-            return;
-        }
+            if (!File.Exists(inputPath))
+            {
+                Console.Error.WriteLine($"File not found: {inputPath}");
+                continue;
+            }
 
-        foreach (string inputPath in pdfFiles)
-        {
-            string fileName = Path.GetFileNameWithoutExtension(inputPath);
-            string outputPath = Path.Combine(outputFolder, $"{fileName}_nup.pdf");
+            // Build the output file name (e.g., doc1_3x2.pdf)
+            string outputPath = Path.Combine(
+                Path.GetDirectoryName(inputPath) ?? string.Empty,
+                Path.GetFileNameWithoutExtension(inputPath) + "_3x2.pdf");
 
             try
             {
-                // Bind the source PDF to the N‑up processor
-                NUpPdfProcessor nupProcessor = new NUpPdfProcessor();
-                nupProcessor.BindPdf(inputPath);
+                // Create an N‑up PDF with 2 rows and 3 columns (total 6 pages per sheet)
+                // PdfFileEditor does not have an NUp method – use MakeNUp instead.
+                // MakeNUp accepts an array of source files, the output path, and a landscape flag.
+                // Setting isLandscape to true yields a wider layout (3 columns).
+                bool success = editor.MakeNUp(new[] { inputPath }, outputPath, true);
 
-                // Configure N‑up options: 3 columns × 2 rows (6‑up)
-                NUpOptions nupOptions = new NUpOptions
+                if (success)
                 {
-                    Columns = 3,
-                    Rows = 2
-                    // Optional: set the page size of the resulting PDF
-                    // PageSize = PageSize.A4
-                };
-
-                // Apply the N‑up layout
-                nupProcessor.Process(nupOptions);
-
-                // Save the resulting N‑up PDF
-                nupProcessor.Save(outputPath);
-
-                Console.WriteLine($"Created N‑up PDF: {outputPath}");
+                    Console.WriteLine($"N‑up PDF created: {outputPath}");
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Failed to create N‑up PDF for {inputPath}");
+                }
             }
             catch (Exception ex)
             {

@@ -6,31 +6,37 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string pptxPath = "output.pptx";
+        // Input PDF and output PPTX paths
+        const string inputPdfPath = "input.pdf";
+        const string outputPptxPath = "output.pptx";
 
-        if (!File.Exists(pdfPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Source PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF, set metadata, then convert to PPTX.
-        using (Document pdfDoc = new Document(pdfPath))
+        // Load the PDF, set document properties, then save as PPTX
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // ---- Standard PDF properties ----
-            pdfDoc.Info.Subject = "Quarterly Report"; // existing property
+            // ----- Set built‑in document properties -----
+            pdfDoc.Info.Subject = "Converted Presentation"; // built‑in property
 
-            // ---- Custom metadata (Company, Project, etc.) ----
-            // DocumentInfo exposes an indexer for arbitrary key/value pairs.
+            // ----- Add custom properties (key/value) -----
+            // The DocumentInfo class does not expose a "Company" property; use the indexer to store custom metadata.
             pdfDoc.Info["Company"] = "Acme Corp";
-            pdfDoc.Info["Project"] = "Apollo";
+            // Example of another custom entry
+            pdfDoc.Info["Project"] = "Demo";
 
-            // Convert the PDF to PPTX.
+            // ----- Convert to PPTX -----
+            // Save options classes are located directly in the Aspose.Pdf namespace (no Aspose.Pdf.Saving namespace).
             var pptxOptions = new PptxSaveOptions();
-            pdfDoc.Save(pptxPath, pptxOptions);
+
+            // Save the document as PPTX. The Save method with SaveOptions ensures the correct format.
+            pdfDoc.Save(outputPptxPath, pptxOptions);
         }
 
-        Console.WriteLine($"PDF converted to PPTX with properties saved at '{pptxPath}'.");
+        Console.WriteLine($"PDF successfully converted to PPTX: {outputPptxPath}");
     }
 }

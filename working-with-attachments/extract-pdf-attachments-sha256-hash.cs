@@ -18,30 +18,43 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(pdfPath))
         {
-            // Embedded files are stored in the Document.EmbeddedFiles collection
+            // Check if the document contains any embedded files (attachments)
             if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
                 Console.WriteLine("No embedded files found in the PDF.");
                 return;
             }
 
+            Console.WriteLine($"Found {doc.EmbeddedFiles.Count} embedded file(s):");
+
+            // Iterate over each embedded file
             foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
             {
-                // Ensure the content stream is positioned at the start
-                Stream content = fileSpec.Contents;
-                if (content.CanSeek)
-                    content.Position = 0;
+                // Resolve a display name for the file
+                string name = !string.IsNullOrEmpty(fileSpec.Name) ? fileSpec.Name : "EmbeddedFile";
 
+                // Read the file contents into a byte array
+                byte[] content;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    // Ensure the stream is positioned at the beginning
+                    if (fileSpec.Contents.CanSeek)
+                        fileSpec.Contents.Position = 0;
+                    fileSpec.Contents.CopyTo(ms);
+                    content = ms.ToArray();
+                }
+
+                // Compute SHA‑256 hash
                 string hashHex;
                 using (SHA256 sha256 = SHA256.Create())
                 {
                     byte[] hashBytes = sha256.ComputeHash(content);
-                    hashHex = BitConverter.ToString(hashBytes).Replace("-", string.Empty).ToLowerInvariant();
+                    hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
                 }
 
-                Console.WriteLine($"Embedded file: {fileSpec.Name}");
-                Console.WriteLine($"SHA‑256: {hashHex}");
-                Console.WriteLine();
+                Console.WriteLine($"- {name}");
+                Console.WriteLine($"  Size: {content.Length} bytes");
+                Console.WriteLine($"  SHA‑256: {hashHex}");
             }
         }
     }

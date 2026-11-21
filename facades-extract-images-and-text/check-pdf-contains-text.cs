@@ -6,37 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // PdfExtractor is a Facades class that can extract text from a PDF.
+        // Use PdfExtractor from Aspose.Pdf.Facades to extract text.
+        // The class implements IDisposable, so wrap it in a using block.
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF file.
-            extractor.BindPdf(inputPath);
+            // Bind the PDF file to the extractor.
+            extractor.BindPdf(inputPdf);
 
-            // Perform text extraction.
+            // Enable text extraction.
             extractor.ExtractText();
 
-            // Store the extracted text in a MemoryStream.
-            using (MemoryStream ms = new MemoryStream())
+            // Extract the text into a MemoryStream.
+            using (MemoryStream textStream = new MemoryStream())
             {
-                // The Aspose API expects a non‑null stream. The null‑forgiving operator
-                // guarantees the compiler that 'ms' is not null, silencing CS8600.
-                extractor.GetText(ms!);
-                ms.Position = 0; // Ensure the stream is at the beginning.
+                extractor.GetText(textStream);
 
-                // If the stream length is greater than zero, the PDF contains text.
-                bool hasText = ms.Length > 0;
+                // After extraction, the stream position is at the end.
+                // Length indicates the number of bytes extracted.
+                bool containsText = textStream.Length > 0;
 
-                Console.WriteLine(hasText
-                    ? "PDF contains text."
-                    : "PDF does not contain any text.");
+                Console.WriteLine(containsText
+                    ? "The PDF contains text."
+                    : "The PDF does not contain any text.");
             }
         }
     }

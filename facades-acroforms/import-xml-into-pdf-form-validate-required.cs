@@ -1,84 +1,80 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
+using System.Data;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmlDataPath = "data.xml";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string xmlData = "data.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {inputPdf}");
             return;
         }
-        if (!File.Exists(xmlDataPath))
+        if (!File.Exists(xmlData))
         {
-            Console.Error.WriteLine($"XML data not found: {xmlDataPath}");
+            Console.Error.WriteLine($"XML data file not found: {xmlData}");
             return;
         }
 
-        try
+        // Define required form field names (as they appear in the PDF)
+        var requiredFields = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            // Load the PDF document
-            using (Document pdfDoc = new Document(pdfPath))
+            "FirstName",
+            "LastName",
+            "Email"
+        };
+
+        // ------------------------------------------------------------
+        // 1. Load XML data into a DataTable.
+        //    Aspose.Pdf.Facades.AutoFiller works with DataTable, not XML.
+        // ------------------------------------------------------------
+        DataSet ds = new DataSet();
+        ds.ReadXml(xmlData);
+        DataTable dt = ds.Tables.Count > 0 ? ds.Tables[0] : new DataTable();
+
+        // ------------------------------------------------------------
+        // 2. Import the DataTable into the PDF using AutoFiller.
+        //    This replaces the missing PdfFormEditor class.
+        // ------------------------------------------------------------
+        using (AutoFiller filler = new AutoFiller())
+        {
+            filler.BindPdf(inputPdf);
+            filler.ImportDataTable(dt);
+            filler.Save(outputPdf);
+        }
+
+        // ------------------------------------------------------------
+        // 3. Validate that required fields are not empty after import.
+        //    Iterate over Document.Form.Fields (Aspose.Pdf.Forms.Field).
+        // ------------------------------------------------------------
+        using (Document pdfDoc = new Document(outputPdf))
+        {
+            foreach (var field in pdfDoc.Form.Fields)
             {
-                // Bind the PDF to the Form facade and import XML data
-                using (Form formFacade = new Form(pdfDoc))
+                string fieldName = field.PartialName;
+                if (requiredFields.Contains(fieldName))
                 {
-                    // Import form data from the XML file – Form.ImportXml expects a Stream
-                    using (FileStream xmlStream = File.OpenRead(xmlDataPath))
+                    string fieldValue = field.Value?.ToString() ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(fieldValue))
                     {
-                        formFacade.ImportXml(xmlStream);
+                        Console.WriteLine($"Validation error: Required field '{fieldName}' is empty.");
                     }
                 }
-
-                // Validate required fields
-                bool hasViolations = false;
-                var fields = pdfDoc.Form?.Fields;
-                if (fields != null)
-                {
-                    foreach (var field in fields)
-                    {
-                        // Determine if the field is marked as required (via reflection, as not all field types expose it directly)
-                        bool isRequired = false;
-                        var requiredProp = field.GetType().GetProperty("Required");
-                        if (requiredProp != null && requiredProp.PropertyType == typeof(bool))
-                        {
-                            var propValue = requiredProp.GetValue(field);
-                            if (propValue != null)
-                                isRequired = (bool)propValue;
-                        }
-
-                        if (isRequired)
-                        {
-                            string value = field.Value?.ToString() ?? string.Empty;
-                            if (string.IsNullOrWhiteSpace(value))
-                            {
-                                hasViolations = true;
-                                Console.WriteLine($"Validation error: Required field '{field.Name}' is empty.");
-                            }
-                        }
-                    }
-                }
-
-                if (!hasViolations)
-                {
-                    Console.WriteLine("All required fields are filled.");
-                }
-
-                // Save the updated PDF
-                pdfDoc.Save(outputPath);
-                Console.WriteLine($"PDF saved to '{outputPath}'.");
             }
+
+            // No further modifications, but saving ensures the document is flushed correctly.
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Processing completed. Result saved to '{outputPdf}'.");
     }
 }

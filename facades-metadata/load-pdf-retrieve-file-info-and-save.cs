@@ -16,22 +16,19 @@ class Program
             return;
         }
 
-        // Retrieve basic PDF metadata using PdfFileInfo.
-        using (PdfFileInfo info = new PdfFileInfo(inputPath))
+        // Read PDF file information using PdfFileInfo inside a using block
+        using (PdfFileInfo fileInfo = new PdfFileInfo(inputPath))
         {
-            Console.WriteLine($"Pages: {info.NumberOfPages}");
-            Console.WriteLine($"Author: {info.Author}");
-            Console.WriteLine($"Title: {info.Title}");
+            Console.WriteLine($"Pages: {fileInfo.NumberOfPages}");
+            Console.WriteLine($"Author: {fileInfo.Author}");
+            Console.WriteLine($"Title: {fileInfo.Title}");
         }
 
-        // Perform low‑level PDF manipulation with Document.
+        // Load, modify, and save the PDF using Document inside a using block
         using (Document pdfDoc = new Document(inputPath))
         {
-            // Add a blank page at the end of the document.
-            pdfDoc.Pages.Add();
-
-            // Save the modified PDF.
-            pdfDoc.Save(outputPath);
+            pdfDoc.Pages.Add();                 // Example operation: add a blank page
+            pdfDoc.Save(outputPath);            // Save the modified PDF
         }
 
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");

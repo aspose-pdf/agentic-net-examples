@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -8,6 +7,7 @@ class Program
 {
     static void Main()
     {
+        // Input and output PDF paths
         const string inputPath  = "input.pdf";
         const string outputPath = "resized_output.pdf";
 
@@ -17,24 +17,24 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
+        // Load the source PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Create the facade that will perform the content resize operation
+            PdfFileEditor editor = new PdfFileEditor();
 
-        // Define the pages to be resized (all pages in this example)
-        int[] pages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+            // Configure margins using point values only (Length class not available in this version)
+            // Left: 10 points, Right: 5 points, Top: 15 points, Bottom: 3 points
+            PdfFileEditor.ContentsResizeParameters resizeParams =
+                PdfFileEditor.ContentsResizeParameters.Margins(10, 5, 15, 3);
 
-        // Create resize parameters.
-        // The Margins factory method creates a ContentsResizeParameters instance.
-        // Here we use absolute margins of 20 points for left/right and 20 points for top/bottom.
-        // If a mixed (percent/absolute) overload exists, replace the values accordingly.
-        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(20, 20, 20, 20);
+            // Apply the resize operation to all pages of the document
+            editor.ResizeContents(doc, resizeParams);
 
-        // Perform the resize operation on the specified pages
-        PdfFileEditor editor = new PdfFileEditor();
-        editor.ResizeContents(doc, pages, resizeParams);
+            // Save the modified PDF (no SaveOptions needed for PDF output)
+            doc.Save(outputPath);
+        }
 
-        // Save the modified document
-        doc.Save(outputPath);
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

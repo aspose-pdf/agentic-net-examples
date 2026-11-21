@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -16,40 +17,42 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // -----------------------------------------------------------------
-            // Hide the zoom controls in the viewer preferences.
-            // The ViewerPreferences property is only available in newer Aspose.Pdf
-            // versions. To keep the source compatible with older versions we access
-            // it via dynamic and swallow the RuntimeBinderException if the property
-            // does not exist.
-            // -----------------------------------------------------------------
+            // Load the PDF document
+            Document pdfDoc = new Document(inputPath);
+
+            // ---------------------------------------------------------------------
+            // Attempt to use ViewerPreferences (available in newer Aspose.Pdf versions).
+            // The property may not exist in older versions, so we access it via
+            // dynamic and gracefully handle the absence.
+            // ---------------------------------------------------------------------
+            dynamic docDynamic = pdfDoc;
             try
             {
-                dynamic dynDoc = doc; // bypass compile‑time check
-                dynDoc.ViewerPreferences.HideZoomControls = true;
+                var prefs = docDynamic.ViewerPreferences;
+                // Hide toolbar and window UI – this removes the built‑in zoom controls.
+                prefs.HideToolbar = true;
+                prefs.HideWindowUI = true;
             }
-            catch (Microsoft.CSharp.RuntimeBinder.RuntimeBinderException)
+            catch (RuntimeBinderException)
             {
-                Console.WriteLine("ViewerPreferences.HideZoomControls is not supported by the current Aspose.Pdf version.");
+                // Fallback for older Aspose.Pdf versions that lack ViewerPreferences.
+                // We set a fixed zoom level (100%) using JavaScript and hide UI
+                // elements that can be controlled via JavaScript.
+                // Note: Not all viewers respect these settings, but it provides a
+                // reasonable degradation path.
+                pdfDoc.OpenAction = new JavascriptAction("this.zoom = 100; app.hideToolbar = true; app.hideMenuBar = true;");
             }
-
-            // -----------------------------------------------------------------
-            // Set a fixed zoom level (100 %) when the document is opened.
-            // Using a JavaScript open action is the most version‑agnostic way to
-            // enforce a specific zoom because the Destination class may be absent
-            // in older releases.
-            // -----------------------------------------------------------------
-            const int zoomPercent = 100; // 100 % = 1.0 scale
-            string js = $"this.zoom = {zoomPercent};";
-            doc.OpenAction = new JavascriptAction(js);
 
             // Save the modified PDF
-            doc.Save(outputPath);
-        }
+            pdfDoc.Save(outputPath);
 
-        Console.WriteLine($"PDF saved with disabled zoom controls and fixed zoom to '{outputPath}'.");
+            Console.WriteLine($"PDF saved with disabled zoom controls: '{outputPath}'");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

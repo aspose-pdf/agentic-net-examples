@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing; // for Position
 
 class Program
 {
@@ -9,31 +9,36 @@ class Program
     {
         const string outputPath = "superscript.pdf";
 
-        // Create a new PDF document and ensure it is disposed properly
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
+            // Base coordinates for the normal text
+            double baseX = 50;   // distance from the left edge
+            double baseY = 750;  // distance from the bottom edge (higher Y = higher on page)
+
             // Normal text fragment
-            TextFragment normal = new TextFragment("E = mc");
-            normal.Position = new Position(100, 700);
-            // Optionally set a base font size (default is 12)
-            normal.TextState.FontSize = 12f;
+            TextFragment normal = new TextFragment("Normal text ");
+            normal.TextState.Font = FontRepository.FindFont("Arial");
+            normal.TextState.FontSize = 12;
+            // Position the normal text at the baseline
+            normal.Position = new Position(baseX, baseY);
             page.Paragraphs.Add(normal);
 
-            // Superscript text fragment
-            TextFragment superscript = new TextFragment("2");
-            // Reduce font size for a typical superscript look
-            superscript.TextState.FontSize = (float)(normal.TextState.FontSize * 0.7);
-            // Position the superscript slightly higher than the baseline of the normal text
-            superscript.Position = new Position(150, 720); // Y coordinate increased to raise the text
+            // Superscript text fragment – placed slightly to the right and higher than the baseline
+            TextFragment superscript = new TextFragment("Superscript");
+            superscript.TextState.Font = FontRepository.FindFont("Arial");
+            superscript.TextState.FontSize = 8; // typical smaller size for superscript
+            // Raise the Y coordinate (positive offset) to simulate superscript
+            superscript.Position = new Position(baseX + 80, baseY + 6);
             page.Paragraphs.Add(superscript);
 
             // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Superscript PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -1,63 +1,62 @@
 using System;
 using System.IO;
+using System.Drawing.Imaging;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF file
         const string inputPdf = "input.pdf";
-        // Directory where extracted images will be saved
         const string outputDir = "ExtractedImages";
-        // Minimum area (width * height) in points^2 to keep an image
-        const double minArea = 5000.0;
+        const double minArea = 5000.0; // Minimum area (points²) to keep an image
 
+        // Verify source file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output folder exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Wrap Document in a using block (lifecycle rule)
+        using (Document doc = new Document(inputPdf))
         {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdf))
+            // Pages are 1‑based (page-indexing-one-based rule)
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
+                Page page = doc.Pages[pageNum];
                 int imageCounter = 0;
 
-                // Iterate over all pages
-                foreach (Page page in doc.Pages)
+                // XImageCollection is iterable directly (ximage-collection-foreach-only-no-keys rule)
+                foreach (XImage img in page.Resources.Images)
                 {
-                    // Iterate over the image resources of the page
-                    foreach (XImage img in page.Resources.Images)
-                    {
-                        // Width and Height are in points; compute the area
-                        double width = img.Width;
-                        double height = img.Height;
-                        double area = width * height;
+                    imageCounter++;
 
-                        // Export only images whose area exceeds the defined threshold
-                        if (area >= minArea)
+                    // Compute bounding rectangle area
+                    double area = img.Width * img.Height;
+
+                    // Export only images exceeding the defined area
+                    if (area > minArea)
+                    {
+                        // Use PNG as a generic output format
+                        string outPath = Path.Combine(
+                            outputDir,
+                            $"page{pageNum}_img{imageCounter}.png");
+
+                        // XImage.Save expects a Stream, not a file path.
+                        // Open a FileStream and specify the PNG format explicitly.
+                        using (FileStream fs = File.Create(outPath))
                         {
-                            string outPath = Path.Combine(outputDir, $"image_{++imageCounter}.png");
-                            // XImage.Save expects a Stream, not a file path string
-                            using (FileStream fs = new FileStream(outPath, FileMode.Create, FileAccess.Write))
-                            {
-                                img.Save(fs);
-                            }
-                            Console.WriteLine($"Saved image #{imageCounter} (area={area}) to {outPath}");
+                            img.Save(fs, ImageFormat.Png);
                         }
+
+                        Console.WriteLine($"Saved: {outPath} (Area = {area})");
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

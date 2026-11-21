@@ -7,51 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "OutputImages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "PagesAsJpeg";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
-
-        // Prepare JPEG device with 150 DPI resolution (horizontal & vertical)
-        // Using the two‑parameter constructor avoids ambiguous overloads.
-        JpegDevice jpegDevice = new JpegDevice(new Resolution(150, 150));
-
-        // Convert pages 1 through 10 (or up to the last page if the PDF has fewer pages)
-        int lastPage = Math.Min(10, pdfDocument.Pages.Count);
-        for (int pageNumber = 1; pageNumber <= lastPage; pageNumber++)
+        // Load the PDF document (deterministic disposal via using)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Ensure the page's CropBox is used – Aspose.Pdf renders using CropBox by default.
-            // If you need to modify the CropBox, you can do it here, e.g.:
-            // pdfDocument.Pages[pageNumber].CropBox = new Aspose.Pdf.Rectangle(...);
+            // Determine the page range (1‑10 or total page count)
+            int startPage = 1;
+            int endPage   = Math.Min(10, pdfDoc.Pages.Count);
 
-            string outputPath = Path.Combine(outputDir, $"page_{pageNumber}.jpg");
-            try
+            // Initialise the JPEG device with the required DPI.
+            // The device uses the page's CropBox by default, so no PageSize property is needed.
+            var jpegDevice = new JpegDevice(new Resolution(150));
+
+            // Convert each page individually
+            for (int pageNumber = startPage; pageNumber <= endPage; pageNumber++)
             {
-                using (FileStream outStream = new FileStream(outputPath, FileMode.Create))
-                {
-                    // Render the specific page to JPEG
-                    jpegDevice.Process(pdfDocument.Pages[pageNumber], outStream);
-                }
-            }
-            catch (Exception ex)
-            {
-                // If Aspose.Pdf tries to start an external helper process and fails,
-                // provide a clear message. The most common cause is a missing or
-                // mismatched Aspose.Pdf assembly. Ensure the NuGet package is added
-                // and the correct version is copied to the output folder.
-                Console.Error.WriteLine($"Failed to convert page {pageNumber}: {ex.Message}");
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.jpg");
+                jpegDevice.Process(pdfDoc.Pages[pageNumber], outputPath);
+                Console.WriteLine($"Page {pageNumber} saved as {outputPath}");
             }
         }
 
-        Console.WriteLine("Conversion of pages 1‑10 to JPEG completed.");
+        Console.WriteLine("Conversion completed.");
     }
 }

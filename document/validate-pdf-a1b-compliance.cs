@@ -2,43 +2,50 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class PdfAValidatorProgram
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string logFilePath   = "validation_log.txt";
+        const string inputPath = "input.pdf";
+        const string logPath   = "validation_log.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        var document = new Document(inputPdfPath);
-
-        // Validate PDF/A‑1B compliance. The Validate method writes a detailed log to the
-        // supplied file and returns a boolean indicating overall compliance.
-        bool isCompliant = document.Validate(logFilePath, PdfFormat.PDF_A_1B);
-
-        // Write a short outcome to console and prepend it to the log file.
-        using (var logWriter = new StreamWriter(logFilePath, true)) // append the summary
+        try
         {
-            if (isCompliant)
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                string msg = "Document is PDF/A‑1B compliant.";
-                Console.WriteLine(msg);
-                logWriter.WriteLine(msg);
-            }
-            else
-            {
-                string msg = "Document is NOT PDF/A‑1B compliant. See detailed log above for non‑conformant elements.";
-                Console.WriteLine(msg);
-                logWriter.WriteLine(msg);
+                // Validate against PDF/A‑1B compliance. The Validate method writes
+                // detailed validation information to the supplied log file and
+                // returns a boolean indicating overall compliance.
+                bool isValid = doc.Validate(logPath, PdfFormat.PDF_A_1B);
+
+                if (isValid)
+                {
+                    Console.WriteLine("Document is PDF/A‑1B compliant.");
+                }
+                else
+                {
+                    Console.WriteLine("Document is NOT PDF/A‑1B compliant. See log for details.");
+                    // Output the validation errors that were written to the log file.
+                    if (File.Exists(logPath))
+                    {
+                        foreach (string line in File.ReadLines(logPath))
+                        {
+                            Console.WriteLine(line);
+                        }
+                    }
+                }
             }
         }
-
-        Console.WriteLine($"Validation log written to '{logFilePath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during validation: {ex.Message}");
+        }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
@@ -10,7 +9,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_tagged.pdf";
-        const string language = "en-US";
 
         if (!File.Exists(inputPath))
         {
@@ -18,31 +16,47 @@ class Program
             return;
         }
 
-        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content interface
-            ITaggedContent tagged = doc.TaggedContent;
-
-            // Set the language on the document (root element)
-            tagged.SetLanguage(language);
-
-            // Obtain the root structure element (no cast needed)
-            StructureElement root = tagged.RootElement;
-
-            // Retrieve all descendant structure elements recursively
-            var allElements = root.FindElements<StructureElement>(true);
-
-            // Propagate the language attribute to each element
-            foreach (StructureElement element in allElements)
+            // Ensure the PDF is tagged
+            if (doc.TaggedContent == null)
             {
-                element.Language = language;
+                Console.WriteLine("The document is not a tagged PDF.");
+                return;
             }
 
-            // Save the updated PDF
+            ITaggedContent taggedContent = doc.TaggedContent;
+
+            // Access the root element dynamically to avoid compile‑time dependency on StructureElement
+            dynamic root = taggedContent.RootElement;
+
+            // Set a default language if none is defined
+            if (string.IsNullOrEmpty((string)root.Language))
+                root.Language = "en-US"; // example default language
+
+            // Propagate the language attribute to all descendants
+            PropagateLanguage(root, root.Language);
+
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Language '{language}' propagated to all elements and saved as '{outputPath}'.");
+        Console.WriteLine($"Language propagated and saved to '{outputPath}'.");
+    }
+
+    // Recursively sets the Language property on each structure element using dynamic typing
+    static void PropagateLanguage(dynamic element, string language)
+    {
+        // Apply language to the current element
+        element.Language = language;
+
+        // Recurse through child elements if they exist
+        if (element.ChildElements != null)
+        {
+            foreach (var child in element.ChildElements)
+            {
+                PropagateLanguage(child, language);
+            }
+        }
     }
 }

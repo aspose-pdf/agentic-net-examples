@@ -1,131 +1,87 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Forms;
 
-class SignatureReportGenerator
+class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "signed.pdf";
-        const string reportPdfPath = "signature_report.pdf";
+        const string inputPdf = "signed_document.pdf";
+        const string reportPdf = "signature_report.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Bind the PDF for signature operations (newer constructor pattern)
-        using (PdfFileSignature pdfSignature = new PdfFileSignature())
+        // Initialize PdfFileSignature using the non‑obsolete pattern
+        PdfFileSignature pdfSignature = new PdfFileSignature();
+        pdfSignature.BindPdf(inputPdf);
+
+        // Retrieve the list of signature names (includes valid and invalid signatures)
+        var signatureNames = pdfSignature.GetSignatureNames(true);
+
+        // Create a new PDF document for the report
+        using (Document report = new Document())
         {
-            pdfSignature.BindPdf(inputPdfPath);
+            // Add the first page
+            Page page = report.Pages.Add();
 
-            // Load the document to access signature fields (SignatureInfo class is no longer exposed)
-            Document srcDoc = new Document(inputPdfPath);
+            // Title
+            TextFragment title = new TextFragment("Signature Report");
+            title.TextState.FontSize = 18;
+            title.TextState.FontStyle = FontStyles.Bold;
+            title.Position = new Position(0, page.PageInfo.Height - 50);
+            title.HorizontalAlignment = HorizontalAlignment.Center;
+            page.Paragraphs.Add(title);
 
-            // Retrieve signature fields via the generic Fields collection
-            var signatureFields = srcDoc.Form?.Fields?.OfType<SignatureField>()?.ToList() ?? new System.Collections.Generic.List<SignatureField>();
-            int signatureCount = signatureFields.Count;
+            // Starting Y coordinate for the list
+            double y = page.PageInfo.Height - 80;
 
-            // Prepare a new PDF document that will hold the report
-            using (Document reportDoc = new Document())
+            foreach (var sigName in signatureNames)
             {
-                // Add a page for the report content
-                Page reportPage = reportDoc.Pages.Add();
+                // Verify the signature using the facade
+                bool isValid = pdfSignature.VerifySignature(sigName);
 
-                // Title of the report
-                TextFragment title = new TextFragment("Signature Verification Report");
-                title.TextState.FontSize = 18;
-                title.TextState.FontStyle = FontStyles.Bold;
-                title.TextState.Font = FontRepository.FindFont("Helvetica");
-                title.Margin = new MarginInfo(10, 0, 10, 0);
-                reportPage.Paragraphs.Add(title);
-
-                // Create a table with four columns
-                Table table = new Table
+                // Retrieve signer information (if available)
+                string signer = pdfSignature.GetSignerName(sigName) ?? "Unknown";
+                DateTime? signDate = null;
+                try
                 {
-                    ColumnWidths = "50 200 200 80",
-                    Border = new BorderInfo(BorderSide.All, 0.5f)
-                };
+                    signDate = pdfSignature.GetDateTime(sigName);
+                }
+                catch { /* GetDateTime may throw for malformed signatures; ignore */ }
 
-                // Helper to create a cell containing a simple text fragment
-                Cell CreateCell(string text)
+                // Prepare line text
+                string line = $"Signer: {signer}, Verified: {isValid}";
+                if (signDate.HasValue)
                 {
-                    Cell cell = new Cell();
-                    cell.Paragraphs.Add(new TextFragment(text));
-                    return cell;
+                    line += $", Date: {signDate.Value:G}";
                 }
 
-                // Header row
-                Row header = table.Rows.Add();
-                header.Cells.Add(CreateCell("No."));
-                header.Cells.Add(CreateCell("Signer"));
-                header.Cells.Add(CreateCell("Signing Time"));
-                header.Cells.Add(CreateCell("Valid"));
+                // Add line to the page
+                TextFragment tf = new TextFragment(line);
+                tf.Position = new Position(20, y);
+                tf.TextState.FontSize = 12;
+                page.Paragraphs.Add(tf);
 
-                // Iterate over each signature field and populate the table
-                for (int i = 0; i < signatureCount; i++)
+                y -= 20; // Move down for next entry
+
+                // Add a new page if we run out of space
+                if (y < 50)
                 {
-                    var sigField = signatureFields[i];
-
-                    // Try to extract the certificate to obtain signer information
-                    string signer = "Unknown";
-                    try
-                    {
-                        X509Certificate2 cert = sigField.ExtractCertificateObject();
-                        if (cert != null)
-                            signer = cert.Subject;
-                    }
-                    catch { /* certificate extraction not supported – keep "Unknown" */ }
-
-                    // Signing time – some versions expose it via SignatureInfo, otherwise fallback to N/A
-                    string signingTime = "N/A";
-                    try
-                    {
-                        var infoProp = sigField.GetType().GetProperty("SignatureInfo");
-                        if (infoProp != null)
-                        {
-                            var info = infoProp.GetValue(sigField);
-                            var timeProp = info?.GetType().GetProperty("SigningTime");
-                            var timeVal = timeProp?.GetValue(info) as DateTime?;
-                            if (timeVal.HasValue)
-                                signingTime = timeVal.Value.ToString("g");
-                        }
-                    }
-                    catch { /* ignore – keep N/A */ }
-
-                    // Verify the signature using the facade (field name based verification)
-                    bool isValid = false;
-                    try
-                    {
-                        // Use the field's full name for verification
-                        string fieldName = sigField.FullName ?? sigField.Name;
-                        if (!string.IsNullOrEmpty(fieldName))
-                            isValid = pdfSignature.VerifySignature(fieldName);
-                    }
-                    catch { /* verification not supported – treat as false */ }
-
-                    // Add a data row to the table
-                    Row row = table.Rows.Add();
-                    row.Cells.Add(CreateCell((i + 1).ToString()));
-                    row.Cells.Add(CreateCell(signer));
-                    row.Cells.Add(CreateCell(signingTime));
-                    row.Cells.Add(CreateCell(isValid ? "Yes" : "No"));
+                    page = report.Pages.Add();
+                    y = page.PageInfo.Height - 50;
                 }
-
-                // Add the populated table to the page
-                reportPage.Paragraphs.Add(table);
-
-                // Save the report PDF
-                reportDoc.Save(reportPdfPath);
             }
+
+            // Save the report PDF
+            report.Save(reportPdf);
         }
 
-        Console.WriteLine($"Signature report generated: {reportPdfPath}");
+        Console.WriteLine($"Signature report saved to '{reportPdf}'.");
     }
 }

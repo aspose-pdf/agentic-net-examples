@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // FontRepository, TextState, WatermarkArtifact
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,53 +16,67 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document using the high‑level API (Document).
+        Document doc = new Document(inputPath);
+
+        // Common watermark appearance settings.
+        Aspose.Pdf.Color wmColor = Aspose.Pdf.Color.FromRgb(0.5, 0.5, 0.5); // light gray
+        float opacity = 0.3f;   // semi‑transparent
+        int rotation = 45;      // degrees
+        bool isBackground = false; // draw on top of existing content
+
+        // Font to be used for all lines (size will be set per line via TextState).
+        Font baseFont = FontRepository.FindFont("Arial");
+
+        // Iterate over every page and add three watermark artifacts – one per line.
+        foreach (Page page in doc.Pages)
         {
-            // Define the font to be used for all watermark lines
-            Aspose.Pdf.Text.Font watermarkFont = FontRepository.FindFont("Arial");
+            // ----- First line (largest font) -----
+            var artifactLarge = new WatermarkArtifact();
+            artifactLarge.SetTextAndState(
+                "CONFIDENTIAL",
+                new TextState { Font = baseFont, FontSize = 48, ForegroundColor = wmColor }
+            );
+            artifactLarge.Rotation = rotation;
+            artifactLarge.Opacity = opacity;
+            artifactLarge.IsBackground = isBackground;
+            artifactLarge.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
+            artifactLarge.ArtifactVerticalAlignment = VerticalAlignment.Center;
+            page.Artifacts.Add(artifactLarge);
 
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
+            // ----- Second line (medium font) -----
+            var artifactMedium = new WatermarkArtifact();
+            artifactMedium.SetTextAndState(
+                "Do Not Distribute",
+                new TextState { Font = baseFont, FontSize = 36, ForegroundColor = wmColor }
+            );
+            artifactMedium.Rotation = rotation;
+            artifactMedium.Opacity = opacity;
+            artifactMedium.IsBackground = isBackground;
+            artifactMedium.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
+            artifactMedium.ArtifactVerticalAlignment = VerticalAlignment.Center;
+            // Position offset – 50 points lower than the centre.
+            artifactMedium.Position = new Aspose.Pdf.Point(page.PageInfo.Width / 2, (page.PageInfo.Height / 2) - 50);
+            page.Artifacts.Add(artifactMedium);
 
-                // First line – largest font size
-                TextFragment line1 = new TextFragment("CONFIDENTIAL");
-                line1.TextState.Font = watermarkFont;
-                line1.TextState.FontSize = 48;
-                line1.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                // Center horizontally, 70% up the page height
-                line1.Position = new Position(
-                    (page.PageInfo.Width - line1.TextState.FontSize * line1.Text.Length) / 2,
-                    page.PageInfo.Height * 0.7);
-                page.Paragraphs.Add(line1);
-
-                // Second line – medium font size
-                TextFragment line2 = new TextFragment("Do Not Distribute");
-                line2.TextState.Font = watermarkFont;
-                line2.TextState.FontSize = 32;
-                line2.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                line2.Position = new Position(
-                    (page.PageInfo.Width - line2.TextState.FontSize * line2.Text.Length) / 2,
-                    page.PageInfo.Height * 0.6);
-                page.Paragraphs.Add(line2);
-
-                // Third line – smallest font size
-                TextFragment line3 = new TextFragment("For Internal Use Only");
-                line3.TextState.Font = watermarkFont;
-                line3.TextState.FontSize = 24;
-                line3.TextState.ForegroundColor = Aspose.Pdf.Color.Gray;
-                line3.Position = new Position(
-                    (page.PageInfo.Width - line3.TextState.FontSize * line3.Text.Length) / 2,
-                    page.PageInfo.Height * 0.5);
-                page.Paragraphs.Add(line3);
-            }
-
-            // Save the modified document
-            doc.Save(outputPath);
+            // ----- Third line (small font) -----
+            var artifactSmall = new WatermarkArtifact();
+            artifactSmall.SetTextAndState(
+                "Internal Use Only",
+                new TextState { Font = baseFont, FontSize = 24, ForegroundColor = wmColor }
+            );
+            artifactSmall.Rotation = rotation;
+            artifactSmall.Opacity = opacity;
+            artifactSmall.IsBackground = isBackground;
+            artifactSmall.ArtifactHorizontalAlignment = HorizontalAlignment.Center;
+            artifactSmall.ArtifactVerticalAlignment = VerticalAlignment.Center;
+            // Position offset – 100 points lower than the centre.
+            artifactSmall.Position = new Aspose.Pdf.Point(page.PageInfo.Width / 2, (page.PageInfo.Height / 2) - 100);
+            page.Artifacts.Add(artifactSmall);
         }
 
+        // Save the watermarked PDF.
+        doc.Save(outputPath);
         Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

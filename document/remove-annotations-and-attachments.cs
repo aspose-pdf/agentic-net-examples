@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 
 class Program
 {
@@ -16,33 +15,48 @@ class Program
             return;
         }
 
-        // Load the PDF, then strip annotations (comments) and embedded file attachments.
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Remove all annotations from every page.
-            foreach (Page page in doc.Pages)
+            // Open the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                page.Annotations?.Clear();
-            }
-
-            // Remove all embedded files (attachments) from the document.
-            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
-            {
-                // EmbeddedFileCollection uses 1‑based indexing. Delete each file by its name.
-                for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                // ---------- Remove all annotations (comments, markup, etc.) ----------
+                // Annotations are stored per page. Iterate pages and delete each annotation.
+                foreach (Page page in doc.Pages)
                 {
-                    var fileSpec = doc.EmbeddedFiles[i];
-                    if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                    if (page.Annotations != null && page.Annotations.Count > 0)
                     {
-                        doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        // AnnotationCollection uses 1‑based indexing. Delete from the end to avoid re‑indexing issues.
+                        for (int i = page.Annotations.Count; i >= 1; i--)
+                        {
+                            page.Annotations.Delete(i);
+                        }
                     }
                 }
+
+                // ---------- Remove all embedded files (attachments) ----------
+                // EmbeddedFileCollection also uses 1‑based indexing and provides a Delete(string name) overload.
+                if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+                {
+                    for (int i = doc.EmbeddedFiles.Count; i >= 1; i--)
+                    {
+                        var fileSpec = doc.EmbeddedFiles[i];
+                        if (fileSpec != null && !string.IsNullOrEmpty(fileSpec.Name))
+                        {
+                            doc.EmbeddedFiles.Delete(fileSpec.Name);
+                        }
+                    }
+                }
+
+                // Save the cleaned PDF
+                doc.Save(outputPath);
             }
 
-            // Save the cleaned PDF.
-            doc.Save(outputPath);
+            Console.WriteLine($"Cleaned PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF cleaned and saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

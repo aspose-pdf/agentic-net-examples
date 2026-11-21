@@ -1,53 +1,59 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Drawing; // ImageStamp lives in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string pdfPath   = "input.pdf";
-        const string imgPath   = "stamp.png";
-        const string outputPdf = "output.pdf";
+        // Paths for the source PDF, the image to stamp, and the output PDF
+        const string pdfPath   = "source.pdf";
+        const string imagePath = "stamp.png";
+        const string outPath   = "stamped.pdf";
 
-        // Verify files exist
+        // Validate input files
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
-        if (!File.Exists(imgPath))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Image not found: {imgPath}");
+            Console.Error.WriteLine($"Image not found: {imagePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Load the image into a memory stream
+        using (MemoryStream imgStream = new MemoryStream(File.ReadAllBytes(imagePath)))
         {
-            // Create a memory stream from the image file
-            using (MemoryStream imgStream = new MemoryStream(File.ReadAllBytes(imgPath)))
+            // Create an ImageStamp from the memory stream
+            ImageStamp stamp = new ImageStamp(imgStream)
             {
-                // Create an ImageStamp from the memory stream (Drawing API)
-                ImageStamp stamp = new ImageStamp(imgStream);
+                // Scale the stamp to 50% of its original size
+                Zoom = 0.5, // double‑precision scaling factor (50 %)
 
-                // Scale to 50% of the original dimensions using the Zoom property
-                stamp.Zoom = 0.5; // 50% scaling
+                // Optional positioning – keep default bottom‑left corner
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                XIndent = 0f,
+                YIndent = 0f,
 
-                // Optional positioning – center on the page
-                stamp.HorizontalAlignment = HorizontalAlignment.Center;
-                stamp.VerticalAlignment   = VerticalAlignment.Center;
+                // Place the stamp in the foreground (over existing content)
+                Background = false
+            };
 
-                // Add the stamp to the first page of the document
-                doc.Pages[1].AddStamp(stamp);
+            // Load the PDF document (Document implements IDisposable)
+            using (Document pdfDoc = new Document(pdfPath))
+            {
+                // Add the stamp to the first page (pages are 1‑based)
+                pdfDoc.Pages[1].AddStamp(stamp);
+
+                // Save the modified PDF
+                pdfDoc.Save(outPath);
             }
-
-            // Save the modified PDF
-            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Image stamp added and saved to '{outputPdf}'.");
+        Console.WriteLine($"Image stamp applied and saved to '{outPath}'.");
     }
 }

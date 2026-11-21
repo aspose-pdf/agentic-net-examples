@@ -1,50 +1,27 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Aspose.Pdf.Facades;
-
-// Stub implementation for PdfFormEditor when the Aspose.Pdf library is not referenced.
-// This allows the code to compile and run for demonstration purposes.
-// In a real project, reference the official Aspose.Pdf NuGet package instead of this stub.
-namespace Aspose.Pdf.Facades
-{
-    public class PdfFormEditor
-    {
-        private string _pdfPath;
-
-        /// <summary>
-        /// Binds the specified PDF file to the editor.
-        /// </summary>
-        public void BindPdf(string pdfPath)
-        {
-            if (string.IsNullOrEmpty(pdfPath))
-                throw new ArgumentException("PDF path cannot be null or empty.", nameof(pdfPath));
-            if (!File.Exists(pdfPath))
-                throw new FileNotFoundException($"PDF file not found: {pdfPath}", pdfPath);
-            _pdfPath = pdfPath;
-        }
-
-        /// <summary>
-        /// Retrieves the list of options for a radio‑button field.
-        /// This stub returns an empty array; replace with real implementation when using Aspose.Pdf.
-        /// </summary>
-        public string[] GetRadioButtonOptions(string fieldName)
-        {
-            if (string.IsNullOrEmpty(fieldName))
-                throw new ArgumentException("Field name cannot be null or empty.", nameof(fieldName));
-            // Real implementation would inspect the PDF form fields and return the actual options.
-            // For the stub we simply return an empty array to keep the example compilable.
-            return Array.Empty<string>();
-        }
-    }
-}
+using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "form.pdf";               // input PDF containing the form
-        const string radioFieldName = "Gender";          // name of the radio button field to check
+        // Path to the PDF containing the form
+        const string pdfPath = "form.pdf";
+
+        // Name of the radio button field to inspect
+        const string radioFieldName = "Gender";
+
+        // Expected set of options for the radio button
+        var expectedOptions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Male",
+            "Female",
+            "Other"
+        };
 
         if (!File.Exists(pdfPath))
         {
@@ -52,32 +29,42 @@ class Program
             return;
         }
 
-        // Expected set of options for the radio button field
-        string[] expectedOptions = new[] { "Male", "Female", "Other" };
+        // Load the PDF document (FormEditor does not expose option values)
+        Document pdfDocument = new Document(pdfPath);
 
-        // Bind the PDF to the form editor (no using needed – PdfFormEditor is not a Document)
-        PdfFormEditor formEditor = new PdfFormEditor();
-        formEditor.BindPdf(pdfPath);
-
-        // Retrieve the actual options defined for the radio button field
-        string[] actualOptions = formEditor.GetRadioButtonOptions(radioFieldName);
-
-        // Compare the two sets (order‑independent)
-        bool optionsMatch = expectedOptions.Length == actualOptions.Length &&
-                            expectedOptions.OrderBy(o => o)
-                                           .SequenceEqual(actualOptions.OrderBy(o => o));
-
-        if (optionsMatch)
+        // Retrieve the radio button field from the document's form collection
+        RadioButtonField radioField = pdfDocument.Form[radioFieldName] as RadioButtonField;
+        if (radioField == null)
         {
-            Console.WriteLine("Radio button options match the expected set.");
+            Console.Error.WriteLine($"Radio button field '{radioFieldName}' not found or is not a radio button.");
+            return;
+        }
+
+        // Extract the option values (Value if set, otherwise the display name)
+        string[] options = radioField.Options
+                                      .Select(opt => !string.IsNullOrEmpty(opt.Value) ? opt.Value : opt.Name)
+                                      .ToArray();
+
+        if (options == null || options.Length == 0)
+        {
+            Console.Error.WriteLine($"Radio button field '{radioFieldName}' has no options.");
+            return;
+        }
+
+        // Convert the retrieved options to a set for comparison
+        var actualOptions = new HashSet<string>(options, StringComparer.OrdinalIgnoreCase);
+
+        // Compare the actual options with the expected set
+        bool matches = expectedOptions.SetEquals(actualOptions);
+        if (matches)
+        {
+            Console.WriteLine($"Radio button '{radioFieldName}' options match the expected set.");
         }
         else
         {
-            Console.WriteLine("Radio button options do NOT match the expected set.");
-            Console.WriteLine($"Expected: [{string.Join(", ", expectedOptions)}]");
-            Console.WriteLine($"Actual  : [{string.Join(", ", actualOptions)}]");
+            Console.WriteLine($"Radio button '{radioFieldName}' options do NOT match.");
+            Console.WriteLine("Expected: " + string.Join(", ", expectedOptions));
+            Console.WriteLine("Actual:   " + string.Join(", ", actualOptions));
         }
-
-        // No explicit disposal required for PdfFormEditor; it will be reclaimed by GC.
     }
 }

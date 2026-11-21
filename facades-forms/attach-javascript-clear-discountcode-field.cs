@@ -1,16 +1,13 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_with_js.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -18,34 +15,20 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Try to get the field "DiscountCode" as a TextBoxField.
-        // The indexer returns a generic Field; we cast to TextBoxField.
-        // If the cast fails, the field either does not exist or is of a different type.
-        if (doc.Form == null)
+        // Load the PDF using the FormEditor facade
+        using (FormEditor formEditor = new FormEditor())
         {
-            Console.Error.WriteLine("The document does not contain a form.");
-            return;
+            formEditor.BindPdf(inputPath);
+
+            // JavaScript that clears the field when it receives focus
+            string clearOnFocusJs = "this.value='';";
+
+            // Attach the JavaScript to the field named "DiscountCode"
+            formEditor.AddFieldScript("DiscountCode", clearOnFocusJs);
+
+            // Save the updated PDF
+            formEditor.Save(outputPath);
         }
-
-        TextBoxField discountField = doc.Form["DiscountCode"] as TextBoxField;
-        if (discountField == null)
-        {
-            Console.Error.WriteLine("Form field 'DiscountCode' not found or is not a TextBoxField.");
-            return;
-        }
-
-        // JavaScript that clears the field when it receives focus.
-        // Using the 'event' object is the recommended way in Acrobat JavaScript.
-        string focusClearJs = "event.target.value='';";
-
-        // Attach the JavaScript to the field's OnEnter action (focus event).
-        discountField.Actions.OnEnter = new JavascriptAction(focusClearJs);
-
-        // Save the modified PDF
-        doc.Save(outputPath);
 
         Console.WriteLine($"JavaScript attached and saved to '{outputPath}'.");
     }

@@ -1,8 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text; // Font, FontRepository, FontStyles, TextStamp
 
 class Program
 {
@@ -17,47 +16,49 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
+        // Load the document to obtain page size and to apply stamps.
+        Document doc = new Document(inputPath);
+        Page firstPage = doc.Pages[1]; // 1‑based indexing
+        double pageWidth = firstPage.PageInfo.Width;
+        double pageHeight = firstPage.PageInfo.Height;
 
-        // Common watermark appearance
-        const int fontSize = 48;
-        Color watermarkColor = Color.FromRgb(0.8, 0.8, 0.8); // light gray
+        // Center X is not used directly – we centre via HorizontalAlignment.
+        // Y‑coordinates are handled as floats because TextStamp.YIndent expects a float.
+        float startY = (float)(pageHeight / 2 + 30); // first line a bit above centre
+        float lineSpacing = 20f;
+        // FontSize in Aspose.Pdf.Text.TextState is a float, so use float here.
+        float fontSize = 36f;
 
-        // Define the three lines with their styles and positions
-        var lines = new[]
+        // Define the three lines together with the font name and the desired style.
+        string[] texts = { "CONFIDENTIAL", "Do Not Distribute", "© Company 2026" };
+        string[] fonts = { "Arial", "Times New Roman", "Courier New" };
+        FontStyles[] styles = { FontStyles.Bold, FontStyles.Italic, FontStyles.Regular };
+
+        for (int i = 0; i < texts.Length; i++)
         {
-            new { Text = "CONFIDENTIAL",          FontStyle = FontStyles.Bold,   X = 100.0, Y = 500.0 },
-            new { Text = "DO NOT DISTRIBUTE",    FontStyle = FontStyles.Italic, X = 100.0, Y = 450.0 },
-            new { Text = "FOR INTERNAL USE ONLY", FontStyle = FontStyles.Regular, X = 100.0, Y = 400.0 }
-        };
+            // Create a TextStamp for the current line.
+            TextStamp stamp = new TextStamp(texts[i]);
 
-        // Apply the watermark to every page (or change to a specific page if required)
-        foreach (Page page in pdfDoc.Pages)
-        {
-            foreach (var line in lines)
-            {
-                // Create a TextFragment for the current line
-                TextFragment tf = new TextFragment(line.Text)
-                {
-                    Position = new Position(line.X, line.Y),
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment = VerticalAlignment.Bottom
-                };
+            // Assign font, size, style and colour.
+            stamp.TextState.Font = FontRepository.FindFont(fonts[i]);
+            stamp.TextState.FontSize = fontSize; // now matches the property type (float)
+            stamp.TextState.FontStyle = styles[i];
+            stamp.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0.5, 0.5, 0.5);
 
-                // Set font, size and color for this line
-                tf.TextState.Font = FontRepository.FindFont("Arial", line.FontStyle);
-                tf.TextState.FontSize = fontSize;
-                tf.TextState.ForegroundColor = watermarkColor;
+            // Centre the text horizontally and position it vertically.
+            stamp.HorizontalAlignment = HorizontalAlignment.Center;
+            // Explicit cast to float because YIndent is a float property.
+            stamp.YIndent = (float)(startY - i * lineSpacing);
 
-                // Add the fragment to the page
-                page.Paragraphs.Add(tf);
-            }
+            // Optional: make the watermark semi‑transparent.
+            stamp.Opacity = 0.5f;
+
+            // Add the stamp to the first page (or loop over all pages if required).
+            firstPage.AddStamp(stamp);
         }
 
-        // Save the modified PDF
-        pdfDoc.Save(outputPath);
-
-        Console.WriteLine($"Watermark applied successfully to '{outputPath}'.");
+        // Save the watermarked PDF.
+        doc.Save(outputPath);
+        Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }
 }

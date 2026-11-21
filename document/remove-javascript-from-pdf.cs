@@ -4,12 +4,12 @@ using System.Reflection;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
-class RemoveJavaScript
+class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_no_js.pdf";
+        const string outputPath = "cleaned.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -17,73 +17,66 @@ class RemoveJavaScript
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // ----- Remove document‑level JavaScript actions -----
-            // Document may expose several action properties (OnOpen, OnClose, etc.).
-            // Iterate over them via reflection and clear any JavascriptAction.
+            // ---- Remove document‑level JavaScript ----
+            // Document.JavaScript is read‑only; clear actions via reflection.
             ClearJavascriptActions(doc.Actions);
 
-            // Remove OpenAction if it is a JavaScript action
-            if (doc.OpenAction is JavascriptAction)
-                doc.OpenAction = null;
+            // Some PDFs have an OpenAction that executes JavaScript.
+            // Setting it to null disables the action.
+            doc.OpenAction = null;
 
-            // ----- Iterate through all pages -----
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // ---- Iterate through all pages ----
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                Page page = doc.Pages[pageIndex];
+                Page page = doc.Pages[i];
 
-                // Remove page‑level JavaScript actions (OnOpen, OnClose, etc.)
-                ClearJavascriptActions(page.Actions);
-
-                // Remove JavaScript from annotations (iterate backwards to allow removal if needed)
-                for (int annotIndex = page.Annotations.Count; annotIndex >= 1; annotIndex--)
+                // Remove page‑level actions (e.g., OnOpen, OnClose) that may contain JavaScript.
+                if (page.Actions != null)
                 {
-                    Annotation annot = page.Annotations[annotIndex];
+                    ClearJavascriptActions(page.Actions);
+                }
 
-                    // Only LinkAnnotation (and a few others) expose an Action property.
-                    // Guard with a type‑check before accessing.
+                // Remove JavaScript actions attached to annotations.
+                foreach (Annotation annot in page.Annotations)
+                {
+                    // LinkAnnotation may contain a JavaScript action.
                     if (annot is LinkAnnotation link && link.Action is JavascriptAction)
                     {
                         link.Action = null;
                     }
-                    // WidgetAnnotation (form fields) expose an Actions collection.
-                    else if (annot is WidgetAnnotation widget && widget.Actions != null)
+
+                    // WidgetAnnotation (form fields) can have actions; clear them via reflection.
+                    if (annot is WidgetAnnotation widget && widget.Actions != null)
                     {
                         ClearJavascriptActions(widget.Actions);
                     }
                 }
             }
 
-            // Save the cleaned PDF
+            // Save the cleaned PDF.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"JavaScript removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"All JavaScript removed. Saved to '{outputPath}'.");
     }
 
     /// <summary>
-    /// Clears any JavascriptAction found in the supplied action collection (DocumentActionCollection, PageActionCollection, or AnnotationActions).
+    /// Clears any JavascriptAction properties from the given action collection using reflection.
     /// </summary>
-    private static void ClearJavascriptActions(object actionsCollection)
+    private static void ClearJavascriptActions(object actionCollection)
     {
-        if (actionsCollection == null) return;
-
-        // Use reflection to enumerate all public instance properties of the collection.
-        PropertyInfo[] props = actionsCollection.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-        foreach (PropertyInfo prop in props)
+        if (actionCollection == null) return;
+        PropertyInfo[] props = actionCollection.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+        foreach (var prop in props)
         {
-            // Only writable properties are relevant.
-            if (!prop.CanWrite) continue;
-
-            // If the property value is a JavascriptAction, set it to null.
-            if (prop.GetValue(actionsCollection) is JavascriptAction)
+            // Only consider writable properties of type JavascriptAction
+            if (prop.CanWrite && prop.PropertyType == typeof(JavascriptAction))
             {
-                prop.SetValue(actionsCollection, null);
+                prop.SetValue(actionCollection, null);
             }
-            // Some collections (e.g., WidgetAnnotation.Actions) expose nested action objects like OnMouseEnter, OnMouseExit, etc.
-            // Those nested objects are also of type JavascriptAction, so the same logic applies.
         }
     }
 }

@@ -7,29 +7,35 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputTiffPath = "output.tiff";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.tiff";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDoc = new Document(inputPdfPath);
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
 
-        // Create a TiffDevice with the desired resolution.
-        // The overload without a compression argument uses the default compression (CCITT4).
-        Resolution resolution = new Resolution(300); // DPI
-        TiffDevice tiffDevice = new TiffDevice(resolution);
-
-        // Write all pages to a single multi‑page TIFF file.
-        using (FileStream tiffStream = new FileStream(outputTiffPath, FileMode.Create, FileAccess.Write))
+        // Configure TIFF settings (compression, DPI, etc.)
+        Resolution resolution = new Resolution(300); // desired DPI
+        TiffSettings tiffSettings = new TiffSettings
         {
+            Compression = CompressionType.CCITT4 // LZW, CCITT4, CCITT3, RLE, None are valid values
+        };
+
+        // Create the TiffDevice with the resolution and settings
+        TiffDevice tiffDevice = new TiffDevice(resolution, tiffSettings);
+
+        // Write the multi‑page TIFF to a file stream
+        using (FileStream tiffStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+        {
+            // Convert all pages (1 .. pdfDoc.Pages.Count) into a single TIFF file
             tiffDevice.Process(pdfDoc, 1, pdfDoc.Pages.Count, tiffStream);
         }
 
-        Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputTiffPath}");
+        Console.WriteLine($"PDF successfully converted to multi‑page TIFF: {outputPath}");
     }
 }

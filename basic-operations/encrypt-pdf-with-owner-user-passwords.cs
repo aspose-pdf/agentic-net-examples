@@ -6,33 +6,27 @@ class Program
 {
     static void Main()
     {
-        // Input PDF path
-        const string inputPath = "input.pdf";
-        // Output encrypted PDF path
-        const string encryptedPath = "encrypted.pdf";
+        const string inputPath      = "input.pdf";
+        const string encryptedPath  = "encrypted.pdf";
+        const string userPassword   = "user123";
+        const string ownerPassword  = "owner123";
 
-        // Passwords
-        const string userPassword  = "user123";
-        const string ownerPassword = "owner123";
-
-        // Verify input file exists
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
+            // Load the PDF and apply encryption
             using (Document doc = new Document(inputPath))
             {
-                // Define permissions: exclude PrintDocument to restrict printing
-                Permissions perms = Permissions.ExtractContent; // printing not allowed
-
-                // Encrypt with user/owner passwords and AES-256 algorithm
+                // Restrict permissions: do NOT include PrintDocument permission
+                Permissions perms = Permissions.ExtractContent; // example: allow content extraction only
+                // Encrypt with AES-256 (recommended)
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
                 // Save the encrypted PDF
                 doc.Save(encryptedPath);
             }

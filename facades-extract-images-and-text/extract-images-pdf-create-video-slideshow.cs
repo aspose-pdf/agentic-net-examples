@@ -7,50 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
         const string imagesDir = "extracted_images";
+        const string ffmpegPath = "ffmpeg"; // assumes ffmpeg is in the system PATH
         const string videoPath = "slideshow.mp4";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output folder for images exists
+        // Ensure the directory for extracted images exists
         Directory.CreateDirectory(imagesDir);
 
-        // Extract all images from the PDF using PdfExtractor
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(inputPdf);
-            extractor.ExtractImage(); // extracts images from the bound PDF
+        // Extract images from the PDF using Aspose.Pdf.Facades.PdfExtractor
+        PdfExtractor extractor = new PdfExtractor();
+        extractor.BindPdf(pdfPath);
+        extractor.ExtractImage();
 
-            int imageIndex = 1;
-            while (extractor.HasNextImage())
-            {
-                // Save each image as a sequentially numbered JPEG
-                string imageFile = Path.Combine(imagesDir, $"image_{imageIndex:D3}.jpg");
-                extractor.GetNextImage(imageFile);
-                imageIndex++;
-            }
+        int imageIndex = 1;
+        while (extractor.HasNextImage())
+        {
+            string imageFile = Path.Combine(imagesDir, $"image_{imageIndex:D3}.png");
+            extractor.GetNextImage(imageFile);
+            imageIndex++;
         }
 
-        // Verify that at least one image was extracted
-        string[] imageFiles = Directory.GetFiles(imagesDir, "image_*.jpg");
-        if (imageFiles.Length == 0)
+        if (imageIndex == 1)
         {
-            Console.WriteLine("No images were extracted from the PDF.");
+            Console.WriteLine("No images were found in the PDF.");
             return;
         }
 
-        // Build FFmpeg arguments to create a slideshow (1 second per image)
-        string ffmpegArgs = $"-y -framerate 1 -i \"{Path.Combine(imagesDir, "image_%03d.jpg")}\" -c:v libx264 -r 30 -pix_fmt yuv420p \"{videoPath}\"";
+        // Build FFmpeg arguments to create a slideshow (1 frame per second)
+        string args = $"-y -framerate 1 -i \"{Path.Combine(imagesDir, "image_%03d.png")}\" -c:v libx264 -r 30 -pix_fmt yuv420p \"{videoPath}\"";
 
         ProcessStartInfo psi = new ProcessStartInfo
         {
-            FileName = "ffmpeg",
-            Arguments = ffmpegArgs,
+            FileName = ffmpegPath,
+            Arguments = args,
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
@@ -65,20 +61,21 @@ class Program
                 string stdErr = proc.StandardError.ReadToEnd();
                 proc.WaitForExit();
 
-                if (proc.ExitCode == 0)
+                Console.WriteLine(stdOut);
+                if (proc.ExitCode != 0)
                 {
-                    Console.WriteLine($"Video slideshow created: {videoPath}");
+                    Console.Error.WriteLine($"FFmpeg exited with code {proc.ExitCode}");
+                    Console.Error.WriteLine(stdErr);
                 }
                 else
                 {
-                    Console.Error.WriteLine("FFmpeg failed:");
-                    Console.Error.WriteLine(stdErr);
+                    Console.WriteLine($"Video slideshow created: {videoPath}");
                 }
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error running ffmpeg: {ex.Message}");
+            Console.Error.WriteLine($"Error running FFmpeg: {ex.Message}");
         }
     }
 }

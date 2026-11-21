@@ -12,31 +12,21 @@ class Program
 
         if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document.
+        using (Document doc = new Document(pdfPath))
+        // Create the output FDF file stream.
+        using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
         {
-            // Load the PDF document
-            using (Document doc = new Document(pdfPath))
-            // Create a file stream for the FDF output
-            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
-            {
-                // Initialize the Form facade and bind the document
-                using (Form formFacade = new Form())
-                {
-                    formFacade.BindPdf(doc);
-                    // Export form data to the FDF stream
-                    formFacade.ExportFdf(fdfStream);
-                }
-            }
+            // Use the Form facade to export AcroForm data to FDF.
+            Form formFacade = new Form();
+            formFacade.BindPdf(doc);
+            formFacade.ExportFdf(fdfStream);
+        }
 
-            Console.WriteLine($"Form data exported to FDF: {fdfPath}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine($"Form data exported to FDF file: {fdfPath}");
     }
 }

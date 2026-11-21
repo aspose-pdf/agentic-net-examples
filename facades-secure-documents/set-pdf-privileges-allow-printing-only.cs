@@ -1,14 +1,17 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Security; // for CryptoAlgorithm enum
+using Aspose.Pdf; // Document, Permissions, CryptoAlgorithm
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "output_privileges.pdf";
+
+        // Owner password is required to enforce permissions.
+        // User password left empty to allow opening without a password.
+        const string userPassword = "";
         const string ownerPassword = "owner123";
 
         if (!File.Exists(inputPath))
@@ -17,20 +20,14 @@ class Program
             return;
         }
 
-        // Define permissions: allow printing, disallow copying (extracting content)
-        Permissions permissions = Permissions.PrintDocument; // only printing is permitted
+        // Allow printing, disallow copying (ExtractContent).
+        Permissions perms = Permissions.PrintDocument;
 
-        // Load the PDF, apply encryption with the desired permissions, and save the result.
-        // An empty user password means the document can be opened without a password,
-        // while the owner password protects the permissions.
-        Document pdfDocument = new Document(inputPath);
-        pdfDocument.Encrypt(
-            userPassword: "",               // no password required to open
-            ownerPassword: ownerPassword,   // owner password to modify permissions
-            permissions: permissions,
-            cryptoAlgorithm: CryptoAlgorithm.AESx256); // strong encryption
-        pdfDocument.Save(outputPath);
+        // Load the PDF, apply the permissions and save.
+        Document doc = new Document(inputPath);
+        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
+        doc.Save(outputPath);
 
-        Console.WriteLine($"Document privileges set and saved to '{outputPath}'.");
+        Console.WriteLine($"Privileges set and saved to '{outputPath}'.");
     }
 }

@@ -8,7 +8,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_incremental.pdf";
-        const string conversionLog = "conversion_log.xml";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -19,14 +19,19 @@ class Program
         // Load the PDF
         using (Document doc = new Document(inputPath))
         {
-            // Change PDF version to 1.5 using Document.Convert
-            doc.Convert(conversionLog, PdfFormat.v_1_5, ConvertErrorAction.Delete);
+            // Change PDF version to 1.5 using Convert (Version property is read‑only)
+            doc.Convert(logPath, PdfFormat.v_1_5, ConvertErrorAction.Delete);
 
-            // Save with incremental update – open a read/write stream and call parameterless Save()
-            using (FileStream fs = new FileStream(outputPath, FileMode.Create, FileAccess.ReadWrite))
-            {
-                doc.Save(fs); // parameterless Save performs incremental update on the stream
-            }
+            // Initial save
+            doc.Save(outputPath);
+        }
+
+        // Perform incremental update: reopen with a read/write stream and save without options
+        using (var fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite))
+        using (var doc = new Document(fs))
+        {
+            // No further modifications; calling Save() triggers an incremental update
+            doc.Save();
         }
 
         Console.WriteLine($"PDF saved with version 1.5 and incremental update to '{outputPath}'.");

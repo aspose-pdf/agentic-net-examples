@@ -2,74 +2,75 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 
-class Program
+class LargePdfSaveInterrupt
 {
     static void Main()
     {
-        const string sourcePath = "large_input.pdf";
+        const string inputPath = "large_input.pdf";
         const string outputPath = "large_output.pdf";
         const int batchSize = 100; // number of pages to process before releasing resources
 
-        if (!File.Exists(sourcePath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Remove any previous output file
-        if (File.Exists(outputPath))
-            File.Delete(outputPath);
-
-        // Load the source PDF
-        using (Aspose.Pdf.Document sourceDoc = new Aspose.Pdf.Document(sourcePath))
+        // Load the source PDF once
+        using (Document srcDoc = new Document(inputPath))
         {
-            int totalPages = sourceDoc.Pages.Count;
-            int processedPages = 0;
-
-            Aspose.Pdf.Document targetDoc = null;
+            int totalPages = srcDoc.Pages.Count;
+            bool firstBatch = true;
+            Document batchDoc = null;
 
             try
             {
-                while (processedPages < totalPages)
+                // Start with an empty document for the first batch
+                batchDoc = new Document();
+
+                // Iterate using 1‑based page indexing (Aspose.Pdf requirement)
+                for (int pageIndex = 1; pageIndex <= totalPages; pageIndex++)
                 {
-                    // Create a new target document for the current batch
-                    targetDoc = new Aspose.Pdf.Document();
+                    // Add the current page from source to the batch document
+                    batchDoc.Pages.Add(srcDoc.Pages[pageIndex]);
 
-                    // Add a batch of pages from the source to the target
-                    for (int i = 0; i < batchSize && processedPages < totalPages; i++)
+                    // When the batch size is reached or it's the last page, save incrementally
+                    if (pageIndex % batchSize == 0 || pageIndex == totalPages)
                     {
-                        // Aspose.Pdf uses 1‑based page indexing
-                        Aspose.Pdf.Page srcPage = sourceDoc.Pages[processedPages + 1];
-                        targetDoc.Pages.Add(srcPage);
-                        processedPages++;
-                    }
+                        if (firstBatch)
+                        {
+                            // First save creates the file
+                            batchDoc.Save(outputPath);
+                        }
+                        else
+                        {
+                            // Subsequent saves perform an incremental update
+                            using (var fs = new FileStream(outputPath, FileMode.Open, FileAccess.ReadWrite))
+                            {
+                                batchDoc.Save(fs); // parameterless Save on a stream triggers incremental update
+                            }
+                        }
 
-                    // Save the batch
-                    if (processedPages == batchSize)
-                    {
-                        // First batch creates the file
-                        targetDoc.Save(outputPath);
-                    }
-                    else
-                    {
-                        // Subsequent batches append to the existing file.
-                        // Incremental saving is achieved by reopening the file and adding more pages.
-                        targetDoc.Save(outputPath, new Aspose.Pdf.PdfSaveOptions());
-                    }
+                        // Release resources held by the batch document
+                        batchDoc.Dispose();
 
-                    // Dispose the current target document to free memory/resources
-                    targetDoc.Dispose();
-                    targetDoc = null;
+                        // If there are more pages to process, reload the partially saved file
+                        if (pageIndex != totalPages)
+                        {
+                            batchDoc = new Document(outputPath);
+                        }
+
+                        firstBatch = false;
+                    }
                 }
             }
             finally
             {
-                // Ensure any remaining target document is disposed
-                if (targetDoc != null)
-                    targetDoc.Dispose();
+                // Ensure the last batch document is disposed even if an exception occurs
+                batchDoc?.Dispose();
             }
         }
 
-        Console.WriteLine($"Completed saving. Output file: {outputPath}");
+        Console.WriteLine($"Large PDF saved incrementally to '{outputPath}'.");
     }
 }

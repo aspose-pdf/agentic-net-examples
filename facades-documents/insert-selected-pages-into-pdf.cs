@@ -1,67 +1,47 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Paths to the source PDF (pages to take), the original destination PDF,
-        // and the final PDF that will contain the inserted pages.
-        const string sourcePath = "source.pdf";
-        const string destinationPath = "destination.pdf";
-        const string outputPath = "result.pdf";
+        // Paths to the source PDF (pages to take) and the destination PDF (where to insert)
+        const string sourcePdf = "source.pdf";
+        const string destinationPdf = "dest.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Define which pages (1‑based) from the source PDF should be inserted.
+        // Array of page numbers (1‑based) to insert from the source PDF
         int[] pagesToInsert = new int[] { 2, 4, 5 };
 
         // Position in the destination PDF after which the pages will be inserted.
-        // Use 0 to insert at the very beginning.
-        int insertAfterPage = 3;
+        // 1‑based index; insert after this page number.
+        int insertPosition = 3;
 
-        // Verify that the input files exist.
-        if (!File.Exists(sourcePath))
+        // Validate files exist
+        if (!File.Exists(sourcePdf))
         {
-            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            Console.Error.WriteLine($"Source file not found: {sourcePdf}");
             return;
         }
-        if (!File.Exists(destinationPath))
+        if (!File.Exists(destinationPdf))
         {
-            Console.Error.WriteLine($"Destination file not found: {destinationPath}");
+            Console.Error.WriteLine($"Destination file not found: {destinationPdf}");
             return;
         }
 
-        // Load both PDFs using the Document class (PdfFileEditor does not provide InsertPage).
-        Document srcDoc = new Document(sourcePath);
-        Document destDoc = new Document(destinationPath);
-
-        // Determine the insertion index for the destination document.
-        // Aspose.Pdf.Pages.Insert inserts *before* the supplied index (1‑based).
-        // To insert after page N we insert at position N + 1. If N == 0 we insert at the very start (position 1).
-        int insertPos = insertAfterPage == 0 ? 1 : insertAfterPage + 1;
-
-        // Insert the selected pages preserving their original order.
-        foreach (int srcPageNumber in pagesToInsert)
+        // Use PdfFileEditor to insert the selected pages.
+        // The Insert method writes the result directly to the output file.
+        PdfFileEditor editor = new PdfFileEditor();
+        try
         {
-            // Validate source page number.
-            if (srcPageNumber < 1 || srcPageNumber > srcDoc.Pages.Count)
-            {
-                Console.Error.WriteLine($"Source page {srcPageNumber} is out of range. Skipping.");
-                continue;
-            }
-
-            // Clone the page from the source document.
-            Page pageToInsert = srcDoc.Pages[srcPageNumber];
-            // Insert the page into the destination document at the calculated position.
-            destDoc.Pages.Insert(insertPos, pageToInsert);
-            // Advance the insertion position so subsequent pages keep their order.
-            insertPos++;
+            // Insert after 'insertPosition' page of the destination PDF.
+            editor.Insert(destinationPdf, insertPosition, sourcePdf, pagesToInsert, outputPdf);
+            Console.WriteLine($"Successfully inserted {pagesToInsert.Length} pages into '{outputPdf}'.");
         }
-
-        // Save the modified document to the output path.
-        destDoc.Save(outputPath);
-
-        Console.WriteLine($"Inserted pages {string.Join(",", pagesToInsert)} from '{sourcePath}' into '{destinationPath}' after page {insertAfterPage}.");
-        Console.WriteLine($"Result saved as '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during insertion: {ex.Message}");
+        }
     }
 }

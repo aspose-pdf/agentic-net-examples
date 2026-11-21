@@ -4,13 +4,14 @@ using System.Xml.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class XmlToPdfGenerator
 {
     static void Main()
     {
-        const string xmlPath        = "input.xml";
-        const string outputPdfPath  = "output.pdf";
-        const string customFontPath = "custom.ttf";
+        // Paths – adjust as needed
+        const string xmlPath = "input.xml";
+        const string pdfPath = "output.pdf";
+        const string fontPath = "CustomFont.ttf"; // path to the custom TrueType/OpenType font
 
         if (!File.Exists(xmlPath))
         {
@@ -18,76 +19,56 @@ class Program
             return;
         }
 
-        if (!File.Exists(customFontPath))
+        if (!File.Exists(fontPath))
         {
-            Console.Error.WriteLine($"Custom font file not found: {customFontPath}");
+            Console.Error.WriteLine($"Font file not found: {fontPath}");
             return;
         }
 
-        // Load the XML document.
+        // Load the XML document
         XDocument xDoc = XDocument.Load(xmlPath);
-        if (xDoc.Root == null)
+
+        // Create a new PDF document
+        Aspose.Pdf.Document pdfDoc = new Aspose.Pdf.Document();
+
+        // Add a single page (more pages can be added as needed)
+        Aspose.Pdf.Page page = pdfDoc.Pages.Add();
+
+        // Load the custom font
+        Aspose.Pdf.Text.Font customFont = Aspose.Pdf.Text.FontRepository.OpenFont(fontPath);
+
+        // Process XML elements in document order
+        foreach (XElement element in xDoc.Descendants())
         {
-            Console.Error.WriteLine("XML document has no root element.");
-            return;
+            // Skip elements that contain child elements – we only render leaf text nodes
+            if (element.HasElements) continue;
+
+            // Create a text fragment with the element's text content
+            Aspose.Pdf.Text.TextFragment fragment = new Aspose.Pdf.Text.TextFragment(element.Value);
+
+            // Apply the custom font to specific elements (e.g., <title>)
+            if (string.Equals(element.Name.LocalName, "title", StringComparison.OrdinalIgnoreCase))
+            {
+                fragment.TextState.Font = customFont;
+                fragment.TextState.FontSize = 16; // larger size for titles
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.FromRgb(0, 0, 0.8); // optional color
+            }
+            else
+            {
+                // Default styling for other text
+                fragment.TextState.FontSize = 12;
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            }
+
+            // Add a line break after each fragment for readability
+            fragment.Text += "\n";
+
+            // Add the fragment to the page's paragraph collection
+            page.Paragraphs.Add(fragment);
         }
 
-        // Register the custom font using the modern FontRepository API.
-        // "CustomFont" is an arbitrary name used to reference the font later.
-        FontRepository.Substitutions.Add(new SimpleFontSubstitution("CustomFont", customFontPath));
-        Font customFont = FontRepository.FindFont("CustomFont");
-
-        // Create a new PDF document.
-        using (Document pdfDoc = new Document())
-        {
-            // Add a single page to hold the content.
-            Page page = pdfDoc.Pages.Add();
-
-            // Recursively process XML elements and add them to the PDF.
-            ProcessElement(xDoc.Root, page, customFont);
-
-            // Save the PDF.
-            pdfDoc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"PDF generated at '{outputPdfPath}'.");
-    }
-
-    // Recursively traverses XML elements, creating a TextFragment for each.
-    // Elements named "Important" (example) will use the custom font.
-    static void ProcessElement(XElement element, Page page, Font customFont)
-    {
-        if (element == null) return;
-
-        // Create a text fragment for the element's name.
-        TextFragment nameFragment = new TextFragment($"<{element.Name}>");
-        nameFragment.TextState.FontSize = 12;
-        // Use custom font for elements named "Important".
-        if (string.Equals(element.Name.LocalName, "Important", StringComparison.OrdinalIgnoreCase))
-            nameFragment.TextState.Font = customFont;
-        page.Paragraphs.Add(nameFragment);
-
-        // If the element has a value (text content), add it.
-        if (!string.IsNullOrWhiteSpace(element.Value) && !element.HasElements)
-        {
-            TextFragment valueFragment = new TextFragment(element.Value.Trim());
-            valueFragment.TextState.FontSize = 12;
-            if (string.Equals(element.Name.LocalName, "Important", StringComparison.OrdinalIgnoreCase))
-                valueFragment.TextState.Font = customFont;
-            page.Paragraphs.Add(valueFragment);
-        }
-
-        // Process child elements.
-        foreach (XElement child in element.Elements())
-        {
-            ProcessElement(child, page, customFont);
-        }
-
-        // Add a closing tag fragment.
-        TextFragment closeFragment = new TextFragment($"</{element.Name}>");
-        closeFragment.TextState.FontSize = 12;
-        if (string.Equals(element.Name.LocalName, "Important", StringComparison.OrdinalIgnoreCase))
-            closeFragment.TextState.Font = customFont;
-        page.Paragraphs.Add(closeFragment);
+        // Save the generated PDF
+        pdfDoc.Save(pdfPath);
+        Console.WriteLine($"PDF generated successfully at '{pdfPath}'.");
     }
 }

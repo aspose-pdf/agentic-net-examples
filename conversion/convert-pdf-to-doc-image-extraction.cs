@@ -6,37 +6,31 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.docx";
+        const string inputPdf = "input.pdf";
+        const string outputDoc = "output.doc";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the source PDF
-            using (Document pdfDoc = new Document(inputPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Configure DOCX save options.
-                // The Format property selects DOCX output.
-                // If the current Aspose.Pdf version supports a recognition mode
-                // that extracts only images, it can be set via the RecognitionMode
-                // property (e.g., DocSaveOptions.RecognitionMode.ImagesOnly).
-                // This property is optional and omitted here to ensure compilation
-                // with versions where it may not exist.
-                var saveOptions = new DocSaveOptions
-                {
-                    Format = DocSaveOptions.DocFormat.DocX
-                    // RecognitionMode = DocSaveOptions.RecognitionMode.ImagesOnly // uncomment if available
-                };
+                // Configure DOC save options. The ImageRecognitionMode property is not available in the current
+                // Aspose.Pdf version, so we only set the supported Mode property (optional).
+                var saveOptions = new DocSaveOptions();
+                // Optional: set the recognition mode if needed. The default is Flow.
+                saveOptions.Mode = DocSaveOptions.RecognitionMode.Flow;
 
-                // Save the PDF as a DOCX file using the configured options.
-                pdfDoc.Save(outputPath, saveOptions);
-                Console.WriteLine($"PDF successfully converted to DOCX (images only) at: {outputPath}");
+                // Save as DOC using the configured options
+                pdfDoc.Save(outputDoc, saveOptions);
             }
+
+            Console.WriteLine($"PDF successfully converted to DOC: {outputDoc}");
         }
         catch (Exception ex)
         {

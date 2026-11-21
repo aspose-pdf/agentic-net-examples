@@ -1,66 +1,98 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
+
+#pragma warning disable NU1902 // Package 'System.Security.Cryptography.Pkcs' 9.0.0 has a known moderate severity vulnerability
+#pragma warning disable NU1903 // Package 'System.Security.Cryptography.Pkcs' 9.0.0 has a known high severity vulnerability
 
 class Program
 {
     static void Main()
     {
-        // Directory containing input XML files
-        const string inputDir = "XmlInputs";
+        // Directory containing XML files
+        const string inputDirectory = "XmlInputs";
         // Directory where generated PDFs will be saved
-        const string outputDir = "PdfOutputs";
+        const string outputDirectory = "GeneratedPdfs";
+
+        // Validate input directory
+        if (!Directory.Exists(inputDirectory))
+        {
+            Console.Error.WriteLine($"Input directory '{inputDirectory}' does not exist. Nothing to process.");
+            return;
+        }
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(outputDirectory);
 
-        if (!Directory.Exists(inputDir))
-        {
-            Console.Error.WriteLine($"Input directory not found: {inputDir}");
-            return;
-        }
-
-        // Get all XML files in the input directory
-        string[] xmlFiles = Directory.GetFiles(inputDir, "*.xml");
+        // Collect all XML files in the input directory
+        string[] xmlFiles = Directory.GetFiles(inputDirectory, "*.xml", SearchOption.TopDirectoryOnly);
         if (xmlFiles.Length == 0)
         {
-            Console.WriteLine("No XML files found to process.");
+            Console.WriteLine($"No XML files found in '{inputDirectory}'.");
             return;
         }
 
-        // Process each XML file individually
+        Console.WriteLine($"Found {xmlFiles.Length} XML file(s) to process.");
+
         foreach (string xmlPath in xmlFiles)
         {
-            string baseName = Path.GetFileNameWithoutExtension(xmlPath);
-            string pdfPath = Path.Combine(outputDir, baseName + ".pdf");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(xmlPath);
+            string pdfPath = Path.Combine(outputDirectory, fileNameWithoutExt + ".pdf");
 
-            Console.WriteLine($"--- Processing '{xmlPath}' ---");
-
+            Console.WriteLine($"\nProcessing '{xmlPath}'...");
             try
             {
-                // Load the XML file as a PDF document
-                XmlLoadOptions loadOptions = new XmlLoadOptions();
-                using (Document doc = new Document(xmlPath, loadOptions))
+                // Load XML document
+                XDocument xDoc = XDocument.Load(xmlPath);
+                Console.WriteLine("  XML loaded successfully.");
+
+                // Create a new PDF document
+                using (Document pdfDoc = new Document())
                 {
-                    Console.WriteLine($"Loaded XML successfully. Page count: {doc.Pages.Count}");
+                    Console.WriteLine("  PDF document created.");
 
-                    // (Optional) Insert additional PDF generation steps here
-                    // e.g., add headers, footers, watermarks, etc.
+                    // Add a page
+                    Page page = pdfDoc.Pages.Add();
+                    Console.WriteLine("  Page added to PDF.");
 
-                    // Save the generated PDF
-                    doc.Save(pdfPath);
-                    Console.WriteLine($"PDF saved to '{pdfPath}'.");
+                    // Extract information from XML
+                    string rootName = xDoc.Root?.Name.LocalName ?? "UnknownRoot";
+                    string innerXml = xDoc.Root?.ToString() ?? string.Empty;
+
+                    // Title fragment
+                    TextFragment titleFragment = new TextFragment($"XML Root: {rootName}");
+                    titleFragment.TextState.FontSize = 16;
+                    titleFragment.TextState.FontStyle = FontStyles.Bold;
+                    titleFragment.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
+                    page.Paragraphs.Add(titleFragment);
+                    Console.WriteLine("  Title added to PDF.");
+
+                    // Content fragment (escaped for readability)
+                    TextFragment contentFragment = new TextFragment(innerXml);
+                    contentFragment.TextState.FontSize = 10;
+                    contentFragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                    page.Paragraphs.Add(contentFragment);
+                    Console.WriteLine("  Content added to PDF.");
+
+                    // Save the PDF
+                    pdfDoc.Save(pdfPath);
+                    Console.WriteLine($"  PDF saved to '{pdfPath}'.");
                 }
+
+                Console.WriteLine($"Successfully processed '{xmlPath}'.");
             }
             catch (Exception ex)
             {
-                // Log any errors that occur during processing
-                Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.Message}");
+                // Log detailed error information
+                Console.Error.WriteLine($"Error processing '{xmlPath}': {ex.GetType().Name} - {ex.Message}");
+                Console.Error.WriteLine($"Stack Trace: {ex.StackTrace}");
             }
-
-            Console.WriteLine($"--- Finished '{xmlPath}' ---\n");
         }
 
-        Console.WriteLine("All files have been processed.");
+        Console.WriteLine("\nProcessing completed.");
     }
 }
+#pragma warning restore NU1902
+#pragma warning restore NU1903

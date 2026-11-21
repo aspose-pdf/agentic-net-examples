@@ -1,60 +1,77 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Directory containing source PDFs
+        // Input directory containing PDFs
         const string inputDir = @"C:\PdfInput";
-        // Directory where stamped PDFs will be saved
+        // Output directory for stamped PDFs
         const string outputDir = @"C:\PdfOutput";
-        // Path to the image that will be used as a stamp
+        // Path to the image to be used as a stamp
         const string stampImagePath = @"C:\stamp.png";
-        // Rotation angle for the stamp (in degrees)
-        const float rotationAngle = 45f;
 
-        // Validate input folder and stamp image
         if (!Directory.Exists(inputDir))
         {
             Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
+
+        Directory.CreateDirectory(outputDir);
+
         if (!File.Exists(stampImagePath))
         {
             Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        // Ensure output folder exists
-        Directory.CreateDirectory(outputDir);
-
-        // Process each PDF file in the input directory
+        // Iterate over all PDF files in the input directory
         foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputDir, $"{fileNameWithoutExt}_stamped.pdf");
+            string fileName = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputDir, fileName);
 
-            // Load the PDF using Document (PdfFileEditor does not support BindPdf/AddStamp/Save)
-            using (Document pdfDoc = new Document(pdfPath))
+            try
             {
-                // Create an image stamp and configure its rotation and alignment
-                ImageStamp stamp = new ImageStamp(stampImagePath)
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    RotateAngle = rotationAngle,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
+                    // Ensure the document has at least one page
+                    if (doc.Pages.Count < 1)
+                    {
+                        Console.WriteLine($"Skipping empty PDF: {fileName}");
+                        continue;
+                    }
 
-                // Add the stamp to the first page (pages are 1‑based)
-                pdfDoc.Pages[1].AddStamp(stamp);
+                    // Create an ImageStamp from the specified image
+                    ImageStamp imgStamp = new ImageStamp(stampImagePath)
+                    {
+                        // Position the stamp (optional)
+                        XIndent = 100,
+                        YIndent = 100,
+                        // Keep the stamp on top of existing content
+                        Background = false
+                    };
+                    // Rotate the stamp by 45 degrees (arbitrary angle)
+                    imgStamp.RotateAngle = 45f; // Use RotateAngle instead of Rotate (which expects the Rotation enum)
 
-                // Save the modified PDF to the output location
-                pdfDoc.Save(outputPath);
+                    // Add the stamp to the first page (page indexing is 1‑based)
+                    Page firstPage = doc.Pages[1];
+                    firstPage.AddStamp(imgStamp);
+
+                    // Save the modified PDF to the output directory
+                    doc.Save(outputPath);
+                }
+
+                Console.WriteLine($"Stamped PDF saved: {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch stamping completed.");
     }
 }

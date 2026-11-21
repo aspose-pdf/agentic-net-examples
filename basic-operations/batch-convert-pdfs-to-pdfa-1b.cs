@@ -6,10 +6,12 @@ class Program
 {
     static void Main()
     {
-        // Input folder containing PDFs to be processed
+        // Input folder containing PDFs
         const string inputFolder = "InputPdfs";
-        // Output folder where PDF/A‑1b files will be saved
+        // Output folder for PDF/A‑1b files
         const string outputFolder = "OutputPdfA";
+        // Log file for conversion details
+        const string logFilePath = "conversion_log.xml";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -17,34 +19,32 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Get all PDF files in the input directory (non‑recursive)
+        // Get all PDF files in the input folder
         string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
 
-        foreach (string pdfPath in pdfFiles)
+        foreach (string sourcePath in pdfFiles)
         {
-            string baseName = Path.GetFileNameWithoutExtension(pdfPath);
-            string outputPath = Path.Combine(outputFolder, $"{baseName}_PDF_A_1b.pdf");
-            string logPath = Path.Combine(outputFolder, $"{baseName}_conversion_log.xml");
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(sourcePath);
+            string destinationPath = Path.Combine(outputFolder, $"{fileNameWithoutExt}_PDF_A_1b.pdf");
 
             try
             {
-                // Load each PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfPath))
+                // Load the source PDF
+                using (Document doc = new Document(sourcePath))
                 {
-                    // Convert the document to PDF/A‑1b; log any conversion issues
-                    doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
-                    // Save the converted document as a regular PDF (PDF/A is a PDF variant)
-                    doc.Save(outputPath);
+                    // Convert to PDF/A‑1b
+                    doc.Convert(logFilePath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+                    // Save the converted PDF
+                    doc.Save(destinationPath);
                 }
 
-                Console.WriteLine($"Converted: {pdfPath} → {outputPath}");
+                Console.WriteLine($"Converted: {sourcePath} → {destinationPath}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error converting '{sourcePath}': {ex.Message}");
             }
         }
     }

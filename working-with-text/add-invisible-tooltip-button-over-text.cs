@@ -1,9 +1,10 @@
 using System;
 using System.IO;
+using System.Drawing; // for System.Drawing.Color used in field characteristics
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Annotations; // JavascriptAction, AnnotationFlags
+using Aspose.Pdf.Forms; // ButtonField, Border
+using Aspose.Pdf.Text; // TextFragmentAbsorber, TextFragment
 
 class Program
 {
@@ -11,8 +12,8 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_with_tooltip.pdf";
-        const string searchText = "Target Text";          // text to locate
-        const string tooltip = "This is a tooltip message";
+        const string searchText = "TargetText";          // text to overlay
+        const string tooltip = "This is a tooltip";      // tooltip message
 
         if (!File.Exists(inputPath))
         {
@@ -23,48 +24,45 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // -----------------------------------------------------------------
-            // Locate the first occurrence of the desired text using TextFragmentAbsorber
-            // -----------------------------------------------------------------
+            // Locate the desired text fragments
             TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchText);
-            absorber.TextSearchOptions = new TextSearchOptions(true); // case‑insensitive
             doc.Pages.Accept(absorber);
 
-            if (absorber.TextFragments.Count == 0)
+            // Iterate over each found fragment and place an invisible button over it
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                Console.WriteLine($"Text \"{searchText}\" not found.");
-                return;
+                // Get the rectangle of the fragment (coordinates are in points)
+                Aspose.Pdf.Rectangle rect = fragment.Rectangle;
+
+                // Create a button field on the same page as the fragment
+                ButtonField button = new ButtonField(fragment.Page, rect)
+                {
+                    // Unique name for the field
+                    PartialName = $"tooltipBtn_{fragment.Page.Number}_{Guid.NewGuid()}",
+                    // Prevent user interaction (read‑only)
+                    ReadOnly = true,
+                    // Hide the widget (no visual representation)
+                    Flags = AnnotationFlags.Invisible
+                };
+
+                // Make the button background transparent via field characteristics
+                button.Characteristics.Background = System.Drawing.Color.Transparent;
+
+                // Remove any visible border
+                button.Border = new Border(button) { Width = 0 };
+
+                // Add a JavaScript action that shows a tooltip when the mouse enters the button area
+                JavascriptAction jsAction = new JavascriptAction($"app.alert('{tooltip}');");
+                button.Actions.OnEnter = jsAction; // Mouse‑enter action
+
+                // Add the button to the document's form collection
+                doc.Form.Add(button);
             }
-
-            // Get the rectangle of the first match (1‑based page index)
-            TextFragment fragment = absorber.TextFragments[0];
-            int pageNumber = doc.Pages.IndexOf(fragment.Page) + 1; // Pages collection is 0‑based, PDF pages are 1‑based
-            Aspose.Pdf.Rectangle textRect = fragment.Rectangle;
-
-            // ---------------------------------------------------------------
-            // Create an invisible ButtonField over the located text rectangle
-            // ---------------------------------------------------------------
-            ButtonField btn = new ButtonField(doc.Pages[pageNumber], textRect)
-            {
-                // No visible caption – keep the button transparent
-                NormalCaption = string.Empty,
-                // Tooltip (TU entry) – shown by many PDF viewers on hover
-                AlternateName = tooltip
-            };
-
-            // Remove any border so the button is truly invisible
-            btn.Border = new Border(btn) { Width = 0 };
-
-            // Assign a JavaScript action that runs when the mouse enters the button area
-            btn.Actions.OnEnter = new JavascriptAction($"app.alert('{tooltip}');");
-
-            // Add the button to the document's form (AcroForm)
-            doc.Form.Add(btn);
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with tooltip button: {outputPath}");
+        Console.WriteLine($"PDF saved with invisible tooltip buttons: {outputPath}");
     }
 }

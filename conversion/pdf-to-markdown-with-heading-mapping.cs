@@ -1,92 +1,69 @@
 using System;
 using System.IO;
-using System.Reflection;
+using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Text;
-using Aspose.Pdf.Tagged;
-using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.md";
+        const string inputPdfPath = "input.pdf";
+        const string outputMdPath = "output.md";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Access tagged content if the PDF is tagged
-            ITaggedContent tagged = doc.TaggedContent;
+            // Extract all text fragments from the document
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber();
+            absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+            pdfDoc.Pages.Accept(absorber);
 
-            using (StreamWriter writer = new StreamWriter(outputPath))
+            // Custom heading level mapping based on font size (adjust thresholds as needed)
+            var headingMap = new (double MinFontSize, string MarkdownPrefix)[]
             {
-                if (tagged != null && tagged.RootElement != null)
-                {
-                    // Recursively write structure elements as Markdown
-                    WriteElement(tagged.RootElement, writer);
-                }
-                else
-                {
-                    // Fallback: extract plain text when no tagging is present
-                    TextAbsorber absorber = new TextAbsorber();
-                    doc.Pages.Accept(absorber);
-                    writer.WriteLine(absorber.Text);
-                }
-            }
-        }
+                (18.0, "# "),   // Level 1
+                (14.0, "## "),  // Level 2
+                (12.0, "### ")  // Level 3
+            };
 
-        Console.WriteLine($"Markdown saved to '{outputPath}'.");
-    }
+            StringBuilder markdownBuilder = new StringBuilder();
 
-    // Recursively writes a structure element and its children to the Markdown file
-    static void WriteElement(StructureElement element, StreamWriter writer)
-    {
-        // Handle header elements – map PDF heading levels to Markdown '#'
-        if (element is HeaderElement header)
-        {
-            int level = 1; // default level
-
-            // Attempt to read the Level property via reflection (if it exists)
-            PropertyInfo levelProp = header.GetType().GetProperty("Level");
-            if (levelProp != null && levelProp.PropertyType == typeof(int))
+            foreach (TextFragment fragment in absorber.TextFragments)
             {
-                object val = levelProp.GetValue(header);
-                if (val is int lvl && lvl > 0)
-                    level = lvl;
+                string line = fragment.Text.TrimEnd('\r', '\n');
+
+                // Preserve blank lines in the output
+                if (string.IsNullOrWhiteSpace(line))
+                {
+                    markdownBuilder.AppendLine();
+                    continue;
+                }
+
+                // Determine heading level using the fragment's font size (via TextState)
+                string prefix = string.Empty;
+                double fontSize = fragment.TextState.FontSize; // <-- Fixed property access
+                foreach (var (minSize, mdPrefix) in headingMap)
+                {
+                    if (fontSize >= minSize)
+                    {
+                        prefix = mdPrefix;
+                        break; // Use the first matching (largest) level
+                    }
+                }
+
+                markdownBuilder.AppendLine($"{prefix}{line}");
             }
 
-            // Clamp level to a maximum of 6 (Markdown supports up to ######)
-            level = Math.Min(level, 6);
-            string hashes = new string('#', level);
-            string text   = header.ActualText ?? string.Empty;
-            writer.WriteLine($"{hashes} {text}");
-        }
-        // Paragraph elements – write their text as a normal paragraph
-        else if (element is ParagraphElement paragraph)
-        {
-            string text = paragraph.ActualText ?? string.Empty;
-            if (!string.IsNullOrWhiteSpace(text))
-                writer.WriteLine(text);
-        }
-        // Any other element – write its actual text if available
-        else
-        {
-            string text = element.ActualText ?? string.Empty;
-            if (!string.IsNullOrWhiteSpace(text))
-                writer.WriteLine(text);
-        }
-
-        // Recurse into child elements
-        foreach (Element child in element.ChildElements)
-        {
-            if (child is StructureElement se)
-                WriteElement(se, writer);
+            // Write the generated Markdown to a file
+            File.WriteAllText(outputMdPath, markdownBuilder.ToString(), Encoding.UTF8);
+            Console.WriteLine($"Markdown file created at '{outputMdPath}'.");
         }
     }
 }

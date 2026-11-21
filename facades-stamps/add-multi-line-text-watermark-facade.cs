@@ -1,56 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "watermarked.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDoc = new Document(inputPath);
+        // Build a FormattedText object that contains all watermark lines.
+        var formattedText = new FormattedText(
+            "Confidential",                     // first line
+            System.Drawing.Color.Red,            // colour – fully qualified to avoid ambiguity
+            "Helvetica",                        // font name
+            EncodingType.Winansi,                // encoding
+            false,                               // embed the font?
+            36);                                 // font size
 
-        // Create a watermark artifact
-        WatermarkArtifact watermark = new WatermarkArtifact();
+        // Add the remaining lines.
+        formattedText.AddNewLineText("Do Not Distribute");
+        formattedText.AddNewLineText("© Company Name");
 
-        // Prepare the text (multi‑line) and its visual style
-        string[] lines = { "Confidential", "Do Not Distribute", "© 2026 Company" };
-        string watermarkText = string.Join("\n", lines); // newline separates the lines
+        // Create a Stamp and bind the FormattedText to it.
+        var textStamp = new Aspose.Pdf.Facades.Stamp(); // fully qualified to avoid ambiguity with Aspose.Pdf.Stamp
+        textStamp.BindLogo(formattedText);
+        textStamp.SetOrigin(100, 500);   // lower‑left corner of the first line
+        textStamp.Opacity = 0.5f;        // 50 % transparent
+        textStamp.IsBackground = false; // draw on top of page content
 
-        TextState textState = new TextState
+        // Apply the stamp to every page of the source PDF.
+        using (var fileStamp = new PdfFileStamp())
         {
-            Font = FontRepository.FindFont("Arial"),
-            FontSize = 36,
-            ForegroundColor = Color.Gray
-        };
-
-        // Apply the text and style to the artifact
-        watermark.SetTextAndState(watermarkText, textState);
-
-        // Configure appearance of the watermark
-        watermark.ArtifactHorizontalAlignment = HorizontalAlignment.Center; // center horizontally
-        watermark.ArtifactVerticalAlignment   = VerticalAlignment.Center;   // center vertically
-        watermark.Rotation = 45;               // rotate 45 degrees
-        watermark.Opacity = 0.5f;              // semi‑transparent
-        watermark.IsBackground = true;        // render as background (watermark)
-
-        // Add the watermark to every page of the document
-        foreach (Page page in pdfDoc.Pages)
-        {
-            page.Artifacts.Add(watermark);
+            fileStamp.BindPdf(inputPath);
+            fileStamp.AddStamp(textStamp); // default = all pages
+            fileStamp.Save(outputPath);
         }
-
-        // Save the watermarked PDF
-        pdfDoc.Save(outputPath);
 
         Console.WriteLine($"Watermarked PDF saved to '{outputPath}'.");
     }

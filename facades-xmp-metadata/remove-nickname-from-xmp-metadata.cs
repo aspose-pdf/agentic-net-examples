@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades; // required per task specification
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_no_nickname.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,21 +16,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        using (Document pdfDocument = new Document(inputPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            const string nicknameKey = "xmp:Nickname"; // XMP property name for Nickname
-
-            // Remove the Nickname entry from the XMP metadata dictionary if it exists
-            if (pdfDocument.Metadata.ContainsKey(nicknameKey))
+            // Remove the Nickname element from XMP metadata if it exists.
+            // In Aspose.Pdf the XMP metadata is exposed via the Document.Metadata dictionary.
+            const string nicknameKey = "xmp:Nickname";
+            if (doc.Metadata != null && doc.Metadata.ContainsKey(nicknameKey))
             {
-                pdfDocument.Metadata.Remove(nicknameKey);
+                doc.Metadata.Remove(nicknameKey);
             }
 
             // Save the updated PDF
-            pdfDocument.Save(outputPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Nickname removed. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Nickname element removed. Saved to '{outputPath}'.");
     }
 }

@@ -1,16 +1,17 @@
 # Facades sign documents
 
-> **Facades sign documents** in PDF using C# / .NET -- **34** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades sign documents** in PDF using C# / .NET -- **35** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-sign-documents`
-- Examples: 34
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 35
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-digital-signature-to-pdf-page.cs`](./add-digital-signature-to-pdf-page.cs) -- Add digital signature to pdf page
 - [`add-second-digital-signature-to-pdf-page-3.cs`](./add-second-digital-signature-to-pdf-page-3.cs) -- Add second digital signature to pdf page 3
 - [`add-signature-field-and-sign-pdf.cs`](./add-signature-field-and-sign-pdf.cs) -- Add signature field and sign pdf
+- [`configure-custom-signature-appearance.cs`](./configure-custom-signature-appearance.cs) -- Configure custom signature appearance
 - [`custom-pdf-signature-appearance.cs`](./custom-pdf-signature-appearance.cs) -- Custom pdf signature appearance
 - [`extract-certificate-details-from-pdf-signatures.cs`](./extract-certificate-details-from-pdf-signatures.cs) -- Extract certificate details from pdf signatures
 - [`extract-certificate-serial-number-from-pdf-signatures.cs`](./extract-certificate-serial-number-from-pdf-signatures.cs) -- Extract certificate serial number from pdf signatures

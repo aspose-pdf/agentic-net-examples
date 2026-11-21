@@ -1,13 +1,12 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // for Rectangle type (if needed)
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -19,25 +18,19 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            // Ensure the document has at least 12 pages
+            // Verify the document has at least 12 pages (pages are 1‑based)
             if (doc.Pages.Count < 12)
             {
-                Console.Error.WriteLine("Document does not contain 12 pages.");
+                Console.Error.WriteLine("The document must contain at least 12 pages.");
                 return;
             }
 
-            // Get the MediaBox of page 8
-            // MediaBox is an Aspose.Pdf.Rectangle; clone it to avoid reference issues
+            // Retrieve the MediaBox from page 8
             Aspose.Pdf.Rectangle sourceBox = doc.Pages[8].MediaBox;
-            Aspose.Pdf.Rectangle clonedBox = new Aspose.Pdf.Rectangle(
-                sourceBox.LLX,
-                sourceBox.LLY,
-                sourceBox.URX,
-                sourceBox.URY);
 
-            // Apply the cloned MediaBox to page 12
-            doc.Pages[12].MediaBox = clonedBox;
+            // Apply the same dimensions to page 12
+            doc.Pages[12].MediaBox = new Aspose.Pdf.Rectangle(
+                sourceBox.LLX, sourceBox.LLY, sourceBox.URX, sourceBox.URY);
 
             // Save the modified PDF
             doc.Save(outputPath);

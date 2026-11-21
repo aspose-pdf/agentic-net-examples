@@ -1,49 +1,58 @@
 using System;
 using System.IO;
-using System.Xml.Linq;
 using Aspose.Pdf;
+using System.Xml.Linq;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "pagesize.xml";
+        const string xmlPath = "pagesizes.xml";
         const string outputPdf = "output.pdf";
 
-        // Verify that the XML source exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML and read width/height values (in points)
-        XDocument xdoc = XDocument.Load(xmlPath);
-        // Expected XML format:
-        // <PageSize>
-        //     <Width>595</Width>
-        //     <Height>842</Height>
-        // </PageSize>
-        double width = (double?)xdoc.Root.Element("Width") ?? 595;   // default A4 width
-        double height = (double?)xdoc.Root.Element("Height") ?? 842; // default A4 height
+        // Load the XML that defines page sizes.
+        XDocument xDoc = XDocument.Load(xmlPath);
 
-        // Create a new PDF document and ensure deterministic disposal
-        using (Document doc = new Document())
+        // Create a new PDF document.
+        using (Document pdfDoc = new Document())
         {
-            // Add a blank page (first page is at index 1)
-            Page page = doc.Pages.Add();
+            // Iterate over each <Page> element in the XML.
+            // Expected XML format:
+            // <Pages>
+            //   <Page index="1">
+            //     <Width>595</Width>
+            //     <Height>842</Height>
+            //   </Page>
+            //   ...
+            // </Pages>
+            foreach (XElement pageElem in xDoc.Root.Elements("Page"))
+            {
+                // Parse width and height (points). Default to A4 if missing.
+                double width = (double?)pageElem.Element("Width") ?? 595;   // A4 width
+                double height = (double?)pageElem.Element("Height") ?? 842; // A4 height
 
-            // Apply the size extracted from the XML
-            page.SetPageSize(width, height);
+                // Add a new blank page to the document.
+                pdfDoc.Pages.Add();
 
-            // Example content (optional)
-            // TextFragment tf = new TextFragment($"Page size: {width} x {height}");
-            // page.Paragraphs.Add(tf);
+                // Aspose.Pdf uses 1‑based indexing for pages.
+                int pageIndex = pdfDoc.Pages.Count; // the page we just added
+                Page page = pdfDoc.Pages[pageIndex];
 
-            // Save the PDF
-            doc.Save(outputPdf);
+                // Set custom page dimensions.
+                page.PageInfo.Width = width;
+                page.PageInfo.Height = height;
+            }
+
+            // Save the resulting PDF.
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF created with page size {width}x{height} points at '{outputPdf}'.");
+        Console.WriteLine($"PDF created with custom page sizes: {outputPdf}");
     }
 }

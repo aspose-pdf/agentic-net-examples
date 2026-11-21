@@ -7,66 +7,52 @@ class Program
 {
     static void Main()
     {
-        // Paths for the output PDF
-        const string outputPath = "TableWithMargins.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Ensure the output directory exists
-        string outputDir = Path.GetDirectoryName(Path.GetFullPath(outputPath));
-        if (!Directory.Exists(outputDir))
-            Directory.CreateDirectory(outputDir);
-
-        // Create a new PDF document
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a page to the document
-            Aspose.Pdf.Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a table and set its column widths
-            Aspose.Pdf.Table table = new Aspose.Pdf.Table
+        // Load the PDF (deterministic disposal)
+        using (Document doc = new Document(inputPath))
+        {
+            // Use the first page (or add one if the document is empty)
+            Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+
+            // Create a table using the core Table API
+            Table table = new Table
             {
-                ColumnWidths = "100 150 100"
+                // Example column widths – adjust as needed
+                ColumnWidths = "200",
+                // Optional: default cell padding for the whole table
+                DefaultCellPadding = new MarginInfo(2, 2, 2, 2),
+                // Optional: border for visual reference
+                Border = new BorderInfo(BorderSide.All, 0.5f, Color.Black)
             };
 
-            // Define a MarginInfo object to be used for cell padding
-            Aspose.Pdf.MarginInfo cellMargin = new Aspose.Pdf.MarginInfo
-            {
-                Left = 5,
-                Right = 5,
-                Top = 2,
-                Bottom = 2
-            };
+            // Header row
+            Row headerRow = table.Rows.Add();
+            Cell headerCell = headerRow.Cells.Add("Header");
+            // You can style the header cell if desired
+            headerCell.BackgroundColor = Color.LightGray;
 
-            // Apply the margin (padding) to all cells by setting the table's default cell padding
-            table.DefaultCellPadding = cellMargin;
+            // Data row
+            Row dataRow = table.Rows.Add();
+            Cell dataCell = dataRow.Cells.Add("Data cell with margins");
 
-            // First row (header)
-            Aspose.Pdf.Row row1 = table.Rows.Add();
-            Aspose.Pdf.Cell cell11 = row1.Cells.Add("Header 1");
-            cell11.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            Aspose.Pdf.Cell cell12 = row1.Cells.Add("Header 2");
-            cell12.BackgroundColor = Aspose.Pdf.Color.LightGray;
-            Aspose.Pdf.Cell cell13 = row1.Cells.Add("Header 3");
-            cell13.BackgroundColor = Aspose.Pdf.Color.LightGray;
+            // Configure cell margins (left, bottom, right, top) using MarginInfo
+            dataCell.Margin = new MarginInfo(5, 3, 5, 3);
 
-            // Second row
-            Aspose.Pdf.Row row2 = table.Rows.Add();
-            row2.Cells.Add("Row 1, Col 1");
-            row2.Cells.Add("Row 1, Col 2");
-            row2.Cells.Add("Row 1, Col 3");
-
-            // Third row
-            Aspose.Pdf.Row row3 = table.Rows.Add();
-            row3.Cells.Add("Row 2, Col 1");
-            row3.Cells.Add("Row 2, Col 2");
-            row3.Cells.Add("Row 2, Col 3");
-
-            // Add the table to the page's paragraphs collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with table and cell margins saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

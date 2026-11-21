@@ -1,80 +1,64 @@
 using System;
 using System.IO;
-using System.Xml;
+using System.Xml.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Text; // <-- added to resolve TextFragment
+using Aspose.Pdf.Optimization;
 
 class Program
 {
     static void Main()
     {
-        const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        const string xmlPath = "input.xml";   // XML that defines PDF content
+        const string outputPdf = "output.pdf"; // Destination compressed PDF
 
+        // Verify the XML source exists
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
             return;
         }
 
-        // Load the XML document
-        XmlDocument xmlDoc = new XmlDocument();
-        xmlDoc.Load(xmlPath);
-
-        // Ensure the document has a root element
-        if (xmlDoc.DocumentElement == null)
+        try
         {
-            Console.Error.WriteLine("The XML document does not contain a root element.");
-            return;
-        }
-
-        // Create a new PDF document
-        using (Document pdfDoc = new Document())
-        {
-            // Add a single page
-            Page page = pdfDoc.Pages.Add();
-
-            // Retrieve a font for text rendering
-            Aspose.Pdf.Text.Font font = FontRepository.FindFont("Arial");
-
-            // Recursively add XML nodes as text fragments
-            AddXmlNodeToPage(xmlDoc.DocumentElement, page, font, 0);
-
-            // Optimize resources to compress streams (including text objects)
-            // The parameterless overload compresses streams without requiring the
-            // OptimizationOptions class, which may be unavailable in some library versions.
-            pdfDoc.OptimizeResources();
-
-            // Save the resulting PDF
-            pdfDoc.Save(pdfPath);
-        }
-
-        Console.WriteLine($"PDF created at '{pdfPath}'.");
-    }
-
-    // Helper method to add an XML node and its children to the PDF page
-    static void AddXmlNodeToPage(XmlNode node, Page page, Aspose.Pdf.Text.Font font, int indentLevel)
-    {
-        // Prepare indented text representing the XML element
-        string indent = new string(' ', indentLevel * 4);
-        string content = $"{indent}<{node.Name}> {node.InnerText}";
-
-        // Create a text fragment with the content
-        TextFragment fragment = new TextFragment(content);
-        fragment.TextState.Font = font;
-        fragment.TextState.FontSize = 12;
-        fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-
-        // Add the fragment to the page
-        page.Paragraphs.Add(fragment);
-
-        // Process child elements recursively
-        foreach (XmlNode child in node.ChildNodes)
-        {
-            if (child.NodeType == XmlNodeType.Element)
+            // Document lifecycle must be wrapped in a using block (rule: document-disposal-with-using)
+            using (Document pdfDoc = new Document())
             {
-                AddXmlNodeToPage(child, page, font, indentLevel + 1);
+                // Load the XML and translate it into PDF objects using the core API.
+                // This replaces the removed Document.LoadXml method.
+                XDocument xDoc = XDocument.Load(xmlPath);
+                Page page = pdfDoc.Pages.Add();
+
+                // Simple example: each element's inner text becomes a separate paragraph.
+                // Adjust the parsing logic to match the actual XML schema you use.
+                foreach (XElement element in xDoc.Descendants())
+                {
+                    if (!string.IsNullOrWhiteSpace(element.Value))
+                    {
+                        TextFragment tf = new TextFragment(element.Value.Trim());
+                        // Optional: you can style the fragment here (font, size, color, etc.)
+                        page.Paragraphs.Add(tf);
+                    }
+                }
+
+                // Apply high‑level resource optimization (stream compression, unused object removal, etc.)
+                OptimizationOptions opt = OptimizationOptions.All();
+                opt.CompressImages = true;          // compress images if any
+                opt.ImageQuality = 75;              // adjust quality as needed
+                opt.RemoveUnusedObjects = true;    // drop objects not referenced
+                opt.RemoveUnusedStreams = true;    // drop empty streams
+                opt.SubsetFonts = true;             // embed only used glyphs
+                pdfDoc.OptimizeResources(opt);
+
+                // Save the optimized PDF
+                pdfDoc.Save(outputPdf);
             }
+
+            Console.WriteLine($"Compressed PDF saved to '{outputPdf}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

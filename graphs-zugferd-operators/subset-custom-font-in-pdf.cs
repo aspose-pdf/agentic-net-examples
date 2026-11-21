@@ -7,15 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf  = "input.pdf";
-        const string outputPdf = "output_subset.pdf";
-        const string fontPath  = "MyCustomFont.ttf";
-
-        if (!File.Exists(inputPdf))
-        {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
-            return;
-        }
+        const string fontPath   = "MyFont.ttf";          // Path to the custom TrueType/OpenType font
+        const string outputPath = "subset_font.pdf";    // Resulting PDF file
 
         if (!File.Exists(fontPath))
         {
@@ -23,30 +16,32 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block (deterministic disposal)
-        using (Document doc = new Document(inputPdf))
+        // Load the font and configure it for subset embedding.
+        // Subset mode ensures only glyphs actually used in the document are embedded,
+        // dramatically reducing the PDF size while preserving required characters.
+        Font customFont = FontRepository.OpenFont(fontPath);
+        customFont.IsEmbedded = true;   // embed the font into the PDF
+        customFont.IsSubset   = true;   // enable subset embedding (only used glyphs)
+
+        // Create the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document())
         {
-            // Load the custom TrueType font via the low‑level FontRepository API
-            // OpenFont returns a Font object that can be configured for embedding/subsetting
-            Font customFont = FontRepository.OpenFont(fontPath);
+            // Add a single page.
+            Page page = doc.Pages.Add();
 
-            // Request embedding and enable subset mode to keep only used glyphs
-            customFont.IsEmbedded = true;   // embed the font into the PDF
-            customFont.IsSubset   = true;   // embed only the glyphs that are actually used
+            // Create a text fragment that uses the subsetted font.
+            TextFragment fragment = new TextFragment("Hello, Aspose PDF with subsetted font!");
+            fragment.TextState.Font     = customFont;
+            fragment.TextState.FontSize = 24;
+            fragment.Position = new Position(50, 750); // Position on the page (x, y)
 
-            // Create a text fragment that uses the subset font
-            TextFragment fragment = new TextFragment("Hello, subset font!");
-            fragment.TextState.Font = customFont;
-            fragment.TextState.FontSize = 12;
-
-            // Use 1‑based page indexing (first page is Pages[1])
-            Page page = doc.Pages[1];
+            // Add the fragment to the page's paragraph collection.
             page.Paragraphs.Add(fragment);
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
-            doc.Save(outputPdf);
+            // Save the document.
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with subset font: {outputPdf}");
+        Console.WriteLine($"PDF saved to '{outputPath}' with subsetted font.");
     }
 }

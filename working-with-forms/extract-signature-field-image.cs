@@ -2,75 +2,66 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "signed.pdf";
-        const string outputImage = "signature_appearance.png";
-        const string signatureFieldName = "Signature1";
+        const string pdfPath = "input.pdf";
+        const string fieldName = "Signature1";               // name of the signature field
+        const string outputImagePath = "signature_appearance.png";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdf))
+        using (Document doc = new Document(pdfPath))
         {
-            // Locate the signature field by its partial name
-            SignatureField sigField = null;
-            foreach (Field field in doc.Form.Fields)
+            // Verify that the form contains the requested field
+            if (!doc.Form.HasField(fieldName))
             {
-                if (field is SignatureField s && s.PartialName == signatureFieldName)
-                {
-                    sigField = s;
-                    break;
-                }
-            }
-
-            if (sigField == null)
-            {
-                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found.");
+                Console.Error.WriteLine($"Signature field '{fieldName}' not found.");
                 return;
             }
 
-            // Get the rectangle that defines the visual area of the field
-            Aspose.Pdf.Rectangle fieldRect = sigField.Rect;
-
-            // The field resides on a specific page (PageIndex is 1‑based)
-            int pageNumber = sigField.PageIndex;
-            Page page = doc.Pages[pageNumber];
-
-            // Preserve the original CropBox so we can restore it later
-            Aspose.Pdf.Rectangle originalCropBox = page.CropBox;
-
-            // Temporarily set the page's CropBox to the signature rectangle
-            page.CropBox = fieldRect;
-
-            // Configure a PNG device with a suitable resolution (e.g., 300 DPI)
-            Resolution resolution = new Resolution(300);
-            PngDevice pngDevice = new PngDevice(resolution)
+            // Retrieve the field via the Form indexer (returns WidgetAnnotation) and cast to SignatureField
+            if (doc.Form[fieldName] is not SignatureField sigField)
             {
-                // Use the CropBox coordinates for rendering
-                CoordinateType = PageCoordinateType.CropBox
-            };
-
-            // Render only the cropped region (signature appearance) to a memory stream and then to a file
-            using (MemoryStream ms = new MemoryStream())
-            {
-                // Process the page; the device will render the area defined by the current CropBox
-                pngDevice.Process(page, ms);
-                File.WriteAllBytes(outputImage, ms.ToArray());
+                Console.Error.WriteLine($"Field '{fieldName}' is not a signature field.");
+                return;
             }
 
-            // Restore the original CropBox
-            page.CropBox = originalCropBox;
+            // Extract the visual appearance of the signature field as a stream
+            using (Stream imgStream = sigField.ExtractImage())
+            {
+                if (imgStream == null)
+                {
+                    Console.Error.WriteLine("Signature field has no appearance.");
+                    return;
+                }
 
-            Console.WriteLine($"Signature appearance saved to '{outputImage}'.");
+                // Save the appearance stream to a PNG file for audit logs
+                using (FileStream fs = new FileStream(outputImagePath, FileMode.Create, FileAccess.Write))
+                {
+                    imgStream.CopyTo(fs);
+                }
+                Console.WriteLine($"Signature appearance saved to '{outputImagePath}'.");
+
+                // Optionally, obtain the image bytes for further processing (e.g., storing in a DB)
+                byte[] imageBytes;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    // Reset the position of the original stream if needed
+                    imgStream.Position = 0;
+                    imgStream.CopyTo(ms);
+                    imageBytes = ms.ToArray();
+                }
+                // imageBytes now contains the PNG data of the signature appearance
+                // (you can use it as needed, e.g., embed in audit log entries)
+            }
         }
     }
 }

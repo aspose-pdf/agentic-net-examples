@@ -16,31 +16,31 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document within a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based; select the first page
+            // Select the page to which the annotation will be added (first page in this example)
             Page page = doc.Pages[1];
 
-            // Define the rectangle area for the highlight (llx, lly, urx, ury)
+            // Define the rectangle area for the highlight (coordinates are in points)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 520);
 
-            // Create a highlight annotation on the specified rectangle
+            // Create a highlight annotation on the specified page and rectangle
             HighlightAnnotation highlight = new HighlightAnnotation(page, rect);
 
-            // Optional: set the highlight color (yellow)
-            highlight.Color = Aspose.Pdf.Color.Yellow;
-
-            // Set opacity to 70% (0.7)
+            // Set the opacity to 70% (0.7). This makes the highlight subtle.
             highlight.Opacity = 0.7f;
+
+            // Optional: set the highlight color (yellow is typical for highlights)
+            highlight.Color = Aspose.Pdf.Color.Yellow;
 
             // Add the annotation to the page's annotation collection
             page.Annotations.Add(highlight);
 
-            // Save the modified PDF
+            // Save the modified PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved highlighted PDF to '{outputPath}'.");
+        Console.WriteLine($"Highlight annotation with 70% opacity saved to '{outputPath}'.");
     }
 }

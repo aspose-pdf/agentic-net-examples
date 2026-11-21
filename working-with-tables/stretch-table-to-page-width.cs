@@ -7,50 +7,47 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "table_output.pdf";
+        const string outputPath = "table_autofit.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a single page to the document
+            // Add a single page
             Page page = doc.Pages.Add();
 
-            // Create a table that will stretch to the full page width.
-            // Setting ColumnWidths to a percentage string makes the table auto‑fit.
+            // Create a table and stretch it across the page width
             Table table = new Table
             {
-                // Example with three columns that together occupy 100% of the page width
-                ColumnWidths = "33% 34% 33%"
+                // Use ColumnAdjustment.AutoFitToWindow to make the table fill the page width
+                ColumnAdjustment = ColumnAdjustment.AutoFitToWindow
             };
 
-            // Optional: add a border to make the table visible
-            table.Border = new BorderInfo(BorderSide.All, 0.5f);
-
-            // Add a header row
+            // Header row
             Row header = table.Rows.Add();
-            Cell h1 = header.Cells.Add();
-            h1.Paragraphs.Add(new TextFragment("Header 1"));
-            Cell h2 = header.Cells.Add();
-            h2.Paragraphs.Add(new TextFragment("Header 2"));
-            Cell h3 = header.Cells.Add();
-            h3.Paragraphs.Add(new TextFragment("Header 3"));
+            header.Cells.Add(CreateCell("Header 1"));
+            header.Cells.Add(CreateCell("Header 2"));
+            header.Cells.Add(CreateCell("Header 3"));
 
-            // Add a data row
+            // Data row
             Row data = table.Rows.Add();
-            Cell d1 = data.Cells.Add();
-            d1.Paragraphs.Add(new TextFragment("Data 1"));
-            Cell d2 = data.Cells.Add();
-            d2.Paragraphs.Add(new TextFragment("Data 2"));
-            Cell d3 = data.Cells.Add();
-            d3.Paragraphs.Add(new TextFragment("Data 3"));
+            data.Cells.Add(CreateCell("Cell 1"));
+            data.Cells.Add(CreateCell("Cell 2"));
+            data.Cells.Add(CreateCell("Cell 3"));
 
-            // Insert the table into the page's paragraph collection
+            // Add the table to the page
             page.Paragraphs.Add(table);
 
-            // Save the PDF document
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with stretched table saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
+    }
+
+    // Helper to create a table cell containing a text fragment
+    private static Cell CreateCell(string text)
+    {
+        TextFragment tf = new TextFragment(text);
+        return new Cell { Paragraphs = { tf } };
     }
 }

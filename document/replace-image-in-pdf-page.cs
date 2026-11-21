@@ -1,17 +1,20 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing; // Image class lives here
 
 class ReplaceImageInPdf
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";   // source PDF
-        const string outputPdfPath = "output.pdf";  // result PDF
-        const string newImagePath  = "newImage.jpg"; // replacement image
+        // Paths – adjust as needed
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string newImagePath = "newImage.jpg";
 
-        // Verify files exist
+        // Page number to process (1‑based as required by Aspose.Pdf)
+        const int pageNumber = 1;
+
+        // Validate files
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -23,29 +26,43 @@ class ReplaceImageInPdf
             return;
         }
 
-        // Load the whole PDF document
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing – replace images on the first page
-            Page page = doc.Pages[1];
+            // Ensure the requested page exists
+            if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
+            {
+                Console.Error.WriteLine($"Page {pageNumber} is out of range. Document has {pdfDoc.Pages.Count} pages.");
+                return;
+            }
 
-            // Read the replacement image once – reuse the byte array for every occurrence
-            byte[] newImageBytes = File.ReadAllBytes(newImagePath);
+            // Get the target page (1‑based indexing)
+            Page page = pdfDoc.Pages[pageNumber];
 
-            // Walk through all paragraph elements on the page and replace any Image element
+            // Replace the first raster image on the page while preserving its layout.
+            // The actual placed images are represented by Aspose.Pdf.Image objects in the page's Paragraphs collection.
+            bool replaced = false;
             foreach (var paragraph in page.Paragraphs)
             {
                 if (paragraph is Image img)
                 {
-                    // Preserve layout (position, size, margins) – only swap the underlying image data
-                    img.ImageStream = new MemoryStream(newImageBytes);
+                    // Preserve position, size, rotation etc. – only change the source file.
+                    img.File = newImagePath; // Assign new image file; Aspose.Pdf updates the XObject internally.
+                    replaced = true;
+                    break; // Remove this break if you need to replace multiple images.
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            if (!replaced)
+            {
+                Console.Error.WriteLine("No images found on the specified page.");
+                return;
+            }
+
+            // Save the modified PDF. The using block ensures the document stays alive until Save completes.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Image(s) replaced and PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Image replaced and PDF saved to '{outputPdfPath}'.");
     }
 }

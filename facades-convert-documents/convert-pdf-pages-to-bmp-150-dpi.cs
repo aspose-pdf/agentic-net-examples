@@ -1,53 +1,53 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Devices; // Resolution struct
+using Aspose.Pdf.Devices; // for Resolution
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath   = "input.pdf";
-        const string outputDir = "BmpPages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "BmpPages";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
         // PdfConverter implements IDisposable, so wrap it in a using block
         using (PdfConverter converter = new PdfConverter())
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            // Bind the source PDF document
+            converter.BindPdf(inputPdfPath);
+
+            // Determine how many pages to process (max 20 or total page count)
+            // PageCount is available after binding the document
+            int totalPages = converter.PageCount;
+            int pagesToConvert = Math.Min(20, totalPages);
+
+            // Set the page range (1‑based indexing)
+            converter.StartPage = 1;
+            converter.EndPage   = pagesToConvert;
+
+            // Set the desired resolution (150 DPI)
+            converter.Resolution = new Resolution(150);
+
+            // Prepare the conversion
+            converter.DoConvert();
+
+            // Loop through the pages and save each as a BMP image
+            for (int pageNumber = 1; pageNumber <= pagesToConvert; pageNumber++)
             {
-                // Bind the document to the converter
-                converter.BindPdf(doc);
-
-                // Determine how many pages we will convert (max 20)
-                int maxPage = Math.Min(20, doc.Pages.Count);
-
-                // Configure the conversion range and resolution
-                converter.StartPage = 1;
-                converter.EndPage   = maxPage;
-                converter.Resolution = new Resolution(150); // 150 DPI
-
-                // Perform the conversion; after this call GetNextImage() will return each page image
-                converter.DoConvert();
-
-                // Retrieve each page image as BMP (format inferred from file extension)
-                for (int pageNum = 1; pageNum <= maxPage; pageNum++)
-                {
-                    string outPath = Path.Combine(outputDir, $"Page_{pageNum}.bmp");
-                    converter.GetNextImage(outPath); // BMP format because of .bmp extension
-                }
+                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.bmp");
+                // GetNextImage saves the current page using the file extension to infer format
+                converter.GetNextImage(outputPath);
+                Console.WriteLine($"Saved page {pageNumber} as BMP to '{outputPath}'.");
             }
         }
-
-        Console.WriteLine("PDF pages 1‑20 have been converted to BMP images.");
     }
 }

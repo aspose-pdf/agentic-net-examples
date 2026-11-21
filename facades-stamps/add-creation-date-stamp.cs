@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,39 +16,46 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Load the PDF to read its creation date (Document must be disposed via using)
+        string creationDateText;
         using (Document doc = new Document(inputPath))
         {
-            // Determine the creation date (fallback to now if not set)
+            // If the creation date is not set, use current date as fallback
             DateTime creationDate = doc.Info.CreationDate != DateTime.MinValue
-                ? doc.Info.CreationDate
-                : DateTime.Now;
-            string dateText = creationDate.ToString("yyyy-MM-dd");
-
-            // Create a text stamp with the formatted date
-            TextStamp stamp = new TextStamp(dateText)
-            {
-                HorizontalAlignment = HorizontalAlignment.Left,
-                VerticalAlignment   = VerticalAlignment.Top,
-                XIndent = 10, // left margin
-                YIndent = 10, // top margin
-                TextState = {
-                    Font = FontRepository.FindFont("Arial"),
-                    FontSize = 12,
-                    ForegroundColor = Aspose.Pdf.Color.Black
-                }
-            };
-
-            // Apply the stamp to every page of the document
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(stamp);
-            }
-
-            // Save the stamped document
-            doc.Save(outputPath);
+                                    ? doc.Info.CreationDate
+                                    : DateTime.Now;
+            creationDateText = creationDate.ToString("yyyy-MM-dd");
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        // Create a text stamp with the formatted creation date
+        TextStamp dateStamp = new TextStamp(creationDateText)
+        {
+            // Position at top‑left corner of the page
+            HorizontalAlignment = HorizontalAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top,
+            // Optional offsets from the page edges
+            XIndent = 10,
+            YIndent = 10,
+            // Appearance settings
+            Background = false,
+            Opacity = 0.8
+        };
+        // TextState is read‑only; modify the existing instance instead of assigning a new one
+        dateStamp.TextState.ForegroundColor = Color.Black;
+        dateStamp.TextState.FontSize = 12;
+        // Optional: set a specific font if desired
+        // dateStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+
+        // Load the document again, apply the stamp to every page, and save the result
+        using (Document pdfDoc = new Document(inputPath))
+        {
+            foreach (Page page in pdfDoc.Pages)
+            {
+                page.AddStamp(dateStamp);
+            }
+            pdfDoc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Stamp added. Output saved to '{outputPath}'.");
     }
 }

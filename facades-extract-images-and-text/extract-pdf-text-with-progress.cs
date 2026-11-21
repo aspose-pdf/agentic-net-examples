@@ -16,49 +16,57 @@ class Program
             return;
         }
 
-        // Determine total pages (1‑based indexing).
-        int pageCount;
-        using (var doc = new Document(inputPdfPath))
+        try
         {
-            pageCount = doc.Pages.Count;
-        }
+            // Load the document to obtain the total page count (PdfExtractor does not expose this).
+            Document doc = new Document(inputPdfPath);
+            int pageCount = doc.Pages.Count;
 
-        // PdfExtractor implements IDisposable.
-        using (var extractor = new PdfExtractor())
-        {
-            extractor.BindPdf(inputPdfPath);
-
-            using (var writer = new StreamWriter(outputTxtPath))
+            // PdfExtractor implements IDisposable – use a using block for deterministic disposal.
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                for (int page = 1; page <= pageCount; page++)
+                // Bind the source PDF.
+                extractor.BindPdf(inputPdfPath);
+
+                // Prepare the output file.
+                using (StreamWriter writer = new StreamWriter(outputTxtPath, false))
                 {
-                    // Process a single page.
-                    extractor.StartPage = page;
-                    extractor.EndPage   = page;
-                    extractor.ExtractText();
-
-                    // GetText requires a destination stream.
-                    string pageText;
-                    using (var ms = new MemoryStream())
+                    // Process each page individually to report progress.
+                    for (int page = 1; page <= pageCount; page++)
                     {
-                        extractor.GetText(ms);
-                        ms.Position = 0; // rewind
-                        using (var sr = new StreamReader(ms))
+                        Console.WriteLine($"Processing page {page} of {pageCount}...");
+
+                        // Configure the extractor to work on a single page.
+                        extractor.StartPage = page;
+                        extractor.EndPage   = page;
+
+                        // Extract text from the current page.
+                        extractor.ExtractText();
+
+                        // Retrieve the extracted text via a stream (GetText requires a destination stream).
+                        string pageText;
+                        using (MemoryStream textStream = new MemoryStream())
                         {
-                            pageText = sr.ReadToEnd();
+                            extractor.GetText(textStream);
+                            textStream.Position = 0;
+                            using (StreamReader reader = new StreamReader(textStream))
+                            {
+                                pageText = reader.ReadToEnd();
+                            }
                         }
+
+                        // Write the page text to the output file (optional separator).
+                        writer.WriteLine($"--- Page {page} ---");
+                        writer.WriteLine(pageText);
                     }
-
-                    writer.WriteLine(pageText);
-
-                    // Progress report (overwrites the same console line).
-                    int percent = (page * 100) / pageCount;
-                    Console.Write($"\rProcessing page {page}/{pageCount} ({percent}%)");
                 }
+
+                Console.WriteLine($"Extraction completed. Text saved to '{outputTxtPath}'.");
             }
         }
-
-        // Move to the next line after the progress loop.
-        Console.WriteLine("\nExtraction completed successfully.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

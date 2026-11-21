@@ -1,34 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf;
+// URL-STABILITY STUB
+//
+// Apply password protection to pdf
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.10.0/facades-secure-documents/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "protected.pdf";
-        const string userPassword = "user123";
-        const string ownerPassword = "owner123";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // Load the existing PDF document.
-        Document doc = new Document(inputPath);
-
-        // Define the permissions you want to allow.
-        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-
-        // Apply password protection using AES‑256 encryption.
-        doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
-
-        // Save the encrypted PDF to a new file.
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Password‑protected PDF saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }

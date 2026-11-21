@@ -6,7 +6,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_faded.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,28 +15,40 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate over all pages
-            foreach (Page page in doc.Pages)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Iterate over all artifacts on the page
-                foreach (Artifact artifact in page.Artifacts)
+                // Pages are 1‑based in Aspose.Pdf
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    // Apply only to background artifacts
-                    if (artifact is BackgroundArtifact bgArtifact)
+                    Page page = doc.Pages[i];
+
+                    // Ensure the page has artifacts before iterating
+                    if (page.Artifacts != null)
                     {
-                        // Set opacity to 40% (0.4)
-                        bgArtifact.Opacity = 0.4f;
+                        foreach (Artifact artifact in page.Artifacts)
+                        {
+                            // Target only background artifacts
+                            if (artifact is BackgroundArtifact bgArtifact)
+                            {
+                                // Set opacity to 40% (value range 0.0‑1.0)
+                                bgArtifact.Opacity = 0.4f;
+                            }
+                        }
                     }
                 }
+
+                // Save the modified PDF
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            Console.WriteLine($"Faded PDF saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

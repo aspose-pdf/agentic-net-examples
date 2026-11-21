@@ -11,36 +11,40 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        try
         {
-            // Configure HTML save options to embed all resources (including images) directly into the HTML file
-            HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Embed all parts (CSS, fonts, images) into the single HTML output as Base64 data URIs
-                PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
-                // Ensure the output is a single HTML file (no page splitting)
-                SplitIntoPages = false
-            };
+                // Configure HTML save options to embed all resources (including images) as Base64 data URIs.
+                HtmlSaveOptions htmlOpts = new HtmlSaveOptions
+                {
+                    PartsEmbeddingMode = HtmlSaveOptions.PartsEmbeddingModes.EmbedAllIntoHtml,
+                    // Ensure a single HTML file is produced.
+                    SplitIntoPages = false
+                };
 
-            // HTML conversion relies on GDI+ and is Windows‑only; handle possible exceptions on other platforms
-            try
-            {
+                // Save the PDF as HTML. Images will be embedded as Base64 data URIs.
                 pdfDoc.Save(outputHtmlPath, htmlOpts);
                 Console.WriteLine($"PDF successfully converted to HTML with embedded images: {outputHtmlPath}");
             }
-            catch (TypeInitializationException)
-            {
-                Console.WriteLine("HTML conversion requires Windows (GDI+). Operation skipped on this platform.");
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error during HTML conversion: {ex.Message}");
-            }
+        }
+        // HTML conversion relies on GDI+ and is Windows‑only.
+        catch (TypeInitializationException)
+        {
+            Console.WriteLine("HTML conversion requires Windows (GDI+). Skipped on this platform.");
+        }
+        catch (DllNotFoundException)
+        {
+            Console.WriteLine("GDI+ library not found. HTML conversion is unavailable on this platform.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

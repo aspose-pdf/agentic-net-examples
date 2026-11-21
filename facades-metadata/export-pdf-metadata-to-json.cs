@@ -1,17 +1,31 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
-using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // PdfFileInfo is in this namespace
 
-class Program
+class PdfMetadataExporter
 {
+    // Simple POCO to hold metadata that will be serialized to JSON
+    public class MetadataInfo
+    {
+        // Initialise non‑nullable reference types to avoid CS8618 warnings
+        public string FileName { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
+        public string Author { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string Keywords { get; set; } = string.Empty;
+        // PdfFileInfo exposes dates as strings – keep them as strings to avoid conversion errors
+        public string? CreationDate { get; set; }
+        public string? ModificationDate { get; set; }
+        public string Producer { get; set; } = string.Empty;
+        public string Creator { get; set; } = string.Empty;
+    }
+
     static void Main()
     {
-        // Folder containing PDF files
-        const string folderPath = "pdfs";
-        // Output JSON file path
-        const string outputJson = "metadata.json";
+        const string folderPath = @"C:\PdfFolder";          // folder containing PDFs
+        const string outputJson = @"C:\PdfFolder\metadata.json";
 
         if (!Directory.Exists(folderPath))
         {
@@ -19,40 +33,49 @@ class Program
             return;
         }
 
-        // List to hold metadata dictionaries for each PDF
-        var metadataList = new List<Dictionary<string, object>>();
+        var metadataList = new List<MetadataInfo>();
 
-        // Enumerate all PDF files in the folder
-        foreach (string filePath in Directory.EnumerateFiles(folderPath, "*.pdf"))
+        // Iterate over all PDF files in the folder
+        foreach (string pdfPath in Directory.GetFiles(folderPath, "*.pdf"))
         {
-            // PdfFileInfo reads document metadata without loading the full PDF
-            PdfFileInfo info = new PdfFileInfo(filePath);
-
-            var meta = new Dictionary<string, object>
+            try
             {
-                ["FileName"]          = Path.GetFileName(filePath),
-                ["Title"]             = info.Title,
-                ["Author"]            = info.Author,
-                ["Subject"]           = info.Subject,
-                ["Keywords"]          = info.Keywords,
-                ["CreationDate"]      = info.CreationDate,
-                // Correct property name for modification date in PdfFileInfo
-                ["ModificationDate"] = info.ModDate,
-                ["Producer"]          = info.Producer,
-                ["Creator"]           = info.Creator,
-                // PdfFileInfo does not expose a version property; if needed, load the document to get it.
-                // ["Version"]        = info.Version // removed – property does not exist
-            };
+                // PdfFileInfo extracts document information without loading the full PDF
+                var info = new PdfFileInfo(pdfPath);
 
-            metadataList.Add(meta);
+                var meta = new MetadataInfo
+                {
+                    FileName = Path.GetFileName(pdfPath),
+                    Title = info.Title ?? string.Empty,
+                    Author = info.Author ?? string.Empty,
+                    Subject = info.Subject ?? string.Empty,
+                    Keywords = info.Keywords ?? string.Empty,
+                    CreationDate = string.IsNullOrWhiteSpace(info.CreationDate) ? null : info.CreationDate,
+                    ModificationDate = string.IsNullOrWhiteSpace(info.ModDate) ? null : info.ModDate,
+                    Producer = info.Producer ?? string.Empty,
+                    Creator = info.Creator ?? string.Empty
+                };
+
+                metadataList.Add(meta);
+            }
+            catch (Exception ex)
+            {
+                // Log but continue processing other files
+                Console.Error.WriteLine($"Failed to read '{pdfPath}': {ex.Message}");
+            }
         }
 
-        // Serialize the list to formatted JSON
-        JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
-        string json = JsonSerializer.Serialize(metadataList, jsonOptions);
-
-        // Write JSON to the output file
-        File.WriteAllText(outputJson, json);
-        Console.WriteLine($"Metadata exported to '{outputJson}'.");
+        try
+        {
+            // Serialize the list to JSON with indentation for readability
+            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(metadataList, jsonOptions);
+            File.WriteAllText(outputJson, json);
+            Console.WriteLine($"Metadata exported to '{outputJson}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error writing JSON file: {ex.Message}");
+        }
     }
 }

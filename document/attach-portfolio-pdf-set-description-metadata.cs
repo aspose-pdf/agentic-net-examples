@@ -6,39 +6,40 @@ class Program
 {
     static void Main()
     {
-        const string targetPdfPath = "target.pdf";      // PDF to which the portfolio will be attached
-        const string portfolioPdfPath = "portfolio.pdf"; // PDF file to embed as a portfolio item
-        const string outputPdfPath = "output.pdf";      // Resulting PDF with attachment and metadata
+        const string mainPdfPath = "main.pdf";
+        const string portfolioPdfPath = "portfolio.pdf";
+        const string outputPdfPath = "output.pdf";
 
-        // Verify that input files exist
-        if (!File.Exists(targetPdfPath))
+        if (!File.Exists(mainPdfPath) || !File.Exists(portfolioPdfPath))
         {
-            Console.Error.WriteLine($"Target PDF not found: {targetPdfPath}");
-            return;
-        }
-        if (!File.Exists(portfolioPdfPath))
-        {
-            Console.Error.WriteLine($"Portfolio PDF not found: {portfolioPdfPath}");
+            Console.Error.WriteLine("Required PDF files not found.");
             return;
         }
 
-        // Load the target PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(targetPdfPath))
+        // Load the main PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(mainPdfPath))
         {
-            // Create a FileSpecification for the portfolio PDF with a custom description
-            // The constructor reads the file from disk automatically.
-            FileSpecification portfolioSpec = new FileSpecification(portfolioPdfPath, "Portfolio attachment");
+            // Ensure the document has a collection (portfolio) initialized
+            if (doc.Collection == null)
+                doc.Collection = new Collection();
 
-            // Add the file specification to the document's EmbeddedFiles collection
-            doc.EmbeddedFiles.Add(portfolioSpec);
+            // Create a file specification for the portfolio PDF with a custom description
+            var fileSpec = new FileSpecification(portfolioPdfPath, "Attached portfolio document")
+            {
+                // Load the file contents into a memory stream as required by the API
+                Contents = new MemoryStream(File.ReadAllBytes(portfolioPdfPath))
+            };
 
-            // Set a custom metadata property named "Description" using the DocumentInfo indexer
-            doc.Info["Description"] = "Custom description for the PDF document";
+            // Add the file specification to the document's collection (portfolio)
+            doc.Collection.Add(fileSpec);
 
-            // Save the modified PDF. Since the output is a PDF, no SaveOptions are required.
+            // Set custom metadata (description) using the DocumentInfo indexer
+            doc.Info["Description"] = "Custom description for this PDF";
+
+            // Save the updated document
             doc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"PDF saved with portfolio attachment and custom metadata: {outputPdfPath}");
+        Console.WriteLine($"Portfolio attached and metadata set. Saved to '{outputPdfPath}'.");
     }
 }

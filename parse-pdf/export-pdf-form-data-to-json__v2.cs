@@ -7,9 +7,9 @@ class Program
     static void Main()
     {
         // JSON string containing form data
-        string json = "{\"name\":\"John Doe\",\"email\":\"john.doe@example.com\",\"age\":30}";
+        string json = "{\"name\":\"John Doe\",\"email\":\"john@example.com\"}";
 
-        // Path of the output file
+        // Path to the output file
         string outputPath = "formData.json";
 
         // Save the JSON string to a UTF‑8 encoded file

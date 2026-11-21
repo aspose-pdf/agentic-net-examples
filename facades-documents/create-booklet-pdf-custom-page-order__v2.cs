@@ -6,25 +6,33 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "source.pdf";
-        const string outputPath = "booklet.pdf";
+        const string inputPdfPath = "source.pdf";
+        const string outputPdfPath = "booklet.pdf";
 
-        if (!File.Exists(inputPath))
+        // Verify the input file exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Use the MakeBooklet overload that does not require a PageSize argument.
-        // It returns a bool indicating success.
-        PdfFileEditor editor = new PdfFileEditor();
-        bool success = editor.MakeBooklet(inputPath, outputPath);
-        if (!success)
+        try
         {
-            Console.Error.WriteLine("Failed to create booklet.");
-            return;
-        }
+            // PdfFileEditor does not implement IDisposable; instantiate directly
+            PdfFileEditor editor = new PdfFileEditor();
 
-        Console.WriteLine($"Booklet created successfully at '{outputPath}'.");
+            // Use the overload that creates a booklet without requiring a PageSize argument
+            // This method returns a bool indicating success (depending on Aspose.PDF version)
+            bool success = editor.MakeBooklet(inputPdfPath, outputPdfPath);
+
+            if (success)
+                Console.WriteLine($"Booklet created successfully: {outputPdfPath}");
+            else
+                Console.Error.WriteLine("Booklet creation failed.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during booklet creation: {ex.Message}");
+        }
     }
 }

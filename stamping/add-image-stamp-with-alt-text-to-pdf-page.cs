@@ -9,8 +9,9 @@ class Program
         const string inputPdf = "input.pdf";
         const string outputPdf = "output.pdf";
         const string stampImagePath = "stamp.png";
-        const string altText = "Company logo stamp";
+        const string altText = "Company logo";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
@@ -22,45 +23,44 @@ class Program
             return;
         }
 
-        try
+        // Open the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            using (Document doc = new Document(inputPdf))
+            // Ensure the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
+            if (doc.Pages.Count < 3)
             {
-                // Ensure the document has at least three pages (1‑based indexing)
-                if (doc.Pages.Count < 3)
-                {
-                    Console.Error.WriteLine("Document has fewer than 3 pages.");
-                    return;
-                }
-
-                // Create an image stamp
-                ImageStamp stamp = new ImageStamp(stampImagePath)
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
-                    Background = false,   // place on top of existing content
-                    Opacity = 0.8         // optional transparency
-                };
-
-                // Add the stamp to page 3
-                doc.Pages[3].AddStamp(stamp);
-
-                // Set alternative text for the image resource on page 3
-                foreach (XImage img in doc.Pages[3].Resources.Images)
-                {
-                    // Links alt text to the image on the specified page
-                    img.TrySetAlternativeText(altText, doc.Pages[3]);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPdf);
+                Console.Error.WriteLine("Document has fewer than 3 pages.");
+                return;
             }
 
-            Console.WriteLine($"Image stamp with alt text added to page 3. Saved as '{outputPdf}'.");
+            // Retrieve page three
+            Page page = doc.Pages[3];
+
+            // Create an image stamp from the PNG file
+            ImageStamp imgStamp = new ImageStamp(stampImagePath)
+            {
+                // Example positioning – top‑right corner of the page
+                HorizontalAlignment = HorizontalAlignment.Right,
+                VerticalAlignment   = VerticalAlignment.Top,
+                Opacity = 1.0,
+                Background = false
+            };
+
+            // Add the stamp to page three
+            page.AddStamp(imgStamp);
+
+            // After stamping, the image becomes part of the page's resource collection.
+            // Set alternative text for each image resource to improve accessibility.
+            foreach (XImage img in page.Resources.Images)
+            {
+                // TrySetAlternativeText attaches alt text to the image resource.
+                img.TrySetAlternativeText(altText, page);
+            }
+
+            // Save the modified PDF
+            doc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Image stamp with alternative text added to page 3. Saved as '{outputPdf}'.");
     }
 }

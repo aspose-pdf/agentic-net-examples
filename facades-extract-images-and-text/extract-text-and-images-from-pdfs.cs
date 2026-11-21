@@ -2,57 +2,46 @@ using System;
 using System.IO;
 using Aspose.Pdf.Facades;
 
-namespace PdfProcessor
+class Program
 {
-    class Program
+    // Entry point of the service
+    static void Main(string[] args)
     {
-        // Directory inside the container that will be mounted from the host
-        private const string InputDirectory = "/data";
+        // Input and output directories are taken from environment variables.
+        // If not set, default to typical Docker mount points.
+        string inputDir  = Environment.GetEnvironmentVariable("PDF_INPUT_DIR")  ?? "/data";
+        string outputDir = Environment.GetEnvironmentVariable("PDF_OUTPUT_DIR") ?? "/output";
 
-        static void Main(string[] args)
+        // Ensure the output directory exists.
+        Directory.CreateDirectory(outputDir);
+
+        // Process each PDF file found in the input directory.
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
-            Console.WriteLine("PDF extraction service started.");
-            if (!Directory.Exists(InputDirectory))
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string txtPath = Path.Combine(outputDir, fileNameWithoutExt + ".txt");
+
+            // PdfExtractor implements IDisposable – wrap it in a using block.
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                Console.Error.WriteLine($"Input directory '{InputDirectory}' does not exist.");
-                return;
+                // Bind the PDF file to the extractor.
+                extractor.BindPdf(pdfPath);
+
+                // NOTE: Older versions of Aspose.Pdf.Facades do not expose the ExtractionOptions
+                // property. The default extraction mode already provides raw text, so we can
+                // simply call ExtractText() without configuring additional options.
+
+                // Perform the text extraction.
+                extractor.ExtractText();
+
+                // Write the extracted text to a .txt file.
+                using (FileStream outStream = new FileStream(txtPath, FileMode.Create, FileAccess.Write))
+                {
+                    extractor.GetText(outStream);
+                }
             }
 
-            // Process all PDF files found in the mounted volume
-            foreach (string pdfPath in Directory.EnumerateFiles(InputDirectory, "*.pdf", SearchOption.TopDirectoryOnly))
-            {
-                try
-                {
-                    ExtractText(pdfPath);
-                }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"Failed to process '{pdfPath}': {ex.Message}");
-                }
-            }
-
-            Console.WriteLine("PDF extraction service completed.");
-        }
-
-        // Uses Aspose.Pdf.Facades.PdfExtractor to extract text from a PDF file
-        private static void ExtractText(string pdfPath)
-        {
-            // Output text file will be placed alongside the source PDF
-            string txtPath = Path.ChangeExtension(pdfPath, ".txt");
-
-            // PdfExtractor does NOT implement IDisposable, so no using block is required
-            PdfExtractor extractor = new PdfExtractor();
-
-            // Bind the PDF file to the extractor
-            extractor.BindPdf(pdfPath);
-
-            // Enable text extraction
-            extractor.ExtractText();
-
-            // Save extracted text to a .txt file
-            extractor.GetText(txtPath);
-
-            Console.WriteLine($"Extracted text from '{Path.GetFileName(pdfPath)}' to '{Path.GetFileName(txtPath)}'.");
+            Console.WriteLine($"Extracted text from '{pdfPath}' to '{txtPath}'.");
         }
     }
 }

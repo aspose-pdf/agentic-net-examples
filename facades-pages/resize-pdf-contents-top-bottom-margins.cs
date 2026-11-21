@@ -16,24 +16,28 @@ class Program
             return;
         }
 
-        // Desired margins (in points)
-        double leftMargin   = 0.0;   // no change on the left side
-        double rightMargin  = 0.0;   // no change on the right side
-        double topMargin    = 50.0;  // top margin to add
-        double bottomMargin = 30.0;  // bottom margin to add
+        // Margins are specified in points (1 point = 1/72 inch)
+        double topMargin = 50;    // top margin
+        double bottomMargin = 30; // bottom margin
 
-        // Create resize parameters via the static Margins method (left, right, top, bottom)
+        // Load the source PDF using the high‑level Document API
+        Document pdfDoc = new Document(inputPath);
+
+        // Prepare resize parameters – left and right margins are 0, top/bottom are as required
+        // PdfFileEditor.ContentsResizeParameters is a nested type; use the static Margins factory method.
         var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(
-            leftMargin, rightMargin, topMargin, bottomMargin);
+            left: 0,
+            right: 0,
+            top: topMargin,
+            bottom: bottomMargin);
 
-        // Load the PDF, apply the resize, and save the result
-        using (Document doc = new Document(inputPath))
-        {
-            PdfFileEditor editor = new PdfFileEditor();
-            editor.ResizeContents(doc, resizeParams);
-            doc.Save(outputPath);
-        }
+        // Use PdfFileEditor to apply the resize operation. Passing null for pageNumbers applies to all pages.
+        PdfFileEditor editor = new PdfFileEditor();
+        editor.ResizeContents(pdfDoc, null, resizeParams);
 
-        Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"PDF saved with adjusted margins to '{outputPath}'.");
     }
 }

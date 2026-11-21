@@ -7,46 +7,53 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string docxPath = "output.docx";
-        // Path to the custom TrueType/OpenType font you want to embed
-        const string customFontPath = "MyCustomFont.ttf";
+        const string inputPdfPath = "input.pdf";
+        const string outputDocxPath = "output.docx";
 
-        if (!File.Exists(pdfPath))
+        // Paths to custom TrueType/OpenType font files that should be embedded
+        string[] customFontFiles = { "fonts/CustomFont-Regular.ttf", "fonts/CustomFont-Bold.ttf" };
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(customFontPath))
+        // Register custom fonts via FontRepository.Substitutions (AddFont was removed in newer versions)
+        foreach (string fontFile in customFontFiles)
         {
-            Console.Error.WriteLine($"Font not found: {customFontPath}");
-            return;
+            if (File.Exists(fontFile))
+            {
+                // Use the file name (without extension) as the logical font name
+                string fontName = Path.GetFileNameWithoutExtension(fontFile);
+                FontRepository.Substitutions.Add(new SimpleFontSubstitution(fontName, fontFile));
+            }
+            else
+            {
+                Console.Error.WriteLine($"Warning: Font file not found: {fontFile}");
+            }
         }
 
         try
         {
-            // Register the custom font via substitution so Aspose.Pdf can use it during conversion
-            FontRepository.Substitutions.Add(new SimpleFontSubstitution("MyCustomFont", customFontPath));
-
-            // Load the source PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(pdfPath))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Configure DOCX save options – only the format needs to be set; fonts are embedded automatically
-                var saveOptions = new DocSaveOptions
+                // Configure DOCX save options – only the Format property is required
+                DocSaveOptions docxOptions = new DocSaveOptions
                 {
                     Format = DocSaveOptions.DocFormat.DocX
                 };
 
-                // Perform the conversion and save the DOCX with embedded fonts
-                pdfDoc.Save(docxPath, saveOptions);
+                // Save the PDF as DOCX; fonts are embedded automatically when possible
+                pdfDoc.Save(outputDocxPath, docxOptions);
             }
 
-            Console.WriteLine($"Conversion completed: '{docxPath}' (fonts embedded).");
+            Console.WriteLine($"Conversion successful. DOCX saved to: {outputDocxPath}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
         }
     }
 }

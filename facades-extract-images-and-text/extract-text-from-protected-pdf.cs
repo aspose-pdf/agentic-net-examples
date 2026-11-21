@@ -1,70 +1,42 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Ensure the Aspose.PDF assembly can be located at runtime.
-        // If you are using a project file, add the NuGet package "Aspose.PDF" (which provides Aspose.Pdf.dll).
-        // The following handler helps when the assembly file is named differently (e.g., Aspose.Pdf.dll) on case‑sensitive platforms.
-        AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
-        {
-            if (args.Name.StartsWith("Aspose.PDF", StringComparison.OrdinalIgnoreCase))
-            {
-                string possiblePath = Path.Combine(AppContext.BaseDirectory, "Aspose.Pdf.dll");
-                if (File.Exists(possiblePath))
-                {
-                    return Assembly.LoadFrom(possiblePath);
-                }
-            }
-            return null;
-        };
-
-        const string inputPdf = "protected.pdf";
+        const string inputPath = "protected.pdf";
+        const string outputPath = "extracted.txt";
         const string ownerPassword = "owner123";
-        const string outputTxt = "extracted.txt";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Verify that the Aspose.Pdf assembly is present before proceeding.
-        string asposeDllPath = Path.Combine(AppContext.BaseDirectory, "Aspose.Pdf.dll");
-        if (!File.Exists(asposeDllPath))
+        try
         {
-            Console.Error.WriteLine($"Aspose.PDF assembly not found at '{asposeDllPath}'. Install the NuGet package 'Aspose.PDF' and ensure the DLL is copied to the output directory.");
-            return;
-        }
-
-        using (PdfExtractor extractor = new PdfExtractor())
-        {
-            // Supply the owner (or user) password **before** binding the PDF
-            extractor.Password = ownerPassword;
-
-            // Bind the PDF file (single‑argument overload)
-            extractor.BindPdf(inputPdf);
-
-            // Perform the extraction
-            extractor.ExtractText();
-
-            // Get the extracted text via the stream overload of GetText()
-            using (MemoryStream textStream = new MemoryStream())
+            // PdfExtractor implements IDisposable, so use a using block
+            using (PdfExtractor extractor = new PdfExtractor())
             {
-                extractor.GetText(textStream);
-                textStream.Position = 0;
-                using (StreamReader reader = new StreamReader(textStream))
-                {
-                    string extractedText = reader.ReadToEnd();
-                    File.WriteAllText(outputTxt, extractedText);
-                }
-            }
-        }
+                // Bind the PDF (no password overload) and then supply the owner password
+                extractor.BindPdf(inputPath);
+                extractor.Password = ownerPassword; // full‑permission access
 
-        Console.WriteLine($"Text extracted to '{outputTxt}'.");
+                // Extract text from all pages
+                extractor.ExtractText();
+
+                // Write the extracted text to a plain‑text file
+                extractor.GetText(outputPath);
+            }
+
+            Console.WriteLine($"Text successfully extracted to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

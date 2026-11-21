@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -22,34 +23,31 @@ class Program
         try
         {
             // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdfPath))
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Prepare a dictionary to hold form field names and their values
+                // Collect form field names and their values
                 var formData = new Dictionary<string, object>();
 
                 // Ensure the document actually contains a form
-                if (doc.Form != null && doc.Form.Fields != null)
+                if (pdfDoc.Form != null && pdfDoc.Form.Fields != null)
                 {
-                    foreach (var field in doc.Form.Fields)
+                    foreach (Field field in pdfDoc.Form.Fields)
                     {
-                        // Some fields may have null values; handle gracefully
-                        string fieldName = field?.PartialName ?? string.Empty;
-                        object fieldValue = field?.Value;
-
-                        // Store the value as a string for JSON serialization
-                        formData[fieldName] = fieldValue?.ToString() ?? string.Empty;
+                        // Different field types expose the value via the 'Value' property
+                        // For checkboxes/radio buttons the value may be a string like "On"/"Off"
+                        formData[field.FullName] = field.Value;
                     }
                 }
 
-                // Serialize the dictionary to a JSON string
-                string json = JsonSerializer.Serialize(formData, new JsonSerializerOptions { WriteIndented = true });
+                // Serialize the dictionary to JSON
+                string jsonString = JsonSerializer.Serialize(formData, new JsonSerializerOptions { WriteIndented = true });
 
                 // Convert JSON string to UTF-8 bytes
-                byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+                byte[] jsonBytes = Encoding.UTF8.GetBytes(jsonString);
 
-                // Write the JSON bytes into a GZip-compressed file
+                // Write compressed JSON using GZipStream
                 using (FileStream fileStream = new FileStream(outputGzipPath, FileMode.Create, FileAccess.Write))
-                using (GZipStream gzipStream = new GZipStream(fileStream, CompressionLevel.Optimal))
+                using (GZipStream gzipStream = new GZipStream(fileStream, CompressionMode.Compress))
                 {
                     gzipStream.Write(jsonBytes, 0, jsonBytes.Length);
                 }

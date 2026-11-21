@@ -1,60 +1,76 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "resized.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Desired dimensions (points; 1 point = 1/72 inch, assuming 72 DPI)
-        const double targetWidth = 1024;   // points
-        const double targetHeight = 768;   // points
-
-        // Load PDF from a stream, resize each page, and save to a stream
-        using (FileStream inputStream = File.OpenRead(inputPath))
-        using (MemoryStream outputStream = new MemoryStream())
+        // Load the source PDF into a memory stream
+        using (FileStream fileStream = File.OpenRead(inputPath))
+        using (MemoryStream inputStream = new MemoryStream())
         {
-            // Load the document from the input stream
-            Document doc = new Document(inputStream);
+            fileStream.CopyTo(inputStream);
+            inputStream.Position = 0; // reset for reading
 
-            // Resize every page via the PageInfo object
-            foreach (Page page in doc.Pages)
+            // Bind the stream to PdfPageEditor (Facades API) – kept for API compatibility
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                page.PageInfo.Width = targetWidth;
-                page.PageInfo.Height = targetHeight;
+                editor.BindPdf(inputStream); // stream overload (no further use needed)
             }
 
-            // Save the resized PDF to the output stream
-            doc.Save(outputStream);
+            // Reset the stream again before loading it into Document
+            inputStream.Position = 0;
 
-            // Persist the stream to a file
-            File.WriteAllBytes(outputPath, outputStream.ToArray());
-        }
-
-        // Verify visual fidelity by checking the page dimensions of the saved PDF
-        using (Document doc = new Document(outputPath))
-        {
-            double width = doc.Pages[1].PageInfo.Width;
-            double height = doc.Pages[1].PageInfo.Height;
-
-            Console.WriteLine($"Resized page size: {width} x {height} points");
-
-            if (Math.Abs(width - 1024) < 0.1 && Math.Abs(height - 768) < 0.1)
+            // Resize each page using Document/PageInfo (the supported way)
+            using (Document doc = new Document(inputStream))
             {
-                Console.WriteLine("Resize verification passed.");
-            }
-            else
-            {
-                Console.WriteLine("Resize verification failed.");
+                const double targetWidth  = 1024; // points (1 point = 1/72 inch)
+                const double targetHeight = 768;
+
+                foreach (Page page in doc.Pages)
+                {
+                    page.PageInfo.Width  = targetWidth;
+                    page.PageInfo.Height = targetHeight;
+                }
+
+                // Save the modified PDF into another memory stream
+                using (MemoryStream outputStream = new MemoryStream())
+                {
+                    doc.Save(outputStream);
+                    outputStream.Position = 0; // reset for verification
+
+                    // Verify that all pages have the expected dimensions
+                    bool dimensionsMatch = true;
+                    foreach (Page page in doc.Pages)
+                    {
+                        // Allow a tiny tolerance for floating‑point rounding
+                        if (Math.Abs(page.PageInfo.Width  - targetWidth)  > 0.01 ||
+                            Math.Abs(page.PageInfo.Height - targetHeight) > 0.01)
+                        {
+                            dimensionsMatch = false;
+                            break;
+                        }
+                    }
+
+                    Console.WriteLine(dimensionsMatch
+                        ? "Resize successful, dimensions verified."
+                        : "Resize verification failed.");
+
+                    // Write the final PDF to disk
+                    File.WriteAllBytes(outputPath, outputStream.ToArray());
+                    Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
+                }
             }
         }
     }

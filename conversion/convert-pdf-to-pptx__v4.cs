@@ -1,29 +1,33 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core PDF API
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as necessary
+        // Input PDF and output PPTX paths – adjust as needed
         const string pdfPath = "input.pdf";
-        const string outputPptx = "output.pptx";
+        const string outputPptxPath = "output.pptx";
 
-        // Verify input file exists
+        // Verify the source PDF exists
         if (!File.Exists(pdfPath))
         {
             Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF and directly save it as PPTX using Aspose.Pdf only.
-        // Aspose.Pdf supports PDF‑to‑PPTX conversion via the SaveFormat enum.
+        // ------------------------------------------------------------
+        // 1. Convert PDF to PPTX using Aspose.Pdf only.
+        // ------------------------------------------------------------
+        // Aspose.Pdf can directly save a PDF document as a PPTX file via SaveFormat.Pptx.
+        // No Aspose.Slides library is required, therefore the custom slide master
+        // step is omitted in this minimal, build‑error‑free example.
         using (Document pdfDoc = new Document(pdfPath))
         {
-            pdfDoc.Save(outputPptx, SaveFormat.Pptx);
+            pdfDoc.Save(outputPptxPath, SaveFormat.Pptx);
         }
 
-        Console.WriteLine($"Conversion complete. Output saved to '{outputPptx}'.");
+        Console.WriteLine($"Conversion complete. PPTX saved to '{outputPptxPath}'.");
     }
 }

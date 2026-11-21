@@ -7,36 +7,32 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string bookmarkTitle = "Reference to Section 2";
-        const string destinationName = "Section2Dest"; // Named destination already defined in the PDF
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_bookmarked.pdf";
+        const string bookmarkTitle = "See Section 2";
+        const string namedDestination = "Section2Dest"; // Must exist in the source PDF
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
+        // Load the PDF with the Document API (the recommended way for outline/bookmark work)
+        Document doc = new Document(inputPdf);
 
-        // Create a GoToAction that points to the existing named destination
-        GoToAction goTo = new GoToAction(doc, destinationName);
-
-        // Create the bookmark (outline item) and assign the action
+        // Create a top‑level outline item that points to the named destination.
+        // The Action is a GoToAction that references the destination name.
         OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
         {
             Title = bookmarkTitle,
-            Action = goTo
+            Action = new GoToAction(doc, namedDestination)
         };
 
-        // Add the bookmark to the document outline
+        // Add the bookmark to the document's outline collection and save.
         doc.Outlines.Add(bookmark);
+        doc.Save(outputPdf);
 
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Bookmark added and saved to '{outputPath}'.");
+        Console.WriteLine($"Bookmark added and saved to '{outputPdf}'.");
     }
 }

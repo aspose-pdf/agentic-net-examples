@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 
 class Program
@@ -7,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_without_zugferd.pdf";
+        const string outputPath = "output_no_zugferd.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,30 +16,40 @@ class Program
             return;
         }
 
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Work with embedded files – the Attachments collection does not exist.
-            if (doc.EmbeddedFiles != null && doc.EmbeddedFiles.Count > 0)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // Iterate backwards so that removal does not affect the index of remaining items.
-                for (int i = doc.EmbeddedFiles.Count - 1; i >= 0; i--)
+                // Collect the names of embedded files that contain "ZUGFeRD"
+                List<string> namesToRemove = new List<string>();
+                foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
                 {
-                    FileSpecification fileSpec = doc.EmbeddedFiles[i];
-                    string name = fileSpec.Name ?? string.Empty;
-
-                    // ZUGFeRD files are usually XML and often contain the word "ZUGFeRD" in the name.
-                    if (name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0 ||
-                        name.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                    bool isZugferd = (!string.IsNullOrEmpty(fileSpec.Name) &&
+                                      fileSpec.Name.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0) ||
+                                      (!string.IsNullOrEmpty(fileSpec.Description) &&
+                                      fileSpec.Description.IndexOf("ZUGFeRD", StringComparison.OrdinalIgnoreCase) >= 0);
+                    if (isZugferd)
                     {
-                        // Delete expects the attachment name (string), not the index.
-                        doc.EmbeddedFiles.Delete(name);
+                        namesToRemove.Add(fileSpec.Name);
                     }
                 }
+
+                // Delete the identified embedded files
+                foreach (string name in namesToRemove)
+                {
+                    doc.EmbeddedFiles.Delete(name);
+                }
+
+                // Save the PDF without the ZUGFeRD attachment
+                doc.Save(outputPath);
             }
 
-            doc.Save(outputPath);
+            Console.WriteLine($"ZUGFeRD attachment removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"ZUGFeRD attachment removed. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

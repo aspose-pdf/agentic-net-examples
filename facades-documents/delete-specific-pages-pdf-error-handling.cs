@@ -8,31 +8,34 @@ class Program
     {
         // Input PDF file path
         const string inputPath = "input.pdf";
-        // Output PDF file path after deletion
+        // Page number to delete (1‑based indexing)
+        const int pageToDelete = 2;
+        // Output PDF file path
         const string outputPath = "output.pdf";
-        // Pages to delete (example: pages 2 and 3)
-        int[] pagesToDelete = new int[] { 2, 3 };
 
         // Verify that the input file exists before invoking Delete
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Error: Input file '{inputPath}' not found.");
+            Console.Error.WriteLine($"Error: Input file not found – '{inputPath}'.");
             return;
         }
 
         try
         {
-            // PdfFileEditor does not implement IDisposable, so no using block is needed
+            // PdfFileEditor does NOT implement IDisposable; instantiate directly
             PdfFileEditor editor = new PdfFileEditor();
 
-            // Delete specified pages using the file‑path overload
+            // Delete overload expects an array of page numbers
+            int[] pagesToDelete = new[] { pageToDelete };
+
+            // Delete the specified page(s) and write the result to outputPath
             editor.Delete(inputPath, pagesToDelete, outputPath);
 
-            Console.WriteLine($"Pages deleted successfully. Result saved to '{outputPath}'.");
+            Console.WriteLine($"Page {pageToDelete} deleted successfully. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            // Catch any runtime errors from the Delete operation
+            // Catch any unexpected errors (e.g., invalid page number, I/O issues)
             Console.Error.WriteLine($"Error during Delete operation: {ex.Message}");
         }
     }

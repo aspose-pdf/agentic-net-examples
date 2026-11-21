@@ -17,39 +17,36 @@ class Program
             return;
         }
 
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Get the first page (1‑based indexing)
+            // Aspose.Pdf uses 1‑based page indexing
             Page page = doc.Pages[1];
 
-            // Define the annotation rectangle (llx, lly, urx, ury) in points
-            var rect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            // Define the annotation rectangle (lower‑left x/y, upper‑right x/y)
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
 
-            // DefaultAppearance is required for FreeTextAnnotation
-            var appearance = new DefaultAppearance("Arial", 12, System.Drawing.Color.Black);
+            // Create a DefaultAppearance required by FreeTextAnnotation constructor
+            DefaultAppearance appearance = new DefaultAppearance("Helvetica", 12, System.Drawing.Color.Black);
 
-            // Create the free‑text annotation
-            var freeText = new FreeTextAnnotation(page, rect, appearance)
-            {
-                Contents = "Sample free‑text annotation",
-                // Border/fill colour – using the inherited Color property
-                Color = Aspose.Pdf.Color.Yellow,
-                // Mark this annotation as a callout
-                Intent = FreeTextIntent.FreeTextCallout,
-                // Optional: show an arrow at the end of the leader line
-                EndingStyle = LineEnding.OpenArrow
-            };
+            // Create a free‑text annotation on the specified page with the appearance
+            FreeTextAnnotation freeText = new FreeTextAnnotation(page, rect, appearance);
+            freeText.Contents = "Free‑text annotation with a callout leader line.";
 
-            // Set a leader line (callout) of exactly 20 points.
-            // The first point is placed at the centre of the annotation's bottom edge;
-            // the second point is 20 points to the left, creating a 20‑point line.
+            // Configure the annotation as a callout and set the leader line length to 20 points
+            // The leader line length is defined by the distance between the first two points of the Callout array.
+            freeText.Intent = FreeTextIntent.FreeTextCallout;
             freeText.Callout = new Aspose.Pdf.Point[]
             {
-                new Aspose.Pdf.Point(rect.LLX + (rect.URX - rect.LLX) / 2, rect.LLY),
-                new Aspose.Pdf.Point(rect.LLX + (rect.URX - rect.LLX) / 2 - 20, rect.LLY)
+                // First point (anchor) – placed at the centre of the annotation rectangle for simplicity
+                new Aspose.Pdf.Point(rect.LLX + (rect.URX - rect.LLX) / 2, rect.LLY + (rect.URY - rect.LLY) / 2),
+                // Second point – 20 points to the right of the first point (leader line length)
+                new Aspose.Pdf.Point(rect.LLX + (rect.URX - rect.LLX) / 2 + 20, rect.LLY + (rect.URY - rect.LLY) / 2)
             };
+            // Optional: show an arrow at the end of the leader line
+            freeText.EndingStyle = LineEnding.OpenArrow;
 
-            // Add the annotation to the page
+            // Add the annotation to the page's annotation collection
             page.Annotations.Add(freeText);
 
             // Save the modified PDF

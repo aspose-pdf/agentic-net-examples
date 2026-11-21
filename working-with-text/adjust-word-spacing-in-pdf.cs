@@ -9,45 +9,33 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string textToInsert = "Sample text with custom spacing.";
-        const float wordSpacing = 2.0f; // increase spacing between words
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF within a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            using (Document doc = new Document(inputPath))
-            {
-                // Create a TextFragment with the desired text
-                TextFragment fragment = new TextFragment(textToInsert);
+            // Create a TextFragment containing the text to insert
+            TextFragment fragment = new TextFragment("Sample text with custom spacing");
 
-                // Set font, size, and color
-                fragment.TextState.Font = Aspose.Pdf.Text.FontRepository.FindFont("Arial");
-                fragment.TextState.FontSize = 12;
-                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Configure the existing TextState (do NOT replace the whole object)
+            fragment.TextState.FontSize = 12f;                     // float literal
+            fragment.TextState.Font = FontRepository.FindFont("Arial");
+            fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            fragment.TextState.WordSpacing = 2.0f;                // increase spacing between words (float literal)
 
-                // Adjust word spacing
-                fragment.TextState.WordSpacing = wordSpacing;
+            // Add the fragment to the first page (adjust page index as needed)
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(fragment);
 
-                // Position the fragment on the first page (example coordinates)
-                fragment.Position = new Aspose.Pdf.Text.Position(100, 700);
-
-                // Add the fragment to the first page
-                doc.Pages[1].Paragraphs.Add(fragment);
-
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Text inserted with custom word spacing saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

@@ -18,27 +18,17 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPath))
+            using (Document doc = new Document(inputPath))
             {
-                // Set extraction options to preserve line breaks and spacing
-                // The formatting mode is supplied via the constructor
-                TextExtractionOptions extractionOptions = new TextExtractionOptions(
-                    TextExtractionOptions.TextFormattingMode.Pure);
-
-                // Create a TextAbsorber with the configured options
-                TextAbsorber absorber = new TextAbsorber
-                {
-                    ExtractionOptions = extractionOptions
-                };
+                // Configure TextAbsorber to preserve layout using the constructor overload
+                var extractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
+                TextAbsorber absorber = new TextAbsorber(extractionOptions);
 
                 // Extract text from all pages
-                pdfDoc.Pages.Accept(absorber);
-
-                // Get the extracted text
+                doc.Pages.Accept(absorber);
                 string extractedText = absorber.Text;
 
-                // Write the text to an output file
+                // Write the extracted text to a file
                 File.WriteAllText(outputPath, extractedText);
                 Console.WriteLine($"Text extracted to '{outputPath}'.");
             }

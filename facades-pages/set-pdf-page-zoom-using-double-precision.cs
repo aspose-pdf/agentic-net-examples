@@ -7,31 +7,43 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputImagePath = "page1_zoom.png";
+        const string inputPath = "input.pdf";
+        const string outputDir = "ZoomedPages";
 
-        if (!File.Exists(inputPdfPath))
+        // Verify input file exists
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document.
-        Document pdfDocument = new Document(inputPdfPath);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputDir);
 
-        // Desired zoom factor (e.g., 2.5 = 250%).
-        const float zoomFactor = 2.5f;
-        // Convert zoom factor to DPI (default PDF DPI is 72).
-        int dpi = (int)(72 * zoomFactor);
+        // Desired zoom factor (double for high‑precision scaling)
+        const double zoomFactor = 2.0; // 200% scaling
+        // Aspose.Pdf uses DPI to control image size; the default export DPI is 96.
+        const int baseDpi = 96;
+        var resolution = new Resolution((int)(baseDpi * zoomFactor), (int)(baseDpi * zoomFactor));
 
-        // Render the first page to a PNG image with the calculated DPI.
-        using (FileStream imageStream = new FileStream(outputImagePath, FileMode.Create, FileAccess.Write))
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            // PngDevice respects the supplied Resolution (DPI) which effectively applies the zoom.
-            PngDevice pngDevice = new PngDevice(new Resolution(dpi));
-            pngDevice.Process(pdfDocument.Pages[1], imageStream);
+            int pageCount = doc.Pages.Count;
+
+            for (int i = 1; i <= pageCount; i++)
+            {
+                string outPath = Path.Combine(outputDir, $"Page_{i}.png");
+                using (var outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                {
+                    // Render the page as PNG using the calculated resolution (i.e., zoom)
+                    var pngDevice = new PngDevice(resolution);
+                    pngDevice.Process(doc.Pages[i], outStream);
+                }
+                Console.WriteLine($"Page {i} saved to {outPath}");
+            }
         }
 
-        Console.WriteLine($"Page rendered with {zoomFactor * 100}% zoom saved to '{outputImagePath}'.");
+        Console.WriteLine("All pages exported with the specified zoom.");
     }
 }

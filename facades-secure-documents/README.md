@@ -1,14 +1,14 @@
 # Facades secure documents
 
-> **Facades secure documents** in PDF using C# / .NET -- **39** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades secure documents** in PDF using C# / .NET -- **38** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-secure-documents`
-- Examples: 39
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 38
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
-- [`apply-password-protection-to-pdf.cs`](./apply-password-protection-to-pdf.cs) -- Apply password protection to pdf
+- [`apply-password-protection-to-pdf__v2.cs`](./apply-password-protection-to-pdf__v2.cs) -- Apply password protection to pdf  v2
 - [`batch-decrypt-pdfs-owner-passwords.cs`](./batch-decrypt-pdfs-owner-passwords.cs) -- Batch decrypt pdfs owner passwords
 - [`batch-encrypt-pdf-files.cs`](./batch-encrypt-pdf-files.cs) -- Batch encrypt pdf files
 - [`batch-update-pdf-user-passwords.cs`](./batch-update-pdf-user-passwords.cs) -- Batch update pdf user passwords
@@ -20,7 +20,6 @@
 - [`conditional-pdf-encryption-based-on-filename.cs`](./conditional-pdf-encryption-based-on-filename.cs) -- Conditional pdf encryption based on filename
 - [`decrypt-pdf-owner-password.cs`](./decrypt-pdf-owner-password.cs) -- Decrypt pdf owner password
 - [`decrypt-pdf-using-owner-password-azure-key-vault.cs`](./decrypt-pdf-using-owner-password-azure-key-vault.cs) -- Decrypt pdf using owner password azure key vault
-- [`directory-watcher-pdf-encryption-service.cs`](./directory-watcher-pdf-encryption-service.cs) -- Directory watcher pdf encryption service
 - [`disable-copying-enable-printing-pdf.cs`](./disable-copying-enable-printing-pdf.cs) -- Disable copying enable printing pdf
 - [`encrypt-decrypt-pdf-roundtrip.cs`](./encrypt-decrypt-pdf-roundtrip.cs) -- Encrypt decrypt pdf roundtrip
 - [`encrypt-pdf-256-aes.cs`](./encrypt-pdf-256-aes.cs) -- Encrypt pdf 256 aes

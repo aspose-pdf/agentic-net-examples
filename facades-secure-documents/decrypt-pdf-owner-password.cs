@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -16,11 +17,20 @@ class Program
             return;
         }
 
-        // Load the encrypted PDF using the owner password.
-        Document pdfDoc = new Document(encryptedPath, ownerPassword);
+        // Verify whether the PDF is actually encrypted
+        var fileInfo = new PdfFileInfo(encryptedPath);
+        if (!fileInfo.IsEncrypted)
+        {
+            Console.WriteLine("PDF is not encrypted – copying original file.");
+            File.Copy(encryptedPath, decryptedPath, true);
+            return;
+        }
 
-        // Save the document; this creates an unencrypted copy.
-        pdfDoc.Save(decryptedPath);
+        // Decrypt the PDF using the owner password
+        using var security = new PdfFileSecurity();
+        security.BindPdf(encryptedPath);
+        security.DecryptFile(ownerPassword);
+        security.Save(decryptedPath);
 
         Console.WriteLine($"Decrypted PDF saved to '{decryptedPath}'.");
     }

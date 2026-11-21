@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-annotations
 
-> **Facades annotations** in PDF using C# / .NET -- **102** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades annotations** in PDF using C# / .NET -- **104** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,28 +23,24 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (80/102 files) ← category-specific
-- `using Aspose.Pdf.Facades;` (56/102 files) ← category-specific
-- `using Aspose.Pdf.Annotations;` (44/102 files)
-- `using Aspose.Pdf.Text;` (2/102 files)
-- `using Aspose.Pdf.Devices;` (1/102 files)
-- `using Aspose.Pdf.Forms;` (1/102 files)
-- `using System;` (102/102 files)
-- `using System.IO;` (98/102 files)
-- `using System.Collections.Generic;` (21/102 files)
-- `using System.Linq;` (7/102 files)
-- `using System.Threading.Tasks;` (5/102 files)
-- `using System.Diagnostics;` (3/102 files)
-- `using System.Reflection;` (3/102 files)
-- `using System.Text.Json;` (3/102 files)
-- `using System.Threading;` (3/102 files)
-- `using System.IO.Compression;` (2/102 files)
-- `using System.Xml.Linq;` (2/102 files)
-- `using Azure.Storage.Blobs;` (1/102 files)
-- `using Azure.Storage.Blobs.Models;` (1/102 files)
-- `using NUnit.Framework;` (1/102 files)
-- `using System.Xml;` (1/102 files)
-- `using System.Xml.Schema;` (1/102 files)
+- `using Aspose.Pdf;` (80/104 files) ← category-specific
+- `using Aspose.Pdf.Facades;` (70/104 files) ← category-specific
+- `using Aspose.Pdf.Annotations;` (47/104 files)
+- `using Aspose.Pdf.Text;` (5/104 files)
+- `using Aspose.Pdf.Forms;` (1/104 files)
+- `using System;` (104/104 files)
+- `using System.IO;` (104/104 files)
+- `using System.Collections.Generic;` (16/104 files)
+- `using System.Threading;` (4/104 files)
+- `using System.Diagnostics;` (3/104 files)
+- `using System.Linq;` (3/104 files)
+- `using System.Text.Json;` (3/104 files)
+- `using System.Threading.Tasks;` (3/104 files)
+- `using System.IO.Compression;` (2/104 files)
+- `using System.Text;` (2/104 files)
+- `using System.Xml;` (2/104 files)
+- `using System.Xml.Linq;` (2/104 files)
+- `using System.Xml.Schema;` (1/104 files)
 
 ## Common Code Pattern
 
@@ -61,40 +57,40 @@ tool.Save("output.pdf");
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [add-text-annotation-with-custom-flags](./add-text-annotation-with-custom-flags.cs) | Add Custom Annotation Flags to PDF | `Document`, `Page`, `Annotation` | Demonstrates how to iterate over annotations on a PDF page and set custom flags such as NoView us... |
-| [annotation-removal-report](./annotation-removal-report.cs) | Generate PDF Annotation Removal Report | `Document`, `Page`, `PdfAnnotationEditor` | The sample counts all annotations in each PDF, removes them using Aspose.Pdf's annotation editor,... |
-| [async-pdf-annotation-operations](./async-pdf-annotation-operations.cs) | Add Text Annotation Asynchronously to PDF | `Document`, `Rectangle`, `TextAnnotation` | Shows how to add a text annotation to a PDF document using Aspose.Pdf's PdfAnnotationEditor wrapp... |
-| [backup-pdf-and-flatten-form-fields](./backup-pdf-and-flatten-form-fields.cs) | Backup PDF and Flatten Annotations | `PdfAnnotationEditor`, `BindPdf`, `FlatteningAnnotations` | Shows how to create a backup of a PDF file before flattening its annotations using Aspose.Pdf.Fac... |
-| [batch-delete-pdf-annotations-azure-blob](./batch-delete-pdf-annotations-azure-blob.cs) | Batch Add Text Annotation to PDFs in Azure Blob Storage | `PdfAnnotationEditor`, `BindPdf`, `TextAnnotation` | Streams PDF blobs from an Azure Blob container, binds each to Aspose.Pdf's PdfAnnotationEditor, a... |
-| [batch-delete-pdf-annotations-retain-types](./batch-delete-pdf-annotations-retain-types.cs) | Batch Delete PDF Annotations Except Specified Types | `Document`, `Page`, `Annotation` | Loads a JSON configuration that lists annotation types to keep, iterates through each page of a P... |
-| [batch-delete-pdf-annotations-with-progress](./batch-delete-pdf-annotations-with-progress.cs) | Batch Delete PDF Annotations with Progress Indicator | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Demonstrates iterating over PDFs in a folder, removing all annotations with PdfAnnotationEditor, ... |
-| [batch-delete-stamp-annotations](./batch-delete-stamp-annotations.cs) | Batch Remove Stamp Annotations from PDFs | `Document`, `Page`, `StampAnnotation` | Iterates through all PDF files in a folder, loads each document, finds and deletes every stamp an... |
-| [batch-export-delete-annotations-xfdf](./batch-export-delete-annotations-xfdf.cs) | Export, Delete and Archive PDF Annotations to XFDF | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Demonstrates a batch process that copies PDFs, exports their annotations to XFDF files, removes a... |
-| [batch-flatten-pdf-annotations-cancellation](./batch-flatten-pdf-annotations-cancellation.cs) | Batch Flatten PDF Annotations with Cancellation Support | `PdfAnnotationEditor`, `BindPdf`, `FlatteningAnnotations` | Demonstrates how to flatten annotations in multiple PDF files using Aspose.Pdf.Facades while supp... |
-| [batch-flatten-pdf-annotations](./batch-flatten-pdf-annotations.cs) | Batch Flatten PDF Annotations | `PdfAnnotationEditor`, `BindPdf`, `FlatteningAnnotations` | Shows how to iterate over all PDF files in a folder and use Aspose.Pdf.Facades.PdfAnnotationEdito... |
-| [batch-import-xfdf-annotations-into-pdfs__v2](./batch-import-xfdf-annotations-into-pdfs__v2.cs) | Batch Import XFDF Data into Matching PDFs | `Document`, `Form`, `BindPdf` | Demonstrates iterating over a folder, matching each PDF with an XFDF file of the same name, impor... |
-| [batch-remove-old-annotations](./batch-remove-old-annotations.cs) | Batch Remove Old PDF Annotations | `Document`, `Page`, `Annotation` | Shows how to scan PDFs in a folder, find annotations older than a specified number of days, and d... |
-| [batch-update-annotation-author](./batch-update-annotation-author.cs) | Batch Update Annotation Author Across PDFs | `Document`, `PdfAnnotationEditor`, `Pages` | Demonstrates how to loop through multiple PDF files and use Aspose.Pdf's PdfAnnotationEditor to c... |
-| [benchmark-delete-annotations](./benchmark-delete-annotations.cs) | Benchmark DeleteAnnotation vs DeleteAnnotations Performance | `Document`, `Page`, `TextAnnotation` | Creates a PDF with many text annotations and measures the time required to delete a single annota... |
-| [check-duplicate-annotation-names](./check-duplicate-annotation-names.cs) | Check Duplicate Annotation Names in PDF | `Document`, `Page`, `Annotation` | Loads a PDF, iterates through all pages and their annotations, and reports any annotation names t... |
-| [clone-annotation-change-color](./clone-annotation-change-color.cs) | Clone Annotation, Change Color, and Add to Another PDF Page | `Document`, `Page`, `Annotation` | Demonstrates how to clone an existing annotation from a source PDF, modify its color, and insert ... |
-| [clone-modify-pdf-annotation](./clone-modify-pdf-annotation.cs) | Clone and Modify PDF Annotation | `Document`, `Page`, `Annotation` | Shows how to clone the first text annotation on a PDF page, change its title, contents and other ... |
-| [concurrent-insert-delete-pdf](./concurrent-insert-delete-pdf.cs) | Concurrent Import and Delete Operations on a PDF | `PdfFileEditor`, `Insert`, `Delete` | Demonstrates how to run multiple import and delete operations on the same PDF file concurrently u... |
-| [conditional-pdf-flattening](./conditional-pdf-flattening.cs) | Conditional PDF Flattening Preserving Digital Signatures | `Document`, `SignatureField`, `Flatten` | Loads a PDF, checks for digital signature fields and skips flattening to keep signatures valid; o... |
-| [copy-annotations-to-multiple-pdfs](./copy-annotations-to-multiple-pdfs.cs) | Copy Annotations from Template PDF to Multiple PDFs | `Document`, `Page`, `Annotation` | Demonstrates how to extract annotations from a template PDF, cache them, and import them into sev... |
-| [delete-all-annotations-from-pdf](./delete-all-annotations-from-pdf.cs) | Delete All Annotations from a PDF and Verify Removal | `Document`, `Page`, `PageCollection` | Loads a PDF, counts its annotations, removes all of them, saves the result, and then reloads the ... |
-| [delete-annotations-by-author](./delete-annotations-by-author.cs) | Remove Annotations by Author from PDF | `Document`, `Page`, `Annotation` | Demonstrates loading a PDF with Aspose.Pdf, iterating through each page's annotations, filtering ... |
-| [delete-annotations-export-xfdf](./delete-annotations-export-xfdf.cs) | Delete Text Annotations and Export Remaining to XFDF | `Document`, `Page`, `Annotation` | Demonstrates how to remove all Free‑Text (Text) annotations from a PDF document and then export t... |
-| [delete-annotations-from-pdf-using-config](./delete-annotations-from-pdf-using-config.cs) | Delete Specified Annotations from PDF Using Configuration | `Document`, `Page`, `Annotation` | Shows how to read a JSON file that lists annotation types and remove those annotations from a PDF... |
-| [delete-annotations-from-pdf](./delete-annotations-from-pdf.cs) | Delete All Annotations from a PDF Page | `Document`, `Page`, `TextAnnotation` | Shows how to create a PDF with text annotations and then remove them using PdfAnnotationEditor wi... |
-| [delete-annotations-with-backup](./delete-annotations-with-backup.cs) | Delete All Annotations with Backup Option | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Demonstrates how to create a backup of the original PDF and then remove all annotations from the ... |
-| [delete-flatten-pdf-annotations](./delete-flatten-pdf-annotations.cs) | Delete and Flatten PDF Annotations | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Demonstrates loading a PDF, removing all annotations, flattening any remaining ones (e.g., form f... |
-| [delete-pdf-annotation-by-name](./delete-pdf-annotation-by-name.cs) | Delete a Specific Annotation from a PDF | `Document`, `Page`, `Annotation` | Shows how to locate an annotation named "Comment1" in a PDF, remove it using Aspose.Pdf, and save... |
-| [delete-pdf-annotation-by-name__v2](./delete-pdf-annotation-by-name__v2.cs) | Delete PDF Annotation by Name using Aspose.Pdf | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotation` | Demonstrates how to remove a specific annotation from a PDF by passing its name to the DeleteAnno... |
-| ... | | | *and 72 more files* |
+| [add-text-annotation-with-custom-flags](./add-text-annotation-with-custom-flags.cs) | Add Custom Annotation Flags to PDF | `Document`, `Page`, `Annotation` | Demonstrates how to load a PDF, retrieve an annotation, combine existing flags with standard and ... |
+| [annotation-removal-report](./annotation-removal-report.cs) | Generate Annotation Removal Report for PDF Files | `Document`, `Page`, `PdfAnnotationEditor` | Counts and removes all annotations from each PDF in a folder, saves the cleaned PDFs, and creates... |
+| [async-pdf-annotation-operations](./async-pdf-annotation-operations.cs) | Add Text Annotation to PDF Asynchronously | `Document`, `Page`, `TextAnnotation` | Demonstrates adding a text annotation to a PDF document with Aspose.Pdf and executing the operati... |
+| [backup-pdf-and-flatten-form-fields](./backup-pdf-and-flatten-form-fields.cs) | Backup PDF and Flatten Annotations | `PdfAnnotationEditor`, `BindPdf`, `FlatteningAnnotations` | Shows how to create a backup of a PDF file before flattening its annotations using Aspose.Pdf's P... |
+| [batch-delete-pdf-annotations-retain-types](./batch-delete-pdf-annotations-retain-types.cs) | Retain Specific Annotation Types During PDF Batch Deletion | `Document`, `Page`, `AnnotationCollection` | Demonstrates loading a JSON configuration that lists annotation types to keep, then iterates thro... |
+| [batch-delete-pdf-annotations-with-progress](./batch-delete-pdf-annotations-with-progress.cs) | Batch Delete PDF Annotations with Console Progress Bar | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Demonstrates how to delete all annotations from multiple PDF files using Aspose.Pdf.Facades.PdfAn... |
+| [batch-delete-stamp-annotations](./batch-delete-stamp-annotations.cs) | Batch Delete Stamp Annotations from PDFs | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Processes each PDF in a specified folder, removes all stamp annotations using PdfAnnotationEditor... |
+| [batch-export-delete-annotations-xfdf](./batch-export-delete-annotations-xfdf.cs) | Export PDF Annotations to XFDF, Delete Them, and Archive | `Document`, `PdfAnnotationEditor`, `ExportAnnotationsXfdf` | Processes each PDF in a folder, exports its annotations to an XFDF file, removes the annotations ... |
+| [batch-flatten-pdf-annotations-cancellation](./batch-flatten-pdf-annotations-cancellation.cs) | Batch Flatten PDF Annotations with Cancellation Support | `Document`, `PdfAnnotationEditor`, `BindPdf` | Demonstrates flattening annotations in multiple PDF files using Aspose.Pdf's PdfAnnotationEditor ... |
+| [batch-flatten-pdf-annotations](./batch-flatten-pdf-annotations.cs) | Batch Flatten PDF Annotations | `PdfAnnotationEditor`, `BindPdf`, `FlatteningAnnotations` | Iterates through all PDF files in a folder, flattens their annotations using Aspose.Pdf, and save... |
+| [batch-import-xfdf-annotations-into-pdfs__v2](./batch-import-xfdf-annotations-into-pdfs__v2.cs) | Batch Import XFDF Annotations into Matching PDFs | `Document`, `Form`, `ImportXfdf` | Demonstrates how to iterate over a folder of PDFs, locate corresponding XFDF files by name, and i... |
+| [batch-remove-old-annotations](./batch-remove-old-annotations.cs) | Remove Old Annotations from PDFs in Batch | `Document`, `Page`, `AnnotationCollection` | Demonstrates how to iterate through PDFs in a folder, examine each annotation's modification date... |
+| [batch-update-annotation-author](./batch-update-annotation-author.cs) | Batch Update Annotation Author Across Multiple PDFs | `Document`, `PdfAnnotationEditor`, `BindPdf` | Shows how to iterate over PDF files in a directory and use PdfAnnotationEditor.ModifyAnnotationsA... |
+| [benchmark-delete-annotations](./benchmark-delete-annotations.cs) | Benchmark DeleteAnnotation vs DeleteAnnotations | `Document`, `TextAnnotation`, `Rectangle` | Shows how to measure the performance difference between deleting a single annotation with DeleteA... |
+| [check-duplicate-annotation-names](./check-duplicate-annotation-names.cs) | Check for Duplicate Annotation Names in a PDF | `Document`, `Page`, `Annotation` | Loads a PDF, iterates through all pages to collect annotation names, groups them, and logs any na... |
+| [clone-annotation-change-color](./clone-annotation-change-color.cs) | Clone PDF Annotation, Change Its Color, and Add to Another P... | `Document`, `Page`, `Annotation` | Demonstrates how to clone an existing annotation from one page, modify its color, and place the c... |
+| [clone-modify-pdf-annotation](./clone-modify-pdf-annotation.cs) | Clone and Modify PDF Annotation | `Document`, `Page`, `Annotation` | Shows how to clone an existing annotation on a PDF page, adjust its properties, and add the clone... |
+| [concurrent-insert-delete-pdf](./concurrent-insert-delete-pdf.cs) | Concurrent Import and Delete PDF Pages | `Document`, `Page`, `TextFragment` | Demonstrates thread‑safe concurrent importing of pages from one PDF and deleting pages from anoth... |
+| [conditional-pdf-flattening](./conditional-pdf-flattening.cs) | Conditional PDF Flattening with Signature Preservation | `Document`, `Form`, `Flatten()` | The example loads a PDF, checks for any digital signature fields, and only flattens the form when... |
+| [copy-annotations-to-multiple-pdfs](./copy-annotations-to-multiple-pdfs.cs) | Copy Annotations from Template PDF to Multiple PDFs | `Document`, `ExportAnnotationsToXfdf`, `ImportAnnotationsFromXfdf` | Demonstrates exporting annotations from a template PDF to an XFDF file and importing them into a ... |
+| [delete-all-annotations-from-pdf](./delete-all-annotations-from-pdf.cs) | Delete All Annotations and Verify Removal | `Document`, `Page`, `PdfAnnotationEditor` | The example counts PDF annotations before and after using Aspose.Pdf, deletes all annotations wit... |
+| [delete-annotations-by-author](./delete-annotations-by-author.cs) | Remove Annotations by Author from PDF | `Document`, `Page`, `Annotation` | Demonstrates how to filter and delete PDF annotations whose Author matches a specified name, iter... |
+| [delete-annotations-export-xfdf](./delete-annotations-export-xfdf.cs) | Delete Specific Annotations and Export Remaining to XFDF | `Document`, `Page`, `Annotation` | The example removes all TextAnnotation objects from a PDF, saves the cleaned document, and then e... |
+| [delete-annotations-from-pdf-using-config](./delete-annotations-from-pdf-using-config.cs) | Delete PDF Annotations Using JSON Configuration | `Document`, `Page`, `AnnotationType` | Shows how to create or read a JSON file that lists annotation types, map them to Aspose.Pdf.Annot... |
+| [delete-annotations-from-pdf](./delete-annotations-from-pdf.cs) | Delete All Annotations from a PDF | `Document`, `Page`, `TextAnnotation` | Creates a PDF with two text annotations, verifies their count, clears all annotations from the fi... |
+| [delete-annotations-with-backup](./delete-annotations-with-backup.cs) | Backup PDF and Remove All Annotations | `Document`, `Page`, `Annotations` | Creates a backup of the source PDF, then loads the document and clears all annotations from each ... |
+| [delete-flatten-pdf-annotations](./delete-flatten-pdf-annotations.cs) | Delete and Flatten PDF Annotations | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotations` | Demonstrates how to remove all annotations from a PDF, flatten any remaining ones, and save the p... |
+| [delete-pdf-annotation-by-name](./delete-pdf-annotation-by-name.cs) | Delete a Specific Annotation from a PDF | `Document`, `Page`, `Annotations` | Shows how to locate an annotation by its Name property and remove it from a PDF document using As... |
+| [delete-pdf-annotation-by-name__v2](./delete-pdf-annotation-by-name__v2.cs) | Delete PDF Annotation by Name | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotation` | Shows how to remove a specific annotation from a PDF using Aspose.Pdf.Facades by passing the anno... |
+| [delete-pdf-annotation-with-error-handling](./delete-pdf-annotation-with-error-handling.cs) | Delete PDF Annotation with Error Handling | `PdfAnnotationEditor`, `BindPdf`, `DeleteAnnotation` | Demonstrates how to bind a PDF, attempt to delete a named annotation, and handle errors when the ... |
+| ... | | | *and 74 more files* |
 
 ## Category Statistics
-- Total examples: 102
+- Total examples: 104
 
 ## Category-Specific Tips
 
@@ -135,5 +131,5 @@ tool.Save("output.pdf");
 - Review code examples in this folder for facades-annotations patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-26 | Run: `20261026_001223_9dc44d`
+Updated: 2026-11-06 | Run: `20261106_012731_84a3e2`
 <!-- AUTOGENERATED:END -->

@@ -1,62 +1,63 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // Added namespace for action types
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Facades; // Bookmark class lives in this namespace
 
 class Program
 {
     static void Main()
     {
-        // Folder containing PDFs to process
-        const string inputFolder = @"C:\PdfBatch";
-        // Output folder for processed PDFs
-        const string outputFolder = @"C:\PdfBatch\Reviewed";
+        const string inputFolder = "InputPdfs";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
             try
             {
-                // Load the document (using for deterministic disposal)
-                using (Document doc = new Document(inputPath))
+                // Determine the last page number of the PDF
+                int lastPage;
+                using (Document doc = new Document(pdfPath))
                 {
-                    int pageCount = doc.Pages.Count;
+                    lastPage = doc.Pages.Count; // 1‑based page index
+                }
 
-                    // Get the last page instance
-                    Page lastPage = doc.Pages[pageCount];
+                // Create and bind the bookmark editor
+                using (PdfBookmarkEditor editor = new PdfBookmarkEditor())
+                {
+                    editor.BindPdf(pdfPath);
 
-                    // Add a top‑level bookmark titled "Reviewed" that points to the last page
-                    OutlineItemCollection bookmark = new OutlineItemCollection(doc.Outlines)
+                    // Build a single Bookmark instance for the "Reviewed" entry
+                    Bookmark reviewed = new Bookmark
                     {
                         Title = "Reviewed",
-                        Action = new GoToAction(lastPage) // jump to the last page
+                        PageNumber = lastPage,
+                        // The bookmark is expanded (open) by default when Open = true
+                        Open = true,
+                        // Optional visual tweaks – can be omitted
+                        BoldFlag = false,
+                        ItalicFlag = false,
+                        Action = "GoTo" // standard GoTo action for page navigation
                     };
-                    doc.Outlines.Add(bookmark);
 
-                    // Prepare output file path
-                    string fileName = Path.GetFileNameWithoutExtension(inputPath);
-                    string outputPath = Path.Combine(outputFolder, $"{fileName}_reviewed.pdf");
+                    // Add the bookmark to the document
+                    editor.CreateBookmarks(reviewed);
 
-                    // Save the modified PDF
-                    doc.Save(outputPath);
-
-                    Console.WriteLine($"Processed: {Path.GetFileName(inputPath)} → {Path.GetFileName(outputPath)}");
+                    // Persist changes, overwriting the original file
+                    editor.Save(pdfPath);
                 }
+
+                Console.WriteLine($"Added 'Reviewed' bookmark to: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing {Path.GetFileName(pdfPath)}: {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch bookmark addition completed.");
     }
 }

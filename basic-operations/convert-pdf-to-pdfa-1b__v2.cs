@@ -12,24 +12,24 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal.
+            // Load the source PDF inside a using block for deterministic disposal.
             using (Document doc = new Document(inputPath))
             {
-                // Convert the document to PDF/A‑1B compliance.
-                // The conversion log is written to logPath.
+                // Convert the document to PDF/A‑1b compliance.
+                // The overload writes a conversion log and applies the PDF/A‑1b format.
                 doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-                // Save the PDF/A‑1B compliant document.
+                // Save the converted PDF/A‑1b document.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"PDF/A‑1B compliant file saved to '{outputPath}'.");
+            Console.WriteLine($"PDF/A‑1b compliant file saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

@@ -1,56 +1,66 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputPdfPath = "signed_output.pdf";
-        const string signatureImgPath = "signature.png";
+        const string inputPath = "input.pdf";          // source PDF
+        const string outputPath = "signed_output.pdf"; // result PDF
+        const string imagePath = "signature.png";     // custom appearance image
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
             return;
         }
 
-        if (!File.Exists(signatureImgPath))
+        if (!File.Exists(imagePath))
         {
-            Console.Error.WriteLine($"Signature image not found: {signatureImgPath}");
+            Console.Error.WriteLine($"Signature image not found: {imagePath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Get the last page (Aspose.Pdf uses 1‑based indexing)
-            Page lastPage = doc.Pages[doc.Pages.Count];
+            // Aspose.Pdf uses 1‑based page indexing
+            int lastPageIndex = doc.Pages.Count; // last page number
 
-            // Create an ImageStamp from the signature image file
-            using (FileStream imgStream = File.OpenRead(signatureImgPath))
+            // Define the rectangle where the signature will appear (coordinates in points)
+            double llx = 100; // lower‑left X
+            double lly = 100; // lower‑left Y
+            double urx = 300; // upper‑right X
+            double ury = 200; // upper‑right Y
+
+            // Create the rectangle for the signature field
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
+
+            // Create a signature field on the last page (field itself is invisible – appearance will be added via an ImageStamp)
+            SignatureField sigField = new SignatureField(doc.Pages[lastPageIndex], rect)
             {
-                ImageStamp signatureStamp = new ImageStamp(imgStream);
+                PartialName = "Signature1"
+            };
+            doc.Form.Add(sigField, doc.Pages[lastPageIndex].Number);
 
-                // Configure stamp appearance
-                signatureStamp.Background = false;          // place over page content
-                signatureStamp.Opacity    = 0.85;           // semi‑transparent
-                signatureStamp.XIndent    = 100;            // distance from left edge (points)
-                signatureStamp.YIndent    = 150;            // distance from bottom edge (points)
-
-                // Optionally set explicit size (in points)
-                // signatureStamp.Width  = 200;
-                // signatureStamp.Height = 80;
-
-                // Add the stamp to the last page
-                lastPage.AddStamp(signatureStamp);
-            }
+            // Add a visual appearance (image) on top of the field using ImageStamp – this is the supported way without Facades
+            ImageStamp imgStamp = new ImageStamp(imagePath)
+            {
+                // Size of the stamp matches the rectangle size
+                Width = urx - llx,
+                Height = ury - lly,
+                // Position – use XIndent/YIndent (ImageStamp has no Left/Top properties)
+                XIndent = llx,
+                YIndent = lly
+            };
+            doc.Pages[lastPageIndex].AddStamp(imgStamp);
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Signature image added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Signature appearance added and saved to '{outputPath}'.");
     }
 }

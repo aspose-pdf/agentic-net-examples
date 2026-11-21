@@ -1,63 +1,65 @@
 {
   "category": "securing-and-signing-pdf",
-  "nuget_version": "26.9.0",
-  "last_updated": "2026-10-27T05:20:00Z",
+  "nuget_version": "26.10.0",
+  "last_updated": "2026-11-17T11:25:20Z",
   "examples": {
     "apply-pkcs7-detached-digital-signature": {
-      "title": "Create PDF Signature Field from Stream",
+      "title": "Apply Detached PKCS#7 Signature to PDF",
       "filename": "apply-pkcs7-detached-digital-signature.cs",
-      "description": "Loads a PDF from a file stream, adds a placeholder signature field (for a PKCS#7 detached signature), and saves the updated document.",
+      "description": "Demonstrates loading a PDF from a stream, adding an invisible signature field, and applying a PKCS#7 detached digital signature using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "signature",
-        "stream",
-        "aspose",
-        "form"
+        "digital-signature",
+        "pkcs7",
+        "detached",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Forms.PKCS7Detached",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Document.Form.Add",
         "Aspose.Pdf.Document.Save"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21164"
     },
     "batch-sign-pdfs-with-certificate": {
       "title": "Batch Sign PDFs with Certificate and Timestamp",
       "filename": "batch-sign-pdfs-with-certificate.cs",
-      "description": "Demonstrates how to iterate through a folder of PDF files and apply a digital signature using a PFX certificate, adding a visible signature field and a timestamp from a TSA.",
+      "description": "Demonstrates how to iterate through a folder of PDF files and apply a visible digital signature using a PFX certificate, including timestamp authority integration, saving the signed PDFs to an output directory.",
       "tags": [
-        "pdf",
-        "digital-signature",
+        "pdf-signature",
         "batch-processing",
         "timestamp",
-        "certificate"
+        "certificate",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
         "Aspose.Pdf.Forms.TimestampSettings",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
         "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21166"
     },
     "encrypt-pdf-disable-printing": {
       "title": "Encrypt PDF with User Password and Disable Printing",
       "filename": "encrypt-pdf-disable-printing.cs",
-      "description": "Demonstrates how to load a PDF, apply AES‑256 encryption with a user password, restrict permissions to disable printing, and save the protected document.",
+      "description": "Loads a PDF, applies AES‑256 encryption with a user password, disables printing by setting permissions, and saves the protected document.",
       "tags": [
-        "pdf-encryption",
-        "disable-printing",
+        "encryption",
+        "pdf",
         "permissions",
-        "aspose-pdf",
+        "aspose.pdf",
         "csharp"
       ],
       "apis_used": [
@@ -68,36 +70,37 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21167"
     },
     "encrypt-pdf-owner-password-high-res-printing": {
-      "title": "Encrypt PDF with Owner Password and Restrict Copying",
+      "title": "Encrypt PDF with Owner Password and Print Permissions",
       "filename": "encrypt-pdf-owner-password-high-res-printing.cs",
-      "description": "Shows how to encrypt a PDF using Aspose.Pdf, set an owner password, allow high‑resolution printing, and disable copying.",
+      "description": "Demonstrates how to encrypt a PDF using Aspose.Pdf, set an owner password, allow high‑resolution printing, and restrict copying.",
       "tags": [
-        "pdf-encryption",
-        "owner-password",
-        "printing",
-        "no-copy",
-        "aspose-pdf"
+        "pdf encryption",
+        "owner password",
+        "print permission",
+        "Aspose.Pdf",
+        "AES-256"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Security.Permissions",
-        "Aspose.Pdf.Security.CryptoAlgorithm"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21168"
     },
     "decrypt-pdf-with-owner-password": {
-      "title": "Decrypt PDF with Owner Password using Aspose.Pdf",
+      "title": "Decrypt PDF Using Owner Password",
       "filename": "decrypt-pdf-with-owner-password.cs",
-      "description": "Shows how to open a password‑protected PDF with the owner password, remove its encryption, and save the unencrypted document using Aspose.Pdf for .NET.",
+      "description": "Shows how to open a password‑protected PDF with the owner password, decrypt the document, and save it as an unprotected PDF using Aspose.Pdf.",
       "tags": [
         "pdf",
         "decryption",
@@ -108,48 +111,49 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Decrypt",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21169"
     },
     "add-visible-digital-signature-second-page": {
-      "title": "Add Visible Digital Signature to Second PDF Page",
+      "title": "Add Visible Digital Signature to Bottom‑Right of PDF Page 2",
       "filename": "add-visible-digital-signature-second-page.cs",
-      "description": "Loads a PDF, creates a visible signature field at the bottom‑right corner of the second page, signs it with a PKCS#1 certificate, and saves the signed document.",
+      "description": "Demonstrates how to place a visible digital signature field in the bottom‑right corner of the second page of a PDF, configure its appearance, and sign it using a PKCS#7 certificate with Aspose.Pdf for .NET.",
       "tags": [
         "digital-signature",
         "visible-signature",
-        "pdf",
-        "csharp",
-        "aspose"
+        "pdf-signing",
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS1",
-        "SignatureField.Sign",
-        "Document.Save"
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color.FromArgb"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21171"
     },
     "add-invisible-digital-signature-to-pdf": {
-      "title": "Apply Invisible Digital Signature to PDF",
+      "title": "Add Invisible Digital Signature to PDF",
       "filename": "add-invisible-digital-signature-to-pdf.cs",
-      "description": "Demonstrates how to add an invisible PKCS#7 digital signature to a PDF using Aspose.Pdf without affecting the document layout.",
+      "description": "Demonstrates how to create an invisible signature field, apply a PKCS#7 digital signature, and save the PDF without altering its layout.",
       "tags": [
         "digital-signature",
         "pdf",
         "invisible",
-        "aspose-pdf",
-        "pkcs7"
+        "Aspose.Pdf",
+        "PKCS7"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -157,45 +161,44 @@
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
         "Aspose.Pdf.Forms.SignatureField.Sign",
-        "Aspose.Pdf.Document.Form.Add",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21172"
     },
     "extract-signature-field-metadata": {
-      "title": "Extract Signature Fields and Certificate Info from PDF",
+      "title": "Extract Signature Field Metadata from PDF",
       "filename": "extract-signature-field-metadata.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, enumerate its form fields, identify signature fields, and retrieve any attached X.509 certificate details.",
+      "description": "Shows how to open a PDF with Aspose.Pdf, locate signature form fields, and read their metadata such as signer name, reason, location, date and validation status.",
       "tags": [
         "pdf",
         "signature",
-        "certificate",
-        "form-fields",
+        "metadata",
+        "forms",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.PartialName",
-        "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject"
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Forms.Signature.Verify"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21174"
     },
     "extract-images-from-signed-pdf": {
-      "title": "Extract Images from Signed PDF Pages",
+      "title": "Extract Images from Signed PDF to PNG",
       "filename": "extract-images-from-signed-pdf.cs",
-      "description": "Loads a signed PDF, iterates through each page, extracts embedded images, and saves them as PNG files.",
+      "description": "Shows how to open a signed PDF with Aspose.Pdf, iterate over each page's image resources, and save every embedded image as a PNG file.",
       "tags": [
         "pdf",
         "image-extraction",
-        "aspose-pdf",
+        "aspose",
         "signed-pdf",
         "csharp"
       ],
@@ -203,134 +206,134 @@
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.XImage",
-        "Aspose.Pdf.Page.Resources",
-        "Aspose.Pdf.XImageCollection"
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Resources.Images",
+        "Aspose.Pdf.XImage.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21175"
     },
     "remove-digital-signature-from-pdf": {
       "title": "Remove Digital Signature Fields from PDF",
       "filename": "remove-digital-signature-from-pdf.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, locate signature form fields, delete them when permissions allow, and save the resulting unsigned document.",
+      "description": "Shows how to programmatically delete signature fields from a PDF using Aspose.Pdf when the document's permissions allow it.",
       "tags": [
         "pdf",
         "signature",
         "remove",
-        "form",
-        "aspose"
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.Form.Delete",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21176"
     },
     "sign-pdf-with-smart-card": {
-      "title": "Create PDF Signature Field Using a Smart Card Certificate",
+      "title": "Sign PDF with Smart Card Certificate using Aspose.Pdf",
       "filename": "sign-pdf-with-smart-card.cs",
-      "description": "Demonstrates locating a certificate with a private key (e.g., from a smart card), adding a signature field to a PDF with Aspose.Pdf, and saving the document for later signing.",
+      "description": "Demonstrates how to locate a smart‑card certificate, add a signature field, and apply an external signature to a PDF using Aspose.Pdf, prompting the user for PIN entry.",
       "tags": [
-        "pdf",
-        "digital-signature",
+        "pdf-signature",
         "smart-card",
-        "aspose-pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Document.Form.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21177"
-    },
-    "sign-pdf-with-smart-card-no-pin": {
-      "title": "Sign PDF with Smart Card Certificate (No PIN Prompt)",
-      "filename": "sign-pdf-with-smart-card-no-pin.cs",
-      "description": "Shows how to sign a PDF using a certificate stored on a smart‑card without prompting for a PIN, leveraging Aspose.Pdf's PKCS7 and signature field APIs.",
-      "tags": [
-        "pdf",
-        "signing",
-        "smartcard",
+        "certificate",
         "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.PKCS7",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
-        "Aspose.Pdf.Drawing.Color",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.ExternalSignature",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21177"
+    },
+    "sign-pdf-with-smart-card-no-pin": {
+      "title": "Sign PDF with Smart Card Certificate (No PIN Prompt)",
+      "filename": "sign-pdf-with-smart-card-no-pin.cs",
+      "description": "Shows how to locate a smart‑card certificate in the CurrentUser store, create a visible signature field, and sign a PDF using Aspose.Pdf without prompting the user for a PIN.",
+      "tags": [
+        "pdf-signing",
+        "smart-card",
+        "certificate",
+        "Aspose.Pdf",
+        "digital-signature"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.ExternalSignature",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21178"
     },
     "custom-security-handler-logging-pdf-access": {
-      "title": "Encrypt and Decrypt PDF with Logging",
+      "title": "Log Access Attempts for Encrypted PDF",
       "filename": "custom-security-handler-logging-pdf-access.cs",
-      "description": "Shows how to encrypt a PDF with user/owner passwords, log the encryption details, then open (decrypt) the encrypted PDF while logging the access attempt using Aspose.Pdf security features.",
+      "description": "Demonstrates encrypting a PDF with user and owner passwords, then opening it while logging each access attempt and handling invalid passwords.",
       "tags": [
-        "encryption",
-        "logging",
-        "pdf-security",
-        "permissions",
-        "aspose-pdf"
+        "pdf-encryption",
+        "access-logging",
+        "aspose-pdf",
+        "security",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.InvalidPasswordException",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Decrypt",
-        "Aspose.Pdf.Security.Permissions",
-        "Aspose.Pdf.Security.CryptoAlgorithm",
-        "Aspose.Pdf.Security.InvalidPasswordException"
+        "Aspose.Pdf.Document.Decrypt"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21179"
     },
     "restrict-copy-paste-in-pdf": {
       "title": "Restrict Copy‑Paste in PDF with AES‑256 Encryption",
       "filename": "restrict-copy-paste-in-pdf.cs",
-      "description": "The example loads an existing PDF, applies AES‑256 encryption with user and owner passwords, and sets permissions to allow printing while disabling content extraction (copy‑paste). The protected PDF is then saved.",
+      "description": "Demonstrates how to apply a security handler that disables copy‑paste by encrypting a PDF with AES‑256 and setting specific permissions.",
       "tags": [
+        "pdf-security",
         "encryption",
         "permissions",
         "copy-protection",
-        "pdf-security",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21180"
     },
     "sign-pdf-with-timestamp": {
-      "title": "Sign PDF with Timestamp from TSA",
+      "title": "Sign PDF with Timestamp from a TSA",
       "filename": "sign-pdf-with-timestamp.cs",
       "description": "Demonstrates how to add a digital signature to a PDF and apply a trusted timestamp from a Time‑Stamp Authority using Aspose.Pdf.",
       "tags": [
@@ -350,241 +353,245 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21181"
     },
     "validate-pdf-digital-signature": {
-      "title": "Validate Detached PKCS#7 Signature and Certificate Chain",
+      "title": "Validate Detached PKCS#7 Signature and Certificate Chain for a PDF",
       "filename": "validate-pdf-digital-signature.cs",
-      "description": "Shows how to verify a detached PKCS#7 signature for a PDF (or any data file) and validate the signer's X.509 certificate chain using .NET cryptography APIs.",
+      "description": "Shows how to verify a detached PKCS#7 signature on a PDF file and examine the signer's certificate chain using .NET cryptography classes.",
       "tags": [
         "pkcs7",
         "signature",
+        "pdf",
         "certificate-chain",
-        "verification",
-        "pdf"
+        "csharp"
       ],
       "apis_used": [],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21182"
     },
     "validate-pdf-signature-crl": {
-      "title": "Validate PDF Signature with Revocation (CRL) Check",
+      "title": "Validate PDF Signature Revocation Using CRL Distribution Points",
       "filename": "validate-pdf-signature-crl.cs",
-      "description": "Loads a signed PDF, iterates through its signature fields and validates each signature while checking revocation status via CRL distribution points. Uses reflection to enable revocation checking when supported.",
+      "description": "Demonstrates how to extract a signing certificate from a PDF signature field and verify its revocation status by building a certificate chain with online CRL checking using Aspose.Pdf.",
       "tags": [
         "pdf",
-        "signature",
-        "validation",
+        "digital-signature",
+        "revocation",
         "crl",
-        "revocation"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Signatures.ValidationOptions",
-        "SignatureField.ValidateSignature",
-        "SignatureField.PartialName"
+        "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject",
+        "Aspose.Pdf.Document.Form"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21184"
     },
     "extract-pdf-signature-signing-time-utc": {
-      "title": "Extract Signature Signing Time and Convert to UTC",
+      "title": "Extract Signing Time from PDF Signature and Convert to UTC",
       "filename": "extract-pdf-signature-signing-time-utc.cs",
-      "description": "Shows how to read the signing time of each digital signature in a PDF and convert it to UTC using Aspose.Pdf's PdfFileSignature facade via reflection.",
+      "description": "Shows how to load a signed PDF with Aspose.Pdf, retrieve signature fields, extract the signing time from the signature dictionary using reflection, parse the PDF date format, and convert the timestamp to UTC.",
       "tags": [
         "pdf",
         "digital-signature",
         "signing-time",
         "utc",
-        "reflection"
+        "aspose-pdf"
       ],
       "apis_used": [
-        "Aspose.Pdf.Facades.PdfFileSignature",
-        "PdfFileSignature.BindPdf",
-        "PdfFileSignature.GetSignatureNames",
-        "PdfFileSignature.GetDateTime",
-        "PdfFileSignature.Dispose"
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Form.Fields"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21185"
     },
     "extract-certificate-chain-from-pdf-signature": {
-      "title": "Extract Certificate Chain from PDF Signature",
+      "title": "Extract Certificate Chain from PDF Signature and Save as DER Files",
       "filename": "extract-certificate-chain-from-pdf-signature.cs",
-      "description": "Demonstrates how to read a signed PDF, extract the signing certificate and its full certificate chain, and save each certificate as a DER file using Aspose.Pdf.",
+      "description": "Loads a signed PDF, locates the first signature field, extracts the signing certificate, builds its X509 chain, and writes each certificate in the chain to separate DER files.",
       "tags": [
         "pdf",
-        "digital-signature",
-        "certificate-chain",
+        "signature",
+        "certificate",
         "aspose-pdf",
-        "csharp"
+        "der"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.FieldCollection",
         "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Field",
+        "Aspose.Pdf.Document.Form",
         "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21186"
     },
     "sign-pdf-with-reason-contact-location": {
-      "title": "Sign PDF with Reason, Location, and Contact Info",
+      "title": "Sign PDF with Reason, Contact Info, and Location",
       "filename": "sign-pdf-with-reason-contact-location.cs",
-      "description": "Demonstrates how to digitally sign a PDF using a PKCS#7 certificate while setting the reason, location, and contact information, and adding a visual signature image.",
+      "description": "Demonstrates how to add a visible signature field to a PDF and sign it using a PKCS#7 certificate while populating the Reason, ContactInfo, and Location properties.",
       "tags": [
         "pdf-signature",
         "digital-signature",
         "aspose-pdf",
-        "visual-appearance",
-        "pkcs7"
+        "pkcs7",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Drawing.ImageStamp",
-        "Aspose.Pdf.Document.Save"
+        "SignatureField.Sign",
+        "Document.Form.Add",
+        "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21187"
     },
     "sign-pdf-with-custom-image-appearance": {
       "title": "Sign PDF with Visible Image Signature",
       "filename": "sign-pdf-with-custom-image-appearance.cs",
-      "description": "Demonstrates how to digitally sign a PDF using a certificate and display a custom graphic image as the visible signature appearance.",
+      "description": "Shows how to add a visible signature field to a PDF and sign it using a PFX certificate while using a custom PNG image as the signature appearance.",
       "tags": [
-        "pdf signing",
-        "visible signature",
-        "custom appearance",
-        "digital certificate",
-        "image stamp"
+        "pdf-signature",
+        "visible-signature",
+        "image-appearance",
+        "aspnet",
+        "certificate"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
-        "Aspose.Pdf.ImageStamp",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Forms.PKCS7Detached",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Forms.Document.Form.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21188"
     },
     "sign-pdf-lock-specific-form-fields": {
-      "title": "Lock Form Fields After PDF Signing",
+      "title": "Sign PDF and Lock Form Fields with Aspose.Pdf",
       "filename": "sign-pdf-lock-specific-form-fields.cs",
-      "description": "Demonstrates signing a PDF with a visible signature using a certificate and then setting selected form fields to read‑only to prevent further edits.",
+      "description": "Demonstrates loading a PDF, adding a digital signature field, applying a PKCS#7 signature, and setting specific form fields to read‑only to prevent further edits.",
       "tags": [
-        "pdf-signature",
-        "form-fields",
-        "readonly",
-        "aspose-pdf",
-        "digital-signature"
+        "pdf",
+        "digital-signature",
+        "field-lock",
+        "aspose",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.Field"
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.FormField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21193"
     },
     "sign-pdf-and-lock-readonly": {
-      "title": "Lock PDF After Adding Digital Signature Field",
+      "title": "Sign PDF and Lock It for Read‑Only Access",
       "filename": "sign-pdf-and-lock-readonly.cs",
-      "description": "Shows how to add a signature field to a PDF and then make the document read‑only by encrypting it with no permissions using Aspose.Pdf.",
+      "description": "The example encrypts a PDF to disable editing permissions, then adds a digital signature, producing a signed PDF that is read‑only.",
       "tags": [
-        "pdf",
         "digital-signature",
-        "encryption",
+        "pdf-encryption",
         "read-only",
-        "Aspose.Pdf"
+        "Aspose.Pdf",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Security.Permissions",
-        "Aspose.Pdf.Security.CryptoAlgorithm"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Document.Form.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21194"
     },
     "encrypt-pdf-aes256-user-owner-passwords": {
       "title": "Encrypt PDF with AES‑256 and Set User/Owner Passwords",
       "filename": "encrypt-pdf-aes256-user-owner-passwords.cs",
-      "description": "Shows how to load a PDF with Aspose.Pdf, apply AES‑256 encryption, assign user and owner passwords, configure permissions, and save the encrypted document.",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, applying AES‑256 encryption, setting user and owner passwords, and saving the protected file.",
       "tags": [
-        "pdf encryption",
-        "aes-256",
-        "user password",
-        "owner password",
-        "permissions"
+        "encryption",
+        "AES-256",
+        "password-protection",
+        "Aspose.Pdf",
+        "PDF security"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.InvalidPasswordException"
+        "Aspose.Pdf.CryptoAlgorithm"
       ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "beginner",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21195"
     },
     "encrypt-pdf-rc4-128-bit-restrict-editing": {
       "title": "Encrypt PDF with RC4 128‑bit and Restrict Editing",
       "filename": "encrypt-pdf-rc4-128-bit-restrict-editing.cs",
-      "description": "Demonstrates how to encrypt a PDF using RC4‑128 encryption with user and owner passwords and set permissions to allow only printing and content extraction, thereby preventing editing.",
+      "description": "Demonstrates loading a PDF, applying RC4 128‑bit encryption with user and owner passwords, setting permissions to allow printing and content extraction while disabling modifications, and saving the encrypted file.",
       "tags": [
-        "pdf",
         "encryption",
-        "rc4",
+        "RC4",
+        "PDF",
         "permissions",
-        "aspose-pdf"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21196"
     },
     "decrypt-pdf-extract-embedded-images": {
       "title": "Decrypt PDF and Extract Embedded Images",
       "filename": "decrypt-pdf-extract-embedded-images.cs",
-      "description": "Shows how to open an encrypted PDF with a user password, remove its encryption, and extract all images from each page, saving them as PNG files.",
+      "description": "The example opens an encrypted PDF with a user password, decrypts it, iterates through each page, and saves all embedded images to disk, determining the correct file extension from the image header.",
       "tags": [
         "pdf",
         "decryption",
@@ -594,73 +601,73 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Decrypt()",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Document.Decrypt()",
         "Aspose.Pdf.XImage.Save()",
-        "Aspose.Pdf.InvalidPasswordException"
+        "Aspose.Pdf.Page.Resources.Images"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21197"
     },
     "decrypt-pdf-update-metadata": {
-      "title": "Decrypt PDF and Update Metadata with Aspose.PDF",
+      "title": "Decrypt PDF with Owner Password and Update Metadata",
       "filename": "decrypt-pdf-update-metadata.cs",
-      "description": "Demonstrates opening an encrypted PDF using the owner password, removing its encryption, modifying document metadata, and saving the updated file.",
+      "description": "Demonstrates opening an encrypted PDF using the owner password, removing its encryption, modifying document metadata (title, author, subject, keywords), and saving the updated file.",
       "tags": [
         "pdf",
         "decryption",
         "metadata",
-        "aspose.pdf",
-        "c#"
+        "aspose-pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Decrypt",
         "Aspose.Pdf.Document.Info",
-        "Aspose.Pdf.DocumentInfo",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21198"
     },
     "batch-encrypt-pdfs-by-filename": {
-      "title": "Batch encrypt PDFs using file name passwords",
+      "title": "Batch Encrypt PDFs with Passwords Derived from File Names",
       "filename": "batch-encrypt-pdfs-by-filename.cs",
-      "description": "Shows how to encrypt every PDF in a folder with Aspose.Pdf, creating a user password from each file's name and applying AES‑256 encryption with selected permissions.",
+      "description": "Shows how to loop through a folder of PDFs, generate a password from each file name, encrypt each document using AES‑256, and save the encrypted files.",
       "tags": [
-        "pdf",
-        "encryption",
+        "pdf-encryption",
         "batch",
-        "aspose",
-        "csharp"
+        "aspose-pdf",
+        "aes-256",
+        "file-io"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Permissions"
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21199"
     },
     "batch-decrypt-pdfs-lookup-table": {
-      "title": "Batch Decrypt Password-Protected PDFs Using a Password Lookup Table",
+      "title": "Batch Decrypt Password-Protected PDFs Using a Lookup Table",
       "filename": "batch-decrypt-pdfs-lookup-table.cs",
-      "description": "The example iterates through PDF files in a folder, tries a list of possible passwords, and decrypts each document with Aspose.Pdf when the correct password is found.",
+      "description": "Demonstrates iterating over a folder of encrypted PDFs, trying a list of possible passwords, decrypting each with Aspose.Pdf, and saving the unprotected files.",
       "tags": [
         "pdf",
         "decryption",
-        "password",
         "batch",
-        "aspose"
+        "password",
+        "aspose.pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -669,92 +676,95 @@
         "Aspose.Pdf.InvalidPasswordException"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21200"
     },
     "batch-sign-pdfs-title-based-certificate-selection": {
-      "title": "Batch Sign PDFs with Metadata‑Based Certificate Selection",
+      "title": "Batch Sign PDFs Using Metadata-Driven Certificates",
       "filename": "batch-sign-pdfs-title-based-certificate-selection.cs",
-      "description": "Demonstrates how to process a folder of PDF files, choose a signing certificate based on each document's metadata (title), add a signature field, and save the signed PDFs.",
+      "description": "Shows how to process a folder of PDFs, select a PFX certificate based on each document's title metadata, add a visible signature field, and apply a PKCS#7 digital signature with Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "digital-signature",
-        "batch-processing",
+        "pdf-signature",
+        "batch",
         "metadata",
-        "certificate"
+        "certificate",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
         "Aspose.Pdf.DocumentInfo.Title",
-        "Aspose.Pdf.Form.Add",
-        "Aspose.Pdf.Signatures.PkcsSignature"
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21201"
     },
     "batch-encrypt-and-sign-pdfs": {
-      "title": "Batch Encrypt and Sign PDFs",
+      "title": "Batch Encrypt and Digitally Sign PDFs",
       "filename": "batch-encrypt-and-sign-pdfs.cs",
-      "description": "Demonstrates how to encrypt multiple PDF files with a user/owner password and then apply a PKCS#7 digital signature to each encrypted document using Aspose.Pdf.",
+      "description": "Demonstrates how to encrypt multiple PDF files with AES‑256 and then apply a PKCS#7 digital signature to each encrypted document in a batch process.",
       "tags": [
-        "encryption",
-        "digital-signature",
-        "batch-processing",
-        "pdf-security",
-        "Aspose.Pdf"
+        "pdf encryption",
+        "digital signature",
+        "batch processing",
+        "aspose.pdf",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Permissions",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS7"
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21203"
     },
     "extract-signature-field-names-and-page-numbers": {
       "title": "Extract Signature Field Names and Page Numbers from PDF",
       "filename": "extract-signature-field-names-and-page-numbers.cs",
-      "description": "Demonstrates how to load a PDF with Aspose.Pdf, iterate through its pages, and retrieve the names of signature fields together with the page numbers they appear on.",
+      "description": "The example loads a PDF, checks for form fields, and lists each signature field's name together with the page number on which it appears.",
       "tags": [
-        "signature",
         "pdf",
-        "fields",
-        "pages",
-        "aspose"
+        "signature",
+        "form-fields",
+        "aspose.pdf",
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Page.Annotations"
+        "Aspose.Pdf.Forms.FieldCollection",
+        "Aspose.Pdf.Document.Form"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21204"
     },
     "retrieve-reason-location-from-pdf-signatures": {
-      "title": "Retrieve Reason and Location from PDF Signatures",
+      "title": "Retrieve Reason and Location from PDF Digital Signatures",
       "filename": "retrieve-reason-location-from-pdf-signatures.cs",
-      "description": "Shows how to load a signed PDF with Aspose.Pdf, locate signature fields, and read the Reason and Location metadata stored in each digital signature.",
+      "description": "Demonstrates how to open a PDF with Aspose.Pdf, locate signature fields, and read the Reason and Location metadata of each digital signature.",
       "tags": [
         "pdf",
         "digital-signature",
+        "aspose-pdf",
         "metadata",
-        "aspnet",
-        "aspose"
+        "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -763,93 +773,19 @@
         "Aspose.Pdf.Document.Form",
         "Aspose.Pdf.Document.Form.Fields"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21206"
     },
     "sign-pdf-add-custom-xmp-metadata": {
-      "title": "Sign PDF and Add Custom XMP Metadata",
+      "title": "Sign PDF and Embed Custom XMP Metadata",
       "filename": "sign-pdf-add-custom-xmp-metadata.cs",
-      "description": "Demonstrates how to embed custom XMP metadata in a PDF and apply a digital PKCS#7 signature using a certificate with Aspose.Pdf for .NET.",
+      "description": "Demonstrates loading a PDF, adding custom XMP metadata, creating a digital signature field, signing the document with a PKCS#7 certificate, and saving the signed PDF.",
       "tags": [
         "pdf-signature",
         "xmp-metadata",
         "digital-certificate",
-        "aspnet",
-        "aspose-pdf"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Metadata",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.Form.Add",
-        "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureField.Sign",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21209"
-    },
-    "sign-pdf-with-pkcs7-and-custom-xml": {
-      "title": "Sign PDF and Embed Custom XML Signature Data",
-      "filename": "sign-pdf-with-pkcs7-and-custom-xml.cs",
-      "description": "Demonstrates how to digitally sign a PDF using a PKCS#12 certificate, add a signature field, and embed custom XML compliance data as an embedded file.",
-      "tags": [
-        "pdf-signature",
-        "custom-xml",
-        "certificate",
-        "compliance",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
-        "Aspose.Pdf.FileSpecification"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21210"
-    },
-    "sign-pdf-with-incremental-updates": {
-      "title": "Create Incremental PDF Signature with Aspose.Pdf",
-      "filename": "sign-pdf-with-incremental-updates.cs",
-      "description": "Shows how to add a digital signature field to a PDF, sign it using a PKCS#7 certificate, and save the document so that additional signatures can be appended later.",
-      "tags": [
-        "pdf",
-        "digital-signature",
-        "pkcs7",
-        "incremental",
-        "aspnet"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureField.Sign",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21212"
-    },
-    "sign-pdf-prevent-additional-signatures": {
-      "title": "Sign PDF with Invisible Final Signature",
-      "filename": "sign-pdf-prevent-additional-signatures.cs",
-      "description": "Loads a PDF, adds an invisible signature field, signs it with a PFX certificate using Aspose.Pdf, and saves the signed document. The example notes that certification level to block further changes is not available in the used version.",
-      "tags": [
-        "pdf-signature",
-        "invisible-signature",
-        "digital-signature",
         "aspose-pdf",
         "csharp"
       ],
@@ -858,66 +794,91 @@
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21209"
+    },
+    "sign-pdf-with-incremental-updates": {
+      "title": "Sign PDF with a Visible Signature Field for Future Signatures",
+      "filename": "sign-pdf-with-incremental-updates.cs",
+      "description": "Demonstrates adding a signature field to a PDF, applying a PKCS#7 digital signature using a PFX certificate, and saving the document so additional signatures can be added later.",
+      "tags": [
+        "pdf-signature",
+        "digital-signature",
+        "aspnet",
+        "pkcs7",
+        "signature-field"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Form.Add",
         "Aspose.Pdf.Forms.SignatureField.Sign",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
-      "task_id": "21213"
+      "task_id": "21212"
     },
     "encrypt-pdf-print-only-permission": {
       "title": "Encrypt PDF with Print-Only Permission",
       "filename": "encrypt-pdf-print-only-permission.cs",
-      "description": "Shows how to encrypt a PDF using Aspose.Pdf, set user and owner passwords, and restrict permissions so that only printing is allowed.",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf, set user and owner passwords, and restrict permissions to printing only with AES‑256 encryption.",
       "tags": [
         "pdf encryption",
-        "permissions",
-        "printing",
+        "print permission",
         "aes-256",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21214"
+    },
+    "encrypt-pdf-allow-copy-block-print": {
+      "title": "Encrypt PDF and Allow Copying While Blocking Printing",
+      "filename": "encrypt-pdf-allow-copy-block-print.cs",
+      "description": "Demonstrates how to encrypt a PDF using AES‑256, set permissions to allow content extraction (copy) and prevent printing, and save the protected document.",
+      "tags": [
+        "pdf-encryption",
+        "permissions",
+        "copy",
+        "printing",
         "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21214"
-    },
-    "encrypt-pdf-allow-copy-block-print": {
-      "title": "Encrypt PDF with Copy Permission and No Printing",
-      "filename": "encrypt-pdf-allow-copy-block-print.cs",
-      "description": "Shows how to encrypt a PDF using Aspose.Pdf, permitting content extraction (copy) while disabling printing.",
-      "tags": [
-        "pdf",
-        "encryption",
-        "permissions",
-        "copy",
-        "printing"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Permissions",
         "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21215"
     },
     "encrypt-pdf-with-print-copy-permissions": {
       "title": "Encrypt PDF with Printing and Copying Permissions",
       "filename": "encrypt-pdf-with-print-copy-permissions.cs",
-      "description": "Shows how to encrypt a PDF using AES‑256 and set permissions that allow printing and content extraction (copying) with Aspose.Pdf.",
+      "description": "Shows how to load a PDF, apply AES‑256 encryption with user and owner passwords, and set permissions to allow printing and content extraction using Aspose.Pdf.",
       "tags": [
-        "pdf encryption",
+        "encryption",
         "permissions",
         "printing",
         "copying",
@@ -926,42 +887,42 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm"
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21216"
     },
     "encrypt-pdf-disable-content-extraction": {
-      "title": "Encrypt PDF and Restrict Content Extraction",
+      "title": "Encrypt PDF and Disable All Permissions",
       "filename": "encrypt-pdf-disable-content-extraction.cs",
-      "description": "Demonstrates how to load a PDF, apply AES‑256 encryption, and set permissions that allow only printing while disabling content extraction, then save the protected file.",
+      "description": "Demonstrates how to load a PDF, encrypt it with AES‑256, and set permissions to block all content extraction and other actions.",
       "tags": [
         "pdf-encryption",
         "permissions",
-        "aes-256",
+        "aes256",
         "aspose-pdf",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21217"
     },
     "decrypt-pdf-extract-images-reencrypt": {
       "title": "Decrypt PDF, Extract Images, and Re‑encrypt with New Owner Password",
       "filename": "decrypt-pdf-extract-images-reencrypt.cs",
-      "description": "The example opens an encrypted PDF using a user password, extracts all embedded images to files, then re‑encrypts the PDF with the same user password and a new owner password.",
+      "description": "The example opens an encrypted PDF using a user password, decrypts it, extracts all embedded images to a folder, and then re‑encrypts the document with a new owner password while preserving the original user password.",
       "tags": [
         "pdf",
         "decryption",
@@ -972,27 +933,27 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Decrypt",
-        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Page",
         "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21218"
     },
     "encrypt-pdf-with-password-aes256": {
-      "title": "Encrypt PDF with User Password (AES‑256)",
+      "title": "Encrypt PDF with Passwords (AES-256)",
       "filename": "encrypt-pdf-with-password-aes256.cs",
-      "description": "Loads a PDF from a byte array, applies AES‑256 encryption with a user password and specific permissions, and returns the encrypted PDF as a byte array.",
+      "description": "Loads a PDF from a byte array, applies AES-256 encryption with user and owner passwords, and returns the encrypted PDF bytes.",
       "tags": [
-        "pdf-encryption",
-        "aes256",
-        "aspose-pdf",
-        "csharp",
-        "permissions"
+        "pdf encryption",
+        "password protection",
+        "aes-256",
+        "permissions",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1002,84 +963,86 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21220"
     },
     "sign-pdf-with-windows-certificate": {
-      "title": "Add PDF Signature Field Using Certificate Thumbprint",
+      "title": "Sign PDF with Windows Certificate Store using Aspose.Pdf",
       "filename": "sign-pdf-with-windows-certificate.cs",
-      "description": "Shows how to retrieve an X509 certificate from the Windows certificate store by thumbprint and create an empty signature field in a PDF using Aspose.Pdf.",
+      "description": "Demonstrates loading a certificate from the current user's store by thumbprint, creating an invisible signature field, and applying a PKCS#7 signature to a PDF using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "digital-signature",
+        "pdf signing",
         "certificate",
-        "aspose-pdf",
-        "c#"
+        "aspose",
+        "c#",
+        "windows-store"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Document.Pages",
-        "Aspose.Pdf.Document.Form.Add"
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21222"
     },
     "sign-pdf-with-certificate": {
-      "title": "Sign PDF with Certificate from Azure Key Vault",
+      "title": "Sign PDF with PKCS7 using Aspose.Pdf",
       "filename": "sign-pdf-with-certificate.cs",
-      "description": "Shows how to load a PDF, add a visible signature field, and sign it using a PFX certificate (read from a Base64 environment variable) via Aspose.Pdf's PKCS7 support.",
+      "description": "Shows how to load a certificate (as a placeholder for Azure Key Vault), create a visible signature field, configure PKCS#7 signature details, and apply a digital signature to a PDF using Aspose.Pdf.",
       "tags": [
-        "pdf-signature",
-        "aspose-pdf",
-        "azure-key-vault",
+        "pdf",
+        "signing",
         "pkcs7",
-        "csharp"
+        "aspose",
+        "certificate"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Form.Add",
-        "Aspose.Pdf.Forms.SignatureField.Sign"
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21223"
     },
     "sign-pdf-hardware-token-pkcs11": {
-      "title": "Add a Digital Signature Field to a PDF Using a Hardware Token",
+      "title": "Sign PDF with PKCS#7 Certificate using Aspose.Pdf",
       "filename": "sign-pdf-hardware-token-pkcs11.cs",
-      "description": "Shows how to load a certificate from a PKCS#11 hardware token and create an empty digital signature field in a PDF using Aspose.Pdf.",
+      "description": "Loads a PDF, adds a visible signature field, configures a PKCS#7 signature with a certificate (placeholder for a hardware token), and saves the signed document.",
       "tags": [
-        "pdf",
+        "pdf-signature",
+        "pkcs7",
+        "aspose.pdf",
         "digital-signature",
-        "certificate",
-        "hardware-token",
-        "aspose"
+        "hardware-token"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.Form.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.PKCS7",
+        "SignatureField.Sign",
+        "Document.Save",
+        "PdfForm.Add"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21224"
     },
     "validate-pdf-signature": {
-      "title": "Validate PDF Signature Against Trusted Root CA",
+      "title": "Validate PDF Signature Using a Custom Trusted Root CA",
       "filename": "validate-pdf-signature.cs",
-      "description": "Shows how to extract a certificate from a PDF signature with Aspose.Pdf, build a custom X509 chain using a supplied root CA, and report validation errors.",
+      "description": "Demonstrates how to load a PDF, locate signature fields, extract the signing certificate, and validate the certificate chain against a supplied trusted root CA using Aspose.Pdf.",
       "tags": [
         "pdf",
         "signature",
@@ -1089,21 +1052,20 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.Form",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.SignatureField.ExtractCertificate",
-        "Aspose.Pdf.Forms.SignatureField.PartialName",
-        "Aspose.Pdf.Form",
-        "Aspose.Pdf.FormFieldCollection"
+        "Aspose.Pdf.Forms.SignatureField.PartialName"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21225"
     },
     "validate-pdf-signature-timestamp": {
-      "title": "Validate PDF Signature Timestamp Against Certificate Validity",
+      "title": "Validate PDF Signature and Verify Timestamp Within Certificate Validity",
       "filename": "validate-pdf-signature-timestamp.cs",
-      "description": "Loads a PDF, extracts each digital signature's certificate and signing time, and checks that the signing time falls within the certificate's validity period.",
+      "description": "Loads a signed PDF, verifies each digital signature, extracts the signing certificate, and checks that the signing timestamp falls inside the certificate's validity period.",
       "tags": [
         "pdf",
         "signature",
@@ -1114,190 +1076,194 @@
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.ExtractCertificate",
-        "Aspose.Pdf.Forms.SignatureField.Signature",
-        "Aspose.Pdf.Forms.Signature"
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Forms.Signature.Verify",
+        "Aspose.Pdf.Forms.Signature.Date",
+        "Aspose.Pdf.Forms.SignatureField.ExtractCertificate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21226"
     },
     "extract-signature-image-to-png": {
-      "title": "Extract Signature Image from PDF",
+      "title": "Extract Signature Image from PDF Signature Field",
       "filename": "extract-signature-image-to-png.cs",
-      "description": "Loads a signed PDF, locates the first signature field, extracts its appearance image stream, and saves it as a PNG file.",
+      "description": "Loads a signed PDF, retrieves the normal appearance XForm of the first signature field, renders it to a temporary one‑page PDF, and saves the rendered image as a PNG file.",
       "tags": [
-        "pdf",
         "signature",
-        "image-extraction",
-        "aspose",
-        "csharp"
+        "pdf",
+        "image",
+        "appearance",
+        "png"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Forms.FieldCollection",
-        "Aspose.Pdf.Forms.SignatureField.ExtractImage"
+        "Aspose.Pdf.Forms.AppearanceDictionary",
+        "Aspose.Pdf.Forms.XForm",
+        "Aspose.Pdf.Operators.Do",
+        "Aspose.Pdf.Devices.PngDevice",
+        "Aspose.Pdf.Devices.Resolution"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21227"
     },
     "extract-signature-images": {
-      "title": "Extract Signature Appearance Images from PDF",
+      "title": "Extract Signature Appearance Images from a PDF",
       "filename": "extract-signature-images.cs",
-      "description": "Loads a signed PDF, iterates through its signature fields, extracts each field's visual appearance as an image, and saves the images to a specified folder.",
+      "description": "Loads a signed PDF, locates all signature fields, extracts the visual appearance image of each signature, determines its file type, and saves the images to disk.",
       "tags": [
         "signature",
-        "image",
-        "pdf",
-        "aspose",
-        "forms"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.ExtractImage()",
-        "Aspose.Pdf.Form",
-        "Aspose.Pdf.Forms"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21228"
-    },
-    "extract-images-from-signed-pdf__v2": {
-      "title": "Extract Images from Each PDF Page into Separate Folders",
-      "filename": "extract-images-from-signed-pdf__v2.cs",
-      "description": "Demonstrates how to load a signed PDF with Aspose.Pdf, iterate through each page, extract all embedded images, and save them as PNG files in page‑specific subfolders.",
-      "tags": [
         "pdf",
         "image-extraction",
-        "aspose-pdf",
-        "page-wise",
+        "aspose",
         "csharp"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.XImage",
-        "Aspose.Pdf.XImage.Save",
-        "Aspose.Pdf.Page.Resources.Images"
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.SignatureField.ExtractImage",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Forms.SignatureField.PageIndex"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21228"
+    },
+    "extract-images-from-signed-pdf__v2": {
+      "title": "Extract Images from Signed PDF into Page‑Specific Folders",
+      "filename": "extract-images-from-signed-pdf__v2.cs",
+      "description": "Loads a signed PDF, iterates through each page, extracts all embedded images, and saves them into separate folders named for each page.",
+      "tags": [
+        "pdf",
+        "image-extraction",
+        "aspnet",
+        "signed-pdf",
+        "folders"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.XImage",
+        "Aspose.Pdf.Page.Resources.Images",
+        "Aspose.Pdf.Drawing.XImage.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21229"
     },
     "extract-signature-certificate-chain": {
-      "title": "Extract Signature Certificate Chain and Verify Expiration Dates",
+      "title": "Extract Signature Certificate Chain and Verify Expiration",
       "filename": "extract-signature-certificate-chain.cs",
-      "description": "Loads a signed PDF, locates signature fields, extracts the signer's X509 certificate, builds the certificate chain, and displays each certificate's expiration date.",
+      "description": "Loads a PDF, finds signature fields, extracts the signing certificate, builds its X509 chain, and reports each certificate's validity period and expiration status.",
       "tags": [
         "pdf",
         "signature",
         "certificate",
         "expiration",
-        "chain"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject",
-        "Aspose.Pdf.Forms.FieldCollection"
+        "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21230"
     },
     "custom-security-handler-warning-overlay": {
-      "title": "Apply Security Handler with Warning Overlay and Copy‑Paste Restriction",
+      "title": "Secure PDF with Copy‑Paste Disabled and Warning Overlay",
       "filename": "custom-security-handler-warning-overlay.cs",
-      "description": "The example loads a PDF, adds a visible warning text annotation to each page, and secures the document by encrypting it with AES‑256 while allowing only printing, thereby disabling copy‑paste.",
+      "description": "Loads a PDF, adds a semi‑transparent warning stamp to every page, and applies AES‑256 encryption that disables content extraction (copy‑paste) while allowing printing.",
       "tags": [
         "pdf-security",
-        "text-annotation",
-        "encryption",
-        "permissions",
-        "copy-protection"
+        "watermark",
+        "copy-protection",
+        "aspose-pdf",
+        "encryption"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Page.AddStamp"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21232"
     },
     "sign-pdf-flatten-signature": {
       "title": "Sign PDF and Flatten Signature Appearance",
       "filename": "sign-pdf-flatten-signature.cs",
-      "description": "Demonstrates how to add a visible digital signature to a PDF, apply a PKCS#7 certificate, and flatten the signature appearance to prevent further visual changes.",
+      "description": "Demonstrates how to add a digital signature to a PDF, apply a PKCS#7 certificate, and flatten the signature appearance so it cannot be edited.",
       "tags": [
-        "digital-signature",
         "pdf-signature",
         "flatten",
         "aspose-pdf",
-        "c#"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS7",
-        "SignatureField.Sign",
-        "SignatureField.Flatten",
-        "Document.Save"
-      ],
-      "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21233"
-    },
-    "sign-pdf-remove-annotations": {
-      "title": "Sign PDF and Remove Annotations While Preserving the Signature",
-      "filename": "sign-pdf-remove-annotations.cs",
-      "description": "Demonstrates how to digitally sign a PDF with a PKCS#1 certificate using Aspose.Pdf, then iterate through the document to delete all annotations except the signature widget, keeping the signature valid.",
-      "tags": [
-        "pdf-signature",
-        "annotations",
-        "aspose-pdf",
-        "csharp",
+        "security",
         "digital-signature"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS1",
-        "Aspose.Pdf.Annotations.Annotation",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Annotations.SignatureField"
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Forms.SignatureField.Flatten"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21233"
+    },
+    "sign-pdf-remove-annotations": {
+      "title": "Sign PDF and Remove All Annotations While Preserving the Signature",
+      "filename": "sign-pdf-remove-annotations.cs",
+      "description": "Demonstrates how to add a digital signature to a PDF using Aspose.Pdf and then delete every page annotation without affecting the signature field, finally saving the cleaned document.",
+      "tags": [
+        "digital-signature",
+        "pdf-annotations",
+        "aspose-pdf",
+        "pdf-cleanup",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21234"
     },
     "encrypt-pdf-with-password": {
-      "title": "Encrypt PDF with Password and Permissions",
+      "title": "Encrypt PDF with User and Owner Passwords",
       "filename": "encrypt-pdf-with-password.cs",
-      "description": "Shows how to load a PDF, apply AES‑256 encryption with a user and owner password, define specific permissions, and save the encrypted file using Aspose.Pdf.",
+      "description": "Loads a PDF, applies AES‑256 encryption requiring a user password to open and an owner password to modify permissions, then saves the protected file.",
       "tags": [
         "pdf-encryption",
         "password-protection",
         "permissions",
-        "aspose-pdf",
-        "csharp"
+        "aes256",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1307,86 +1273,85 @@
         "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21235"
     },
     "encrypt-pdf-view-only-edit-password": {
-      "title": "Encrypt PDF for View-Only Access with Owner Password",
+      "title": "Encrypt PDF with Owner Password for Editing Only",
       "filename": "encrypt-pdf-view-only-edit-password.cs",
-      "description": "Shows how to encrypt a PDF so it can be opened without a password for viewing, while requiring an owner password to edit or change permissions.",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf so it can be viewed without a password while requiring an owner password for any editing, with specific permissions set.",
       "tags": [
-        "pdf encryption",
-        "owner password",
-        "view only",
+        "pdf",
+        "encryption",
+        "owner-password",
         "permissions",
-        "Aspose.Pdf"
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21236"
     },
     "decrypt-pdf-sign-fields-multiple-certs": {
       "title": "Decrypt PDF and Re‑sign All Signature Fields with Different Certificates",
       "filename": "decrypt-pdf-sign-fields-multiple-certs.cs",
-      "description": "The example opens an encrypted PDF, decrypts it, locates every signature field, and applies a new PKCS#7 digital signature using a rotating set of certificates, then saves the updated document.",
+      "description": "The example opens an encrypted PDF, extracts every signature field, and re‑signs each field using a different PFX certificate before saving the updated document.",
       "tags": [
         "pdf",
         "decryption",
         "digital-signature",
         "certificate",
-        "aspose-pdf"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Document.Decrypt",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
+        "Aspose.Pdf.Document.Decrypt",
         "Aspose.Pdf.Forms.SignatureField.Sign",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21237"
     },
     "batch-sign-and-compress-pdfs": {
       "title": "Batch Sign and Compress PDFs",
       "filename": "batch-sign-and-compress-pdfs.cs",
-      "description": "Demonstrates how to load multiple PDF files, add a digital signature using a PFX certificate, compress the signed document, and save the result in a batch operation.",
+      "description": "Shows how to iterate through PDF files, add a digital signature field, sign it with a PKCS#7 certificate, and compress the signed documents using Aspose.Pdf.",
       "tags": [
         "pdf",
         "digital-signature",
         "batch-processing",
         "compression",
-        "aspose-pdf"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.Signature",
-        "Aspose.Pdf.Forms.PKCS1",
+        "Aspose.Pdf.Forms.PKCS7",
         "Aspose.Pdf.Optimization.OptimizationOptions",
-        "Aspose.Pdf.Document.OptimizeResources"
+        "Aspose.Pdf.Document.OptimizeResources",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21238"
     },
     "batch-encrypt-pdfs-archive-zip": {
-      "title": "Batch Encrypt PDFs and Archive to ZIP",
+      "title": "Batch Encrypt PDFs and Create ZIP Archive",
       "filename": "batch-encrypt-pdfs-archive-zip.cs",
-      "description": "Demonstrates how to encrypt multiple PDF files with unique passwords using Aspose.Pdf and then package the encrypted PDFs into a ZIP archive.",
+      "description": "Shows how to encrypt multiple PDF files with unique passwords using Aspose.Pdf and bundle the encrypted PDFs and a password list into a ZIP file.",
       "tags": [
         "pdf-encryption",
         "batch-processing",
@@ -1402,157 +1367,155 @@
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21239"
     },
     "extract-digest-algorithm-from-pdf-signatures": {
       "title": "Extract Digest Algorithm from PDF Digital Signatures",
       "filename": "extract-digest-algorithm-from-pdf-signatures.cs",
-      "description": "Loads a PDF, enumerates its signature fields, extracts the signing certificate, and determines the digest algorithm used for each digital signature.",
+      "description": "Shows how to load a signed PDF with Aspose.Pdf, locate signature fields, and retrieve the digest hash algorithm used for timestamping.",
       "tags": [
         "pdf",
         "digital-signature",
-        "digest-algorithm",
-        "aspose",
-        "csharp"
+        "digest",
+        "aspose-pdf",
+        "compliance"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject",
-        "Aspose.Pdf.Forms.SignatureField.Signature",
-        "Aspose.Pdf.Form"
+        "Aspose.Pdf.Security.PKCS7",
+        "Aspose.Pdf.Security.TimestampSettings",
+        "Aspose.Pdf.Security.DigestHashAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21240"
     },
     "sign-pdf-with-sha384-digest": {
-      "title": "Sign PDF with SHA-384 Digest Using Aspose.Pdf",
+      "title": "Create PDF Signature with SHA‑384 Digest",
       "filename": "sign-pdf-with-sha384-digest.cs",
-      "description": "Shows how to add an invisible signature field to a PDF and sign it with a PKCS#7 certificate using the SHA‑384 digest algorithm via Aspose.Pdf.",
+      "description": "Demonstrates how to add a visible PKCS#7 signature field to a PDF and configure the signature to use the SHA‑384 digest algorithm via Aspose.Pdf's TimestampSettings.",
       "tags": [
-        "pdf-signature",
+        "pdf",
+        "digital-signature",
         "sha384",
-        "pkcs7",
         "aspose-pdf",
-        "digital-signature"
+        "pkcs7"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.TimestampSettings",
-        "Aspose.Pdf.Forms.DigestHashAlgorithm",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.TimestampSettings",
+        "Aspose.Pdf.DigestHashAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21241"
     },
     "sign-pdf-with-sha512": {
       "title": "Sign PDF with SHA‑512 Digest Using Aspose.Pdf",
       "filename": "sign-pdf-with-sha512.cs",
-      "description": "Shows how to load a PDF, add a signature field, configure a PKCS7 provider to use the SHA‑512 digest algorithm via TimestampSettings, and save the signed document.",
+      "description": "Demonstrates how to create a digital signature on a PDF document using a PKCS#7 certificate and configure the SHA‑512 digest algorithm via timestamp settings.",
       "tags": [
-        "pdf-signature",
-        "sha512",
-        "pkcs7",
-        "timestamp",
-        "aspnet"
+        "pdf signing",
+        "sha-512",
+        "digital signature",
+        "aspose-pdf",
+        "timestamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.TimestampSettings",
+        "Aspose.Pdf.Forms.SignatureCustomAppearance"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21242"
+    },
+    "sign-pdf-with-4096-rsa-certificate": {
+      "title": "Sign PDF with RSA 4096‑bit Private Key",
+      "filename": "sign-pdf-with-4096-rsa-certificate.cs",
+      "description": "Demonstrates how to digitally sign a PDF using an RSA 4096‑bit certificate (PKCS#12) with Aspose.Pdf, creating a visible signature field and saving the signed document.",
+      "tags": [
+        "pdf signing",
+        "rsa",
+        "aspose.pdf",
+        "digital signature",
+        "c#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.TimestampSettings",
-        "Document.Form.Add",
         "SignatureField.Sign",
         "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
-      "status": "verified",
-      "task_id": "21242"
-    },
-    "sign-pdf-with-4096-rsa-certificate": {
-      "title": "Create PDF Signature Field with RSA Certificate",
-      "filename": "sign-pdf-with-4096-rsa-certificate.cs",
-      "description": "The example loads a PDF and a 4096‑bit RSA certificate, adds a signature field to the first page, and saves the document. It demonstrates setting up a placeholder for a digital signature using Aspose.Pdf (actual signing requires the Signatures package).",
-      "tags": [
-        "pdf",
-        "digital-signature",
-        "rsa",
-        "aspose-pdf",
-        "signature-field"
-      ],
-      "apis_used": [
-        "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Form.Add",
-        "Aspose.Pdf.Document.Save"
-      ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21243"
     },
     "sign-pdf-with-ecc-p256": {
-      "title": "Sign PDF with ECC P‑256 Certificate using Aspose.Pdf",
+      "title": "Sign PDF with ECC P‑256 Certificate",
       "filename": "sign-pdf-with-ecc-p256.cs",
-      "description": "Demonstrates loading an ECC P‑256 certificate, creating a visible signature field, and applying a digital signature to a PDF with Aspose.Pdf.",
+      "description": "Demonstrates how to apply a PKCS#7 digital signature to a PDF using an ECC P‑256 certificate with Aspose.Pdf, writing the signed document back to a stream.",
       "tags": [
         "pdf-signature",
         "ecc",
         "p256",
-        "aspose",
-        "csharp"
+        "pkcs7",
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS1",
-        "SignatureField.Sign",
-        "Document.Save"
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Forms.SignatureField.Sign"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21244"
     },
     "encrypt-pdf-with-smart-card-certificate": {
-      "title": "Encrypt PDF with Password and Smart Card Certificate",
+      "title": "Encrypt PDF with Smart Card Certificate",
       "filename": "encrypt-pdf-with-smart-card-certificate.cs",
-      "description": "The example loads a certificate from a hardware security module (smart card) and uses Aspose.Pdf to encrypt a PDF with strong password protection (AES‑256) and specific permissions, then saves the encrypted file.",
+      "description": "Demonstrates loading a certificate from a smart card (HSM) and encrypting a PDF with that certificate, applying specific permissions and saving the protected file.",
       "tags": [
         "pdf-encryption",
-        "smart-card",
         "certificate",
-        "aspose-pdf",
-        "csharp"
+        "smart-card",
+        "security",
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21245"
     },
     "decrypt-pdf-with-certificate-token": {
-      "title": "Decrypt PDF Using Certificate from Hardware Token",
+      "title": "Decrypt PDF Encrypted with Certificate Using Hardware Token",
       "filename": "decrypt-pdf-with-certificate-token.cs",
-      "description": "Shows how to load a certificate with a private key from a smart card or hardware token and use Aspose.Pdf to decrypt a PDF that was encrypted with that certificate.",
+      "description": "Shows how to locate a certificate on a hardware token, create certificate‑based encryption options, open an encrypted PDF with Aspose.Pdf, and save it unencrypted.",
       "tags": [
         "pdf",
         "decryption",
@@ -1562,308 +1525,307 @@
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
         "Aspose.Pdf.Security.CertificateEncryptionOptions",
-        "Aspose.Pdf.Document.Decrypt",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Security.EncryptionOptions",
+        "Aspose.Pdf.Security"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21246"
     },
     "batch-sign-pdfs-with-certificate-per-document-type": {
-      "title": "Batch Sign PDFs Based on Document Type Metadata",
+      "title": "Batch Sign PDFs Using Document-Type Certificates",
       "filename": "batch-sign-pdfs-with-certificate-per-document-type.cs",
-      "description": "Demonstrates how to iterate over a set of PDF files, read a custom metadata key to determine the document type, retrieve the appropriate X509 certificate, and apply a PKCS#7 digital signature with a visual appearance using Aspose.Pdf.",
+      "description": "Demonstrates how to sign multiple PDF files in a folder, selecting a certificate based on the document's metadata (title) and adding a visible signature field to each PDF.",
       "tags": [
-        "pdf-signing",
-        "batch-processing",
+        "pdf signing",
         "certificate",
+        "batch processing",
         "metadata",
-        "aspose-pdf"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21247"
     },
     "batch-encrypt-pdfs-date-password": {
-      "title": "Batch Encrypt PDFs with Hashed Passwords",
+      "title": "Batch Encrypt PDFs with Date‑Based Passwords",
       "filename": "batch-encrypt-pdfs-date-password.cs",
-      "description": "Loads each PDF from a source folder, creates a password from the file name and current UTC date, hashes it, and encrypts the PDF with AES‑256 using Aspose.Pdf.",
+      "description": "Demonstrates iterating over PDF files in a folder, generating a password from the file name and current date, and encrypting each PDF using Aspose.Pdf.",
       "tags": [
-        "pdf",
-        "encryption",
-        "batch",
-        "hash",
-        "aes256"
+        "pdf encryption",
+        "batch processing",
+        "password generation",
+        "aes256",
+        "aspose.pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21248"
     },
     "add-new-empty-signature-field": {
-      "title": "Extract Existing Signature Fields and Add a New Empty Signature Field",
+      "title": "Extract Signature Fields and Add a New Empty Signature Field",
       "filename": "add-new-empty-signature-field.cs",
-      "description": "The example loads a PDF, lists all existing signature fields, creates a uniquely‑named empty signature field on a specified page, and saves the updated document.",
+      "description": "The example opens a PDF, enumerates all existing signature fields, creates a new empty signature field on a specified page for future signing, and saves the modified document.",
       "tags": [
+        "signature",
         "pdf",
-        "signature-field",
-        "aspose-pdf",
+        "aspose",
         "form",
-        "csharp"
+        "field"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Field",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Forms.Form.Add"
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21249"
     },
     "validate-pdf-signature-extract-san": {
-      "title": "Validate PDF Signature and Extract SAN Entries",
+      "title": "Validate PDF Signature and Extract SAN from Signing Certificate",
       "filename": "validate-pdf-signature-extract-san.cs",
-      "description": "Loads a signed PDF, finds signature fields, validates each digital signature, extracts the signing X509 certificate, and lists its Subject Alternative Name (SAN) entries.",
+      "description": "Loads a signed PDF, verifies its digital signature, extracts the signer's X.509 certificate, and displays the Subject Alternative Name (SAN) extension.",
       "tags": [
-        "pdf-signature",
+        "pdf",
+        "signature",
         "certificate",
         "san",
-        "aspose-pdf",
-        "validation"
+        "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.Field",
-        "Aspose.Pdf.Forms.SignatureField.ValidateSignature",
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Forms.Signature.Verify",
         "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21252"
     },
     "encrypt-pdf-with-user-owner-passwords-remove-user": {
-      "title": "Encrypt PDF with User and Owner Passwords and Remove User Password",
+      "title": "Encrypt PDF with User and Owner Passwords then Remove User Password",
       "filename": "encrypt-pdf-with-user-owner-passwords-remove-user.cs",
-      "description": "Demonstrates how to encrypt a PDF using both user and owner passwords, then reopen it and remove the user password while keeping the document encrypted.",
+      "description": "The example demonstrates encrypting a PDF with both user and owner passwords using Aspose.Pdf, then re‑encrypting it with an empty user password to remove the user password while preserving encryption.",
       "tags": [
-        "pdf-encryption",
-        "user-password",
-        "owner-password",
-        "aspose-pdf",
-        "csharp"
+        "pdf",
+        "encryption",
+        "password",
+        "Aspose.Pdf",
+        "owner-password"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Permissions",
         "Aspose.Pdf.Document.Encrypt",
         "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.CryptoAlgorithm",
-        "Aspose.Pdf.InvalidPasswordException"
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21253"
     },
     "sign-pdf-and-flatten-form-fields": {
       "title": "Sign PDF and Flatten Form Fields",
       "filename": "sign-pdf-and-flatten-form-fields.cs",
-      "description": "Demonstrates how to add a visible digital signature to a PDF using a PKCS#7 certificate and then flatten all form fields to prevent further editing.",
+      "description": "Demonstrates how to apply a PKCS#7 digital signature to a PDF, add a signature field, and then flatten the document so all form fields become non‑editable.",
       "tags": [
         "pdf-signature",
         "flatten",
-        "form-fields",
-        "aspose-pdf",
-        "digital-signature"
+        "aspnet",
+        "security",
+        "forms"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.Form",
-        "Aspose.Pdf.Rectangle"
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Flatten",
+        "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21254"
     },
     "sign-pdf-first-page-with-digital-signature": {
-      "title": "Digitally Sign First Page of PDF Using Aspose.Pdf",
+      "title": "Sign PDF with Visible Signature from Memory Stream",
       "filename": "sign-pdf-first-page-with-digital-signature.cs",
-      "description": "Loads a PDF from a memory stream, adds a signature field on the first page, configures a PKCS#7 digital signature with visual appearance, and saves the signed document.",
+      "description": "Loads a PDF from an expandable memory stream, creates a visible signature field on the first page, configures a PKCS#7 signature, and writes the signed PDF back to disk.",
       "tags": [
-        "digital-signature",
-        "pdf",
-        "aspose-pdf",
+        "pdf-signature",
         "memory-stream",
-        "signature-field"
+        "visible-signature",
+        "pkcs7",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
         "Aspose.Pdf.Forms.SignatureCustomAppearance",
-        "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save",
-        "Aspose.Pdf.Forms.SignatureField.Sign"
+        "Aspose.Pdf.Rectangle"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21165"
     },
     "disable-content-extraction-form-filling": {
-      "title": "Disable Content Extraction and Form Filling in PDF",
+      "title": "Set PDF Privileges to Disable Extraction and Form Filling",
       "filename": "disable-content-extraction-form-filling.cs",
-      "description": "Demonstrates how to open a signed PDF, apply encryption with specific permissions to allow printing and editing while disabling content extraction and form filling, and save the updated document.",
+      "description": "Demonstrates how to apply document privileges to a signed PDF, disabling content extraction and form filling while allowing printing, using AES‑256 encryption.",
       "tags": [
         "pdf",
         "encryption",
         "permissions",
-        "security",
-        "aspose-pdf"
+        "Aspose.Pdf",
+        "security"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Permissions",
         "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.CryptoAlgorithm",
         "Aspose.Pdf.Document.Save"
       ],
       "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21170"
     },
     "validate-pdf-digital-signature__v2": {
       "title": "Validate PDF Digital Signature and Retrieve Certificate Details",
       "filename": "validate-pdf-digital-signature__v2.cs",
-      "description": "Loads a signed PDF, verifies each signature field, and extracts the signing X509 certificate to display its properties.",
+      "description": "Opens a PDF, enumerates signature fields, checks for a signature object, extracts the signing X.509 certificate and prints its properties.",
       "tags": [
         "pdf",
         "digital-signature",
-        "validation",
         "certificate",
-        "aspose"
+        "validation",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Forms.Form",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.SignatureField.Signature.Verify",
-        "Aspose.Pdf.Forms.SignatureField.ExtractCertificateObject"
+        "Aspose.Pdf.Forms.Form",
+        "Aspose.Pdf.Forms.SignatureField.Signature",
+        "Aspose.Pdf.Forms.SignatureField.ExtractCertificate"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21173"
     },
     "sign-pdf-with-invisible-certification": {
-      "title": "Add Invisible Digital Signature to PDF",
+      "title": "Certify PDF with No-Modification Digital Signature",
       "filename": "sign-pdf-with-invisible-certification.cs",
-      "description": "Loads a PDF, creates a PKCS7 digital signature with an invisible appearance, adds a signature field, signs the document, and saves the result.",
+      "description": "Demonstrates how to apply a certification‑level digital signature to a PDF using Aspose.Pdf, making further modifications disallowed.",
       "tags": [
         "pdf",
         "digital-signature",
-        "invisible",
         "certification",
-        "Aspose"
+        "security",
+        "aspnet"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureCustomAppearance",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Color"
+        "Document.Form.Add",
+        "SignatureField.Sign",
+        "Document.Save"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21189"
     },
     "sign-pdf-certify-allow-form-filling": {
-      "title": "Sign PDF with Certification Allowing Form Filling",
+      "title": "Sign and Certify PDF Allowing Form Filling Only",
       "filename": "sign-pdf-certify-allow-form-filling.cs",
-      "description": "Demonstrates adding a digital signature to a PDF, setting a certification level that permits form filling while blocking content changes, and saving the signed document using Aspose.Pdf.",
+      "description": "Loads a PDF, adds a visible signature field, signs it with a PKCS#12 certificate, and applies certification‑style restrictions that permit only form filling while blocking other content changes.",
       "tags": [
         "pdf-signature",
         "certification",
         "form-filling",
-        "aspose-pdf",
-        "digital-signature"
+        "encryption",
+        "aspose-pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
         "Aspose.Pdf.Forms.PKCS7",
-        "Aspose.Pdf.Forms.SignatureField.Sign",
-        "Aspose.Pdf.Form.Add",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.SignatureField.Sign"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21190"
     },
     "compute-verify-pdf-hash-before-after-signing": {
       "title": "Compute and Verify PDF Hash Before and After Signing",
       "filename": "compute-verify-pdf-hash-before-after-signing.cs",
-      "description": "Demonstrates how to calculate a SHA‑256 hash of a PDF, sign the document with a certificate, then recompute the hash to verify that the content integrity is preserved after signing.",
+      "description": "Demonstrates how to calculate a SHA‑256 hash of a PDF, apply a digital signature with Aspose.Pdf, then recompute the hash to confirm that signing altered the file while preserving integrity.",
       "tags": [
         "pdf",
-        "hash",
         "digital-signature",
+        "hash",
         "integrity",
         "aspose"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS1",
+        "Aspose.Pdf.Forms.PKCS7",
         "Aspose.Pdf.Rectangle",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Forms.SignatureField.Sign"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21207"
     },
     "pdf-with-encrypted-attachment-and-signature": {
       "title": "Create PDF with Encrypted Attachment and Digital Signature",
       "filename": "pdf-with-encrypted-attachment-and-signature.cs",
-      "description": "The example encrypts a file using AES, embeds the encrypted data as an attachment in a PDF, and then digitally signs the PDF with a PKCS#1 certificate.",
+      "description": "The example encrypts a file using AES‑256, embeds the encrypted data as an attachment in a PDF, adds a visible signature field, and digitally signs the document with a PKCS#7 certificate.",
       "tags": [
         "pdf",
         "encryption",
-        "signature",
+        "digital-signature",
         "attachment",
-        "Aspose"
+        "Aspose.Pdf"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
@@ -1871,59 +1833,228 @@
         "Aspose.Pdf.Text.TextFragment",
         "Aspose.Pdf.FileSpecification",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Forms.PKCS1"
+        "Aspose.Pdf.Forms.PKCS7"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21208"
     },
     "sign-pdf-and-lock-signature-field__v2": {
-      "title": "Create Read‑Only Signature Field in PDF",
+      "title": "Sign PDF and Lock Signature Field",
       "filename": "sign-pdf-and-lock-signature-field__v2.cs",
-      "description": "Shows how to add a visible signature field to a PDF with Aspose.Pdf, set it to read‑only to lock the field, and save the document.",
+      "description": "Demonstrates how to add a digital signature to a PDF using Aspose.Pdf, lock the signature field to prevent further edits, and save the signed document.",
       "tags": [
-        "pdf",
-        "signature",
-        "readonly",
-        "aspnet",
-        "form"
+        "pdf signing",
+        "digital signature",
+        "field lock",
+        "Aspose.Pdf",
+        "C#"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
-        "Aspose.Pdf.Page",
-        "Aspose.Pdf.Rectangle",
         "Aspose.Pdf.Forms.SignatureField",
-        "Aspose.Pdf.Document.Save"
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Rectangle"
       ],
-      "difficulty": "beginner",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21211"
     },
     "add-watermark-and-encrypt-pdf": {
-      "title": "Add Watermark and Encrypt PDF with Aspose.Pdf",
+      "title": "Add Watermark and Encrypt PDF",
       "filename": "add-watermark-and-encrypt-pdf.cs",
-      "description": "Demonstrates how to create a PDF, apply a centered semi‑transparent watermark, and secure the document with AES‑256 encryption and specific permissions using Aspose.Pdf.",
+      "description": "Demonstrates adding a centered semi‑transparent watermark to every page using TextStamp and then securing the PDF with user/owner passwords, specific permissions, and AES‑256 encryption.",
       "tags": [
         "watermark",
         "encryption",
         "permissions",
         "pdf",
-        "aspose-pdf"
+        "security"
       ],
       "apis_used": [
         "Aspose.Pdf.Document",
         "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
         "Aspose.Pdf.Text.TextStamp",
         "Aspose.Pdf.Permissions",
-        "Aspose.Pdf.Document.Encrypt",
-        "Aspose.Pdf.CryptoAlgorithm"
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt"
       ],
       "difficulty": "intermediate",
-      "generated_at": "2026-10-27T05:20:00Z",
+      "generated_at": "2026-11-17T11:25:20Z",
       "status": "verified",
       "task_id": "21231"
+    },
+    "validate-pdf-signature-ocsp": {
+      "title": "Validate PDF Signature Using OCSP",
+      "filename": "validate-pdf-signature-ocsp.cs",
+      "description": "Demonstrates how to locate a digital signature in a PDF and verify its integrity and revocation status using an OCSP responder with Aspose.Pdf.",
+      "tags": [
+        "signature",
+        "ocsp",
+        "validation",
+        "pdf",
+        "security"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Signature",
+        "Aspose.Pdf.Security.ValidationOptions",
+        "Aspose.Pdf.Security.ValidationResult"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21183"
+    },
+    "sign-pdf-with-digital-signature": {
+      "title": "Sign PDF with Digital Signature Using Aspose.Pdf",
+      "filename": "sign-pdf-with-digital-signature.cs",
+      "description": "Loads a PDF, adds a signature field, signs it with a PKCS#7 certificate from a PFX file, and saves the signed document.",
+      "tags": [
+        "digital-signature",
+        "pdf-signing",
+        "aspose-pdf",
+        "certificate",
+        "signature-field"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21191"
+    },
+    "certified-pdf-signature-allow-add-pages": {
+      "title": "Sign PDF with Certification Allowing Additional Pages",
+      "filename": "certified-pdf-signature-allow-add-pages.cs",
+      "description": "The example opens an existing PDF, creates a signature field, signs it with a PKCS#7 certificate, and then adds a new blank page, demonstrating a certification level that permits adding pages after signing.",
+      "tags": [
+        "pdf-signature",
+        "certification",
+        "add-page",
+        "Aspose.Pdf",
+        "PKCS7"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Document.Form.Add",
+        "Aspose.Pdf.Forms.SignatureField.Sign",
+        "Aspose.Pdf.Pages.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21192"
+    },
+    "batch-sign-pdfs-with-unique-visible-signature-images": {
+      "title": "Batch Sign PDFs with Unique Visible Signature Images",
+      "filename": "batch-sign-pdfs-with-unique-visible-signature-images.cs",
+      "description": "The example loads multiple PDF files, adds a digital signature field on the last page, signs it with a PFX certificate, and overlays a unique visible signature image for each document.",
+      "tags": [
+        "pdf-signing",
+        "batch",
+        "visible-signature",
+        "digital-certificate",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21202"
+    },
+    "list-signature-dictionaries-object-ids": {
+      "title": "List Signature Dictionaries and Their Object IDs",
+      "filename": "list-signature-dictionaries-object-ids.cs",
+      "description": "Shows how to enumerate signature fields in a PDF with Aspose.Pdf and obtain each field's underlying PDF dictionary object ID using reflection.",
+      "tags": [
+        "signature",
+        "pdf",
+        "object-id",
+        "aspose",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Form",
+        "Aspose.Pdf.Forms.FieldCollection",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.Field"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21205"
+    },
+    "download-sign-pdf-azure-blob": {
+      "title": "Download PDF, Add Placeholder Signature Field, and Save",
+      "filename": "download-sign-pdf-azure-blob.cs",
+      "description": "The example downloads a PDF from a URL, loads it with Aspose.Pdf, creates a signature field placeholder on the first page, and saves the modified document to a local folder representing Azure Blob storage.",
+      "tags": [
+        "pdf",
+        "signature",
+        "download",
+        "aspose",
+        "azure-blob"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Document.Form",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21219"
+    },
+    "create-readonly-secured-signed-pdf": {
+      "title": "Create Read‑Only Secured PDF and Add Digital Signature",
+      "filename": "create-readonly-secured-signed-pdf.cs",
+      "description": "The example builds a PDF in memory, applies AES‑256 encryption with read‑only permissions, adds a signature field, and digitally signs the document using a PKCS#7 certificate.",
+      "tags": [
+        "pdf-encryption",
+        "digital-signature",
+        "read-only",
+        "aspose-pdf",
+        "pdf-security"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Forms.SignatureField",
+        "Aspose.Pdf.Forms.PKCS7"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-17T11:25:20Z",
+      "status": "verified",
+      "task_id": "21250"
     }
   }
 }

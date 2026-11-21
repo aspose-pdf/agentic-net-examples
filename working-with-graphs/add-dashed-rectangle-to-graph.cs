@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath = "input.pdf";   // PDF that already contains the graph
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,34 +17,34 @@ class Program
             return;
         }
 
-        // Open the PDF document
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based
+            // Assume the graph is on the first page
             Page page = doc.Pages[1];
 
-            // Create a Graph that covers the whole page (or any size you need)
-            // Here we use the page dimensions so we can place shapes using absolute coordinates.
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Define rectangle coordinates (lower‑left x,y and upper‑right x,y)
+            // Adjust these values to position the rectangle over the desired part of the graph
+            Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 400);
 
-            // Define a rectangle shape (left, bottom, width, height).
-            // The desired rectangle spans from (100, 400) to (300, 500).
-            Aspose.Pdf.Drawing.Rectangle shapeRect = new Aspose.Pdf.Drawing.Rectangle(100, 400, 200, 100);
-
-            // Configure visual appearance: 2‑point black border, dashed line.
-            shapeRect.GraphInfo = new GraphInfo
+            // Create a square annotation (represents a rectangular shape)
+            SquareAnnotation square = new SquareAnnotation(page, rect)
             {
-                Color = Aspose.Pdf.Color.Black,   // border color
-                LineWidth = 2,                    // 2‑point thickness
-                DashArray = new int[] { 6, 3 },   // dash pattern: 6 points on, 3 points off
-                DashPhase = 0                     // start at beginning of pattern
+                // Border colour
+                Color = Aspose.Pdf.Color.Black,
+                // No fill (transparent interior)
+                InteriorColor = Aspose.Pdf.Color.Transparent
             };
 
-            // Add the rectangle to the graph
-            graph.Shapes.Add(shapeRect);
+            // Set a 2‑point dashed border – Border requires the parent annotation in the ctor
+            square.Border = new Border(square)
+            {
+                Width = 2,
+                Style = BorderStyle.Dashed
+            };
 
-            // Add the graph to the page's content
-            page.Paragraphs.Add(graph);
+            // Add the annotation to the page
+            page.Annotations.Add(square);
 
             // Save the modified PDF
             doc.Save(outputPath);

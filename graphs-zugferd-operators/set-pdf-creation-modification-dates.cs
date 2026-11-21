@@ -6,24 +6,25 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_timestamped.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page so the PDF is not empty (optional)
-            doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Set creation and modification dates to the current processing timestamp
+        // Load the PDF, set creation and modification dates, then save
+        using (Document doc = new Document(inputPath))
+        {
             DateTime now = DateTime.Now;
-            doc.Info.CreationDate = now;
-            // The correct property for modification date is ModDate (not ModificationDate)
-            doc.Info.ModDate = now;
+            doc.Info.CreationDate = now;          // set creation timestamp
+            doc.Info.ModDate = now;               // set modification timestamp (correct property name)
 
-            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with timestamps to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated timestamps to '{outputPath}'.");
     }
 }

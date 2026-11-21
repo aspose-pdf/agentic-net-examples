@@ -1,61 +1,97 @@
 using System;
 using System.IO;
 using System.IO.Compression;
-using Aspose.Pdf;
-using Aspose.Pdf.Facades; // required by task specification
+using System.Drawing;
+using System.Drawing.Imaging;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath  = "input.pdf";
-        const string zipPath  = "images.zip";
+        const string inputPdfPath = "input.pdf";
+        const string outputZipPath = "images.zip";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        // Extract images using Aspose.Pdf.Facades.PdfExtractor
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Create the ZIP archive file
-            using (FileStream zipFileStream = new FileStream(zipPath, FileMode.Create, FileAccess.Write))
-            using (ZipArchive zip = new ZipArchive(zipFileStream, ZipArchiveMode.Create, leaveOpen: false))
+            // Bind the source PDF
+            extractor.BindPdf(inputPdfPath);
+            // Extract images from all pages (or set StartPage/EndPage if needed)
+            extractor.ExtractImage();
+
+            // Create the ZIP archive to store extracted images
+            using (FileStream zipFileStream = new FileStream(outputZipPath, FileMode.Create))
+            using (ZipArchive zipArchive = new ZipArchive(zipFileStream, ZipArchiveMode.Create, leaveOpen: false))
             {
-                int imageCounter = 0;
-
-                // Pages are 1‑based in Aspose.Pdf
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                int imageIndex = 1;
+                // Iterate over all extracted images
+                while (extractor.HasNextImage())
                 {
-                    Page page = doc.Pages[pageIndex];
-
-                    // Iterate over images; XImageCollection is not a dictionary
-                    foreach (XImage img in page.Resources.Images)
+                    // Retrieve the next image into a memory stream
+                    using (MemoryStream imageStream = new MemoryStream())
                     {
-                        imageCounter++;
+                        extractor.GetNextImage(imageStream);
+                        imageStream.Position = 0; // reset for reading
 
-                        // Generate a unique file name for each image
-                        string entryName = $"image_page{pageIndex}_{imageCounter}.png";
+                        // Determine the image file extension from the image data
+                        string extension = GetImageExtension(imageStream);
+                        // Reset again after inspection
+                        imageStream.Position = 0;
 
-                        // Create a new entry in the ZIP archive
-                        ZipArchiveEntry entry = zip.CreateEntry(entryName, CompressionLevel.Optimal);
+                        string entryName = $"image_{imageIndex}.{extension}";
 
-                        // Save the image to the ZIP entry
-                        using (Stream entryStream = entry.Open())
-                        using (MemoryStream imgStream = new MemoryStream())
+                        // Add the image as a new entry in the ZIP archive
+                        ZipArchiveEntry zipEntry = zipArchive.CreateEntry(entryName);
+                        using (Stream entryStream = zipEntry.Open())
                         {
-                            // XImage.Save writes the image in its native format
-                            img.Save(imgStream);
-                            imgStream.Position = 0;
-                            imgStream.CopyTo(entryStream);
+                            imageStream.CopyTo(entryStream);
                         }
+
+                        imageIndex++;
                     }
                 }
             }
         }
 
-        Console.WriteLine($"All images extracted to ZIP archive: {zipPath}");
+        Console.WriteLine($"Extraction complete. Images saved to '{outputZipPath}'.");
+    }
+
+    /// <summary>
+    /// Determines a suitable file extension for an image contained in the supplied stream.
+    /// The stream position is left unchanged.
+    /// </summary>
+    private static string GetImageExtension(Stream imageStream)
+    {
+        // Ensure the stream can be read as an Image
+        try
+        {
+            using (Image img = Image.FromStream(imageStream, useEmbeddedColorManagement: false, validateImageData: false))
+            {
+                if (img.RawFormat.Equals(ImageFormat.Jpeg))
+                    return "jpg";
+                if (img.RawFormat.Equals(ImageFormat.Png))
+                    return "png";
+                if (img.RawFormat.Equals(ImageFormat.Gif))
+                    return "gif";
+                if (img.RawFormat.Equals(ImageFormat.Bmp))
+                    return "bmp";
+                if (img.RawFormat.Equals(ImageFormat.Tiff))
+                    return "tiff";
+                // Fallback for unknown formats
+                return "bin";
+            }
+        }
+        catch
+        {
+            // If the stream cannot be interpreted as an image, default to a generic binary extension
+            return "bin";
+        }
     }
 }

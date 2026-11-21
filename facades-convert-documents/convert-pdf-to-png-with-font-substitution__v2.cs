@@ -2,55 +2,43 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
+using Aspose.Pdf.Text; // Required for SimpleFontSubstitution
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string outputDir = "PngPages";
+        const string outputDir = "OutputImages";
 
+        // Verify input file exists
         if (!File.Exists(inputPdf))
         {
             Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPdf);
+
+        // Register simple font substitutions for any fonts that might be missing.
+        // Substitute common missing fonts with Arial (adjust as needed).
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Times New Roman", "Arial"));
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution("Helvetica", "Arial"));
+
+        // Create a PNG device with the desired resolution (e.g., 300 DPI)
+        var pngDevice = new PngDevice(new Resolution(300));
+
+        // Iterate through all pages (1‑based indexing)
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Load PDF
-            using (Document pdfDoc = new Document(inputPdf))
-            {
-                // Enable font substitution if the property exists (some older versions lack it)
-                var fontSubProp = pdfDoc.GetType().GetProperty("FontSubstitutionEnabled");
-                if (fontSubProp != null && fontSubProp.CanWrite)
-                {
-                    fontSubProp.SetValue(pdfDoc, true);
-                }
-
-                // Set the desired resolution (DPI) for the PNG images
-                var resolution = new Resolution(300);
-                var pngDevice = new PngDevice(resolution);
-
-                // Convert each page to a separate PNG file (1‑based indexing)
-                for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
-                {
-                    string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.png");
-                    using (FileStream outStream = new FileStream(outPath, FileMode.Create))
-                    {
-                        pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
-                    }
-                    Console.WriteLine($"Saved page {pageNumber} as PNG → {outPath}");
-                }
-            }
-
-            Console.WriteLine("PDF to PNG conversion completed.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
+            // Convert the current page to PNG and write directly to file
+            pngDevice.Process(pdfDocument.Pages[pageNumber], outPath);
+            Console.WriteLine($"Saved page {pageNumber} as PNG to {outPath}");
         }
     }
 }

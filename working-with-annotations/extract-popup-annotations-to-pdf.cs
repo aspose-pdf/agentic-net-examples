@@ -2,72 +2,65 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
-using Aspose.Pdf.Text;
 
-class Program
+class RetrievePopupAnnotationResource
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "popup_extracted.pdf";
+        // Input PDF that contains a popup (file attachment) annotation
+        const string inputPdfPath = "input.pdf";
 
-        if (!File.Exists(inputPath))
+        // Output path for the extracted embedded PDF
+        const string outputFilePath = "extracted_attachment.pdf";
+
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the source PDF inside a using block (deterministic disposal)
-        using (Document srcDoc = new Document(inputPath))
+        // Load the document inside a using block for deterministic disposal
+        using (Document pdfDocument = new Document(inputPdfPath))
         {
-            bool popupFound = false;
+            bool extracted = false;
 
-            // Pages are 1‑based in Aspose.Pdf
-            for (int i = 1; i <= srcDoc.Pages.Count && !popupFound; i++)
+            // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
+            for (int pageIndex = 1; pageIndex <= pdfDocument.Pages.Count; pageIndex++)
             {
-                Page page = srcDoc.Pages[i];
+                Page page = pdfDocument.Pages[pageIndex];
 
-                // Iterate all annotations on the page
-                foreach (Annotation annot in page.Annotations)
+                // Iterate over all annotations on the current page
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Identify a PopupAnnotation
-                    if (annot is PopupAnnotation popupAnnot)
+                    // Look for a FileAttachmentAnnotation (the popup that holds an embedded file)
+                    if (annotation is FileAttachmentAnnotation fileAttachment)
                     {
-                        // The popup text is stored in the parent markup annotation's Contents property
-                        string popupText = popupAnnot.Parent?.Contents ?? string.Empty;
+                        // The attached file specification is accessed via the File property
+                        FileSpecification fileSpec = fileAttachment.File;
 
-                        if (!string.IsNullOrEmpty(popupText))
+                        // Ensure the file specification and its content stream are present
+                        if (fileSpec != null && fileSpec.Contents != null)
                         {
-                            // Create a new PDF document for the extracted popup
-                            using (Document popupDoc = new Document())
+                            // Copy the embedded stream to a separate PDF file
+                            using (Stream sourceStream = fileSpec.Contents)
+                            using (FileStream destinationStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write))
                             {
-                                // Add a blank page to host the popup text
-                                Page newPage = popupDoc.Pages.Add();
-
-                                // Insert the popup text as a TextFragment
-                                TextFragment tf = new TextFragment(popupText)
-                                {
-                                    // Optional formatting – adjust as needed
-                                    TextState = { FontSize = 12, Font = FontRepository.FindFont("Helvetica") }
-                                };
-                                newPage.Paragraphs.Add(tf);
-
-                                // Save the new PDF
-                                popupDoc.Save(outputPath);
+                                sourceStream.CopyTo(destinationStream);
                             }
 
-                            Console.WriteLine($"Popup annotation saved to '{outputPath}'.");
-                            popupFound = true;
-                            break; // Exit inner foreach – we already processed a popup
+                            Console.WriteLine($"Embedded file extracted to: {outputFilePath}");
+                            extracted = true;
+                            break; // Stop after the first successful extraction
                         }
                     }
                 }
+
+                if (extracted)
+                    break;
             }
 
-            if (!popupFound)
-            {
-                Console.WriteLine("No popup annotation with content found in the document.");
-            }
+            if (!extracted)
+                Console.WriteLine("No popup/file attachment annotation with an embedded file was found.");
         }
     }
 }

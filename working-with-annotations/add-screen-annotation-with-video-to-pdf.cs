@@ -7,50 +7,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string videoPath = "sample.mp4";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string videoFile = "sample.mp4";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-        if (!File.Exists(videoPath))
-        {
-            Console.Error.WriteLine($"Video file not found: {videoPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        if (!File.Exists(videoFile))
         {
-            // Verify that the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
-            if (doc.Pages.Count < 3)
-            {
-                Console.Error.WriteLine("The document contains fewer than 3 pages.");
-                return;
-            }
+            Console.Error.WriteLine($"Video file not found: {videoFile}");
+            return;
+        }
 
-            // Retrieve page three
-            Page page = doc.Pages[3];
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
+        {
+            // Ensure the document has at least three pages (Aspose.Pdf uses 1‑based indexing)
+            while (doc.Pages.Count < 3)
+                doc.Pages.Add();
 
-            // Define the rectangle where the annotation will be placed (llx, lly, urx, ury)
+            // Define the annotation rectangle (lower‑left x/y, upper‑right x/y)
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 400, 800);
 
-            // Create a ScreenAnnotation and associate the video file via the constructor
-            ScreenAnnotation screen = new ScreenAnnotation(page, rect, videoPath);
-
-            // Optional title displayed in the annotation UI
-            screen.Title = "Sample Video";
+            // Create a ScreenAnnotation on page 3 with the rectangle and the media file
+            ScreenAnnotation screen = new ScreenAnnotation(doc.Pages[3], rect, videoFile)
+            {
+                // Optional description shown in the annotation UI
+                Contents = "Sample Video"
+            };
 
             // Add the annotation to the page's annotation collection
-            page.Annotations.Add(screen);
+            doc.Pages[3].Annotations.Add(screen);
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Screen annotation added and saved to '{outputPath}'.");
+        Console.WriteLine($"Screen annotation with video added to page 3. Saved as '{outputPdf}'.");
     }
 }

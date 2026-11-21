@@ -1,10 +1,10 @@
 # Facades annotations
 
-> **Facades annotations** in PDF using C# / .NET -- **102** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades annotations** in PDF using C# / .NET -- **104** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-annotations`
-- Examples: 102
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 104
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -12,7 +12,6 @@
 - [`annotation-removal-report.cs`](./annotation-removal-report.cs) -- Annotation removal report
 - [`async-pdf-annotation-operations.cs`](./async-pdf-annotation-operations.cs) -- Async pdf annotation operations
 - [`backup-pdf-and-flatten-form-fields.cs`](./backup-pdf-and-flatten-form-fields.cs) -- Backup pdf and flatten form fields
-- [`batch-delete-pdf-annotations-azure-blob.cs`](./batch-delete-pdf-annotations-azure-blob.cs) -- Batch delete pdf annotations azure blob
 - [`batch-delete-pdf-annotations-retain-types.cs`](./batch-delete-pdf-annotations-retain-types.cs) -- Batch delete pdf annotations retain types
 - [`batch-delete-pdf-annotations-with-progress.cs`](./batch-delete-pdf-annotations-with-progress.cs) -- Batch delete pdf annotations with progress
 - [`batch-delete-stamp-annotations.cs`](./batch-delete-stamp-annotations.cs) -- Batch delete stamp annotations
@@ -45,6 +44,8 @@
 - [`delete-pdf-annotations-in-parallel.cs`](./delete-pdf-annotations-in-parallel.cs) -- Delete pdf annotations in parallel
 - [`delete-text-annotations-from-pdf.cs`](./delete-text-annotations-from-pdf.cs) -- Delete text annotations from pdf
 - [`export-annotations-to-xfdf-stream.cs`](./export-annotations-to-xfdf-stream.cs) -- Export annotations to xfdf stream
+- [`export-annotations-xfdf-no-annotations.cs`](./export-annotations-xfdf-no-annotations.cs) -- Export annotations xfdf no annotations
+- [`export-highlight-annotations-to-xfdf.cs`](./export-highlight-annotations-to-xfdf.cs) -- Export highlight annotations to xfdf
 - [`export-import-flatten-pdf-annotations-logging.cs`](./export-import-flatten-pdf-annotations-logging.cs) -- Export import flatten pdf annotations logging
 - [`export-import-pdf-annotations-xfdf__v2.cs`](./export-import-pdf-annotations-xfdf__v2.cs) -- Export import pdf annotations xfdf  v2
 - [`export-pdf-annotations-pretty-xfdf.cs`](./export-pdf-annotations-pretty-xfdf.cs) -- Export pdf annotations pretty xfdf
@@ -71,6 +72,7 @@
 - [`generate-annotation-summary-report.cs`](./generate-annotation-summary-report.cs) -- Generate annotation summary report
 - [`get-annotation-counts-from-pdf.cs`](./get-annotation-counts-from-pdf.cs) -- Get annotation counts from pdf
 - [`get-annotation-names-by-author.cs`](./get-annotation-names-by-author.cs) -- Get annotation names by author
+- [`import-annotations-from-xfdf-stream.cs`](./import-annotations-from-xfdf-stream.cs) -- Import annotations from xfdf stream
 - [`import-annotations-without-overwrite.cs`](./import-annotations-without-overwrite.cs) -- Import annotations without overwrite
 - [`import-xfdf-annotations-into-multiple-pdfs__v2.cs`](./import-xfdf-annotations-into-multiple-pdfs__v2.cs) -- Import xfdf annotations into multiple pdfs  v2
 - [`import-xfdf-annotations-into-pdf__v3.cs`](./import-xfdf-annotations-into-pdf__v3.cs) -- Import xfdf annotations into pdf  v3

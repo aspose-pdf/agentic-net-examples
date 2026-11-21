@@ -3,108 +3,102 @@ using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string schemaPath = "schema.json";
-        const string outputPath = "generated_form.pdf";
+        const string jsonSchemaPath = "schema.json";
+        const string outputPdfPath = "generated_form.pdf";
 
-        if (!File.Exists(schemaPath))
+        if (!File.Exists(jsonSchemaPath))
         {
-            Console.Error.WriteLine($"Schema file not found: {schemaPath}");
+            Console.Error.WriteLine($"JSON schema file not found: {jsonSchemaPath}");
             return;
         }
 
         // Load and parse the JSON schema
-        string json = File.ReadAllText(schemaPath);
-        using JsonDocument doc = JsonDocument.Parse(json);
-        JsonElement root = doc.RootElement;
+        string jsonContent = File.ReadAllText(jsonSchemaPath);
+        using JsonDocument schemaDoc = JsonDocument.Parse(jsonContent);
+        JsonElement root = schemaDoc.RootElement;
 
-        // Create a new PDF document
-        using (Document pdf = new Document())
+        // Expecting a "properties" object under the root
+        if (!root.TryGetProperty("properties", out JsonElement properties))
         {
-            // Add a blank page (pages are 1‑based)
-            Page page = pdf.Pages.Add();
-
-            // Simple layout variables
-            double marginLeft = 50;
-            double marginTop = 750;
-            double fieldWidth = 300;
-            double fieldHeight = 20;
-            double verticalSpacing = 30;
-
-            // Ensure the schema has a "properties" object
-            if (root.TryGetProperty("properties", out JsonElement properties))
-            {
-                int fieldIndex = 0;
-                foreach (JsonProperty prop in properties.EnumerateObject())
-                {
-                    string fieldName = prop.Name;
-                    JsonElement propDef = prop.Value;
-                    string fieldType = propDef.GetProperty("type").GetString();
-
-                    // Calculate field rectangle
-                    double llx = marginLeft;
-                    double lly = marginTop - fieldIndex * verticalSpacing - fieldHeight;
-                    double urx = llx + fieldWidth;
-                    double ury = lly + fieldHeight;
-                    Rectangle rect = new Rectangle(llx, lly, urx, ury);
-
-                    // Create appropriate AcroForm field
-                    if (fieldType == "string")
-                    {
-                        TextBoxField txtField = new TextBoxField(page, rect)
-                        {
-                            PartialName = fieldName,
-                            Value = "" // default empty
-                        };
-                        pdf.Form.Add(txtField);
-                    }
-                    else if (fieldType == "boolean")
-                    {
-                        CheckboxField chkField = new CheckboxField(page, rect)
-                        {
-                            PartialName = fieldName,
-                            // "Off" means unchecked; "Yes" (or any non‑Off value) would be checked
-                            Value = "Off"
-                        };
-                        pdf.Form.Add(chkField);
-                    }
-                    else // fallback to a text box for numbers, integers, etc.
-                    {
-                        TextBoxField txtField = new TextBoxField(page, rect)
-                        {
-                            PartialName = fieldName,
-                            Value = ""
-                        };
-                        pdf.Form.Add(txtField);
-                    }
-
-                    // Add a label for the field (simple text fragment)
-                    TextFragment label = new TextFragment(fieldName + ":")
-                    {
-                        Position = new Position(marginLeft - 40, lly + 5)
-                    };
-                    label.TextState.FontSize = 12;
-                    label.TextState.ForegroundColor = Color.Black;
-                    page.Paragraphs.Add(label);
-
-                    fieldIndex++;
-                }
-            }
-            else
-            {
-                Console.Error.WriteLine("The JSON schema does not contain a 'properties' object.");
-                return;
-            }
-
-            // Save the PDF (no SaveOptions needed for PDF output)
-            pdf.Save(outputPath);
+            Console.Error.WriteLine("Invalid JSON schema: missing 'properties' object.");
+            return;
         }
 
-        Console.WriteLine($"PDF with AcroForm fields saved to '{outputPath}'.");
+        // Create a new PDF document
+        using (Document pdfDoc = new Document())
+        {
+            // Add a blank page to host the form fields
+            Page page = pdfDoc.Pages.Add();
+
+            // Simple layout parameters
+            const double left = 50;
+            const double width = 300;
+            const double height = 20;
+            double top = 800; // start from top of the page
+            const double verticalSpacing = 30;
+
+            foreach (JsonProperty prop in properties.EnumerateObject())
+            {
+                string fieldName = prop.Name;
+                string fieldType = "string"; // default type
+
+                if (prop.Value.TryGetProperty("type", out JsonElement typeElement))
+                {
+                    fieldType = typeElement.GetString()?.ToLowerInvariant() ?? "string";
+                }
+
+                // Define the rectangle for the field
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(left, top - height, left + width, top);
+
+                // Create appropriate form field based on JSON schema type
+                switch (fieldType)
+                {
+                    case "boolean":
+                        // CheckBox field
+                        CheckboxField checkBox = new CheckboxField(pdfDoc, rect)
+                        {
+                            PartialName = fieldName,
+                            Value = "Off" // default unchecked
+                        };
+                        pdfDoc.Form.Add(checkBox);
+                        break;
+
+                    case "integer":
+                    case "number":
+                        // Numeric input as TextBox (Aspose.Pdf does not have a dedicated numeric field)
+                        TextBoxField numericBox = new TextBoxField(pdfDoc, rect)
+                        {
+                            PartialName = fieldName,
+                            Value = string.Empty
+                        };
+                        pdfDoc.Form.Add(numericBox);
+                        break;
+
+                    case "string":
+                    default:
+                        // General text input
+                        TextBoxField textBox = new TextBoxField(pdfDoc, rect)
+                        {
+                            PartialName = fieldName,
+                            Value = string.Empty
+                        };
+                        pdfDoc.Form.Add(textBox);
+                        break;
+                }
+
+                // Move down for the next field
+                top -= verticalSpacing;
+            }
+
+            // Save the generated PDF
+            pdfDoc.Save(outputPdfPath);
+        }
+
+        Console.WriteLine($"PDF with AcroForm fields generated at '{outputPdfPath}'.");
     }
 }

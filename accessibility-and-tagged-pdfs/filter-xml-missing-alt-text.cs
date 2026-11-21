@@ -8,6 +8,7 @@ class Program
 {
     static void Main()
     {
+        // Path to the XML validation report that contains image errors
         const string xmlPath = "validation_report.xml";
 
         if (!File.Exists(xmlPath))
@@ -16,22 +17,37 @@ class Program
             return;
         }
 
-        // Load the XML validation report
+        // Load the XML document (XDocument does not need a using block)
         XDocument doc = XDocument.Load(xmlPath);
 
-        // Find all <Image> elements that have an Id attribute but lack a non‑empty Alt attribute
-        List<string> missingAltIds = doc.Descendants("Image")
-            .Where(img =>
-                // Image must have an Id attribute
-                !string.IsNullOrWhiteSpace((string)img.Attribute("Id")) &&
-                // Alt attribute is missing or empty/whitespace
-                string.IsNullOrWhiteSpace((string)img.Attribute("Alt")))
-            .Select(img => (string)img.Attribute("Id"))
-            .Distinct()
-            .ToList();
+        // The expected structure:
+        // <Errors>
+        //   <Error>
+        //     <ImageID>img123</ImageID>
+        //     <Message>Missing Alt text</Message>
+        //   </Error>
+        //   ...
+        // </Errors>
 
+        // Select all ImageID values where the Message indicates a missing Alt text.
+        IEnumerable<string> imageIds = doc
+            .Descendants("Error")
+            .Where(err =>
+            {
+                var message = (string)err.Element("Message");
+                // Look for the phrase "missing alt" (case‑insensitive)
+                return !string.IsNullOrEmpty(message) &&
+                       message.IndexOf("missing alt", StringComparison.OrdinalIgnoreCase) >= 0;
+            })
+            .Select(err => (string)err.Element("ImageID"))
+            .Where(id => !string.IsNullOrEmpty(id));
+
+        // Remove duplicates and materialize the list
+        List<string> affectedIds = imageIds.Distinct().ToList();
+
+        // Output the result
         Console.WriteLine("Images missing Alt text:");
-        foreach (string id in missingAltIds)
+        foreach (string id in affectedIds)
         {
             Console.WriteLine(id);
         }

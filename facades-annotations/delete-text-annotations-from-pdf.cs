@@ -17,14 +17,16 @@ class Program
 
         try
         {
-            // Load the PDF into the annotation editor
+            // PdfAnnotationEditor does NOT implement IDisposable, so no using block.
             PdfAnnotationEditor editor = new PdfAnnotationEditor();
+
+            // Load the PDF document.
             editor.BindPdf(inputPath);
 
-            // Delete only annotations of type "Text"
+            // Delete only annotations of type "Text".
             editor.DeleteAnnotations("Text");
 
-            // Save the resulting PDF
+            // Save the modified PDF.
             editor.Save(outputPath);
 
             Console.WriteLine($"Text annotations removed. Saved to '{outputPath}'.");

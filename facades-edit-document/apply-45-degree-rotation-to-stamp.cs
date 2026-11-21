@@ -1,60 +1,53 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Included as requested
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdfPath = "input.pdf";
+        const string stampImagePath = "stamp.png";
+        const string outputPdfPath = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        // Validate input files
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            return;
+        }
+        if (!File.Exists(stampImagePath))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImagePath}");
             return;
         }
 
-        try
+        // Load the source PDF to obtain the page count (PdfFileStamp no longer exposes GetPageCount)
+        Document srcDoc = new Document(inputPdfPath);
+        int pageCount = srcDoc.Pages.Count;
+
+        // Bind the PDF to the stamp processor
+        using (PdfFileStamp pdfStamp = new PdfFileStamp())
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Create a text stamp; TextStamp derives from Stamp and provides the needed properties
-                TextStamp stamp = new TextStamp("CONFIDENTIAL")
-                {
-                    // Rotate 45 degrees for diagonal placement
-                    RotateAngle = 45,
+            pdfStamp.BindPdf(inputPdfPath);
 
-                    // Center the stamp on each page
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
+            // Create a stamp based on the image and set rotation
+            Aspose.Pdf.Facades.Stamp stamp = new Aspose.Pdf.Facades.Stamp();
+            stamp.BindImage(stampImagePath);
+            stamp.Rotation = 45f;               // rotate 45 degrees for diagonal placement
+            stamp.IsBackground = false;        // overlay on top of existing content
+            stamp.SetOrigin(100f, 100f);        // position (adjust as needed)
 
-                    // No additional offset
-                    XIndent = 0,
-                    YIndent = 0,
+            // Apply the stamp to every page
+            stamp.Pages = Enumerable.Range(1, pageCount).ToArray();
+            pdfStamp.AddStamp(stamp);
 
-                    // Optional visual tweaks
-                    Opacity   = 0.5,   // semi‑transparent
-                    Background = false // transparent background
-                };
-
-                // Apply the stamp to every page in the document
-                foreach (Page page in doc.Pages)
-                {
-                    page.AddStamp(stamp);
-                }
-
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Stamp applied and saved to '{outputPath}'.");
+            // Save the modified PDF
+            pdfStamp.Save(outputPdfPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Rotated stamp applied. Output saved to '{outputPdfPath}'.");
     }
 }

@@ -1,21 +1,21 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf; // Core PDF API
+using Aspose.Pdf.Annotations; // Needed for StampAnnotation
 
 class Program
 {
     static void Main()
     {
+        // Input / output files
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
-        // The Bates number stamp text to remove
-        const string targetBatesNumber = "BATES-00123";
+        // Text of the Bates number stamp to remove
+        const string stampText = "Bates 001";
 
         // Pages (1‑based) from which the stamp should be removed
-        List<int> pagesToProcess = new List<int> { 2, 3, 5 };
+        int[] pagesToProcess = { 2, 3, 5 }; // example page numbers
 
         if (!File.Exists(inputPath))
         {
@@ -25,36 +25,42 @@ class Program
 
         try
         {
-            // Document must be wrapped in a using block for deterministic disposal
+            // Load the PDF inside a using block (ensures deterministic disposal)
             using (Document doc = new Document(inputPath))
             {
-                foreach (int pageIndex in pagesToProcess)
+                // Iterate using 1‑based indexing (Aspose.Pdf requirement)
+                foreach (int pageNumber in pagesToProcess)
                 {
-                    // Ensure the page index is within the document range
-                    if (pageIndex < 1 || pageIndex > doc.Pages.Count)
-                        continue; // skip invalid page numbers
+                    // Guard against invalid page numbers
+                    if (pageNumber < 1 || pageNumber > doc.Pages.Count)
+                        continue;
 
-                    Page page = doc.Pages[pageIndex];
+                    Page page = doc.Pages[pageNumber];
 
-                    // Iterate backwards when removing items from the Annotations collection
-                    for (int i = page.Annotations.Count - 1; i >= 0; i--)
+                    // Remove any StampAnnotation whose title matches the Bates text.
+                    // The Annotations collection is 1‑based, so we iterate backwards
+                    // to safely delete items while enumerating.
+                    for (int i = page.Annotations.Count; i >= 1; i--)
                     {
-                        Annotation ann = page.Annotations[i];
-                        // StampAnnotation stores its visible text in the Contents property
-                        if (ann is StampAnnotation stamp &&
-                            string.Equals(stamp.Contents, targetBatesNumber, StringComparison.Ordinal))
+                        var annotation = page.Annotations[i];
+                        if (annotation is StampAnnotation stampAnn)
                         {
-                            // Remove the matching stamp annotation from the page
-                            page.Annotations.Delete(i);
+                            // Some versions store the stamp text in the Title property.
+                            // Fall back to Subject if Title is empty.
+                            string candidate = stampAnn.Title ?? stampAnn.Subject ?? string.Empty;
+                            if (candidate.Equals(stampText, StringComparison.OrdinalIgnoreCase))
+                            {
+                                page.Annotations.Delete(i);
+                            }
                         }
                     }
                 }
 
-                // Save the modified PDF
+                // Save the modified PDF.
                 doc.Save(outputPath);
             }
 
-            Console.WriteLine($"Bates number '{targetBatesNumber}' removed. Output saved to '{outputPath}'.");
+            Console.WriteLine($"Bates stamp removed. Output saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

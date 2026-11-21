@@ -8,37 +8,44 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "stamped_output.pdf";
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Create a text stamp with red font and a semi‑transparent red background
+        // Load the PDF with the Document class (PdfFileEditor does not support stamping)
+        Document doc = new Document(inputPath);
+
+        // Create a text stamp with the desired appearance
         TextStamp stamp = new TextStamp("Confidential")
         {
+            // Font and style settings
+            TextState =
+            {
+                Font = FontRepository.FindFont("Arial"),
+                FontSize = 14,
+                FontStyle = FontStyles.Bold,
+                ForegroundColor = Color.Red
+            },
+            // Semi‑transparent background
+            Background = true,
+            Opacity = 0.5, // 0 = fully transparent, 1 = fully opaque
+            // Center the stamp on each page
             HorizontalAlignment = HorizontalAlignment.Center,
-            VerticalAlignment   = VerticalAlignment.Center,
-            Background          = true,   // enable background rectangle
-            Opacity             = 0.5     // 50 % transparency for the whole stamp
+            VerticalAlignment = VerticalAlignment.Center
         };
 
-        // Configure text appearance via the TextState instance
-        stamp.TextState.Font           = FontRepository.FindFont("Arial");
-        stamp.TextState.FontSize       = 72;
-        stamp.TextState.ForegroundColor = Color.Red;                     // red font
-        stamp.TextState.BackgroundColor = Color.Red;                     // red background (blended with Opacity)
-
-        // Load the PDF and apply the stamp to every page
-        Document pdf = new Document(inputPath);
-        foreach (Page page in pdf.Pages)
+        // Apply the stamp to every page in the document
+        foreach (Page page in doc.Pages)
         {
             page.AddStamp(stamp);
         }
-        pdf.Save(outputPath);
 
+        // Save the modified PDF
+        doc.Save(outputPath);
         Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
     }
 }

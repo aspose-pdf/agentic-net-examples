@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_indented.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,35 +16,50 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create a text fragment containing the paragraph to format
-            TextFragment paragraph = new TextFragment(
-                "Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
-                "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. " +
-                "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-            );
+            // Load the source PDF
+            using (Document doc = new Document(inputPath))
+            {
+                // Ensure there is at least one page
+                if (doc.Pages.Count == 0)
+                {
+                    Console.Error.WriteLine("The document contains no pages.");
+                    return;
+                }
 
-            // Apply line spacing as a multiplier (1.5 = 150% line height)
-            paragraph.TextState.LineSpacing = 1.5f;
+                // Choose the first page (pages are 1‑based)
+                Page page = doc.Pages[1];
 
-            // Optional: set basic font properties for readability
-            paragraph.TextState.FontSize = 12;
-            paragraph.TextState.Font = FontRepository.FindFont("Arial");
+                // Create a text fragment with the desired content
+                TextFragment fragment = new TextFragment("Lorem ipsum dolor sit amet, consectetur adipiscing elit. " +
+                                                         "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.");
 
-            // Simulate a first‑line indent by shifting the whole paragraph to the right.
-            // Aspose.Pdf does not expose a direct ParagraphIndent property on TextState.
-            paragraph.Position = new Position(70, 700); // X increased to create an indent effect
+                // ----- Paragraph indentation -----
+                // Use the MarginInfo to set a left indent (e.g., 30 points)
+                fragment.Margin = new MarginInfo { Left = 30 };
 
-            // Add the formatted paragraph to the first page
-            Page firstPage = doc.Pages[1];
-            firstPage.Paragraphs.Add(paragraph);
+                // ----- Line spacing -----
+                // Set the line spacing factor (e.g., 1.5 for 150% line height)
+                fragment.TextState.LineSpacing = 1.5f;
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+                // Optional: set other text appearance properties
+                fragment.TextState.FontSize = 12;
+                fragment.TextState.Font = FontRepository.FindFont("Arial");
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Add the fragment to the page's paragraphs collection
+                page.Paragraphs.Add(fragment);
+
+                // Save the modified PDF
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF saved with indentation and line spacing to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF with formatted paragraph saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

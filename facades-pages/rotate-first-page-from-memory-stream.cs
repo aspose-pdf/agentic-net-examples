@@ -1,51 +1,60 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Input and output file paths (replace with your own paths as needed)
-        const string sourcePath = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Paths for the resulting PDF after manipulation
+        const string resultPath = "output.pdf";
 
-        if (!File.Exists(sourcePath))
+        // ---------------------------------------------------------------------
+        // Create a minimal PDF in memory (the sandbox has no pre‑existing files).
+        // This ensures the example is self‑contained and does not throw a
+        // FileNotFoundException at runtime.
+        // ---------------------------------------------------------------------
+        byte[] sourcePdfBytes;
+        using (var seedDoc = new Document())
         {
-            Console.Error.WriteLine($"File not found: {sourcePath}");
-            return;
-        }
-
-        // Load the PDF file into a memory stream
-        byte[] pdfBytes = File.ReadAllBytes(sourcePath);
-        using (MemoryStream memoryStream = new MemoryStream(pdfBytes))
-        {
-            // Load the PDF document from the memory stream (Document implements IDisposable)
-            using (Document doc = new Document(memoryStream))
+            // Add a single blank page – enough for the page‑rotation demo.
+            seedDoc.Pages.Add();
+            using (var ms = new MemoryStream())
             {
-                // Example manipulation: delete the first page if the document has more than one page
-                if (doc.Pages.Count > 1)
-                {
-                    // Document.Pages provides Delete method (1‑based index)
-                    doc.Pages.Delete(1);
-                }
-
-                // Example manipulation: insert a blank page at the end of the document
-                // Document.Pages.Add creates a new blank page and returns it
-                Page blankPage = doc.Pages.Add();
-                // Optionally set size of the new page to match the previous last page
-                if (doc.Pages.Count > 1)
-                {
-                    Page reference = doc.Pages[doc.Pages.Count - 1];
-                    blankPage.PageInfo.Width  = reference.PageInfo.Width;
-                    blankPage.PageInfo.Height = reference.PageInfo.Height;
-                }
-
-                // Save the modified document to the output file
-                doc.Save(outputPath);
+                seedDoc.Save(ms);
+                sourcePdfBytes = ms.ToArray();
             }
         }
 
-        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+        // ---------------------------------------------------------------------
+        // Load the PDF from the in‑memory byte array into PdfPageEditor for
+        // manipulation without touching the file system.
+        // ---------------------------------------------------------------------
+        using (var inputStream = new MemoryStream(sourcePdfBytes))
+        {
+            // PdfPageEditor does NOT implement IDisposable – do NOT wrap it in a using block.
+            var pageEditor = new PdfPageEditor();
+
+            // Bind the PDF from the memory stream. Ensure the stream position is at the start.
+            inputStream.Position = 0;
+            pageEditor.BindPdf(inputStream);
+
+            // Specify which pages to affect (1‑based indexing). Here we rotate the first page.
+            pageEditor.ProcessPages = new int[] { 1 };
+            // Rotation is expressed in degrees: 0, 90, 180, 270.
+            pageEditor.Rotation = 90; // rotate 90° clockwise
+
+            // Save the modified PDF into another memory stream.
+            using (var outputStream = new MemoryStream())
+            {
+                pageEditor.Save(outputStream);
+
+                // Write the resulting bytes to a file.
+                File.WriteAllBytes(resultPath, outputStream.ToArray());
+            }
+        }
+
+        Console.WriteLine($"PDF page manipulation completed. Output saved to '{resultPath}'.");
     }
 }

@@ -8,9 +8,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string figureDescription = "Concise description of the figure";
+        const string figureTitle = "Concise description of the figure";
 
         if (!File.Exists(inputPath))
         {
@@ -18,27 +18,28 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Access the tagged content interface
-            ITaggedContent tagged = doc.TaggedContent;
+            // Access the tagged content (if any)
+            ITaggedContent taggedContent = doc.TaggedContent;
 
-            // Optional: set document language and title
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
+            // Find the first FigureElement in the structure tree
+            FigureElement figure = null;
+            var figures = taggedContent.RootElement.FindElements<FigureElement>(true);
+            if (figures.Count > 0)
+                figure = figures[0];
 
-            // Get the root structure element (no cast required)
-            StructureElement root = tagged.RootElement;
-
-            // Create a FigureElement which represents an image/figure in the structure tree
-            FigureElement figure = tagged.CreateFigureElement();
+            // If no figure exists, create one and attach it to the root
+            if (figure == null)
+            {
+                figure = taggedContent.CreateFigureElement();
+                // Attach the new figure to the root element
+                taggedContent.RootElement.AppendChild(figure);
+            }
 
             // Set the concise description using the AlternativeText property
-            figure.AlternativeText = figureDescription;
-
-            // Attach the figure to the root (or any appropriate parent) using AppendChild
-            root.AppendChild(figure);
+            figure.AlternativeText = figureTitle;
 
             // Save the modified PDF
             doc.Save(outputPath);

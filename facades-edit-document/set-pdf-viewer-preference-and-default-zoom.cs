@@ -1,7 +1,7 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
@@ -16,35 +16,41 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPath);
+
+        // Try to set viewer preferences (PageLayout = OneColumn, Zoom = 100%)
+        // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
+        // We use reflection to keep the code compilable with older versions as well.
+        PropertyInfo viewerPrefProp = typeof(Document).GetProperty("ViewerPreferences", BindingFlags.Public | BindingFlags.Instance);
+        if (viewerPrefProp != null)
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            object viewerPrefs = viewerPrefProp.GetValue(pdfDoc);
+            if (viewerPrefs != null)
             {
-                // Attempt to set viewer preferences. The ViewerPreferences property
-                // exists only in newer Aspose.Pdf versions (>= 20.9). To keep the code
-                // compatible with older versions we access it via dynamic and handle
-                // the possible RuntimeBinderException gracefully.
-                try
+                // Set PageLayout = OneColumn (continuous scrolling)
+                PropertyInfo pageLayoutProp = viewerPrefs.GetType().GetProperty("PageLayout", BindingFlags.Public | BindingFlags.Instance);
+                if (pageLayoutProp != null && pageLayoutProp.CanWrite)
                 {
-                    dynamic d = doc;
-                    d.ViewerPreferences.PageLayout = Aspose.Pdf.PageLayout.OneColumn; // continuous scrolling (single‑page view)
-                    d.ViewerPreferences.Zoom = 100; // default zoom 100%
-                }
-                catch (RuntimeBinderException)
-                {
-                    Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Skipping viewer‑preference configuration.");
+                    pageLayoutProp.SetValue(viewerPrefs, PageLayout.OneColumn);
                 }
 
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Set Zoom = 100 (default zoom 100%)
+                PropertyInfo zoomProp = viewerPrefs.GetType().GetProperty("Zoom", BindingFlags.Public | BindingFlags.Instance);
+                if (zoomProp != null && zoomProp.CanWrite)
+                {
+                    zoomProp.SetValue(viewerPrefs, 100);
+                }
             }
-
-            Console.WriteLine($"PDF saved with viewer preferences to '{outputPath}'.");
         }
-        catch (Exception ex)
+        else
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine("ViewerPreferences property is not available in the referenced Aspose.Pdf version. Skipping viewer preference configuration.");
         }
+
+        // Save the modified PDF
+        pdfDoc.Save(outputPath);
+
+        Console.WriteLine($"Viewer preferences applied (if supported) and saved to '{outputPath}'.");
     }
 }

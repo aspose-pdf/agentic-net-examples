@@ -1,63 +1,45 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPdf  = "input.pdf";
         const string outputDir = "ExtractedImages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        try
+        // PdfExtractor is a disposable Facade – wrap it in a using block
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF document to obtain the page count (PdfExtractor does not expose it directly)
-            Document pdfDoc = new Document(inputPath);
-            int totalPages = pdfDoc.Pages.Count;
+            // Bind the source PDF
+            extractor.BindPdf(inputPdf);
 
-            // PdfExtractor implements IDisposable, so wrap it in a using block
-            using (PdfExtractor extractor = new PdfExtractor())
+            // Configure the extractor to pull images (original format)
+            // In current API the mode is set by calling ExtractImage()
+            extractor.ExtractImage();
+
+            int imageIndex = 1;
+            // Loop while there are images to retrieve
+            while (extractor.HasNextImage())
             {
-                // Bind the PDF file
-                extractor.BindPdf(inputPath);
-
-                // Configure extraction to keep images in their original format.
-                // The correct property in this library version is ExtractImageMode.
-                // Using DefinedInResources extracts the image streams exactly as stored in the PDF.
-                extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-
-                // Set the page range to the whole document
-                extractor.StartPage = 1;
-                extractor.EndPage   = totalPages;
-
-                // Perform the extraction
-                extractor.ExtractImage();
-
-                // Save each extracted image. The extractor provides HasNextImage/GetNextImage methods.
-                int imageIndex = 1;
-                while (extractor.HasNextImage())
-                {
-                    string outPath = Path.Combine(outputDir, $"Image_{imageIndex}.png");
-                    extractor.GetNextImage(outPath);
-                    imageIndex++;
-                }
+                // Save each image using the overload that preserves the original format
+                string imagePath = Path.Combine(outputDir, $"Image_{imageIndex}.img");
+                extractor.GetNextImage(imagePath);
+                Console.WriteLine($"Extracted image {imageIndex} to {imagePath}");
+                imageIndex++;
             }
+        }
 
-            Console.WriteLine($"Images have been extracted to '{outputDir}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        Console.WriteLine("Image extraction completed.");
     }
 }

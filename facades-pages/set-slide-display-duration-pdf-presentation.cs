@@ -1,13 +1,13 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades; // Required for PdfPageEditor
+using Aspose.Pdf.Facades; // required per task specification
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "presentation.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,34 +16,23 @@ class Program
             return;
         }
 
-        // Define display duration (in seconds) for each slide.
-        // If fewer durations than pages are provided, the last value is reused.
-        int[] slideDurations = { 5, 8, 4, 6 }; // example values
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Load the PDF inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPath))
+        // Desired display time (seconds) for each slide
+        int displaySeconds = 5;
+        // Integer value that represents the Fade transition (check Aspose.Pdf docs for exact value; 11 is typical for Fade)
+        int fadeTransitionType = 11;
+
+        // Use PdfPageEditor to set transition type and duration for all pages
+        using (PdfPageEditor editor = new PdfPageEditor(doc))
         {
-            // Iterate using 1‑based page indexing (Aspose.Pdf requirement).
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                // Choose duration for the current page.
-                int duration = i <= slideDurations.Length
-                               ? slideDurations[i - 1]
-                               : slideDurations[slideDurations.Length - 1];
-
-                // Apply a transition to the current page using PdfPageEditor.
-                // TransitionType is set via its integer value (2 corresponds to Fade in Aspose.Pdf).
-                using (PdfPageEditor editor = new PdfPageEditor(doc))
-                {
-                    editor.ProcessPages = new int[] { i }; // target page (1‑based)
-                    editor.TransitionType = 2;            // Fade transition (integer code)
-                    editor.TransitionDuration = duration; // duration in seconds
-                    editor.ApplyChanges();
-                }
-            }
-
-            // Save the modified PDF.
-            doc.Save(outputPath);
+            // Apply to every page – null or an empty array means all pages
+            editor.ProcessPages = null;
+            editor.TransitionType = fadeTransitionType;   // integer transition type
+            editor.TransitionDuration = displaySeconds;   // duration in seconds
+            editor.ApplyChanges();
+            editor.Save(outputPath);
         }
 
         Console.WriteLine($"Presentation PDF saved to '{outputPath}'.");

@@ -7,74 +7,63 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "stamped_output.pdf";
-        const string logoImagePath = "logo.png";
+        const string inputPdf = "input.pdf";          // source PDF
+        const string outputPdf = "stamped_output.pdf"; // destination PDF
+        const string logoPath = "logo.png";           // company logo image
 
-        if (!File.Exists(inputPdfPath))
+        // Verify required files exist
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(logoPath))
+        {
+            Console.Error.WriteLine($"Logo image not found: {logoPath}");
             return;
         }
 
-        if (!File.Exists(logoImagePath))
+        // Load the PDF document
+        Document pdfDoc = new Document(inputPdf);
+
+        // ---------------------------------------------------------------------
+        // Create an image stamp (company logo)
+        // ---------------------------------------------------------------------
+        ImageStamp imageStamp = new ImageStamp(logoPath)
         {
-            Console.Error.WriteLine($"Logo image not found: {logoImagePath}");
-            return;
+            Width = 100,
+            Height = 50,
+            Opacity = 0.5,
+            Background = false,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        // ---------------------------------------------------------------------
+        // Create a text stamp ("Confidential")
+        // ---------------------------------------------------------------------
+        TextStamp textStamp = new TextStamp("Confidential")
+        {
+            Opacity = 0.5,
+            Background = false,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+        // TextState is read‑only – modify the existing instance instead of assigning a new one
+        textStamp.TextState.Font = FontRepository.FindFont("Arial");
+        textStamp.TextState.FontSize = 24;
+        textStamp.TextState.FontStyle = FontStyles.Bold;
+        textStamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // red
+
+        // Apply both stamps to every page in the document
+        foreach (Page page in pdfDoc.Pages)
+        {
+            page.AddStamp(imageStamp);
+            page.AddStamp(textStamp);
         }
 
-        try
-        {
-            // Load the PDF document
-            using (Document doc = new Document(inputPdfPath))
-            {
-                // ------------------------------------------------------------
-                // 1. Image stamp – company logo
-                // ------------------------------------------------------------
-                ImageStamp logoStamp = new ImageStamp(logoImagePath)
-                {
-                    HorizontalAlignment = HorizontalAlignment.Left,
-                    VerticalAlignment   = VerticalAlignment.Top,
-                    XIndent = 20,   // distance from left edge
-                    YIndent = 20,   // distance from top edge
-                    Background = false,
-                    Opacity = 0.8
-                };
-
-                // ------------------------------------------------------------
-                // 2. Text stamp – the word "Confidential"
-                // ------------------------------------------------------------
-                TextStamp textStamp = new TextStamp("Confidential")
-                {
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center,
-                    Background = false,
-                    Opacity = 0.5
-                };
-                // All visual properties of a TextStamp are set through its TextState object
-                textStamp.TextState.Font = FontRepository.FindFont("Arial");
-                textStamp.TextState.FontSize = 24;
-                textStamp.TextState.FontStyle = FontStyles.Bold;
-                textStamp.TextState.ForegroundColor = Color.Red;
-
-                // ------------------------------------------------------------
-                // 3. Apply both stamps to every page in the document
-                // ------------------------------------------------------------
-                foreach (Page page in doc.Pages)
-                {
-                    page.AddStamp(logoStamp);
-                    page.AddStamp(textStamp);
-                }
-
-                // Save the stamped PDF
-                doc.Save(outputPdfPath);
-            }
-
-            Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+        // Save the stamped PDF
+        pdfDoc.Save(outputPdf);
+        Console.WriteLine($"Stamped PDF saved to '{outputPdf}'.");
     }
 }

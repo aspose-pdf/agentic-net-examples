@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "rotated_table.pdf";
+        const string outputPath = "rotated_cell.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,50 +16,43 @@ class Program
             return;
         }
 
-        try
+        // Load the existing PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the existing PDF document
-            using (Document doc = new Document(inputPath))
+            // Create a table with two columns
+            Table table = new Table
             {
-                // Ensure there is at least one page to place the table on
-                Page page = doc.Pages.Count > 0 ? doc.Pages[1] : doc.Pages.Add();
+                ColumnWidths = "200 200", // set column widths
+                Border = new BorderInfo(BorderSide.All, 1f) // optional border for visibility
+            };
 
-                // Create a table with a single column (adjust widths as needed)
-                Table table = new Table();
-                table.ColumnWidths = "200"; // width of the single column
+            // Add a single row to the table
+            Row row = table.Rows.Add();
 
-                // ---------- Header Row ----------
-                Row headerRow = table.Rows.Add();
-                Cell headerCell = headerRow.Cells.Add("Header");
-                // Optional styling for header
-                headerCell.BackgroundColor = Color.LightGray;
-                headerCell.DefaultCellTextState = new TextState
-                {
-                    FontSize = 12,
-                    FontStyle = FontStyles.Bold
-                };
+            // First cell with normal orientation
+            Cell cell1 = row.Cells.Add("Normal");
 
-                // ---------- Body Row with Rotated Text ----------
-                Row bodyRow = table.Rows.Add();
-                Cell bodyCell = bodyRow.Cells.Add(); // add an empty cell first
-                // Create a TextFragment, set its rotation, and add it to the cell
-                TextFragment rotatedFragment = new TextFragment("Rotated Text");
-                rotatedFragment.TextState.Rotation = 45; // rotate 45 degrees
-                rotatedFragment.TextState.FontSize = 12;
-                bodyCell.Paragraphs.Add(rotatedFragment);
+            // Second cell with rotated text
+            Cell cell2 = row.Cells.Add();
+            // Create a TextFragment that will hold the rotated text
+            TextFragment rotatedFragment = new TextFragment("Rotated");
+            // Define basic text appearance (modify the existing TextState instance)
+            rotatedFragment.TextState.Font = FontRepository.FindFont("Helvetica");
+            rotatedFragment.TextState.FontSize = 12F;
+            rotatedFragment.TextState.ForegroundColor = Color.Black;
+            // Rotate the text inside the cell (45 degrees)
+            rotatedFragment.TextState.Rotation = 45;
+            // Add the fragment to the cell
+            cell2.Paragraphs.Add(rotatedFragment);
 
-                // Add the table to the page
-                page.Paragraphs.Add(table);
+            // Add the table to the first page of the document
+            Page page = doc.Pages[1];
+            page.Paragraphs.Add(table);
 
-                // Save the modified PDF
-                doc.Save(outputPath);
-            }
-
-            Console.WriteLine($"PDF saved with rotated cell text to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

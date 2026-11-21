@@ -7,31 +7,31 @@ class Program
     static void Main()
     {
         // Paths to the source PDF and the output PDF
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        // Name of the annotation to delete (could come from elsewhere)
+        // Name of the annotation to delete (could be obtained at runtime)
         string annotationName = "MyAnnotation";
 
-        // Verify that the source file exists
-        if (!File.Exists(inputPath))
+        // Verify the source file exists
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Source file not found: {inputPdf}");
             return;
         }
 
-        // Create the Facade editor for annotations
+        // Create the annotation editor (no IDisposable, so no using block needed)
         PdfAnnotationEditor editor = new PdfAnnotationEditor();
 
-        // Bind the editor to the existing PDF file
-        editor.BindPdf(inputPath);
+        // Load the PDF into the editor
+        editor.BindPdf(inputPdf);
 
         // Delete the annotation whose name matches the variable
         editor.DeleteAnnotation(annotationName);
 
-        // Save the modified PDF to a new file
-        editor.Save(outputPath);
+        // Save the modified PDF
+        editor.Save(outputPdf);
 
-        Console.WriteLine($"Annotation '{annotationName}' deleted. Saved to '{outputPath}'.");
+        Console.WriteLine($"Annotation \"{annotationName}\" deleted. Saved to '{outputPdf}'.");
     }
 }

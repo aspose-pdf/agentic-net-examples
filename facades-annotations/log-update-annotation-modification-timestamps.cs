@@ -9,7 +9,6 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
-        const string logPath = "annotation_log.txt";
 
         if (!File.Exists(inputPath))
         {
@@ -17,45 +16,47 @@ class Program
             return;
         }
 
-        // Ensure the log file is empty before we start
-        File.WriteAllText(logPath, string.Empty);
-
-        // Load the PDF document inside a using block (document-disposal-with-using rule)
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing rule)
-            for (int i = 1; i <= doc.Pages.Count; i++)
+            // Iterate through all pages
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                Page page = doc.Pages[i];
+                Page page = pdfDoc.Pages[pageNum];
+                if (page.Annotations == null) continue;
 
-                // Each page may contain multiple annotations
                 foreach (Annotation annotation in page.Annotations)
                 {
-                    // Only markup annotations have a modification timestamp property
+                    // Use a reliable identifier (Name if set, otherwise the annotation type)
+                    string identifier = !string.IsNullOrEmpty(annotation.Name) ? annotation.Name : annotation.AnnotationType.ToString();
+
+                    // Only markup annotations have a modification timestamp and color property
                     if (annotation is MarkupAnnotation markup)
                     {
-                        // Update the modification timestamp (use Modified property, not ModifiedDate)
+                        // Log the existing modification timestamp (if any)
+                        Console.WriteLine($"Page {pageNum}, Annotation {identifier}: Modified = {markup.Modified}");
+
+                        // Example modification: change annotation color to yellow
+                        markup.Color = Color.Yellow;
+
+                        // Update the modification timestamp to the current UTC time
                         markup.Modified = DateTime.UtcNow;
 
-                        // Log the annotation type and its new timestamp
-                        string logEntry = $"Page {i}, Annotation {annotation.GetType().Name}, Modified = {markup.Modified:O}";
-                        File.AppendAllText(logPath, logEntry + Environment.NewLine);
-                        Console.WriteLine(logEntry);
+                        // Log the update
+                        Console.WriteLine($"Updated annotation {identifier}: Modified = {markup.Modified}");
                     }
                     else
                     {
-                        // For non‑markup annotations just log that they were inspected
-                        string logEntry = $"Page {i}, Annotation {annotation.GetType().Name} (no modification timestamp)";
-                        File.AppendAllText(logPath, logEntry + Environment.NewLine);
-                        Console.WriteLine(logEntry);
+                        // Non‑markup annotations do not expose a Modified property
+                        Console.WriteLine($"Page {pageNum}, Annotation {identifier}: (non‑markup, no Modified property)");
                     }
                 }
             }
 
-            // Save the modified PDF (still inside the using block)
-            doc.Save(outputPath);
+            // Save the updated PDF
+            pdfDoc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processing complete. Modified PDF saved to '{outputPath}'. Log written to '{logPath}'.");
+        Console.WriteLine($"Annotated PDF saved to '{outputPath}'.");
     }
 }

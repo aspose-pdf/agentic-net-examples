@@ -1,81 +1,81 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Facades;   // required by task specification
 
 class BatchStampReposition
 {
     static void Main()
     {
-        // Input folder containing PDFs to process
-        const string inputFolder = @"C:\InputPdfs";
-        // Output folder for the modified PDFs
-        const string outputFolder = @"C:\OutputPdfs";
+        // Folder containing source PDFs
+        const string inputFolder  = @"C:\Pdf\Input";
+        // Folder where processed PDFs will be saved
+        const string outputFolder = @"C:\Pdf\Output";
 
-        // Verify input folder exists
         if (!Directory.Exists(inputFolder))
         {
-            Console.WriteLine($"Input folder does not exist: {inputFolder}");
+            Console.Error.WriteLine($"Input folder does not exist: {inputFolder}");
             return;
         }
 
-        // Ensure output folder exists
         Directory.CreateDirectory(outputFolder);
 
         // Process each PDF file in the input folder
-        foreach (string inputPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            // Verify the PDF file exists before loading
-            if (!File.Exists(inputPath))
-            {
-                Console.WriteLine($"File not found, skipping: {inputPath}");
-                continue;
-            }
+            string fileName   = Path.GetFileName(pdfPath);
+            string outputPath = Path.Combine(outputFolder, fileName);
 
-            // Load the PDF with the core Document API (must be disposed via using)
-            using (Document doc = new Document(inputPath))
+            try
             {
-                int pageCount = doc.Pages.Count;
-
-                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= pageCount; pageIndex++)
+                // Load the PDF document inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    Page page = doc.Pages[pageIndex];
-
-                    // Iterate over a copy of the annotations collection to avoid modification issues
-                    for (int annIndex = page.Annotations.Count; annIndex >= 1; annIndex--)
+                    // Iterate over all pages (1‑based indexing)
+                    for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
                     {
-                        Annotation annotation = page.Annotations[annIndex];
+                        Page page = doc.Pages[pageIndex];
 
-                        // Only process stamp annotations
-                        if (annotation is StampAnnotation stamp)
+                        // Find all stamp annotations on the current page
+                        var stampAnnotations = page.Annotations
+                                                   .OfType<StampAnnotation>()
+                                                   .ToList();
+
+                        foreach (StampAnnotation stamp in stampAnnotations)
                         {
-                            // Current stamp dimensions
-                            double stampWidth = stamp.Rect.URX - stamp.Rect.LLX;
+                            // Current stamp size
+                            double stampWidth  = stamp.Rect.URX - stamp.Rect.LLX;
                             double stampHeight = stamp.Rect.URY - stamp.Rect.LLY;
 
                             // Page dimensions
-                            double pageWidth = page.PageInfo.Width;
+                            double pageWidth  = page.PageInfo.Width;
                             double pageHeight = page.PageInfo.Height;
 
-                            // Compute new rectangle: top‑center of the page
-                            double newLlx = (pageWidth - stampWidth) / 2.0;
-                            double newLly = pageHeight - stampHeight; // top edge
-                            double newUrx = newLlx + stampWidth;
-                            double newUry = pageHeight;
+                            // Desired top‑center position (10 units margin from top edge)
+                            double llx = (pageWidth - stampWidth) / 2.0;
+                            double lly = pageHeight - stampHeight - 10.0;
+                            double urx = llx + stampWidth;
+                            double ury = pageHeight - 10.0;
 
-                            // Apply the new position
-                            stamp.Rect = new Aspose.Pdf.Rectangle(newLlx, newLly, newUrx, newUry);
+                            // Update the rectangle using the fully qualified Rectangle type
+                            stamp.Rect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
                         }
                     }
+
+                    // Save the modified PDF to the output folder
+                    doc.Save(outputPath);
                 }
 
-                // Save the modified PDF to the output folder
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(inputPath));
-                doc.Save(outputPath);
+                Console.WriteLine($"Repositioned stamps: {fileName} → {outputPath}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
             }
         }
 
-        Console.WriteLine("Batch stamp repositioning completed.");
+        Console.WriteLine("Batch processing completed.");
     }
 }

@@ -5,6 +5,9 @@ using Aspose.Pdf.Optimization;
 
 class Program
 {
+    // 1 MB threshold
+    const long SizeThreshold = 1 * 1024 * 1024;
+
     static void Main()
     {
         const string inputPath = "input.pdf";
@@ -16,42 +19,69 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate over all pages (1‑based indexing)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                Page page = doc.Pages[i];
+            bool needsCompression = false;
 
-                // Iterate over all images on the page to detect large ones (optional logging)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            {
+                Page page = doc.Pages[pageIndex];
+
+                // Iterate the image collection directly (not a dictionary)
                 foreach (XImage img in page.Resources.Images)
                 {
-                    using (MemoryStream ms = new MemoryStream())
+                    if (img == null)
+                        continue;
+
+                    // Determine the raw size of the image by saving it to a memory stream
+                    long imageSize;
+                    using (var ms = new MemoryStream())
                     {
                         img.Save(ms);
-                        long sizeInBytes = ms.Length;
-                        if (sizeInBytes > 1_048_576) // 1 MB
-                        {
-                            // Log the large image – actual compression will be done globally later
-                            Console.WriteLine($"Found large image ({sizeInBytes / 1024} KB) on page {i} – will be compressed.");
-                        }
+                        imageSize = ms.Length;
+                    }
+
+                    // If the image exceeds the 1 MB threshold, mark for compression
+                    if (imageSize > SizeThreshold)
+                    {
+                        needsCompression = true;
+                        break; // No need to continue checking other images on this page
                     }
                 }
+
+                if (needsCompression)
+                    break; // Exit outer loop early – we will compress the whole document
             }
 
-            // Apply global optimization that recompresses images (including those >1 MB)
-            OptimizationOptions opt = OptimizationOptions.All();
-            opt.CompressImages = true;          // enable image recompression
-            opt.ImageQuality = 50;              // adjust quality (0‑100) as needed
-            opt.RemoveUnusedObjects = true;
-            opt.RemoveUnusedStreams = true;
-            doc.OptimizeResources(opt);
+            // Apply compression if any large image was found
+            if (needsCompression)
+            {
+                // Configure optimization options – compress images with JPEG quality 75
+                OptimizationOptions opt = OptimizationOptions.All();
+                opt.CompressImages = true;
+                opt.ImageCompressionOptions.CompressImages = true;
+                opt.ImageCompressionOptions.ImageQuality = 75; // JPEG quality (0‑100)
+                opt.ImageCompressionOptions.ResizeImages = true;
+                opt.ImageCompressionOptions.MaxResolution = 150; // optional DPI limit
+                opt.RemoveUnusedObjects = true;
+                opt.RemoveUnusedStreams = true;
+                opt.LinkDuplicateStreams = true;
+                opt.SubsetFonts = true;
+
+                doc.OptimizeResources(opt);
+            }
 
             // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
+        // Report size reduction
+        long originalSize = new FileInfo(inputPath).Length;
+        long newSize = new FileInfo(outputPath).Length;
+        Console.WriteLine($"Original size: {originalSize:N0} bytes");
+        Console.WriteLine($"Compressed size: {newSize:N0} bytes");
+        Console.WriteLine($"Reduction: {originalSize - newSize:N0} bytes");
     }
 }

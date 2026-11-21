@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 
 class Program
@@ -16,43 +15,30 @@ class Program
             return;
         }
 
-        // Load the PDF document.
-        using (Document pdf = new Document(inputPath))
+        // Load the PDF to inspect custom metadata.
+        using (Document doc = new Document(inputPath))
         {
-            // Retrieve custom metadata that lists pages needing rotation.
-            // Expected custom property: "LandscapePages" = "1,3,5"
-            string propValue = pdf.Info["LandscapePages"] as string;
-
-            if (string.IsNullOrWhiteSpace(propValue))
+            // Determine whether rotation is required based on a custom property stored in the document's Info dictionary.
+            bool rotatePages = false;
+            string flag = doc.Info["Landscape"]; // Retrieve custom metadata via the indexer.
+            if (!string.IsNullOrEmpty(flag))
             {
-                // No pages flagged for rotation – just copy the original file.
-                File.Copy(inputPath, outputPath, true);
-                Console.WriteLine("No rotation needed. File copied unchanged.");
-                return;
+                rotatePages = string.Equals(flag, "true", StringComparison.OrdinalIgnoreCase);
             }
 
-            // Parse the comma‑separated list of page numbers.
-            var pagesToRotate = propValue
-                .Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(p => int.Parse(p.Trim()))
-                .ToList();
-
-            // Rotate each specified page 90 degrees clockwise.
-            foreach (int pageNumber in pagesToRotate)
+            if (rotatePages)
             {
-                if (pageNumber < 1 || pageNumber > pdf.Pages.Count)
+                // Rotate every page 90 degrees clockwise using the Page.Rotate property.
+                for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
                 {
-                    Console.WriteLine($"Warning: page {pageNumber} is out of range and will be ignored.");
-                    continue;
+                    doc.Pages[i].Rotate = Rotation.on90; // on90 = 90° clockwise
                 }
-
-                // Aspose.Pdf uses the Rotation enum. on90 = 90° clockwise.
-                pdf.Pages[pageNumber].Rotate = Rotation.on90;
             }
 
-            // Save the modified PDF.
-            pdf.Save(outputPath);
-            Console.WriteLine($"Rotated pages saved to '{outputPath}'.");
+            // Save the (possibly rotated) PDF.
+            doc.Save(outputPath);
         }
+
+        Console.WriteLine($"Processing completed. Output saved to '{outputPath}'.");
     }
 }

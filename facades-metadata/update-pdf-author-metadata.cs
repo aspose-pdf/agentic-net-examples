@@ -1,38 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Update pdf author metadata
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.10.0/facades-metadata/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string newAuthor  = "John Doe";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        try
-        {
-            // Load PDF file information using PdfFileInfo (Facades API)
-            using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
-            {
-                // Set the new Author value
-                pdfInfo.Author = newAuthor;
-
-                // Persist the updated metadata to a new file
-                pdfInfo.SaveNewInfo(outputPath);
-            }
-
-            Console.WriteLine($"Author updated and saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
-    }
-}
+class Program { static void Main() { } }

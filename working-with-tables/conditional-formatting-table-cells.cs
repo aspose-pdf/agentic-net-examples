@@ -1,69 +1,96 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Tagged;
+using Aspose.Pdf.LogicalStructure;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "conditional_formatted.pdf";
-        const double threshold  = 50.0; // cells with value > 50 will be highlighted
+        const string outputPath = "conditional_table.pdf";
+        const double threshold = 50.0; // cells with value > 50 will be highlighted
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
+            // Add a blank page (required for the document to have a page collection)
+            doc.Pages.Add();
 
-        // Load the source PDF
-        using (Document doc = new Document(inputPath))
-        {
-            // Ensure we work with the first page (1‑based indexing)
-            Page page = doc.Pages[1];
+            // Access the tagged content API
+            ITaggedContent tagged = doc.TaggedContent;
+            tagged.SetLanguage("en-US");
+            tagged.SetTitle("Conditional Formatting Example");
 
-            // Create a table with two columns
-            Table table = new Table
-            {
-                ColumnWidths = "100 100",
-                DefaultCellBorder = new BorderInfo(BorderSide.All, 0.5f)
-            };
+            // Root element of the structure tree
+            StructureElement root = tagged.RootElement;
 
-            // Header row
-            Row header = table.Rows.Add();
-            header.Cells.Add("Item");
-            header.Cells.Add("Value");
+            // Create a table element
+            TableElement table = tagged.CreateTableElement();
+            table.AlternativeText = "Sample data table with conditional formatting";
+            root.AppendChild(table);
+
+            // Create table header
+            TableTHeadElement thead = tagged.CreateTableTHeadElement();
+            table.AppendChild(thead);
+            TableTRElement headerRow = tagged.CreateTableTRElement();
+            thead.AppendChild(headerRow);
+
+            // Header cells
+            TableTHElement thName = tagged.CreateTableTHElement();
+            thName.SetText("Item");
+            headerRow.AppendChild(thName);
+
+            TableTHElement thValue = tagged.CreateTableTHElement();
+            thValue.SetText("Value");
+            headerRow.AppendChild(thValue);
+
+            // Create table body
+            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+            table.AppendChild(tbody);
 
             // Sample data rows
-            string[] items  = { "A", "B", "C", "D", "E" };
-            double[] values = { 23.5, 67.2, 45.0, 89.1, 12.3 };
+            string[] items = { "A", "B", "C", "D", "E" };
+            double[] values = { 30, 75, 45, 90, 20 };
 
             for (int i = 0; i < items.Length; i++)
             {
-                Row row = table.Rows.Add();
-                // First cell: item name (text)
-                row.Cells.Add(items[i]);
+                TableTRElement dataRow = tagged.CreateTableTRElement();
+                tbody.AppendChild(dataRow);
 
-                // Second cell: numeric value (as string)
-                string valueStr = values[i].ToString();
-                Cell valueCell = row.Cells.Add(valueStr);
+                // Item cell
+                TableTDElement tdItem = tagged.CreateTableTDElement();
+                tdItem.SetText(items[i]);
+                dataRow.AppendChild(tdItem);
 
-                // Conditional formatting: set background color if value exceeds threshold
-                if (values[i] > threshold)
+                // Value cell
+                TableTDElement tdValue = tagged.CreateTableTDElement();
+                tdValue.SetText(values[i].ToString());
+                dataRow.AppendChild(tdValue);
+            }
+
+            // Apply conditional formatting: set background color for cells where value > threshold
+            // Iterate over all TableTDElement cells in the table body
+            foreach (Element child in tbody.ChildElements)
+            {
+                if (child is TableTRElement row)
                 {
-                    // Use Aspose.Pdf.Color to avoid System.Drawing ambiguity
-                    valueCell.BackgroundColor = Aspose.Pdf.Color.LightSalmon;
+                    // The second cell in each row holds the numeric value
+                    if (row.ChildElements.Count >= 2 && row.ChildElements[1] is TableTDElement valueCell)
+                    {
+                        if (double.TryParse(valueCell.ActualText, out double cellValue) && cellValue > threshold)
+                        {
+                            // Set a light red background for cells exceeding the threshold
+                            valueCell.BackgroundColor = Aspose.Pdf.Color.FromRgb(1.0, 0.8, 0.8);
+                        }
+                    }
                 }
             }
 
-            // Add the table to the page's paragraph collection
-            page.Paragraphs.Add(table);
-
-            // Save the modified PDF
+            // Save the PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with conditional formatting: {outputPath}");
+        Console.WriteLine($"PDF with conditional formatting saved to '{outputPath}'.");
     }
 }

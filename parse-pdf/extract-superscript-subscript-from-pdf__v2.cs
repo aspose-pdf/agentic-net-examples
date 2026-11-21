@@ -1,11 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class Program
+class SuperscriptSubscriptExtractor
 {
     static void Main()
     {
@@ -17,58 +18,88 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal.
         using (Document doc = new Document(inputPath))
         {
-            // Process each page separately
-            foreach (Page page in doc.Pages)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf rule).
+            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
             {
-                // Use TextFragmentAbsorber to obtain text fragments for the current page
+                Page page = doc.Pages[pageIndex];
+
+                // Extract text fragments with their layout information.
                 TextFragmentAbsorber absorber = new TextFragmentAbsorber();
                 absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
                 page.Accept(absorber);
 
-                var fragments = absorber.TextFragments;
-                if (fragments == null || fragments.Count == 0)
-                    continue;
-
-                // Compute average font size and average baseline Y (LLY) for the page
-                double avgFontSize = fragments.Sum(f => f.TextState.FontSize) / fragments.Count;
-                double avgBaselineY = fragments.Sum(f => f.Rectangle.LLY) / fragments.Count;
-
-                // Heuristic thresholds
-                const double sizeThreshold = 0.8;   // smaller than 80% of average size
-                const double yOffset = 2.0;        // vertical offset from average baseline (points)
-
-                // Output detected superscript and subscript characters
-                foreach (var frag in fragments)
+                // Collect font sizes and baseline Y positions of all fragments.
+                List<double> fontSizes = new List<double>();
+                List<double> yPositions = new List<double>();
+                foreach (TextFragment fragment in absorber.TextFragments)
                 {
-                    bool isSmall = frag.TextState.FontSize < avgFontSize * sizeThreshold;
-                    double baselineY = frag.Rectangle.LLY;
-                    bool isSup = isSmall && baselineY > avgBaselineY + yOffset;
-                    bool isSub = isSmall && baselineY < avgBaselineY - yOffset;
+                    fontSizes.Add(fragment.TextState.FontSize);
+                    // Rectangle.LLY is the lower‑left Y coordinate (baseline) of the fragment.
+                    yPositions.Add(fragment.Rectangle.LLY);
+                }
 
-                    foreach (char ch in frag.Text)
+                if (fontSizes.Count == 0)
+                {
+                    continue; // No text on this page.
+                }
+
+                // Determine median font size and median Y position for the page.
+                double medianFontSize = GetMedian(fontSizes);
+                double medianY = GetMedian(yPositions);
+
+                // Build the output for the current page.
+                StringBuilder pageOutput = new StringBuilder();
+
+                foreach (TextFragment fragment in absorber.TextFragments)
+                {
+                    bool isSmaller = fragment.TextState.FontSize < medianFontSize * 0.9;
+                    double baselineY = fragment.Rectangle.LLY;
+                    bool isHigher = baselineY > medianY + (medianFontSize * 0.2);
+                    bool isLower = baselineY < medianY - (medianFontSize * 0.2);
+
+                    if (isSmaller && isHigher)
                     {
-                        if (isSup)
-                        {
-                            // U+207A = SUPERSCRIPT PLUS used as a generic superscript marker
-                            Console.Write($"\u207A{ch}");
-                        }
-                        else if (isSub)
-                        {
-                            // U+208A = SUBSCRIPT PLUS used as a generic subscript marker
-                            Console.Write($"\u208A{ch}");
-                        }
-                        else
-                        {
-                            Console.Write(ch);
-                        }
+                        // Superscript – wrap with Unicode superscript markers U+207D … U+207E.
+                        pageOutput.Append('\u207D'); // ⁽
+                        pageOutput.Append(fragment.Text);
+                        pageOutput.Append('\u207E'); // ⁾
+                    }
+                    else if (isSmaller && isLower)
+                    {
+                        // Subscript – wrap with Unicode subscript markers U+208D … U+208E.
+                        pageOutput.Append('\u208D'); // ₍
+                        pageOutput.Append(fragment.Text);
+                        pageOutput.Append('\u208E'); // ₎
+                    }
+                    else
+                    {
+                        // Regular text.
+                        pageOutput.Append(fragment.Text);
                     }
                 }
 
-                Console.WriteLine(); // separate pages
+                // Output the processed text for the page.
+                Console.WriteLine($"--- Page {pageIndex} ---");
+                Console.WriteLine(pageOutput.ToString());
             }
+        }
+    }
+
+    // Helper to compute the median of a numeric list.
+    private static double GetMedian(List<double> values)
+    {
+        var sorted = values.OrderBy(v => v).ToList();
+        int count = sorted.Count;
+        if (count % 2 == 1)
+        {
+            return sorted[count / 2];
+        }
+        else
+        {
+            return (sorted[(count / 2) - 1] + sorted[count / 2]) / 2.0;
         }
     }
 }

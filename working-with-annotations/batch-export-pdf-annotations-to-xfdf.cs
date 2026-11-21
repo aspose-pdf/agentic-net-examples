@@ -1,68 +1,44 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-// Note: The XFDF export requires the optional Aspose.Pdf.Xfdf assembly.
-// If the assembly is referenced, the commented code can be uncommented.
+using Aspose.Pdf; // Core Aspose.Pdf namespace
 
-class Program
+class ExportAnnotationsBatch
 {
     static void Main()
     {
-        // Base directory of the running application
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing source PDFs
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where XFDF files will be written
+        const string outputFolder = @"C:\XfdfOutput";
 
-        // Folder containing the source PDF files (fallback to current directory if missing)
-        string inputFolder = Path.Combine(baseDir, "InputPdfs");
-        if (!Directory.Exists(inputFolder))
-        {
-            Console.WriteLine($"Input folder not found: '{inputFolder}'. Using current directory instead.");
-            inputFolder = Directory.GetCurrentDirectory();
-        }
-
-        // Folder where the XFDF files will be written
-        string outputFolder = Path.Combine(baseDir, "OutputXfdf");
+        // Ensure output directory exists
         Directory.CreateDirectory(outputFolder);
 
-        // Retrieve all PDF files from the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
+        // Get all PDF files in the input folder (non‑recursive)
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
         if (pdfFiles.Length == 0)
         {
-            Console.WriteLine($"No PDF files found in '{inputFolder}'. Nothing to process.");
+            Console.WriteLine("No PDF files found in the input folder.");
             return;
         }
 
         foreach (string pdfPath in pdfFiles)
         {
-            // Build the corresponding XFDF file name (same base name as the PDF)
-            string xfdfPath = Path.Combine(
-                outputFolder,
-                Path.GetFileNameWithoutExtension(pdfPath) + ".xfdf");
+            // Derive output XFDF file name from the PDF name
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(pdfPath);
+            string xfdfPath = Path.Combine(outputFolder, fileNameWithoutExt + ".xfdf");
 
-            try
+            // Load the PDF and export its annotations using the XFDF save format.
+            // The older Aspose.Pdf versions do not expose SaveFormat.Xfdf, so we rely on
+            // the overload that infers the format from the file extension.
+            using (Document doc = new Document(pdfPath))
             {
-                // Load the PDF document. If the Aspose.Pdf.Xfdf assembly is referenced,
-                // the following block can be used to export annotations to XFDF.
-                //
-                // using (Document pdfDocument = new Document(pdfPath))
-                // {
-                //     var xfdfWriter = new Aspose.Pdf.Xfdf.XfdfWriter(pdfDocument);
-                //     xfdfWriter.Write(xfdfPath);
-                // }
-                //
-                // For now we simply load the document to demonstrate successful
-                // processing of each file.
-                using (Document pdfDocument = new Document(pdfPath))
-                {
-                    // Placeholder – no operation needed for the demo.
-                }
+                doc.Save(xfdfPath); // Saves as XFDF because the extension is .xfdf
+            }
 
-                Console.WriteLine($"Annotations exported: '{pdfPath}' → '{xfdfPath}'");
-            }
-            catch (Exception ex)
-            {
-                // Log any errors but continue processing the remaining files
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
-            }
+            Console.WriteLine($"Exported annotations: '{pdfPath}' → '{xfdfPath}'");
         }
+
+        Console.WriteLine("Batch export completed.");
     }
 }

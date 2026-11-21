@@ -1,46 +1,43 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
-using Aspose.Pdf;               // Document, page counting
-using Aspose.Pdf.Facades;      // PdfPageEditor
+using System.Linq;
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_zoomed.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputDir = "ZoomedPages";
 
-        // Verify input file exists
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Determine total page count (Aspose.Pdf uses 1‑based indexing)
-        int pageCount;
-        using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPath))
-        {
-            pageCount = doc.Pages.Count;
-        }
+        Directory.CreateDirectory(outputDir);
 
-        // Collect all odd‑numbered page indices
-        List<int> oddPages = new List<int>();
-        for (int i = 1; i <= pageCount; i += 2)   // step by 2 → 1,3,5,...
+        // Load the document to know how many pages it has.
+        using (var doc = new Document(inputPdf))
         {
-            oddPages.Add(i);
-        }
+            // Determine the odd‑numbered pages (1‑based indexing).
+            int[] oddPages = Enumerable.Range(1, doc.Pages.Count)
+                                       .Where(p => p % 2 == 1)
+                                       .ToArray();
 
-        // Apply a 1.2 (120 %) zoom to the selected odd pages
-        using (PdfPageEditor editor = new PdfPageEditor())
-        {
-            editor.BindPdf(inputPath);                 // load source PDF
-            editor.ProcessPages = oddPages.ToArray();  // target pages
-            editor.Zoom = 1.2f;                        // set zoom factor
-            editor.Save(outputPath);                   // write result
-        }
+            // Apply a 1.2 (120 %) zoom factor to the selected pages.
+            using (var editor = new PdfPageEditor())
+            {
+                editor.BindPdf(inputPdf);
+                editor.ProcessPages = oddPages;   // target odd pages only
+                editor.Zoom = 1.2f;               // 120 % magnification
 
-        Console.WriteLine($"Zoom of 1.2 applied to odd pages. Output saved to '{outputPath}'.");
+                string zoomedPdfPath = Path.Combine(outputDir, "ZoomedOddPages.pdf");
+                editor.Save(zoomedPdfPath);
+                Console.WriteLine($"Saved zoom‑adjusted PDF to {zoomedPdfPath}");
+            }
+        }
     }
 }

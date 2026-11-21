@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -9,120 +8,78 @@ class Program
 {
     static void Main()
     {
-        const string csvPath = "data.csv";          // CSV with header row matching PDF field names
-        const string pdfPath = "template.pdf";      // PDF containing form fields
-        const string outputPdf = "filled_output.pdf";
+        const string csvPath   = "data.csv";      // CSV with header row = field names
+        const string inputPdf  = "template.pdf"; // PDF containing form fields
+        const string outputPdf = "filled.pdf";   // Resulting PDF
 
+        // Verify input files exist
         if (!File.Exists(csvPath))
         {
             Console.Error.WriteLine($"CSV file not found: {csvPath}");
             return;
         }
-
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"PDF template not found: {pdfPath}");
+            Console.Error.WriteLine($"PDF template not found: {inputPdf}");
             return;
         }
 
-        // Read CSV file
-        List<Dictionary<string, string>> records = new List<Dictionary<string, string>>();
+        // -------------------------------------------------
+        // Read CSV into a dictionary (header -> value)
+        // -------------------------------------------------
+        var fieldValues = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         using (StreamReader reader = new StreamReader(csvPath))
         {
+            // First line: column headers (field names)
             string headerLine = reader.ReadLine();
-            if (headerLine == null)
+            // Second line: values for those fields (single record assumed)
+            string valueLine = reader.ReadLine();
+
+            if (headerLine == null || valueLine == null)
             {
-                Console.Error.WriteLine("CSV file is empty.");
+                Console.Error.WriteLine("CSV must contain at least two rows (header + data).");
                 return;
             }
 
-            // Split header into column names
-            string[] headers = SplitCsvLine(headerLine);
+            string[] headers = headerLine.Split(',');
+            string[] values  = valueLine.Split(',');
 
-            // Read each data line and map column name -> value
-            string line;
-            while ((line = reader.ReadLine()) != null)
+            int count = Math.Min(headers.Length, values.Length);
+            for (int i = 0; i < count; i++)
             {
-                string[] values = SplitCsvLine(line);
-                var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-                for (int i = 0; i < headers.Length && i < values.Length; i++)
-                {
-                    dict[headers[i]] = values[i];
-                }
-                records.Add(dict);
+                string key   = headers[i].Trim();
+                string value = values[i].Trim();
+                if (!string.IsNullOrEmpty(key))
+                    fieldValues[key] = value;
             }
         }
 
-        if (records.Count == 0)
+        // -------------------------------------------------
+        // Load PDF, populate form fields, and save result
+        // -------------------------------------------------
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            Console.Error.WriteLine("CSV contains no data rows.");
-            return;
-        }
+            Form pdfForm = pdfDoc.Form;
 
-        // For this example we populate the PDF with the first record only.
-        var firstRecord = records[0];
-
-        // Load PDF template and fill form fields
-        using (Document pdfDoc = new Document(pdfPath))
-        {
-            // Ensure the document contains a form
-            if (pdfDoc.Form == null || pdfDoc.Form.Count == 0)
+            foreach (var kvp in fieldValues)
             {
-                Console.Error.WriteLine("PDF does not contain any form fields.");
-                return;
-            }
-
-            // Iterate over each field in the PDF form (use Form.Fields collection)
-            foreach (Field field in pdfDoc.Form.Fields)
-            {
-                // Prefer FullName, fall back to Name if FullName is null/empty
-                string fieldName = !string.IsNullOrEmpty(field.FullName) ? field.FullName : field.Name;
-
-                if (string.IsNullOrEmpty(fieldName))
-                    continue; // skip unnamed fields
-
-                // If CSV provides a value for this field, set it
-                if (firstRecord.TryGetValue(fieldName, out string value))
+                // Retrieve the form field by name; returns null if not present
+                Field field = pdfForm[kvp.Key] as Field;
+                if (field != null)
                 {
-                    // All form field types expose the Value property (object).
-                    field.Value = value;
+                    // The Field class (Aspose.Pdf.Forms) exposes the Value property
+                    field.Value = kvp.Value;
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: PDF does not contain field '{kvp.Key}'.");
                 }
             }
 
-            // Save the populated PDF
+            // Save the modified PDF
             pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF populated and saved to '{outputPdf}'.");
-    }
-
-    // Simple CSV line splitter handling commas and quoted values
-    static string[] SplitCsvLine(string line)
-    {
-        var values = new List<string>();
-        bool inQuotes = false;
-        StringBuilder current = new StringBuilder();
-
-        foreach (char c in line)
-        {
-            if (c == '"')
-            {
-                inQuotes = !inQuotes;
-                continue;
-            }
-
-            if (c == ',' && !inQuotes)
-            {
-                values.Add(current.ToString());
-                current.Clear();
-            }
-            else
-            {
-                current.Append(c);
-            }
-        }
-
-        values.Add(current.ToString());
-        return values.ToArray();
+        Console.WriteLine($"PDF successfully saved to '{outputPdf}'.");
     }
 }

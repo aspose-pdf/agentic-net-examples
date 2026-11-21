@@ -1,110 +1,111 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.Json;
-using System.Collections.Generic;
 
 class Program
 {
     static void Main()
     {
-        const string jsonPath = "formdata.json";
-        const string csvPath = "formdata.csv";
+        const string jsonPath = "formData.json";   // input JSON file containing extracted form data
+        const string csvPath  = "formData.csv";    // output CSV file
 
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            Console.Error.WriteLine($"Input file not found: {jsonPath}");
             return;
         }
 
-        // Read the entire JSON file
+        // Read the entire JSON content
         string jsonContent;
-        using (StreamReader reader = new StreamReader(jsonPath))
+        using (StreamReader reader = new StreamReader(jsonPath, Encoding.UTF8))
         {
             jsonContent = reader.ReadToEnd();
         }
 
-        // Deserialize JSON into a list of dictionaries (field name -> value)
-        List<Dictionary<string, JsonElement>> records;
+        // Parse JSON as an array of objects
+        JsonDocument doc;
         try
         {
-            records = JsonSerializer.Deserialize<List<Dictionary<string, JsonElement>>>(jsonContent);
+            doc = JsonDocument.Parse(jsonContent);
         }
         catch (JsonException ex)
         {
-            Console.Error.WriteLine($"Failed to parse JSON: {ex.Message}");
+            Console.Error.WriteLine($"Invalid JSON format: {ex.Message}");
             return;
         }
 
-        if (records == null || records.Count == 0)
+        if (doc.RootElement.ValueKind != JsonValueKind.Array)
         {
-            Console.WriteLine("No data to convert.");
+            Console.Error.WriteLine("Expected JSON array at the root.");
             return;
         }
 
-        // Use the keys from the first record as CSV headers
-        var headers = new List<string>(records[0].Keys);
+        // Collect rows as dictionaries (field name -> value)
+        var rows = new List<Dictionary<string, string>>();
+        var headerSet = new SortedSet<string>(); // to keep column order consistent
 
-        // Write CSV file
-        using (StreamWriter writer = new StreamWriter(csvPath, false, Encoding.UTF8))
+        foreach (JsonElement element in doc.RootElement.EnumerateArray())
         {
-            // Header line
-            writer.WriteLine(string.Join(",", EscapeCsvValues(headers)));
+            if (element.ValueKind != JsonValueKind.Object)
+                continue; // skip non‑object entries
 
-            // Data rows
-            foreach (var record in records)
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (JsonProperty prop in element.EnumerateObject())
             {
-                var row = new List<string>();
-                foreach (var header in headers)
+                string value = prop.Value.ValueKind switch
                 {
-                    if (record.TryGetValue(header, out JsonElement value))
-                        row.Add(ConvertJsonElementToString(value));
-                    else
-                        row.Add(string.Empty);
+                    JsonValueKind.String  => prop.Value.GetString(),
+                    JsonValueKind.Number  => prop.Value.GetRawText(),
+                    JsonValueKind.True    => "true",
+                    JsonValueKind.False   => "false",
+                    JsonValueKind.Null    => string.Empty,
+                    _                      => prop.Value.GetRawText()
+                };
+                dict[prop.Name] = value ?? string.Empty;
+                headerSet.Add(prop.Name);
+            }
+            rows.Add(dict);
+        }
+
+        // Write CSV
+        using (StreamWriter writer = new StreamWriter(csvPath, false, new UTF8Encoding(true)))
+        {
+            // Write header line
+            var header = new List<string>(headerSet);
+            writer.WriteLine(string.Join(",", EscapeCsvFields(header)));
+
+            // Write each row
+            foreach (var row in rows)
+            {
+                var fields = new List<string>();
+                foreach (string col in header)
+                {
+                    row.TryGetValue(col, out string val);
+                    fields.Add(val ?? string.Empty);
                 }
-                writer.WriteLine(string.Join(",", EscapeCsvValues(row)));
+                writer.WriteLine(string.Join(",", EscapeCsvFields(fields)));
             }
         }
 
-        Console.WriteLine($"CSV file created at: {csvPath}");
+        Console.WriteLine($"Conversion completed. CSV saved to '{csvPath}'.");
     }
 
-    // Convert a JsonElement to a plain string suitable for CSV
-    private static string ConvertJsonElementToString(JsonElement element)
+    // Escape fields that contain commas, quotes or line breaks according to CSV rules
+    private static IEnumerable<string> EscapeCsvFields(IEnumerable<string> fields)
     {
-        return element.ValueKind switch
+        foreach (var field in fields)
         {
-            JsonValueKind.String => element.GetString(),
-            JsonValueKind.Number => element.GetRawText(),
-            JsonValueKind.True => "true",
-            JsonValueKind.False => "false",
-            JsonValueKind.Null => string.Empty,
-            JsonValueKind.Object => element.GetRawText(),
-            JsonValueKind.Array => element.GetRawText(),
-            _ => element.GetRawText()
-        };
-    }
-
-    // Escape CSV values that contain commas, quotes, or newlines
-    private static IEnumerable<string> EscapeCsvValues(IEnumerable<string> values)
-    {
-        foreach (var v in values)
-        {
-            if (v == null)
+            if (field.Contains(',') || field.Contains('\"') || field.Contains('\n') || field.Contains('\r'))
             {
-                yield return string.Empty;
-                continue;
-            }
-
-            bool mustQuote = v.Contains(',') || v.Contains('\"') || v.Contains('\n') || v.Contains('\r');
-            if (mustQuote)
-            {
-                string escaped = v.Replace("\"", "\"\"");
-                yield return $"\"{escaped}\"";
+                // Double up any existing quotes and wrap the field in quotes
+                string escaped = $"\"{field.Replace("\"", "\"\"")}\"";
+                yield return escaped;
             }
             else
             {
-                yield return v;
+                yield return field;
             }
         }
     }

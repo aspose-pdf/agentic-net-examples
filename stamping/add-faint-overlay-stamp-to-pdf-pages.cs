@@ -1,51 +1,47 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations; // not needed for ImageStamp but kept for completeness
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string stampPath  = "overlay.png"; // image to use as stamp
-        const string outputPath = "stamped_output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "output_faint_overlay.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        if (!File.Exists(stampPath))
+        if (!File.Exists(stampImg))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampPath}");
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
         // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        using (Document pdfDocument = new Document(inputPdf))
         {
-            // Create the stamp once; it will be reused for each page
-            ImageStamp stamp = new ImageStamp(stampPath)
+            // Create an ImageStamp with the desired opacity (0.4 = 40% opaque, 60% transparent)
+            ImageStamp stamp = new ImageStamp(stampImg)
             {
-                // Set opacity to 0.4 for a faint overlay
-                Opacity = 0.4,
-                // Optional: position the stamp (here centered on the page)
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center
+                Opacity = 0.4,          // Set faint overlay opacity
+                Background = false      // Draw on top of page content
             };
 
-            // Apply the stamp to every page in the document
-            foreach (Page page in doc.Pages)
+            // Apply the stamp to each page individually
+            foreach (Page page in pdfDocument.Pages)
             {
                 page.AddStamp(stamp);
             }
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            pdfDocument.Save(outputPdf);
         }
 
-        Console.WriteLine($"Stamped PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Faint overlay applied and saved to '{outputPdf}'.");
     }
 }

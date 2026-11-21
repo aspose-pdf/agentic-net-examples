@@ -1,19 +1,18 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Facades;
 using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "product.pdf";          // source PDF
-        const string outputPdfPath = "product_verified.pdf"; // stamped PDF
-        const string qrImagePath = "qr_code.png";          // QR code image file
-        const string verificationText = "Verify product authenticity at https://example.com/verify";
+        const string inputPdfPath   = "product.pdf";
+        const string outputPdfPath  = "product_verified.pdf";
+        const string qrImagePath    = "qr_code.png";
+        const string verificationText = "Verify product authenticity";
 
-        // Ensure required files exist
         if (!File.Exists(inputPdfPath))
         {
             Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
@@ -21,53 +20,65 @@ class Program
         }
         if (!File.Exists(qrImagePath))
         {
-            Console.Error.WriteLine($"QR image not found: {qrImagePath}");
+            Console.Error.WriteLine($"QR code image not found: {qrImagePath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPdfPath);
-
-        // ---------- Create QR code image stamp ----------
-        ImageStamp qrStamp = new ImageStamp(qrImagePath)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Position the QR code at the bottom‑right corner of the page
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment   = VerticalAlignment.Bottom,
-            // Optional margins from the page edges
-            XIndent = 20, // points from the right edge
-            YIndent = 20, // points from the bottom edge
-            // Scale the image to a reasonable size (e.g., 100x100 points)
-            Width  = 100,
-            Height = 100,
-            // Ensure the image is placed above existing content
-            Background = false
-        };
+            // Create an ImageStamp for the QR code
+            ImageStamp qrStamp = new ImageStamp(qrImagePath)
+            {
+                // Position the QR code at the bottom‑right corner of the first page
+                // (coordinates are in points; 0,0 is lower‑left)
+                // Adjust as needed for your layout
+                BottomMargin = 20,
+                RightMargin  = 20,
+                // Set the stamp size (optional)
+                Width  = 100,
+                Height = 100,
+                // Ensure the stamp is placed on top of existing content
+                Background = false
+            };
 
-        // ---------- Create descriptive text stamp ----------
-        TextStamp textStamp = new TextStamp(verificationText)
-        {
-            // Position the text just above the QR code
-            HorizontalAlignment = HorizontalAlignment.Right,
-            VerticalAlignment   = VerticalAlignment.Bottom,
-            XIndent = 20,
-            YIndent = 130, // QR height (100) + some padding
-            Background = false
-        };
-        // Configure font and appearance
-        textStamp.TextState.Font = FontRepository.FindFont("Arial");
-        textStamp.TextState.FontSize = 12;
-        textStamp.TextState.ForegroundColor = Color.DarkBlue;
+            // Create a TextStamp for the descriptive text
+            TextStamp textStamp = new TextStamp(verificationText)
+            {
+                // Position the text just above the QR code
+                BottomMargin = qrStamp.BottomMargin + qrStamp.Height + 10,
+                RightMargin  = qrStamp.RightMargin,
+                // Set the text appearance
+                // TextState is read‑only; modify its properties instead of assigning a new instance
+                // Use fully qualified type names to avoid ambiguity
+                // Font size, color, and other properties can be customized here
+                // Example: 24‑point bold font, dark gray color
+                // Note: Font must be available; using built‑in Helvetica
+                // The Font property expects a Font object from Aspose.Pdf.Text
+                // The Color property expects Aspose.Pdf.Color
+                // No System.Drawing usage
+                // Set alignment if needed (centered, left, etc.)
+                // Here we keep default left alignment
+                // The stamp will be rendered on the page content
+                // (Background = false means it appears over the page)
+                Background = false
+            };
+            // Modify the existing TextState object
+            textStamp.TextState.FontSize = 24;
+            textStamp.TextState.Font = FontRepository.FindFont("Helvetica");
+            textStamp.TextState.FontStyle = FontStyles.Bold;
+            textStamp.TextState.ForegroundColor = Aspose.Pdf.Color.DarkGray;
 
-        // Add the stamps to every page
-        foreach (Page page in pdfDocument.Pages)
-        {
-            page.AddStamp(qrStamp);
-            page.AddStamp(textStamp);
+            // Apply both stamps to the first page
+            // PageCollection does not have AddStamp; stamps are added per Page
+            Page firstPage = pdfDoc.Pages[1];
+            firstPage.AddStamp(qrStamp);
+            firstPage.AddStamp(textStamp);
+
+            // Save the modified PDF
+            pdfDoc.Save(outputPdfPath);
         }
 
-        // Save the stamped PDF
-        pdfDocument.Save(outputPdfPath);
         Console.WriteLine($"Stamped PDF saved to '{outputPdfPath}'.");
     }
 }

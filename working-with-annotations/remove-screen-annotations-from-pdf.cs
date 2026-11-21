@@ -1,6 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,7 +8,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,40 +17,33 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Aspose.Pdf uses 1‑based page indexing
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Iterate pages (1‑based indexing)
-                for (int i = 1; i <= doc.Pages.Count; i++)
+                Page page = doc.Pages[i];
+
+                // Gather all ScreenAnnotation objects on the page
+                List<ScreenAnnotation> toRemove = new List<ScreenAnnotation>();
+                foreach (Annotation annot in page.Annotations)
                 {
-                    Page page = doc.Pages[i];
-                    var toRemove = new List<Annotation>();
-
-                    // Collect all ScreenAnnotation instances on the page
-                    foreach (Annotation ann in page.Annotations)
-                    {
-                        if (ann is ScreenAnnotation)
-                            toRemove.Add(ann);
-                    }
-
-                    // Remove the collected annotations
-                    foreach (Annotation ann in toRemove)
-                    {
-                        page.Annotations.Delete(ann);
-                    }
+                    if (annot is ScreenAnnotation screenAnnot)
+                        toRemove.Add(screenAnnot);
                 }
 
-                // Save the cleaned PDF
-                doc.Save(outputPath);
+                // Remove the collected ScreenAnnotations
+                foreach (ScreenAnnotation screenAnnot in toRemove)
+                {
+                    page.Annotations.Delete(screenAnnot);
+                }
             }
 
-            Console.WriteLine($"All ScreenAnnotation objects removed. Saved to '{outputPath}'.");
+            // Save the modified PDF
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Screen annotations removed. Saved to '{outputPath}'.");
     }
 }

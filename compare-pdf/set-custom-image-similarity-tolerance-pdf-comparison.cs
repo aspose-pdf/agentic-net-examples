@@ -7,32 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath1 = "original.pdf";
-        const string pdfPath2 = "scanned.pdf";
-        const string outputPath = "comparison_result.pdf";
+        const string pdfAPath = "scanned_a.pdf";
+        const string pdfBPath = "scanned_b.pdf";
+        const string diffOutputPath = "comparison_result.pdf";
 
         // Verify input files exist
-        if (!File.Exists(pdfPath1) || !File.Exists(pdfPath2))
+        if (!File.Exists(pdfAPath))
         {
-            Console.Error.WriteLine("One or both input PDF files were not found.");
+            Console.Error.WriteLine($"File not found: {pdfAPath}");
+            return;
+        }
+        if (!File.Exists(pdfBPath))
+        {
+            Console.Error.WriteLine($"File not found: {pdfBPath}");
             return;
         }
 
-        // Load the PDF documents
-        Document doc1 = new Document(pdfPath1);
-        Document doc2 = new Document(pdfPath2);
+        // Load the PDFs
+        Document docA = new Document(pdfAPath);
+        Document docB = new Document(pdfBPath);
 
-        // Configure graphical comparer with a custom image similarity tolerance.
-        // Threshold is expressed as a percentage of allowed difference.
-        // For 85% similarity required, allow 15% difference.
-        GraphicalPdfComparer comparer = new GraphicalPdfComparer
+        // Configure graphical comparison with a custom image similarity tolerance.
+        // Threshold is expressed as a percentage of allowed visual difference.
+        // For example, a threshold of 15 means up to 15% difference is tolerated (≈85% similarity).
+        var graphicalComparer = new GraphicalPdfComparer
         {
             Threshold = 15.0 // tolerance in percent
         };
 
-        // Perform visual side‑by‑side comparison and save the result PDF.
-        comparer.CompareDocumentsToPdf(doc1, doc2, outputPath);
+        // Perform the comparison and generate a diff PDF
+        graphicalComparer.CompareDocumentsToPdf(docA, docB, diffOutputPath);
 
-        Console.WriteLine($"Comparison completed. Result saved to '{outputPath}'.");
+        Console.WriteLine($"Comparison completed. Result saved to '{diffOutputPath}'.");
     }
 }

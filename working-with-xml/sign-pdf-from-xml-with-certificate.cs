@@ -7,12 +7,14 @@ class Program
 {
     static void Main()
     {
+        // Paths for input XML, intermediate PDF, signed PDF and certificate
         const string xmlPath = "input.xml";
-        const string pdfPath = "output.pdf";
+        const string pdfPath = "intermediate.pdf";
         const string signedPdfPath = "signed_output.pdf";
         const string certPath = "certificate.pfx";
-        const string certPassword = "certPass";
+        const string certPassword = "certPassword";
 
+        // Validate required files
         if (!File.Exists(xmlPath))
         {
             Console.Error.WriteLine($"XML file not found: {xmlPath}");
@@ -24,34 +26,40 @@ class Program
             return;
         }
 
-        // Convert XML to PDF
-        using (Document doc = new Document(xmlPath, new XmlLoadOptions()))
+        // Convert XML to PDF using XmlLoadOptions
+        var xmlLoadOptions = new XmlLoadOptions();
+        using (var pdfDoc = new Document(xmlPath, xmlLoadOptions))
         {
-            doc.Save(pdfPath);
+            pdfDoc.Save(pdfPath);
         }
 
         // Load the generated PDF for signing
-        using (Document signedDoc = new Document(pdfPath))
+        var doc = new Document(pdfPath);
+
+        // Define the signature rectangle (left, bottom, right, top) in points
+        var rect = new Rectangle(100, 100, 300, 160);
+
+        // Create a signature field on the first page
+        var signatureField = new SignatureField(doc.Pages[1], rect)
         {
-            // Define the rectangle where the visible signature will appear (lower‑left X, lower‑left Y, upper‑right X, upper‑right Y)
-            var signatureRect = new Aspose.Pdf.Rectangle(100, 100, 300, 200);
+            PartialName = "Signature1"
+        };
+        // Add the field to the document's form collection (position 1 = first field)
+        doc.Form.Add(signatureField, 1);
 
-            // Create a signature field on the first page (page index 1)
-            var signatureField = new SignatureField(signedDoc, signatureRect)
-            {
-                Name = "Signature1"
-            };
-            signedDoc.Form.Add(signatureField);
+        // Prepare the PKCS7 signature object
+        var pkcs7 = new PKCS7(certPath, certPassword)
+        {
+            Reason = "Document signed for authenticity",
+            Location = "Location",
+            ContactInfo = "contact@example.com"
+        };
 
-            // Load the PKCS#7 certificate
-            var pkcs7 = new PKCS7(certPath, certPassword);
+        // Sign the field – this writes the digital signature into the PDF
+        signatureField.Sign(pkcs7);
 
-            // Apply the digital signature
-            signatureField.Sign(pkcs7);
-
-            // Save the signed PDF
-            signedDoc.Save(signedPdfPath);
-        }
+        // Save the signed PDF
+        doc.Save(signedPdfPath);
 
         Console.WriteLine($"Signed PDF saved to '{signedPdfPath}'.");
     }

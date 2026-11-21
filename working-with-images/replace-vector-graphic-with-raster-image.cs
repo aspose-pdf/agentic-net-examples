@@ -1,77 +1,82 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Operators;
+using Aspose.Pdf.Drawing; // ImageStamp lives here
 
-class Program
+class ReplaceVectorWithRaster
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputPdfPath = "output.pdf";
-        const string rasterImgPath = "image.png";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string rasterImg = "raster.jpg"; // raster image to insert
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf) || !File.Exists(rasterImg))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(rasterImgPath))
-        {
-            Console.Error.WriteLine($"Raster image not found: {rasterImgPath}");
+            Console.Error.WriteLine("Input PDF or raster image not found.");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        try
         {
-            // Aspose.Pdf uses 1‑based page indexing
-            Page page = doc.Pages[1];
-
-            // Locate the first vector graphic (Path) on the page
-            Operator vectorOperator = null;
-            foreach (var element in page.Contents)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
             {
-                if (element is Aspose.Pdf.Drawing.Path)
+                // Assume the vector graphic is on the first page (pages are 1‑based)
+                Page page = doc.Pages[1];
+
+                // ------------------------------------------------------------
+                // 1. Locate and remove the vector graphic operators.
+                //    Here we remove the first XObject‑painting operator (Do).
+                // ------------------------------------------------------------
+                OperatorCollection ops = page.Contents;
+                // Iterate backwards because Delete uses a 1‑based index
+                for (int i = ops.Count; i >= 1; i--)
                 {
-                    vectorOperator = element;
-                    break;
+                    if (ops[i] is Do)
+                    {
+                        ops.Delete(i);
+                        // Stop after removing the first matching operator.
+                        break;
+                    }
                 }
+
+                // ------------------------------------------------------------
+                // 2. Insert the raster image at the same location.
+                //    Replace the rectangle with the actual coordinates of the
+                //    removed vector graphic if they are known.
+                // ------------------------------------------------------------
+                // Example rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
+                Aspose.Pdf.Rectangle imgRect = new Aspose.Pdf.Rectangle(100, 500, 300, 700);
+                double width = imgRect.URX - imgRect.LLX;
+                double height = imgRect.URY - imgRect.LLY;
+
+                ImageStamp imgStamp = new ImageStamp(rasterImg)
+                {
+                    Background = false,          // draw over existing content
+                    Width = width,
+                    Height = height,
+                    XIndent = imgRect.LLX,       // horizontal offset from the left edge
+                    YIndent = imgRect.LLY        // vertical offset from the bottom edge
+                };
+
+                // Add the stamp to the page. This inserts the raster image into
+                // the page content stream while preserving all other content.
+                page.AddStamp(imgStamp);
+
+                // ------------------------------------------------------------
+                // 3. Save the modified PDF.
+                // ------------------------------------------------------------
+                doc.Save(outputPdf);
             }
 
-            if (vectorOperator == null)
-            {
-                Console.WriteLine("No vector graphic (Path) found on page 1.");
-                doc.Save(outputPdfPath);
-                return;
-            }
-
-            // Approximate the bounds of the vector graphic.
-            // In a real scenario you would compute the exact bounds from the path data.
-            // Here we use a placeholder rectangle (0,0,200,200).
-            Aspose.Pdf.Rectangle bounds = new Aspose.Pdf.Rectangle(0, 0, 200, 200);
-
-            // Remove the vector graphic from the page contents
-            page.Contents.Remove(vectorOperator);
-
-            // Create an ImageStamp (raster image) and position it to match the original bounds
-            ImageStamp imgStamp = new ImageStamp(rasterImgPath)
-            {
-                Width = bounds.URX - bounds.LLX,
-                Height = bounds.URY - bounds.LLY,
-                XIndent = bounds.LLX,
-                YIndent = bounds.LLY,
-                // Ensure the stamp does not add a background rectangle
-                Background = false
-            };
-
-            // Add the stamp to the page
-            page.AddStamp(imgStamp);
-
-            // Save the modified PDF
-            doc.Save(outputPdfPath);
+            Console.WriteLine($"Vector graphic replaced with raster image. Saved to '{outputPdf}'.");
         }
-
-        Console.WriteLine($"Raster image replaced vector graphic and saved to '{outputPdfPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

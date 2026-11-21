@@ -6,25 +6,29 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf"; // file where updated metadata will be saved
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Verify the source PDF exists
+        // Verify source file exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load PDF metadata without loading the full document
-        PdfFileInfo pdfInfo = new PdfFileInfo(inputPath);
+        // Copy original PDF so we can modify the copy
+        File.Copy(inputPath, outputPath, true);
 
-        // Assign a custom Creator value
-        pdfInfo.Creator = "My Custom Creator";
+        // PdfFileInfo implements IDisposable – wrap in using for deterministic cleanup
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(outputPath))
+        {
+            // Assign a custom Creator value
+            pdfInfo.Creator = "My Custom Creator";
 
-        // Persist the updated metadata back to a PDF file (outputPath is required)
-        pdfInfo.SaveNewInfo(outputPath);
+            // Persist the updated metadata back to the file – SaveNewInfo requires the output file path
+            pdfInfo.SaveNewInfo(outputPath);
+        }
 
-        Console.WriteLine("Creator value has been updated successfully.");
+        Console.WriteLine($"Custom Creator set and saved to '{outputPath}'.");
     }
 }

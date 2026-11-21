@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException when using dynamic
+using Microsoft.CSharp.RuntimeBinder; // for RuntimeBinderException
 
 class Program
 {
@@ -13,56 +13,47 @@ class Program
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document.
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Load the PDF document
-            Document pdfDocument = new Document(inputPdfPath);
+            string pageLayout = "NotSupported";
+            string zoom = "NotSupported";
 
-            // Use dynamic access to guard against older Aspose.Pdf versions that lack ViewerPreferences
-            string pageLayoutStr = "Unknown";
-            int zoom = 0;
-
+            // ViewerPreferences property exists only in newer Aspose.Pdf versions.
+            // Use dynamic access to avoid compile‑time errors on older versions.
             try
             {
-                dynamic docDyn = pdfDocument;
-                var prefs = docDyn.ViewerPreferences; // May throw RuntimeBinderException on older versions
-                // PageLayout is an enum; convert to string safely
-                pageLayoutStr = prefs.PageLayout != null ? prefs.PageLayout.ToString() : "Unknown";
-                // Zoom is typically an int (percentage). Cast to int safely.
-                zoom = prefs.Zoom != null ? (int)prefs.Zoom : 0;
+                dynamic dynDoc = doc; // bypass compile‑time member check
+                var prefs = dynDoc.ViewerPreferences; // may throw RuntimeBinderException
+
+                // Access the properties safely – they are also dynamic.
+                pageLayout = prefs.PageLayout?.ToString() ?? "Undefined";
+                zoom = prefs.Zoom?.ToString() ?? "Undefined";
             }
             catch (RuntimeBinderException)
             {
-                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Using default values.");
+                Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version. Using default placeholders.");
             }
             catch (Exception ex)
             {
-                // Any other unexpected error while reading preferences
-                Console.WriteLine($"Unexpected error while accessing ViewerPreferences: {ex.Message}");
+                // Any other unexpected error while reading preferences.
+                Console.WriteLine($"Error retrieving viewer preferences: {ex.Message}");
             }
 
-            // Prepare a simple configuration object
             var config = new
             {
-                PageLayout = pageLayoutStr,
+                PageLayout = pageLayout,
                 Zoom = zoom
             };
 
-            // Serialize to indented JSON
-            string json = JsonSerializer.Serialize(config, new JsonSerializerOptions { WriteIndented = true });
-
-            // Write JSON to file
+            var jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(config, jsonOptions);
             File.WriteAllText(outputJsonPath, json);
-
             Console.WriteLine($"Viewer preferences saved to '{outputJsonPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

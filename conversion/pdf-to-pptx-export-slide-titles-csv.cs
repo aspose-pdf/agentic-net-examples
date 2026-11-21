@@ -1,14 +1,13 @@
 using System;
 using System.IO;
-using System.Text;
-using System.IO.Compression;
-using System.Xml.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Text;
 
 class PdfToPptxAndExtractTitles
 {
     static void Main()
     {
+        // Input PDF, intermediate PPTX, and output CSV paths
         const string pdfPath = "input.pdf";
         const string pptxPath = "output.pptx";
         const string csvPath = "slide_titles.csv";
@@ -19,54 +18,48 @@ class PdfToPptxAndExtractTitles
             return;
         }
 
-        // Convert PDF to PPTX using Aspose.Pdf core API
+        // ---------- Convert PDF to PPTX ----------
         using (Document pdfDoc = new Document(pdfPath))
         {
+            // Save directly to PPTX format – no separate SaveOptions class is required
             pdfDoc.Save(pptxPath, SaveFormat.Pptx);
         }
 
-        // Extract slide titles from the generated PPTX without using Aspose.Slides
-        using (var csvWriter = new StreamWriter(csvPath, false, Encoding.UTF8))
+        // ---------- Extract slide titles from the original PDF (as a proxy for PPTX slide titles) ----------
+        using (Document pdfDoc = new Document(pdfPath))
+        using (StreamWriter csvWriter = new StreamWriter(csvPath, false))
         {
-            csvWriter.WriteLine("SlideNumber,Title"); // CSV header
+            // Write CSV header
+            csvWriter.WriteLine("SlideNumber,Title");
 
-            using (var archive = ZipFile.OpenRead(pptxPath))
+            int slideNumber = 1;
+            foreach (Page page in pdfDoc.Pages)
             {
-                // PPTX stores slides as ppt/slides/slide1.xml, slide2.xml, ...
-                var slideEntries = archive.Entries;
-                int slideIndex = 0;
-                foreach (var entry in slideEntries)
+                // Extract all text from the page
+                TextAbsorber absorber = new TextAbsorber();
+                page.Accept(absorber);
+                string pageText = absorber.Text ?? string.Empty;
+
+                // Assume the first non‑empty line is the slide title
+                string title = string.Empty;
+                using (StringReader sr = new StringReader(pageText))
                 {
-                    if (!entry.FullName.StartsWith("ppt/slides/slide", StringComparison.OrdinalIgnoreCase) ||
-                        !entry.FullName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
-                        continue;
-
-                    slideIndex++;
-                    string titleText = string.Empty;
-
-                    using (var stream = entry.Open())
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
                     {
-                        XDocument slideDoc = XDocument.Load(stream);
-                        XNamespace p = "http://schemas.openxmlformats.org/presentationml/2006/main";
-                        XNamespace a = "http://schemas.openxmlformats.org/drawingml/2006/main";
-
-                        // Find shape (<p:sp>) that contains a placeholder (<p:ph>) with type="title"
-                        var titleShape = slideDoc.Root
-                            .Descendants(p + "sp")
-                            .FirstOrDefault(sp => sp.Element(p + "ph")?.Attribute("type")?.Value == "title");
-
-                        if (titleShape != null)
+                        line = line.Trim();
+                        if (!string.IsNullOrEmpty(line))
                         {
-                            // Extract all text (<a:t>) inside the shape
-                            var textRuns = titleShape.Descendants(a + "t");
-                            titleText = string.Join(" ", textRuns.Select(tr => tr.Value));
+                            title = line;
+                            break;
                         }
                     }
-
-                    // Escape double quotes for CSV compliance
-                    titleText = titleText.Replace("\"", "\"\"");
-                    csvWriter.WriteLine($"{slideIndex},\"{titleText}\"");
                 }
+
+                // Escape double quotes in title for CSV compliance
+                string escapedTitle = title.Replace("\"", "\"\"");
+                csvWriter.WriteLine($"{slideNumber},\"{escapedTitle}\"");
+                slideNumber++;
             }
         }
 

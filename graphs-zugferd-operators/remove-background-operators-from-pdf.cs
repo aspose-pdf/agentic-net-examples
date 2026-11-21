@@ -1,14 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Operators; // contains operator classes like Do
+using Aspose.Pdf.Operators;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "cleaned.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,31 +16,35 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal (rule: document-disposal-with-using)
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Iterate pages using 1‑based indexing (rule: page-indexing-one-based)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
-            {
-                Page page = doc.Pages[pageNum];
-                // OperatorCollection is also 1‑based (rule: operator-collection-1based)
-                var ops = page.Contents;
+            // Load the PDF using the core Document API
+            Document doc = new Document(inputPath);
 
-                // Delete unwanted operators (e.g., Do – XObject painting) while iterating backwards
-                // (rule: delete-operators-iterate-backwards)
+            // Iterate through each page and delete unwanted operators from the content stream.
+            // "Do" – external XObject drawing operator
+            // "BI" – inline image operator
+            foreach (Page page in doc.Pages)
+            {
+                OperatorCollection ops = page.Contents;
+                // OperatorCollection is 1‑based; iterate backwards when removing items.
                 for (int i = ops.Count; i >= 1; i--)
                 {
-                    if (ops[i] is Do) // correct class name, not DoOperator
+                    var op = ops[i];
+                    if (op is Do || op is BI)
                     {
-                        ops.Delete(i); // use Delete, not RemoveAt
+                        ops.Delete(i); // Remove the operator at the current 1‑based index.
                     }
                 }
             }
 
-            // Save the modified PDF (no special SaveOptions needed)
+            // Save the cleaned PDF.
             doc.Save(outputPath);
+            Console.WriteLine($"Background operators removed. Saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"Background graphics removed. Saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

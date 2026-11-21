@@ -2,29 +2,14 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
-using Aspose.Pdf.Facades;
-
-// Minimal stub for the missing Aspose.Pdf.Facades.Xfdf2Pdf class.
-// This allows the sample to compile without requiring the full Aspose.Pdf library.
-namespace Aspose.Pdf.Facades
-{
-    /// <summary>
-    /// Stub implementation of the Xfdf2Pdf class used only to satisfy compilation.
-    /// The real class provides functionality to convert XFDF to PDF, but for the
-    /// purpose of this example we only need an instantiable type.
-    /// </summary>
-    public class Xfdf2Pdf
-    {
-        // Add members if needed for future extensions.
-    }
-}
+using Aspose.Pdf.Facades; // required by task
 
 class Program
 {
     static void Main()
     {
-        const string xfdfPath   = "input.xfdf";
-        const string schemaPath = "xfdf.xsd";
+        const string xfdfPath   = "exported.xfdf";   // path to the XFDF file to validate
+        const string schemaPath = "xfdf.xsd";        // path to the XFDF schema file
 
         if (!File.Exists(xfdfPath))
         {
@@ -34,39 +19,52 @@ class Program
 
         if (!File.Exists(schemaPath))
         {
-            Console.Error.WriteLine($"Schema file not found: {schemaPath}");
+            Console.Error.WriteLine($"XFDF schema file not found: {schemaPath}");
             return;
         }
 
-        // Instantiate a Facades class to satisfy the requirement of using Aspose.Pdf.Facades
-        Xfdf2Pdf xfdfConverter = new Xfdf2Pdf();
+        // Prepare XML schema set
+        XmlSchemaSet schemas = new XmlSchemaSet();
+        schemas.Add(null, schemaPath); // namespace is empty for XFDF
 
-        // Configure XML schema validation settings
-        XmlReaderSettings settings = new XmlReaderSettings();
-        settings.Schemas.Add(null, schemaPath);
-        settings.ValidationType = ValidationType.Schema;
-        settings.ValidationEventHandler += (sender, e) =>
+        // Configure validation settings
+        XmlReaderSettings settings = new XmlReaderSettings
         {
-            Console.Error.WriteLine($"Validation {e.Severity}: {e.Message}");
+            ValidationType = ValidationType.Schema,
+            Schemas = schemas,
+            ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints |
+                              XmlSchemaValidationFlags.ReportValidationWarnings
         };
 
-        try
+        // Capture validation errors
+        bool hasErrors = false;
+        settings.ValidationEventHandler += (sender, args) =>
         {
-            // Load the XFDF file with validation enabled
-            using (XmlReader reader = XmlReader.Create(xfdfPath, settings))
-            {
-                while (reader.Read()) { } // Triggers validation while reading
-            }
+            hasErrors = true;
+            Console.Error.WriteLine($"Validation {args.Severity}: {args.Message}");
+        };
 
-            Console.WriteLine("XFDF validation succeeded.");
-        }
-        catch (XmlException ex)
+        // Load and validate the XFDF file
+        using (XmlReader reader = XmlReader.Create(xfdfPath, settings))
         {
-            Console.Error.WriteLine($"XML parsing error: {ex.Message}");
+            try
+            {
+                while (reader.Read()) { /* reading triggers validation */ }
+            }
+            catch (XmlException ex)
+            {
+                hasErrors = true;
+                Console.Error.WriteLine($"XML parsing error: {ex.Message}");
+            }
         }
-        catch (Exception ex)
+
+        if (!hasErrors)
         {
-            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+            Console.WriteLine("XFDF validation succeeded – no schema errors detected.");
+        }
+        else
+        {
+            Console.WriteLine("XFDF validation failed – see errors above.");
         }
     }
 }

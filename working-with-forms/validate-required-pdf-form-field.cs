@@ -1,45 +1,62 @@
 using System;
 using System.IO;
+using System.Drawing; // needed for System.Drawing.Color
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations; // for Border and BorderStyle
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "validated_form.pdf";
+        const string inputPath = "form.pdf";
+        const string outputPath = "form_validated.pdf";
 
-        // Create a new PDF document and add a page
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            Page page = doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Define the rectangle for the text box field (llx, lly, urx, ury)
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
+        using (Document doc = new Document(inputPath))
+        {
+            // Name of the required field in the PDF form
+            const string fieldName = "Name";
 
-            // Create a required text box field
-            TextBoxField nameField = new TextBoxField(page, fieldRect);
-            nameField.PartialName = "NameField";
-            nameField.Value = "";               // initially empty
-            nameField.Required = true;          // mark as required (PDF flag)
-
-            // Add the field to the document's AcroForm on page 1
-            doc.Form.Add(nameField, 1);
-
-            // Simulate form submission: if the required field is empty, highlight it
-            if (string.IsNullOrWhiteSpace(nameField.Value))
+            // Verify the field exists – use HasField, not Contains
+            if (!doc.Form.HasField(fieldName))
             {
-                // Border requires the parent annotation (the field itself) in the constructor
-                nameField.Border = new Border(nameField);
-                nameField.Border.Width = 2;                     // set border thickness
-                nameField.Color = Aspose.Pdf.Color.Red;        // set border color to red
+                Console.Error.WriteLine($"Form field '{fieldName}' not found.");
+                return;
             }
 
-            // Save the resulting PDF
+            // Cast the field to a TextBoxField (adjust type if different)
+            TextBoxField txtField = doc.Form[fieldName] as TextBoxField;
+            if (txtField == null)
+            {
+                Console.Error.WriteLine($"Field '{fieldName}' is not a TextBoxField.");
+                return;
+            }
+
+            // Determine if the field is empty after submission
+            string value = txtField.Value?.ToString() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                // Required field is empty – display a red border
+                txtField.Characteristics.Border = System.Drawing.Color.Red; // fully qualified to avoid ambiguity
+                txtField.Border = new Border(txtField) { Width = 2, Style = BorderStyle.Solid };
+            }
+            else
+            {
+                // Field has a value – reset to normal appearance
+                txtField.Characteristics.Border = System.Drawing.Color.Black; // fully qualified to avoid ambiguity
+                txtField.Border = new Border(txtField) { Width = 1, Style = BorderStyle.Solid };
+            }
+
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF with validation saved to '{outputPath}'.");
+        Console.WriteLine($"Validated PDF saved to '{outputPath}'.");
     }
 }

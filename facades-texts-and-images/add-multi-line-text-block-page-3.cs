@@ -16,28 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF using the high‑level API (Document)
+        // Load the PDF document using the high‑level Document API
         Document pdf = new Document(inputPath);
 
-        // Multi‑line text (use '\n' for line breaks)
-        string multiLineText = "First line of text\nSecond line of text\nThird line of text";
-
-        // Create a TextFragment and configure its appearance
-        TextFragment fragment = new TextFragment(multiLineText)
+        // Ensure the document has at least three pages
+        if (pdf.Pages.Count < 3)
         {
-            // Position the lower‑left corner of the fragment (left margin = 20 points)
-            Position = new Position(20, 750) // X = 20, Y = 750 points from bottom
-        };
+            Console.Error.WriteLine("The PDF does not contain a third page.");
+            return;
+        }
 
-        // Set font, size, color and custom line spacing (leading)
-        fragment.TextState.Font = FontRepository.FindFont("Arial");
-        fragment.TextState.FontSize = 12;
-        fragment.TextState.ForegroundColor = Color.Black;
-        // Use LineSpacing instead of the non‑existent Leading property
-        fragment.TextState.LineSpacing = 18; // 1.5 × font size (12 pt) = 18 pt
+        // Get page 3 and its size
+        Page page3 = pdf.Pages[3];
+        double pageHeight = page3.PageInfo.Height; // PageInfo.Height returns double
+        // Define the left‑margin X coordinate (0) and a Y coordinate that starts near the top
+        // Position uses the lower‑left corner, so we subtract a small offset from the top.
+        double leftX = 0.0;
+        double topY = pageHeight - 12.0; // 12 points down from the top edge
 
-        // Add the fragment to page 3 (pages are 1‑based)
-        pdf.Pages[3].Paragraphs.Add(fragment);
+        // Multi‑line text (CRLF works for line breaks)
+        string multiLineText = "First line\r\nSecond line\r\nThird line";
+
+        // Create a TextFragment and apply the desired styling via the existing TextState instance
+        TextFragment tf = new TextFragment(multiLineText);
+        tf.Position = new Position(leftX, topY);
+        tf.TextState.Font = FontRepository.FindFont("Arial");
+        tf.TextState.FontSize = 12;
+        tf.TextState.LineSpacing = 5; // custom line spacing in points
+
+        // Add the fragment to page 3
+        page3.Paragraphs.Add(tf);
 
         // Save the modified PDF
         pdf.Save(outputPath);

@@ -11,7 +11,7 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
@@ -19,15 +19,17 @@ class Program
         {
             using (Document doc = new Document(inputPath))
             {
-                // Enable CSS style embedding and keep the original layout when converting to SVG
+                // Convert PDF to SVG while embedding CSS styles via pixel scaling.
+                // The original PDF coordinate system (origin at bottom‑left) is preserved by default.
                 SvgSaveOptions svgOptions = new SvgSaveOptions
                 {
-                    ScaleToPixels = true // preserves the original coordinate system indirectly
+                    ScaleToPixels = true // enables CSS style embedding and keeps layout fidelity
                 };
+
                 doc.Save(outputPath, svgOptions);
             }
 
-            Console.WriteLine($"SVG saved to '{outputPath}' with original coordinate system preserved.");
+            Console.WriteLine($"SVG saved to '{outputPath}'.");
         }
         catch (Exception ex)
         {

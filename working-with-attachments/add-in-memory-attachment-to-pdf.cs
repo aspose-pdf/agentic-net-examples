@@ -6,32 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output_with_attachment.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_attachment.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
 
-        // Prepare attachment data in memory (e.g., a simple text file)
-        byte[] attachmentData = System.Text.Encoding.UTF8.GetBytes("This is the attachment content.");
+        // Sample data for the attachment (could be any binary content)
+        byte[] attachmentData = System.Text.Encoding.UTF8.GetBytes("This is the content of the attachment.");
 
-        // Load the existing PDF document
-        using (Document doc = new Document(inputPath))
+        // Use a MemoryStream so no intermediate file is written to disk
+        using (var attachmentStream = new MemoryStream(attachmentData))
+        using (var doc = new Document(inputPdf))
         {
-            // Create a FileSpecification for the attachment using a MemoryStream
-            var fileSpec = new FileSpecification("sample.txt", "Sample attachment");
-            fileSpec.Contents = new MemoryStream(attachmentData);
+            // Create a FileSpecification; the first argument is the name shown in the PDF
+            var fileSpec = new FileSpecification("example.txt")
+            {
+                // Assign the stream containing the file data
+                Contents = attachmentStream
+            };
 
             // Add the file specification to the EmbeddedFiles collection
             doc.EmbeddedFiles.Add(fileSpec);
 
             // Save the modified PDF
-            doc.Save(outputPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with attachment: {outputPath}");
+        Console.WriteLine($"Attachment added and saved to '{outputPdf}'.");
     }
 }

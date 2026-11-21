@@ -1,89 +1,84 @@
 using System;
 using System.IO;
 using System.Text;
-using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputHtml = "report.html";
+        const string pdfPath = "input.pdf";
+        const string htmlPath = "report.html";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdf))
+        // Facade for extracting resources from a PDF
+        using (PdfExtractor extractor = new PdfExtractor())
         {
-            var htmlBuilder = new StringBuilder();
+            // Load the PDF document
+            extractor.BindPdf(pdfPath);
 
-            // Basic HTML skeleton
+            // NOTE: The ExtractImageMode property does not exist in the current Aspose.Pdf.Facades version.
+            // Image extraction is performed by calling ExtractImage() which extracts all images by default.
+            // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources; // removed for compatibility
+
+            // Extract all images from the document
+            extractor.ExtractImage();
+
+            // Build an HTML report that embeds each image as a base64 data URI
+            StringBuilder htmlBuilder = new StringBuilder();
             htmlBuilder.AppendLine("<!DOCTYPE html>");
-            htmlBuilder.AppendLine("<html><head><meta charset=\"UTF-8\"><title>Extracted Images</title></head><body>");
-            htmlBuilder.AppendLine("<h1>Images extracted from PDF</h1>");
+            htmlBuilder.AppendLine("<html lang=\"en\">");
+            htmlBuilder.AppendLine("<head><meta charset=\"UTF-8\"><title>Image Report</title></head>");
+            htmlBuilder.AppendLine("<body>");
+            htmlBuilder.AppendLine("<h1>Extracted Images</h1>");
 
-            int imageIndex = 0;
-
-            // Aspose.Pdf uses 1‑based page indexing
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            int imageIndex = 1;
+            while (extractor.HasNextImage())
             {
-                Page page = pdfDoc.Pages[pageNum];
-
-                // Iterate over all images on the current page
-                foreach (XImage img in page.Resources.Images)
+                // Use a temporary file because the current Aspose.Pdf API requires a file path
+                string tempFile = Path.GetTempFileName();
+                try
                 {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        // Save the image to a memory stream in its original format
-                        img.Save(ms);
-                        byte[] imageBytes = ms.ToArray();
+                    // Extract the next image to the temporary file as PNG (you can change the format if needed)
+                    extractor.GetNextImage(tempFile, ImageFormat.Png);
 
-                        // Determine MIME type by inspecting the image header
-                        string mime = GetMimeType(imageBytes);
+                    // Read the image bytes
+                    byte[] imageBytes = File.ReadAllBytes(tempFile);
 
-                        htmlBuilder.AppendLine("<div>");
-                        htmlBuilder.AppendLine($"<p>Page {pageNum}, Image {++imageIndex}</p>");
-                        string base64 = Convert.ToBase64String(imageBytes);
-                        htmlBuilder.AppendLine($"<img src=\"data:{mime};base64,{base64}\" alt=\"Extracted image\"/>");
-                        htmlBuilder.AppendLine("</div>");
-                    }
+                    // Convert the image bytes to a Base64 string
+                    string base64 = Convert.ToBase64String(imageBytes);
+
+                    // The format we saved the image in (png in this case)
+                    string format = "png";
+
+                    // Append an <img> tag with a data URI to the HTML
+                    htmlBuilder.AppendLine($"<div style=\"margin-bottom:20px;\">");
+                    htmlBuilder.AppendLine($"  <p>Image {imageIndex} ({format.ToUpperInvariant()})</p>");
+                    htmlBuilder.AppendLine($"  <img src=\"data:image/{format};base64,{base64}\" alt=\"Extracted Image {imageIndex}\" />");
+                    htmlBuilder.AppendLine($"</div>");
+
+                    imageIndex++;
+                }
+                finally
+                {
+                    // Clean up the temporary file
+                    if (File.Exists(tempFile))
+                        File.Delete(tempFile);
                 }
             }
 
-            htmlBuilder.AppendLine("</body></html>");
+            htmlBuilder.AppendLine("</body>");
+            htmlBuilder.AppendLine("</html>");
 
-            // Write the generated HTML to disk
-            File.WriteAllText(outputHtml, htmlBuilder.ToString());
-            Console.WriteLine($"HTML report created at '{outputHtml}'.");
+            // Write the HTML report to disk
+            File.WriteAllText(htmlPath, htmlBuilder.ToString(), Encoding.UTF8);
+            Console.WriteLine($"HTML report generated: {htmlPath}");
         }
-    }
-
-    /// <summary>
-    /// Very small header‑based MIME detection. Supports JPEG, PNG, GIF, BMP. Falls back to PNG.
-    /// </summary>
-    private static string GetMimeType(byte[] bytes)
-    {
-        if (bytes == null || bytes.Length < 4)
-            return "image/png"; // safe default
-
-        // JPEG: FF D8 FF
-        if (bytes[0] == 0xFF && bytes[1] == 0xD8 && bytes[2] == 0xFF)
-            return "image/jpeg";
-        // PNG: 89 50 4E 47
-        if (bytes[0] == 0x89 && bytes[1] == 0x50 && bytes[2] == 0x4E && bytes[3] == 0x47)
-            return "image/png";
-        // GIF: 47 49 46 38
-        if (bytes[0] == 0x47 && bytes[1] == 0x49 && bytes[2] == 0x46 && bytes[3] == 0x38)
-            return "image/gif";
-        // BMP: 42 4D
-        if (bytes[0] == 0x42 && bytes[1] == 0x4D)
-            return "image/bmp";
-
-        // Default fallback
-        return "image/png";
     }
 }

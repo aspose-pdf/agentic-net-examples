@@ -1,74 +1,108 @@
 using System;
 using System.IO;
+using System.Reflection;
 using Aspose.Pdf;
-using Aspose.Pdf.Comparison;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Comparison; // retained for runtime type lookup
 
-class Program
+class DiffHighlightVerifier
 {
     static void Main()
     {
+        // Input PDF paths
         const string originalPath = "original.pdf";
         const string modifiedPath = "modified.pdf";
         const string diffPath = "diff.pdf";
 
-        if (!File.Exists(originalPath) || !File.Exists(modifiedPath))
+        // Verify input files exist
+        if (!File.Exists(originalPath))
         {
-            Console.Error.WriteLine("Required input PDFs not found.");
+            Console.Error.WriteLine($"File not found: {originalPath}");
+            return;
+        }
+        if (!File.Exists(modifiedPath))
+        {
+            Console.Error.WriteLine($"File not found: {modifiedPath}");
             return;
         }
 
-        try
+        // -----------------------------------------------------------------
+        // Generate diff PDF using default style (no custom options)
+        // -----------------------------------------------------------------
+        using (Document originalDoc = new Document(originalPath))
+        using (Document modifiedDoc = new Document(modifiedPath))
         {
-            // Load the two PDFs to be compared
-            using (Document originalDoc = new Document(originalPath))
-            using (Document modifiedDoc = new Document(modifiedPath))
+            // PdfComparator lives in Aspose.Pdf.Comparison.dll which may not be
+            // referenced at compile time. Resolve it via reflection to avoid a
+            // compile‑time dependency.
+            const string comparatorTypeName = "Aspose.Pdf.Comparison.PdfComparator, Aspose.Pdf.Comparison";
+            Type comparatorType = Type.GetType(comparatorTypeName);
+            if (comparatorType == null)
             {
-                // Create visual side‑by‑side comparison PDF using default highlight colors
-                var options = new SideBySideComparisonOptions(); // defaults: Added → Yellow, Deleted → Red
-                SideBySidePdfComparer.Compare(originalDoc, modifiedDoc, diffPath, options);
+                Console.Error.WriteLine("PdfComparator type not found. Ensure Aspose.Pdf.Comparison assembly is available.");
+                return;
             }
 
-            // Verify that the highlight colors in the generated diff PDF match the defaults
-            using (Document diffDoc = new Document(diffPath))
+            // Create an instance: new PdfComparator(originalDoc, modifiedDoc)
+            object comparator = Activator.CreateInstance(comparatorType, originalDoc, modifiedDoc);
+            MethodInfo compareMethod = comparatorType.GetMethod("Compare", new[] { typeof(string) });
+            if (compareMethod == null)
             {
-                bool allMatch = true;
+                Console.Error.WriteLine("Compare method not found on PdfComparator.");
+                return;
+            }
+            // Execute: comparator.Compare(diffPath);
+            compareMethod.Invoke(comparator, new object[] { diffPath });
+        }
 
-                foreach (Page page in diffDoc.Pages)
+        // -----------------------------------------------------------------
+        // Verify that highlight colors in the diff PDF match defaults
+        // (default highlight color is Aspose.Pdf.Color.Yellow)
+        // -----------------------------------------------------------------
+        if (!File.Exists(diffPath))
+        {
+            Console.Error.WriteLine($"Diff PDF was not created: {diffPath}");
+            return;
+        }
+
+        bool allHighlightsMatch = true;
+        int highlightCount = 0;
+
+        using (Document diffDoc = new Document(diffPath))
+        {
+            // Pages are 1‑based; iterate accordingly
+            for (int i = 1; i <= diffDoc.Pages.Count; i++)
+            {
+                Page page = diffDoc.Pages[i];
+                // Annotations collection may contain HighlightAnnotation objects
+                foreach (Annotation annot in page.Annotations)
                 {
-                    foreach (Annotation annot in page.Annotations)
+                    if (annot is HighlightAnnotation highlight)
                     {
-                        if (annot is HighlightAnnotation highlight)
+                        highlightCount++;
+                        // Compare with the documented default color (Yellow)
+                        if (!highlight.Color.Equals(Aspose.Pdf.Color.Yellow))
                         {
-                            // Title is defined on MarkupAnnotation, so we need to cast
-                            string title = string.Empty;
-                            if (highlight is MarkupAnnotation markup)
-                                title = markup.Title ?? string.Empty;
-
-                            Aspose.Pdf.Color expectedColor = null;
-
-                            if (title.Equals("Added", StringComparison.OrdinalIgnoreCase))
-                                expectedColor = Aspose.Pdf.Color.Yellow;
-                            else if (title.Equals("Deleted", StringComparison.OrdinalIgnoreCase))
-                                expectedColor = Aspose.Pdf.Color.Red;
-
-                            if (expectedColor != null && !highlight.Color.Equals(expectedColor))
-                            {
-                                allMatch = false;
-                                Console.WriteLine($"Page {page.Number}: Highlight '{title}' has unexpected color.");
-                            }
+                            allHighlightsMatch = false;
+                            Console.WriteLine($"Page {i}: Highlight color mismatch. Found: {highlight.Color}");
                         }
                     }
                 }
-
-                Console.WriteLine(allMatch
-                    ? "All highlight colors match documentation defaults."
-                    : "Some highlight colors do not match defaults.");
             }
         }
-        catch (Exception ex)
+
+        // Report verification result
+        if (highlightCount == 0)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine("No highlight annotations were found in the diff PDF.");
+        }
+        else if (allHighlightsMatch)
+        {
+            Console.WriteLine($"All {highlightCount} highlight annotations use the default color (Yellow).");
+        }
+        else
+        {
+            Console.WriteLine("Some highlight annotations do not use the default color. See messages above.");
         }
     }
 }

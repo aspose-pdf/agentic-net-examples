@@ -1,40 +1,50 @@
 using System;
 using System.IO;
+using System.Xml.Linq;
+using System.Linq;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string xmpPath = "metadata.xml";
+        const string inputPath = "input.pdf";
+        const string outputPath = "metadata.xml";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
-            // Use a using block for deterministic disposal of the Document.
-            using (Document doc = new Document(pdfPath))
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPath))
             {
-                // The Metadata property returns a Metadata object that represents the native XMP packet.
-                Metadata metadata = doc.Metadata;
+                // Retrieve the embedded XMP metadata via the Metadata dictionary
+                var metadata = doc.Metadata;
 
-                // If the document has no XMP metadata, the Metadata object will be empty (its string representation is empty).
-                if (metadata == null || string.IsNullOrEmpty(metadata.ToString()))
+                if (metadata == null || metadata.Count == 0)
                 {
                     Console.WriteLine("No XMP metadata found in the PDF.");
+                    return;
                 }
-                else
-                {
-                    // Convert the Metadata object to its XML string representation and write it to a file.
-                    string xmpXml = metadata.ToString();
-                    File.WriteAllText(xmpPath, xmpXml);
-                    Console.WriteLine($"XMP metadata extracted to '{xmpPath}'.");
-                }
+
+                // Build XML representation of the metadata dictionary
+                var entries = metadata.Select(kvp =>
+                    new XElement("Entry",
+                        new XAttribute("Key", kvp.Key),
+                        // XmpValue must be converted to a string before being placed in CDATA
+                        new XCData(kvp.Value?.ToString() ?? string.Empty)));
+
+                var xmpXml = new XDocument(
+                    new XElement("XmpMetadata", entries)
+                );
+
+                // Save the XML to the output file
+                xmpXml.Save(outputPath);
+                Console.WriteLine($"XMP metadata extracted to '{outputPath}'.");
             }
         }
         catch (Exception ex)

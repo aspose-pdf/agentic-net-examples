@@ -17,32 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // List to hold the checked state of each checkbox field
+        List<bool> checkboxStates = new List<bool>();
+
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure the document contains a form
-            if (doc.Form == null || doc.Form.Fields == null)
+            // Ensure the document contains AcroForm fields
+            if (doc.Form != null && doc.Form.Fields != null)
             {
-                Console.WriteLine("[]"); // No form fields, output empty JSON array
-                return;
-            }
-
-            List<bool> checkboxStates = new List<bool>();
-
-            // Iterate over all form fields
-            foreach (Field field in doc.Form.Fields)
-            {
-                // Identify checkbox fields using the fully qualified type
-                if (field is CheckboxField checkBox)
+                foreach (var field in doc.Form.Fields)
                 {
-                    // The Checked property indicates the state of the checkbox
-                    checkboxStates.Add(checkBox.Checked);
+                    // Process only checkbox fields
+                    if (field is CheckboxField checkBox)
+                    {
+                        // Add the checked state (true = checked, false = unchecked)
+                        checkboxStates.Add(checkBox.Checked);
+                    }
                 }
             }
-
-            // Serialize the list of booleans to JSON
-            string json = JsonSerializer.Serialize(checkboxStates);
-            Console.WriteLine(json);
         }
+
+        // Serialize the boolean list to JSON and output it
+        string json = JsonSerializer.Serialize(checkboxStates);
+        Console.WriteLine(json);
     }
 }

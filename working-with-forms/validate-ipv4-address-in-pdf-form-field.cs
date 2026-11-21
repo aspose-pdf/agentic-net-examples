@@ -3,24 +3,37 @@ using System.Text.RegularExpressions;
 
 class Program
 {
-    static void Main()
-    {
-        // Example IP address to validate
-        string ip = "192.168.0.1";
+    // Regular expression for a valid IPv4 address.
+    // Each octet: 0-255, no leading zeros unless the octet is zero.
+    private static readonly Regex IPv4Regex = new Regex(
+        @"^(?:(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)\.){3}"
+      + @"(?:25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)$",
+        RegexOptions.Compiled);
 
-        bool isValid = IsValidIPv4(ip);
-        Console.WriteLine($"{ip} is {(isValid ? "valid" : "invalid")} IPv4 address.");
-    }
-
-    // Returns true if the input string matches IPv4 format (0.0.0.0 to 255.255.255.255)
-    static bool IsValidIPv4(string ip)
+    // Returns true if the input string is a valid IPv4 address.
+    static bool IsValidIPv4(string ipAddress)
     {
-        if (string.IsNullOrWhiteSpace(ip))
+        if (string.IsNullOrWhiteSpace(ipAddress))
             return false;
 
-        // Regex pattern for IPv4 octets ranging from 0 to 255
-        const string pattern = @"^(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d{2}|[1-9]?\d)){3}$";
+        return IPv4Regex.IsMatch(ipAddress);
+    }
 
-        return Regex.IsMatch(ip, pattern);
+    static void Main()
+    {
+        // Example usage: validate a sample IP address.
+        string[] testAddresses = {
+            "192.168.1.1",
+            "255.255.255.255",
+            "0.0.0.0",
+            "256.100.50.25",   // invalid
+            "123.045.067.089", // invalid (leading zeros)
+            "abc.def.ghi.jkl"  // invalid
+        };
+
+        foreach (var ip in testAddresses)
+        {
+            Console.WriteLine($"{ip} => {(IsValidIPv4(ip) ? "Valid" : "Invalid")}");
+        }
     }
 }

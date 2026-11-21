@@ -1,106 +1,155 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
+    // Path to the Excel‑like CSV file
+    const string DataCsvPath = "data.csv";
+
+    // Path to the JSON configuration that maps Excel column names to PDF field names
+    const string MappingJsonPath = "fieldMapping.json";
+
+    // Path to the PDF form template
+    const string PdfTemplatePath = "template.pdf";
+
+    // Output folder for the generated PDFs
+    const string OutputFolder = "FilledPdfs";
+
     static void Main()
     {
-        // Paths – adjust as needed
-        const string configPath   = "mapping.json";   // JSON: { "ExcelColumnName": "PdfFieldName", ... }
-        const string csvPath      = "data.csv";       // Simple CSV, first line = headers
-        const string templatePdf  = "template.pdf";   // PDF form template
-        const string outputFolder = "FilledForms";
-
-        // Validate input files
-        if (!File.Exists(configPath))
+        // Validate required files
+        if (!File.Exists(DataCsvPath))
         {
-            Console.Error.WriteLine($"Config file not found: {configPath}");
-            return;
-        }
-        if (!File.Exists(csvPath))
-        {
-            Console.Error.WriteLine($"CSV file not found: {csvPath}");
-            return;
-        }
-        if (!File.Exists(templatePdf))
-        {
-            Console.Error.WriteLine($"PDF template not found: {templatePdf}");
+            Console.Error.WriteLine($"Data file not found: {DataCsvPath}");
             return;
         }
 
-        // Load column‑to‑field mapping
-        Dictionary<string, string> columnToPdfField;
-        try
+        if (!File.Exists(MappingJsonPath))
         {
-            columnToPdfField = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(configPath));
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Failed to parse mapping file: {ex.Message}");
+            Console.Error.WriteLine($"Mapping file not found: {MappingJsonPath}");
             return;
         }
 
-        // Read CSV data
-        string[] csvLines = File.ReadAllLines(csvPath);
-        if (csvLines.Length < 2)
+        if (!File.Exists(PdfTemplatePath))
         {
-            Console.Error.WriteLine("CSV file does not contain data rows.");
+            Console.Error.WriteLine($"PDF template not found: {PdfTemplatePath}");
             return;
         }
 
-        // First line = headers
-        string[] headers = csvLines[0].Split(',');
+        // Load the column‑to‑field mapping
+        Dictionary<string, string> columnToFieldMap = LoadMapping(MappingJsonPath);
+
+        // Read CSV data (first line = header)
+        List<Dictionary<string, string>> rows = LoadCsvData(DataCsvPath);
 
         // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        Directory.CreateDirectory(OutputFolder);
 
-        // Process each data row
-        for (int rowIndex = 1; rowIndex < csvLines.Length; rowIndex++)
+        int rowIndex = 1;
+        foreach (var row in rows)
         {
-            string[] values = csvLines[rowIndex].Split(',');
+            // Create a fresh copy of the template for each row
+            string outputPath = Path.Combine(OutputFolder, $"filled_{rowIndex}.pdf");
 
-            // Guard against malformed rows
-            if (values.Length != headers.Length)
-            {
-                Console.Error.WriteLine($"Row {rowIndex} column count mismatch – skipped.");
-                continue;
-            }
-
-            // Create a new Form facade bound to the template PDF
+            // Use Aspose.Pdf.Facades.Form to fill fields
             using (Aspose.Pdf.Facades.Form pdfForm = new Aspose.Pdf.Facades.Form())
             {
-                pdfForm.BindPdf(templatePdf);
+                // Bind the template PDF
+                pdfForm.BindPdf(PdfTemplatePath);
 
-                // Iterate over each column, map to PDF field if a mapping exists
-                for (int col = 0; col < headers.Length; col++)
+                // Iterate over the mapping and set field values
+                foreach (var kvp in columnToFieldMap)
                 {
-                    string excelColumn = headers[col].Trim();
-                    string cellValue   = values[col].Trim();
+                    string excelColumn = kvp.Key;
+                    string pdfFieldName = kvp.Value;
 
-                    if (columnToPdfField.TryGetValue(excelColumn, out string pdfFieldName))
+                    // If the CSV row contains the column, fill the corresponding PDF field
+                    if (row.TryGetValue(excelColumn, out string value))
                     {
-                        // Fill the PDF field; ignore empty values if desired
-                        if (!string.IsNullOrEmpty(cellValue))
-                        {
-                            bool filled = pdfForm.FillField(pdfFieldName, cellValue);
-                            if (!filled)
-                            {
-                                Console.Error.WriteLine($"Row {rowIndex}: Field \"{pdfFieldName}\" not found in PDF.");
-                            }
-                        }
+                        // FillField expects a string value; nulls are converted to empty strings
+                        pdfForm.FillField(pdfFieldName, value ?? string.Empty);
                     }
                 }
 
-                // Save the filled PDF – one file per data row
-                string outputPdfPath = Path.Combine(outputFolder, $"Filled_{rowIndex}.pdf");
-                pdfForm.Save(outputPdfPath);
-                Console.WriteLine($"Row {rowIndex} saved to \"{outputPdfPath}\"");
+                // Save the filled PDF
+                pdfForm.Save(outputPath);
             }
+
+            Console.WriteLine($"Row {rowIndex} saved to '{outputPath}'.");
+            rowIndex++;
         }
 
-        Console.WriteLine("Processing completed.");
+        Console.WriteLine("All rows processed.");
+    }
+
+    // Loads the JSON mapping file into a dictionary
+    static Dictionary<string, string> LoadMapping(string jsonPath)
+    {
+        string jsonContent = File.ReadAllText(jsonPath);
+        // The JSON should represent an object where property names are Excel columns
+        // and property values are the corresponding PDF field names.
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(jsonContent);
+    }
+
+    // Loads CSV data into a list of dictionaries (one per row)
+    static List<Dictionary<string, string>> LoadCsvData(string csvPath)
+    {
+        var rows = new List<Dictionary<string, string>>();
+        using (var reader = new StreamReader(csvPath))
+        {
+            // Read header line
+            string headerLine = reader.ReadLine();
+            if (headerLine == null)
+                return rows; // empty file
+
+            string[] headers = SplitCsvLine(headerLine);
+
+            // Read each subsequent line as a data row
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                string[] fields = SplitCsvLine(line);
+                var rowDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                for (int i = 0; i < headers.Length && i < fields.Length; i++)
+                {
+                    rowDict[headers[i]] = fields[i];
+                }
+                rows.Add(rowDict);
+            }
+        }
+        return rows;
+    }
+
+    // Simple CSV splitter that handles commas inside quoted fields
+    static string[] SplitCsvLine(string line)
+    {
+        var result = new List<string>();
+        bool inQuotes = false;
+        var current = new System.Text.StringBuilder();
+
+        foreach (char c in line)
+        {
+            if (c == '\"')
+            {
+                inQuotes = !inQuotes;
+                continue;
+            }
+
+            if (c == ',' && !inQuotes)
+            {
+                result.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+        result.Add(current.ToString());
+        return result.ToArray();
     }
 }

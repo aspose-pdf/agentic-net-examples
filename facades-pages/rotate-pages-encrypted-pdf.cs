@@ -1,52 +1,74 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "encrypted_input.pdf";
-        const string outputPath = "modified_output.pdf";
-        const string password   = "userPassword"; // password for the encrypted PDF
+        // Paths and password for the encrypted PDF
+        const string encryptedPdfPath = "encrypted_input.pdf";
+        const string userPassword     = "user123";
+        const string intermediatePath = "aligned.pdf";
+        const string finalOutputPath  = "final_output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(encryptedPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {encryptedPdfPath}");
             return;
         }
 
-        try
+        // ------------------------------------------------------------
+        // 1. Load the encrypted PDF with a password using Document,
+        //    then bind that Document to PdfPageEditor for page‑level
+        //    manipulations.
+        // ------------------------------------------------------------
+        Document encryptedDoc = new Document(encryptedPdfPath, userPassword);
+        PdfPageEditor editor = new PdfPageEditor();
+        // BindPdf has an overload that accepts a Document instance.
+        editor.BindPdf(encryptedDoc);
+        editor.ProcessPages = new int[] { 1 }; // 1‑based page numbers
+        editor.HorizontalAlignment = HorizontalAlignment.Center; // example alignment
+        editor.Save(intermediatePath); // save intermediate result (still encrypted)
+
+        // ------------------------------------------------------------
+        // 2. Load the intermediate PDF (still encrypted) with the same
+        //    password and perform structural page manipulations using the
+        //    Document API.
+        // ------------------------------------------------------------
+        using (Document doc = new Document(intermediatePath, userPassword))
         {
-            // Load the encrypted PDF by providing the password to the Document constructor.
-            Document pdfDoc = new Document(inputPath, password);
+            // Delete the second page (if it exists)
+            if (doc.Pages.Count >= 2)
+            {
+                doc.Pages.Delete(2); // Pages are 1‑based
+            }
 
-            // 1. Delete the first page (if it exists).
-            if (pdfDoc.Pages.Count >= 1)
-                pdfDoc.Pages.Delete(1);
+            // Optionally add a text annotation to the first page
+            if (doc.Pages.Count >= 1)
+            {
+                Page firstPage = doc.Pages[1];
+                Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+                TextAnnotation annotation = new TextAnnotation(firstPage, rect)
+                {
+                    Title    = "Note",
+                    Contents = "Page processed with password.",
+                    Open     = true,
+                    Icon     = TextIcon.Note
+                };
+                firstPage.Annotations.Add(annotation);
+            }
 
-            // 2. Rotate the (new) first page by 90 degrees clockwise.
-            if (pdfDoc.Pages.Count >= 1)
-                pdfDoc.Pages[1].Rotate = Rotation.on90; // use the correct enum value
-
-            // 3. Insert a blank page at the end.
-            // Create a temporary blank PDF document with a single empty page.
-            Document blankDoc = new Document();
-            blankDoc.Pages.Add(); // adds an empty page
-            // Insert the blank page after the last existing page of the original document.
-            pdfDoc.Pages.Insert(pdfDoc.Pages.Count + 1, blankDoc.Pages[1]);
-
-            // Save the modified PDF.
-            pdfDoc.Save(outputPath);
-            Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
+            // Save the final PDF (still encrypted with the original password)
+            doc.Save(finalOutputPath);
         }
-        catch (InvalidPasswordException ex)
-        {
-            Console.Error.WriteLine($"Password error: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        // Clean up the intermediate file
+        try { File.Delete(intermediatePath); } catch { /* ignore */ }
+
+        Console.WriteLine($"Processing completed. Output saved to '{finalOutputPath}'.");
     }
 }

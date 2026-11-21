@@ -8,53 +8,46 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputCerPath = "LegalSignature.cer";
-        const string signatureFieldName = "LegalSignature";
+        const string pdfPath = "input.pdf";
+        const string signatureField = "LegalSignature";
+        const string outputCerPath = "certificate.cer";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        try
+        // Load the PDF document.
+        Document pdfDoc = new Document(pdfPath);
+
+        bool fieldFound = false;
+        // Iterate over all form fields and locate the signature field by its name.
+        foreach (Field field in pdfDoc.Form.Fields)
         {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPdfPath);
-
-            bool fieldFound = false;
-            foreach (Field field in pdfDoc.Form.Fields)
+            if (field is SignatureField sigField && sigField.PartialName == signatureField)
             {
-                // Look for a signature field with the specified name
-                if (field is SignatureField sigField &&
-                    string.Equals(sigField.PartialName, signatureFieldName, StringComparison.OrdinalIgnoreCase))
+                fieldFound = true;
+                // Extract the signing certificate directly from the signature field.
+                X509Certificate2 cert = sigField.ExtractCertificateObject();
+                if (cert == null)
                 {
-                    fieldFound = true;
-                    // Extract the signing certificate from the signature field
-                    X509Certificate2 cert = sigField.ExtractCertificateObject();
-                    if (cert == null)
-                    {
-                        Console.Error.WriteLine($"Signature field '{signatureFieldName}' does not contain a certificate.");
-                        return;
-                    }
-
-                    // Save the certificate in DER format as a .cer file
-                    byte[] certBytes = cert.Export(X509ContentType.Cert);
-                    File.WriteAllBytes(outputCerPath, certBytes);
-                    Console.WriteLine($"Certificate extracted and saved to '{outputCerPath}'.");
-                    break;
+                    Console.Error.WriteLine("No certificate associated with the signature.");
+                    return;
                 }
-            }
 
-            if (!fieldFound)
-            {
-                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found in the PDF.");
+                // Export the certificate in DER format and write it to a .cer file.
+                byte[] certBytes = cert.Export(X509ContentType.Cert);
+                File.WriteAllBytes(outputCerPath, certBytes);
+
+                Console.WriteLine($"Certificate extracted and saved to '{outputCerPath}'.");
+                break;
             }
         }
-        catch (Exception ex)
+
+        if (!fieldFound)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Signature field '{signatureField}' not found.");
         }
     }
 }

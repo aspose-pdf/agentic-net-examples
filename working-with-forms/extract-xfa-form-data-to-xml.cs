@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using System.Xml;
 
 class Program
 {
@@ -19,29 +18,28 @@ class Program
 
         try
         {
-            using (Document doc = new Document(inputPdf))
+            // Load the PDF document inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdf))
             {
-                // Verify that the PDF contains an XFA form
-                if (doc.Form != null && doc.Form.HasXfa)
-                {
-                    // Access the XFA packet via the core API (uppercase XFA)
-                    XFA xfa = doc.Form.XFA;
-                    XmlNode datasets = xfa.Datasets;
+                // Access the form object
+                var form = pdfDoc.Form;
 
-                    if (datasets != null)
-                    {
-                        // Save the XFA datasets (XML) to a file
-                        File.WriteAllText(outputXml, datasets.OuterXml);
-                        Console.WriteLine($"XFA data saved to '{outputXml}'.");
-                    }
-                    else
-                    {
-                        Console.WriteLine("XFA packet does not contain datasets.");
-                    }
+                // Check if XFA data is present using the correct properties
+                if (form != null && form.HasXfa)
+                {
+                    // Retrieve the XFA object
+                    XFA xfa = form.XFA;
+
+                    // The XFA class does not expose a Save method.  The XML data can be
+                    // obtained from the Datasets property (an XmlNode) and written to a file.
+                    string xmlContent = xfa.Datasets?.OuterXml ?? string.Empty;
+                    File.WriteAllText(outputXml, xmlContent);
+
+                    Console.WriteLine($"XFA data extracted to '{outputXml}'.");
                 }
                 else
                 {
-                    Console.WriteLine("No XFA form found in the PDF.");
+                    Console.WriteLine("No XFA form data found in the PDF.");
                 }
             }
         }

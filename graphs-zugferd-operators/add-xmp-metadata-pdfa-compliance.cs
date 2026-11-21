@@ -1,55 +1,41 @@
 using System;
+using System.IO;
 using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string outputPath = "pdfa_output.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output_pdfa.pdf";
 
-        // Create a new PDF document and ensure it is disposed properly
-        using (Document doc = new Document())
+        if (!File.Exists(inputPath))
         {
-            // Add a blank page (PDF must contain at least one page)
-            doc.Pages.Add();
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // ------------------------------------------------------------
-            // Build XMP metadata required for PDF/A‑1b compliance using
-            // the core Document.Metadata API (no XmpMetadata property).
-            // ------------------------------------------------------------
-            string documentId = Guid.NewGuid().ToString("N");
+        using (Document doc = new Document(inputPath))
+        {
+            // Register the standard XMP namespace (required for the prefixed properties)
+            doc.Metadata.RegisterNamespaceUri("xmp", "http://ns.adobe.com/xap/1.0/");
 
-            // Register the namespaces used in the XMP packet
-            doc.Metadata.RegisterNamespaceUri("pdfaid", "http://www.aiim.org/pdfa/id/");
-            doc.Metadata.RegisterNamespaceUri("dc", "http://purl.org/dc/elements/1.1/");
+            // PDF/A requires a document identifier – store it as a UUID prefixed with "uuid:"
+            string documentId = "uuid:" + Guid.NewGuid().ToString();
+            doc.Metadata["xmp:DocumentID"] = documentId;
 
-            // Populate the required XMP entries
-            doc.Metadata["pdfaid:part"] = "1";                 // PDF/A part
-            doc.Metadata["pdfaid:conformance"] = "B";          // Conformance level B
-            doc.Metadata["pdfaid:documentID"] = documentId;    // Document identifier
-            doc.Metadata["pdfaid:creationTool"] = "Aspose.Pdf for .NET"; // Creation tool
-            doc.Metadata["dc:format"] = "application/pdf";   // MIME type (optional but common)
+            // Creator tool information
+            doc.Metadata["xmp:CreatorTool"] = "My PDF/A Generator";
 
-            // ------------------------------------------------------------
-            // Populate standard document information (optional but recommended)
-            // ------------------------------------------------------------
-            doc.Info.Title = "Sample PDF/A Document";
-            doc.Info.Author = "Aspose Example";
-            doc.Info.Creator = "Aspose.Pdf for .NET"; // maps to PDF "Creator" entry
-            // Aspose expects local time for these properties (not UTC)
-            doc.Info.CreationDate = DateTime.Now;
-            doc.Info.ModDate = DateTime.Now; // modification date
-            // Store the same identifier in the document info dictionary for completeness
-            doc.Info["DocumentID"] = documentId;
+            // Creation and modification dates in ISO‑8601 UTC format
+            string nowIso = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            doc.Metadata["xmp:CreateDate"] = nowIso;
+            doc.Metadata["xmp:ModifyDate"] = nowIso;
 
-            // Convert the document to PDF/A‑1b using conversion options
-            PdfFormatConversionOptions convOpts = new PdfFormatConversionOptions(PdfFormat.PDF_A_1B);
-            doc.Convert(convOpts);
-
-            // Save the PDF/A compliant file
+            // Save the PDF – the XMP packet is automatically embedded
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF/A file saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with PDF/A XMP metadata to '{outputPath}'.");
     }
 }

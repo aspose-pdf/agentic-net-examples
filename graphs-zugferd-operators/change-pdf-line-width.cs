@@ -18,27 +18,29 @@ class Program
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
+            // Load the PDF document
             using (Document doc = new Document(inputPath))
             {
-                // Iterate over all pages (Aspose.Pdf uses 1‑based indexing)
-                for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+                // Iterate through all pages (Aspose.Pdf uses 1‑based indexing)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    Page page = doc.Pages[pageIndex];
+                    Page page = doc.Pages[i];
 
-                    // Each page may have multiple content streams; in recent versions the
-                    // operators are accessed directly via the Contents collection.
-                    for (int contentIndex = 1; contentIndex <= page.Contents.Count; contentIndex++)
+                    // Iterate through the content operators of the page
+                    for (int j = 0; j < page.Contents.Count; j++)
                     {
-                        // If the operator sets the line width, replace it with a width of 3 points.
-                        if (page.Contents[contentIndex] is SetLineWidth)
+                        // Use var to avoid referencing the non‑existent Operator type directly
+                        var op = page.Contents[j];
+
+                        // Identify SetLineWidth operators and change the width to 3 points
+                        if (op is SetLineWidth setWidth)
                         {
-                            page.Contents[contentIndex] = new SetLineWidth(3);
+                            setWidth.Width = 3; // new line width in points
                         }
                     }
                 }
 
-                // Save the modified PDF (default Save writes PDF format)
+                // Save the modified PDF
                 doc.Save(outputPath);
             }
 

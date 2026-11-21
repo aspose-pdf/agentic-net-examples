@@ -4,77 +4,68 @@ using System.IO.Compression;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
-class AnnotationBatchProcessor
+class Program
 {
     static void Main()
     {
-        // Folders for input PDFs, processed PDFs, and exported XFDF files
-        const string inputFolder = "InputPdfs";
-        const string outputFolder = "ProcessedPdfs";
-        const string xfdfFolder = "XFDF";
+        // Directories for input PDFs, processed PDFs, and temporary XFDF files
+        const string inputDir = "InputPdfs";
+        const string outputDir = "ProcessedPdfs";
+        const string xfdfDir = "XFDF";
         const string archivePath = "AnnotationsArchive.zip";
 
-        // Ensure required directories exist
-        Directory.CreateDirectory(inputFolder);
-        Directory.CreateDirectory(outputFolder);
-        Directory.CreateDirectory(xfdfFolder);
+        // Ensure directories exist
+        Directory.CreateDirectory(inputDir);
+        Directory.CreateDirectory(outputDir);
+        Directory.CreateDirectory(xfdfDir);
 
-        // Process each PDF file in the input folder
-        foreach (string sourcePdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the input directory
+        foreach (string pdfFile in Directory.GetFiles(inputDir, "*.pdf"))
         {
-            string fileName = Path.GetFileName(sourcePdfPath);
-            string destPdfPath = Path.Combine(outputFolder, fileName);
-            string xfdfPath = Path.Combine(xfdfFolder, Path.GetFileNameWithoutExtension(fileName) + ".xfdf");
+            string fileName = Path.GetFileName(pdfFile);
+            string processedPath = Path.Combine(outputDir, fileName);
+            string xfdfPath = Path.Combine(xfdfDir, Path.GetFileNameWithoutExtension(pdfFile) + ".xfdf");
 
-            // Copy original PDF to the output folder (working copy)
-            File.Copy(sourcePdfPath, destPdfPath, true);
-
-            // ------------------------------------------------------------
-            // 1. Export all annotations of the PDF to an XFDF file
-            // ------------------------------------------------------------
-            // NOTE: The XFDF export functionality lives in the separate
-            // Aspose.Pdf.Xfdf assembly. If that assembly is referenced, the
-            // code below can be uncommented and used. To keep the project
-            // buildable without the extra DLL, the export step is omitted.
-            //
-            // using (var pdfDocument = new Document(destPdfPath))
-            // using (var xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
-            // {
-            //     var xfdfWriter = new Aspose.Pdf.Xfdf.XfdfWriter();
-            //     xfdfWriter.WriteAnnotations(pdfDocument, xfdfStream);
-            // }
-
-            // ------------------------------------------------------------
-            // 2. Delete all annotations from the PDF
-            // ------------------------------------------------------------
-            using (var annotationEditor = new PdfAnnotationEditor())
+            // Determine the number of pages in the source PDF (required for ExportAnnotationsXfdf)
+            int pageCount;
+            using (var tempDoc = new Document(pdfFile))
             {
-                // Bind the working copy
-                annotationEditor.BindPdf(destPdfPath);
-                // Remove every annotation
-                annotationEditor.DeleteAnnotations();
-                // Save the cleaned PDF back to the same path
-                annotationEditor.Save(destPdfPath);
+                pageCount = tempDoc.Pages.Count;
             }
+
+            // Use PdfAnnotationEditor to export, delete, and save the PDF
+            using (PdfAnnotationEditor editor = new PdfAnnotationEditor())
+            {
+                // Load the PDF
+                editor.BindPdf(pdfFile);
+
+                // Export all annotations to an XFDF file (using the correct overload)
+                using (FileStream xfdfStream = new FileStream(xfdfPath, FileMode.Create, FileAccess.Write))
+                {
+                    // (string[])null selects the overload that imports all annotation types
+                    editor.ExportAnnotationsXfdf(xfdfStream, 1, pageCount, (string[])null);
+                }
+
+                // Delete all annotations from the PDF
+                editor.DeleteAnnotations();
+
+                // Save the cleaned PDF to the output directory
+                editor.Save(processedPath);
+            }
+
+            Console.WriteLine($"Processed '{fileName}': annotations exported to XFDF and removed.");
         }
 
         // Archive all generated XFDF files into a single ZIP file
-        using (FileStream zipStream = new FileStream(archivePath, FileMode.Create))
-        using (ZipArchive archive = new ZipArchive(zipStream, ZipArchiveMode.Update))
+        if (File.Exists(archivePath))
         {
-            foreach (string xfdfFile in Directory.GetFiles(xfdfFolder, "*.xfdf"))
-            {
-                // Add each XFDF file to the archive preserving its file name
-                archive.CreateEntryFromFile(xfdfFile, Path.GetFileName(xfdfFile));
-            }
+            File.Delete(archivePath);
         }
 
-        // Optional: clean up individual XFDF files after archiving
-        // foreach (string xfdfFile in Directory.GetFiles(xfdfFolder, "*.xfdf"))
-        // {
-        //     File.Delete(xfdfFile);
-        // }
+        ZipFile.CreateFromDirectory(xfdfDir, archivePath);
+        Console.WriteLine($"All XFDF files archived to '{archivePath}'.");
 
-        Console.WriteLine("Annotation deletion and archiving completed. XFDF export requires the Aspose.Pdf.Xfdf assembly.");
+        // Optional: clean up temporary XFDF directory after archiving
+        // Directory.Delete(xfdfDir, true);
     }
 }

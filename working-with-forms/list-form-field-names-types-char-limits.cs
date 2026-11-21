@@ -1,65 +1,82 @@
 using System;
 using System.IO;
-using System.Reflection;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
 class Program
 {
-    static void Main(string[] args)
+    static void Main()
     {
-        // PDF files to process – use command‑line arguments or a default list
-        string[] pdfFiles = args.Length > 0 ? args : new[] { "sample1.pdf", "sample2.pdf" };
+        // Folder containing the PDF files to process
+        const string inputFolder = "pdfs";
+        // Path for the generated CSV report
+        const string outputCsv = "form_fields_report.csv";
 
-        foreach (string pdfPath in pdfFiles)
+        if (!Directory.Exists(inputFolder))
         {
-            if (!File.Exists(pdfPath))
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
+            return;
+        }
+
+        // Create the CSV file and write the header line
+        using (StreamWriter writer = new StreamWriter(outputCsv))
+        {
+            writer.WriteLine("FileName,FieldName,FieldType,CharacterLimit");
+
+            // Process each PDF file in the folder
+            foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
             {
-                Console.Error.WriteLine($"File not found: {pdfPath}");
-                continue;
-            }
-
-            // Load each PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
-            {
-                Console.WriteLine($"--- Form fields in '{Path.GetFileName(pdfPath)}' ---");
-
-                // Retrieve the AcroForm (if any) once and work with the local variable.
-                var form = doc.Form;
-                if (form == null || form.Fields == null || !form.Fields.Any())
+                // Ensure deterministic disposal of the Document
+                using (Document doc = new Document(pdfPath))
                 {
-                    Console.WriteLine("No form fields found.");
-                    continue;
-                }
+                    // Skip files without a form
+                    if (doc.Form == null || doc.Form.Fields == null)
+                        continue;
 
-                // Iterate over all form fields
-                foreach (Field field in form.Fields)
-                {
-                    string name = field.FullName;               // Field name
-                    string type = field.GetType().Name;         // Field type (e.g., TextBoxField, CheckBoxField)
-
-                    // Character limit applies mainly to text fields. Use reflection so the code compiles even if the
-                    // MaxLength property is not present in the referenced Aspose.Pdf version.
-                    string charLimit = "N/A";
-                    if (field is TextBoxField txtField)
+                    // Iterate over all form fields in the document
+                    foreach (Field field in doc.Form.Fields)
                     {
-                        PropertyInfo maxLenProp = typeof(TextBoxField).GetProperty("MaxLength", BindingFlags.Public | BindingFlags.Instance);
-                        if (maxLenProp != null)
-                        {
-                            int maxLen = (int)maxLenProp.GetValue(txtField);
-                            charLimit = maxLen > 0 ? maxLen.ToString() : "Unlimited";
-                        }
-                        else
-                        {
-                            // Property not available – keep "N/A" or attempt a best‑effort default.
-                            charLimit = "N/A";
-                        }
+                        string fieldName   = field.FullName ?? field.PartialName ?? string.Empty;
+                        string fieldType   = GetFieldType(field);
+                        string charLimit   = GetCharacterLimit(field);
+                        string csvLine     = $"{Path.GetFileName(pdfPath)},{Escape(fieldName)},{fieldType},{charLimit}";
+                        writer.WriteLine(csvLine);
                     }
-
-                    Console.WriteLine($"Name: {name}, Type: {type}, CharLimit: {charLimit}");
                 }
             }
         }
+
+        Console.WriteLine($"Report saved to {outputCsv}");
+    }
+
+    // Returns the concrete type name of the form field (e.g., TextBoxField, CheckboxField)
+    static string GetFieldType(Field field)
+    {
+        return field.GetType().Name;
+    }
+
+    // Returns the character limit for text fields; otherwise "N/A"
+    static string GetCharacterLimit(Field field)
+    {
+        if (field is TextBoxField txt)
+        {
+            // MaxLen == 0 means unlimited characters
+            return txt.MaxLen > 0 ? txt.MaxLen.ToString() : "Unlimited";
+        }
+        return "N/A";
+    }
+
+    // Escapes commas and quotes in CSV fields
+    static string Escape(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+            return value;
+
+        if (value.Contains(",") || value.Contains("\""))
+        {
+            string escaped = value.Replace("\"", "\"\"");
+            return $"\"{escaped}\"";
+        }
+        return value;
     }
 }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_popup.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,51 +16,41 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Wrap Document in a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Ensure there is at least one page
+            // Ensure the document has at least one page
             Page page = doc.Pages[1];
 
-            // Create a markup annotation (TextAnnotation) that will own the popup
-            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing
-            Aspose.Pdf.Rectangle markupRect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
-            TextAnnotation markup = new TextAnnotation(page, markupRect)
+            // ----- Parent markup annotation (TextAnnotation) -----
+            // Define custom dimensions for the parent annotation
+            Aspose.Pdf.Rectangle parentRect = new Aspose.Pdf.Rectangle(100, 600, 200, 650);
+            TextAnnotation parentAnno = new TextAnnotation(page, parentRect)
             {
                 Title    = "Note",
-                Contents = "Click the icon to see more details.",
-                Open     = false,
+                Contents = "Click to see details.",
                 Icon     = TextIcon.Note,
-                // Use Aspose.Pdf.Color for cross‑platform compatibility
-                Color    = Aspose.Pdf.Color.Yellow
+                Open     = false // collapsed initially
             };
-            page.Annotations.Add(markup);
+            page.Annotations.Add(parentAnno);
 
-            // Define custom dimensions for the popup (width 250, height 150)
-            // Position it relative to the markup: offset 20 points right and 20 points down
-            double popupWidth  = 250;
-            double popupHeight = 150;
+            // ----- Popup annotation linked to the parent markup -----
+            // Position the popup relative to the parent (e.g., 20 pts right, 30 pts down)
             double offsetX = 20;
-            double offsetY = -20; // negative Y moves down in PDF coordinate system
+            double offsetY = -30; // negative Y moves downwards in PDF coordinate space
+            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(
+                parentRect.LLX + offsetX,
+                parentRect.LLY + offsetY,
+                parentRect.URX + offsetX,
+                parentRect.URY + offsetY);
 
-            // Calculate popup rectangle based on markup rectangle
-            double llx = markupRect.LLX + offsetX;
-            double lly = markupRect.LLY + offsetY - popupHeight; // lower‑left Y
-            double urx = llx + popupWidth;
-            double ury = lly + popupHeight;
-
-            Aspose.Pdf.Rectangle popupRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
-
-            // Create the PopupAnnotation and associate it with the markup annotation
-            PopupAnnotation popup = new PopupAnnotation(page, popupRect)
+            PopupAnnotation popupAnno = new PopupAnnotation(page, popupRect)
             {
-                // The Parent property links the popup to its markup annotation
-                Parent = markup,
-                // Optional: set a background color for the popup window
-                Color = Aspose.Pdf.Color.LightGray
-                // Title property is not available on PopupAnnotation in older versions; omitted intentionally
+                // Title property is not available in older Aspose.Pdf versions; omit it.
+                Parent   = parentAnno, // associate with the parent markup
+                Contents = "This is the popup content providing more information."
             };
-            page.Annotations.Add(popup);
+            page.Annotations.Add(popupAnno);
 
             // Save the modified PDF
             doc.Save(outputPath);

@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Text;                // For TextStamp and TextState
+using Aspose.Pdf;
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "rotated_annotation.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,46 +16,30 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
+
+        // Define the rectangle for the annotation (llx, lly, urx, ury)
+        Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
+
+        // Get the first page (pages are 1‑based)
+        Page page = pdfDocument.Pages[1];
+
+        // Create a TextAnnotation, set its properties and rotate it 90 degrees
+        TextAnnotation txtAnnot = new TextAnnotation(page, rect)
         {
-            // Create a TextStamp that will act as the rotated annotation
-            TextStamp txtStamp = new TextStamp("Diagonal Note");
+            Title    = "Diagonal Note",
+            Contents = "This annotation is rotated to match diagonal content."
+        };
+        // Rotation is set via the Characteristics property using the Rotation enum
+        txtAnnot.Characteristics.Rotate = Aspose.Pdf.Rotation.on90;
 
-            // -----------------------------------------------------------------
-            // Positioning – you can adjust XIndent/YIndent or use alignment flags.
-            // Here we place the stamp roughly at the centre of the first page.
-            // -----------------------------------------------------------------
-            txtStamp.HorizontalAlignment = HorizontalAlignment.Center;
-            txtStamp.VerticalAlignment   = VerticalAlignment.Center;
-            // Optional fine‑tuning offsets (in points)
-            txtStamp.XIndent = 0;   // no extra horizontal offset
-            txtStamp.YIndent = 0;   // no extra vertical offset
+        // Add the annotation to the page
+        page.Annotations.Add(txtAnnot);
 
-            // -----------------------------------------------------------------
-            // Rotation – use RotateAngle (degrees) instead of the non‑existent
-            // Rotation property.
-            // -----------------------------------------------------------------
-            txtStamp.RotateAngle = 90f; // rotates 90 degrees clockwise
+        // Save the modified PDF
+        pdfDocument.Save(outputPath);
 
-            // -----------------------------------------------------------------
-            // Visual appearance – TextState is read‑only, so we modify the
-            // existing instance rather than assigning a new one.
-            // -----------------------------------------------------------------
-            txtStamp.TextState.FontSize   = 12;
-            txtStamp.TextState.FontStyle  = FontStyles.Bold;
-            txtStamp.TextState.Font       = FontRepository.FindFont("Arial");
-            txtStamp.Opacity               = 0.5;   // semi‑transparent background
-            txtStamp.Background            = true; // draw background rectangle
-
-            // Add the stamp to the first page (or iterate over pages as needed)
-            Page targetPage = doc.Pages[1];
-            targetPage.AddStamp(txtStamp);
-
-            // Save the modified PDF
-            doc.Save(outputPath);
-        }
-
-        Console.WriteLine($"Rotated text annotation saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with rotated annotation to '{outputPath}'.");
     }
 }

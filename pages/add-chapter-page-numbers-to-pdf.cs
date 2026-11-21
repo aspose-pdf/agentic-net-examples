@@ -16,32 +16,34 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create a text fragment with the custom prefix and page number
-                TextFragment tf = new TextFragment($"Chapter {i}");
+                // Create the page number text with the custom prefix
+                string pageNumberText = $"Chapter {i}";
 
-                // Set visual properties
-                tf.TextState.FontSize = 12;
-                tf.TextState.Font = FontRepository.FindFont("Arial");
-                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+                // TextFragment holds the text to be added
+                TextFragment fragment = new TextFragment(pageNumberText)
+                {
+                    // Position the text near the bottom center of the page
+                    Position = new Position(page.PageInfo.Width / 2, 20),
 
-                // Position near the bottom‑right corner
-                double margin = 20;
-                double x = page.PageInfo.Width - margin;
-                double y = margin;
-                tf.Position = new Position(x, y);
-                tf.HorizontalAlignment = HorizontalAlignment.Right;
-                tf.VerticalAlignment = VerticalAlignment.Bottom;
+                    // Center align the text horizontally
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
 
-                // Add the fragment to the page
-                page.Paragraphs.Add(tf);
+                // Apply styling by modifying the existing TextState instance (read‑only property)
+                fragment.TextState.FontSize = 12;
+                fragment.TextState.Font = FontRepository.FindFont("Arial");
+                fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+
+                // Add the fragment to the page's paragraph collection
+                page.Paragraphs.Add(fragment);
             }
 
             // Save the modified PDF

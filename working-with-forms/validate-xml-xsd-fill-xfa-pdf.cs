@@ -2,127 +2,94 @@ using System;
 using System.IO;
 using System.Xml;
 using System.Xml.Schema;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
 class Program
 {
-    // Path to the PDF form template
-    const string PdfTemplatePath = "form_template.pdf";
-    // Path to the XML data file
-    const string XmlDataPath = "data.xml";
-    // Path to the XSD schema file
-    const string XsdSchemaPath = "schema.xsd";
-    // Path for the filled PDF output
-    const string OutputPdfPath = "filled_form.pdf";
-
     static void Main()
     {
-        // Verify that required files exist
-        if (!File.Exists(PdfTemplatePath))
+        const string xmlPath = "data.xml";
+        const string xsdPath = "schema.xsd";
+        const string pdfTemplatePath = "template.pdf";
+        const string outputPdfPath = "filled.pdf";
+
+        if (!File.Exists(xmlPath) || !File.Exists(xsdPath) || !File.Exists(pdfTemplatePath))
         {
-            Console.Error.WriteLine($"PDF template not found: {PdfTemplatePath}");
-            return;
-        }
-        if (!File.Exists(XmlDataPath))
-        {
-            Console.Error.WriteLine($"XML data file not found: {XmlDataPath}");
-            return;
-        }
-        if (!File.Exists(XsdSchemaPath))
-        {
-            Console.Error.WriteLine($"XSD schema file not found: {XsdSchemaPath}");
+            Console.Error.WriteLine("Required file missing.");
             return;
         }
 
-        // Load and validate the XML document
-        XmlDocument xmlDoc = new XmlDocument();
-        bool isValid = ValidateXml(XmlDataPath, XsdSchemaPath, xmlDoc);
-        if (!isValid)
-        {
-            Console.Error.WriteLine("XML validation failed. Aborting PDF form fill.");
-            return;
-        }
-
-        // Ensure the XML has a root element before iterating
-        if (xmlDoc.DocumentElement == null)
-        {
-            Console.Error.WriteLine("XML document does not contain a root element.");
-            return;
-        }
-
-        // Open the PDF form inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(PdfTemplatePath))
-        {
-            // Iterate over each element in the XML and map it to a PDF form field
-            // Assumes that XML element names match the PDF field names
-            foreach (XmlNode node in xmlDoc.DocumentElement.ChildNodes)
-            {
-                if (node.NodeType != XmlNodeType.Element)
-                    continue;
-
-                string fieldName = node.Name;
-                string fieldValue = node.InnerText;
-
-                // The Form indexer returns a WidgetAnnotation; cast it to Field before using.
-                Field? pdfField = pdfDoc.Form[fieldName] as Field;
-                if (pdfField != null)
-                {
-                    pdfField.Value = fieldValue;
-                }
-                else
-                {
-                    Console.WriteLine($"Warning: PDF does not contain field '{fieldName}'.");
-                }
-            }
-
-            // Save the filled PDF
-            pdfDoc.Save(OutputPdfPath);
-        }
-
-        Console.WriteLine($"PDF form successfully filled and saved to '{OutputPdfPath}'.");
-    }
-
-    // Validates an XML file against an XSD schema.
-    // Returns true if validation succeeds; otherwise false.
-    // The validated XmlDocument is output via the resultDoc parameter.
-    static bool ValidateXml(string xmlPath, string xsdPath, XmlDocument resultDoc)
-    {
+        // Validate XML against the XSD schema
         bool isValid = true;
-
-        // Set up the schema set
-        XmlSchemaSet schemas = new XmlSchemaSet();
-        schemas.Add(null, xsdPath);
-
-        // Configure XmlReaderSettings for validation
-        XmlReaderSettings settings = new XmlReaderSettings
-        {
-            ValidationType = ValidationType.Schema,
-            Schemas = schemas,
-            ValidationFlags = XmlSchemaValidationFlags.ProcessIdentityConstraints |
-                              XmlSchemaValidationFlags.ReportValidationWarnings
-        };
+        XmlReaderSettings settings = new XmlReaderSettings();
+        settings.Schemas.Add(null, xsdPath);
+        settings.ValidationType = ValidationType.Schema;
         settings.ValidationEventHandler += (sender, args) =>
         {
-            // Treat warnings as errors for strict validation
-            Console.Error.WriteLine($"{args.Severity}: {args.Message}");
+            Console.Error.WriteLine($"Validation error: {args.Message}");
             isValid = false;
         };
 
-        // Parse and validate the XML
-        using (XmlReader reader = XmlReader.Create(xmlPath, settings))
+        using (var reader = XmlReader.Create(xmlPath, settings))
         {
             try
             {
-                resultDoc.Load(reader);
+                while (reader.Read()) { } // forces validation while reading
             }
             catch (XmlException ex)
             {
                 Console.Error.WriteLine($"XML parsing error: {ex.Message}");
-                return false;
+                return;
             }
         }
 
-        return isValid;
+        if (!isValid)
+        {
+            Console.Error.WriteLine("XML validation failed. Import aborted.");
+            return;
+        }
+
+        // Load XML data into a dictionary (field name -> value)
+        var fieldValues = new Dictionary<string, string>();
+        XmlDocument xmlDoc = new XmlDocument();
+        xmlDoc.Load(xmlPath);
+        // Expected format: <Fields><Field name="FieldName">Value</Field>...</Fields>
+        var nodes = xmlDoc.SelectNodes("//Field[@name]");
+        if (nodes != null)
+        {
+            foreach (XmlNode node in nodes)
+            {
+                var nameAttr = node.Attributes["name"];
+                if (nameAttr != null)
+                {
+                    fieldValues[nameAttr.Value] = node.InnerText;
+                }
+            }
+        }
+
+        // Fill the PDF form fields
+        using (Document pdfDoc = new Document(pdfTemplatePath))
+        {
+            foreach (var kvp in fieldValues)
+            {
+                // Retrieve the form field using the Forms API. The indexer returns a WidgetAnnotation,
+                // so we need to cast it to Field (or a derived type) before accessing the Value property.
+                Field? field = pdfDoc.Form[kvp.Key] as Field;
+                if (field != null)
+                {
+                    field.Value = kvp.Value;
+                }
+                else
+                {
+                    Console.WriteLine($"Warning: PDF does not contain field '{kvp.Key}'.");
+                }
+            }
+
+            pdfDoc.Save(outputPdfPath); // saves as PDF
+        }
+
+        Console.WriteLine($"PDF form filled and saved to '{outputPdfPath}'.");
     }
 }

@@ -1,34 +1,40 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputJsonPath = "form_data.json";
+        const string inputPdf = "input.pdf";
+        const string outputXml = "form_data.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document document = new Document(inputPdfPath))
+        try
         {
-            // Enable automatic recalculation of form fields (no Recalculate method exists)
-            document.Form.AutoRecalculate = true;
-
-            // Export all form field values to JSON (ExportDataToXML does not exist)
-            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
+            // Load the PDF document.
+            using (Document pdfDocument = new Document(inputPdf))
+            using (FileStream xmlStream = new FileStream(outputXml, FileMode.Create, FileAccess.Write))
             {
-                document.Form.ExportToJson(jsonStream);
+                // Use the Form facade to export form data. The facade's ExportFdf method writes the
+                // form data in FDF format, which is an XML‑based representation of the fields.
+                using (Form formFacade = new Form(pdfDocument))
+                {
+                    formFacade.ExportFdf(xmlStream);
+                }
             }
-        }
 
-        Console.WriteLine($"Form data exported to JSON file: {outputJsonPath}");
+            Console.WriteLine($"Form data successfully exported to '{outputXml}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -7,53 +7,60 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "signed.pdf";
+        // Paths – adjust as needed
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "signed_output.pdf";
         const string certificatePath = "certificate.pfx";
-        const string certificatePassword = "password";
+        const string certificatePwd = "certPassword";
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        // Verify files exist
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
         if (!File.Exists(certificatePath))
         {
-            Console.Error.WriteLine($"Certificate file not found: {certificatePath}");
+            Console.Error.WriteLine($"Certificate not found: {certificatePath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Create an invisible signature field (zero‑size rectangle).
-            // A zero‑size rectangle makes the field invisible and does not affect layout.
-            var invisibleRect = new Rectangle(0, 0, 0, 0);
-            SignatureField sigField = new SignatureField(doc, invisibleRect)
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                PartialName = "Signature1" // required identifier for the field
-            };
+                // Create an invisible signature field on the first page (zero‑size rectangle)
+                var invisibleRect = new Rectangle(0, 0, 0, 0);
+                var signatureField = new SignatureField(pdfDoc.Pages[1], invisibleRect)
+                {
+                    PartialName = "Signature1"
+                };
 
-            // Add the signature field to the document's form collection
-            doc.Form.Add(sigField);
+                // Add the signature field to the document's form (page 1)
+                pdfDoc.Form.Add(signatureField, 1);
 
-            // Create a PKCS#7 signature using the certificate file
-            PKCS7 pkcs7 = new PKCS7(certificatePath, certificatePassword)
-            {
-                Reason = "Document approved",
-                Location = "Head Office",
-                ContactInfo = "security@example.com"
-                // Signing time is recorded automatically when Sign() is called
-            };
+                // Prepare PKCS7 signature (digital signature)
+                var pkcs7 = new PKCS7(certificatePath, certificatePwd)
+                {
+                    Reason = "Document approval",
+                    Location = "Company HQ",
+                    ContactInfo = "support@example.com"
+                    // Signing time is automatically recorded; no SignDate property exists.
+                };
 
-            // Apply the digital signature to the field
-            sigField.Sign(pkcs7);
+                // Apply the signature to the invisible field
+                signatureField.Sign(pkcs7);
 
-            // Save the signed PDF
-            doc.Save(outputPath);
+                // Save the signed PDF (layout unchanged)
+                pdfDoc.Save(outputPdfPath);
+            }
+
+            Console.WriteLine($"Signed PDF saved to '{outputPdfPath}'.");
         }
-
-        Console.WriteLine($"Invisible digital signature applied. Output saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

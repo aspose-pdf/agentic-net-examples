@@ -1,72 +1,76 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath      = "input.pdf";
-        const string outputPath     = "output.pdf";
-        const string placeholderImg = "placeholder.png"; // path to the placeholder graphic
+        const string inputPdfPath = "input.pdf";
+        const string outputPdfPath = "output.pdf";
+        const string placeholderImgPath = "placeholder.png";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
             return;
         }
 
-        if (!File.Exists(placeholderImg))
+        if (!File.Exists(placeholderImgPath))
         {
-            Console.Error.WriteLine($"Placeholder image not found: {placeholderImg}");
+            Console.Error.WriteLine($"Placeholder image not found: {placeholderImgPath}");
             return;
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the source PDF inside a using block (lifecycle rule)
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // Iterate over pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
-            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
+            // Iterate pages using 1‑based indexing (global rule)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
                 // Process only odd‑numbered pages
                 if (pageNum % 2 == 0) continue;
 
-                Page page = doc.Pages[pageNum];
+                Page page = pdfDoc.Pages[pageNum];
 
-                // Iterate over all images on the page
+                // Collect existing images to a list (cannot modify collection while iterating)
+                var existingImages = new List<XImage>();
                 foreach (XImage img in page.Resources.Images)
                 {
-                    // Preserve the original image dimensions
-                    double originalWidth  = img.Width;
-                    double originalHeight = img.Height;
+                    existingImages.Add(img);
+                }
 
-                    // Create an ImageStamp that uses the placeholder graphic
-                    ImageStamp placeholderStamp = new ImageStamp(placeholderImg)
+                // Replace each original image with a placeholder stamp preserving dimensions
+                foreach (XImage originalImg in existingImages)
+                {
+                    // Preserve the original image dimensions (in points)
+                    double imgWidth = originalImg.Width;
+                    double imgHeight = originalImg.Height;
+
+                    // Create a stamp that uses the placeholder image
+                    ImageStamp stamp = new ImageStamp(placeholderImgPath)
                     {
-                        // Set the stamp size to match the original image dimensions
-                        Width   = originalWidth,
-                        Height  = originalHeight,
-
-                        // Position the stamp at the lower‑left corner of the page.
-                        // Exact original coordinates are not directly accessible via the core API,
-                        // so we place the stamp at (0,0). Adjust XIndent/YIndent if needed.
+                        // Position the stamp at (0,0). Adjust if exact coordinates are known.
                         XIndent = 0,
                         YIndent = 0,
-
-                        // Ensure the stamp is drawn over existing content
+                        Width = imgWidth,
+                        Height = imgHeight,
+                        // Draw over existing content
                         Background = false
                     };
 
-                    // Add the stamp to the current page (it will appear on top of the original image)
-                    page.AddStamp(placeholderStamp);
+                    // Add the placeholder stamp to the current page
+                    page.AddStamp(stamp);
                 }
             }
 
-            // Save the modified PDF
-            doc.Save(outputPath);
+            // Save the modified PDF (still PDF format, no special SaveOptions needed)
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed PDF saved to '{outputPdfPath}'.");
     }
 }

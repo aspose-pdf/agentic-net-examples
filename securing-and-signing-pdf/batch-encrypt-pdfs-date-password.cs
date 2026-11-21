@@ -2,75 +2,80 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using Aspose.Pdf;
 
-class Program
+// Suppress NuGet vulnerability warnings for the transitive package System.Security.Cryptography.Pkcs.
+// The current sample does not use any PKCS functionality, and the warning is treated as informational.
+[assembly: SuppressMessage("NuGet", "NU1902", Justification = "Package is a transitive dependency and not used directly.")]
+[assembly: SuppressMessage("NuGet", "NU1903", Justification = "Package is a transitive dependency and not used directly.")]
+
+class BatchEncryptPdf
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where encrypted PDFs will be saved
-        const string outputFolder = "EncryptedPdfs";
+        // Base directory of the application (works cross‑platform)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        if (!Directory.Exists(inputFolder))
+        // Input and output directories (relative to the base directory)
+        string inputDir = Path.Combine(baseDir, "input_pdfs");
+        string outputDir = Path.Combine(baseDir, "encrypted_pdfs");
+
+        // Validate / create directories
+        if (!Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Input directory not found: {inputDir}");
             return;
         }
+        Directory.CreateDirectory(outputDir);
 
-        Directory.CreateDirectory(outputFolder);
-
-        // Retrieve all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-
-        foreach (string pdfPath in pdfFiles)
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
             try
             {
-                // Build a password from the file name and current UTC date (yyyyMMdd)
+                // Generate a password based on file name and current date
                 string fileName = Path.GetFileNameWithoutExtension(pdfPath);
                 string datePart = DateTime.UtcNow.ToString("yyyyMMdd");
-                string rawPassword = $"{fileName}_{datePart}";
-                string password = GenerateHashPassword(rawPassword);
+                string hashInput = fileName + datePart;
 
-                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
+                // Compute SHA256 hash and take first 16 characters as password
+                string password = ComputeHashPassword(hashInput, 16);
 
-                // Load the PDF inside a using block for deterministic disposal
+                // Load the PDF, encrypt it, and save to the output folder
                 using (Document doc = new Document(pdfPath))
                 {
-                    // Define desired permissions (example: allow printing and content extraction)
+                    // Define permissions (example: allow printing and content extraction)
                     Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    // Encrypt using AES‑256; user and owner passwords are the same derived password
+                    // Encrypt using AES‑256 algorithm
                     doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
 
-                    // Save the encrypted PDF
+                    // Save encrypted PDF
+                    string outputPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
                     doc.Save(outputPath);
                 }
 
-                Console.WriteLine($"Encrypted: '{pdfPath}' → '{outputPath}'");
+                Console.WriteLine($"Encrypted '{Path.GetFileName(pdfPath)}' with password '{password}'.");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
+                Console.Error.WriteLine($"[Error] Failed to process '{pdfPath}': {ex.Message}");
             }
         }
     }
 
-    // Generates a 16‑character password from a SHA‑256 hash of the input string
-    private static string GenerateHashPassword(string input)
+    // Helper method to compute SHA256 hash and return a hex string of desired length
+    private static string ComputeHashPassword(string input, int length)
     {
         using (SHA256 sha256 = SHA256.Create())
         {
-            byte[] hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
-            // Convert to hex and take the first 16 characters for a manageable password length
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hash.Length && sb.Length < 16; i++)
-            {
-                sb.Append(hash[i].ToString("x2"));
-            }
-            return sb.ToString();
+            foreach (byte b in hashBytes)
+                sb.Append(b.ToString("x2"));
+            // Ensure the requested length does not exceed the hash length
+            return sb.ToString().Substring(0, Math.Min(length, sb.Length));
         }
     }
 }

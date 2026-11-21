@@ -8,10 +8,10 @@ class Program
 {
     static void Main()
     {
-        const string inputPath   = "input.pdf";
-        const string outputPath  = "output.pdf";
-        const string targetTitle = "Original Title";   // Title to locate
-        const string corrected   = "Corrected Title"; // New ActualText
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
+        const string targetTitle = "Original Paragraph Title"; // Title to locate
+        const string correctedActualText = "Corrected paragraph text.";
 
         if (!File.Exists(inputPath))
         {
@@ -19,47 +19,57 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Verify the PDF is tagged by checking TaggedContent (IsTagged does not exist)
+            // Verify that the PDF is tagged by checking TaggedContent is not null
             if (doc.TaggedContent == null)
             {
-                Console.WriteLine("Document is not tagged. No structure to modify.");
+                Console.WriteLine("Document is not tagged. Tagging is required to modify structure elements.");
                 return;
             }
 
-            // Access the tagged content API
+            // Access the tagged content interface
             ITaggedContent tagged = doc.TaggedContent;
 
-            // Root element of the structure tree (no cast required)
+            // Get the root of the logical structure tree
             StructureElement root = tagged.RootElement;
 
-            // Recursively find all paragraph elements
+            // Retrieve all paragraph elements recursively
             var paragraphs = root.FindElements<ParagraphElement>(true);
 
-            bool updated = false;
-            foreach (ParagraphElement para in paragraphs)
+            // Locate the paragraph whose title matches the target (using AlternativeText or ActualText)
+            ParagraphElement targetParagraph = null;
+            foreach (var para in paragraphs)
             {
-                // Locate the paragraph by its current ActualText (acting as title)
-                if (string.Equals(para.ActualText, targetTitle, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(para.AlternativeText) &&
+                    para.AlternativeText.Equals(targetTitle, StringComparison.OrdinalIgnoreCase))
                 {
-                    // Modify the ActualText property with the corrected value
-                    para.ActualText = corrected;
-                    updated = true;
+                    targetParagraph = para;
+                    break;
+                }
+
+                if (!string.IsNullOrEmpty(para.ActualText) &&
+                    para.ActualText.Equals(targetTitle, StringComparison.OrdinalIgnoreCase))
+                {
+                    targetParagraph = para;
                     break;
                 }
             }
 
-            if (!updated)
+            if (targetParagraph == null)
             {
-                Console.WriteLine($"Paragraph with title '{targetTitle}' not found.");
+                Console.WriteLine($"Paragraph with title \"{targetTitle}\" not found.");
                 return;
             }
 
+            // Update the ActualText property with the corrected content
+            targetParagraph.ActualText = correctedActualText;
+
             // Save the modified PDF
             doc.Save(outputPath);
-            Console.WriteLine($"Paragraph corrected and saved to '{outputPath}'.");
         }
+
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 }

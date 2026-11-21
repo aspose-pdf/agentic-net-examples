@@ -1,16 +1,17 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Needed for TextState
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string oldText = "OldString";
-        const string newText = "NewString";
+        const string oldText    = "OldString";   // text to replace
+        const string newText    = "NewString";   // replacement text
 
         if (!File.Exists(inputPath))
         {
@@ -18,23 +19,21 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
+        // PdfContentEditor does not implement IDisposable, so no using block is required.
+        PdfContentEditor editor = new PdfContentEditor();
 
-        // Create a TextFragmentAbsorber to find the text on page 2 only
-        TextFragmentAbsorber absorber = new TextFragmentAbsorber(oldText);
-        // Page collection is 1‑based; page 2 is accessed via index 2
-        pdfDocument.Pages[2].Accept(absorber);
+        // Load the PDF document.
+        editor.BindPdf(inputPath);
 
-        // Replace each found fragment with the new text while preserving original font/style
-        foreach (TextFragment fragment in absorber.TextFragments)
-        {
-            fragment.Text = newText;
-        }
+        // Replace the specified text on page 2 only, preserving the original font style.
+        // In newer Aspose.PDF versions the overload is:
+        // ReplaceText(string oldText, int pageNumber, string newText, TextState textState)
+        // Passing null for TextState keeps the original formatting.
+        editor.ReplaceText(oldText, 2, newText, null);
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
+        // Save the modified PDF.
+        editor.Save(outputPath);
 
-        Console.WriteLine($"Text replaced and saved to '{outputPath}'.");
+        Console.WriteLine($"Text replacement completed. Saved to '{outputPath}'.");
     }
 }

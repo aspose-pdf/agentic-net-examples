@@ -1,29 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Input PDF containing graphs
+        const string inputPdfPath = "graph_input.pdf";
+        // Output folder for rendered images
+        const string outputFolder = "RenderedImages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal.
-        using (Document doc = new Document(inputPath))
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
+        // Load the PDF document
+        using (Document pdfDoc = new Document(inputPdfPath))
         {
-            // The core Aspose.Pdf API does not expose graph anti‑aliasing settings.
-            // Such settings are available via Aspose.Pdf.Plugins.GraphInfo, which is prohibited by the task constraints.
-            // Therefore we simply save the document using the default rendering pipeline.
-            doc.Save(outputPath);
+            // Configure rendering options:
+            // - High resolution (300 DPI) for better detail and inherent anti‑aliasing
+            Resolution renderResolution = new Resolution(300);
+            PngDevice pngDevice = new PngDevice(renderResolution);
+
+            // Render each page to a separate PNG file
+            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            {
+                string outputImagePath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
+                using (FileStream imageStream = new FileStream(outputImagePath, FileMode.Create))
+                {
+                    // Render the current page using the configured device
+                    pngDevice.Process(pdfDoc.Pages[pageNumber], imageStream);
+                }
+
+                Console.WriteLine($"Rendered page {pageNumber} to '{outputImagePath}'.");
+            }
         }
 
-        Console.WriteLine($"PDF saved to '{outputPath}'.");
+        Console.WriteLine("Rendering completed with high‑resolution output (anti‑aliasing applied by the renderer).");
     }
 }

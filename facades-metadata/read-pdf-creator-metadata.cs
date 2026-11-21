@@ -14,13 +14,14 @@ class Program
             return;
         }
 
-        // PdfFileInfo gives access to document metadata without loading the full PDF.
-        string creator;
-        using (PdfFileInfo info = new PdfFileInfo(pdfPath))
+        // PdfFileInfo implements IDisposable, so wrap it in a using block
+        using (PdfFileInfo fileInfo = new PdfFileInfo(pdfPath))
         {
-            creator = info.Creator; // Retrieve the Creator metadata
-        }
+            // Access the Creator metadata field
+            string creator = fileInfo.Creator;
 
-        Console.WriteLine($"Creator: {creator}");
+            // Variable 'creator' now holds the PDF's creator information
+            Console.WriteLine($"Creator: {creator}");
+        }
     }
 }

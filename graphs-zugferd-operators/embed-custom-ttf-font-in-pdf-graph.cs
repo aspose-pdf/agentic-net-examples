@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
@@ -9,10 +8,9 @@ class Program
 {
     static void Main()
     {
-        // Path to the custom TrueType font file
-        const string fontPath = "MyCustomFont.ttf";
-        // Output PDF file
-        const string outputPdf = "graph_with_custom_font.pdf";
+        const string outputPath = "graph_with_custom_font.pdf";
+        const string fontPath   = "MyCustomFont.ttf";
+        const string fontAlias  = "MyCustomFont"; // alias used for substitution
 
         if (!File.Exists(fontPath))
         {
@@ -20,104 +18,65 @@ class Program
             return;
         }
 
-        // Load the custom font and ensure it will be embedded
-        Font customFont = FontRepository.OpenFont(fontPath);
-        customFont.IsEmbedded = true;
+        // Register the custom TrueType font so that Aspose.Pdf can resolve it by alias.
+        FontRepository.Substitutions.Add(new SimpleFontSubstitution(fontAlias, fontPath));
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        // Retrieve the Font object that will be embedded when used.
+        Font customFont = FontRepository.FindFont(fontAlias);
+        if (customFont == null)
         {
-            // Add a page to the document
-            Page page = doc.Pages.Add();
-
-            // -----------------------------------------------------------------
-            // Add chart title using the custom font
-            // -----------------------------------------------------------------
-            TextFragment title = new TextFragment("Sample Bar Chart");
-            title.TextState.Font = customFont;
-            title.TextState.FontSize = 20;
-            title.TextState.HorizontalAlignment = HorizontalAlignment.Center;
-            page.Paragraphs.Add(title);
-
-            // -----------------------------------------------------------------
-            // Add X‑axis title using the custom font
-            // -----------------------------------------------------------------
-            TextFragment xAxisTitle = new TextFragment("Categories");
-            xAxisTitle.TextState.Font = customFont;
-            xAxisTitle.TextState.FontSize = 12;
-            // Positioning will be handled later (simple flow layout)
-
-            // -----------------------------------------------------------------
-            // Add Y‑axis title (rotated) using the custom font
-            // -----------------------------------------------------------------
-            TextFragment yAxisTitle = new TextFragment("Values");
-            yAxisTitle.TextState.Font = customFont;
-            yAxisTitle.TextState.FontSize = 12;
-            yAxisTitle.TextState.Rotation = 90;
-
-            // -----------------------------------------------------------------
-            // Create a simple bar chart using the Graph drawing container
-            // -----------------------------------------------------------------
-            const float graphWidth = 500f;
-            const float graphHeight = 300f;
-            Graph graph = new Graph(graphWidth, graphHeight);
-
-            double[] data = new double[] { 10, 20, 30, 25, 15 };
-            float barWidth = 40f;
-            float barSpacing = 20f;
-            float startX = 50f;
-            float baseY = 20f;
-            float yScale = (float)(graphHeight - 40) / 30f; // assuming max value ~30
-
-            // Store bar labels to add after the graph
-            List<TextFragment> barLabels = new List<TextFragment>();
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                float barHeight = (float)data[i] * yScale;
-                float x1 = startX + i * (barWidth + barSpacing);
-                float y1 = baseY;
-                float x2 = x1 + barWidth;
-                float y2 = baseY + barHeight;
-
-                // Draw a filled rectangle to represent the bar
-                Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(x1, y1, x2, y2)
-                {
-                    GraphInfo = new GraphInfo
-                    {
-                        Color = Color.Blue,
-                        FillColor = Color.LightBlue,
-                        LineWidth = 1
-                    }
-                };
-                graph.Shapes.Add(rect);
-
-                // Create label for the bar
-                TextFragment barLabel = new TextFragment((i + 1).ToString());
-                barLabel.TextState.Font = customFont;
-                barLabel.TextState.FontSize = 10;
-                barLabel.TextState.HorizontalAlignment = HorizontalAlignment.Center;
-                // Position will be handled after the graph is placed
-                barLabels.Add(barLabel);
-            }
-
-            // Add the graph drawing to the page
-            page.Paragraphs.Add(graph);
-
-            // Add axis titles after the graph (simple layout for demonstration)
-            page.Paragraphs.Add(xAxisTitle);
-            page.Paragraphs.Add(yAxisTitle);
-
-            // Add bar labels after the axis titles
-            foreach (var lbl in barLabels)
-            {
-                page.Paragraphs.Add(lbl);
-            }
-
-            // Save the PDF; the custom font will be embedded automatically
-            doc.Save(outputPdf);
+            Console.Error.WriteLine($"Failed to load font alias: {fontAlias}");
+            return;
         }
 
-        Console.WriteLine($"PDF saved to '{outputPdf}' with embedded custom TrueType font.");
+        // Create a new PDF document.
+        using (Document doc = new Document())
+        {
+            // Add a page to the document.
+            Page page = doc.Pages.Add();
+
+            // Create a graph (width x height) – use double values as the float overload is obsolete.
+            Graph graph = new Graph(400.0, 300.0);
+
+            // Optional: give the graph a thin gray border so the area is visible.
+            graph.Border = new BorderInfo(BorderSide.All, Color.Gray);
+
+            // Set the graph title using the custom font.
+            TextFragment title = new TextFragment("Sample Chart");
+            title.TextState.Font = customFont;
+            title.TextState.FontSize = 18;
+            graph.Title = title;
+
+            // -----------------------------------------------------------------
+            // Add a simple line series to the graph.
+            // The points are expressed in the graph's coordinate system (0‑400, 0‑300).
+            // -----------------------------------------------------------------
+            float[] linePoints = new float[] { 50, 250, 100, 200, 150, 220, 200, 180, 250, 210 };
+            Line line = new Line(linePoints);
+            line.GraphInfo = new GraphInfo
+            {
+                Color = Color.Blue,
+                LineWidth = 2
+            };
+            graph.Shapes.Add(line);
+
+            // Add a legend entry for the series – also using the custom font.
+            // A TextFragment can be placed on the page; here we add it directly to the page
+            // because Graph only supports a single Title TextFragment.
+            TextFragment legend = new TextFragment("Series 1");
+            legend.TextState.Font = customFont;
+            legend.TextState.FontSize = 10;
+            // Position the legend near the top‑right corner of the graph.
+            legend.Position = new Position(300, 260);
+            page.Paragraphs.Add(legend);
+
+            // Add the graph to the page.
+            page.Paragraphs.Add(graph);
+
+            // Save the PDF; the custom font will be embedded automatically.
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

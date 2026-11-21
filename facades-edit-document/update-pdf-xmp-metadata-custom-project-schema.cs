@@ -6,29 +6,42 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
+        // Input and output PDF paths
+        const string inputPdf  = "input.pdf";
+        const string outputPdf = "output_with_xmp.pdf";
 
-        if (!File.Exists(inputPath))
+        // Custom metadata values
+        const string projectId = "MyProject";
+        const string version   = "1.2.3";
+
+        // -----------------------------------------------------------------
+        // Ensure a source PDF exists – create a minimal placeholder if it does not.
+        // -----------------------------------------------------------------
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
+            using var placeholder = new Document();
+            placeholder.Pages.Add();
+            placeholder.Save(inputPdf);
         }
 
-        // Load the PDF document
-        using (Document doc = new Document(inputPath))
+        // Load the source PDF, add custom XMP metadata, and save a copy.
+        // Document must be wrapped in a using block (lifecycle rule).
+        using (Document doc = new Document(inputPdf))
         {
-            // Define a prefix for the custom schema (the actual namespace URI is not required for the dictionary API)
-            const string prefix = "proj";
+            // Register a custom namespace for the project schema.
+            const string projPrefix    = "proj";
+            const string projNamespace = "http://example.com/ns/project/1.0/";
+            doc.Metadata.RegisterNamespaceUri(projPrefix, projNamespace);
 
-            // Add custom metadata entries using the document's Metadata dictionary
-            doc.Metadata[$"{prefix}:ProjectID"] = "MyProject123";
-            doc.Metadata[$"{prefix}:Version"]   = "1.0.0";
+            // Set the custom XMP properties. The "xmp:" prefix is required for
+            // the metadata indexer, followed by the custom namespace prefix.
+            doc.Metadata[$"xmp:{projPrefix}:ProjectIdentifier"] = projectId;
+            doc.Metadata[$"xmp:{projPrefix}:VersionNumber"]   = version;
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+            // Save the PDF with the updated XMP packet.
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Updated metadata saved to '{outputPath}'.");
+        Console.WriteLine($"Custom XMP metadata added to '{outputPdf}'.");
     }
 }

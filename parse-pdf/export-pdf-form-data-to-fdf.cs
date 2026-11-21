@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Text;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,53 +7,28 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string fdfPath = "output.fdf";
+        const string inputPdfPath = "input.pdf";      // source PDF with form fields
+        const string outputJsonPath = "output.json"; // destination JSON file (used instead of FDF due to API constraints)
 
-        if (!File.Exists(pdfPath))
+        // Ensure the input PDF exists
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        // Load the PDF document; using ensures deterministic disposal.
-        using (Document doc = new Document(pdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdfPath))
         {
-            // Verify that the PDF contains a form.
-            if (doc.Form == null || doc.Form.Count == 0)
+            // Open a FileStream for writing the form data as JSON
+            using (FileStream jsonStream = new FileStream(outputJsonPath, FileMode.Create, FileAccess.Write))
             {
-                Console.WriteLine("The PDF does not contain any form fields.");
-                return;
-            }
-
-            // Create a FileStream for the FDF output; using will close the stream.
-            using (FileStream fdfStream = new FileStream(fdfPath, FileMode.Create, FileAccess.Write))
-            using (StreamWriter writer = new StreamWriter(fdfStream, Encoding.ASCII))
-            {
-                // Write a minimal FDF structure manually because the core API does not expose ExportFdf.
-                writer.WriteLine("%FDF-1.2");
-                writer.WriteLine("1 0 obj");
-                writer.WriteLine("<<");
-                writer.WriteLine("/FDF << /Fields [");
-
-                foreach (Field field in doc.Form.Fields)
-                {
-                    string name = field.Name ?? field.FullName ?? string.Empty;
-                    string value = field.Value?.ToString() ?? string.Empty;
-                    // Escape parentheses in name/value according to PDF string rules.
-                    name = name.Replace("(", "\\(").Replace(")", "\\)");
-                    value = value.Replace("(", "\\(").Replace(")", "\\)");
-                    writer.WriteLine($"<< /T ({name}) /V ({value}) >>");
-                }
-
-                writer.WriteLine("] >> >>");
-                writer.WriteLine("endobj");
-                writer.WriteLine("trailer << /Root 1 0 R >>");
-                writer.WriteLine("%%EOF");
-                writer.Flush(); // Ensure all data is written before the stream is closed.
+                // Export the form data to the JSON stream (core API alternative to ExportFdf)
+                doc.Form.ExportToJson(jsonStream);
+                // The using statement will automatically flush and close the stream
             }
         }
 
-        Console.WriteLine($"FDF data successfully written to '{fdfPath}'.");
+        Console.WriteLine($"Form data exported to JSON: {outputJsonPath}");
     }
 }

@@ -1,7 +1,8 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms; // needed for PKCS7 and signature appearance
+using System.Drawing;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Forms;
 
 class Program
 {
@@ -10,43 +11,45 @@ class Program
         const string inputPath = "input.pdf";
         const string outputPath = "signed.pdf";
         const string certPath = "certificate.pfx";
-        const string certPassword = "password";
+        const string certPassword = "certPassword";
 
+        // Verify required files exist
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
             return;
         }
-
         if (!File.Exists(certPath))
         {
             Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
-        // Load the PDF document
-        Document doc = new Document(inputPath);
-
-        // Create a visible signature field (position can be adjusted as needed)
-        // Rectangle(xLL, yLL, xUR, yUR) – lower‑left and upper‑right coordinates
-        SignatureField sigField = new SignatureField(doc, new Aspose.Pdf.Rectangle(100, 100, 300, 200))
+        // Use PdfFileSignature inside a using block (it implements IDisposable)
+        using (PdfFileSignature signer = new PdfFileSignature())
         {
-            Name = "Signature1"
-        };
-        doc.Form.Add(sigField);
+            // Load the source PDF
+            signer.BindPdf(inputPath);
 
-        // Configure PKCS7 signature with reason and location
-        PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
-        {
-            Reason = "Approved for release",
-            Location = "New York"
-        };
+            // Define a visible signature rectangle (x, y, width, height)
+            Rectangle signatureRect = new Rectangle(100, 100, 200, 50);
 
-        // Sign the field
-        sigField.Sign(pkcs7);
+            // Create PKCS7 object from the certificate (used for the digital signature)
+            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
+            {
+                Reason = "Approved for release", // set signature reason
+                Location = "New York",           // set signature location
+                ContactInfo = string.Empty        // optional – suppress contact field
+            };
 
-        // Save the signed PDF
-        doc.Save(outputPath);
+            // Sign page 1 with a visible signature using the PKCS7 object.
+            // The overload Sign(int pageNumber, bool visible, Rectangle rect, PKCS7 signature)
+            // picks up Reason, Location and ContactInfo from the PKCS7 instance.
+            signer.Sign(1, true, signatureRect, pkcs7);
+
+            // Save the signed PDF to the desired output path
+            signer.Save(outputPath);
+        }
 
         Console.WriteLine($"Signed PDF saved to '{outputPath}'.");
     }

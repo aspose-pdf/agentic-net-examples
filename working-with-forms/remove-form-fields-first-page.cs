@@ -3,7 +3,6 @@ using System.IO;
 using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for WidgetAnnotation
 
 class Program
 {
@@ -18,39 +17,29 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF document
         using (Document doc = new Document(inputPath))
         {
-            // Guard against documents without a form
-            if (doc.Form == null || doc.Form.Fields == null)
+            // Collect fields that reside on the first page (page index 0)
+            List<Field> fieldsToRemove = new List<Field>();
+            foreach (Field field in doc.Form.Fields)
             {
-                Console.WriteLine("No form fields present in the document.");
-                doc.Save(outputPath);
-                return;
-            }
-
-            // Collect the names of all form fields that reside on the first page
-            List<string> fieldsOnFirstPage = new List<string>();
-            Page firstPage = doc.Pages[1]; // Aspose.Pdf pages are 1‑based
-            foreach (Annotation annotation in firstPage.Annotations)
-            {
-                if (annotation is WidgetAnnotation widget)
+                if (field.PageIndex == 0) // first page (zero‑based index)
                 {
-                    // The widget's Name corresponds to the field's name in the AcroForm
-                    fieldsOnFirstPage.Add(widget.Name);
+                    fieldsToRemove.Add(field);
                 }
             }
 
-            // Delete each collected field from the document
-            foreach (string fieldName in fieldsOnFirstPage)
+            // Remove the collected fields from the form
+            foreach (Field field in fieldsToRemove)
             {
-                doc.Form.Delete(fieldName);
+                doc.Form.Delete(field);
             }
 
-            // Save the cleaned PDF (first page now has no form fields)
+            // Save the cleaned document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Template page saved to '{outputPath}'.");
+        Console.WriteLine($"First‑page form fields removed. Saved as '{outputPath}'.");
     }
 }

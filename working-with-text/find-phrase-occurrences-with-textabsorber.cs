@@ -8,7 +8,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string phrase    = "specific phrase";
+        const string phrase = "specific phrase";
 
         if (!File.Exists(inputPath))
         {
@@ -16,29 +16,26 @@ class Program
             return;
         }
 
-        // Load PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through each page and use TextFragmentAbsorber to locate the phrase
-            for (int pageIndex = 1; pageIndex <= doc.Pages.Count; pageIndex++)
+            // Pages are 1‑based in Aspose.Pdf
+            for (int pageNum = 1; pageNum <= doc.Pages.Count; pageNum++)
             {
-                var page = doc.Pages[pageIndex];
-
-                // TextFragmentAbsorber extracts text fragments from the current page
-                var absorber = new TextFragmentAbsorber();
+                // Extract raw text from the current page
+                TextAbsorber absorber = new TextAbsorber();
                 absorber.ExtractionOptions = new TextExtractionOptions(TextExtractionOptions.TextFormattingMode.Pure);
-                page.Accept(absorber);
+                doc.Pages[pageNum].Accept(absorber);
+                string pageText = absorber.Text;
 
-                foreach (TextFragment fragment in absorber.TextFragments)
+                // Locate every occurrence of the target phrase (case‑insensitive)
+                int searchStart = 0;
+                int occurrence = 0;
+                while ((searchStart = pageText.IndexOf(phrase, searchStart, StringComparison.OrdinalIgnoreCase)) >= 0)
                 {
-                    if (fragment.Text != null && fragment.Text.IndexOf(phrase, StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        // Use the fragment's rectangle to obtain coordinates (lower‑left corner)
-                        double x = fragment.Rectangle.LLX; // left‑most X coordinate
-                        double y = fragment.Rectangle.LLY; // lower‑most Y coordinate
-
-                        Console.WriteLine($"Found on page {pageIndex} at ({x}, {y}): \"{fragment.Text}\"");
-                    }
+                    occurrence++;
+                    Console.WriteLine($"Page {pageNum}, occurrence {occurrence}, character offset {searchStart}");
+                    searchStart += phrase.Length; // advance past the found phrase
                 }
             }
         }

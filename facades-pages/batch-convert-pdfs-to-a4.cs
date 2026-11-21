@@ -1,56 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
-class BatchResizeToA4
+class Program
 {
     static void Main()
     {
         // Folder containing source PDFs
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where resized PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        const string inputFolder = "InputPdfs";
+        // Folder where A4‑converted PDFs will be saved
+        const string outputFolder = "OutputA4";
+
+        if (!Directory.Exists(inputFolder))
+        {
+            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            return;
+        }
 
         // Ensure the output directory exists
         Directory.CreateDirectory(outputFolder);
 
         // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf", SearchOption.TopDirectoryOnly);
-        if (pdfFiles.Length == 0)
-        {
-            Console.WriteLine("No PDF files found in the input folder.");
-            return;
-        }
+        string[] pdfFiles = Directory.GetFiles(inputFolder, "*.pdf");
 
         foreach (string inputPath in pdfFiles)
         {
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(inputPath);
+            string outputPath = Path.Combine(outputFolder, $"{fileNameWithoutExt}_A4.pdf");
+
             try
             {
-                // Determine output file name (optional suffix to avoid overwriting)
-                string outputPath = Path.Combine(outputFolder,
-                    Path.GetFileNameWithoutExtension(inputPath) + "_A4.pdf");
+                // PdfPageEditor does NOT implement IDisposable, so no using block
+                PdfPageEditor editor = new PdfPageEditor();
 
-                // Load the source PDF using Document (not PdfPageEditor)
-                Document pdfDocument = new Document(inputPath);
+                // Load the source PDF
+                editor.BindPdf(inputPath);
 
-                // Resize each page to A4 size using PageInfo
-                foreach (Page page in pdfDocument.Pages)
-                {
-                    page.PageInfo.Width = PageSize.A4.Width;
-                    page.PageInfo.Height = PageSize.A4.Height;
-                }
+                // Set the target page size to A4 using the correct enum
+                editor.PageSize = Aspose.Pdf.PageSize.A4;
 
                 // Save the resized PDF
-                pdfDocument.Save(outputPath);
+                editor.Save(outputPath);
 
-                Console.WriteLine($"Resized '{Path.GetFileName(inputPath)}' → '{Path.GetFileName(outputPath)}'");
+                Console.WriteLine($"Converted '{inputPath}' to A4 -> '{outputPath}'");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing '{Path.GetFileName(inputPath)}': {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{inputPath}': {ex.Message}");
             }
         }
-
-        Console.WriteLine("Batch resizing completed.");
     }
 }

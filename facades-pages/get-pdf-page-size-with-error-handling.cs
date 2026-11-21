@@ -1,49 +1,65 @@
 using System;
 using System.IO;
-using Aspose.Pdf.Facades;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "sample.pdf";
+        const string pdfPath = "sample.pdf";
 
-        // Verify the source PDF exists
-        if (!File.Exists(inputPath))
+        // Verify the input file exists
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
-        // PdfPageEditor provides GetPageSize; it does not implement IDisposable
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(inputPath);
+        // PdfPageEditor is a Facades class used for page‑level operations
+        PdfPageEditor pageEditor = new PdfPageEditor();
 
-        // Define page numbers to query (including invalid ones)
-        int[] pagesToCheck = { 1, 2, 10, 0, -1 };
+        // Bind the PDF file to the editor
+        pageEditor.BindPdf(pdfPath);
 
-        foreach (int pageNum in pagesToCheck)
+        // Example 1: Get size of a valid page (pages are 1‑based)
+        int validPageNumber = 1;
+        try
         {
-            try
-            {
-                // GetPageSize returns Aspose.Pdf.PageSize, not System.Drawing.SizeF
-                PageSize pageSize = editor.GetPageSize(pageNum);
-                Console.WriteLine($"Page {pageNum}: Width = {pageSize.Width} pt, Height = {pageSize.Height} pt");
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                // Handle non‑existent page numbers gracefully
-                Console.WriteLine($"Page {pageNum} does not exist (out of range).");
-            }
-            catch (Exception ex)
-            {
-                // Catch any other unexpected errors
-                Console.WriteLine($"Error retrieving size for page {pageNum}: {ex.Message}");
-            }
+            // GetPageSize returns Aspose.Pdf.PageSize, not System.Drawing.SizeF
+            PageSize size = pageEditor.GetPageSize(validPageNumber);
+            Console.WriteLine($"Page {validPageNumber} size: {size.Width} x {size.Height} points");
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            // Handles request for a page number that does not exist
+            Console.WriteLine($"Page {validPageNumber} does not exist: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            // Generic fallback for any other unexpected errors
+            Console.WriteLine($"Error retrieving size for page {validPageNumber}: {ex.Message}");
         }
 
-        // Release resources held by the editor
-        editor.Close();
+        // Example 2: Attempt to get size of a non‑existent page
+        int invalidPageNumber = 999;
+        try
+        {
+            PageSize size = pageEditor.GetPageSize(invalidPageNumber);
+            Console.WriteLine($"Page {invalidPageNumber} size: {size.Width} x {size.Height} points");
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            // Expected path when the page number is out of range
+            Console.WriteLine($"Page {invalidPageNumber} does not exist: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            // Generic fallback for any other unexpected errors
+            Console.WriteLine($"Error retrieving size for page {invalidPageNumber}: {ex.Message}");
+        }
+
+        // No explicit disposal is required for PdfPageEditor; it does not implement IDisposable.
+        // The bound PDF file will be released when the program exits.
     }
 }

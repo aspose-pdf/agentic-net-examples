@@ -9,62 +9,54 @@ class Program
     static void Main()
     {
         // Input PDF files to be concatenated
-        string[] inputFiles = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
-        string outputFile = "merged_with_separators.pdf";
+        string[] inputPdfs = { "doc1.pdf", "doc2.pdf", "doc3.pdf" };
+        // Output PDF file with separator pages
+        const string outputPdf = "merged_with_separators.pdf";
+        // Temporary blank page PDF (will be deleted after use)
+        const string blankPdf = "blank_page.pdf";
 
-        // Validate input files
-        foreach (string file in inputFiles)
+        // Verify that all input files exist
+        foreach (string path in inputPdfs)
         {
-            if (!File.Exists(file))
+            if (!File.Exists(path))
             {
-                Console.Error.WriteLine($"Input file not found: {file}");
+                Console.Error.WriteLine($"Input file not found: {path}");
                 return;
             }
         }
 
-        // Path for the temporary blank separator page
-        string blankPagePath = Path.Combine(Path.GetTempPath(), "blank_separator.pdf");
-
-        try
+        // -----------------------------------------------------------------
+        // Create a single-page blank PDF using the core Document API.
+        // This PDF will be inserted between each pair of source PDFs.
+        // -----------------------------------------------------------------
+        using (Document blankDoc = new Document())
         {
-            // Create a single blank page PDF using Document (lifecycle rule)
-            using (Document blankDoc = new Document())
-            {
-                // Add an empty page
-                blankDoc.Pages.Add();
-                // Save the blank PDF
-                blankDoc.Save(blankPagePath);
-            }
-
-            // Build the list of files to concatenate, inserting the blank page between PDFs
-            List<string> filesToConcat = new List<string>();
-            for (int i = 0; i < inputFiles.Length; i++)
-            {
-                filesToConcat.Add(inputFiles[i]);
-                // Add separator after each file except the last one
-                if (i < inputFiles.Length - 1)
-                {
-                    filesToConcat.Add(blankPagePath);
-                }
-            }
-
-            // Use PdfFileEditor (Facades) to concatenate the PDFs
-            PdfFileEditor editor = new PdfFileEditor();
-            editor.Concatenate(filesToConcat.ToArray(), outputFile);
-
-            Console.WriteLine($"Merged PDF with separators saved to '{outputFile}'.");
+            // Add an empty page (no content)
+            blankDoc.Pages.Add();
+            // Save the blank page to a temporary file
+            blankDoc.Save(blankPdf);
         }
-        catch (Exception ex)
+
+        // Build the sequence: source PDF, blank PDF, source PDF, ...
+        List<string> filesToMerge = new List<string>();
+        for (int i = 0; i < inputPdfs.Length; i++)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            filesToMerge.Add(inputPdfs[i]);
+            // Add a separator after every source PDF except the last one
+            if (i < inputPdfs.Length - 1)
+                filesToMerge.Add(blankPdf);
         }
-        finally
-        {
-            // Clean up the temporary blank page file
-            if (File.Exists(blankPagePath))
-            {
-                try { File.Delete(blankPagePath); } catch { /* ignore cleanup errors */ }
-            }
-        }
+
+        // -----------------------------------------------------------------
+        // Use PdfFileEditor (Facades) to concatenate the prepared list.
+        // PdfFileEditor does NOT implement IDisposable, so no using block.
+        // -----------------------------------------------------------------
+        PdfFileEditor editor = new PdfFileEditor();
+        editor.Concatenate(filesToMerge.ToArray(), outputPdf);
+
+        // Clean up the temporary blank page file
+        try { File.Delete(blankPdf); } catch { /* ignore cleanup errors */ }
+
+        Console.WriteLine($"Merged PDF with separators saved to '{outputPdf}'.");
     }
 }

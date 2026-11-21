@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -12,45 +13,35 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF to read original page dimensions.
+        // Load the document to obtain the page count (no editing is done via Document)
         using (Document doc = new Document(inputPath))
         {
-            // Assume uniform page size; get dimensions of the first page.
-            var firstPage = doc.Pages[1];
-            double origWidth = firstPage.PageInfo.Width;
-            double origHeight = firstPage.PageInfo.Height;
-
-            // 20% margin on each side.
-            double marginX = origWidth * 0.20;
-            double marginY = origHeight * 0.20;
-
-            // New page size includes margins on both sides.
-            double newWidth = origWidth + 2 * marginX;
-            double newHeight = origHeight + 2 * marginY;
-
-            // Resize every page and add the calculated margins.
-            foreach (Page page in doc.Pages)
+            // Prepare the PdfPageEditor – this class works on the bound PDF file
+            using (PdfPageEditor editor = new PdfPageEditor())
             {
-                // Set the new page dimensions.
-                page.PageInfo.Width = newWidth;
-                page.PageInfo.Height = newHeight;
+                // Bind the source PDF
+                editor.BindPdf(inputPath);
 
-                // Define the whitespace (margin) around the original content.
-                page.PageInfo.Margin = new MarginInfo
-                {
-                    Left = marginX,
-                    Right = marginX,
-                    Top = marginY,
-                    Bottom = marginY
-                };
+                // Target all pages (1‑based indexing)
+                int pageCount = doc.Pages.Count;
+                editor.ProcessPages = Enumerable.Range(1, pageCount).ToArray();
+
+                // 20 % margin on each side means the content should occupy 60 % of the original size
+                // (100 % – 20 % left – 20 % right = 60 %). The same applies vertically.
+                // Setting Zoom to 0.6 scales the page content accordingly.
+                editor.Zoom = 0.6f;
+
+                // Center the scaled content so the empty space is distributed evenly
+                editor.HorizontalAlignment = HorizontalAlignment.Center;
+                editor.VerticalAlignmentType = VerticalAlignment.Center;
+
+                // Save the edited PDF
+                editor.Save(outputPath);
             }
-
-            // Save the updated PDF.
-            doc.Save(outputPath);
         }
 
         Console.WriteLine($"PDF saved with 20% margins: {outputPath}");

@@ -1,81 +1,65 @@
 using System;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using Aspose.Pdf;
 
-class Program
+class BatchEncrypt
 {
     static void Main()
     {
-        // Base directory of the application (works for both Windows and Linux)
-        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+        // Folder containing PDFs to encrypt
+        const string inputFolder = @"C:\PdfInput";
+        // Folder where encrypted PDFs will be saved
+        const string outputFolder = @"C:\PdfEncrypted";
+        // Path to the password log file (stored securely by the caller)
+        const string logPath = @"C:\PdfEncrypted\passwords.log";
 
-        // Input folder containing PDFs to encrypt (created if missing)
-        string inputDir = Path.Combine(baseDir, "InputPdfs");
-        // Output folder for encrypted PDFs (created if missing)
-        string outputDir = Path.Combine(baseDir, "EncryptedPdfs");
-        // Secure log file that records filename and generated password
-        string logPath = Path.Combine(baseDir, "encryption_log.txt");
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Ensure the required directories exist
-        Directory.CreateDirectory(inputDir);
-        Directory.CreateDirectory(outputDir);
-
-        // Get all PDF files in the input folder
-        string[] pdfFiles = Directory.GetFiles(inputDir, "*.pdf");
-        if (pdfFiles.Length == 0)
+        // Open the log file for appending
+        using (StreamWriter logWriter = new StreamWriter(logPath, append: true))
         {
-            Console.WriteLine($"No PDF files found in '{inputDir}'. Place PDFs there and rerun the program.");
-            return;
-        }
-
-        // Open the log file once and keep it open for the batch
-        using (StreamWriter logWriter = new StreamWriter(logPath, append: true, Encoding.UTF8))
-        {
-            foreach (string pdfPath in pdfFiles)
+            // Process each PDF file in the input folder
+            foreach (string pdfFile in Directory.GetFiles(inputFolder, "*.pdf"))
             {
-                try
+                // Generate a unique password from the file name (e.g., base name + a fixed salt)
+                string fileName = Path.GetFileNameWithoutExtension(pdfFile);
+                string password = GeneratePassword(fileName);
+
+                // Define output file path
+                string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfFile));
+
+                // Encrypt the PDF using a using block for deterministic disposal
+                using (Document doc = new Document(pdfFile))
                 {
-                    string fileName = Path.GetFileNameWithoutExtension(pdfPath);
-                    // Generate a deterministic password from the file name
-                    string password = GeneratePasswordFromFileName(fileName);
+                    // Set permissions (example: allow printing and content extraction)
+                    Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
 
-                    string outputPath = Path.Combine(outputDir, Path.GetFileName(pdfPath));
+                    // Encrypt with AES-256 algorithm
+                    doc.Encrypt(userPassword: password,
+                                ownerPassword: password,
+                                permissions: perms,
+                                cryptoAlgorithm: CryptoAlgorithm.AESx256);
 
-                    // Encrypt the PDF using AES‑256 and basic permissions
-                    using (Document doc = new Document(pdfPath))
-                    {
-                        Permissions perms = Permissions.PrintDocument | Permissions.ExtractContent;
-                        doc.Encrypt(password, password, perms, CryptoAlgorithm.AESx256);
-                        doc.Save(outputPath);
-                    }
-
-                    // Record the mapping in the secure log
-                    logWriter.WriteLine($"{Path.GetFileName(pdfPath)}\t{password}");
-                    Console.WriteLine($"Encrypted: {Path.GetFileName(pdfPath)}");
+                    // Save the encrypted PDF
+                    doc.Save(outputPath);
                 }
-                catch (Exception ex)
-                {
-                    // Log the error but continue processing the remaining files
-                    Console.Error.WriteLine($"[Error] Failed to process '{Path.GetFileName(pdfPath)}': {ex.Message}");
-                }
+
+                // Log the file name and its password
+                logWriter.WriteLine($"{fileName}: {password}");
             }
         }
 
         Console.WriteLine("Batch encryption completed.");
     }
 
-    // Creates a 16‑character password from the SHA‑256 hash of the file name
-    static string GeneratePasswordFromFileName(string name)
+    // Simple deterministic password generator based on file name
+    private static string GeneratePassword(string baseName)
     {
-        using (SHA256 sha = SHA256.Create())
-        {
-            byte[] hash = sha.ComputeHash(Encoding.UTF8.GetBytes(name));
-            StringBuilder sb = new StringBuilder(16);
-            for (int i = 0; i < 8; i++) // first 8 bytes => 16 hex chars
-                sb.Append(hash[i].ToString("x2"));
-            return sb.ToString();
-        }
+        // Example: reverse the base name and append a constant suffix
+        const string suffix = "_Secure2026";
+        char[] chars = baseName.ToCharArray();
+        Array.Reverse(chars);
+        return new string(chars) + suffix;
     }
 }

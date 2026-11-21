@@ -19,27 +19,28 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Pages are 1‑based in Aspose.Pdf
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Iterate over all annotations on the page
+                // Iterate all annotations on the page
                 foreach (Annotation annot in page.Annotations)
                 {
                     // Process only highlight annotations
                     if (annot is HighlightAnnotation highlight)
                     {
-                        // Set the highlight color to light green (cross‑platform Aspose.Pdf.Color)
-                        highlight.Color = Aspose.Pdf.Color.LightGreen;
+                        // Set the highlight color to a light green.
+                        // Use Aspose.Pdf.Color to stay cross‑platform.
+                        highlight.Color = Aspose.Pdf.Color.FromRgb(0.5, 1.0, 0.5);
                     }
                 }
             }
 
-            // Save the modified document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"All highlight annotations recolored to light green and saved to '{outputPath}'.");
+        Console.WriteLine($"All highlight annotations recolored and saved to '{outputPath}'.");
     }
 }

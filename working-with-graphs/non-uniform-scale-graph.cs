@@ -1,68 +1,52 @@
 using System;
 using System.IO;
-using System.Drawing;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Paths – adjust as needed
-        const string inputPdfPath   = "input.pdf";          // source PDF containing the graph
-        const string outputPdfPath  = "scaled_graph.pdf";   // result PDF
-        const string graphImagePath = "graph.png";          // external image of the graph (if replacing)
+        const string outputPath = "scaled_graph.pdf";
 
-        // Desired non‑uniform scaling factors
-        const double scaleX = 1.5; // stretch horizontally by 150%
-        const double scaleY = 0.75; // compress vertically to 75%
-
-        if (!File.Exists(inputPdfPath))
+        // Create a new PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
+            // Add a page (first page is at index 1 because Aspose.Pdf uses 1‑based indexing).
+            Page page = doc.Pages.Add();
+
+            // Create a simple graph (chart) with sample data.
+            // Use the double‑based constructor to avoid the obsolete warning.
+            Graph graph = new Graph(400.0, 300.0); // width = 400, height = 300
+            graph.Left = 100; // X position on the page
+            graph.Top = 500;  // Y position on the page (distance from bottom)
+            graph.Title = new TextFragment("Sample Graph");
+            // Axis titles are not available in the current Graph API version, so they are omitted.
+
+            // Add a data series as a rectangle shape (Aspose.Pdf Graph does not have a Series collection).
+            // For demonstration we add a simple rectangle shape representing a bar.
+            Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle(20, 0, 40, 120);
+            bar.Text = new TextFragment("Q1");
+            bar.GraphInfo.FillColor = Aspose.Pdf.Color.FromRgb(0.2, 0.6, 0.8);
+            bar.GraphInfo.Color = Aspose.Pdf.Color.Black; // stroke colour
+            graph.Shapes.Add(bar);
+
+            // Desired non‑uniform scaling factors.
+            double scaleX = 1.5; // stretch 150 % on X axis
+            double scaleY = 0.7; // compress to 70 % on Y axis
+
+            // Apply non‑uniform scaling via GraphInfo.
+            graph.GraphInfo.ScalingRateX = scaleX;
+            graph.GraphInfo.ScalingRateY = scaleY;
+
+            // Add the graph to the page's paragraphs collection.
+            page.Paragraphs.Add(graph);
+
+            // Save the document as PDF.
+            doc.Save(outputPath);
         }
 
-        // Load the existing PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
-        {
-            // Assume the graph is an image on the first page.
-            // We'll replace it with a scaled version using ImageStamp.
-            Page page = doc.Pages[1];
-
-            // Load the graph image to obtain its original dimensions.
-            // System.Drawing.Image provides Width and Height in pixels.
-            double originalWidth;
-            double originalHeight;
-            using (System.Drawing.Image sysImg = System.Drawing.Image.FromFile(graphImagePath))
-            {
-                originalWidth  = sysImg.Width;   // pixels
-                originalHeight = sysImg.Height;  // pixels
-            }
-
-            // Create an ImageStamp for the graph and apply non‑uniform scaling.
-            ImageStamp graphStamp = new ImageStamp(graphImagePath)
-            {
-                // Apply non‑uniform scaling by setting Width and Height separately.
-                Width  = originalWidth  * scaleX,
-                Height = originalHeight * scaleY,
-
-                // Position the stamp – here we center it on the page.
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-
-                // Ensure the stamp is placed above existing content.
-                Background = false
-            };
-
-            // Add the scaled stamp to the page.
-            page.AddStamp(graphStamp);
-
-            // Save the modified PDF.
-            doc.Save(outputPdfPath);
-        }
-
-        Console.WriteLine($"Scaled graph PDF saved to '{outputPdfPath}'.");
+        Console.WriteLine($"PDF with scaled graph saved to '{outputPath}'.");
     }
 }

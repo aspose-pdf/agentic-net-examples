@@ -1,13 +1,15 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output_modified.pdf";
+        const string outputPath = "modified.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,27 +17,41 @@ class Program
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
-
-        // Apply rotation, size, and a simulated zoom to each page
-        foreach (Page page in pdfDocument.Pages)
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // 1. Rotate 90 degrees clockwise
-            page.Rotate = Rotation.on90; // valid enum values: on90, on180, on270, None
+            // -------------------------------------------------------------------
+            // 1️⃣ Apply per‑page transformations that are part of the Document API:
+            //    • Rotation (using the Rotation enum)
+            //    • Page size (using PageInfo.Width / Height)
+            // -------------------------------------------------------------------
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                // Rotate the page 90° clockwise
+                doc.Pages[i].Rotate = Rotation.on90;
 
-            // 2. Set page size to A4 using width/height doubles (required overload)
-            page.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+                // Set a new page size – A5 (420 × 595 points)
+                doc.Pages[i].PageInfo.Width = 420;
+                doc.Pages[i].PageInfo.Height = 595;
+            }
 
-            // 3. Simulate a zoom factor of 150% by scaling the page dimensions
-            //    (Zoom is a viewer‑side concept; to reflect it in the file we enlarge the page size)
-            const double zoomFactor = 1.5;
-            page.PageInfo.Width  = page.PageInfo.Width  * zoomFactor;
-            page.PageInfo.Height = page.PageInfo.Height * zoomFactor;
+            // -------------------------------------------------------------------
+            // 2️⃣ Apply viewer‑zoom using PdfPageEditor (the Zoom property works on the
+            //    pages specified via the ProcessPages array). This must be done after
+            //    the Document modifications because PdfPageEditor works on the bound
+            //    Document instance.
+            // -------------------------------------------------------------------
+            using (PdfPageEditor editor = new PdfPageEditor())
+            {
+                editor.BindPdf(doc);
+                // Target all pages (1‑based indexing)
+                editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
+                // 150 % zoom (1.5 ×)
+                editor.Zoom = 1.5f;
+                // Save the final PDF with all changes applied
+                editor.Save(outputPath);
+            }
         }
-
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }

@@ -14,8 +14,10 @@ class Program
             return;
         }
 
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
+            // Check if there are any embedded files (attachments)
             if (doc.EmbeddedFiles == null || doc.EmbeddedFiles.Count == 0)
             {
                 Console.WriteLine("No attachments found.");
@@ -23,35 +25,20 @@ class Program
             }
 
             Console.WriteLine("Attachments:");
+            // Iterate over each embedded file and output its name and size
             foreach (FileSpecification fileSpec in doc.EmbeddedFiles)
             {
-                string name = fileSpec.Name ?? "Unnamed";
-                long size = GetStreamLength(fileSpec.Contents);
+                string name = fileSpec.Name; // Attachment file name
+                long size = 0;
+                if (fileSpec.Contents != null)
+                {
+                    // Ensure the stream is positioned at the beginning
+                    if (fileSpec.Contents.CanSeek)
+                        fileSpec.Contents.Position = 0;
+                    size = fileSpec.Contents.Length; // Size in bytes
+                }
                 Console.WriteLine($"{name} - {size} bytes");
             }
-        }
-    }
-
-    private static long GetStreamLength(Stream stream)
-    {
-        if (stream == null)
-            return 0;
-
-        // If the stream supports seeking, use Length directly.
-        if (stream.CanSeek)
-        {
-            long originalPos = stream.Position;
-            long length = stream.Length;
-            // Reset position to original to avoid side‑effects.
-            stream.Position = originalPos;
-            return length;
-        }
-
-        // Otherwise copy to a MemoryStream to determine length.
-        using (var ms = new MemoryStream())
-        {
-            stream.CopyTo(ms);
-            return ms.Length;
         }
     }
 }

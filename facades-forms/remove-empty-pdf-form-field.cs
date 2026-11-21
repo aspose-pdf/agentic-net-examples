@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
-using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -12,49 +10,39 @@ class Program
         const string outputPath = "output.pdf";
         const string fieldName = "TempField";
 
+        // Verify the source PDF exists
         if (!File.Exists(inputPath))
         {
             Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Load the PDF document
-        Document pdfDocument = new Document(inputPath);
-        Form pdfForm = pdfDocument.Form;
-
-        if (pdfForm == null)
+        // Read the current value of the field using the Form facade
+        string fieldValue;
+        using (Form form = new Form())
         {
-            Console.WriteLine("The PDF does not contain a form.");
-            pdfDocument.Save(outputPath);
-            return;
+            form.BindPdf(inputPath);
+            // GetField returns the field's value as a string (empty string if the field has no data)
+            fieldValue = form.GetField(fieldName);
         }
 
-        // Locate the field by its partial name (or full name)
-        Field targetField = pdfForm.Fields
-                                   .FirstOrDefault(f => string.Equals(f.PartialName, fieldName, StringComparison.Ordinal));
-
-        if (targetField != null)
+        // Delete the field only when it contains no user‑entered data
+        if (string.IsNullOrEmpty(fieldValue))
         {
-            string fieldValue = targetField.Value?.ToString() ?? string.Empty;
-
-            // Remove the field only if it contains no user input (null or empty)
-            if (string.IsNullOrEmpty(fieldValue))
+            using (FormEditor editor = new FormEditor())
             {
-                pdfForm.Delete(fieldName);
-                Console.WriteLine($"Field '{fieldName}' removed because it is empty.");
-            }
-            else
-            {
-                Console.WriteLine($"Field '{fieldName}' retained (value: '{fieldValue}').");
+                editor.BindPdf(inputPath);
+                // FormEditor does not have DeleteField; the correct method is RemoveField
+                editor.RemoveField(fieldName);
+                editor.Save(outputPath);
             }
         }
         else
         {
-            Console.WriteLine($"Field '{fieldName}' not found in the PDF.");
+            // No deletion required – just copy the original PDF to the output location
+            File.Copy(inputPath, outputPath, true);
         }
 
-        // Save the modified PDF
-        pdfDocument.Save(outputPath);
         Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Tagged;
@@ -8,7 +9,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output_with_table.pdf";
 
         if (!File.Exists(inputPath))
@@ -17,64 +18,80 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        // Sample data for the table (first column will be auto‑numbered)
+        List<string> items = new List<string>
         {
-            // Obtain the tagged content interface (creates structure if missing)
-            ITaggedContent tagged = doc.TaggedContent;
-            tagged.SetLanguage("en-US");
-            tagged.SetTitle("Document with Auto‑Numbered Table");
+            "Apple",
+            "Banana",
+            "Cherry",
+            "Date",
+            "Elderberry"
+        };
 
-            // Root element of the logical structure tree
-            StructureElement root = tagged.RootElement;
-
-            // Create a table element and attach it to the root
-            TableElement table = tagged.CreateTableElement();
-            table.AlternativeText = "Sample data table with auto‑numbered first column";
-            root.AppendChild(table);
-
-            // ----- Table Header -----
-            TableTHeadElement thead = tagged.CreateTableTHeadElement();
-            table.AppendChild(thead);
-
-            TableTRElement headerRow = tagged.CreateTableTRElement();
-            thead.AppendChild(headerRow);
-
-            // Header cell for the auto‑numbered column
-            TableTHElement thNumber = tagged.CreateTableTHElement();
-            thNumber.SetText("No.");
-            headerRow.AppendChild(thNumber);
-
-            // Header cell for a data column
-            TableTHElement thData = tagged.CreateTableTHElement();
-            thData.SetText("Data");
-            headerRow.AppendChild(thData);
-
-            // ----- Table Body -----
-            TableTBodyElement tbody = tagged.CreateTableTBodyElement();
-            table.AppendChild(tbody);
-
-            // Insert rows with sequential numbers in the first cell
-            for (int i = 1; i <= 10; i++)
+        try
+        {
+            using (Document doc = new Document(inputPath))
             {
-                TableTRElement row = tagged.CreateTableTRElement();
-                tbody.AppendChild(row);
+                // Access tagged content (creates a tagged structure if none exists)
+                ITaggedContent tagged = doc.TaggedContent;
+                tagged.SetLanguage("en-US");
+                tagged.SetTitle(Path.GetFileNameWithoutExtension(inputPath));
 
-                // First cell: auto‑numbered value
-                TableTDElement tdNumber = tagged.CreateTableTDElement();
-                tdNumber.SetText(i.ToString());
-                row.AppendChild(tdNumber);
+                // Root element of the structure tree
+                StructureElement root = tagged.RootElement;
 
-                // Second cell: placeholder data
-                TableTDElement tdData = tagged.CreateTableTDElement();
-                tdData.SetText($"Row {i} data");
-                row.AppendChild(tdData);
+                // Create a table element and attach it to the root
+                TableElement table = tagged.CreateTableElement();
+                table.AlternativeText = "Sample data table with auto‑numbered column";
+                root.AppendChild(table);
+
+                // ----- Table Header -----
+                TableTHeadElement thead = tagged.CreateTableTHeadElement();
+                table.AppendChild(thead);
+
+                TableTRElement headerRow = tagged.CreateTableTRElement();
+                thead.AppendChild(headerRow);
+
+                // Header cell for the auto‑numbered column
+                TableTHElement thNumber = tagged.CreateTableTHElement();
+                thNumber.SetText("No.");
+                headerRow.AppendChild(thNumber);
+
+                // Header cell for the data column
+                TableTHElement thItem = tagged.CreateTableTHElement();
+                thItem.SetText("Item");
+                headerRow.AppendChild(thItem);
+
+                // ----- Table Body -----
+                TableTBodyElement tbody = tagged.CreateTableTBodyElement();
+                table.AppendChild(tbody);
+
+                for (int i = 0; i < items.Count; i++)
+                {
+                    // Create a new row
+                    TableTRElement dataRow = tagged.CreateTableTRElement();
+                    tbody.AppendChild(dataRow);
+
+                    // First cell: auto‑numbered value (i + 1)
+                    TableTDElement tdNumber = tagged.CreateTableTDElement();
+                    tdNumber.SetText((i + 1).ToString());
+                    dataRow.AppendChild(tdNumber);
+
+                    // Second cell: actual item text
+                    TableTDElement tdItem = tagged.CreateTableTDElement();
+                    tdItem.SetText(items[i]);
+                    dataRow.AppendChild(tdItem);
+                }
+
+                // Save the modified PDF (no PreSave call required)
+                doc.Save(outputPath);
             }
 
-            // Save the modified PDF (no PreSave call required)
-            doc.Save(outputPath);
+            Console.WriteLine($"PDF with auto‑numbered table saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF saved with auto‑numbered table: {outputPath}");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

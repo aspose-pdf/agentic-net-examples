@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -7,40 +8,62 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
-        // Load the PDF document using the Document API (preferred over FormEditor for form fields)
-        Document pdfDoc = new Document(inputPath);
+        // Load the PDF document
+        Document doc = new Document(inputPdf);
 
-        // Retrieve the combo box (dropdown) field named "CountryList"
-        ComboBoxField comboBox = pdfDoc.Form["CountryList"] as ComboBoxField;
-        if (comboBox == null)
+        // Retrieve the list‑box (or combo‑box) field named "CountryList"
+        var listBox = doc.Form["CountryList"] as ListBoxField;
+        if (listBox == null)
         {
-            Console.Error.WriteLine("Dropdown field 'CountryList' not found or is not a ComboBoxField.");
+            Console.Error.WriteLine("Field 'CountryList' not found or is not a list box.");
             return;
         }
 
-        // Remove all existing list items
-        comboBox.Options.Clear();
-
-        // Populate new values
-        string[] newCountries = { "USA", "Canada", "Mexico", "Germany", "France" };
-        foreach (string country in newCountries)
+        // ------------------------------------------------------------
+        // Remove all existing options
+        // Options is a read‑only collection; we must delete each entry
+        // by its export value (Name).  Collect the names first to avoid
+        // modifying the collection while iterating.
+        // ------------------------------------------------------------
+        var existingNames = listBox.Options
+                                   .Cast<Option>()
+                                   .Select(o => o.Name)
+                                   .ToArray();
+        foreach (var name in existingNames)
         {
-            // AddOption adds a value/display pair; using the same string for both is sufficient here
-            comboBox.AddOption(country, country);
+            listBox.DeleteOption(name);
         }
 
-        // Save the modified PDF
-        pdfDoc.Save(outputPath);
+        // ------------------------------------------------------------
+        // Populate the field with the new values
+        // Use AddOption(exportValue, displayName) – when only one string
+        // is supplied it is used for both export value and display text.
+        // ------------------------------------------------------------
+        string[] newItems = new[]
+        {
+            "United States",
+            "Canada",
+            "Mexico",
+            "Germany",
+            "France"
+        };
+        foreach (var item in newItems)
+        {
+            listBox.AddOption(item);
+        }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        // Save the updated PDF
+        doc.Save(outputPdf);
+
+        Console.WriteLine($"Dropdown field \"CountryList\" updated and saved to '{outputPdf}'.");
     }
 }

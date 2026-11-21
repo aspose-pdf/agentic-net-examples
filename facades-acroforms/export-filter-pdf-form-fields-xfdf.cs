@@ -1,64 +1,57 @@
 using System;
 using System.IO;
-using System.Text;
 using System.Xml;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputXml = "filtered_fields.xml";
+        const string pdfPath = "input.pdf";
+        const string xmlPath = "filtered_fields.xml";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         // Load the PDF document
-        Document pdfDocument = new Document(inputPdf);
-
-        // Retrieve all form fields via the Document's Form collection
-        var fields = pdfDocument.Form?.Fields;
-        if (fields == null)
+        using (Document doc = new Document(pdfPath))
         {
-            Console.WriteLine("No form fields found in the PDF.");
-            return;
-        }
+            // Access the form fields collection (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Forms.Form pdfForm = doc.Form;
 
-        // Prepare XML writer
-        XmlWriterSettings settings = new XmlWriterSettings
-        {
-            Indent = true,
-            Encoding = Encoding.UTF8
-        };
+            // Prepare an XML document to hold the filtered fields
+            XmlDocument xmlDoc = new XmlDocument();
+            XmlElement root = xmlDoc.CreateElement("FormFields");
+            xmlDoc.AppendChild(root);
 
-        using (XmlWriter writer = XmlWriter.Create(outputXml, settings))
-        {
-            writer.WriteStartDocument();
-            writer.WriteStartElement("Fields"); // root element
-
-            // Write only fields whose names start with "Customer"
-            foreach (Field field in fields)
+            // Iterate over all form fields
+            foreach (var field in pdfForm.Fields)
             {
-                string name = field.Name ?? field.FullName;
-                if (!string.IsNullOrEmpty(name) &&
-                    name.StartsWith("Customer", StringComparison.Ordinal))
+                // Get the field's full name
+                string fieldName = field.FullName;
+
+                // Include only fields whose names start with "Customer"
+                if (!string.IsNullOrEmpty(fieldName) &&
+                    fieldName.StartsWith("Customer", StringComparison.OrdinalIgnoreCase))
                 {
-                    writer.WriteStartElement("Field");
-                    writer.WriteAttributeString("Name", name);
-                    writer.WriteString(field.Value?.ToString() ?? string.Empty);
-                    writer.WriteEndElement(); // Field
+                    // Retrieve the field's value as a string
+                    string fieldValue = field.Value?.ToString() ?? string.Empty;
+
+                    // Create an XML element for this field
+                    XmlElement fieldElem = xmlDoc.CreateElement("Field");
+                    fieldElem.SetAttribute("Name", fieldName);
+                    fieldElem.SetAttribute("Value", fieldValue);
+                    root.AppendChild(fieldElem);
                 }
             }
 
-            writer.WriteEndElement(); // Fields
-            writer.WriteEndDocument();
+            // Save the filtered fields to XML
+            xmlDoc.Save(xmlPath);
         }
 
-        Console.WriteLine($"Filtered form fields saved to '{outputXml}'.");
+        Console.WriteLine($"Filtered form fields saved to '{xmlPath}'.");
     }
 }

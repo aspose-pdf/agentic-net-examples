@@ -3,52 +3,52 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class Program
+class ExportPageAsRaster
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputImg = "page1.png";
-        const int dpiX = 300; // horizontal resolution
-        const int dpiY = 300; // vertical resolution
+        const string inputPdfPath = "input.pdf";
+        const string outputImgPath = "page_raster.png";
+        const int pageNumber = 1;      // 1‑based index
+        const int dpi = 300;           // Desired resolution in DPI
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
         try
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPdf))
+            // Document implements IDisposable, wrap it in using for deterministic cleanup
+            using (Document pdfDoc = new Document(inputPdfPath))
             {
-                // Aspose.Pdf uses 1‑based page indexing
-                if (doc.Pages.Count < 1)
+                // Access the required page (Aspose.Pdf uses 1‑based indexing)
+                Page page = pdfDoc.Pages[pageNumber];
+
+                // Set the raster resolution – use the Resolution class (ImageDeviceResolution does not exist)
+                var resolution = new Resolution(dpi);
+
+                // PngDevice is a concrete device and does NOT implement IDisposable – do NOT use a using block
+                var pngDevice = new PngDevice(resolution)
                 {
-                    Console.Error.WriteLine("The PDF contains no pages.");
-                    return;
-                }
+                    TransparentBackground = true // optional: keep background transparent
+                };
 
-                // Define the desired raster resolution
-                var resolution = new Resolution(dpiX, dpiY);
-
-                // PngDevice does NOT implement IDisposable – instantiate directly
-                var pngDevice = new PngDevice(resolution) { TransparentBackground = true };
-
-                // Render the first page as a single raster image using a FileStream (which is disposed)
-                using (FileStream outStream = new FileStream(outputImg, FileMode.Create, FileAccess.Write))
-                {
-                    pngDevice.Process(doc.Pages[1], outStream);
-                }
+                // Render the whole page (all vector elements combined) to the output file
+                pngDevice.Process(page, outputImgPath);
             }
 
-            Console.WriteLine($"Page rasterized to '{outputImg}' at {dpiX}×{dpiY} DPI.");
+            Console.WriteLine($"Page {pageNumber} exported as raster image at {dpi} DPI to '{outputImgPath}'.");
         }
-        // Image conversion relies on GDI+; handle the Windows‑only limitation
+        // GDI+ related exceptions may be thrown on non‑Windows platforms
         catch (TypeInitializationException)
         {
-            Console.WriteLine("Raster conversion requires GDI+ and is only supported on Windows platforms.");
+            Console.WriteLine("Raster image conversion requires GDI+ and is only supported on Windows.");
+        }
+        catch (DllNotFoundException)
+        {
+            Console.WriteLine("Required GDI+ library not found. This operation is Windows‑only.");
         }
         catch (Exception ex)
         {

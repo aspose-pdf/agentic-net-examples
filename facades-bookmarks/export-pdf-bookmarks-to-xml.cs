@@ -15,15 +15,23 @@ class Program
             return;
         }
 
-        // PdfBookmarkEditor handles bookmark export; it does not implement IDisposable.
-        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        try
+        {
+            // PdfBookmarkEditor does not implement IDisposable, so we instantiate it directly.
+            PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
 
-        // Bind the PDF document before performing any bookmark operation.
-        bookmarkEditor.BindPdf(pdfPath);
+            // Bind the PDF document to the editor.
+            bookmarkEditor.BindPdf(pdfPath);
 
-        // Export the complete bookmark (outline) hierarchy to an XML file.
-        bookmarkEditor.ExportBookmarksToXML(xmlPath);
+            // Export the complete bookmark hierarchy to an XML file.
+            // Correct method name is ExportBookmarksToXML (instance method).
+            bookmarkEditor.ExportBookmarksToXML(xmlPath);
 
-        Console.WriteLine($"Bookmarks exported to '{xmlPath}'.");
+            Console.WriteLine($"Bookmarks exported to '{xmlPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error exporting bookmarks: {ex.Message}");
+        }
     }
 }

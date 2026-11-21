@@ -15,18 +15,18 @@ class Program
             return;
         }
 
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Aspose.Pdf uses 1‑based page indexing
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
-
-                // Even pages → 90° clockwise, Odd pages → no rotation
-                page.Rotate = (i % 2 == 0) ? Rotation.on90 : Rotation.None;
+                // Rotate odd‑numbered pages 90°, even‑numbered pages 0°
+                page.Rotate = (i % 2 == 1) ? Rotation.on90 : Rotation.None;
             }
 
-            // Save the modified PDF
+            // Save the modified document
             doc.Save(outputPath);
         }
 

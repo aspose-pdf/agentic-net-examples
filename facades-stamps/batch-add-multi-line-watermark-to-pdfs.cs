@@ -7,52 +7,87 @@ class BatchWatermark
 {
     static void Main()
     {
-        // Folder containing source PDFs
-        const string inputFolder = @"C:\PdfInput";
-        // Folder where watermarked PDFs will be saved
-        const string outputFolder = @"C:\PdfOutput";
+        // ---------------------------------------------------------------------
+        // NOTE: The original project produced NU1902/NU1903 warnings because it
+        // referenced System.Security.Cryptography.Pkcs 9.0.0, which has known
+        // vulnerabilities.  To eliminate the warnings (and treat them as errors
+        // if the build is configured with "Treat warnings as errors"), update the
+        // package reference in the *.csproj file to a newer, patched version, e.g.:
+        //
+        //   <PackageReference Update="System.Security.Cryptography.Pkcs" Version="9.0.1" />
+        //
+        // Alternatively, you can suppress the specific warnings with:
+        //   <NoWarn>NU1902;NU1903</NoWarn>
+        // ---------------------------------------------------------------------
 
-        // Ensure output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Resolve base directory (works for both Windows and Linux)
+        string baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-        // Define the multi‑line watermark text
-        const string watermarkText = "Confidential\r\nDo Not Distribute\r\n© Company";
+        // Input and output folders (relative to the executable location)
+        string inputFolder = Path.Combine(baseDir, "InputPdfs");
+        string outputFolder = Path.Combine(baseDir, "WatermarkedPdfs");
 
-        // Iterate over all PDF files in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Validate input folder – if it does not exist, inform the user and exit.
+        if (!Directory.Exists(inputFolder))
         {
-            // Build the output file path (same file name, different folder)
-            string outputPath = Path.Combine(outputFolder, Path.GetFileName(pdfPath));
-
-            // Load the source PDF using the high‑level Document API
-            using (Document pdfDoc = new Document(pdfPath))
-            {
-                // Create a TextStamp with the multi‑line text
-                TextStamp textStamp = new TextStamp(watermarkText)
-                {
-                    RotateAngle = 45f,
-                    Opacity = 0.5,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                // Configure appearance of the watermark
-                textStamp.TextState.FontSize = 72;                                   // Large font
-                textStamp.TextState.ForegroundColor = Color.Gray;                    // Gray color (cross‑platform)
-
-                // Apply the stamp to every page of the PDF
-                foreach (Page page in pdfDoc.Pages)
-                {
-                    page.AddStamp(textStamp);
-                }
-
-                // Save the watermarked PDF to the output location
-                pdfDoc.Save(outputPath);
-            }
-
-            Console.WriteLine($"Watermarked: {outputPath}");
+            Console.Error.WriteLine($"[Error] Input folder not found: {inputFolder}");
+            return;
         }
 
-        Console.WriteLine("Batch processing completed.");
+        // Ensure output folder exists.
+        Directory.CreateDirectory(outputFolder);
+
+        // Multi‑line watermark text
+        string watermarkText = "Confidential\nDo Not Distribute";
+
+        // Create a reusable TextStamp (the same instance can be added to many pages)
+        TextStamp stamp = new TextStamp(watermarkText)
+        {
+            TextState = {
+                Font = FontRepository.FindFont("Arial"),
+                FontSize = 48,
+                ForegroundColor = Aspose.Pdf.Color.FromRgb(0.8, 0.8, 0.8)
+            },
+            Opacity = 0.3,
+            RotateAngle = 45,
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment = VerticalAlignment.Center
+        };
+
+        // Process each PDF file in the input folder
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        {
+            string fileName = Path.GetFileName(pdfPath);
+            string outPath = Path.Combine(outputFolder, fileName);
+
+            // Verify the source file exists (defensive programming – GetFiles already filters, but keep for safety)
+            if (!File.Exists(pdfPath))
+            {
+                Console.Error.WriteLine($"[Warning] Skipping missing file: {pdfPath}");
+                continue;
+            }
+
+            try
+            {
+                // Load source PDF
+                using (Document srcDoc = new Document(pdfPath))
+                {
+                    // Apply the watermark to every page
+                    foreach (Page page in srcDoc.Pages)
+                    {
+                        page.AddStamp(stamp);
+                    }
+
+                    // Save the watermarked document
+                    srcDoc.Save(outPath);
+                }
+
+                Console.WriteLine($"Watermarked: {fileName}");
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[Error] Failed to process '{fileName}': {ex.Message}");
+            }
+        }
     }
 }

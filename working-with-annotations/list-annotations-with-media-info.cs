@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -16,74 +15,61 @@ class Program
             return;
         }
 
-        // Wrap Document in a using block for deterministic disposal
+        // Open the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Aspose.Pdf uses 1‑based page indexing
+            // Iterate pages using 1‑based indexing (Aspose.Pdf uses 1‑based page numbers)
             for (int i = 1; i <= doc.Pages.Count; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Annotations collection may be empty
-                if (page.Annotations == null) continue;
-
-                foreach (Annotation annot in page.Annotations)
+                // Each page has an Annotations collection
+                foreach (Annotation annotation in page.Annotations)
                 {
-                    // Get the concrete annotation type name
-                    string typeName = annot.GetType().Name;
+                    // Annotation type name
+                    string typeName = annotation.GetType().Name;
 
-                    // Use fully qualified Rectangle to avoid ambiguity
-                    Aspose.Pdf.Rectangle rect = annot.Rect;
+                    // Rectangle (position) of the annotation
+                    Aspose.Pdf.Rectangle rect = annotation.Rect;
+                    string rectInfo = $"LLX={rect.LLX}, LLY={rect.LLY}, URX={rect.URX}, URY={rect.URY}";
 
-                    // Retrieve associated media file name when applicable
-                    string mediaFile = GetMediaFileName(annot);
+                    // Retrieve an associated media file name (if any)
+                    string mediaFileName = string.Empty;
 
-                    Console.WriteLine(
-                        $"Page {i}: Type={typeName}, Rect=[{rect.LLX},{rect.LLY},{rect.URX},{rect.URY}], Media={mediaFile}");
-                }
-            }
-        }
-    }
-
-    // Helper method to extract a media file name from known annotation types
-    private static string GetMediaFileName(Annotation annot)
-    {
-        switch (annot)
-        {
-            case FileAttachmentAnnotation fileAnnot:
-                // The File property returns a FileSpecification; use its Name property
-                return fileAnnot.File?.Name ?? "(none)";
-
-            case RichMediaAnnotation richAnnot:
-                // RichMediaContent may not exist in older Aspose.Pdf versions – use reflection
-                var richContentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
-                if (richContentProp != null)
-                {
-                    var richContent = richContentProp.GetValue(richAnnot);
-                    if (richContent != null)
+                    // FileAttachmentAnnotation – use the File property (FileSpecification) and its Name
+                    if (annotation is FileAttachmentAnnotation fileAttachment && fileAttachment.File != null)
                     {
-                        var assetsProp = richContent.GetType().GetProperty("Assets");
-                        var assets = assetsProp?.GetValue(richContent) as IEnumerable;
-                        if (assets != null)
+                        mediaFileName = fileAttachment.File.Name ?? string.Empty;
+                    }
+                    // RichMediaAnnotation – the RichMediaContent type may not exist in older versions.
+                    // Use reflection to safely obtain the first asset's file name when possible.
+                    else if (annotation is RichMediaAnnotation richMedia)
+                    {
+                        var richContentProp = typeof(RichMediaAnnotation).GetProperty("RichMediaContent");
+                        if (richContentProp != null)
                         {
-                            var enumerator = assets.GetEnumerator();
-                            if (enumerator.MoveNext())
+                            var richContent = richContentProp.GetValue(richMedia);
+                            if (richContent != null)
                             {
-                                var asset = enumerator.Current;
-                                // Asset may expose FileName or Name – try both
-                                var nameProp = asset.GetType().GetProperty("FileName") ??
-                                                asset.GetType().GetProperty("Name");
-                                var name = nameProp?.GetValue(asset) as string;
-                                return name ?? "(none)";
+                                var assetsProp = richContent.GetType().GetProperty("Assets");
+                                var assets = assetsProp?.GetValue(richContent) as System.Collections.IList;
+                                if (assets != null && assets.Count > 0)
+                                {
+                                    var firstAsset = assets[0];
+                                    var fileNameProp = firstAsset.GetType().GetProperty("FileName");
+                                    if (fileNameProp != null)
+                                    {
+                                        mediaFileName = fileNameProp.GetValue(firstAsset) as string ?? string.Empty;
+                                    }
+                                }
                             }
                         }
                     }
-                }
-                return "(none)";
 
-            default:
-                // Other annotation types do not reference external media
-                return "(n/a)";
+                    // Log the details
+                    Console.WriteLine($"Page {i}: Type={typeName}, Rect=[{rectInfo}], MediaFile=\"{mediaFileName}\"");
+                }
+            }
         }
     }
 }

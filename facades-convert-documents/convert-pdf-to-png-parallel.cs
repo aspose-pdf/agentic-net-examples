@@ -2,52 +2,50 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // <-- added for PngDevice and Resolution
+using Aspose.Pdf.Devices;
 
 class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
-        const string outputDir = "Pages";
+        const string inputPdfPath = "input.pdf";
+        const string outputFolder = "output_images";
 
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        // Load the PDF once; wrap in using for deterministic disposal
-        using (Document doc = new Document(pdfPath))
+        int totalPages;
+        // Get page count (lifecycle rule – use using block)
+        using (Document doc = new Document(inputPdfPath))
         {
-            int pageCount = doc.Pages.Count;
-            object sync = new object(); // synchronize access to the shared Document
-
-            // Process pages in parallel to speed up conversion
-            Parallel.For(1, pageCount + 1, pageNumber =>
-            {
-                // Create a PNG device with a desired resolution (e.g., 300 DPI)
-                var resolution = new Resolution(300);
-                var pngDevice = new PngDevice(resolution);
-
-                string outPath = Path.Combine(outputDir, $"page_{pageNumber}.png");
-
-                // Document and its Page objects are not thread‑safe; protect access with a lock
-                Page page;
-                lock (sync)
-                {
-                    page = doc.Pages[pageNumber];
-                }
-
-                // Render the page to PNG
-                pngDevice.Process(page, outPath);
-
-                Console.WriteLine($"Saved page {pageNumber} → {outPath}");
-            });
+            totalPages = doc.Pages.Count;
         }
 
-        Console.WriteLine("PDF to PNG conversion completed.");
+        // Process each page in parallel
+        Parallel.For(1, totalPages + 1, pageNumber =>
+        {
+            // Each thread works with its own Document instance (Pdf objects are not thread‑safe)
+            using (Document doc = new Document(inputPdfPath))
+            {
+                // Prepare PNG device – devices are NOT IDisposable, so no using block
+                var resolution = new Resolution(150);
+                var pngDevice = new PngDevice(resolution) { TransparentBackground = true };
+
+                string outputPath = Path.Combine(outputFolder, $"page_{pageNumber}.png");
+                using (var outStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
+                {
+                    // Convert the specific page to PNG
+                    pngDevice.Process(doc.Pages[pageNumber], outStream);
+                }
+            }
+        });
+
+        Console.WriteLine($"Conversion completed. PNG files are saved in '{outputFolder}'.");
     }
 }

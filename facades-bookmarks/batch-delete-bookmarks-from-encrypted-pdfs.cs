@@ -1,54 +1,55 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing encrypted PDFs
-        const string inputFolder = "EncryptedPdfs";
-        // Folder where processed PDFs will be saved
-        const string outputFolder = "ProcessedPdfs";
-        // Password required to open the encrypted PDFs (user password)
-        const string password = "userPassword";
+        // Folder containing the encrypted PDFs
+        const string inputFolder = @"C:\PdfFiles";
+        // Password that unlocks all PDFs in the folder
+        const string pdfPassword = "mySecretPassword";
 
         if (!Directory.Exists(inputFolder))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
+            Console.Error.WriteLine($"Folder not found: {inputFolder}");
             return;
         }
 
-        Directory.CreateDirectory(outputFolder);
-
-        // Process each PDF file in the input folder
+        // Process each PDF file in the folder
         foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(pdfPath);
-            string outputPath = Path.Combine(outputFolder, fileName);
-
             try
             {
-                // Load the encrypted PDF providing the user password
-                Document pdfDoc = new Document(pdfPath, password);
+                // Load the encrypted PDF using Document constructor that accepts a password
+                Document pdfDoc = new Document(pdfPath, pdfPassword);
 
-                // Remove all bookmarks (outlines) from the document
-                // The Outlines collection represents the PDF bookmarks.
-                pdfDoc.Outlines.Clear();
+                // PdfBookmarkEditor works with a Document instance via BindPdf(Document)
+                using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+                {
+                    bookmarkEditor.BindPdf(pdfDoc);
 
-                // Save the modified PDF to the output folder
-                pdfDoc.Save(outputPath);
+                    // Delete all existing bookmarks (no‑argument overload)
+                    bookmarkEditor.DeleteBookmarks();
 
-                Console.WriteLine($"Processed: {fileName}");
+                    // Save the changes back to the same file (overwrites the original)
+                    bookmarkEditor.Save(pdfPath);
+                }
+
+                Console.WriteLine($"Bookmarks removed: {Path.GetFileName(pdfPath)}");
             }
-            catch (InvalidPasswordException ex)
+            catch (InvalidPasswordException)
             {
-                Console.Error.WriteLine($"Invalid password for {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Invalid password for file: {Path.GetFileName(pdfPath)}");
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
+                Console.Error.WriteLine($"Error processing '{Path.GetFileName(pdfPath)}': {ex.Message}");
             }
         }
+
+        Console.WriteLine("Batch bookmark removal completed.");
     }
 }

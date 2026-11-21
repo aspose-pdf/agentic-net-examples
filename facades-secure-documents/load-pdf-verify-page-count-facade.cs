@@ -16,17 +16,17 @@ class Program
 
         try
         {
-            // Load the PDF using Aspose.Pdf.Document (replaces the obsolete Facade PdfDocument)
+            // Load the PDF document using the cross‑platform Document class.
             using (var pdfDoc = new Document(inputPath))
             {
-                // Verify successful loading by checking the page count
-                int pageCount = pdfDoc?.Pages?.Count ?? 0;
+                // Verify successful loading by checking the page count.
+                int pageCount = pdfDoc.Pages.Count;
                 Console.WriteLine($"PDF loaded successfully. Page count: {pageCount}");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error loading PDF: {ex.Message}");
+            Console.Error.WriteLine($"Failed to load PDF: {ex.Message}");
         }
     }
 }

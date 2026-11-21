@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-convert-documents
 
-> **Facades convert documents** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades convert documents** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,10 +23,10 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf.Devices;` (38/40 files) ← category-specific
-- `using Aspose.Pdf;` (37/40 files) ← category-specific
+- `using Aspose.Pdf.Devices;` (40/40 files) ← category-specific
+- `using Aspose.Pdf;` (38/40 files) ← category-specific
 - `using Aspose.Pdf.Facades;` (11/40 files)
-- `using Aspose.Pdf.Text;` (8/40 files)
+- `using Aspose.Pdf.Text;` (9/40 files)
 - `using System;` (40/40 files)
 - `using System.IO;` (40/40 files)
 - `using System.Threading.Tasks;` (1/40 files)
@@ -46,36 +46,36 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
-| [batch-convert-pdfs-to-jpeg__v2](./batch-convert-pdfs-to-jpeg__v2.cs) | Batch Convert PDFs to JPEG Images | `Document`, `JpegDevice`, `Process` | Shows how to iterate through PDF files in a folder and convert each page of every PDF into separa... |
-| [convert-pdf-odd-pages-to-png](./convert-pdf-odd-pages-to-png.cs) | Convert Odd PDF Pages to PNG Images | `Document`, `PngDevice`, `Resolution` | Demonstrates loading a PDF with Aspose.Pdf, iterating over only the odd‑numbered pages, and conve... |
-| [convert-pdf-pages-3-8-to-bmp](./convert-pdf-pages-3-8-to-bmp.cs) | Convert PDF Pages to BMP Images with Page Range | `Document`, `BmpDevice`, `Resolution` | Shows how to convert a specific range of PDF pages (pages 3‑8) to BMP images using Aspose.Pdf, wi... |
-| [convert-pdf-pages-3-8-to-multi-page-tiff](./convert-pdf-pages-3-8-to-multi-page-tiff.cs) | Convert PDF Pages 3‑8 to TIFF Images | `PdfConverter`, `BindPdf`, `SaveAsTIFF` | Demonstrates converting a specific range of PDF pages (pages 3 through 8) to separate TIFF files ... |
-| [convert-pdf-pages-to-bmp-150-dpi](./convert-pdf-pages-to-bmp-150-dpi.cs) | Convert PDF Pages 1‑20 to BMP Images | `PdfConverter`, `Document`, `Resolution` | Demonstrates converting the first up to 20 pages of a PDF to BMP images at 150 DPI using Aspose.P... |
-| [convert-pdf-pages-to-bmp-helvetica-to-arial](./convert-pdf-pages-to-bmp-helvetica-to-arial.cs) | Convert PDF Pages 5‑7 to BMP with Helvetica‑to‑Arial Substit... | `Document`, `FontRepository`, `SimpleFontSubstitution` | The example loads a PDF, substitutes the Helvetica font with Arial, and converts pages 5 through ... |
-| [convert-pdf-pages-to-bmp-images](./convert-pdf-pages-to-bmp-images.cs) | Convert PDF Pages to BMP Images (Partial Range) | `Document`, `BmpDevice`, `Resolution` | Demonstrates how to load a PDF with Aspose.Pdf, select a page range (pages 2‑6), and render each ... |
-| [convert-pdf-pages-to-jpeg-150-dpi](./convert-pdf-pages-to-jpeg-150-dpi.cs) | Convert PDF Pages 1-10 to JPEG Images at 150 DPI | `Document`, `JpegDevice`, `Resolution` | Loads a PDF document, renders pages 1 through 10 to JPEG files at 150 DPI using the CropBox, and ... |
-| [convert-pdf-pages-to-multi-page-tiff](./convert-pdf-pages-to-multi-page-tiff.cs) | Convert PDF Pages 4-9 to Multi-Page TIFF | `PdfConverter`, `BindPdf`, `StartPage` | Demonstrates extracting pages 4 through 9 from a PDF and saving them as a multi-page TIFF file us... |
-| [convert-pdf-pages-to-png-reverse-order](./convert-pdf-pages-to-png-reverse-order.cs) | Convert PDF Pages to PNG Images in Reverse Order | `Document`, `Page`, `PngDevice` | Demonstrates loading a PDF with Aspose.Pdf, iterating its pages from last to first, and saving ea... |
-| [convert-pdf-pages-to-tiff](./convert-pdf-pages-to-tiff.cs) | Convert PDF Pages to Separate TIFF Images | `Document`, `Page`, `TiffDevice` | Demonstrates how to load a PDF with Aspose.Pdf, iterate through each page, and render each page a... |
-| [convert-pdf-to-bmp-200-dpi](./convert-pdf-to-bmp-200-dpi.cs) | Convert PDF to BMP Images at 200 DPI | `Document`, `Resolution`, `BmpDevice` | Shows how to load a PDF with Aspose.Pdf, render each page to a BMP image using a 200 DPI Resoluti... |
-| [convert-pdf-to-bmp-first-10-pages](./convert-pdf-to-bmp-first-10-pages.cs) | Convert PDF to BMP Images (First 10 Pages) | `Document`, `BmpDevice`, `Resolution` | Demonstrates how to convert the first ten pages of a PDF document to BMP images using Aspose.Pdf. |
-| [convert-pdf-to-bmp-images__v2](./convert-pdf-to-bmp-images__v2.cs) | Convert PDF to BMP Images with Custom Resolution | `Document`, `BmpDevice`, `Resolution` | Shows how to convert each page of a PDF into separate BMP files using Aspose.Pdf, setting the DPI... |
-| [convert-pdf-to-bmp-with-cropbox](./convert-pdf-to-bmp-with-cropbox.cs) | Convert PDF Pages to BMP Using CropBox | `Document`, `Page`, `Resolution` | Loads a PDF, iterates through its pages and renders each page to a BMP image using the page's Cro... |
-| [convert-pdf-to-bmp-with-font-substitution](./convert-pdf-to-bmp-with-font-substitution.cs) | Convert PDF to BMP Images with Font Substitution | `Document`, `FontRepository`, `SimpleFontSubstitution` | Shows how to convert each page of a PDF to BMP images while applying font substitution for missin... |
-| [convert-pdf-to-bmp-with-font-substitution__v2](./convert-pdf-to-bmp-with-font-substitution__v2.cs) | Convert PDF to BMP with Font Substitution | `Document`, `Add`, `SimpleFontSubstitution` | Demonstrates converting each page of a PDF to BMP images while substituting Times New Roman with ... |
-| [convert-pdf-to-high-resolution-multi-page-tiff](./convert-pdf-to-high-resolution-multi-page-tiff.cs) | Convert PDF to High-Resolution TIFF Images | `PdfConverter`, `BindPdf`, `DoConvert` | Demonstrates converting each page of a PDF into separate TIFF files at 400 DPI using Aspose.Pdf's... |
-| [convert-pdf-to-jpeg-300dpi-cropbox](./convert-pdf-to-jpeg-300dpi-cropbox.cs) | Convert PDF to JPEG with 300 DPI and CropBox Cropping | `Document`, `Page`, `JpegDevice` | Demonstrates loading a PDF, applying a uniform CropBox to all pages, and converting each page to ... |
-| [convert-pdf-to-jpeg-96-dpi](./convert-pdf-to-jpeg-96-dpi.cs) | Convert PDF to JPEG Images with 96 DPI | `Document`, `Resolution`, `JpegDevice` | Demonstrates how to load a PDF with Aspose.Pdf, set a 96 DPI resolution, and export each page as ... |
-| [convert-pdf-to-jpeg-first-5-pages-200-dpi](./convert-pdf-to-jpeg-first-5-pages-200-dpi.cs) | Convert PDF to JPEG Images (First 5 Pages, 200 DPI) | `Document`, `Resolution`, `JpegDevice` | Shows how to convert up to the first five pages of a PDF document into JPEG images at a resolutio... |
-| [convert-pdf-to-jpeg-images](./convert-pdf-to-jpeg-images.cs) | Convert PDF Pages to JPEG Images | `Document`, `Resolution`, `JpegDevice` | Shows how to load a PDF with Aspose.Pdf, iterate through each page, and save the pages as JPEG im... |
-| [convert-pdf-to-jpeg-images__v2](./convert-pdf-to-jpeg-images__v2.cs) | Convert PDF to JPEG Images | `Document`, `Page`, `JpegDevice` | Shows how to load a PDF with Aspose.Pdf, iterate through its pages, and save each page as a JPEG ... |
-| [convert-pdf-to-jpeg-images__v3](./convert-pdf-to-jpeg-images__v3.cs) | Convert PDF Pages to JPEG Images | `Document`, `JpegDevice`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, iterate through each page, and save each page as an indi... |
-| [convert-pdf-to-jpeg-preview-images](./convert-pdf-to-jpeg-preview-images.cs) | Convert PDF Pages to JPEG Images | `Document`, `Page`, `JpegDevice` | Shows how to load a PDF with Aspose.Pdf, validate a page range, and render each selected page to ... |
-| [convert-pdf-to-jpeg-with-font-substitution](./convert-pdf-to-jpeg-with-font-substitution.cs) | Convert PDF Pages to JPEG with Font Substitution | `Document`, `FontRepository`, `SimpleFontSubstitution` | Loads a PDF, substitutes missing fonts with available ones, and converts each page to a JPEG imag... |
-| [convert-pdf-to-multi-page-tiff-300-dpi](./convert-pdf-to-multi-page-tiff-300-dpi.cs) | Convert PDF to Multi‑Page TIFF with 300 DPI | `PdfConverter`, `BindPdf`, `StartPage` | Shows how to use Aspose.Pdf.Facades.PdfConverter to convert a PDF document into a single multi‑pa... |
-| [convert-pdf-to-multi-page-tiff-600-dpi](./convert-pdf-to-multi-page-tiff-600-dpi.cs) | Convert PDF to Multi‑Page TIFF at 600 DPI | `PdfConverter`, `BindPdf`, `Resolution` | Demonstrates how to use Aspose.Pdf's PdfConverter to convert a PDF document into a multi‑page TIF... |
-| [convert-pdf-to-multi-page-tiff-with-font-substitut...](./convert-pdf-to-multi-page-tiff-with-font-substitution.cs) | Convert PDF to Multi-Page TIFF with Font Substitution | `Document`, `PdfConverter`, `SaveAsTIFF` | Demonstrates converting a PDF document to a multi-page TIFF image while substituting the Courier ... |
-| [convert-pdf-to-multi-page-tiff-with-font-substitut...](./convert-pdf-to-multi-page-tiff-with-font-substitution__v2.cs) | Convert PDF to Multi-Page TIFF with Symbol Font Substitution | `PdfConverter`, `BindPdf`, `SaveAsTIFF` | Demonstrates converting a PDF to a multi-page TIFF at 300 DPI using Aspose.Pdf, while substitutin... |
+| [batch-convert-pdfs-to-jpeg__v2](./batch-convert-pdfs-to-jpeg__v2.cs) | Batch Convert PDFs to JPEG Images | `Document`, `JpegDevice`, `Resolution` | Demonstrates how to iterate through a folder of PDF files and convert each page to a JPEG image u... |
+| [convert-pdf-odd-pages-to-png](./convert-pdf-odd-pages-to-png.cs) | Convert Odd PDF Pages to PNG Images | `Document`, `PageCollection`, `PngDevice` | Loads a PDF file, iterates over its odd‑numbered pages, and saves each page as a separate PNG ima... |
+| [convert-pdf-pages-3-8-to-bmp](./convert-pdf-pages-3-8-to-bmp.cs) | Convert PDF Pages to BMP Images (Pages 3-8) | `Document`, `Resolution`, `BmpDevice` | Shows how to convert a specific range of PDF pages to BMP images using Aspose.Pdf, including page... |
+| [convert-pdf-pages-3-8-to-multi-page-tiff](./convert-pdf-pages-3-8-to-multi-page-tiff.cs) | Convert PDF Pages 3‑8 to TIFF Images | `Document`, `TiffDevice`, `Resolution` | Shows how to convert a specific range of PDF pages (pages 3 through 8) into separate TIFF files u... |
+| [convert-pdf-pages-to-bmp-150-dpi](./convert-pdf-pages-to-bmp-150-dpi.cs) | Convert PDF Pages to BMP Images (1‑20) at 150 DPI | `PdfConverter`, `BindPdf`, `StartPage` | Demonstrates how to use Aspose.Pdf.Facades.PdfConverter to convert the first 20 pages of a PDF in... |
+| [convert-pdf-pages-to-bmp-helvetica-to-arial](./convert-pdf-pages-to-bmp-helvetica-to-arial.cs) | Convert PDF Pages 5-7 to BMP with Helvetica to Arial Substit... | `Document`, `FontRepository`, `SimpleFontSubstitution` | The example loads a PDF, applies a Helvetica‑to‑Arial font substitution, and renders pages 5 thro... |
+| [convert-pdf-pages-to-bmp-images](./convert-pdf-pages-to-bmp-images.cs) | Convert PDF Pages 2-6 to BMP Images | `Document`, `BmpDevice`, `Resolution` | Demonstrates loading a PDF with Aspose.Pdf, selecting a page range (2 to 6), and saving each page... |
+| [convert-pdf-pages-to-jpeg-150-dpi](./convert-pdf-pages-to-jpeg-150-dpi.cs) | Convert PDF Pages to JPEG Images with 150 DPI | `Document`, `JpegDevice`, `Resolution` | Demonstrates how to load a PDF, select pages 1‑10, and convert each page to a JPEG image at 150 D... |
+| [convert-pdf-pages-to-multi-page-tiff](./convert-pdf-pages-to-multi-page-tiff.cs) | Convert PDF Pages 4‑9 to Multi‑Page TIFF | `PdfConverter`, `BindPdf`, `StartPage` | Shows how to extract a specific page range from a PDF and save it as a multi‑page TIFF using Aspo... |
+| [convert-pdf-pages-to-png-reverse-order](./convert-pdf-pages-to-png-reverse-order.cs) | Convert PDF Pages to PNG Images in Reverse Order | `Document`, `PdfConverter`, `BindPdf` | Shows how to load a PDF with Aspose.Pdf, iterate its pages from the last to the first, and render... |
+| [convert-pdf-pages-to-tiff](./convert-pdf-pages-to-tiff.cs) | Convert PDF Pages to Separate TIFF Images | `Document`, `Resolution`, `TiffDevice` | Demonstrates loading a PDF with Aspose.Pdf, iterating through each page, and saving each page as ... |
+| [convert-pdf-to-bmp-200-dpi](./convert-pdf-to-bmp-200-dpi.cs) | Convert PDF Pages to BMP Images at 200 DPI | `Document`, `Resolution`, `BmpDevice` | Demonstrates loading a PDF with Aspose.Pdf, iterating through its pages, and saving each page as ... |
+| [convert-pdf-to-bmp-first-10-pages](./convert-pdf-to-bmp-first-10-pages.cs) | Convert PDF to BMP Images (First 10 Pages) | `Document`, `BmpDevice`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, render up to the first ten pages to BMP format, and save... |
+| [convert-pdf-to-bmp-images__v2](./convert-pdf-to-bmp-images__v2.cs) | Convert PDF to BMP Images with Resolution Settings | `Document`, `BmpDevice`, `Resolution` | Shows how to load a PDF using Aspose.Pdf, set a BmpDevice with a specific resolution, and convert... |
+| [convert-pdf-to-bmp-with-cropbox](./convert-pdf-to-bmp-with-cropbox.cs) | Convert PDF to BMP Images Using CropBox | `Document`, `Resolution`, `BmpDevice` | Shows how to convert each page of a PDF to BMP files with Aspose.Pdf, automatically trimming marg... |
+| [convert-pdf-to-bmp-with-font-substitution](./convert-pdf-to-bmp-with-font-substitution.cs) | Convert PDF to BMP Images with Font Substitution | `Document`, `FontRepository`, `SimpleFontSubstitution` | Shows how to load a PDF, set up font substitution for missing fonts, and convert each page to a B... |
+| [convert-pdf-to-bmp-with-font-substitution__v2](./convert-pdf-to-bmp-with-font-substitution__v2.cs) | Convert PDF to BMP with Font Substitution | `Document`, `Substitutions`, `SimpleFontSubstitution` | Demonstrates loading a PDF, registering a Times New Roman to Calibri font substitution, and conve... |
+| [convert-pdf-to-high-resolution-multi-page-tiff](./convert-pdf-to-high-resolution-multi-page-tiff.cs) | Convert PDF to High-Resolution TIFF Images | `Document`, `PdfConverter`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, iterate through its pages, and save each page as a separ... |
+| [convert-pdf-to-jpeg-300dpi-cropbox](./convert-pdf-to-jpeg-300dpi-cropbox.cs) | Convert PDF to JPEG Images with 300 DPI | `Document`, `JpegDevice`, `Resolution` | Shows how to load a PDF using Aspose.Pdf, configure a JpegDevice at 300 DPI, and save each page a... |
+| [convert-pdf-to-jpeg-96-dpi](./convert-pdf-to-jpeg-96-dpi.cs) | Convert PDF Pages to JPEG Images at 96 DPI | `Document`, `JpegDevice`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, create a JpegDevice with 96 DPI and 80% quality, and sav... |
+| [convert-pdf-to-jpeg-first-5-pages-200-dpi](./convert-pdf-to-jpeg-first-5-pages-200-dpi.cs) | Convert PDF to JPEG Images (First 5 Pages, 200 DPI) | `Document`, `JpegDevice`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, iterate over up to five pages, and save each page as a 2... |
+| [convert-pdf-to-jpeg-images](./convert-pdf-to-jpeg-images.cs) | Convert PDF Pages to JPEG Images | `Document`, `PageCollection`, `JpegDevice` | Demonstrates loading a PDF with Aspose.Pdf, iterating through its pages, and saving each page as ... |
+| [convert-pdf-to-jpeg-images__v2](./convert-pdf-to-jpeg-images__v2.cs) | Convert PDF to JPEG Images | `Document`, `JpegDevice`, `Pages` | Shows how to load a PDF with Aspose.Pdf and convert each page to a JPEG file using the JpegDevice... |
+| [convert-pdf-to-jpeg-images__v3](./convert-pdf-to-jpeg-images__v3.cs) | Convert PDF Pages to JPEG Images | `Document`, `JpegDevice`, `Page` | Shows how to load a PDF with Aspose.Pdf, iterate through each page, and save each page as an indi... |
+| [convert-pdf-to-jpeg-preview-images](./convert-pdf-to-jpeg-preview-images.cs) | Convert PDF Pages to JPEG Preview Images | `Document`, `JpegDevice`, `Resolution` | Shows how to load a PDF with Aspose.Pdf, define a page range (1‑3), and convert each page to a JP... |
+| [convert-pdf-to-jpeg-with-font-substitution](./convert-pdf-to-jpeg-with-font-substitution.cs) | Convert PDF to JPEG with Font Substitution | `Document`, `Substitutions`, `SimpleFontSubstitution` | Shows how to replace missing fonts in a PDF using a custom TrueType font and then render each pag... |
+| [convert-pdf-to-multi-page-tiff-300-dpi](./convert-pdf-to-multi-page-tiff-300-dpi.cs) | Convert PDF to TIFF Images with 300 DPI | `PdfConverter`, `BindPdf`, `DoConvert` | Demonstrates converting each page of a PDF to separate TIFF files using Aspose.Pdf.Facades.PdfCon... |
+| [convert-pdf-to-multi-page-tiff-600-dpi](./convert-pdf-to-multi-page-tiff-600-dpi.cs) | Convert PDF to Multi‑Page TIFF at 600 DPI | `PdfConverter`, `Resolution`, `CompressionType` | Shows how to convert a PDF document into a single multi‑page TIFF image with a resolution of 600 ... |
+| [convert-pdf-to-multi-page-tiff-with-font-substitut...](./convert-pdf-to-multi-page-tiff-with-font-substitution.cs) | Convert PDF to Multi‑Page TIFF with Font Substitution | `Document`, `PdfConverter`, `BindPdf` | Demonstrates converting a PDF document to a multi‑page TIFF image while substituting the Courier ... |
+| [convert-pdf-to-multi-page-tiff-with-font-substitut...](./convert-pdf-to-multi-page-tiff-with-font-substitution__v2.cs) | Convert PDF to Multi-Page TIFF with Font Substitution | `Document`, `Add`, `Resolution` | Shows how to convert a PDF document to a multi-page TIFF image using Aspose.Pdf, applying Symbol ... |
 | ... | | | *and 10 more files* |
 
 ## Category Statistics
@@ -90,5 +90,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for facades-convert-documents patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-10-26 | Run: `20261026_001223_9dc44d`
+Updated: 2026-11-06 | Run: `20261106_033110_dd579b`
 <!-- AUTOGENERATED:END -->

@@ -7,39 +7,37 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "bidirectional_output.pdf";
+        const string outputPath = "bidirectional.pdf";
 
-        if (!File.Exists(inputPath))
+        // Create a new PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document())
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
-            return;
-        }
-
-        // Wrap Document in a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Add a new page where the bidirectional text will be placed
+            // Add a single page (Pages are 1‑based)
             Page page = doc.Pages.Add();
 
-            // Mixed left‑to‑right (English) and right‑to‑left (Arabic, Hebrew) Unicode text
-            string bidiText = "English text, العربية, שלום";
+            // Mixed left‑to‑right (English) and right‑to‑left (Hebrew, Arabic) text
+            // Unicode characters are used directly in the string literal
+            string mixedText = "Hello, שלום, مرحبا!";
 
-            // Create a TextFragment containing the Unicode sequence
-            TextFragment fragment = new TextFragment(bidiText);
+            // Create a TextFragment containing the mixed text
+            TextFragment fragment = new TextFragment(mixedText);
 
-            // Use a Unicode font that supports Arabic and Hebrew characters.
-            // Aspose.PDF automatically renders RTL scripts when a suitable font is used.
-            fragment.TextState.Font = FontRepository.FindFont("Arial Unicode MS");
-            fragment.TextState.FontSize = 14;
+            // Configure the TextState for proper rendering of RTL characters
+            TextState ts = fragment.TextState;
+            ts.Font = FontRepository.FindFont("Arial"); // Font that supports both LTR and RTL glyphs
+            ts.FontSize = 14;
+            // Note: Aspose.Pdf automatically handles bidirectional layout when a Unicode‑capable font is used.
+
+            // Position the fragment on the page
+            fragment.Position = new Position(50, 750);
 
             // Add the fragment to the page's paragraph collection
             page.Paragraphs.Add(fragment);
 
-            // Save the modified PDF
+            // Save the document as PDF (no SaveOptions needed for PDF output)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Bidirectional PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved to {outputPath}");
     }
 }

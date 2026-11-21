@@ -15,20 +15,23 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Append a new empty page at the end of the document
             Page newPage = doc.Pages.Add();
 
-            // Set the page size to A4 (210 mm × 297 mm). Aspose.Pdf uses points.
-            newPage.PageInfo.Width = PageSize.A4.Width;
-            newPage.PageInfo.Height = PageSize.A4.Height;
+            // Set the page size to A4 (210 mm × 297 mm).
+            // Aspose.Pdf provides the dimensions in points via PageSize.A4.
+            newPage.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
+            // Alternative approach (equivalent):
+            // newPage.PageInfo.Width = PageSize.A4.Width;
+            // newPage.PageInfo.Height = PageSize.A4.Height;
 
-            // Save the modified document while the Document instance is still alive
+            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved with an extra A4 page: {outputPath}");
+        Console.WriteLine($"A4 page appended and saved to '{outputPath}'.");
     }
 }

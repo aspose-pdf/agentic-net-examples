@@ -1,20 +1,27 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using System.Text.Json;
 using Aspose.Pdf;
+using Aspose.Pdf.Forms;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files containing form data
-        string[] pdfFiles = { "form1.pdf", "form2.pdf", "form3.pdf" };
-        // Output JSON file path
-        const string jsonOutput = "merged_form_data.json";
+        // Input PDF files – adjust the list as needed
+        string[] pdfFiles = new string[]
+        {
+            "form1.pdf",
+            "form2.pdf",
+            "form3.pdf"
+        };
 
-        // Collection to hold form data from each PDF
-        var allFormData = new List<Dictionary<string, string>>();
+        // Output JSON file
+        const string jsonOutputPath = "merged_form_data.json";
+
+        // Dictionary to hold form data per PDF (key = file name, value = field dictionary)
+        var allFormData = new Dictionary<string, Dictionary<string, string>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (string pdfPath in pdfFiles)
         {
@@ -24,34 +31,48 @@ class Program
                 continue;
             }
 
-            // Load the PDF document – Document implements IDisposable
-            using (var document = new Document(pdfPath))
+            try
             {
-                var fieldsDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-                // Access form fields via Document.Form.Fields collection
-                if (document?.Form?.Fields != null)
+                // Load the PDF document
+                using (Document doc = new Document(pdfPath))
                 {
-                    foreach (var field in document.Form.Fields)
-                    {
-                        // Prefer FullName; fallback to Name if FullName is null
-                        string name = field?.FullName ?? field?.Name ?? string.Empty;
-                        // Convert the field value to string safely
-                        string value = field?.Value?.ToString() ?? string.Empty;
-                        fieldsDict[name] = value;
-                    }
-                }
+                    var fieldData = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-                allFormData.Add(fieldsDict);
+                    // Ensure the document actually contains a form
+                    if (doc.Form != null && doc.Form.Fields != null)
+                    {
+                        foreach (Field field in doc.Form.Fields)
+                        {
+                            // Prefer FullName; fallback to Name if FullName is null
+                            string name = field?.FullName ?? field?.Name ?? string.Empty;
+                            // Convert the field value to string; treat null as empty string
+                            string value = field?.Value?.ToString() ?? string.Empty;
+                            fieldData[name] = value;
+                        }
+                    }
+
+                    // Store the collected data using the file name (without directory) as the key
+                    string fileKey = Path.GetFileName(pdfPath);
+                    allFormData[fileKey] = fieldData;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Error processing '{pdfPath}': {ex.Message}");
             }
         }
 
-        // Serialize the aggregated form data to JSON (indented for readability)
-        string json = JsonSerializer.Serialize(allFormData, new JsonSerializerOptions { WriteIndented = true });
-
-        // Write JSON to the output file
-        File.WriteAllText(jsonOutput, json);
-
-        Console.WriteLine($"Merged form data saved to '{jsonOutput}'.");
+        try
+        {
+            // Serialize the aggregated form data to JSON with indentation for readability
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions { WriteIndented = true };
+            string json = JsonSerializer.Serialize(allFormData, jsonOptions);
+            File.WriteAllText(jsonOutputPath, json);
+            Console.WriteLine($"Merged form data saved to '{jsonOutputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Failed to write JSON file: {ex.Message}");
+        }
     }
 }

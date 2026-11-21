@@ -16,11 +16,15 @@ class Program
             return;
         }
 
-        // Ensure the Document is disposed properly
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Delete the specified form field
-            doc.Form.Delete(fieldName);
+            // Ensure the form and the specific field exist before attempting deletion
+            if (doc.Form != null && doc.Form[fieldName] != null)
+            {
+                // Delete the form field named 'OldPhoneNumber'
+                doc.Form.Delete(fieldName);
+            }
 
             // Save the updated PDF
             doc.Save(outputPath);

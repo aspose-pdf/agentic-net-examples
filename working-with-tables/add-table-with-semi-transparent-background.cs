@@ -13,72 +13,68 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        try
+        // Load the PDF inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
-            {
-                // Access the tagged content API
-                ITaggedContent taggedContent = doc.TaggedContent;
-                taggedContent.SetLanguage("en-US");
-                taggedContent.SetTitle("Accessible Table PDF");
+            // Access the tagged content interface
+            ITaggedContent taggedContent = doc.TaggedContent;
+            taggedContent.SetLanguage("en-US");
+            taggedContent.SetTitle("PDF with Accessible Table");
 
-                // Get the root structure element (no cast needed)
-                StructureElement root = taggedContent.RootElement;
+            // Get the root structure element (no cast required)
+            StructureElement root = taggedContent.RootElement;
 
-                // Create a Table element via the ITaggedContent factory
-                TableElement table = taggedContent.CreateTableElement();
+            // Create a table element via the tagged content factory
+            TableElement table = taggedContent.CreateTableElement();
 
-                // Set a semi‑transparent background color (50% opacity, light gray)
-                // FromArgb expects integer values (0‑255). 128 = 50% opacity.
-                table.BackgroundColor = Aspose.Pdf.Color.FromArgb(128, 230, 230, 230);
+            // Set a light gray background color with 50% opacity using ARGB
+            // Alpha 128 (out of 255) = 50% opacity
+            table.BackgroundColor = Aspose.Pdf.Color.FromArgb(128, 230, 230, 230); // light gray, semi‑transparent
 
-                // Attach the table to the root element
-                root.AppendChild(table);
+            // Optional description for accessibility
+            table.AlternativeText = "Sample data table with background color";
 
-                // ----- Header row -----
-                TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
-                table.AppendChild(thead);
+            // Attach the table to the document's structure tree
+            root.AppendChild(table);
 
-                TableTRElement headerRow = taggedContent.CreateTableTRElement();
-                thead.AppendChild(headerRow);
+            // ----- Build table header -----
+            TableTHeadElement thead = taggedContent.CreateTableTHeadElement();
+            table.AppendChild(thead);
 
-                TableTHElement th1 = taggedContent.CreateTableTHElement();
-                th1.SetText("Name");
-                headerRow.AppendChild(th1);
+            TableTRElement headerRow = taggedContent.CreateTableTRElement();
+            thead.AppendChild(headerRow);
 
-                TableTHElement th2 = taggedContent.CreateTableTHElement();
-                th2.SetText("Value");
-                headerRow.AppendChild(th2);
+            TableTHElement thName = taggedContent.CreateTableTHElement();
+            thName.SetText("Name");
+            headerRow.AppendChild(thName);
 
-                // ----- Body rows -----
-                TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
-                table.AppendChild(tbody);
+            TableTHElement thValue = taggedContent.CreateTableTHElement();
+            thValue.SetText("Value");
+            headerRow.AppendChild(thValue);
 
-                TableTRElement dataRow = taggedContent.CreateTableTRElement();
-                tbody.AppendChild(dataRow);
+            // ----- Build table body -----
+            TableTBodyElement tbody = taggedContent.CreateTableTBodyElement();
+            table.AppendChild(tbody);
 
-                TableTDElement td1 = taggedContent.CreateTableTDElement();
-                td1.SetText("Item A");
-                dataRow.AppendChild(td1);
+            TableTRElement dataRow = taggedContent.CreateTableTRElement();
+            tbody.AppendChild(dataRow);
 
-                TableTDElement td2 = taggedContent.CreateTableTDElement();
-                td2.SetText("42");
-                dataRow.AppendChild(td2);
+            TableTDElement tdItem = taggedContent.CreateTableTDElement();
+            tdItem.SetText("Item A");
+            dataRow.AppendChild(tdItem);
 
-                // Save the modified PDF (no PreSave call required)
-                doc.Save(outputPath);
-            }
+            TableTDElement tdNumber = taggedContent.CreateTableTDElement();
+            tdNumber.SetText("42");
+            dataRow.AppendChild(tdNumber);
 
-            Console.WriteLine($"Tagged PDF with table background saved to '{outputPath}'.");
+            // Save the modified PDF (no PreSave call required)
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"PDF saved with accessible table and background color: '{outputPath}'.");
     }
 }

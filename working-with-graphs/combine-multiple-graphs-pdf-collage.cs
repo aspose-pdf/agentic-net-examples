@@ -1,17 +1,17 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                     // Core PDF API
-using Aspose.Pdf.Annotations;        // For stamp annotations (ImageStamp derives from StampAnnotation)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        // Input graph images to be combined
-        string[] graphImages = { "graph1.png", "graph2.png", "graph3.png" };
+        // Paths to the graph images that will be placed on the page
+        string[] graphImages = { "graph1.png", "graph2.png", "graph3.png", "graph4.png" };
+        const string outputPdf = "collage.pdf";
 
-        // Verify that all image files exist
-        foreach (string imgPath in graphImages)
+        // Verify that all image files exist before proceeding
+        foreach (var imgPath in graphImages)
         {
             if (!File.Exists(imgPath))
             {
@@ -20,51 +20,47 @@ class Program
             }
         }
 
-        // Output PDF path
-        const string outputPdf = "combined_graphs.pdf";
-
-        // Create a new PDF document with a single blank page
+        // Create a new PDF document and ensure deterministic disposal
         using (Document doc = new Document())
         {
-            // Add an empty page (default size A4)
+            // Add a single blank page (default size is A4)
             Page page = doc.Pages.Add();
 
-            // Position each graph image at a different location on the page
-            // Coordinates are measured from the bottom‑left corner of the page
-            // (X = horizontal distance, Y = vertical distance)
-            // Adjust the values as needed for your collage layout
-            double[,] positions = new double[,]
+            // Define absolute positions (left, bottom) for each graph in points
+            // A4 dimensions: 595 x 842 points
+            var positions = new (double left, double bottom)[]
             {
-                { 50,  500 },   // graph1 at (50, 500)
-                { 300, 500 },   // graph2 at (300, 500)
-                { 175, 250 }    // graph3 at (175, 250)
+                (50, 500),   // Position for graph1.png
+                (300, 500),  // Position for graph2.png
+                (50, 200),   // Position for graph3.png
+                (300, 200)   // Position for graph4.png
             };
 
-            for (int i = 0; i < graphImages.Length; i++)
+            // Place each image on the page at its designated coordinates
+            for (int i = 0; i < graphImages.Length && i < positions.Length; i++)
             {
                 // Create an ImageStamp for the current graph image
-                ImageStamp imgStamp = new ImageStamp(graphImages[i]);
+                ImageStamp stamp = new ImageStamp(graphImages[i]);
 
-                // Use absolute positioning: no automatic alignment
-                imgStamp.HorizontalAlignment = HorizontalAlignment.None;
-                imgStamp.VerticalAlignment   = VerticalAlignment.None;
+                // Use absolute positioning by disabling alignment
+                stamp.HorizontalAlignment = HorizontalAlignment.None;
+                stamp.VerticalAlignment   = VerticalAlignment.None;
 
-                // Set the exact X/Y offsets (in points) from the page origin
-                imgStamp.XIndent = positions[i, 0];
-                imgStamp.YIndent = positions[i, 1];
+                // Set the exact location on the page
+                stamp.LeftMargin   = positions[i].left;
+                stamp.BottomMargin = positions[i].bottom;
 
-                // Optional: make the stamp transparent background and set opacity
-                imgStamp.Background = false;
-                imgStamp.Opacity    = 1.0; // fully opaque; adjust between 0.0 and 1.0 if needed
+                // Optional: add a thin gray border around each image
+                // stamp.Border = new Border(stamp) { Width = 1, Color = Aspose.Pdf.Color.Gray };
 
                 // Add the stamp to the page
-                page.AddStamp(imgStamp);
+                page.AddStamp(stamp);
             }
 
-            // Save the resulting PDF
+            // Save the resulting PDF collage
             doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Combined graph PDF saved to '{outputPdf}'.");
+        Console.WriteLine($"Collage PDF saved to '{outputPdf}'.");
     }
 }

@@ -7,8 +7,8 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "header_added.pdf";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -19,29 +19,39 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Create a header/footer object
-            HeaderFooter header = new HeaderFooter();
-
-            // Configure margins for the header (values are in points)
-            header.Margin = new MarginInfo
+            // Ensure the document has at least one page
+            if (doc.Pages.Count < 1)
             {
-                Top    = 20,   // distance from the top edge of the page
-                Bottom = 0,
-                Left   = 0,
-                Right  = 0
+                Console.Error.WriteLine("Document contains no pages.");
+                return;
+            }
+
+            // Configure margins for the first page
+            MarginInfo margins = new MarginInfo
+            {
+                Top = 50,    // points from the top edge
+                Bottom = 50,
+                Left = 50,
+                Right = 50
             };
+            Page firstPage = doc.Pages[1];
+            firstPage.PageInfo.Margin = margins;
 
-            // Create the text fragment that will appear in the header
-            TextFragment tf = new TextFragment("Document Header");
-            tf.TextState.FontSize = 12;
-            tf.TextState.Font = FontRepository.FindFont("Arial");
-            tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
+            // Create a text fragment that will serve as the header
+            TextFragment header = new TextFragment("Document Header");
+            header.TextState.FontSize = 14;
+            header.TextState.Font = FontRepository.FindFont("Arial");
+            header.TextState.FontStyle = FontStyles.Bold;
+            header.TextState.ForegroundColor = Aspose.Pdf.Color.DarkBlue;
 
-            // Add the text fragment to the header's paragraph collection
-            header.Paragraphs.Add(tf);
+            // Position the header inside the top margin.
+            // PDF origin is bottom‑left, so Y = page height - top margin (+ small offset)
+            double yPos = firstPage.PageInfo.Height - margins.Top + 5;
+            double xPos = margins.Left;
+            header.Position = new Position(xPos, yPos);
 
-            // Assign the header to the first page (pages are 1‑based)
-            doc.Pages[1].Header = header;
+            // Add the header to the page
+            firstPage.Paragraphs.Add(header);
 
             // Save the modified PDF
             doc.Save(outputPath);

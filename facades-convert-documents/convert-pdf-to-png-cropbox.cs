@@ -1,51 +1,48 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices; // for PngDevice and Resolution
+using Aspose.Pdf.Devices;
 
-class Program
+class PdfToPngConverter
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDir = "PagesAsPng";
+        const string pdfPath = "input.pdf";
+        const string outputFolder = "PagesAsPng";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        Directory.CreateDirectory(outputDir);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outputFolder);
 
-        try
+        // Load the PDF document
+        Document pdfDocument = new Document(pdfPath);
+
+        // Define the resolution for the PNG images (e.g., 150 DPI)
+        var resolution = new Resolution(150);
+        // Image devices (PngDevice, GifDevice, etc.) are not IDisposable – instantiate directly.
+        var pngDevice = new PngDevice(resolution);
+
+        // Iterate through each page and render it as PNG using the CropBox area
+        for (int pageNumber = 1; pageNumber <= pdfDocument.Pages.Count; pageNumber++)
         {
-            // Load the PDF document
-            Document pdfDoc = new Document(inputPdf);
-
-            // Iterate through each page (1‑based index)
-            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+            // Only the stream needs disposing.
+            using (var imageStream = new MemoryStream())
             {
-                Page page = pdfDoc.Pages[pageNum];
+                // Render the current page into the memory stream
+                pngDevice.Process(pdfDocument.Pages[pageNumber], imageStream);
 
-                // Ensure the CropBox is set – it already defines the visible area.
-                // No need to manually set PageSize or SourceRectangle on PngDevice
-                // because those members do not exist in recent Aspose.Pdf versions.
-
-                // Create a PNG device with the desired DPI
-                PngDevice pngDevice = new PngDevice(new Resolution(300));
-                // Optional: make background transparent
-                pngDevice.TransparentBackground = true;
-
-                string outPath = Path.Combine(outputDir, $"Page_{pageNum}.png");
-                // Process the page and write directly to a file path
-                pngDevice.Process(page, outPath);
-                Console.WriteLine($"Saved page {pageNum} as PNG → {outPath}");
+                // Write the PNG file to disk
+                string outPath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
+                File.WriteAllBytes(outPath, imageStream.ToArray());
+                Console.WriteLine($"Saved page {pageNumber} as PNG: {outPath}");
             }
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
-        }
+
+        Console.WriteLine("PDF to PNG conversion completed.");
     }
 }

@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Annotations;
 
@@ -8,13 +7,11 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
-        const string outputPath = "output.pdf";
-
-        // Identify the note to replace
-        const string oldTitle   = "Old Note";
-        const string newTitle   = "Updated Note";
-        const string newContent = "This is the updated note text.";
+        const string inputPath = "input.pdf";
+        const string outputPath = "updated.pdf";
+        const string oldTitle = "OldNote";          // Title of the note to be removed
+        const string newTitle = "UpdatedNote";      // Title for the new note
+        const string newContents = "This is the updated note text."; // New note text
 
         if (!File.Exists(inputPath))
         {
@@ -22,45 +19,47 @@ class Program
             return;
         }
 
-        // Load the PDF document
+        // Open the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate through all pages
+            // Iterate through all pages to locate the target TextAnnotation
             foreach (Page page in doc.Pages)
             {
-                // Gather annotations that match the old note
-                List<Annotation> toRemove = new List<Annotation>();
+                TextAnnotation targetAnnotation = null;
+                Aspose.Pdf.Rectangle targetRect = null;
+
+                // Search annotations on the current page
                 foreach (Annotation annot in page.Annotations)
                 {
                     if (annot is TextAnnotation textAnnot && textAnnot.Title == oldTitle)
                     {
-                        toRemove.Add(textAnnot);
+                        targetAnnotation = textAnnot;
+                        // Preserve the rectangle of the original note
+                        targetRect = new Aspose.Pdf.Rectangle(
+                            textAnnot.Rect.LLX,
+                            textAnnot.Rect.LLY,
+                            textAnnot.Rect.URX,
+                            textAnnot.Rect.URY);
+                        break; // Assuming only one note with this title per page
                     }
                 }
 
-                // Remove the old note annotations
-                foreach (Annotation rem in toRemove)
+                if (targetAnnotation != null && targetRect != null)
                 {
-                    page.Annotations.Remove(rem);
-                }
+                    // Remove the existing note annotation
+                    page.Annotations.Remove(targetAnnotation);
 
-                // If any note was removed, add the updated note
-                if (toRemove.Count > 0)
-                {
-                    // Define the rectangle where the note will appear
-                    Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 300, 550);
-
-                    // Create a new TextAnnotation (note) with updated content
-                    TextAnnotation newAnnot = new TextAnnotation(page, rect)
+                    // Create a new note annotation with updated content
+                    TextAnnotation newAnnotation = new TextAnnotation(page, targetRect)
                     {
-                        Title    = newTitle,
-                        Contents = newContent,
-                        Open     = true,
-                        Icon     = TextIcon.Note
+                        Title = newTitle,
+                        Contents = newContents,
+                        Open = true,
+                        Icon = TextIcon.Note
                     };
 
                     // Add the new annotation to the page
-                    page.Annotations.Add(newAnnot);
+                    page.Annotations.Add(newAnnotation);
                 }
             }
 
@@ -68,6 +67,6 @@ class Program
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Updated PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Note replaced and saved to '{outputPath}'.");
     }
 }

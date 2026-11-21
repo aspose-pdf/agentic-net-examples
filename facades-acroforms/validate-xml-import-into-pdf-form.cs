@@ -8,63 +8,93 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath    = "template.pdf";
-        const string xmlPath    = "data.xml";
-        const string xsdPath    = "schema.xsd";
-        const string outputPath = "filled.pdf";
+        const string pdfPath = "form.pdf";
+        const string xmlPath = "data.xml";
+        const string xsdPath = "schema.xsd";
+        const string outputPath = "filled_form.pdf";
 
-        // Ensure required files exist
-        if (!File.Exists(pdfPath) || !File.Exists(xmlPath) || !File.Exists(xsdPath))
+        // Verify that required files exist
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine("One or more input files are missing.");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
+            return;
+        }
+        if (!File.Exists(xmlPath))
+        {
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
+            return;
+        }
+        if (!File.Exists(xsdPath))
+        {
+            Console.Error.WriteLine($"XSD not found: {xsdPath}");
             return;
         }
 
-        // ---------- XML validation ----------
+        // -------------------------------------------------
+        // Validate the XML file against the XSD schema
+        // -------------------------------------------------
+        XmlSchemaSet schemas = new XmlSchemaSet();
+        schemas.Add(null, xsdPath);
+
         XmlReaderSettings settings = new XmlReaderSettings
         {
-            ValidationType = ValidationType.Schema
+            ValidationType = ValidationType.Schema,
+            Schemas = schemas
         };
-        // Load the XSD schema (no namespace specified)
-        settings.Schemas.Add(null, xsdPath);
-        // Capture validation errors
-        settings.ValidationEventHandler += (sender, e) =>
-        {
-            Console.Error.WriteLine($"XML validation error: {e.Message}");
-            // Abort on first error
-            throw new XmlSchemaValidationException(e.Message);
-        };
+        settings.ValidationEventHandler += ValidationCallback;
 
+        bool isValid = true;
         try
         {
-            // Parsing the XML triggers validation against the loaded schema
             using (XmlReader reader = XmlReader.Create(xmlPath, settings))
             {
                 while (reader.Read()) { }
             }
         }
-        catch (Exception ex)
+        catch (XmlException ex)
         {
-            Console.Error.WriteLine($"XML validation failed: {ex.Message}");
+            Console.Error.WriteLine($"XML parsing error: {ex.Message}");
+            isValid = false;
+        }
+        catch (XmlSchemaValidationException)
+        {
+            // ValidationCallback already reported the error
+            isValid = false;
+        }
+
+        if (!isValid)
+        {
+            Console.Error.WriteLine("XML validation failed. Import aborted.");
             return;
         }
 
-        // ---------- Import XML into PDF form ----------
+        // -------------------------------------------------
+        // Import the validated XML data into the PDF form
+        // -------------------------------------------------
         using (Form form = new Form())
         {
-            // Bind the PDF template that contains form fields
-            form.BindPdf(pdfPath);
+            form.BindPdf(pdfPath); // Load the PDF form
 
-            // Import the validated XML data into the form fields using the correct API
+            // ImportXml expects a Stream, so open the XML file as a FileStream
             using (FileStream xmlStream = new FileStream(xmlPath, FileMode.Open, FileAccess.Read))
             {
                 form.ImportXml(xmlStream);
             }
 
-            // Save the resulting PDF
-            form.Save(outputPath);
+            form.Save(outputPath); // Save the filled PDF
         }
 
-        Console.WriteLine($"Form data imported successfully. Output saved to '{outputPath}'.");
+        Console.WriteLine($"Form data imported and saved to '{outputPath}'.");
+    }
+
+    // Called for each validation error or warning
+    static void ValidationCallback(object sender, ValidationEventArgs e)
+    {
+        Console.Error.WriteLine($"Validation {e.Severity}: {e.Message}");
+        if (e.Severity == XmlSeverityType.Error)
+        {
+            // Throw to stop validation loop and mark the XML as invalid
+            throw new XmlSchemaValidationException(e.Message);
+        }
     }
 }

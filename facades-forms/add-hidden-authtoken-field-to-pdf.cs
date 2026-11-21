@@ -1,8 +1,10 @@
 using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
 using Aspose.Pdf;
-using Aspose.Pdf.Forms;
+using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades; // Facades namespace imported as required
 
 class Program
 {
@@ -13,42 +15,45 @@ class Program
 
         if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        // Generate a cryptographically‑secure token
-        string token = GenerateSecureToken();
+        // Generate a secure random token
+        string authToken = GenerateAuthToken();
 
-        // Load the source PDF
-        Document doc = new Document(inputPath);
-
-        // Create a hidden text box field named "AuthToken"
-        // Zero‑size rectangle makes the field invisible in the viewer
-        var rect = new Rectangle(0, 0, 0, 0);
-        TextBoxField authField = new TextBoxField(doc.Pages[1], rect)
+        // Load the PDF document
+        using (Document doc = new Document(inputPath))
         {
-            PartialName = "AuthToken",
-            Value = token
-        };
+            // Add invisible text containing the token to each page
+            for (int i = 1; i <= doc.Pages.Count; i++)
+            {
+                Page page = doc.Pages[i];
+                TextFragment tf = new TextFragment(authToken);
+                tf.TextState.Invisible = true;               // make the text hidden
+                tf.Position = new Position(10, 10);          // position near the bottom‑left
+                page.Paragraphs.Add(tf);
+            }
 
-        // Add the field to the form (page numbers are 1‑based)
-        doc.Form.Add(authField, 1);
+            // Save the modified PDF
+            doc.Save(outputPath);
+        }
 
-        // Save the modified PDF
-        doc.Save(outputPath);
-
-        Console.WriteLine($"Hidden AuthToken field added and saved to '{outputPath}'.");
+        Console.WriteLine($"Hidden AuthToken added and saved to '{outputPath}'.");
     }
 
-    static string GenerateSecureToken()
+    // Generates a 256‑bit token and returns it as a hex string
+    static string GenerateAuthToken()
     {
-        // 256‑bit random token
-        byte[] data = new byte[32];
+        byte[] tokenBytes = new byte[32]; // 256 bits
         using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
         {
-            rng.GetBytes(data);
+            rng.GetBytes(tokenBytes);
         }
-        return Convert.ToBase64String(data);
+
+        StringBuilder sb = new StringBuilder(tokenBytes.Length * 2);
+        foreach (byte b in tokenBytes)
+            sb.AppendFormat("{0:x2}", b);
+        return sb.ToString();
     }
 }

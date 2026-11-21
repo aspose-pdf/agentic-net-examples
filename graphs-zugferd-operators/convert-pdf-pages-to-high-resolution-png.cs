@@ -7,46 +7,45 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
+        const string pdfPath = "input.pdf";
         const string outputPng = "page1.png";
-        const int pageNumber = 1; // 1‑based page index
+        const int pageNumber = 1;   // 1‑based index
+        const int dpi = 300;        // desired resolution
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {pdfPath}");
             return;
         }
 
         try
         {
             // Load PDF inside a using block for deterministic disposal
-            using (Document pdfDoc = new Document(inputPdf))
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Verify requested page exists (pages are 1‑based)
+                // Validate page number (Aspose.Pdf uses 1‑based indexing)
                 if (pageNumber < 1 || pageNumber > pdfDoc.Pages.Count)
                 {
-                    Console.Error.WriteLine($"Page {pageNumber} out of range (1‑{pdfDoc.Pages.Count}).");
+                    Console.Error.WriteLine("Invalid page number.");
                     return;
                 }
 
-                // Set 300 DPI resolution
-                Resolution resolution = new Resolution(300);
-                // Create PNG device with the desired resolution
-                PngDevice pngDevice = new PngDevice(resolution);
+                // Create a concrete PNG device – devices are NOT IDisposable, so no using block
+                var pngDevice = new PngDevice(new Resolution(dpi))
+                {
+                    TransparentBackground = true // optional, keeps background transparent
+                };
 
                 // Convert the specified page to PNG
-                using (FileStream outStream = new FileStream(outputPng, FileMode.Create))
-                {
-                    pngDevice.Process(pdfDoc.Pages[pageNumber], outStream);
-                }
+                pngDevice.Process(pdfDoc.Pages[pageNumber], outputPng);
             }
 
-            Console.WriteLine($"Page {pageNumber} saved as PNG at '{outputPng}' (300 DPI).");
+            Console.WriteLine($"Page {pageNumber} saved as PNG at {dpi} DPI to '{outputPng}'.");
         }
         catch (TypeInitializationException)
         {
-            // Image conversion relies on GDI+ and is Windows‑only
-            Console.WriteLine("Image conversion requires Windows (GDI+). Skipped on this platform.");
+            // PNG conversion via PngDevice requires GDI+ (Windows only)
+            Console.WriteLine("PNG conversion requires Windows (GDI+). Operation skipped on this platform.");
         }
         catch (Exception ex)
         {

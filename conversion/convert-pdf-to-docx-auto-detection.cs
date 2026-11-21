@@ -20,14 +20,14 @@ class Program
             // Load the PDF document inside a using block for deterministic disposal
             using (Document pdfDoc = new Document(inputPath))
             {
-                // Set up DOCX save options – automatic content detection is the default behavior.
-                // Specify the output format via the Format property.
-                DocSaveOptions docOptions = new DocSaveOptions
+                // Set up DOCX save options with automatic content detection (default)
+                var docOptions = new DocSaveOptions
                 {
+                    // Specify the output format; automatic detection is implicit
                     Format = DocSaveOptions.DocFormat.DocX
                 };
 
-                // Save the PDF as DOCX using the specified options
+                // Save the PDF as DOCX using the configured options
                 pdfDoc.Save(outputPath, docOptions);
             }
 

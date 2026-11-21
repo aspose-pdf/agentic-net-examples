@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Annotations;
+using Aspose.Pdf.Annotations;          // TextAnnotation, TextIcon
+using Aspose.Pdf.Text;                // for Aspose.Pdf.Rectangle (fully qualified)
 
 class Program
 {
     static void Main()
     {
         const string inputPath  = "input.pdf";
-        const string outputPath = "output_with_popup.pdf";
+        const string outputPath = "pop_up_note.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -16,27 +17,26 @@ class Program
             return;
         }
 
-        // Open the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Choose the page where the annotation will appear (first page in this example)
+            // Choose the page where the annotation will be placed (first page here)
             Page page = doc.Pages[1];
 
-            // Define the rectangle (llx, lly, urx, ury) for the annotation appearance
-            // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle
+            // Define the annotation rectangle (llx, lly, urx, ury) in points
             Aspose.Pdf.Rectangle rect = new Aspose.Pdf.Rectangle(100, 500, 200, 550);
 
-            // Create a TextAnnotation (pop‑up note) and set its properties
-            TextAnnotation popup = new TextAnnotation(page, rect)
+            // Create a TextAnnotation (pop‑up note)
+            TextAnnotation note = new TextAnnotation(page, rect)
             {
-                Title    = "Note Title",                     // Title shown in the pop‑up window
-                Contents = "This is the additional information displayed when the user hovers over the note.", // Text shown in the pop‑up
-                Open     = false,                           // Do not open automatically; appears on hover/click
+                Title    = "Additional Info",               // Title shown in the pop‑up header
+                Contents = "This note appears when the user hovers over the icon.", // Text displayed in the pop‑up
+                Open     = false,                           // Do not open by default; appears on hover/click
                 Icon     = TextIcon.Note                     // Standard note icon
             };
 
             // Add the annotation to the page's annotation collection
-            page.Annotations.Add(popup);
+            page.Annotations.Add(note);
 
             // Save the modified PDF
             doc.Save(outputPath);

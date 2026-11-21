@@ -15,46 +15,39 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // PdfExtractor implements IDisposable, so wrap it in a using block
+        // PdfExtractor implements IDisposable – wrap in using for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Load the PDF document
+            // Bind the PDF document to the extractor
             extractor.BindPdf(inputPdf);
 
-            // Extract text from all pages
+            // Extract all text from the document
             extractor.ExtractText();
 
-            // Get the concatenated text; pages are separated by a form‑feed character (\f)
-            string allText;
+            // GetText requires a destination stream. Write the extracted text to a MemoryStream
+            string fullText;
             using (MemoryStream textStream = new MemoryStream())
             {
-                // Write extracted text into the stream
-                extractor.GetText(textStream);
-                textStream.Position = 0;
+                extractor.GetText(textStream); // write text to the stream
+                textStream.Position = 0;        // rewind for reading
                 using (StreamReader reader = new StreamReader(textStream))
                 {
-                    allText = reader.ReadToEnd();
+                    fullText = reader.ReadToEnd();
                 }
             }
 
-            // Split the text into individual pages using the delimiter
-            string[] pageTexts = allText.Split('\f');
+            // Split the text into individual pages using the page delimiter (form‑feed \f)
+            string[] pageTexts = fullText.Split(new[] { '\f' }, StringSplitOptions.RemoveEmptyEntries);
 
             // Write each page's text to a separate .txt file
             for (int i = 0; i < pageTexts.Length; i++)
             {
-                string pageContent = pageTexts[i].Trim();
-
-                // Skip empty entries that may appear due to leading/trailing delimiters
-                if (string.IsNullOrEmpty(pageContent))
-                    continue;
-
-                string outPath = Path.Combine(outputDir, $"Page_{i + 1}.txt");
-                File.WriteAllText(outPath, pageContent);
-                Console.WriteLine($"Saved page {i + 1} text to '{outPath}'.");
+                string pageFile = Path.Combine(outputDir, $"Page_{i + 1}.txt");
+                File.WriteAllText(pageFile, pageTexts[i]);
+                Console.WriteLine($"Extracted text for page {i + 1} to '{pageFile}'.");
             }
         }
     }

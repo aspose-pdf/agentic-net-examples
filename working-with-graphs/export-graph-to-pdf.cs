@@ -1,6 +1,7 @@
 using System;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
 
 class Program
 {
@@ -8,31 +9,64 @@ class Program
     {
         const string outputPath = "graph_output.pdf";
 
-        // Create a new PDF document inside a using block for deterministic disposal
+        // Create a new PDF document
         using (Document doc = new Document())
         {
-            // Add a blank page to the document
+            // Add a blank page
             Page page = doc.Pages.Add();
 
-            // Create a Graph (vector drawing) using page dimensions
-            Graph graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
+            // Create a Graph container – use double parameters as the float overload is obsolete
+            Graph graph = new Graph(500.0, 400.0);
+            // Position the graph on the page (optional – defaults to (0,0))
+            graph.Left = 50;   // points from the left edge of the page
+            graph.Top = 50;    // points from the bottom edge of the page
 
-            // Create a line using the constructor that accepts a float array
-            // Coordinates are expressed in the graph's coordinate system (origin at bottom‑left)
-            Line line = new Line(new float[] { 50, 750, 550, 750 });
-            line.GraphInfo.Color = Color.Black;
-            line.GraphInfo.LineWidth = 2;
+            // Add a title to the graph
+            graph.Title = new TextFragment("Sample Graph");
 
-            // Add the line to the graph's Shapes collection
-            graph.Shapes.Add(line);
+            // Simple bar‑chart data (X values are implicit, Y values are the heights)
+            double[] yValues = { 10, 30, 20, 50, 40 };
+            double yMax = 100;               // axis maximum (used for scaling)
+            float barWidth = 40f;            // width of each bar (points)
+            float barSpacing = 20f;          // space between bars (points)
+            float originX = 20f;             // left margin inside the graph surface
+            float originY = 20f;             // bottom margin inside the graph surface
+            float graphHeight = (float)graph.Height - 2 * originY; // drawable height
 
-            // Add the graph to the page's paragraphs collection
+            for (int i = 0; i < yValues.Length; i++)
+            {
+                // Calculate bar height proportionally to the maximum Y value
+                float barHeight = (float)(yValues[i] / yMax) * graphHeight;
+                // X position of the current bar
+                float barX = originX + i * (barWidth + barSpacing);
+                // Y position (bottom of the bar) – graph origin is at Bottom
+                float barY = originY;
+
+                // Create the rectangle that represents the bar (use fully‑qualified type to avoid ambiguity)
+                Aspose.Pdf.Drawing.Rectangle bar = new Aspose.Pdf.Drawing.Rectangle(barX, barY, barWidth, barHeight);
+                // Set visual style via GraphInfo
+                bar.GraphInfo.FillColor = Color.SteelBlue;
+                bar.GraphInfo.Color = Color.Black; // stroke colour
+                bar.GraphInfo.LineWidth = 1f;
+
+                // Add a label under the bar (optional)
+                TextFragment label = new TextFragment($"{i + 1}");
+                label.TextState.Font = FontRepository.FindFont("Helvetica");
+                label.TextState.FontSize = 10;
+                // Attach the label to the bar
+                bar.Text = label;
+
+                // Add the bar to the graph
+                graph.Shapes.Add(bar);
+            }
+
+            // Add the graph to the page
             page.Paragraphs.Add(graph);
 
-            // Save the document as PDF
+            // Save the PDF document
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Graph exported to PDF: {outputPath}");
+        Console.WriteLine($"Graph exported to '{outputPath}'.");
     }
 }

@@ -7,32 +7,38 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "compressed.pdf";
+        const string inputXmlPath = "input.xml";   // XML representation of a PDF
+        const string outputPdfPath = "compressed.pdf";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputXmlPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputXmlPath}");
             return;
         }
 
-        // Load the PDF generated from XML
-        using (Document doc = new Document(inputPath))
+        // Load the PDF from its XML representation.
+        XmlLoadOptions loadOptions = new XmlLoadOptions();
+
+        // Ensure deterministic disposal of the Document.
+        using (Document pdfDoc = new Document(inputXmlPath, loadOptions))
         {
-            // Configure optimization to compress streams and images
+            // Create optimization options that compress streams, images and remove unused data.
             OptimizationOptions opt = OptimizationOptions.All();
-            opt.CompressImages = true;          // compress image streams
-            opt.ImageQuality = 50;               // adjust quality as needed (0‑100)
-            opt.RemoveUnusedObjects = true;     // drop objects not referenced
-            opt.RemoveUnusedStreams = true;     // drop empty/unused streams
+            opt.CompressObjects = true;
+            opt.RemoveUnusedObjects = true;
+            opt.RemoveUnusedStreams = true;
+            opt.LinkDuplicateStreams = true;
+            // Optional image compression settings.
+            opt.CompressImages = true;
+            opt.ImageQuality = 75; // adjust quality as needed (0‑100)
 
-            // Apply the optimization settings
-            doc.OptimizeResources(opt);
+            // Apply the optimization to the document.
+            pdfDoc.OptimizeResources(opt);
 
-            // Save the optimized (compressed) PDF
-            doc.Save(outputPath);
+            // Save the optimized (compressed) PDF.
+            pdfDoc.Save(outputPdfPath);
         }
 
-        Console.WriteLine($"Compressed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Compressed PDF saved to '{outputPdfPath}'.");
     }
 }

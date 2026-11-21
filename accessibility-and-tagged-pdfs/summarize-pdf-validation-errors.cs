@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using System.Collections.Generic;
 
 class Program
 {
@@ -11,7 +11,7 @@ class Program
         // Expect the path to the XML validation report as the first argument
         if (args.Length == 0)
         {
-            Console.Error.WriteLine("Usage: Program <validationReport.xml>");
+            Console.Error.WriteLine("Usage: program <validationReport.xml>");
             return;
         }
 
@@ -34,54 +34,38 @@ class Program
             return;
         }
 
-        // Locate elements that represent errors/violations.
-        // Common names are Error, Violation, or Issue.
+        // Gather all elements that represent an error/violation.
+        // The schema may use <error> or <violation> tags.
         var errorElements = doc.Descendants()
-                               .Where(e => e.Name.LocalName.Equals("Error", StringComparison.OrdinalIgnoreCase) ||
-                                           e.Name.LocalName.Equals("Violation", StringComparison.OrdinalIgnoreCase) ||
-                                           e.Name.LocalName.Equals("Issue", StringComparison.OrdinalIgnoreCase));
+                               .Where(e => e.Name.LocalName.Equals("error", StringComparison.OrdinalIgnoreCase) ||
+                                           e.Name.LocalName.Equals("violation", StringComparison.OrdinalIgnoreCase))
+                               .ToList();
 
-        // Dictionaries to aggregate counts and keep a sample message per code
-        var codeCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-        var codeSamples = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // Group errors by their code attribute (or "UNKNOWN" if missing)
+        var groupedByCode = errorElements
+            .GroupBy(e => (string)e.Attribute("code") ?? "UNKNOWN")
+            .OrderBy(g => g.Key);
 
-        foreach (var err in errorElements)
-        {
-            // Try to obtain the error code from an attribute or a child element
-            string code = (string)err.Attribute("code") ??
-                          err.Element(err.Name.Namespace + "Code")?.Value ??
-                          "UNKNOWN";
-
-            // Try to obtain a descriptive message
-            string message = (string)err.Attribute("message") ??
-                             err.Element(err.Name.Namespace + "Message")?.Value ??
-                             err.Value?.Trim();
-
-            // Increment occurrence count
-            if (codeCounts.ContainsKey(code))
-                codeCounts[code]++;
-            else
-                codeCounts[code] = 1;
-
-            // Store the first encountered message as a representative sample
-            if (!codeSamples.ContainsKey(code) && !string.IsNullOrEmpty(message))
-                codeSamples[code] = message;
-        }
-
-        // Output a summary sorted by descending frequency
         Console.WriteLine("Error Code Summary:");
-        foreach (var kvp in codeCounts.OrderByDescending(k => k.Value))
+        foreach (var group in groupedByCode)
         {
-            Console.WriteLine($"{kvp.Key}: {kvp.Value} occurrence(s)");
-            if (codeSamples.TryGetValue(kvp.Key, out string sample) && !string.IsNullOrEmpty(sample))
-                Console.WriteLine($"  Sample message: {sample}");
+            Console.WriteLine($"{group.Key}: {group.Count()} occurrence(s)");
         }
 
-        // Highlight the top three most common violations
-        Console.WriteLine("\nTop 3 common violations:");
-        foreach (var kvp in codeCounts.OrderByDescending(k => k.Value).Take(3))
+        // Determine the most common violation messages.
+        // Use the 'message' attribute if present; otherwise fall back to element value.
+        var messageGroups = errorElements
+            .Select(e => (string)e.Attribute("message") ?? e.Value.Trim())
+            .Where(m => !string.IsNullOrEmpty(m))
+            .GroupBy(m => m)
+            .OrderByDescending(g => g.Count())
+            .Take(5); // show top 5 messages
+
+        Console.WriteLine();
+        Console.WriteLine("Top Violation Messages:");
+        foreach (var msgGroup in messageGroups)
         {
-            Console.WriteLine($"{kvp.Key} - {kvp.Value} times");
+            Console.WriteLine($"\"{msgGroup.Key}\" – {msgGroup.Count()} time(s)");
         }
     }
 }

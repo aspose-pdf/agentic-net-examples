@@ -1,45 +1,49 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Devices;
+using Aspose.Pdf.Devices; // PngDevice resides here
 
-class Program
+// Convert each page of a PDF to a separate PNG image with a transparent background.
+class PdfToPngConverter
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string outputFolder = "PagesAsPng";
+        const string pdfPath   = "input.pdf";
+        const string outFolder = "PngPages";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF file not found: {pdfPath}");
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
+        // Ensure output directory exists
+        Directory.CreateDirectory(outFolder);
 
         // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(inputPdfPath))
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Iterate using 1‑based page indexing (Aspose.Pdf rule)
-            for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
+            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
+            for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
             {
-                Page page = pdfDoc.Pages[pageNumber];
+                // Prepare output file path for the current page
+                string pngPath = Path.Combine(outFolder, $"Page_{pageNum}.png");
 
-                // Build the output file name for each page
-                string outputPath = Path.Combine(outputFolder, $"Page_{pageNumber}.png");
+                // Configure resolution (you can adjust DPI as needed)
+                Resolution resolution = new Resolution(300); // 300 DPI for high quality
 
-                // Create a PNG device with desired resolution and a transparent background.
-                // Resolution is expressed in DPI.
-                var resolution = new Resolution(300);
-                var pngDevice = new PngDevice(resolution);
-                pngDevice.TransparentBackground = true; // enable transparent background
+                // Configure PngDevice (concrete implementation of ImageDevice):
+                // - Enable transparent background
+                // - Use the resolution defined above
+                PngDevice pngDevice = new PngDevice(resolution)
+                {
+                    TransparentBackground = true
+                };
 
-                // Convert the current page to PNG using the PNG device.
-                pngDevice.Process(page, outputPath);
+                // Convert the current page to PNG using the configured device and write directly to file
+                pngDevice.Process(pdfDoc.Pages[pageNum], pngPath);
 
-                Console.WriteLine($"Saved page {pageNumber} as PNG: {outputPath}");
+                Console.WriteLine($"Page {pageNum} saved as PNG: {pngPath}");
             }
         }
 

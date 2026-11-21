@@ -1,14 +1,15 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string logPath = "modifications.log";
+        const string outputPath = "output_modified.pdf";
+        const string logPath = "page_modifications.log";
 
         if (!File.Exists(inputPath))
         {
@@ -16,53 +17,57 @@ class Program
             return;
         }
 
-        // Create or overwrite the log file
-        using (StreamWriter log = new StreamWriter(logPath, false))
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document doc = new Document(inputPath))
+        // Open the log file inside a using block so it is flushed and closed properly.
+        using (StreamWriter log = new StreamWriter(logPath, append: false))
         {
-            // Load the PDF using the Document API (recommended for page‑level changes)
-            Document pdf = new Document(inputPath);
-
-            // ------------------------------------------------------------
-            // Example modification 1: rotate the first page by 90 degrees
-            // ------------------------------------------------------------
-            int pageToRotate = 1;
-            if (pageToRotate <= pdf.Pages.Count)
+            // Example modification: rotate each page 90 degrees clockwise.
+            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
             {
-                // Log original rotation (default is 0)
-                log.WriteLine($"{DateTime.Now:u} Original rotation of page {pageToRotate}: {pdf.Pages[pageToRotate].Rotate}");
+                Page page = doc.Pages[i];
 
-                // Apply rotation using the Rotation enum
-                pdf.Pages[pageToRotate].Rotate = Rotation.on90;
-                log.WriteLine($"{DateTime.Now:u} Rotated page {pageToRotate} by 90 degrees.");
-            }
-            else
-            {
-                log.WriteLine($"{DateTime.Now:u} Page {pageToRotate} does not exist – cannot rotate.");
+                // Get the current rotation (as degrees) and compute the new rotation.
+                int oldRotationDeg = (int)page.Rotate; // Rotation enum maps to 0,90,180,270
+                int newRotationDeg = (oldRotationDeg + 90) % 360;
+                page.Rotate = (Rotation)newRotationDeg;
+
+                // Log the rotation change.
+                log.WriteLine($"Page {i}: Rotation changed from {oldRotationDeg}° to {newRotationDeg}°.");
+
+                // Example modification: change page size to A4 if not already A4.
+                // A4 dimensions in points: 595 x 842.
+                const double a4Width = 595;
+                const double a4Height = 842;
+
+                double oldWidth = page.PageInfo.Width;
+                double oldHeight = page.PageInfo.Height;
+
+                if (Math.Abs(oldWidth - a4Width) > 0.1 || Math.Abs(oldHeight - a4Height) > 0.1)
+                {
+                    // Use SetPageSize to change the page dimensions.
+                    page.SetPageSize(a4Width, a4Height);
+                    log.WriteLine($"Page {i}: Size changed from {oldWidth}x{oldHeight} to {a4Width}x{a4Height} points.");
+                }
+
+                // Example modification using Facades: delete a blank page (if any) via PdfFileEditor.
+                // Here we demonstrate the Facades API; actual condition is placeholder.
+                // In newer Aspose.PDF versions the image collection is accessed via page.Resources.Images.
+                if (page.Paragraphs.Count == 0 &&
+                    page.Resources?.Images?.Count == 0 &&
+                    page.Annotations.Count == 0)
+                {
+                    // Collect blank pages and rebuild the document later.
+                    // For demonstration we simply log the detection; actual removal would be done with PdfFileEditor.Insert/Extract.
+                    log.WriteLine($"Page {i}: Detected as blank – placeholder for deletion using PdfFileEditor.");
+                }
             }
 
-            // ------------------------------------------------------------
-            // Example modification 2: change the size of the second page to A4
-            // ------------------------------------------------------------
-            int pageToResize = 2;
-            if (pageToResize <= pdf.Pages.Count)
-            {
-                Page originalPage = pdf.Pages[pageToResize];
-                log.WriteLine($"{DateTime.Now:u} Original size of page {pageToResize}: Width={originalPage.PageInfo.Width}, Height={originalPage.PageInfo.Height}");
-
-                // Apply new page size (A4) using width and height doubles as required by the API
-                originalPage.SetPageSize(PageSize.A4.Width, PageSize.A4.Height);
-                log.WriteLine($"{DateTime.Now:u} Changed size of page {pageToResize} to A4.");
-            }
-            else
-            {
-                log.WriteLine($"{DateTime.Now:u} Page {pageToResize} does not exist – cannot resize.");
-            }
-
-            // Save the modified PDF
-            pdf.Save(outputPath);
-            log.WriteLine($"{DateTime.Now:u} Saved modified PDF to {outputPath}.");
+            // Save the modified document.
+            doc.Save(outputPath);
+            log.WriteLine($"Document saved to '{outputPath}'.");
         }
 
-        Console.WriteLine("PDF modifications completed. Audit log written to modifications.log");
+        Console.WriteLine("Page modifications completed and logged.");
     }
 }

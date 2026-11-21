@@ -7,49 +7,50 @@ class Program
 {
     static void Main()
     {
-        // Paths – replace with actual file locations
-        const string inputPdfPath   = "input.pdf";
-        const string finalPdfPath   = "final.pdf";
-        const string certPath       = "certificate.pfx";
-        const string certPassword   = "certPassword";
-        const string signatureFieldName = "ClientSignature";
+        const string inputPdf = "input.pdf";
+        const string finalPdf = "final.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "certPassword";
 
-        // Ensure the source PDF exists
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Source PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(certPath))
+        {
+            Console.Error.WriteLine($"Certificate file not found: {certPath}");
             return;
         }
 
         // Load the PDF document
-        using (Document doc = new Document(inputPdfPath))
+        Document doc = new Document(inputPdf);
+
+        // Locate the signature field named "ClientSignature"
+        var sigField = doc.Form["ClientSignature"] as SignatureField;
+        if (sigField == null)
         {
-            // Retrieve the signature field by its partial name
-            SignatureField sigField = doc.Form[signatureFieldName] as SignatureField;
-            if (sigField == null)
-            {
-                Console.Error.WriteLine($"Signature field '{signatureFieldName}' not found.");
-                return;
-            }
-
-            // Create a PKCS#7 signature using the provided certificate
-            PKCS7 pkcs7 = new PKCS7(certPath, certPassword)
-            {
-                Reason = "Document signed by client",
-                Location = "Company HQ",
-                ContactInfo = "contact@example.com"
-            };
-
-            // Sign the field
-            sigField.Sign(pkcs7);
-
-            // Lock the field to prevent further modifications
-            sigField.ReadOnly = true;
-
-            // Save the final PDF with the locked signature field
-            doc.Save(finalPdfPath);
+            Console.Error.WriteLine("Signature field 'ClientSignature' not found.");
+            return;
         }
 
-        Console.WriteLine($"Document processed. Final file: {finalPdfPath}");
+        // Create a PKCS#7 signature using the provided certificate
+        PKCS7 pkcs = new PKCS7(certPath, certPassword)
+        {
+            Reason = "Signed by client",
+            ContactInfo = "Company",
+            Location = "Document Review"
+        };
+
+        // Apply the digital signature to the field
+        sigField.Sign(pkcs);
+
+        // Lock the field to prevent any further modifications
+        sigField.ReadOnly = true;
+
+        // Save the signed and locked PDF
+        doc.Save(finalPdf);
+
+        Console.WriteLine($"Processing complete. Output saved to '{finalPdf}'.");
     }
 }

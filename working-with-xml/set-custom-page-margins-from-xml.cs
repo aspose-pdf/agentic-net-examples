@@ -7,69 +7,67 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "input.pdf";
-        const string marginsXmlPath = "margins.xml";
-        const string outputPdfPath = "output.pdf";
+        const string pdfPath   = "input.pdf";
+        const string xmlPath   = "margins.xml";
+        const string outputPdf = "output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
-        if (!File.Exists(marginsXmlPath))
+        if (!File.Exists(xmlPath))
         {
-            Console.Error.WriteLine($"XML not found: {marginsXmlPath}");
+            Console.Error.WriteLine($"XML not found: {xmlPath}");
             return;
         }
 
         // Load margin definitions from XML.
-        XDocument xmlDoc = XDocument.Load(marginsXmlPath);
-        var sections = xmlDoc.Root?.Elements("Section");
+        // Expected format:
+        // <Sections>
+        //   <Section StartPage="1" EndPage="3" Top="20" Bottom="20" Left="30" Right="30" />
+        //   <Section StartPage="4" EndPage="5" Top="10" Bottom="10" Left="15" Right="15" />
+        // </Sections>
+        XDocument xmlDoc = XDocument.Load(xmlPath);
+        var sections = xmlDoc.Root.Elements("Section");
 
-        if (sections == null)
+        // Open the PDF document inside a using block for deterministic disposal.
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            Console.Error.WriteLine("No sections defined in XML.");
-            return;
-        }
-
-        // Open the PDF inside a using block for deterministic disposal.
-        using (Document pdfDoc = new Document(inputPdfPath))
-        {
-            // Iterate over each section and apply margins to the specified page range.
+            // Iterate over each section definition and apply margins to the specified page range.
             foreach (var sec in sections)
             {
-                // Parse page range.
-                int startPage = sec.Attribute("StartPage") != null ? int.Parse(sec.Attribute("StartPage").Value) : 1;
-                int endPage   = sec.Attribute("EndPage")   != null ? int.Parse(sec.Attribute("EndPage").Value)   : pdfDoc.Pages.Count;
+                // Parse attributes; default to 0 if missing.
+                int startPage = (int?)sec.Attribute("StartPage") ?? 1;
+                int endPage   = (int?)sec.Attribute("EndPage")   ?? pdfDoc.Pages.Count;
+                double top    = (double?)sec.Attribute("Top")    ?? 0;
+                double bottom = (double?)sec.Attribute("Bottom") ?? 0;
+                double left   = (double?)sec.Attribute("Left")   ?? 0;
+                double right  = (double?)sec.Attribute("Right")  ?? 0;
 
-                // Clamp range to actual page count.
+                // Ensure page indices are within the document bounds.
                 if (startPage < 1) startPage = 1;
                 if (endPage > pdfDoc.Pages.Count) endPage = pdfDoc.Pages.Count;
-                if (startPage > endPage) continue;
 
-                // Parse margin values.
-                var marginsElem = sec.Element("Margins");
-                if (marginsElem == null) continue;
-
-                double left   = marginsElem.Attribute("Left")   != null ? double.Parse(marginsElem.Attribute("Left").Value)   : 0;
-                double right  = marginsElem.Attribute("Right")  != null ? double.Parse(marginsElem.Attribute("Right").Value)  : 0;
-                double top    = marginsElem.Attribute("Top")    != null ? double.Parse(marginsElem.Attribute("Top").Value)    : 0;
-                double bottom = marginsElem.Attribute("Bottom") != null ? double.Parse(marginsElem.Attribute("Bottom").Value) : 0;
-
-                // Apply margins to each page in the range.
-                for (int i = startPage; i <= endPage; i++) // 1‑based indexing
+                // Apply margins to each page in the range (1‑based indexing).
+                for (int i = startPage; i <= endPage; i++)
                 {
                     Page page = pdfDoc.Pages[i];
-                    // Use MarginInfo (not the non‑existent Margin class) to set page margins.
-                    page.PageInfo.Margin = new MarginInfo(left, right, top, bottom);
+                    page.PageInfo.Margin = new MarginInfo
+                    {
+                        Top    = top,
+                        Bottom = bottom,
+                        Left   = left,
+                        Right  = right
+                    };
                 }
             }
 
-            // Save the modified PDF.
-            pdfDoc.Save(outputPdfPath);
+            // Save the modified PDF. No SaveOptions needed because the output format is PDF.
+            pdfDoc.Save(outputPdf);
         }
 
-        Console.WriteLine($"PDF saved with custom margins to '{outputPdfPath}'.");
+        Console.WriteLine($"Margins applied and saved to '{outputPdf}'.");
     }
 }

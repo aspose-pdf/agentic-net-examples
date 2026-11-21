@@ -16,17 +16,23 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Convert the document to PDF/A‑1b compliance. Metadata (title, author, etc.)
-            // is preserved automatically by the conversion process.
-            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            using (Document doc = new Document(inputPath))
+            {
+                // Convert the document to PDF/A‑1b compliance. Metadata (Title, Author, etc.)
+                // is preserved automatically by the Convert method.
+                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            // Save the converted document
-            doc.Save(outputPath);
+                // Save the converted document.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

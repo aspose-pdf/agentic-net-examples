@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
 
@@ -8,7 +9,9 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
+        const string outputPath = "readonly_output.pdf";
+        const string fieldName = "myTextField";
+        const string fieldValue = "Initial data";
 
         if (!File.Exists(inputPath))
         {
@@ -16,20 +19,24 @@ class Program
             return;
         }
 
-        // Load the PDF and ensure deterministic disposal
+        // Load the PDF, populate the form field, mark it read‑only, then save.
         using (Document doc = new Document(inputPath))
         {
-            // Populate a text box form field and mark it read‑only
-            if (doc.Form != null && doc.Form["Name"] is TextBoxField nameField)
+            // Retrieve the field from the form's Fields collection.
+            var textBox = doc.Form?.Fields?.FirstOrDefault(f => f.Name == fieldName) as TextBoxField;
+            if (textBox != null)
             {
-                nameField.Value = "John Doe";   // initial population
-                nameField.ReadOnly = true;      // prevent further editing
+                textBox.Value    = fieldValue; // initial population
+                textBox.ReadOnly = true;       // prevent further editing
+            }
+            else
+            {
+                Console.Error.WriteLine($"Form field '{fieldName}' not found or not a TextBoxField.");
             }
 
-            // Save the updated PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Read‑only form PDF saved to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with read‑only field to '{outputPath}'.");
     }
 }

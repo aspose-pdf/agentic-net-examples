@@ -1,61 +1,54 @@
 using System;
 using System.IO;
-using Aspose.Pdf;                 // Core API for PDF manipulation
-using Aspose.Pdf.Facades;        // Included as per task requirement (not used directly)
+using Aspose.Pdf;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string stampImgPath  = "stamp.png";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf  = "input.pdf";
+        const string stampImg  = "stamp.png";
+        const string outputPdf = "output.pdf";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
+        }
+        if (!File.Exists(stampImg))
+        {
+            Console.Error.WriteLine($"Stamp image not found: {stampImg}");
             return;
         }
 
-        if (!File.Exists(stampImgPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document pdfDoc = new Document(inputPdf))
         {
-            Console.Error.WriteLine($"Stamp image not found: {stampImgPath}");
-            return;
-        }
-
-        try
-        {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Aspose.Pdf.Document doc = new Aspose.Pdf.Document(inputPdfPath))
+            // Create an image stamp from the specified image file
+            ImageStamp imgStamp = new ImageStamp(stampImg)
             {
-                // Ensure the document has at least two pages
-                if (doc.Pages.Count < 2)
-                {
-                    Console.Error.WriteLine("The PDF does not contain a second page.");
-                    return;
-                }
+                // Position the stamp in the centre of the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+                // Ensure the stamp appears on top of existing content
+                Background = false
+            };
 
-                // Create an ImageStamp instance (core API) and configure its appearance
-                Aspose.Pdf.ImageStamp imgStamp = new Aspose.Pdf.ImageStamp(stampImgPath)
-                {
-                    Background          = false,                                   // Draw over page content
-                    HorizontalAlignment = Aspose.Pdf.HorizontalAlignment.Center,   // Center horizontally
-                    VerticalAlignment   = Aspose.Pdf.VerticalAlignment.Center      // Center vertically
-                };
-
-                // Add the stamp to the second page (pages are 1‑based)
-                doc.Pages[2].AddStamp(imgStamp);
-
-                // Save the modified PDF
-                doc.Save(outputPdfPath);
+            // Apply the stamp only to the second page (pages are 1‑based)
+            if (pdfDoc.Pages.Count >= 2)
+            {
+                Page secondPage = pdfDoc.Pages[2];
+                secondPage.AddStamp(imgStamp);
+            }
+            else
+            {
+                Console.Error.WriteLine("The PDF does not contain a second page.");
             }
 
-            Console.WriteLine($"Stamp added to page 2 and saved as '{outputPdfPath}'.");
+            // Save the modified PDF
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Stamp added to page 2 and saved as '{outputPdf}'.");
     }
 }

@@ -16,32 +16,27 @@ class Program
             return;
         }
 
-        // Obtain the total number of pages via Document (PdfPageEditor does not expose this).
-        int pageCount;
-        using (var doc = new Document(inputPath))
-        {
-            pageCount = doc.Pages.Count;
-        }
+        // Load the PDF document
+        Document doc = new Document(inputPath);
 
-        // Use PdfPageEditor to set a different DisplayDuration for each page.
-        using (var editor = new PdfPageEditor())
+        // Use PdfPageEditor to set the display duration per page
+        using (PdfPageEditor editor = new PdfPageEditor())
         {
-            editor.BindPdf(inputPath);
+            // Bind the already‑loaded Document instance
+            editor.BindPdf(doc);
 
-            for (int i = 1; i <= pageCount; i++)
+            // Pages are 1‑based; increase duration by one second for each page index
+            for (int i = 1; i <= doc.Pages.Count; i++)
             {
-                // Specify the page to edit (1‑based indexing).
-                editor.ProcessPages = new[] { i };
-                // Set the duration (in seconds) for the selected page.
-                editor.DisplayDuration = i; // page 1 => 1 s, page 2 => 2 s, …
-                // Apply the change before moving to the next page.
-                editor.ApplyChanges();
+                editor.ProcessPages = new int[] { i }; // target current page
+                editor.DisplayDuration = i;            // seconds
+                editor.ApplyChanges();                // persist change for this page
             }
 
-            // Save the modified PDF.
+            // Save the modified PDF
             editor.Save(outputPath);
         }
 
-        Console.WriteLine($"Saved with updated display durations to '{outputPath}'.");
+        Console.WriteLine($"PDF saved with updated DisplayDuration to '{outputPath}'.");
     }
 }

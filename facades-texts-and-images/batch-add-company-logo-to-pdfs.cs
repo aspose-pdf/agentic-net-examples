@@ -1,17 +1,18 @@
 using System;
 using System.IO;
-using Aspose.Pdf; // Core Aspose.Pdf namespace (Document, Page, ImageStamp, etc.)
+using Aspose.Pdf;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
         // Folder containing source PDFs
-        const string inputFolder = "InputPdfs";
-        // Folder where processed PDFs will be written
-        const string outputFolder = "OutputPdfs";
+        string inputFolder = "InputPdfs";
+        // Folder where processed PDFs will be saved
+        string outputFolder = "OutputPdfs";
         // Path to the company logo PNG
-        const string logoPath = "logo.png";
+        string logoPath = "logo.png";
 
         if (!Directory.Exists(inputFolder))
         {
@@ -19,53 +20,55 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
-        Directory.CreateDirectory(outputFolder);
-
         if (!File.Exists(logoPath))
         {
             Console.Error.WriteLine($"Logo file not found: {logoPath}");
             return;
         }
 
+        // Ensure the output directory exists
+        Directory.CreateDirectory(outputFolder);
+
         // Process each PDF file in the input folder
-        foreach (string pdfFilePath in Directory.GetFiles(inputFolder, "*.pdf"))
+        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
         {
-            string fileName = Path.GetFileName(pdfFilePath);
+            string fileName = Path.GetFileName(pdfPath);
             string outputPath = Path.Combine(outputFolder, fileName);
 
-            try
+            // Load the PDF inside a using block for deterministic disposal
+            using (Document pdfDoc = new Document(pdfPath))
             {
-                // Load the PDF inside a using block for deterministic disposal
-                using (Document doc = new Document(pdfFilePath))
+                // Create an ImageStamp for the logo using the Facades API
+                ImageStamp logoStamp = new ImageStamp(logoPath)
                 {
-                    // ImageStamp lives in the Aspose.Pdf namespace (not Aspose.Pdf.Drawing)
-                    ImageStamp logoStamp = new ImageStamp(logoPath);
+                    Width = 100,          // Desired logo width (points)
+                    Height = 50,          // Desired logo height (points)
+                    Background = false,   // Place logo in front of page content
+                    Opacity = 1.0         // Fully opaque
+                };
 
-                    // Position the stamp at the top‑right corner of each page
-                    logoStamp.HorizontalAlignment = HorizontalAlignment.Right;
-                    logoStamp.VerticalAlignment   = VerticalAlignment.Top;
+                // Add the stamp to every page, positioning it at the top‑right corner
+                for (int pageNum = 1; pageNum <= pdfDoc.Pages.Count; pageNum++)
+                {
+                    Page page = pdfDoc.Pages[pageNum];
 
-                    // Optional margins from the page edges (points)
-                    logoStamp.TopMargin   = 10;
-                    logoStamp.RightMargin = 10;
+                    // Margin from the page edges
+                    double margin = 10;
 
-                    // Apply the stamp to every page in the document
-                    foreach (Page page in doc.Pages)
-                    {
-                        page.AddStamp(logoStamp);
-                    }
+                    // Compute coordinates so the stamp sits near the top‑right
+                    logoStamp.XIndent = page.PageInfo.Width - logoStamp.Width - margin;
+                    logoStamp.YIndent = page.PageInfo.Height - logoStamp.Height - margin;
 
-                    // Save the modified PDF
-                    doc.Save(outputPath);
+                    page.AddStamp(logoStamp);
                 }
 
-                Console.WriteLine($"Processed: {fileName}");
+                // Save the modified PDF to the output folder
+                pdfDoc.Save(outputPath);
             }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Error processing {fileName}: {ex.Message}");
-            }
+
+            Console.WriteLine($"Processed: {fileName}");
         }
+
+        Console.WriteLine("Batch processing completed.");
     }
 }

@@ -1,13 +1,14 @@
 using System;
 using System.IO;
 using Aspose.Pdf.Facades;
+using System.Drawing.Imaging;
 
 class Program
 {
     static void Main()
     {
         const string inputPdf = "input.pdf";
-        const string tempImageFolder = "extracted_images";
+        const string tempFolder = "ExtractedImages";
 
         if (!File.Exists(inputPdf))
         {
@@ -15,38 +16,35 @@ class Program
             return;
         }
 
-        // Ensure the folder for extracted images exists and is empty
-        if (Directory.Exists(tempImageFolder))
-            Directory.Delete(tempImageFolder, true);
-        Directory.CreateDirectory(tempImageFolder);
+        // Prepare a clean folder for extracted images
+        if (Directory.Exists(tempFolder))
+            Directory.Delete(tempFolder, true);
+        Directory.CreateDirectory(tempFolder);
 
         // Extract images using PdfExtractor (Facades API)
         using (PdfExtractor extractor = new PdfExtractor())
         {
             extractor.BindPdf(inputPdf);
-            // The ExtractImageMode property is not available in the referenced Aspose.Pdf version.
-            // The default behavior of ExtractImage() extracts all images, so no explicit mode is required.
-            // extractor.ExtractImageMode = ExtractImageMode.DefinedInResources; // removed for compatibility
+            // The ExtractImageMode property does not exist in the current Aspose.Pdf version.
+            // Calling ExtractImage() extracts all images by default.
             extractor.ExtractImage();
 
-            int imageIndex = 1;
+            int index = 1;
             while (extractor.HasNextImage())
             {
-                string outPath = Path.Combine(tempImageFolder, $"image_{imageIndex}.png");
-                extractor.GetNextImage(outPath);
-                imageIndex++;
+                string outPath = Path.Combine(tempFolder, $"Image_{index}.png");
+                // Save each image as PNG
+                extractor.GetNextImage(outPath, ImageFormat.Png);
+                index++;
             }
         }
 
         // Determine if any image files were produced
-        string[] extractedFiles = Directory.GetFiles(tempImageFolder);
-        bool isTextOnly = extractedFiles.Length == 0;
+        bool hasImages = Directory.GetFiles(tempFolder).Length > 0;
 
-        Console.WriteLine(isTextOnly
-            ? "The PDF is text‑only (no images extracted)."
-            : $"The PDF contains images ({extractedFiles.Length} file(s) extracted).");
-
-        // Optional cleanup
-        Directory.Delete(tempImageFolder, true);
+        if (hasImages)
+            Console.WriteLine("PDF contains images (not text-only).");
+        else
+            Console.WriteLine("PDF is text-only (no images found).");
     }
 }

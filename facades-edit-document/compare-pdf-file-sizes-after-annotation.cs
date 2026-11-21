@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Drawing;
 
 class Program
 {
@@ -9,6 +9,7 @@ class Program
     {
         const string originalPath = "original.pdf";
         const string editedPath   = "edited.pdf";
+        const string stampPath    = "stamp.png"; // optional image for stamping
 
         if (!File.Exists(originalPath))
         {
@@ -16,32 +17,54 @@ class Program
             return;
         }
 
-        // Load the PDF with the high‑level Document API (PdfContentEditor does not expose AddText)
+        // -----------------------------------------------------------------
+        // Edit the PDF using the high‑level Aspose.Pdf Document API
+        // -----------------------------------------------------------------
         Document pdf = new Document(originalPath);
 
-        // Create a text fragment to act as a stamp
-        TextFragment tf = new TextFragment("Edited");
-        tf.TextState.FontSize = 24;
-        tf.TextState.ForegroundColor = Aspose.Pdf.Color.Red; // cross‑platform color
-        // Position is the lower‑left corner of the fragment
-        tf.Position = new Position(100, 500);
+        // If a stamp image is available, add it to page 1 at (100,500)
+        if (File.Exists(stampPath))
+        {
+            ImageStamp stamp = new ImageStamp(stampPath)
+            {
+                Background          = false,
+                Opacity             = 0.5,
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment   = VerticalAlignment.Bottom,
+                XIndent             = 100,   // distance from the left edge
+                YIndent             = 500    // distance from the bottom edge
+            };
 
-        // Add the fragment to the first page (pages are 1‑based)
-        pdf.Pages[1].Paragraphs.Add(tf);
+            // Add the stamp to the first page
+            pdf.Pages[1].AddStamp(stamp);
+        }
+        else
+        {
+            // No stamp image – the document is still saved to create a new version.
+        }
 
-        // Save the edited document
+        // Save the edited PDF
         pdf.Save(editedPath);
 
-        // Compare file sizes to verify that changes were applied
-        long originalSize = new FileInfo(originalPath).Length;
-        long editedSize   = new FileInfo(editedPath).Length;
+        // -----------------------------------------------------------------
+        // Compare file sizes of the original and edited PDFs
+        // -----------------------------------------------------------------
+        FileInfo originalInfo = new FileInfo(originalPath);
+        FileInfo editedInfo   = new FileInfo(editedPath);
+
+        long originalSize = originalInfo.Length;
+        long editedSize   = editedInfo.Length;
 
         Console.WriteLine($"Original size: {originalSize} bytes");
-        Console.WriteLine($"Edited size:   {editedSize} bytes");
+        Console.WriteLine($"Edited   size: {editedSize} bytes");
 
-        if (originalSize != editedSize)
+        if (editedSize != originalSize)
+        {
             Console.WriteLine("File sizes differ – changes have been applied.");
+        }
         else
+        {
             Console.WriteLine("File sizes are identical – no changes detected.");
+        }
     }
 }

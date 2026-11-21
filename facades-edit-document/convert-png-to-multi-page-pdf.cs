@@ -1,58 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        // Folder containing the PNG images (ordered alphabetically)
+        // Folder containing the PNG images
         const string imagesFolder = "Images";
-        // Output PDF file
-        const string outputPdf = "Combined.pdf";
+        // Output PDF file path
+        const string outputPdf = "output.pdf";
 
-        // Validate input folder
         if (!Directory.Exists(imagesFolder))
         {
             Console.Error.WriteLine($"Folder not found: {imagesFolder}");
             return;
         }
 
-        // Get all PNG files and sort them to preserve sequence
+        // Get all PNG files in the folder, sorted alphabetically to define page order
         string[] pngFiles = Directory.GetFiles(imagesFolder, "*.png");
-        Array.Sort(pngFiles, StringComparer.InvariantCulture);
-
         if (pngFiles.Length == 0)
         {
             Console.Error.WriteLine("No PNG files found in the specified folder.");
             return;
         }
+        Array.Sort(pngFiles);
 
         // Create a new PDF document
-        Document pdfDoc = new Document();
+        var pdfDocument = new Document();
 
-        foreach (string imgPath in pngFiles)
+        foreach (var pngPath in pngFiles)
         {
             // Add a new page for each image
-            Page page = pdfDoc.Pages.Add();
+            var page = pdfDocument.Pages.Add();
 
-            // Create an Aspose.Pdf.Drawing.Image and bind the PNG file
-            Image img = new Image
+            // Create an Image object and set its source file
+            var image = new Image
             {
-                File = imgPath,
-                // Fit the image to the page size (default margins are respected by using the page dimensions)
-                FixWidth = page.PageInfo.Width,
-                FixHeight = page.PageInfo.Height
+                File = pngPath
             };
 
-            // Add the image to the page content
-            page.Paragraphs.Add(img);
+            // Optionally, fit the image to the page while respecting default margins
+            // Here we simply add the image; Aspose.PDF will place it at the origin.
+            page.Paragraphs.Add(image);
         }
 
         // Save the combined PDF
-        pdfDoc.Save(outputPdf);
+        pdfDocument.Save(outputPdf);
 
-        Console.WriteLine($"PDF created successfully: {outputPdf}");
+        Console.WriteLine($"PDF successfully created at '{outputPdf}'.");
     }
 }

@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
+        const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,32 +16,29 @@ class Program
             return;
         }
 
-        // Load the PDF document inside a using block for deterministic disposal
+        // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
             // Iterate over each form field in the document
-            foreach (Aspose.Pdf.Forms.Field field in doc.Form)
+            foreach (Field field in doc.Form)
             {
-                // Example processing: output field name and its concrete type
-                Console.WriteLine($"Field Name: {field.FullName}, Type: {field.GetType().Name}");
-
-                // If the field is a text box, set a sample value
-                if (field is TextBoxField txt)
+                // Example processing: set a default value for text boxes
+                if (field is TextBoxField txtField)
                 {
-                    txt.Value = "Sample text";
+                    txtField.Value = "Sample text";
                 }
-                // If the field is a check box, mark it as checked
-                else if (field is CheckboxField chk)
+                // Example processing: check all check boxes
+                else if (field is CheckboxField chkField)
                 {
-                    chk.Checked = true;
+                    chkField.Checked = true;
                 }
-                // Additional field-specific logic can be added here
+                // Additional field types can be handled here
             }
 
-            // Save the modified PDF document
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Processed PDF saved to '{outputPath}'.");
+        Console.WriteLine($"Processed form fields and saved to '{outputPath}'.");
     }
 }

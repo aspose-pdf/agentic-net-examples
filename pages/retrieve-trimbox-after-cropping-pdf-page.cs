@@ -14,26 +14,26 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF document inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Iterate pages using 1‑based indexing (Aspose.Pdf requirement)
-            for (int i = 1; i <= doc.Pages.Count; i++)
-            {
-                // OPTIONAL: set a new TrimBox to demonstrate cropping
-                // Replace with your own rectangle if needed
-                Aspose.Pdf.Rectangle newTrim = new Aspose.Pdf.Rectangle(50, 50, 500, 700);
-                doc.Pages[i].TrimBox = newTrim;
+            // Aspose.Pdf uses 1‑based page indexing (see global rule)
+            Page page = doc.Pages[1];
 
-                // Retrieve the TrimBox after any cropping operation
-                Aspose.Pdf.Rectangle trim = doc.Pages[i].TrimBox;
+            // Example cropping: define a new rectangle (llx, lly, urx, ury)
+            // Use fully qualified Rectangle to avoid ambiguity with System.Drawing
+            Aspose.Pdf.Rectangle cropRect = new Aspose.Pdf.Rectangle(50, 50, 500, 800);
+            page.CropBox = cropRect;
 
-                // Output the TrimBox coordinates for verification
-                Console.WriteLine($"Page {i} TrimBox: LLX={trim.LLX}, LLY={trim.LLY}, URX={trim.URX}, URY={trim.URY}");
-            }
+            // After cropping, retrieve the TrimBox values.
+            // If TrimBox was not explicitly set, Aspose.Pdf returns the MediaBox.
+            Aspose.Pdf.Rectangle trimBox = page.TrimBox;
 
-            // If you want to persist the changes, uncomment the line below
-            // doc.Save("output_cropped.pdf");
+            Console.WriteLine($"Page 1 TrimBox:");
+            Console.WriteLine($"  LLX = {trimBox.LLX}");
+            Console.WriteLine($"  LLY = {trimBox.LLY}");
+            Console.WriteLine($"  URX = {trimBox.URX}");
+            Console.WriteLine($"  URY = {trimBox.URY}");
         }
     }
 }

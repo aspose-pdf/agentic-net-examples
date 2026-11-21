@@ -1,40 +1,54 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Tagged;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath      = "input.pdf";
-        const string validationLogPath = "validation_report.txt";
-        const string xmlReportPath     = "document_structure.xml";
+        const string inputPdf = "input.pdf";
+        const string reportXml = "ua_report.xml";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"File not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdf}");
             return;
         }
 
         try
         {
-            // Load the PDF document (tagged PDF expected)
-            using (Document doc = new Document(inputPdfPath))
-            {
-                // Validate against PDF/UA (PdfFormat.PDF_UA_1)
-                // The method returns true if the document complies, false otherwise.
-                bool isCompliant = doc.Validate(validationLogPath, PdfFormat.PDF_UA_1);
-                Console.WriteLine($"PDF/UA validation result: {(isCompliant ? "Compliant" : "Non‑compliant")}");
-                Console.WriteLine($"Validation log written to: {validationLogPath}");
+            bool isCompliant;
 
-                // Save the logical structure of the PDF as XML for detailed inspection.
-                doc.SaveXml(xmlReportPath);
-                Console.WriteLine($"XML structure report saved to: {xmlReportPath}");
+            // Load the PDF document
+            using (Document doc = new Document(inputPdf))
+            {
+                // Determine whether the document is tagged. In the current Aspose.Pdf API the
+                // Document.IsTagged property does not exist; the presence of TaggedContent
+                // indicates a tagged PDF.
+                if (doc.TaggedContent == null)
+                {
+                    Console.WriteLine("Warning: The document is not tagged. PDF/UA validation requires a tagged PDF.");
+                }
+
+                // Perform PDF/UA validation. The method writes an XML report and returns the
+                // compliance result.
+                isCompliant = doc.Validate(reportXml, PdfFormat.PDF_UA_1);
+            }
+
+            Console.WriteLine(isCompliant
+                ? "PDF conforms to PDF/UA."
+                : "PDF does NOT conform to PDF/UA. See the XML report for details.");
+
+            // The XML compliance report is written to the specified path
+            if (File.Exists(reportXml))
+            {
+                Console.WriteLine($"Compliance report saved to '{reportXml}'.");
             }
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during validation: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

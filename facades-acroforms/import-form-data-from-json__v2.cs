@@ -1,46 +1,47 @@
 using System;
 using System.IO;
-using System.Text;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath = "form_template.pdf";
-        const string outputPdfPath = "form_filled.pdf";
-        const string jsonPath = "data.json";
+        const string pdfPath = "input.pdf";      // source PDF with form fields
+        const string jsonPath = "data.json";    // JSON file containing form values
+        const string outputPdf = "filled_output.pdf";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(pdfPath))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"PDF not found: {pdfPath}");
             return;
         }
 
         if (!File.Exists(jsonPath))
         {
-            Console.Error.WriteLine($"JSON file not found: {jsonPath}");
+            Console.Error.WriteLine($"JSON not found: {jsonPath}");
             return;
         }
 
-        try
+        // Load the PDF document
+        using (Document pdfDoc = new Document(pdfPath))
         {
-            // Load JSON into a stream – ImportJson expects a Stream, not a file path.
-            string jsonText = File.ReadAllText(jsonPath);
-            using var jsonStream = new MemoryStream(Encoding.UTF8.GetBytes(jsonText));
+            // Use the Facade Form to import JSON data
+            using (Aspose.Pdf.Facades.Form pdfForm = new Aspose.Pdf.Facades.Form())
+            {
+                pdfForm.BindPdf(pdfDoc);
 
-            // Bind the PDF form and import the JSON data.
-            // Aspose.Pdf.Facades.Form is used (fully‑qualified) to avoid ambiguity with Aspose.Pdf.Forms.Form.
-            using var pdfForm = new Aspose.Pdf.Facades.Form();
-            pdfForm.BindPdf(inputPdfPath);
-            pdfForm.ImportJson(jsonStream); // Missing fields are ignored automatically.
-            pdfForm.Save(outputPdfPath);
+                // Import JSON from a stream; missing fields are ignored automatically
+                using (FileStream jsonStream = File.OpenRead(jsonPath))
+                {
+                    pdfForm.ImportJson(jsonStream);
+                }
+            }
 
-            Console.WriteLine($"Form data imported successfully to '{outputPdfPath}'.");
+            // Save the updated PDF
+            pdfDoc.Save(outputPdf);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Form data imported and saved to '{outputPdf}'.");
     }
 }

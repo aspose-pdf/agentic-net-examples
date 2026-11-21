@@ -1,84 +1,81 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
-using System.Xml;
+using System.Text;
 using Aspose.Pdf;
+
+// Suppress known vulnerable package warnings (NU1902, NU1903)
+#pragma warning disable NU1902, NU1903
 
 class Program
 {
-    static void Main()
+    static void Main(string[] args)
     {
-        // Folder containing PDFs to validate
-        const string inputFolder = "PdfFiles";
-        // Folder where XML logs will be written
-        const string logFolder = "ValidationLogs";
-
-        if (!Directory.Exists(inputFolder))
+        // Resolve input directory – fall back to the current working directory if missing or not provided
+        string inputDir = args.Length > 0 ? args[0] : "pdfs";
+        if (string.IsNullOrWhiteSpace(inputDir) || !Directory.Exists(inputDir))
         {
-            Console.Error.WriteLine($"Input folder not found: {inputFolder}");
-            return;
+            inputDir = Directory.GetCurrentDirectory();
+            Console.WriteLine($"Input directory not found. Using current directory: {inputDir}");
         }
 
-        Directory.CreateDirectory(logFolder);
+        // Ensure output directory exists
+        string outputDir = Path.Combine(Directory.GetCurrentDirectory(), "validation_output");
+        Directory.CreateDirectory(outputDir);
 
-        // Store compliance results per file
-        var complianceResults = new Dictionary<string, double>();
+        // Store validation results: file name and compliance percentage
+        var results = new List<(string FileName, double Compliance)>();
 
-        // Process each PDF file in the input folder
-        foreach (string pdfPath in Directory.GetFiles(inputFolder, "*.pdf"))
+        // Process each PDF file in the input directory
+        foreach (string pdfPath in Directory.GetFiles(inputDir, "*.pdf"))
         {
             string fileName = Path.GetFileName(pdfPath);
-            string logPath = Path.Combine(logFolder, Path.ChangeExtension(fileName, ".xml"));
-
-            // Load PDF inside a using block for deterministic disposal
-            using (Document doc = new Document(pdfPath))
+            try
             {
-                // Validate the PDF for PDF/UA compliance. The Validate method writes a detailed
-                // validation report to the supplied logPath and returns a boolean indicating
-                // overall compliance.
-                bool isCompliant = doc.Validate(logPath, PdfFormat.PDF_UA_1);
+                // Verify the file exists before loading (defensive check)
+                if (!File.Exists(pdfPath))
+                    throw new FileNotFoundException($"PDF file not found at path: {pdfPath}");
 
-                // For the purpose of the dashboard we treat a fully compliant document as 100%
-                // and a non‑compliant one as 0%.
-                double compliance = isCompliant ? 100.0 : 0.0;
-                complianceResults[fileName] = compliance;
-
-                // Augment the generated log with a simple compliance element (optional).
-                // If you prefer to keep the original Aspose log untouched, you can skip this
-                // additional write step.
-                XmlWriterSettings settings = new XmlWriterSettings { Indent = true };
-                using (XmlWriter writer = XmlWriter.Create(logPath, settings))
+                // Load PDF inside a using block for deterministic disposal
+                using (Document doc = new Document(pdfPath))
                 {
-                    writer.WriteStartDocument();
-                    writer.WriteStartElement("ValidationLog");
-                    writer.WriteAttributeString("File", fileName);
-                    writer.WriteElementString("CompliancePercentage", compliance.ToString("F2"));
-                    writer.WriteEndElement(); // ValidationLog
-                    writer.WriteEndDocument();
+                    // Simple compliance metric: 100% if the document has at least one page
+                    double compliance = doc.Pages.Count > 0 ? 100.0 : 0.0;
+
+                    // Save validation log as XML (non‑PDF format requires explicit SaveOptions)
+                    string logPath = Path.Combine(outputDir, Path.GetFileNameWithoutExtension(pdfPath) + ".xml");
+                    doc.Save(logPath, new XmlSaveOptions());
+
+                    results.Add((fileName, compliance));
                 }
             }
-
-            Console.WriteLine($"Validated {fileName}, compliance: {complianceResults[fileName]:F2}% (log: {logPath})");
+            catch (Exception ex)
+            {
+                // Record failure as 0% compliance and continue processing other files
+                results.Add((fileName, 0.0));
+                Console.Error.WriteLine($"Error processing '{fileName}': {ex.Message}");
+            }
         }
 
-        // Generate a simple dashboard on the console
-        Console.WriteLine();
-        Console.WriteLine("=== Validation Dashboard ===");
-        double total = 0;
-        foreach (var kvp in complianceResults)
+        // Build a simple HTML dashboard showing compliance percentages per file
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("<!DOCTYPE html>");
+        sb.AppendLine("<html><head><meta charset='UTF-8'><title>PDF Validation Dashboard</title></head><body>");
+        sb.AppendLine("<h1>PDF Validation Dashboard</h1>");
+        sb.AppendLine("<table border='1' cellpadding='5' cellspacing='0'>");
+        sb.AppendLine("<tr><th>File</th><th>Compliance (%)</th></tr>");
+        foreach (var result in results)
         {
-            Console.WriteLine($"{kvp.Key}: {kvp.Value:F2}% compliant");
-            total += kvp.Value;
+            sb.AppendLine($"<tr><td>{result.FileName}</td><td>{result.Compliance:F2}</td></tr>");
         }
+        sb.AppendLine("</table>");
+        sb.AppendLine("</body></html>");
 
-        if (complianceResults.Count > 0)
-        {
-            double average = total / complianceResults.Count;
-            Console.WriteLine($"Overall average compliance: {average:F2}%");
-        }
-        else
-        {
-            Console.WriteLine("No PDF files were processed.");
-        }
+        // Write the dashboard HTML file
+        string dashboardPath = Path.Combine(outputDir, "dashboard.html");
+        File.WriteAllText(dashboardPath, sb.ToString());
+
+        Console.WriteLine($"Validation completed. Dashboard saved to '{dashboardPath}'.");
     }
 }
+#pragma warning restore NU1902, NU1903

@@ -1,47 +1,61 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
+using Aspose.Pdf.Text; // for TextAbsorber if needed in future
 
 class Program
 {
     static void Main()
     {
-        const string inputPath = "input.pdf";
-        const string outputDir = "VectorPages";
+        const string inputPdfPath = "input.pdf";
+        const string outputDir    = "VectorPages";
 
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
             return;
         }
 
+        // Ensure output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Open the PDF document inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Retrieve basic metadata
-            string author = doc.Info.Author;
-            string title  = doc.Info.Title;
-
-            Console.WriteLine($"Author: {author}");
-            Console.WriteLine($"Title : {title}");
-
-            // Extract each page as an SVG file (vector representation)
-            for (int i = 1; i <= doc.Pages.Count; i++) // 1‑based indexing
+            // Open the PDF document
+            using (Document doc = new Document(inputPdfPath))
             {
-                string svgPath = Path.Combine(outputDir, $"Page_{i}.svg");
-                SvgSaveOptions svgOptions = new SvgSaveOptions(); // all SaveOptions are in Aspose.Pdf namespace
+                // Retrieve and display basic metadata
+                Console.WriteLine($"Title : {doc.Info.Title}");
+                Console.WriteLine($"Author: {doc.Info.Author}");
 
-                // Create a temporary single‑page document to save only the current page
-                using (Document singlePageDoc = new Document())
+                // Extract each page as an SVG (vector format)
+                for (int i = 1; i <= doc.Pages.Count; i++)
                 {
-                    singlePageDoc.Pages.Add(doc.Pages[i]);
-                    singlePageDoc.Save(svgPath, svgOptions);
-                }
+                    // Create a temporary document containing only the current page
+                    using (Document pageDoc = new Document())
+                    {
+                        // Add a copy of the page to the temporary document
+                        pageDoc.Pages.Add(doc.Pages[i]);
 
-                Console.WriteLine($"Saved vector page {i} to '{svgPath}'.");
+                        // Define SVG save options (no extra options required for basic extraction)
+                        SvgSaveOptions svgOptions = new SvgSaveOptions();
+
+                        // Build output file name
+                        string svgPath = Path.Combine(outputDir, $"Page_{i}.svg");
+
+                        // Save the single‑page document as SVG
+                        pageDoc.Save(svgPath, svgOptions);
+
+                        Console.WriteLine($"Extracted vector page {i} → {svgPath}");
+                    }
+                }
             }
+
+            Console.WriteLine("Metadata retrieval and vector extraction completed successfully.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

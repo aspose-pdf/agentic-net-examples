@@ -16,35 +16,33 @@ class Program
             return;
         }
 
-        // Ensure the output directory exists
         Directory.CreateDirectory(outputDir);
 
-        // Load the PDF document inside a using block for deterministic disposal
-        using (Document pdfDoc = new Document(pdfPath))
+        try
         {
-            // Define the page range (2 through 6 inclusive). Guard against PDFs with fewer pages.
-            int startPage = 2;
-            int endPage   = Math.Min(6, pdfDoc.Pages.Count);
-
-            // Set the desired resolution (dots per inch)
-            var resolution = new Resolution(150);
-
-            // BmpDevice does NOT implement IDisposable, so instantiate it without a using block
-            var bmpDevice = new BmpDevice(resolution);
-
-            // Loop through the selected pages and render each one as a BMP image
-            for (int pageNumber = startPage; pageNumber <= endPage; pageNumber++)
+            // Load the PDF document (Document implements IDisposable)
+            using (Document doc = new Document(pdfPath))
             {
-                string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
+                // Set the desired resolution for the BMP output
+                Resolution resolution = new Resolution(150);
 
-                // Dispose only the file stream; the device does not need disposal
-                using (var outStream = new FileStream(outPath, FileMode.Create, FileAccess.Write))
+                // BmpDevice is a concrete image device but it does NOT implement IDisposable.
+                // Therefore we instantiate it without a using‑statement.
+                BmpDevice bmpDevice = new BmpDevice(resolution);
+
+                // Convert pages 2 through 6 (or up to the last page if the PDF is shorter)
+                for (int pageNumber = 2; pageNumber <= 6 && pageNumber <= doc.Pages.Count; pageNumber++)
                 {
-                    bmpDevice.Process(pdfDoc.Pages[pageNumber], outStream);
+                    string outPath = Path.Combine(outputDir, $"Page_{pageNumber}.bmp");
+                    // The device works on a Page object, not directly on the Document.
+                    bmpDevice.Process(doc.Pages[pageNumber], outPath);
+                    Console.WriteLine($"Saved page {pageNumber} as BMP → {outPath}");
                 }
-
-                Console.WriteLine($"Saved page {pageNumber} as BMP to '{outPath}'.");
             }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

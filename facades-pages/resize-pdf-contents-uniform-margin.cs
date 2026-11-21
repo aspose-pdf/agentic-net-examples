@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
@@ -17,38 +16,33 @@ class Program
             return;
         }
 
-        // Uniform margins (20 points on each side)
-        const double leftMargin   = 20.0; // points
-        const double rightMargin  = 20.0; // points
-        const double topMargin    = 20.0; // points
-        const double bottomMargin = 20.0; // points
-
-        // Load the PDF using the high‑level Document API to obtain page dimensions.
+        // Load the PDF using the high‑level Document API (required for resizing)
         Document doc = new Document(inputPath);
-        if (doc.Pages.Count == 0)
-        {
-            Console.Error.WriteLine("The PDF contains no pages.");
-            return;
-        }
 
-        // Assume all pages have the same size; use the first page as reference.
-        double pageWidth  = doc.Pages[1].PageInfo.Width;
-        double pageHeight = doc.Pages[1].PageInfo.Height;
+        // Define a uniform margin (e.g., 50 points) on all sides
+        double margin = 50.0;
 
-        // Compute scaling factors so that after scaling the content fits inside the desired margins.
-        double scaleX = (pageWidth  - leftMargin - rightMargin) / pageWidth;
-        double scaleY = (pageHeight - topMargin - bottomMargin) / pageHeight;
-        // Use the smaller factor to keep the aspect ratio uniform.
-        double uniformScale = Math.Min(scaleX, scaleY);
+        // Retrieve original page dimensions (assumes all pages have same size)
+        Page firstPage = doc.Pages[1];
+        double pageWidth = firstPage.PageInfo.Width;
+        double pageHeight = firstPage.PageInfo.Height;
 
-        // Use PdfPageEditor (the Facades API) to apply the scaling.
-        PdfPageEditor editor = new PdfPageEditor();
-        editor.BindPdf(doc);
-        // Apply the scaling to every page.
-        editor.ProcessPages = Enumerable.Range(1, doc.Pages.Count).ToArray();
-        editor.Zoom = (float)uniformScale;
-        editor.Save(outputPath);
+        // Set up resize parameters using the Margins factory method
+        // This creates a ContentsResizeParameters instance with the specified margins
+        var resizeParams = PdfFileEditor.ContentsResizeParameters.Margins(margin, margin, margin, margin);
 
+        // Prepare an array with all page numbers (1‑based) – the overload expects 1‑based indices
+        int pageCount = doc.Pages.Count;
+        int[] pages = new int[pageCount];
+        for (int i = 0; i < pageCount; i++)
+            pages[i] = i + 1;
+
+        // Use PdfFileEditor to apply the resizing to the selected pages
+        PdfFileEditor editor = new PdfFileEditor();
+        editor.ResizeContents(doc, pages, resizeParams);
+
+        // Save the resized PDF
+        doc.Save(outputPath);
         Console.WriteLine($"Resized PDF saved to '{outputPath}'.");
     }
 }

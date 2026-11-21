@@ -1,122 +1,122 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Aspose.Pdf;
 using Aspose.Pdf.Text;
 
-class PdfComparisonResult
+class ComparisonResult
 {
     public string FileA { get; set; }
     public string FileB { get; set; }
     public bool AreEqual { get; set; }
     public string Differences { get; set; }
-
-    // Initialise non‑nullable properties to avoid CS8618 warnings.
-    public PdfComparisonResult()
-    {
-        FileA = string.Empty;
-        FileB = string.Empty;
-        Differences = string.Empty;
-        AreEqual = true;
-    }
 }
 
-class Program
+class PdfComparer
 {
-    // Extracts the full text of a single page.
-    static string ExtractPageText(Document doc, int pageNumber)
+    // Compare two PDFs: page count and full text content
+    private static ComparisonResult Compare(string pathA, string pathB)
     {
-        // Pages are 1‑based (see GLOBAL RULE: page-indexing-one-based)
-        // TextAbsorber does not implement IDisposable in the current SDK version, so avoid using.
-        TextAbsorber absorber = new TextAbsorber();
-        doc.Pages[pageNumber].Accept(absorber);
-        string text = absorber.Text ?? string.Empty;
-        // No need to dispose explicitly.
-        return text;
-    }
-
-    // Compares two PDFs and returns a result object.
-    static PdfComparisonResult ComparePdfs(string pathA, string pathB)
-    {
-        var result = new PdfComparisonResult
-        {
+        ComparisonResult result = new ComparisonResult {
             FileA = pathA,
             FileB = pathB,
             AreEqual = true,
             Differences = string.Empty
         };
 
-        // Ensure both files exist before proceeding.
-        if (!File.Exists(pathA) || !File.Exists(pathB))
-        {
-            result.AreEqual = false;
-            result.Differences = "One or both files do not exist.";
-            return result;
-        }
-
-        // Load both documents inside using blocks (see GLOBAL RULE: document-disposal-with-using)
+        // Load first document
         using (Document docA = new Document(pathA))
+        // Load second document
         using (Document docB = new Document(pathB))
         {
-            // Compare page counts.
+            // Compare page counts
             if (docA.Pages.Count != docB.Pages.Count)
             {
                 result.AreEqual = false;
-                result.Differences = $"Page count mismatch: {docA.Pages.Count} vs {docB.Pages.Count}.";
-                return result;
+                result.Differences += $"Page count differs (A:{docA.Pages.Count} vs B:{docB.Pages.Count}). ";
             }
 
-            // Compare text content page by page.
-            for (int i = 1; i <= docA.Pages.Count; i++) // 1‑based loop
-            {
-                string textA = ExtractPageText(docA, i);
-                string textB = ExtractPageText(docB, i);
+            // Extract full text from both documents
+            string textA = ExtractFullText(docA);
+            string textB = ExtractFullText(docB);
 
-                if (!string.Equals(textA, textB, StringComparison.Ordinal))
-                {
-                    result.AreEqual = false;
-                    result.Differences = $"Text differs on page {i}.";
-                    // Early exit on first difference; remove break to collect all differences.
-                    break;
-                }
+            if (!string.Equals(textA, textB, StringComparison.Ordinal))
+            {
+                result.AreEqual = false;
+                result.Differences += "Text content differs. ";
             }
         }
 
         return result;
     }
 
-    static async Task Main(string[] args)
+    // Helper: extract all text from a document using TextAbsorber
+    private static string ExtractFullText(Document doc)
     {
-        // Define pairs of PDFs to compare.
-        var pdfPairs = new List<(string FileA, string FileB)>
-        {
-            ("doc1_v1.pdf", "doc1_v2.pdf"),
-            ("report_Jan.pdf", "report_Feb.pdf"),
-            ("manual_en.pdf", "manual_fr.pdf")
-        };
+        TextAbsorber absorber = new TextAbsorber();
+        // Use default TextExtractionOptions (pure text)
+        doc.Pages.Accept(absorber);
+        return absorber.Text ?? string.Empty;
+    }
 
-        // Create a task for each comparison.
-        var comparisonTasks = new List<Task<PdfComparisonResult>>();
-        foreach (var (fileA, fileB) in pdfPairs)
+    // Run comparisons in parallel and collect results
+    public static List<ComparisonResult> CompareInParallel(List<(string, string)> pairs)
+    {
+        var results = new ConcurrentBag<ComparisonResult>();
+        var tasks = new List<Task>();
+
+        foreach (var (fileA, fileB) in pairs)
         {
-            // Capture variables correctly for the lambda.
+            // Capture variables for the task
             string a = fileA;
             string b = fileB;
-            comparisonTasks.Add(Task.Run(() => ComparePdfs(a, b)));
+
+            tasks.Add(Task.Run(() =>
+            {
+                var res = Compare(a, b);
+                results.Add(res);
+            }));
         }
 
-        // Wait for all tasks to finish.
-        PdfComparisonResult[] results = await Task.WhenAll(comparisonTasks);
+        // Wait for all tasks to finish
+        Task.WaitAll(tasks.ToArray());
 
-        // Output the aggregated results.
-        foreach (var res in results)
+        // Return as a regular list
+        return new List<ComparisonResult>(results);
+    }
+
+    // Example usage
+    static void Main()
+    {
+        // Define PDF pairs to compare
+        var pdfPairs = new List<(string, string)>
         {
-            Console.WriteLine($"Comparison: {Path.GetFileName(res.FileA)} ↔ {Path.GetFileName(res.FileB)}");
-            Console.WriteLine($"  Are Equal : {res.AreEqual}");
+            ("doc1_v1.pdf", "doc1_v2.pdf"),
+            ("report_A.pdf", "report_B.pdf"),
+            ("sample1.pdf", "sample2.pdf")
+        };
+
+        // Validate files exist before starting
+        foreach (var (a, b) in pdfPairs)
+        {
+            if (!File.Exists(a) || !File.Exists(b))
+            {
+                Console.Error.WriteLine($"Missing file: {(File.Exists(a) ? b : a)}");
+                return;
+            }
+        }
+
+        // Perform parallel comparison
+        List<ComparisonResult> comparisonResults = CompareInParallel(pdfPairs);
+
+        // Output results
+        foreach (var res in comparisonResults)
+        {
+            Console.WriteLine($"[{res.FileA}] vs [{res.FileB}] => Equal: {res.AreEqual}");
             if (!res.AreEqual)
                 Console.WriteLine($"  Differences: {res.Differences}");
-            Console.WriteLine();
         }
     }
 }

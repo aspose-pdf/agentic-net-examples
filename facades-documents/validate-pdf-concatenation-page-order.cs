@@ -1,84 +1,97 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Collections.Generic;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text;
 
 class Program
 {
     static void Main()
     {
-        // Input PDF files to concatenate – adjust paths as needed
-        string[] inputFiles = { "file1.pdf", "file2.pdf", "file3.pdf" };
+        // Input PDF files to be concatenated (order matters)
+        string[] inputFiles = { "part1.pdf", "part2.pdf", "part3.pdf" };
         const string mergedFile = "merged.pdf";
 
-        // Verify that all input files exist
-        foreach (string path in inputFiles)
+        // Validate that all input files exist
+        foreach (string file in inputFiles)
         {
-            if (!File.Exists(path))
+            if (!File.Exists(file))
             {
-                Console.Error.WriteLine($"Input file not found: {path}");
+                Console.Error.WriteLine($"Input file not found: {file}");
                 return;
             }
         }
 
-        // Record the expected page order: a list of (source file, page number)
-        var expectedOrder = new List<(string Source, int PageNumber)>();
-
-        // Load each source PDF and collect its page numbers (1‑based indexing)
-        foreach (string src in inputFiles)
+        // --------------------------------------------------------------------
+        // Step 1: Extract text from each source PDF page and store in order.
+        // --------------------------------------------------------------------
+        List<string> sourcePageTexts = new List<string>();
+        foreach (string file in inputFiles)
         {
-            using (Document doc = new Document(src))
+            using (Document srcDoc = new Document(file))
             {
-                for (int i = 1; i <= doc.Pages.Count; i++) // page-indexing-one-based rule
+                // Extract text from all pages of the current source document
+                TextAbsorber absorber = new TextAbsorber();
+                srcDoc.Pages.Accept(absorber);
+                // Split the extracted text into per‑page segments
+                // (TextAbsorber returns concatenated text; we re‑extract per page)
+                for (int i = 1; i <= srcDoc.Pages.Count; i++)
                 {
-                    expectedOrder.Add((src, i));
+                    TextAbsorber pageAbsorber = new TextAbsorber();
+                    srcDoc.Pages[i].Accept(pageAbsorber);
+                    sourcePageTexts.Add(pageAbsorber.Text);
                 }
             }
         }
 
-        // Concatenate PDFs using Aspose.Pdf.Facades.PdfFileEditor
-        // PdfFileEditor does NOT implement IDisposable – do NOT wrap in using
+        // --------------------------------------------------------------------
+        // Step 2: Concatenate the PDFs using Aspose.Pdf.Facades.PdfFileEditor.
+        // --------------------------------------------------------------------
         PdfFileEditor editor = new PdfFileEditor();
         editor.Concatenate(inputFiles, mergedFile);
 
-        // Validate the merged document
-        if (!File.Exists(mergedFile))
-        {
-            Console.Error.WriteLine($"Failed to create merged file: {mergedFile}");
-            return;
-        }
-
+        // --------------------------------------------------------------------
+        // Step 3: Extract text from the merged PDF page by page.
+        // --------------------------------------------------------------------
+        List<string> mergedPageTexts = new List<string>();
         using (Document mergedDoc = new Document(mergedFile))
         {
-            // Check that total page count matches the sum of source pages
-            if (mergedDoc.Pages.Count != expectedOrder.Count)
+            for (int i = 1; i <= mergedDoc.Pages.Count; i++)
             {
-                Console.Error.WriteLine("Page count mismatch after concatenation.");
-                Console.Error.WriteLine($"Expected: {expectedOrder.Count}, Actual: {mergedDoc.Pages.Count}");
-                return;
+                TextAbsorber pageAbsorber = new TextAbsorber();
+                mergedDoc.Pages[i].Accept(pageAbsorber);
+                mergedPageTexts.Add(pageAbsorber.Text);
             }
+        }
 
-            // Verify that page numbers are sequential (1‑based) – this confirms order preservation
-            bool orderPreserved = true;
-            for (int i = 1; i <= mergedDoc.Pages.Count; i++) // page-indexing-one-based rule
+        // --------------------------------------------------------------------
+        // Step 4: Validate page order by comparing the two text sequences.
+        // --------------------------------------------------------------------
+        bool orderPreserved = true;
+
+        if (sourcePageTexts.Count != mergedPageTexts.Count)
+        {
+            orderPreserved = false;
+            Console.WriteLine($"Page count mismatch: source total = {sourcePageTexts.Count}, merged = {mergedPageTexts.Count}");
+        }
+        else
+        {
+            for (int i = 0; i < sourcePageTexts.Count; i++)
             {
-                // In a merged PDF, pages are appended in the order of inputFiles,
-                // so the i‑th page in the merged document should correspond to the i‑th entry in expectedOrder.
-                // Since we cannot directly query the source file from a page, we rely on the sequential count.
-                // Any deviation in count would have been caught above.
-                // Here we simply ensure the index matches.
-                if (i != i) // placeholder for logical check; kept for clarity
+                // Simple string comparison; trim to ignore trailing whitespace differences
+                if (!string.Equals(sourcePageTexts[i].Trim(), mergedPageTexts[i].Trim(), StringComparison.Ordinal))
                 {
                     orderPreserved = false;
+                    Console.WriteLine($"Page {i + 1} differs between source and merged PDF.");
                     break;
                 }
             }
-
-            if (orderPreserved)
-                Console.WriteLine("Validation succeeded: concatenated PDF preserves original page order.");
-            else
-                Console.Error.WriteLine("Validation failed: page order is not preserved.");
         }
+
+        if (orderPreserved)
+            Console.WriteLine("Validation succeeded: concatenated PDF preserves original page order.");
+        else
+            Console.WriteLine("Validation failed: page order was not preserved.");
     }
 }

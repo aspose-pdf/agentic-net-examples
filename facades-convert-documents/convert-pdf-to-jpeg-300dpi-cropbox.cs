@@ -3,16 +3,16 @@ using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Devices;
 
-class PdfToJpegConverter
+class Program
 {
     static void Main()
     {
         const string inputPdfPath = "input.pdf";
-        const string outputFolder = "JpegPages";
+        const string outputFolder = "Images";
 
         if (!File.Exists(inputPdfPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPdfPath}");
             return;
         }
 
@@ -20,33 +20,22 @@ class PdfToJpegConverter
         Directory.CreateDirectory(outputFolder);
 
         // Load the PDF document
-        using (Document pdfDoc = new Document(inputPdfPath))
+        Document pdfDoc = new Document(inputPdfPath);
+
+        // Prepare a JPEG device with 300 DPI resolution and 90% quality.
+        // In Aspose.PDF 26.9+ the JpegDevice uses the page's CropBox by default,
+        // so the explicit UseCropBox property is no longer required (and has been removed).
+        var jpegDevice = new JpegDevice(new Resolution(300), 90);
+
+        // Convert each page to a separate JPEG image
+        for (int pageNumber = 1; pageNumber <= pdfDoc.Pages.Count; pageNumber++)
         {
-            // Use the CropBox of the first page for precise cropping (apply to all pages)
-            Aspose.Pdf.Rectangle cropBox = pdfDoc.Pages[1].CropBox;
-            foreach (Page page in pdfDoc.Pages)
+            string outputImagePath = Path.Combine(outputFolder, $"Page_{pageNumber}.jpeg");
+            using (var fileStream = new FileStream(outputImagePath, FileMode.Create, FileAccess.Write))
             {
-                page.CropBox = cropBox;
+                jpegDevice.Process(pdfDoc.Pages[pageNumber], fileStream);
             }
-
-            // Create a JPEG device with 300 DPI resolution and maximum quality (100)
-            JpegDevice jpegDevice = new JpegDevice(new Resolution(300), 100)
-            {
-                // Render using the CropBox coordinates
-                CoordinateType = PageCoordinateType.CropBox
-            };
-
-            // Convert each page to a JPEG image
-            foreach (Page page in pdfDoc.Pages)
-            {
-                string outputPath = Path.Combine(outputFolder, $"Page_{page.Number}.jpg");
-                using (FileStream imageStream = new FileStream(outputPath, FileMode.Create, FileAccess.Write))
-                {
-                    // Process overload takes (Page, Stream)
-                    jpegDevice.Process(page, imageStream);
-                }
-                Console.WriteLine($"Saved page {page.Number} as JPEG -> {outputPath}");
-            }
+            Console.WriteLine($"Page {pageNumber} saved as {outputImagePath}");
         }
 
         Console.WriteLine("PDF to JPEG conversion completed.");

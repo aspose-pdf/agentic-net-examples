@@ -1,10 +1,10 @@
 # Working with graphs
 
-> **Working with graphs** in PDF using C# / .NET -- **84** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with graphs** in PDF using C# / .NET -- **87** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-graphs`
-- Examples: 84
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 87
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -17,11 +17,13 @@
 - [`add-filled-arc-to-pdf-graph.cs`](./add-filled-arc-to-pdf-graph.cs) -- Add filled arc to pdf graph
 - [`add-filled-arc-with-radial-gradient.cs`](./add-filled-arc-with-radial-gradient.cs) -- Add filled arc with radial gradient
 - [`add-filled-circle-to-pdf-graph.cs`](./add-filled-circle-to-pdf-graph.cs) -- Add filled circle to pdf graph
+- [`add-filled-curve-with-opacity-and-border.cs`](./add-filled-curve-with-opacity-and-border.cs) -- Add filled curve with opacity and border
 - [`add-filled-ellipse-with-gradient-to-pdf-graph.cs`](./add-filled-ellipse-with-gradient-to-pdf-graph.cs) -- Add filled ellipse with gradient to pdf graph
 - [`add-filled-rectangle-with-dashed-border.cs`](./add-filled-rectangle-with-dashed-border.cs) -- Add filled rectangle with dashed border
 - [`add-full-size-graph-to-pdf-page.cs`](./add-full-size-graph-to-pdf-page.cs) -- Add full size graph to pdf page
 - [`add-gradient-ellipse-graphs-to-pdfs.cs`](./add-gradient-ellipse-graphs-to-pdfs.cs) -- Add gradient ellipse graphs to pdfs
 - [`add-graph-rectangle-watermark-to-pdf.cs`](./add-graph-rectangle-watermark-to-pdf.cs) -- Add graph rectangle watermark to pdf
+- [`add-graph-to-pdf.cs`](./add-graph-to-pdf.cs) -- Add graph to pdf
 - [`add-graph-with-shapes-to-pdf.cs`](./add-graph-with-shapes-to-pdf.cs) -- Add graph with shapes to pdf
 - [`add-multi-colored-line-segments-to-pdf-graph.cs`](./add-multi-colored-line-segments-to-pdf-graph.cs) -- Add multi colored line segments to pdf graph
 - [`add-non-overlapping-rectangles-to-pdf-graph.cs`](./add-non-overlapping-rectangles-to-pdf-graph.cs) -- Add non overlapping rectangles to pdf graph
@@ -63,7 +65,6 @@
 - [`create-pdf-graph-border-colors.cs`](./create-pdf-graph-border-colors.cs) -- Create pdf graph border colors
 - [`create-pdf-graph-filled-outline-shapes.cs`](./create-pdf-graph-filled-outline-shapes.cs) -- Create pdf graph filled outline shapes
 - [`create-pdf-graph-styled-text.cs`](./create-pdf-graph-styled-text.cs) -- Create pdf graph styled text
-- [`create-pdf-with-graph-shapes.cs`](./create-pdf-with-graph-shapes.cs) -- Create pdf with graph shapes
 - [`create-pdf-with-graph.cs`](./create-pdf-with-graph.cs) -- Create pdf with graph
 - [`create-proportional-graphs-pdf.cs`](./create-proportional-graphs-pdf.cs) -- Create proportional graphs pdf
 - [`create-radial-gradient-rectangle.cs`](./create-radial-gradient-rectangle.cs) -- Create radial gradient rectangle
@@ -73,8 +74,10 @@
 - [`draw-straight-line-in-pdf-graph.cs`](./draw-straight-line-in-pdf-graph.cs) -- Draw straight line in pdf graph
 - [`ellipse-gradient-dark-gray-border.cs`](./ellipse-gradient-dark-gray-border.cs) -- Ellipse gradient dark gray border
 - [`ellipse-with-transparent-fill-and-centered-text.cs`](./ellipse-with-transparent-fill-and-centered-text.cs) -- Ellipse with transparent fill and centered text
+- [`enable-bounds-check-mode-graph.cs`](./enable-bounds-check-mode-graph.cs) -- Enable bounds check mode graph
 - [`export-graph-to-pdf.cs`](./export-graph-to-pdf.cs) -- Export graph to pdf
 - [`export-pdf-to-memorystream-and-save-to-file.cs`](./export-pdf-to-memorystream-and-save-to-file.cs) -- Export pdf to memorystream and save to file
+- [`graph-overlapping-shapes-bounds-check.cs`](./graph-overlapping-shapes-bounds-check.cs) -- Graph overlapping shapes bounds check
 - [`insert-centered-textfragment-rectangle.cs`](./insert-centered-textfragment-rectangle.cs) -- Insert centered textfragment rectangle
 - [`insert-dashed-polyline-annotation.cs`](./insert-dashed-polyline-annotation.cs) -- Insert dashed polyline annotation
 - [`insert-graph-into-pdf-footer.cs`](./insert-graph-into-pdf-footer.cs) -- Insert graph into pdf footer

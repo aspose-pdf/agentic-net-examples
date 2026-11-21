@@ -2,6 +2,10 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Drawing;
+using Aspose.Pdf.Text;
+
+// Alias to avoid ambiguity with Aspose.Pdf.Rectangle (annotation bounds)
+using DrawRect = Aspose.Pdf.Drawing.Rectangle;
 
 class Program
 {
@@ -9,56 +13,47 @@ class Program
     {
         const string outputPath = "graph_with_shadow.pdf";
 
+        // Create a new PDF document
         using (Document doc = new Document())
         {
+            // Add a page to the document
             Page page = doc.Pages.Add();
 
-            // Create a Graph container (200x200 points) and position it on the page
-            Graph graph = new Graph(200.0, 200.0)
-            {
-                Left = 100,
-                Top = 400
-            };
+            // Create a Graph that spans the whole page – Graph is the only container that can hold drawing shapes.
+            var graph = new Graph(page.PageInfo.Width, page.PageInfo.Height);
 
-            // -----------------------------------------------------------------
-            // Shadow emulation: Aspose.Pdf.GraphInfo does not expose a Shadow
-            // property, so we draw a second rectangle slightly offset and with
-            // a semi‑transparent fill to mimic a blurred shadow.
-            // -----------------------------------------------------------------
-            Aspose.Pdf.Drawing.Rectangle shadowRect = new Aspose.Pdf.Drawing.Rectangle(
-                20 + 5,   // X position + horizontal offset
-                20 - 5,   // Y position + vertical offset (negative moves up)
-                160 + 5, // Width + horizontal offset
-                100 - 5   // Height + vertical offset
-            )
-            {
-                GraphInfo = new GraphInfo
-                {
-                    // 30% opaque black (alpha 80 out of 255) creates a soft shadow
-                    FillColor = Color.FromArgb(80, 0, 0, 0)
-                }
-            };
+            // Rectangle dimensions (left, bottom, width, height)
+            float left   = 100f;
+            float bottom = 300f; // Bottom coordinate measured from the bottom of the page
+            float width  = 200f;
+            float height = 200f;
 
-            // Main filled rectangle inside the graph
-            Aspose.Pdf.Drawing.Rectangle rect = new Aspose.Pdf.Drawing.Rectangle(20, 20, 160, 100)
-            {
-                GraphInfo = new GraphInfo
-                {
-                    FillColor = Color.FromRgb(0.2, 0.6, 0.8) // rectangle fill color
-                }
-            };
-
-            // Add the shadow first so it is rendered beneath the main shape
+            // ------------------------------------------------------------
+            // 1️⃣ Simulate a shadow by drawing an offset, semi‑transparent rectangle first.
+            // ------------------------------------------------------------
+            var shadowRect = new DrawRect(left + 5f, bottom - 5f, width, height);
+            // Semi‑transparent gray (alpha 80 out of 255)
+            shadowRect.GraphInfo.FillColor = Color.FromArgb(80, 128, 128, 128);
+            // No border for the shadow shape
+            shadowRect.GraphInfo.Color = Color.Transparent;
             graph.Shapes.Add(shadowRect);
+
+            // ------------------------------------------------------------
+            // 2️⃣ Main filled rectangle.
+            // ------------------------------------------------------------
+            var rect = new DrawRect(left, bottom, width, height);
+            rect.GraphInfo.FillColor = Color.LightBlue;   // Fill color
+            rect.GraphInfo.Color = Color.Black;           // Stroke (border) color
+            rect.GraphInfo.LineWidth = 1f;                // Border thickness
             graph.Shapes.Add(rect);
 
-            // Add the graph to the page
+            // Add the graph (which now contains the shadow + rectangle) to the page.
             page.Paragraphs.Add(graph);
 
-            // Save the PDF
+            // Save the PDF document.
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF saved to {outputPath}");
+        Console.WriteLine($"PDF saved to '{outputPath}'.");
     }
 }

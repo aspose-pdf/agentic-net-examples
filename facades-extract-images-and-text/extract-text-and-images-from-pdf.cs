@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
@@ -8,6 +7,8 @@ class Program
     static void Main()
     {
         const string pdfPath = "input.pdf";
+        const string textOutputPath = "extracted_text.txt";
+        const string imagesOutputDir = "ExtractedImages";
 
         if (!File.Exists(pdfPath))
         {
@@ -15,59 +16,31 @@ class Program
             return;
         }
 
-        // Determine the number of pages in the PDF
-        int pageCount;
-        using (var doc = new Document(pdfPath))
-        {
-            pageCount = doc.Pages.Count;
-        }
+        Directory.CreateDirectory(imagesOutputDir);
 
+        // PdfExtractor implements IDisposable; wrap in using for deterministic disposal
         using (PdfExtractor extractor = new PdfExtractor())
         {
-            // Bind the PDF file
+            // Bind the PDF file to the extractor
             extractor.BindPdf(pdfPath);
 
-            // ---------- Text extraction ----------
-            // Call the method to start text extraction
-            extractor.ExtractText();
+            // Enable both text and image extraction
+            extractor.ExtractText();   // extracts all text
+            extractor.ExtractImage();  // extracts all images
 
-            // Get the extracted text via a stream (PdfExtractor has no parameter‑less GetText())
-            string extractedText;
-            using (MemoryStream textStream = new MemoryStream())
+            // Save extracted text to a file
+            extractor.GetText(textOutputPath);
+
+            // Extract images page by page
+            int imageIndex = 1;
+            while (extractor.HasNextImage())
             {
-                extractor.GetText(textStream);
-                textStream.Position = 0;
-                using (StreamReader reader = new StreamReader(textStream))
-                {
-                    extractedText = reader.ReadToEnd();
-                }
-            }
-            Console.WriteLine("=== Extracted Text ===");
-            Console.WriteLine(extractedText);
-
-            // ---------- Image extraction ----------
-            // Enable resource‑based image extraction (recommended for most PDFs)
-            extractor.ExtractImageMode = ExtractImageMode.DefinedInResources;
-
-            for (int page = 1; page <= pageCount; page++)
-            {
-                // Set the page range for the current iteration
-                extractor.StartPage = page;
-                extractor.EndPage   = page;
-
-                // Start image extraction for the selected page
-                extractor.ExtractImage();
-
-                int imageIndex = 1;
-                // Retrieve each image sequentially
-                while (extractor.HasNextImage())
-                {
-                    string imgPath = $"image_page{page}_{imageIndex}.png";
-                    extractor.GetNextImage(imgPath); // saves the image to file
-                    Console.WriteLine($"Saved image: {imgPath}");
-                    imageIndex++;
-                }
+                string imagePath = Path.Combine(imagesOutputDir, $"image_{imageIndex}.png");
+                extractor.GetNextImage(imagePath);
+                imageIndex++;
             }
         }
+
+        Console.WriteLine("Text and images have been extracted successfully.");
     }
 }

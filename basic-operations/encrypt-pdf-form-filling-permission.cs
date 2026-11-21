@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Security;
+using Aspose.Pdf.Security; // Required for Permissions enum
 
 class Program
 {
@@ -20,10 +20,12 @@ class Program
 
         try
         {
+            // Load the PDF and apply encryption with specific permissions.
             using (Document doc = new Document(inputPath))
             {
-                // Allow only form filling; all other actions (including content extraction) are disabled
-                Permissions perms = Permissions.FillForm;
+                // Allow only form filling (ModifyContent) and disable all other actions,
+                // including content extraction (CopyContents).
+                Permissions perms = Permissions.ModifyContent; // form filling permission
                 doc.Encrypt(userPassword, ownerPassword, perms, CryptoAlgorithm.AESx256);
                 doc.Save(outputPath);
             }

@@ -7,58 +7,65 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputPdf = "watermarked.pdf";
-        const string imagePath = "logo.png";
+        const string inputPdf      = "input.pdf";
+        const string outputPdf     = "watermarked.pdf";
+        const string imagePath     = "logo.png";
         const string watermarkText = "CONFIDENTIAL";
 
+        // Verify required files exist
         if (!File.Exists(inputPdf) || !File.Exists(imagePath))
         {
-            Console.Error.WriteLine("Required files not found.");
+            Console.Error.WriteLine("Input PDF or image file not found.");
             return;
         }
 
-        // Load the source PDF using the high‑level Document API (no PdfContentEditor needed)
+        // Load the source PDF
         Document pdf = new Document(inputPdf);
 
-        // ---------------------------------------------------------------------
-        // 1️⃣ Add the image as a background stamp on page 1
-        // ---------------------------------------------------------------------
-        ImageStamp imgStamp = new ImageStamp(imagePath)
+        // ---------------------------------------------------------------
+        // 1. Image watermark (logo) – placed on page 1
+        // ---------------------------------------------------------------
+        // Use the core ImageStamp (not the Facades.Stamp) – it exposes Width, Height,
+        // XIndent, YIndent and Opacity directly.
+        var imgStamp = new ImageStamp(imagePath)
         {
-            // Position the stamp – use XIndent/YIndent instead of non‑existent X/Y
-            XIndent = 100,
-            YIndent = 500,
-            // Size of the stamp
-            Width = 300,   // 400 - 100
-            Height = 300,  // 800 - 500
-            Background = true   // place behind existing page content
+            Width   = 200f,   // Desired width (points)
+            Height  = 200f,   // Desired height (points)
+            XIndent = 100f,   // X position from left (points)
+            YIndent = 400f,   // Y position from bottom (points)
+            Opacity = 0.5f,   // Semi‑transparent image
+            Background = false // Draw over existing content
         };
         pdf.Pages[1].AddStamp(imgStamp);
 
-        // ---------------------------------------------------------------------
-        // 2️⃣ Add semi‑transparent text over the image on the same page
-        // ---------------------------------------------------------------------
+        // ---------------------------------------------------------------
+        // 2. Text watermark – semi‑transparent, rotated, centered
+        // ---------------------------------------------------------------
         TextStamp txtStamp = new TextStamp(watermarkText)
         {
-            XIndent = 100,
-            YIndent = 500,
-            Width = 300,
-            Height = 300,
-            // Opacity controls the overall stamp transparency (0 = fully transparent, 1 = opaque)
-            Opacity = 0.5f
+            HorizontalAlignment = HorizontalAlignment.Center,
+            VerticalAlignment   = VerticalAlignment.Center,
+            Background          = false,
+            RotateAngle         = 45f,
+            Opacity             = 0.5f,
+            // The stamp will cover the whole page; alignment properties centre the text.
+            XIndent = 0,
+            YIndent = 0,
+            Width   = pdf.Pages[1].PageInfo.Width,
+            Height  = pdf.Pages[1].PageInfo.Height
         };
-        // Configure the visual appearance of the text
-        txtStamp.TextState.FontSize = 48;
+        // Font and style settings
+        txtStamp.TextState.Font      = FontRepository.FindFont("Arial");
+        txtStamp.TextState.FontSize  = 72;
         txtStamp.TextState.FontStyle = FontStyles.Bold;
-        txtStamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // red
-        // No ForegroundOpacity property – opacity is handled by the stamp itself
+        txtStamp.TextState.ForegroundColor = Color.Red;
 
         pdf.Pages[1].AddStamp(txtStamp);
 
-        // Save the modified PDF
+        // ---------------------------------------------------------------
+        // 3. Save the modified PDF
+        // ---------------------------------------------------------------
         pdf.Save(outputPdf);
-
         Console.WriteLine($"Watermarked PDF saved to '{outputPdf}'.");
     }
 }

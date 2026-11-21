@@ -1,7 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
+// If you need additional facade operations, you can also import:
+// using Aspose.Pdf.Facades;
 
 class Program
 {
@@ -9,23 +10,23 @@ class Program
     {
         const string sourcePath = "source.pdf";
 
-        // Verify the source PDF exists
+        // Verify the file exists before attempting to load it.
         if (!File.Exists(sourcePath))
         {
             Console.Error.WriteLine($"File not found: {sourcePath}");
             return;
         }
 
-        // Load the PDF with Document to obtain information such as page count
+        // Load the PDF with the Document class (PdfFileEditor does not provide loading methods).
         Document pdfDoc = new Document(sourcePath);
-        int pageCount = pdfDoc.Pages.Count;
-        Console.WriteLine($"Source PDF page count: {pageCount}");
 
-        // Use PdfFileEditor for operations that modify or extract pages
-        PdfFileEditor editor = new PdfFileEditor();
-        string extractedPath = "extracted_page1.pdf";
-        // Correct signature: Extract(sourceFile, pageNumbers, outputFile)
-        editor.Extract(sourcePath, new int[] { 1 }, extractedPath);
-        Console.WriteLine($"Extracted first page to: {extractedPath}");
+        // Get the page count via the Document API.
+        int pageCount = pdfDoc.Pages.Count;
+        Console.WriteLine($"Loaded PDF '{sourcePath}' with {pageCount} pages.");
+
+        // Additional operations can be performed with PdfFileEditor if needed.
+        // Example (uncomment to use):
+        // var editor = new Aspose.Pdf.Facades.PdfFileEditor();
+        // editor.Split(sourcePath, "outputPages");
     }
 }

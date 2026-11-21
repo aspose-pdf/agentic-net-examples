@@ -10,8 +10,9 @@ class Program
     {
         const string inputPath  = "input.pdf";
         const string outputPath = "output.pdf";
-        const string phrase     = "Aspose";                     // phrase to search
-        const string url        = "https://www.aspose.com";     // hyperlink target
+        const string searchPhrase = "Click here";
+        const string linkText     = "Visit Site";
+        const string url          = "https://example.com";
 
         if (!File.Exists(inputPath))
         {
@@ -22,27 +23,32 @@ class Program
         // Load the PDF inside a using block for deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // Find all occurrences of the phrase
-            TextFragmentAbsorber absorber = new TextFragmentAbsorber(phrase);
-            absorber.TextSearchOptions = new TextSearchOptions(true); // case‑insensitive
+            // Locate all occurrences of the phrase
+            TextFragmentAbsorber absorber = new TextFragmentAbsorber(searchPhrase);
             doc.Pages.Accept(absorber);
 
-            // Convert each found fragment into a clickable hyperlink
+            // Replace each occurrence with a styled hyperlink and add a LinkAnnotation
             foreach (TextFragment fragment in absorber.TextFragments)
             {
-                // Visual styling to indicate a link
-                fragment.TextState.Underline = true;
+                // Replace the text
+                fragment.Text = linkText;
+                // Style the hyperlink (blue and underlined)
                 fragment.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+                fragment.TextState.Underline = true;
 
-                // Create a link annotation that covers the fragment's rectangle
-                // NOTE: LinkAnnotation requires both the owning Page and the rectangle bounds.
-                LinkAnnotation link = new LinkAnnotation(fragment.Page, fragment.Rectangle);
+                // Get the page that contains the fragment
+                Page page = fragment.Page; // Correct way to obtain the page
+
+                // Create a link annotation over the same rectangle
+                Aspose.Pdf.Rectangle rect = fragment.Rectangle;
+                LinkAnnotation link = new LinkAnnotation(page, rect);
                 link.Action = new GoToURIAction(url);
-                // Add the annotation to the page that contains the fragment
-                fragment.Page.Annotations.Add(link);
+                // Make the annotation border invisible
+                link.Border = new Border(link) { Width = 0 };
+                page.Annotations.Add(link);
             }
 
-            // Save the modified PDF (Document.Save writes PDF regardless of extension)
+            // Save the modified PDF (still inside the using block)
             doc.Save(outputPath);
         }
 

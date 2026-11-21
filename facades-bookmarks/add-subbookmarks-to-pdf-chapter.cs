@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Aspose.Pdf.Facades;
-using System.Drawing; // optional, only needed if you set TitleColor etc.
+using Aspose.Pdf.Annotations;
+using System.Drawing;
 
 class Program
 {
@@ -10,7 +10,7 @@ class Program
     {
         const string inputPath = "input.pdf";
         const string outputPath = "output_bookmarked.pdf";
-        const string parentTitle = "Chapter 1";
+        const string parentBookmarkTitle = "Chapter 1";
 
         if (!File.Exists(inputPath))
         {
@@ -18,46 +18,46 @@ class Program
             return;
         }
 
-        // Use the facade editor for simple bookmark operations
-        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        // Load the PDF document (core API provides full outline manipulation)
+        Document doc = new Document(inputPath);
+
+        // Find the existing parent bookmark (outline) named "Chapter 1"
+        OutlineItemCollection parent = null;
+        foreach (OutlineItemCollection item in doc.Outlines)
         {
-            bookmarkEditor.BindPdf(inputPath);
-
-            // Extract existing bookmarks to locate the parent and obtain its level
-            Bookmarks existingBookmarks = bookmarkEditor.ExtractBookmarks();
-            int parentLevel = 0;
-            foreach (Bookmark bm in existingBookmarks)
+            if (item.Title == parentBookmarkTitle)
             {
-                if (bm.Title == parentTitle)
-                {
-                    parentLevel = bm.Level;
-                    break;
-                }
+                parent = item;
+                break;
             }
-
-            // Child bookmark definitions (title + target page)
-            string[] childTitles = { "Section 1.1", "Section 1.2", "Section 1.3" };
-            int[] childPages = { 2, 3, 4 };
-
-            // Create each child bookmark one level deeper than the parent
-            for (int i = 0; i < childTitles.Length; i++)
-            {
-                Bookmark child = new Bookmark
-                {
-                    Title = childTitles[i],
-                    PageNumber = childPages[i],
-                    Level = parentLevel + 1,
-                    Action = "GoTo" // required for a navigation bookmark
-                };
-
-                // The facade API adds a single Bookmark via CreateBookmarks
-                bookmarkEditor.CreateBookmarks(child);
-            }
-
-            // Persist the changes
-            bookmarkEditor.Save(outputPath);
         }
 
-        Console.WriteLine($"Child bookmarks added under '{parentTitle}'. Output saved to '{outputPath}'.");
+        if (parent == null)
+        {
+            Console.Error.WriteLine($"Parent bookmark '{parentBookmarkTitle}' not found.");
+            return;
+        }
+
+        // Helper to create a child outline that points to a specific page.
+        // Aspose.Pdf pages are 1‑based; doc.Pages[pageNumber] returns the page.
+        OutlineItemCollection CreateChild(string title, int pageNumber)
+        {
+            var child = new OutlineItemCollection(doc.Outlines)
+            {
+                Title = title,
+                // Destination that jumps to the top of the target page (no zoom/offset)
+                Destination = new XYZExplicitDestination(doc.Pages[pageNumber], 0, 0, 0)
+            };
+            return child;
+        }
+
+        // Add child bookmarks (sub‑sections) under the found parent.
+        parent.Add(CreateChild("Section 1.1", 2)); // page 2
+        parent.Add(CreateChild("Section 1.2", 5)); // page 5
+        parent.Add(CreateChild("Section 1.3", 8)); // page 8
+
+        // Save the updated PDF with the new bookmark hierarchy.
+        doc.Save(outputPath);
+        Console.WriteLine($"Bookmarks added and saved to '{outputPath}'.");
     }
 }

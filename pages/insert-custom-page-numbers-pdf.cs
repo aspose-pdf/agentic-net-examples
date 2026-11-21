@@ -7,7 +7,7 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output.pdf";
 
         if (!File.Exists(inputPath))
@@ -16,32 +16,36 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF inside a using block (lifecycle rule)
         using (Document doc = new Document(inputPath))
         {
-            int totalPages = doc.Pages.Count; // 1‑based page count
+            int totalPages = doc.Pages.Count; // total number of pages
 
-            // Iterate using 1‑based indexing as required by Aspose.Pdf
+            // Iterate pages using 1‑based indexing (global rule)
             for (int i = 1; i <= totalPages; i++)
             {
                 Page page = doc.Pages[i];
 
-                // Create the page number text in the format "current/total"
-                string pageNumberText = $"{i}/{totalPages}";
+                // Build the page number string with custom separator
+                string pageNumber = $"{i}/{totalPages}";
 
-                TextFragment tf = new TextFragment(pageNumberText);
+                // Create a text fragment for the page number
+                TextFragment tf = new TextFragment(pageNumber);
                 tf.TextState.FontSize = 12;
                 tf.TextState.ForegroundColor = Aspose.Pdf.Color.Black;
-                tf.Position = new Position(50, 20); // Adjust X/Y as needed (bottom‑left corner)
 
-                // Add the text fragment to the page's paragraphs collection
+                // Position the fragment near the bottom‑right corner
+                tf.Position = new Position(page.PageInfo.Width - 50, 20);
+                tf.HorizontalAlignment = HorizontalAlignment.Right;
+
+                // Add the fragment to the page
                 page.Paragraphs.Add(tf);
             }
 
-            // Save the modified PDF
+            // Save the modified PDF (lifecycle rule)
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"Page numbers inserted and saved to '{outputPath}'.");
+        Console.WriteLine($"Page numbers added and saved to '{outputPath}'.");
     }
 }

@@ -2,15 +2,15 @@ using System;
 using System.IO;
 using Aspose.Pdf;
 using Aspose.Pdf.Forms;
-using Aspose.Pdf.Annotations; // for AnnotationFlags
+using Aspose.Pdf.Annotations;
 
 class Program
 {
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string fieldName = "myField";
+        const string outputPath = "output_hidden_field.pdf";
+        const string fieldName = "myField"; // name of the form field to hide
 
         if (!File.Exists(inputPath))
         {
@@ -18,22 +18,23 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
+        // Load the PDF and ensure deterministic disposal
         using (Document doc = new Document(inputPath))
         {
-            // The Form indexer returns a WidgetAnnotation; cast it to Field to access field members
+            // Retrieve the form field by its name and cast to Field
             Field? field = doc.Form[fieldName] as Field;
             if (field != null)
             {
-                // Hide the field by setting the Hidden flag on the underlying annotation
+                // Hide the field so it does not appear when the PDF is rendered
+                // Visibility is controlled via the Flags property using AnnotationFlags
                 field.Flags = AnnotationFlags.Hidden;
             }
             else
             {
-                Console.WriteLine($"Form field '{fieldName}' not found.");
+                Console.WriteLine($"Field '{fieldName}' not found or is not a form field.");
             }
 
-            // Save the modified PDF (PDF format, no SaveOptions needed)
+            // Save the modified PDF
             doc.Save(outputPath);
         }
 

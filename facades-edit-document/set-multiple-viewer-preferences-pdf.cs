@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder;
+using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
 
 class Program
 {
@@ -18,32 +18,32 @@ class Program
 
         try
         {
-            // Load the PDF document inside a using block for deterministic disposal
-            using (Document doc = new Document(inputPath))
+            // Load the PDF document using the high‑level Document class.
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Attempt to set viewer preferences using dynamic dispatch.
-                // This works with newer Aspose.Pdf versions that expose ViewerPreferences,
-                // and gracefully degrades for older versions where the property is absent.
-                dynamic d = doc;
+                // The ViewerPreferences property exists only in newer Aspose.Pdf versions.
+                // Access it dynamically to keep the code compilable with older versions.
+                dynamic docDyn = pdfDoc;
                 try
                 {
-                    d.ViewerPreferences.CenterWindow = true;   // Open the window centered on the screen
-                    d.ViewerPreferences.HideToolbar = true;   // Hide the toolbar when the PDF is opened
+                    // Combine viewer preferences before saving.
+                    docDyn.ViewerPreferences.CenterWindow = true;   // Center the window on open
+                    docDyn.ViewerPreferences.HideToolbar = true;    // Hide the toolbar on open
                 }
                 catch (RuntimeBinderException)
                 {
-                    Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version.");
+                    Console.WriteLine("ViewerPreferences property is not available in the current Aspose.Pdf library version. Preferences will be ignored.");
                 }
 
-                // Save the modified PDF
-                doc.Save(outputPath);
+                // Save the updated PDF
+                pdfDoc.Save(outputPath);
             }
 
             Console.WriteLine($"PDF saved with combined viewer preferences to '{outputPath}'.");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error processing PDF: {ex.Message}");
         }
     }
 }

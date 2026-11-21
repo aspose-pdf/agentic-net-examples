@@ -7,60 +7,75 @@ class Program
 {
     static void Main()
     {
-        // Paths for the source PDF, the image to attach, and the output PDF
-        const string inputPdfPath = "input.pdf";
-        const string imageFilePath = "stamp.png";
-        const string outputPdfPath = "output.pdf";
+        const string inputPdf = "input.pdf";
+        const string imagePath = "stampImage.png";
+        const string outputPdf = "output.pdf";
+        const string tempPdf = "temp_with_attachment.pdf";
 
-        // Verify that required files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
-            return;
-        }
-        if (!File.Exists(imageFilePath))
-        {
-            Console.Error.WriteLine($"Image file not found: {imageFilePath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
 
-        // Load the existing PDF document
-        Document doc = new Document(inputPdfPath);
-
-        // ------------------------------------------------------------
-        // 1) Add the image as an embedded file attachment.
-        // ------------------------------------------------------------
-        // Create a FileSpecification using the (filePath, description) ctor.
-        // No MimeType property is required – Aspose.Pdf infers it from the file.
-        FileSpecification attachment = new FileSpecification(imageFilePath, "Stamp Image Attachment");
-        // Optional: set modification date if needed (available via Params.ModDate).
-        attachment.Params.ModDate = DateTime.UtcNow;
-        doc.EmbeddedFiles.Add(attachment);
-
-        // ------------------------------------------------------------
-        // 2) Add a stamp annotation that references the same image.
-        // ------------------------------------------------------------
-        // Use ImageStamp – positioning is done via alignment + X/Y indents.
-        ImageStamp imgStamp = new ImageStamp(imageFilePath)
+        if (!File.Exists(imagePath))
         {
-            // Define size of the stamp (optional – if omitted the image's original size is used)
-            Width = 100f,
-            Height = 100f,
-            // Position the stamp 100 points from the left and 100 points from the bottom.
+            Console.Error.WriteLine($"Image file not found: {imagePath}");
+            return;
+        }
+
+        // ------------------------------------------------------------
+        // 1. Add the image file as an embedded file (attachment) using the Document API.
+        // ------------------------------------------------------------
+        using (var doc = new Document(inputPdf))
+        {
+            // Create a FileSpecification that represents the embedded file.
+            var fileSpec = new FileSpecification(Path.GetFileName(imagePath))
+            {
+                Description = "Sample image attachment"
+            };
+            // Set the file data via a stream.
+            fileSpec.Contents = new MemoryStream(File.ReadAllBytes(imagePath));
+            // Optional: set modification date.
+            fileSpec.Params.ModDate = DateTime.UtcNow;
+
+            // Add the file specification to the EmbeddedFiles collection.
+            doc.EmbeddedFiles.Add(fileSpec);
+
+            // Save to a temporary PDF that now contains the embedded file.
+            doc.Save(tempPdf);
+        }
+
+        // ------------------------------------------------------------
+        // 2. Create an ImageStamp that references the same image file.
+        // ------------------------------------------------------------
+        var imgStamp = new ImageStamp(imagePath)
+        {
+            // Size of the stamp.
+            Width = 200,
+            Height = 150,
+            // Place the stamp in the foreground.
+            Background = false,
+            // Use absolute positioning.
             HorizontalAlignment = HorizontalAlignment.Left,
             VerticalAlignment = VerticalAlignment.Bottom,
-            XIndent = 100f,
-            YIndent = 100f,
-            // Ensure the stamp is placed on top of page content.
-            Background = false
+            XIndent = 100, // distance from the left edge (points)
+            YIndent = 500  // distance from the bottom edge (points)
         };
 
-        // Add the stamp to the first page (pages are 1‑based).
-        doc.Pages[1].AddStamp(imgStamp);
+        // ------------------------------------------------------------
+        // 3. Apply the stamp only to the first page of the PDF that already contains the attachment.
+        // ------------------------------------------------------------
+        using (var doc = new Document(tempPdf))
+        {
+            // Add the stamp to page 1.
+            doc.Pages[1].AddStamp(imgStamp);
+            doc.Save(outputPdf);
+        }
 
-        // Save the modified PDF to a new file.
-        doc.Save(outputPdfPath);
+        // Clean‑up the intermediate file (optional).
+        try { File.Delete(tempPdf); } catch { /* ignore cleanup errors */ }
 
-        Console.WriteLine($"PDF saved with attachment and stamp: {outputPdfPath}");
+        Console.WriteLine($"PDF saved with attachment and stamp: {outputPdf}");
     }
 }

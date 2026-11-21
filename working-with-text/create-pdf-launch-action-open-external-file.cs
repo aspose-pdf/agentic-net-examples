@@ -8,49 +8,63 @@ class Program
 {
     static void Main()
     {
-        const string outputPath = "LaunchActionExample.pdf";
-        const string externalFilePath = @"C:\Temp\example.txt"; // file to open on click
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output_with_launch.pdf";
+        const string externalFile = "example.txt"; // file to open when text is clicked
 
-        // Ensure the external file exists for demonstration purposes
-        if (!File.Exists(externalFilePath))
+        if (!File.Exists(inputPdf))
         {
-            File.WriteAllText(externalFilePath, "This is the external file opened by the PDF link.");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
+            return;
         }
 
-        // Create a new PDF document
-        using (Document doc = new Document())
+        try
         {
-            // Add a blank page (pages are 1‑based)
-            doc.Pages.Add();
-            Page page = doc.Pages[1];
+            // Load the existing PDF inside a using block for deterministic disposal
+            using (Document doc = new Document(inputPdf))
+            {
+                // Use the first page (1‑based indexing)
+                Page page = doc.Pages[1];
 
-            // Add visible text that the user will click
-            TextFragment tf = new TextFragment("Click here to open the external file");
-            tf.Position = new Position(100, 700); // place the text near the top of the page
-            tf.TextState.FontSize = 14;
-            page.Paragraphs.Add(tf);
+                // Add a visible text fragment to the page
+                TextFragment tf = new TextFragment("Open external file");
+                tf.Position = new Position(100, 700); // coordinates in points
+                tf.TextState.FontSize = 14;
+                tf.TextState.FontStyle = FontStyles.Bold;
+                tf.TextState.ForegroundColor = Aspose.Pdf.Color.Blue;
+                page.Paragraphs.Add(tf);
 
-            // Define a rectangle that covers the text (left, bottom, right, top)
-            // Use fully qualified type to avoid ambiguity with System.Drawing.Rectangle
-            Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(100, 680, 350, 720);
+                // Define a rectangle that covers the text fragment.
+                // Approximate width/height; adjust as needed.
+                double llx = 100;               // lower‑left X
+                double lly = 690;               // lower‑left Y (slightly below the baseline)
+                double urx = 300;               // upper‑right X
+                double ury = 720;               // upper‑right Y
+                Aspose.Pdf.Rectangle linkRect = new Aspose.Pdf.Rectangle(llx, lly, urx, ury);
 
-            // Create a link annotation with a Launch action
-            LinkAnnotation link = new LinkAnnotation(page, linkRect);
-            // LaunchAction opens an external file when the annotation is activated
-            link.Action = new LaunchAction(externalFilePath);
+                // Create a LaunchAction that opens the external file.
+                // Use the constructor that accepts the file path (parameterless ctor is not available).
+                LaunchAction launch = new LaunchAction(externalFile);
 
-            // Optionally set the appearance of the link (e.g., underline)
-            link.Border = new Border(link);
-            link.Border.Width = 0; // no visible border
-            link.Color = Color.Transparent; // make the annotation invisible
+                // Create a LinkAnnotation with the rectangle and associate the launch action
+                LinkAnnotation link = new LinkAnnotation(page, linkRect);
+                link.Action = launch;
+                // Optional visual appearance – Border requires the parent annotation in its ctor.
+                link.Border = new Border(link) { Width = 0 };
+                link.Color = Aspose.Pdf.Color.Transparent;
 
-            // Add the annotation to the page
-            page.Annotations.Add(link);
+                // Add the annotation to the page
+                page.Annotations.Add(link);
 
-            // Save the PDF
-            doc.Save(outputPath);
+                // Save the modified PDF
+                doc.Save(outputPdf);
+            }
+
+            Console.WriteLine($"PDF saved with launch action: {outputPdf}");
         }
-
-        Console.WriteLine($"PDF with launch action saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

@@ -6,15 +6,14 @@ class Program
 {
     static void Main()
     {
-        const string inputPdfPath   = "input.pdf";      // source PDF
-        const string outputPdfPath  = "output.pdf";     // result PDF
-        const string imagePath      = "background.jpg"; // image to use as background
-        const int    targetPageNum  = 1;                // page number (1‑based)
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "output.pdf";
+        const string imagePath = "background.jpg";
+        const int pageNumber = 1; // 1‑based page index
 
-        // Verify files exist
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPdfPath}");
+            Console.Error.WriteLine($"Input PDF not found: {inputPdf}");
             return;
         }
         if (!File.Exists(imagePath))
@@ -23,35 +22,35 @@ class Program
             return;
         }
 
-        // Load the PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPdfPath))
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPdf))
         {
-            // Ensure the requested page exists
-            if (targetPageNum < 1 || targetPageNum > doc.Pages.Count)
+            // Validate the requested page number (Aspose.Pdf uses 1‑based indexing)
+            if (pageNumber < 1 || pageNumber > doc.Pages.Count)
             {
-                Console.Error.WriteLine($"Page {targetPageNum} is out of range. Document has {doc.Pages.Count} pages.");
+                Console.Error.WriteLine("Invalid page number.");
                 return;
             }
 
-            // Get the target page (1‑based indexing)
-            Page page = doc.Pages[targetPageNum];
+            // Retrieve the target page
+            Page page = doc.Pages[pageNumber];
 
             // Create a BackgroundArtifact (parameterless constructor only)
-            BackgroundArtifact bgArtifact = new BackgroundArtifact();
+            BackgroundArtifact background = new BackgroundArtifact();
+            background.Opacity = 0.8; // optional opacity adjustment
 
-            // Set optional properties – note that the image itself cannot be assigned directly
-            // because Artifact.Image is read‑only. To use an image as a background you would
-            // normally employ an ImageStamp with IsBackground = true, but the task focuses on
-            // demonstrating the correct usage of BackgroundArtifact.
-            bgArtifact.Opacity = 0.5; // 50% opacity (optional)
-
-            // Add the artifact to the page's Artifacts collection
-            page.Artifacts.Add(bgArtifact);
+            // Assign the image to the artifact using the writable BackgroundImage property
+            using (FileStream imgStream = File.OpenRead(imagePath))
+            {
+                background.BackgroundImage = imgStream;
+                // Add the artifact to the page's Artifacts collection while the stream is open
+                page.Artifacts.Add(background);
+            }
 
             // Save the modified PDF
-            doc.Save(outputPdfPath);
+            doc.Save(outputPdf);
         }
 
-        Console.WriteLine($"Background artifact added and saved to '{outputPdfPath}'.");
+        Console.WriteLine($"Background artifact added and saved to '{outputPdf}'.");
     }
 }

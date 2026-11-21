@@ -6,31 +6,32 @@ class Program
 {
     static void Main()
     {
-        const string pdfPath = "input.pdf";
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output_updated.pdf";
 
-        // Verify the PDF file exists
-        if (!File.Exists(pdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {pdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         // Open the PDF and create a PdfFileInfo instance for metadata operations
-        PdfFileInfo pdfInfo = new PdfFileInfo(pdfPath);
+        using (PdfFileInfo pdfInfo = new PdfFileInfo(inputPath))
+        {
+            // Read existing metadata
+            Console.WriteLine($"Title  : {pdfInfo.Title}");
+            Console.WriteLine($"Author : {pdfInfo.Author}");
+            Console.WriteLine($"Subject: {pdfInfo.Subject}");
 
-        // Read existing metadata
-        Console.WriteLine($"Title   : {pdfInfo.Title}");
-        Console.WriteLine($"Author  : {pdfInfo.Author}");
-        Console.WriteLine($"Subject : {pdfInfo.Subject}");
-        Console.WriteLine($"Keywords: {pdfInfo.Keywords}");
+            // Modify metadata as needed
+            pdfInfo.Title   = "New Document Title";
+            pdfInfo.Author  = "John Doe";
+            pdfInfo.Subject = "Updated metadata example";
 
-        // Example: modify metadata
-        pdfInfo.Title  = "Updated Document Title";
-        pdfInfo.Author = "Jane Doe";
+            // Save the PDF with the updated metadata
+            pdfInfo.Save(outputPath);
+        }
 
-        // Save the updated metadata back to the PDF file
-        pdfInfo.Save(pdfPath);
-
-        Console.WriteLine("Metadata has been updated successfully.");
+        Console.WriteLine($"Metadata updated and saved to '{outputPath}'.");
     }
 }

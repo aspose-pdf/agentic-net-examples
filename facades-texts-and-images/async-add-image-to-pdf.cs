@@ -2,64 +2,62 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Aspose.Pdf;
-using Aspose.Pdf.Text;
+using Aspose.Pdf.Facades;
+using Aspose.Pdf.Text; // Added for FontStyles and TextState
 
 class Program
 {
-    // Asynchronously adds a text stamp to all pages of a PDF.
-    // The heavy PDF modification work is executed on a background thread via Task.Run.
-    static async Task AddTextStampAsync(string inputPdfPath, string outputPdfPath, string stampText)
+    // Async entry point
+    static async Task Main()
     {
-        // Validate input file existence.
-        if (!File.Exists(inputPdfPath))
-            throw new FileNotFoundException($"Input PDF not found: {inputPdfPath}");
+        const string inputPath  = "input.pdf";
+        const string outputPath = "output.pdf";
 
-        // Run the synchronous Aspose.Pdf operations on a thread‑pool thread.
-        await Task.Run(() =>
+        if (!File.Exists(inputPath))
         {
-            // Load the PDF document.
-            Document doc = new Document(inputPdfPath);
+            Console.Error.WriteLine($"File not found: {inputPath}");
+            return;
+        }
 
-            // Create a text stamp.
-            TextStamp textStamp = new TextStamp(stampText)
-            {
-                // Configure appearance of the stamp.
-                TextState = {
-                    FontSize = 14,
-                    FontStyle = FontStyles.Bold,
-                    ForegroundColor = Color.FromRgb(0.8, 0.1, 0.1)
-                },
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-                // Optional: rotate the stamp if desired.
-                // Rotate = Rotation.Angle90
-            };
+        // Perform the PDF modification without blocking the calling thread
+        await ModifyPdfAsync(inputPath, outputPath);
 
-            // Apply the stamp to every page.
-            foreach (Page page in doc.Pages)
-            {
-                page.AddStamp(textStamp);
-            }
-
-            // Save the modified PDF to the output path.
-            doc.Save(outputPdfPath);
-        });
+        Console.WriteLine($"Modified PDF saved to '{outputPath}'.");
     }
 
-    static async Task Main(string[] args)
+    // Wrap PDF modification in Task.Run for non‑blocking execution
+    static Task ModifyPdfAsync(string sourcePath, string destinationPath)
     {
-        const string inputPath = "input.pdf";
-        const string outputPath = "stamped_output.pdf";
-        const string stampText = "Confidential";
+        return Task.Run(() =>
+        {
+            // Load the source PDF using the core Document API (PdfFileMend does not support stamping)
+            var doc = new Document(sourcePath);
 
-        try
-        {
-            await AddTextStampAsync(inputPath, outputPath, stampText);
-            Console.WriteLine($"Stamp added successfully. Output saved to '{outputPath}'.");
-        }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+            // Create a text stamp that will be applied to every page
+            var stamp = new TextStamp("Confidential")
+            {
+                // Center the stamp on the page
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment   = VerticalAlignment.Center,
+
+                // Configure appearance
+                Opacity = 0.3
+                // Rotation is optional; the default is 0 degrees, so the unsupported RotationAngle enum is omitted
+            };
+
+            // Configure text appearance
+            stamp.TextState.FontSize = 72;
+            stamp.TextState.FontStyle = FontStyles.Bold; // Fixed: FontStyles now resolved via Aspose.Pdf.Text
+            stamp.TextState.ForegroundColor = Color.FromRgb(1, 0, 0); // Red color, cross‑platform
+
+            // Apply the stamp to each page (Aspose.Pdf uses 1‑based page indexing internally)
+            foreach (Page page in doc.Pages)
+            {
+                page.AddStamp(stamp);
+            }
+
+            // Save the modified PDF
+            doc.Save(destinationPath);
+        });
     }
 }

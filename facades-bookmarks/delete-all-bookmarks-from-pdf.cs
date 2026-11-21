@@ -1,12 +1,13 @@
 using System;
 using System.IO;
+using Aspose.Pdf;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_no_bookmarks.pdf";
 
         if (!File.Exists(inputPath))
@@ -15,14 +16,20 @@ class Program
             return;
         }
 
-        // PdfBookmarkEditor does not implement IDisposable, so no using block is needed.
-        PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor();
+        // PdfBookmarkEditor handles bookmark operations.
+        // It implements IDisposable, so wrap it in a using block.
+        using (PdfBookmarkEditor bookmarkEditor = new PdfBookmarkEditor())
+        {
+            // Load the PDF document.
+            bookmarkEditor.BindPdf(inputPath);
 
-        // Bind the source PDF, delete all its bookmarks, and save the result to a new file.
-        bookmarkEditor.BindPdf(inputPath);
-        bookmarkEditor.DeleteBookmarks();
-        bookmarkEditor.Save(outputPath);
+            // Delete all bookmarks from the document.
+            bookmarkEditor.DeleteBookmarks();
 
-        Console.WriteLine($"All bookmarks removed. Saved to '{outputPath}'.");
+            // Save the modified PDF without bookmarks.
+            bookmarkEditor.Save(outputPath);
+        }
+
+        Console.WriteLine($"Bookmarks removed. Saved to '{outputPath}'.");
     }
 }

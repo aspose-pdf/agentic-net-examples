@@ -6,35 +6,36 @@ class Program
 {
     static void Main()
     {
-        const string inputPdf = "input.pdf";
-        const string outputDocx = "output.docx";
+        const string inputPath = "input.pdf";
+        const string outputPath = "output.docx";
 
-        if (!File.Exists(inputPdf))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"File not found: {inputPdf}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
         try
         {
             // Load the PDF document inside a using block for deterministic disposal.
-            using (Document pdfDoc = new Document(inputPdf))
+            using (Document pdfDoc = new Document(inputPath))
             {
-                // Configure DOCX save options. The 'Mode' property selects the
-                // recognition mode. 'Flow' provides the most accurate layout
-                // extraction and preserves footnotes.
-                var docOptions = new DocSaveOptions();
-                docOptions.Mode = DocSaveOptions.RecognitionMode.Flow;
+                // Configure DOCX save options. The Format property selects DOCX output.
+                // Footnotes and enhanced recognition are handled automatically by the current API.
+                DocSaveOptions docOptions = new DocSaveOptions
+                {
+                    Format = DocSaveOptions.DocFormat.DocX
+                };
 
-                // Save as DOCX with the specified options.
-                pdfDoc.Save(outputDocx, docOptions);
+                // Save as DOCX using the configured options.
+                pdfDoc.Save(outputPath, docOptions);
             }
 
-            Console.WriteLine($"Conversion completed: {outputDocx}");
+            Console.WriteLine($"Conversion completed: '{outputPath}'");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"Error during conversion: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
         }
     }
 }

@@ -6,9 +6,9 @@ class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";
+        const string inputPath = "input.pdf";
         const string outputPath = "output_pdfa1b.pdf";
-        const string logPath    = "conversion_log.xml";
+        const string logPath = "conversion_log.xml";
 
         if (!File.Exists(inputPath))
         {
@@ -16,17 +16,24 @@ class Program
             return;
         }
 
-        // Load the source PDF inside a using block for deterministic disposal
-        using (Document doc = new Document(inputPath))
+        try
         {
-            // Convert the document to PDF/A‑1b.
-            // This overload preserves the original structure and embedded fonts.
-            doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
+            // Load the source PDF.
+            using (Document doc = new Document(inputPath))
+            {
+                // Convert to PDF/A‑1b. The conversion process preserves the
+                // original document structure and embedded fonts.
+                doc.Convert(logPath, PdfFormat.PDF_A_1B, ConvertErrorAction.Delete);
 
-            // Save the converted document. No special SaveOptions are required for PDF/A.
-            doc.Save(outputPath);
+                // Save the PDF/A‑1b compliant document.
+                doc.Save(outputPath);
+            }
+
+            Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
         }
-
-        Console.WriteLine($"PDF/A‑1b file saved to '{outputPath}'.");
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
     }
 }

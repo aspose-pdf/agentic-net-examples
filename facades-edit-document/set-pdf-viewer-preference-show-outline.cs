@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using Aspose.Pdf;
-using Microsoft.CSharp.RuntimeBinder; // Needed for RuntimeBinderException
+using Microsoft.CSharp.RuntimeBinder;
 
 class Program
 {
@@ -16,25 +16,25 @@ class Program
             return;
         }
 
-        // Load the PDF document with deterministic disposal
-        using (Document doc = new Document(inputPath))
-        {
-            // Try to set viewer preferences – this property exists only in newer Aspose.Pdf versions.
-            // Using dynamic bypasses compile‑time checks and allows the code to compile against older versions.
-            try
-            {
-                dynamic d = doc;               // Cast to dynamic to avoid compile‑time member validation
-                var prefs = d.ViewerPreferences; // May throw RuntimeBinderException if property is absent
-                prefs.PageMode = PageMode.UseOutlines; // Show outline (bookmarks) panel by default
-            }
-            catch (RuntimeBinderException)
-            {
-                Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version.");
-            }
+        // Load the PDF document
+        Document pdfDocument = new Document(inputPath);
 
-            // Save the updated PDF
-            doc.Save(outputPath);
+        // Attempt to set the PageMode to UseOutlines. The ViewerPreferences property
+        // exists only in newer versions of Aspose.Pdf. Use dynamic access to keep the
+        // code compatible with older versions and guard with a RuntimeBinderException.
+        dynamic doc = pdfDocument;
+        try
+        {
+            // This will succeed when the library version supports ViewerPreferences.
+            doc.ViewerPreferences.PageMode = PageMode.UseOutlines;
         }
+        catch (RuntimeBinderException)
+        {
+            Console.WriteLine("ViewerPreferences property is not supported by the current Aspose.Pdf library version. Skipping viewer preference configuration.");
+        }
+
+        // Save the updated PDF
+        pdfDocument.Save(outputPath);
 
         Console.WriteLine($"Viewer preference applied (if supported) and saved to '{outputPath}'.");
     }

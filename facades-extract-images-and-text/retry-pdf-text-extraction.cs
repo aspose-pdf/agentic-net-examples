@@ -1,61 +1,76 @@
 using System;
 using System.IO;
+using System.Threading;
 using Aspose.Pdf.Facades;
 
 class Program
 {
     static void Main()
     {
-        const string inputPdfPath  = "input.pdf";
-        const string outputTxtPath = "extracted.txt";
+        const string inputPath = "input.pdf";
+        const string outputPath = "extracted.txt";
 
-        if (!File.Exists(inputPdfPath))
+        if (!File.Exists(inputPath))
         {
-            Console.Error.WriteLine($"Input file not found: {inputPdfPath}");
+            Console.Error.WriteLine($"File not found: {inputPath}");
             return;
         }
 
-        const int maxRetries = 3;
+        // Retry up to three times if an IOException occurs during extraction
+        const int maxAttempts = 3;
         int attempt = 0;
-        bool extracted = false;
+        bool success = false;
 
-        while (attempt < maxRetries && !extracted)
+        while (attempt < maxAttempts && !success)
         {
             attempt++;
             try
             {
-                // PdfExtractor implements IDisposable, so wrap it in a using block
+                // PdfExtractor implements IDisposable – wrap in using for deterministic disposal
                 using (PdfExtractor extractor = new PdfExtractor())
                 {
-                    // Bind the source PDF
-                    extractor.BindPdf(inputPdfPath);
+                    // Load the PDF document
+                    extractor.BindPdf(inputPath);
 
-                    // Perform text extraction
+                    // Enable text extraction – call the method, not a property
                     extractor.ExtractText();
 
-                    // Write extracted text to a file
-                    using (FileStream outStream = new FileStream(outputTxtPath, FileMode.Create, FileAccess.Write))
+                    // Extract text to a memory stream
+                    using (MemoryStream textStream = new MemoryStream())
                     {
-                        extractor.GetText(outStream);
+                        extractor.GetText(textStream);
+                        textStream.Position = 0;
+                        using (StreamReader reader = new StreamReader(textStream))
+                        {
+                            string extractedText = reader.ReadToEnd();
+                            File.WriteAllText(outputPath, extractedText);
+                        }
                     }
                 }
 
-                // If we reach here, extraction succeeded
-                extracted = true;
-                Console.WriteLine($"Extraction succeeded on attempt {attempt}.");
+                // If we reach this point, extraction succeeded
+                success = true;
+                Console.WriteLine($"Extraction succeeded on attempt {attempt}. Output saved to '{outputPath}'.");
             }
             catch (IOException ioEx)
             {
                 // Log the IOException and retry if attempts remain
-                Console.Error.WriteLine($"Attempt {attempt} failed with IOException: {ioEx.Message}");
-                if (attempt >= maxRetries)
+                Console.Error.WriteLine($"IOException on attempt {attempt}: {ioEx.Message}");
+                if (attempt >= maxAttempts)
                 {
-                    Console.Error.WriteLine("Maximum retry attempts reached. Extraction aborted.");
-                    // Re‑throw or handle as needed; here we exit the loop
-                    break;
+                    Console.Error.WriteLine("Maximum retry attempts reached. Extraction failed.");
                 }
-                // Optionally, introduce a short delay before retrying
-                // System.Threading.Thread.Sleep(500);
+                else
+                {
+                    // Optional: brief pause before retry
+                    Thread.Sleep(500);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Non-IO exceptions are not retried
+                Console.Error.WriteLine($"Unexpected error: {ex.Message}");
+                break;
             }
         }
     }

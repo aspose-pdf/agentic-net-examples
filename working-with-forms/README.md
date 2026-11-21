@@ -1,10 +1,10 @@
 # Working with forms
 
-> **Working with forms** in PDF using C# / .NET -- **228** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with forms** in PDF using C# / .NET -- **235** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-forms`
-- Examples: 228
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 235
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -21,6 +21,7 @@
 - [`add-date-picker-field-current-date.cs`](./add-date-picker-field-current-date.cs) -- Add date picker field current date
 - [`add-date-picker-field-to-pdf.cs`](./add-date-picker-field-to-pdf.cs) -- Add date picker field to pdf
 - [`add-dynamic-barcode-field-to-pdf.cs`](./add-dynamic-barcode-field-to-pdf.cs) -- Add dynamic barcode field to pdf
+- [`add-dynamic-code128-barcode-to-pdf.cs`](./add-dynamic-code128-barcode-to-pdf.cs) -- Add dynamic code128 barcode to pdf
 - [`add-fallback-metadata-to-pdf.cs`](./add-fallback-metadata-to-pdf.cs) -- Add fallback metadata to pdf
 - [`add-gender-radio-button-group-to-pdf.cs`](./add-gender-radio-button-group-to-pdf.cs) -- Add gender radio button group to pdf
 - [`add-hidden-ip-field-to-pdf.cs`](./add-hidden-ip-field-to-pdf.cs) -- Add hidden ip field to pdf
@@ -35,6 +36,7 @@
 - [`add-numeric-field-with-validation.cs`](./add-numeric-field-with-validation.cs) -- Add numeric field with validation
 - [`add-password-textbox-field-to-pdf.cs`](./add-password-textbox-field-to-pdf.cs) -- Add password textbox field to pdf
 - [`add-paymentmethod-radio-button-group.cs`](./add-paymentmethod-radio-button-group.cs) -- Add paymentmethod radio button group
+- [`add-progress-bar-field-to-pdf-form.cs`](./add-progress-bar-field-to-pdf-form.cs) -- Add progress bar field to pdf form
 - [`add-read-only-date-field-to-pdf.cs`](./add-read-only-date-field-to-pdf.cs) -- Add read only date field to pdf
 - [`add-reset-button-to-pdf-form.cs`](./add-reset-button-to-pdf-form.cs) -- Add reset button to pdf form
 - [`add-reset-button-to-pdf-form__v2.cs`](./add-reset-button-to-pdf-form__v2.cs) -- Add reset button to pdf form  v2
@@ -48,6 +50,7 @@
 - [`add-tooltip-to-pdf-form-textbox.cs`](./add-tooltip-to-pdf-form-textbox.cs) -- Add tooltip to pdf form textbox
 - [`add-tooltip-to-pdf-submit-button.cs`](./add-tooltip-to-pdf-submit-button.cs) -- Add tooltip to pdf submit button
 - [`apply-background-image-to-pdf-form-field.cs`](./apply-background-image-to-pdf-form-field.cs) -- Apply background image to pdf form field
+- [`apply-custom-font-to-pdf-form-fields.cs`](./apply-custom-font-to-pdf-form-fields.cs) -- Apply custom font to pdf form fields
 - [`apply-digital-signature-to-pdf.cs`](./apply-digital-signature-to-pdf.cs) -- Apply digital signature to pdf
 - [`apply-xml-visibility-to-pdf-annotations.cs`](./apply-xml-visibility-to-pdf-annotations.cs) -- Apply xml visibility to pdf annotations
 - [`assign-javascript-onlostfocus-to-pdf-form-field.cs`](./assign-javascript-onlostfocus-to-pdf-form-field.cs) -- Assign javascript onlostfocus to pdf form field
@@ -76,16 +79,18 @@
 - [`create-collapsible-section-pdf-form.cs`](./create-collapsible-section-pdf-form.cs) -- Create collapsible section pdf form
 - [`create-hidden-audit-timestamp-field.cs`](./create-hidden-audit-timestamp-field.cs) -- Create hidden audit timestamp field
 - [`create-hidden-calculation-field.cs`](./create-hidden-calculation-field.cs) -- Create hidden calculation field
+- [`create-localized-pdf-form.cs`](./create-localized-pdf-form.cs) -- Create localized pdf form
 - [`create-multi-page-pdf-with-acroform-fields.cs`](./create-multi-page-pdf-with-acroform-fields.cs) -- Create multi page pdf with acroform fields
 - [`create-multi-select-listbox.cs`](./create-multi-select-listbox.cs) -- Create multi select listbox
 - [`create-pdf-acroform-open-js.cs`](./create-pdf-acroform-open-js.cs) -- Create pdf acroform open js
+- [`create-pdf-acroform-textbox-absolute-coordinates.cs`](./create-pdf-acroform-textbox-absolute-coordinates.cs) -- Create pdf acroform textbox absolute coordinates
 - [`create-pdf-country-dropdown.cs`](./create-pdf-country-dropdown.cs) -- Create pdf country dropdown
 - [`create-pdf-date-field-validation.cs`](./create-pdf-date-field-validation.cs) -- Create pdf date field validation
 - [`create-pdf-form-digital-signature.cs`](./create-pdf-form-digital-signature.cs) -- Create pdf form digital signature
-- [`create-pdf-form-tax-calculation.cs`](./create-pdf-form-tax-calculation.cs) -- Create pdf form tax calculation
 - [`create-pdf-form-template-fill-from-json.cs`](./create-pdf-form-template-fill-from-json.cs) -- Create pdf form template fill from json
 - [`create-pdf-form-with-analytics.cs`](./create-pdf-form-with-analytics.cs) -- Create pdf form with analytics
 - [`create-pdf-form-with-automatic-backup.cs`](./create-pdf-form-with-automatic-backup.cs) -- Create pdf form with automatic backup
+- [`create-pdf-form-with-barcode-field.cs`](./create-pdf-form-with-barcode-field.cs) -- Create pdf form with barcode field
 - [`create-pdf-form-with-barcode-field__v2.cs`](./create-pdf-form-with-barcode-field__v2.cs) -- Create pdf form with barcode field  v2
 - [`create-pdf-form-with-concatenated-barcode.cs`](./create-pdf-form-with-concatenated-barcode.cs) -- Create pdf form with concatenated barcode
 - [`create-pdf-form-with-dynamic-list-box.cs`](./create-pdf-form-with-dynamic-list-box.cs) -- Create pdf form with dynamic list box
@@ -94,12 +99,12 @@
 - [`create-pdf-multi-select-list-box.cs`](./create-pdf-multi-select-list-box.cs) -- Create pdf multi select list box
 - [`create-pdf-template-with-form-fields.cs`](./create-pdf-template-with-form-fields.cs) -- Create pdf template with form fields
 - [`create-pdf-with-acroform-calculation.cs`](./create-pdf-with-acroform-calculation.cs) -- Create pdf with acroform calculation
+- [`create-pdf-with-acroform-fields-and-margins.cs`](./create-pdf-with-acroform-fields-and-margins.cs) -- Create pdf with acroform fields and margins
 - [`create-pdf-with-acroform-tooltips.cs`](./create-pdf-with-acroform-tooltips.cs) -- Create pdf with acroform tooltips
 - [`create-pdf-with-hidden-guid-tracking-field.cs`](./create-pdf-with-hidden-guid-tracking-field.cs) -- Create pdf with hidden guid tracking field
 - [`create-pdf-with-top-checkbox.cs`](./create-pdf-with-top-checkbox.cs) -- Create pdf with top checkbox
 - [`create-pdf-with-xfa-form.cs`](./create-pdf-with-xfa-form.cs) -- Create pdf with xfa form
 - [`create-right-aligned-numeric-text-field.cs`](./create-right-aligned-numeric-text-field.cs) -- Create right aligned numeric text field
-- [`create-rtl-textbox-form-field.cs`](./create-rtl-textbox-form-field.cs) -- Create rtl textbox form field
 - [`create-submit-button-pdf.cs`](./create-submit-button-pdf.cs) -- Create submit button pdf
 - [`define-calculation-order-for-pdf-form-fields.cs`](./define-calculation-order-for-pdf-form-fields.cs) -- Define calculation order for pdf form fields
 - [`delete-form-field-from-pdf.cs`](./delete-form-field-from-pdf.cs) -- Delete form field from pdf
@@ -109,8 +114,10 @@
 - [`export-acroform-data-to-xfdf.cs`](./export-acroform-data-to-xfdf.cs) -- Export acroform data to xfdf
 - [`export-acroform-data-to-xml.cs`](./export-acroform-data-to-xml.cs) -- Export acroform data to xml
 - [`export-barcode-fields-to-xml.cs`](./export-barcode-fields-to-xml.cs) -- Export barcode fields to xml
+- [`export-form-field-appearances.cs`](./export-form-field-appearances.cs) -- Export form field appearances
 - [`export-pdf-conversion-progress-to-xml.cs`](./export-pdf-conversion-progress-to-xml.cs) -- Export pdf conversion progress to xml
 - [`export-pdf-digital-signature-to-xml.cs`](./export-pdf-digital-signature-to-xml.cs) -- Export pdf digital signature to xml
+- [`export-pdf-form-appearance-to-json.cs`](./export-pdf-form-appearance-to-json.cs) -- Export pdf form appearance to json
 - [`export-pdf-form-data-to-indented-json.cs`](./export-pdf-form-data-to-indented-json.cs) -- Export pdf form data to indented json
 - [`export-pdf-form-data-to-json-gzip.cs`](./export-pdf-form-data-to-json-gzip.cs) -- Export pdf form data to json gzip
 - [`export-pdf-form-data-to-json__v6.cs`](./export-pdf-form-data-to-json__v6.cs) -- Export pdf form data to json  v6
@@ -155,8 +162,6 @@
 - [`import-form-data-from-json-via-rest-api.cs`](./import-form-data-from-json-via-rest-api.cs) -- Import form data from json via rest api
 - [`import-form-data-from-json.cs`](./import-form-data-from-json.cs) -- Import form data from json
 - [`import-form-fields-from-csv.cs`](./import-form-fields-from-csv.cs) -- Import form fields from csv
-- [`import-json-form-data-into-pdf.cs`](./import-json-form-data-into-pdf.cs) -- Import json form data into pdf
-- [`import-signature-from-xml.cs`](./import-signature-from-xml.cs) -- Import signature from xml
 - [`import-tax-rate-xml-pdf-hidden-field.cs`](./import-tax-rate-xml-pdf-hidden-field.cs) -- Import tax rate xml pdf hidden field
 - [`import-xfa-data-from-xml.cs`](./import-xfa-data-from-xml.cs) -- Import xfa data from xml
 - [`import-xfa-form-data-with-missing-xml-handling.cs`](./import-xfa-form-data-with-missing-xml-handling.cs) -- Import xfa form data with missing xml handling
@@ -180,6 +185,7 @@
 - [`populate-pdf-form-fields-from-dictionary.cs`](./populate-pdf-form-fields-from-dictionary.cs) -- Populate pdf form fields from dictionary
 - [`populate-pdf-form-fields-using-xslt.cs`](./populate-pdf-form-fields-using-xslt.cs) -- Populate pdf form fields using xslt
 - [`populate-pdf-form-from-csv.cs`](./populate-pdf-form-from-csv.cs) -- Populate pdf form from csv
+- [`post-pdf-form-data-xml.cs`](./post-pdf-form-data-xml.cs) -- Post pdf form data xml
 - [`read-pdf-form-field-value.cs`](./read-pdf-form-field-value.cs) -- Read pdf form field value
 - [`remove-form-field-from-pdf.cs`](./remove-form-field-from-pdf.cs) -- Remove form field from pdf
 - [`remove-form-fields-first-page.cs`](./remove-form-fields-first-page.cs) -- Remove form fields first page
@@ -189,8 +195,8 @@
 - [`remove-typewriter-form-fields-page-3.cs`](./remove-typewriter-form-fields-page-3.cs) -- Remove typewriter form fields page 3
 - [`rename-pdf-form-field.cs`](./rename-pdf-form-field.cs) -- Rename pdf form field
 - [`replace-placeholder-with-current-date.cs`](./replace-placeholder-with-current-date.cs) -- Replace placeholder with current date
+- [`replace-xfa-with-acroform-xml-template.cs`](./replace-xfa-with-acroform-xml-template.cs) -- Replace xfa with acroform xml template
 - [`repopulate-pdf-form-fields-from-xml.cs`](./repopulate-pdf-form-fields-from-xml.cs) -- Repopulate pdf form fields from xml
-- [`require-signature-field-lock-pdf.cs`](./require-signature-field-lock-pdf.cs) -- Require signature field lock pdf
 - [`restore-editability-of-flattened-pdf-form-fields.cs`](./restore-editability-of-flattened-pdf-form-fields.cs) -- Restore editability of flattened pdf form fields
 - [`rotate-form-field-label.cs`](./rotate-form-field-label.cs) -- Rotate form field label
 - [`save-pdf-incremental-updates.cs`](./save-pdf-incremental-updates.cs) -- Save pdf incremental updates
@@ -199,6 +205,7 @@
 - [`set-beveled-border-on-pdf-form-field.cs`](./set-beveled-border-on-pdf-form-field.cs) -- Set beveled border on pdf form field
 - [`set-checkbox-default-checked.cs`](./set-checkbox-default-checked.cs) -- Set checkbox default checked
 - [`set-checkbox-field-in-pdf.cs`](./set-checkbox-field-in-pdf.cs) -- Set checkbox field in pdf
+- [`set-custom-font-for-signature-field.cs`](./set-custom-font-for-signature-field.cs) -- Set custom font for signature field
 - [`set-dashed-border-for-pdf-form-field.cs`](./set-dashed-border-for-pdf-form-field.cs) -- Set dashed border for pdf form field
 - [`set-default-appearance-for-pdf-text-field.cs`](./set-default-appearance-for-pdf-text-field.cs) -- Set default appearance for pdf text field
 - [`set-default-selected-country-in-pdf-combo-box.cs`](./set-default-selected-country-in-pdf-combo-box.cs) -- Set default selected country in pdf combo box

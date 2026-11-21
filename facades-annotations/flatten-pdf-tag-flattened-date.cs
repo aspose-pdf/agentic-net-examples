@@ -7,7 +7,7 @@ class Program
     static void Main()
     {
         const string inputPath = "input.pdf";
-        const string outputPath = "flattened_tagged.pdf";
+        const string outputPath = "flattened.pdf";
 
         if (!File.Exists(inputPath))
         {
@@ -15,29 +15,25 @@ class Program
             return;
         }
 
-        try
+        // Load the PDF, flatten it, add metadata, and save.
+        using (Document doc = new Document(inputPath))
         {
-            // Load the PDF, flatten it, add custom metadata, and save the result
-            using (Document doc = new Document(inputPath))
-            {
-                // Flatten form fields and annotations
-                doc.Flatten();
+            // Flatten annotations and form fields.
+            doc.Flatten();
 
-                // Add a custom metadata entry "FlattenDate" with the current UTC timestamp (ISO 8601)
-                doc.Info["FlattenDate"] = DateTime.UtcNow.ToString("o");
+            // ISO 8601 formatted UTC date/time for the flattening operation.
+            string flattenDate = DateTime.UtcNow.ToString("o");
 
-                // Optionally also set the built‑in modification date for better PDF viewer support
-                doc.Info.ModDate = DateTime.UtcNow;
+            // Store a custom metadata entry named "FlattenDate".
+            doc.Info["FlattenDate"] = flattenDate;
 
-                // Save the flattened and tagged PDF
-                doc.Save(outputPath);
-            }
+            // Optionally set the standard modification date as well.
+            doc.Info.ModDate = DateTime.UtcNow;
 
-            Console.WriteLine($"Flattened PDF with metadata saved to '{outputPath}'.");
+            // Save the flattened PDF with the new metadata.
+            doc.Save(outputPath);
         }
-        catch (Exception ex)
-        {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-        }
+
+        Console.WriteLine($"Flattened PDF saved with metadata at '{outputPath}'.");
     }
 }

@@ -1,23 +1,23 @@
 using System;
 using System.IO;
 using System.Globalization;
+using System.Drawing;
 using Aspose.Pdf;
 using Aspose.Pdf.Facades;
-using Aspose.Pdf.Forms; // PKCS7 and SignatureCustomAppearance are in this namespace for the used version
+using Aspose.Pdf.Forms; // required for PKCS7 and SignatureCustomAppearance
 
 class Program
 {
     static void Main()
     {
-        const string inputPath  = "input.pdf";          // source PDF
-        const string outputPath = "signed_fr.pdf";      // signed PDF with French caption
-        const string certPath   = "certificate.pfx";    // digital certificate file
-        const string certPwd    = "password";           // certificate password
+        const string inputPdf = "input.pdf";
+        const string outputPdf = "signed_french.pdf";
+        const string certPath = "certificate.pfx";
+        const string certPassword = "password";
 
-        // Verify required files exist
-        if (!File.Exists(inputPath))
+        if (!File.Exists(inputPdf))
         {
-            Console.Error.WriteLine($"Input PDF not found: {inputPath}");
+            Console.Error.WriteLine($"Input file not found: {inputPdf}");
             return;
         }
         if (!File.Exists(certPath))
@@ -27,27 +27,28 @@ class Program
         }
 
         // Bind the PDF to the signature facade
-        PdfFileSignature signer = new PdfFileSignature();
-        signer.BindPdf(inputPath);
+        PdfFileSignature pdfSigner = new PdfFileSignature();
+        pdfSigner.BindPdf(inputPdf);
 
-        // Create a PKCS7 signature object using the certificate
-        PKCS7 pkcs7 = new PKCS7(certPath, certPwd)
-        {
-            ContactInfo = "Contact",
-            // LocationInfo property is not available in this version of Aspose.Pdf, so it is omitted.
-            Reason = "Approved"
-        };
+        // Create PKCS7 credentials using the certificate
+        PKCS7 pkcs7 = new PKCS7(certPath, certPassword);
+        pkcs7.Reason = "Document signé numériquement"; // French reason
+        pkcs7.Location = "Paris";
 
-        // Configure custom appearance and set the locale to French
+        // Configure custom appearance with French locale (Reason/Location are set on PKCS7)
         SignatureCustomAppearance customAppearance = new SignatureCustomAppearance
         {
-            Culture = new CultureInfo("fr-FR") // forces the digital‑signed caption to French
+            Culture = new CultureInfo("fr-FR") // French locale for caption labels
         };
         pkcs7.CustomAppearance = customAppearance;
 
-        // Apply the signature and save the result
-        signer.Sign(outputPath, pkcs7);
+        // Define a visible rectangle for the signature on the first page (System.Drawing.Rectangle required)
+        System.Drawing.Rectangle signatureRect = new System.Drawing.Rectangle(100, 100, 100, 80);
 
-        Console.WriteLine($"Signed PDF saved to '{outputPath}' with French caption.");
+        // Apply the signature to the first page and save the result
+        pdfSigner.Sign(1, true, signatureRect, pkcs7);
+        pdfSigner.Save(outputPdf);
+
+        Console.WriteLine($"Signed PDF saved to '{outputPdf}' with French caption.");
     }
 }

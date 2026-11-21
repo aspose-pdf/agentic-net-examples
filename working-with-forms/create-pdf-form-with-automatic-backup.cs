@@ -10,37 +10,35 @@ class Program
     {
         const string outputPath = "form_with_backup.pdf";
 
-        // Create a new PDF document and ensure deterministic disposal
+        // Create a new PDF document inside a using block for deterministic disposal
         using (Document doc = new Document())
         {
-            // Add a blank page to host the form field
-            Page page = doc.Pages.Add();
+            // Add a blank page (first page is at index 1)
+            doc.Pages.Add();
 
-            // Define the field rectangle (lower‑left x, lower‑left y, upper‑right x, upper‑right y)
-            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 600, 300, 650);
+            // Define the rectangle for the text box field (fully qualified to avoid ambiguity)
+            Aspose.Pdf.Rectangle fieldRect = new Aspose.Pdf.Rectangle(100, 700, 300, 730);
 
-            // Create a text box form field
-            TextBoxField txtField = new TextBoxField(page, fieldRect)
+            // Create a text box form field on the first page
+            TextBoxField nameField = new TextBoxField(doc.Pages[1], fieldRect)
             {
-                PartialName = "SampleField",
-                Value = ""
+                PartialName = "NameField",   // field identifier
+                Value = ""                   // initial empty value
             };
 
-            // JavaScript that saves a backup copy each time the field loses focus after a change
-            string js = "var dt = new Date(); " +
-                        "var name = 'backup_' + util.printd('yyyyMMddHHmmss', dt) + '.pdf'; " +
-                        "this.saveAs(name);";
+            // Attach JavaScript that saves a backup copy whenever the field value changes.
+            // Use the valid OnModifyCharacter action (fires on each character change).
+            nameField.Actions.OnModifyCharacter = new JavascriptAction(
+                "this.saveAs('backup_' + this.documentFileName);"
+            );
 
-            // Use the correct action property for "blur" (loss of focus)
-            txtField.Actions.OnLostFocus = new JavascriptAction(js);
-
-            // Add the field to the document's form (page index is 1‑based)
-            doc.Form.Add(txtField, 1);
+            // Add the field to the document's form collection
+            doc.Form.Add(nameField);
 
             // Save the PDF form
             doc.Save(outputPath);
         }
 
-        Console.WriteLine($"PDF form created: {outputPath}");
+        Console.WriteLine($"PDF form created: {Path.GetFullPath(outputPath)}");
     }
 }

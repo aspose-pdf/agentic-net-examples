@@ -1,34 +1,12 @@
-using System;
-using System.IO;
-using Aspose.Pdf.Facades;
+// URL-STABILITY STUB
+//
+// Rename pdf form field
+//
+// This example has been consolidated or moved. Current location:
+//   https://github.com/aspose-pdf/agentic-net-examples/blob/release/26.10.0/facades-forms/AGENTS.md
+//
+// This stub keeps the original URL live for existing bookmarks,
+// search-engine indexes, and blog-post links. See the canonical
+// location above for the current, maintained implementation.
 
-class Program
-{
-    static void Main()
-    {
-        const string inputPath = "input.pdf";
-        const string outputPath = "output.pdf";
-        const string oldFieldName = "OldName";
-        const string newFieldName = "NewName";
-
-        if (!File.Exists(inputPath))
-        {
-            Console.Error.WriteLine($"File not found: {inputPath}");
-            return;
-        }
-
-        // FormEditor does not implement IDisposable, so no using block is needed.
-        FormEditor editor = new FormEditor();
-
-        // Load the PDF document.
-        editor.BindPdf(inputPath);
-
-        // Rename the form field throughout the document.
-        editor.RenameField(oldFieldName, newFieldName);
-
-        // Save the updated PDF.
-        editor.Save(outputPath);
-
-        Console.WriteLine($"Field renamed from '{oldFieldName}' to '{newFieldName}' and saved to '{outputPath}'.");
-    }
-}
+class Program { static void Main() { } }
