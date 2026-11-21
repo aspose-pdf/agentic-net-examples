@@ -1,10 +1,10 @@
 # Facades extract images and text
 
-> **Facades extract images and text** in PDF using C# / .NET -- **82** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades extract images and text** in PDF using C# / .NET -- **84** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-extract-images-and-text`
-- Examples: 82
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 84
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -77,6 +77,8 @@
 - [`extract-text-and-images-from-pdf.cs`](./extract-text-and-images-from-pdf.cs) -- Extract text and images from pdf
 - [`extract-text-and-images-from-pdfs.cs`](./extract-text-and-images-from-pdfs.cs) -- Extract text and images from pdfs
 - [`extract-text-from-pdf-byte-array.cs`](./extract-text-from-pdf-byte-array.cs) -- Extract text from pdf byte array
+- [`extract-text-from-pdf-byte-array__v2.cs`](./extract-text-from-pdf-byte-array__v2.cs) -- Extract text from pdf byte array  v2
+- [`extract-text-from-pdf-queue-trigger.cs`](./extract-text-from-pdf-queue-trigger.cs) -- Extract text from pdf queue trigger
 - [`extract-text-from-pdf-to-utf8-txt.cs`](./extract-text-from-pdf-to-utf8-txt.cs) -- Extract text from pdf to utf8 txt
 - [`extract-text-from-pdf.cs`](./extract-text-from-pdf.cs) -- Extract text from pdf
 - [`extract-text-from-pdf__v2.cs`](./extract-text-from-pdf__v2.cs) -- Extract text from pdf  v2
@@ -89,7 +91,7 @@
 - [`pdf-extractor-unit-test.cs`](./pdf-extractor-unit-test.cs) -- Pdf extractor unit test
 - [`report-pdf-page-image-attachment-counts.cs`](./report-pdf-page-image-attachment-counts.cs) -- Report pdf page image attachment counts
 - [`retry-pdf-text-extraction.cs`](./retry-pdf-text-extraction.cs) -- Retry pdf text extraction
-- [`test-image-extraction-mode-pdf-extractor.cs`](./test-image-extraction-mode-pdf-extractor.cs) -- Test image extraction mode pdf extractor
+- [`watch-folder-extract-pdf-text.cs`](./watch-folder-extract-pdf-text.cs) -- Watch folder extract pdf text
 
 ## See Also
 

@@ -1,10 +1,10 @@
 # Facades texts and images
 
-> **Facades texts and images** in PDF using C# / .NET -- **29** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades texts and images** in PDF using C# / .NET -- **29** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-texts-and-images`
 - Examples: 29
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -13,7 +13,7 @@
 - [`add-image-and-text-to-pdf-with-audit-logging.cs`](./add-image-and-text-to-pdf-with-audit-logging.cs) -- Add image and text to pdf with audit logging
 - [`add-image-and-text-watermark-to-pdf.cs`](./add-image-and-text-watermark-to-pdf.cs) -- Add image and text watermark to pdf
 - [`add-image-to-each-pdf-page-dynamic-position.cs`](./add-image-to-each-pdf-page-dynamic-position.cs) -- Add image to each pdf page dynamic position
-- [`add-image-to-pdf-and-stream.cs`](./add-image-to-pdf-and-stream.cs) -- Add image to pdf and stream
+- [`add-image-to-pdf-and-send-response.cs`](./add-image-to-pdf-and-send-response.cs) -- Add image to pdf and send response
 - [`add-image-to-pdf-page.cs`](./add-image-to-pdf-page.cs) -- Add image to pdf page
 - [`add-image-to-pdf-using-pdffilemend.cs`](./add-image-to-pdf-using-pdffilemend.cs) -- Add image to pdf using pdffilemend
 - [`add-image-to-pdf-with-format-validation.cs`](./add-image-to-pdf-with-format-validation.cs) -- Add image to pdf with format validation
@@ -30,10 +30,10 @@
 - [`batch-extract-images-from-pdfs.cs`](./batch-extract-images-from-pdfs.cs) -- Batch extract images from pdfs
 - [`configure-word-wrapping-bywords-add-long-text.cs`](./configure-word-wrapping-bywords-add-long-text.cs) -- Configure word wrapping bywords add long text
 - [`extract-images-from-pdf-pages.cs`](./extract-images-from-pdf-pages.cs) -- Extract images from pdf pages
-- [`extract-images-from-pdf-to-png.cs`](./extract-images-from-pdf-to-png.cs) -- Extract images from pdf to png
+- [`extract-images-from-pdf-to-png__v2.cs`](./extract-images-from-pdf-to-png__v2.cs) -- Extract images from pdf to png  v2
 - [`insert-png-signature-image-on-every-pdf-page.cs`](./insert-png-signature-image-on-every-pdf-page.cs) -- Insert png signature image on every pdf page
 - [`overlay-semi-transparent-gif-on-pdf.cs`](./overlay-semi-transparent-gif-on-pdf.cs) -- Overlay semi transparent gif on pdf
-- [`remove-all-images-from-pdf.cs`](./remove-all-images-from-pdf.cs) -- Remove all images from pdf
+- [`remove-all-images-from-pdf__v2.cs`](./remove-all-images-from-pdf__v2.cs) -- Remove all images from pdf  v2
 - [`remove-image-from-pdf-page.cs`](./remove-image-from-pdf-page.cs) -- Remove image from pdf page
 - [`replace-jpeg-with-bmp-first-page.cs`](./replace-jpeg-with-bmp-first-page.cs) -- Replace jpeg with bmp first page
 - [`replace-low-res-images-with-high-res-pngs.cs`](./replace-low-res-images-with-high-res-pngs.cs) -- Replace low res images with high res pngs

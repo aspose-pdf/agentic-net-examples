@@ -1,10 +1,10 @@
 # Facades metadata
 
-> **Facades metadata** in PDF using C# / .NET -- **38** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades metadata** in PDF using C# / .NET -- **39** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-metadata`
-- Examples: 38
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 39
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -16,6 +16,7 @@
 - [`apply-metadata-changes-to-multiple-pdfs-in-parallel.cs`](./apply-metadata-changes-to-multiple-pdfs-in-parallel.cs) -- Apply metadata changes to multiple pdfs in parallel
 - [`audit-pdf-metadata-to-csv.cs`](./audit-pdf-metadata-to-csv.cs) -- Audit pdf metadata to csv
 - [`backup-and-update-pdf-metadata.cs`](./backup-and-update-pdf-metadata.cs) -- Backup and update pdf metadata
+- [`convert-pdf-to-pdfa-1b-using-pdffileinfo.cs`](./convert-pdf-to-pdfa-1b-using-pdffileinfo.cs) -- Convert pdf to pdfa 1b using pdffileinfo
 - [`export-pdf-metadata-to-json.cs`](./export-pdf-metadata-to-json.cs) -- Export pdf metadata to json
 - [`handle-readonly-file-errors-when-saving-pdf-metadata.cs`](./handle-readonly-file-errors-when-saving-pdf-metadata.cs) -- Handle readonly file errors when saving pdf metadata
 - [`import-json-metadata-to-pdf.cs`](./import-json-metadata-to-pdf.cs) -- Import json metadata to pdf
@@ -39,12 +40,12 @@
 - [`set-pdf-language-property.cs`](./set-pdf-language-property.cs) -- Set pdf language property
 - [`thread-safe-parallel-pdf-metadata-update.cs`](./thread-safe-parallel-pdf-metadata-update.cs) -- Thread safe parallel pdf metadata update
 - [`update-pdf-author-metadata-conditional.cs`](./update-pdf-author-metadata-conditional.cs) -- Update pdf author metadata conditional
-- [`update-pdf-author-metadata.cs`](./update-pdf-author-metadata.cs) -- Update pdf author metadata
+- [`update-pdf-author-metadata__v3.cs`](./update-pdf-author-metadata__v3.cs) -- Update pdf author metadata  v3
 - [`update-pdf-keywords-metadata.cs`](./update-pdf-keywords-metadata.cs) -- Update pdf keywords metadata
 - [`update-pdf-metadata-memorystream.cs`](./update-pdf-metadata-memorystream.cs) -- Update pdf metadata memorystream
 - [`update-pdf-metadata-save-new-file.cs`](./update-pdf-metadata-save-new-file.cs) -- Update pdf metadata save new file
 - [`update-pdf-subject-metadata.cs`](./update-pdf-subject-metadata.cs) -- Update pdf subject metadata
-- [`update-pdf-title-metadata.cs`](./update-pdf-title-metadata.cs) -- Update pdf title metadata
+- [`update-pdf-title-metadata__v2.cs`](./update-pdf-title-metadata__v2.cs) -- Update pdf title metadata  v2
 - [`validate-set-pdf-metadata-with-regex.cs`](./validate-set-pdf-metadata-with-regex.cs) -- Validate set pdf metadata with regex
 
 ## See Also

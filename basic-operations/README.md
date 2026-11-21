@@ -1,10 +1,10 @@
 # Basic operations
 
-> **Basic operations** in PDF using C# / .NET -- **57** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Basic operations** in PDF using C# / .NET -- **56** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `basic-operations`
-- Examples: 57
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 56
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -26,7 +26,6 @@
 - [`convert-pdf-to-pdfa1b.cs`](./convert-pdf-to-pdfa1b.cs) -- Convert pdf to pdfa1b
 - [`convert-pdf-to-pdfx3-cmyk.cs`](./convert-pdf-to-pdfx3-cmyk.cs) -- Convert pdf to pdfx3 cmyk
 - [`convert-pdf-to-pdfx3-preserve-icc.cs`](./convert-pdf-to-pdfx3-preserve-icc.cs) -- Convert pdf to pdfx3 preserve icc
-- [`convert-pdf-to-pdfx3.cs`](./convert-pdf-to-pdfx3.cs) -- Convert pdf to pdfx3
 - [`create-pdfa1b-with-text-paragraph.cs`](./create-pdfa1b-with-text-paragraph.cs) -- Create pdfa1b with text paragraph
 - [`create-pdfx3-document-three-pages.cs`](./create-pdfx3-document-three-pages.cs) -- Create pdfx3 document three pages
 - [`decrypt-encrypted-pdf.cs`](./decrypt-encrypted-pdf.cs) -- Decrypt encrypted pdf

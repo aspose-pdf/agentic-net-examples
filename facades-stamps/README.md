@@ -1,10 +1,10 @@
 # Facades stamps
 
-> **Facades stamps** in PDF using C# / .NET -- **49** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades stamps** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-stamps`
-- Examples: 49
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 50
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -17,24 +17,25 @@
 - [`add-footer-date-stamp-to-last-pdf-page.cs`](./add-footer-date-stamp-to-last-pdf-page.cs) -- Add footer date stamp to last pdf page
 - [`add-footer-stamp-10-points-above-bottom.cs`](./add-footer-stamp-10-points-above-bottom.cs) -- Add footer stamp 10 points above bottom
 - [`add-footer-with-page-count.cs`](./add-footer-with-page-count.cs) -- Add footer with page count
-- [`add-header-barcode-stamp-to-pdf-pages.cs`](./add-header-barcode-stamp-to-pdf-pages.cs) -- Add header barcode stamp to pdf pages
+- [`add-header-barcode-stamp.cs`](./add-header-barcode-stamp.cs) -- Add header barcode stamp
 - [`add-header-stamp-to-pdf-pages.cs`](./add-header-stamp-to-pdf-pages.cs) -- Add header stamp to pdf pages
 - [`add-image-stamp-to-pdfs-preserve-filenames.cs`](./add-image-stamp-to-pdfs-preserve-filenames.cs) -- Add image stamp to pdfs preserve filenames
 - [`add-lower-roman-page-numbers-odd-pages.cs`](./add-lower-roman-page-numbers-odd-pages.cs) -- Add lower roman page numbers odd pages
 - [`add-multi-line-colored-header-stamp.cs`](./add-multi-line-colored-header-stamp.cs) -- Add multi line colored header stamp
-- [`add-multi-line-text-stamp-with-line-spacing.cs`](./add-multi-line-text-stamp-with-line-spacing.cs) -- Add multi line text stamp with line spacing
 - [`add-multi-line-text-watermark-facade.cs`](./add-multi-line-text-watermark-facade.cs) -- Add multi line text watermark facade
+- [`add-multi-line-text-watermark-with-line-spacing.cs`](./add-multi-line-text-watermark-with-line-spacing.cs) -- Add multi line text watermark with line spacing
 - [`add-multi-line-text-watermark.cs`](./add-multi-line-text-watermark.cs) -- Add multi line text watermark
 - [`add-multi-line-watermark-custom-font.cs`](./add-multi-line-watermark-custom-font.cs) -- Add multi line watermark custom font
 - [`add-page-number-stamp-leading-zeros.cs`](./add-page-number-stamp-leading-zeros.cs) -- Add page number stamp leading zeros
 - [`add-page-number-stamp-to-pdf.cs`](./add-page-number-stamp-to-pdf.cs) -- Add page number stamp to pdf
+- [`add-qr-code-stamp-from-pdf-metadata.cs`](./add-qr-code-stamp-from-pdf-metadata.cs) -- Add qr code stamp from pdf metadata
 - [`add-repeating-background-watermark-image.cs`](./add-repeating-background-watermark-image.cs) -- Add repeating background watermark image
 - [`add-right-aligned-logo-stamp-to-pdf.cs`](./add-right-aligned-logo-stamp-to-pdf.cs) -- Add right aligned logo stamp to pdf
 - [`add-semi-transparent-background-stamp.cs`](./add-semi-transparent-background-stamp.cs) -- Add semi transparent background stamp
 - [`add-transparent-confidential-text-stamp.cs`](./add-transparent-confidential-text-stamp.cs) -- Add transparent confidential text stamp
 - [`apply-custom-line-height-stamp.cs`](./apply-custom-line-height-stamp.cs) -- Apply custom line height stamp
 - [`apply-external-pdf-template-stamp.cs`](./apply-external-pdf-template-stamp.cs) -- Apply external pdf template stamp
-- [`apply-image-stamp-to-all-pdf-pages.cs`](./apply-image-stamp-to-all-pdf-pages.cs) -- Apply image stamp to all pdf pages
+- [`apply-image-stamp-to-all-pdf-pages__v2.cs`](./apply-image-stamp-to-all-pdf-pages__v2.cs) -- Apply image stamp to all pdf pages  v2
 - [`apply-pdf-page-stamp-as-background.cs`](./apply-pdf-page-stamp-as-background.cs) -- Apply pdf page stamp as background
 - [`apply-rotated-image-stamp-to-pdf-pages.cs`](./apply-rotated-image-stamp-to-pdf-pages.cs) -- Apply rotated image stamp to pdf pages
 - [`apply-rotated-text-stamp-odd-pages.cs`](./apply-rotated-text-stamp-odd-pages.cs) -- Apply rotated text stamp odd pages

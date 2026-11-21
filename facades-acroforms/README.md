@@ -1,22 +1,20 @@
 # Facades AcroForms
 
-> **Facades AcroForms** in PDF using C# / .NET -- **41** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades AcroForms** in PDF using C# / .NET -- **39** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-acroforms`
-- Examples: 41
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 39
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-radio-button-group-to-pdf.cs`](./add-radio-button-group-to-pdf.cs) -- Add radio button group to pdf
 - [`add-text-field-to-pdf.cs`](./add-text-field-to-pdf.cs) -- Add text field to pdf
 - [`async-export-pdf-form-data-to-xml.cs`](./async-export-pdf-form-data-to-xml.cs) -- Async export pdf form data to xml
-- [`batch-export-pdf-form-data-to-xml__v2.cs`](./batch-export-pdf-form-data-to-xml__v2.cs) -- Batch export pdf form data to xml  v2
 - [`batch-import-json-data-into-pdfs.cs`](./batch-import-json-data-into-pdfs.cs) -- Batch import json data into pdfs
 - [`combine-acroform-json-exports.cs`](./combine-acroform-json-exports.cs) -- Combine acroform json exports
 - [`create-pdf-form-fields-report.cs`](./create-pdf-form-fields-report.cs) -- Create pdf form fields report
 - [`export-filter-pdf-form-fields-xfdf.cs`](./export-filter-pdf-form-fields-xfdf.cs) -- Export filter pdf form fields xfdf
-- [`export-import-acroform-xfdf.cs`](./export-import-acroform-xfdf.cs) -- Export import acroform xfdf
 - [`export-import-pdf-form-fields-utf8.cs`](./export-import-pdf-form-fields-utf8.cs) -- Export import pdf form fields utf8
 - [`export-pdf-form-data-to-fdf__v2.cs`](./export-pdf-form-data-to-fdf__v2.cs) -- Export pdf form data to fdf  v2
 - [`export-pdf-form-data-to-json-chunks.cs`](./export-pdf-form-data-to-json-chunks.cs) -- Export pdf form data to json chunks

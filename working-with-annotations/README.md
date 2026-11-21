@@ -1,10 +1,10 @@
 # Working with annotations
 
-> **Working with annotations** in PDF using C# / .NET -- **160** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with annotations** in PDF using C# / .NET -- **161** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-annotations`
-- Examples: 160
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 161
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -19,6 +19,7 @@
 - [`add-button-annotation-highlight-text-fields.cs`](./add-button-annotation-highlight-text-fields.cs) -- Add button annotation highlight text fields
 - [`add-button-calc-total-pdf.cs`](./add-button-calc-total-pdf.cs) -- Add button calc total pdf
 - [`add-callout-leader-line-to-freetext-annotation.cs`](./add-callout-leader-line-to-freetext-annotation.cs) -- Add callout leader line to freetext annotation
+- [`add-diagonal-watermark-annotation.cs`](./add-diagonal-watermark-annotation.cs) -- Add diagonal watermark annotation
 - [`add-dynamic-date-watermark-to-pdf-pages.cs`](./add-dynamic-date-watermark-to-pdf-pages.cs) -- Add dynamic date watermark to pdf pages
 - [`add-dynamic-page-number-watermark.cs`](./add-dynamic-page-number-watermark.cs) -- Add dynamic page number watermark
 - [`add-external-url-link-annotation.cs`](./add-external-url-link-annotation.cs) -- Add external url link annotation
@@ -30,6 +31,7 @@
 - [`add-free-text-annotation-with-callout.cs`](./add-free-text-annotation-with-callout.cs) -- Add free text annotation with callout
 - [`add-highlight-annotation-70-opacity.cs`](./add-highlight-annotation-70-opacity.cs) -- Add highlight annotation 70 opacity
 - [`add-highlight-annotation-with-opacity.cs`](./add-highlight-annotation-with-opacity.cs) -- Add highlight annotation with opacity
+- [`add-highres-pdf-page-as-tiled-background.cs`](./add-highres-pdf-page-as-tiled-background.cs) -- Add highres pdf page as tiled background
 - [`add-internal-link-annotation-to-pdf.cs`](./add-internal-link-annotation-to-pdf.cs) -- Add internal link annotation to pdf
 - [`add-javascript-button-annotation-to-pdf-page.cs`](./add-javascript-button-annotation-to-pdf-page.cs) -- Add javascript button annotation to pdf page
 - [`add-javascript-link-annotation-modal-dialog.cs`](./add-javascript-link-annotation-modal-dialog.cs) -- Add javascript link annotation modal dialog
@@ -91,16 +93,15 @@
 - [`create-3d-annotation-with-texture-and-material.cs`](./create-3d-annotation-with-texture-and-material.cs) -- Create 3d annotation with texture and material
 - [`create-button-toggle-annotations-visibility.cs`](./create-button-toggle-annotations-visibility.cs) -- Create button toggle annotations visibility
 - [`create-link-annotation-named-destination.cs`](./create-link-annotation-named-destination.cs) -- Create link annotation named destination
+- [`create-link-annotation-open-embedded-pdf.cs`](./create-link-annotation-open-embedded-pdf.cs) -- Create link annotation open embedded pdf
 - [`create-link-annotation-remote-pdf-page.cs`](./create-link-annotation-remote-pdf-page.cs) -- Create link annotation remote pdf page
 - [`create-pdf-button-export-annotations-json.cs`](./create-pdf-button-export-annotations-json.cs) -- Create pdf button export annotations json
-- [`create-pdf-gradient-background-artifact.cs`](./create-pdf-gradient-background-artifact.cs) -- Create pdf gradient background artifact
 - [`create-pdf-submit-button.cs`](./create-pdf-submit-button.cs) -- Create pdf submit button
 - [`create-popup-annotation-linked-to-highlight.cs`](./create-popup-annotation-linked-to-highlight.cs) -- Create popup annotation linked to highlight
 - [`create-richmedia-annotation-flash-video.cs`](./create-richmedia-annotation-flash-video.cs) -- Create richmedia annotation flash video
 - [`delete-all-annotations-restore-from-xfdf.cs`](./delete-all-annotations-restore-from-xfdf.cs) -- Delete all annotations restore from xfdf
 - [`delete-annotation-by-id-page-two.cs`](./delete-annotation-by-id-page-two.cs) -- Delete annotation by id page two
 - [`delete-pdf-annotations-from-csv.cs`](./delete-pdf-annotations-from-csv.cs) -- Delete pdf annotations from csv
-- [`duplicate-watermark-annotations.cs`](./duplicate-watermark-annotations.cs) -- Duplicate watermark annotations
 - [`embed-pdf-portfolio-rich-media-disable-printing.cs`](./embed-pdf-portfolio-rich-media-disable-printing.cs) -- Embed pdf portfolio rich media disable printing
 - [`export-annotation-ids-to-csv.cs`](./export-annotation-ids-to-csv.cs) -- Export annotation ids to csv
 - [`export-annotations-modify-colors.cs`](./export-annotations-modify-colors.cs) -- Export annotations modify colors
@@ -113,6 +114,7 @@
 - [`export-pdf-annotations-to-xfdf__v3.cs`](./export-pdf-annotations-to-xfdf__v3.cs) -- Export pdf annotations to xfdf  v3
 - [`export-popup-annotations-to-xfdf.cs`](./export-popup-annotations-to-xfdf.cs) -- Export popup annotations to xfdf
 - [`extract-embedded-rich-media.cs`](./extract-embedded-rich-media.cs) -- Extract embedded rich media
+- [`extract-highlight-annotation-to-report.cs`](./extract-highlight-annotation-to-report.cs) -- Extract highlight annotation to report
 - [`extract-media-from-screenannotation.cs`](./extract-media-from-screenannotation.cs) -- Extract media from screenannotation
 - [`extract-pdf-watermark-artifacts-report.cs`](./extract-pdf-watermark-artifacts-report.cs) -- Extract pdf watermark artifacts report
 - [`extract-popup-annotations-to-pdf.cs`](./extract-popup-annotations-to-pdf.cs) -- Extract popup annotations to pdf
@@ -138,9 +140,7 @@
 - [`list-annotation-types-on-pdf-page.cs`](./list-annotation-types-on-pdf-page.cs) -- List annotation types on pdf page
 - [`list-annotations-with-media-info.cs`](./list-annotations-with-media-info.cs) -- List annotations with media info
 - [`list-pdf-annotation-ids-to-csv.cs`](./list-pdf-annotation-ids-to-csv.cs) -- List pdf annotation ids to csv
-- [`metadata-watermark-annotation.cs`](./metadata-watermark-annotation.cs) -- Metadata watermark annotation
 - [`modify-annotation-rectangle-by-id.cs`](./modify-annotation-rectangle-by-id.cs) -- Modify annotation rectangle by id
-- [`modify-figure-annotation-color.cs`](./modify-figure-annotation-color.cs) -- Modify figure annotation color
 - [`recolor-highlight-annotations-light-green.cs`](./recolor-highlight-annotations-light-green.cs) -- Recolor highlight annotations light green
 - [`remove-annotations-from-third-pdf-page.cs`](./remove-annotations-from-third-pdf-page.cs) -- Remove annotations from third pdf page
 - [`remove-background-artifacts-from-pdf.cs`](./remove-background-artifacts-from-pdf.cs) -- Remove background artifacts from pdf
@@ -166,6 +166,7 @@
 - [`set-link-annotation-border-red-width-3.cs`](./set-link-annotation-border-red-width-3.cs) -- Set link annotation border red width 3
 - [`set-underline-annotation-opacity.cs`](./set-underline-annotation-opacity.cs) -- Set underline annotation opacity
 - [`toggle-rich-media-annotation-visibility.cs`](./toggle-rich-media-annotation-visibility.cs) -- Toggle rich media annotation visibility
+- [`toggle-watermark-visibility-button.cs`](./toggle-watermark-visibility-button.cs) -- Toggle watermark visibility button
 - [`update-watermark-artifact-opacity.cs`](./update-watermark-artifact-opacity.cs) -- Update watermark artifact opacity
 - [`validate-xfdf-annotation-count-per-page.cs`](./validate-xfdf-annotation-count-per-page.cs) -- Validate xfdf annotation count per page
 

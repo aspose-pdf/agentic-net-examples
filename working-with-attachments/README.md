@@ -1,17 +1,17 @@
 # Working with attachments
 
-> **Working with attachments** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with attachments** in PDF using C# / .NET -- **49** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-attachments`
-- Examples: 50
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 49
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-attachment-to-password-protected-pdf.cs`](./add-attachment-to-password-protected-pdf.cs) -- Add attachment to password protected pdf
-- [`add-attachments-to-pdf-and-save.cs`](./add-attachments-to-pdf-and-save.cs) -- Add attachments to pdf and save
 - [`add-file-attachment-to-pdf-with-error-handling.cs`](./add-file-attachment-to-pdf-with-error-handling.cs) -- Add file attachment to pdf with error handling
-- [`add-file-attachment-to-pdf.cs`](./add-file-attachment-to-pdf.cs) -- Add file attachment to pdf
+- [`add-file-attachment-to-pdf__v2.cs`](./add-file-attachment-to-pdf__v2.cs) -- Add file attachment to pdf  v2
+- [`add-file-attachment-to-pdf__v5.cs`](./add-file-attachment-to-pdf__v5.cs) -- Add file attachment to pdf  v5
 - [`add-file-attachment-with-retry.cs`](./add-file-attachment-with-retry.cs) -- Add file attachment with retry
 - [`add-image-watermark-to-pdf-attachments.cs`](./add-image-watermark-to-pdf-attachments.cs) -- Add image watermark to pdf attachments
 - [`add-in-memory-attachment-to-pdf.cs`](./add-in-memory-attachment-to-pdf.cs) -- Add in memory attachment to pdf
@@ -35,7 +35,7 @@
 - [`embed-image-into-pdf-portfolio.cs`](./embed-image-into-pdf-portfolio.cs) -- Embed image into pdf portfolio
 - [`extract-attachments-from-encrypted-pdf.cs`](./extract-attachments-from-encrypted-pdf.cs) -- Extract attachments from encrypted pdf
 - [`extract-embedded-file-from-pdf-portfolio.cs`](./extract-embedded-file-from-pdf-portfolio.cs) -- Extract embedded file from pdf portfolio
-- [`extract-embedded-files-from-pdf-portfolio.cs`](./extract-embedded-files-from-pdf-portfolio.cs) -- Extract embedded files from pdf portfolio
+- [`extract-embedded-files-from-pdf-portfolio__v2.cs`](./extract-embedded-files-from-pdf-portfolio__v2.cs) -- Extract embedded files from pdf portfolio  v2
 - [`extract-pdf-attachment-metadata.cs`](./extract-pdf-attachment-metadata.cs) -- Extract pdf attachment metadata
 - [`extract-pdf-attachments-in-parallel.cs`](./extract-pdf-attachments-in-parallel.cs) -- Extract pdf attachments in parallel
 - [`extract-pdf-attachments-sha256-hash.cs`](./extract-pdf-attachments-sha256-hash.cs) -- Extract pdf attachments sha256 hash
@@ -43,7 +43,6 @@
 - [`extract-specific-attachment-from-pdf.cs`](./extract-specific-attachment-from-pdf.cs) -- Extract specific attachment from pdf
 - [`flatten-pdf-portfolio.cs`](./flatten-pdf-portfolio.cs) -- Flatten pdf portfolio
 - [`generate-csv-report-pdf-attachments.cs`](./generate-csv-report-pdf-attachments.cs) -- Generate csv report pdf attachments
-- [`generate-pdf-page-thumbnails.cs`](./generate-pdf-page-thumbnails.cs) -- Generate pdf page thumbnails
 - [`insert-excel-into-pdf-portfolio.cs`](./insert-excel-into-pdf-portfolio.cs) -- Insert excel into pdf portfolio
 - [`list-pdf-attachment-names-sizes.cs`](./list-pdf-attachment-names-sizes.cs) -- List pdf attachment names sizes
 - [`measure-pdf-attachment-performance.cs`](./measure-pdf-attachment-performance.cs) -- Measure pdf attachment performance
@@ -54,7 +53,7 @@
 - [`reorder-pdf-outline-items.cs`](./reorder-pdf-outline-items.cs) -- Reorder pdf outline items
 - [`set-custom-description-for-pdf-attachments.cs`](./set-custom-description-for-pdf-attachments.cs) -- Set custom description for pdf attachments
 - [`test-attachment-removal-updates-collection-count.cs`](./test-attachment-removal-updates-collection-count.cs) -- Test attachment removal updates collection count
-- [`update-pdf-attachment-description.cs`](./update-pdf-attachment-description.cs) -- Update pdf attachment description
+- [`update-pdf-attachment-description__v2.cs`](./update-pdf-attachment-description__v2.cs) -- Update pdf attachment description  v2
 - [`validate-attachment-mime-type-and-add-to-pdf.cs`](./validate-attachment-mime-type-and-add-to-pdf.cs) -- Validate attachment mime type and add to pdf
 - [`validate-attachment-size-before-adding-to-pdf.cs`](./validate-attachment-size-before-adding-to-pdf.cs) -- Validate attachment size before adding to pdf
 - [`verify-pdf-size-increase-after-adding-file-attachment.cs`](./verify-pdf-size-increase-after-adding-file-attachment.cs) -- Verify pdf size increase after adding file attachment

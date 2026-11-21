@@ -1,21 +1,19 @@
 # Accessibility and tagged PDFs
 
-> **Accessibility and tagged PDFs** in PDF using C# / .NET -- **45** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Accessibility and tagged PDFs** in PDF using C# / .NET -- **43** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `accessibility-and-tagged-pdfs`
-- Examples: 45
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 43
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-actualtext-to-images.cs`](./add-actualtext-to-images.cs) -- Add actualtext to images
 - [`add-caption-note-to-figure.cs`](./add-caption-note-to-figure.cs) -- Add caption note to figure
 - [`add-custom-tag-to-paragraph.cs`](./add-custom-tag-to-paragraph.cs) -- Add custom tag to paragraph
-- [`add-external-link-with-title-to-tagged-pdf.cs`](./add-external-link-with-title-to-tagged-pdf.cs) -- Add external link with title to tagged pdf
 - [`add-internal-page-link-to-tagged-pdf.cs`](./add-internal-page-link-to-tagged-pdf.cs) -- Add internal page link to tagged pdf
 - [`add-note-element-to-paragraph.cs`](./add-note-element-to-paragraph.cs) -- Add note element to paragraph
 - [`add-page-break-to-tagged-pdf.cs`](./add-page-break-to-tagged-pdf.cs) -- Add page break to tagged pdf
-- [`add-placeholder-textbox-form-field-tagged.cs`](./add-placeholder-textbox-form-field-tagged.cs) -- Add placeholder textbox form field tagged
 - [`add-textbox-form-field-tagged-pdf.cs`](./add-textbox-form-field-tagged-pdf.cs) -- Add textbox form field tagged pdf
 - [`append-paragraph-actualtext-to-toci.cs`](./append-paragraph-actualtext-to-toci.cs) -- Append paragraph actualtext to toci
 - [`batch-convert-pdfs-to-tagged-pdfa.cs`](./batch-convert-pdfs-to-tagged-pdfa.cs) -- Batch convert pdfs to tagged pdfa

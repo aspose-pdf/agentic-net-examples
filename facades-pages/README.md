@@ -1,10 +1,10 @@
 # Facades pages
 
-> **Facades pages** in PDF using C# / .NET -- **114** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades pages** in PDF using C# / .NET -- **114** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-pages`
 - Examples: 114
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -56,6 +56,7 @@
 - [`incremental-update-pdf-text-annotation.cs`](./incremental-update-pdf-text-annotation.cs) -- Incremental update pdf text annotation
 - [`log-pdf-page-property-changes.cs`](./log-pdf-page-property-changes.cs) -- Log pdf page property changes
 - [`merge-pdfs-with-uniform-margins.cs`](./merge-pdfs-with-uniform-margins.cs) -- Merge pdfs with uniform margins
+- [`modify-pages-preserve-signature.cs`](./modify-pages-preserve-signature.cs) -- Modify pages preserve signature
 - [`report-pdf-page-properties-before-after.cs`](./report-pdf-page-properties-before-after.cs) -- Report pdf page properties before after
 - [`reset-page-rotation-to-zero.cs`](./reset-page-rotation-to-zero.cs) -- Reset page rotation to zero
 - [`resize-and-rotate-pdf-page.cs`](./resize-and-rotate-pdf-page.cs) -- Resize and rotate pdf page
@@ -64,6 +65,7 @@
 - [`resize-page-six-to-letter-size.cs`](./resize-page-six-to-letter-size.cs) -- Resize page six to letter size
 - [`resize-pages-two-and-four.cs`](./resize-pages-two-and-four.cs) -- Resize pages two and four
 - [`resize-pdf-content-uniform-15-percent-margins.cs`](./resize-pdf-content-uniform-15-percent-margins.cs) -- Resize pdf content uniform 15 percent margins
+- [`resize-pdf-contents-asymmetric-margins.cs`](./resize-pdf-contents-asymmetric-margins.cs) -- Resize pdf contents asymmetric margins
 - [`resize-pdf-contents-top-bottom-margins.cs`](./resize-pdf-contents-top-bottom-margins.cs) -- Resize pdf contents top bottom margins
 - [`resize-pdf-contents-uniform-margin.cs`](./resize-pdf-contents-uniform-margin.cs) -- Resize pdf contents uniform margin
 - [`resize-pdf-page-contents-negative-margins.cs`](./resize-pdf-page-contents-negative-margins.cs) -- Resize pdf page contents negative margins
@@ -85,7 +87,6 @@
 - [`rotate-page-2-pdf-90-degrees.cs`](./rotate-page-2-pdf-90-degrees.cs) -- Rotate page 2 pdf 90 degrees
 - [`rotate-pages-encrypted-pdf.cs`](./rotate-pages-encrypted-pdf.cs) -- Rotate pages encrypted pdf
 - [`rotate-pdf-page-180-preserve-transitions.cs`](./rotate-pdf-page-180-preserve-transitions.cs) -- Rotate pdf page 180 preserve transitions
-- [`rotate-pdf-pages-and-save.cs`](./rotate-pdf-pages-and-save.cs) -- Rotate pdf pages and save
 - [`rotate-pdf-pages-preserve-form-fields.cs`](./rotate-pdf-pages-preserve-form-fields.cs) -- Rotate pdf pages preserve form fields
 - [`rotate-pdf-pages-to-landscape-brochure.cs`](./rotate-pdf-pages-to-landscape-brochure.cs) -- Rotate pdf pages to landscape brochure
 - [`rotate-pdf-pages-using-pdfpageeditor.cs`](./rotate-pdf-pages-using-pdfpageeditor.cs) -- Rotate pdf pages using pdfpageeditor
@@ -99,7 +100,6 @@
 - [`set-display-duration-even-pages.cs`](./set-display-duration-even-pages.cs) -- Set display duration even pages
 - [`set-display-duration-page-five.cs`](./set-display-duration-page-five.cs) -- Set display duration page five
 - [`set-horizontal-alignment-and-zoom-on-page.cs`](./set-horizontal-alignment-and-zoom-on-page.cs) -- Set horizontal alignment and zoom on page
-- [`set-horizontal-alignment-pdf.cs`](./set-horizontal-alignment-pdf.cs) -- Set horizontal alignment pdf
 - [`set-last-page-size-a5.cs`](./set-last-page-size-a5.cs) -- Set last page size a5
 - [`set-page-display-duration-by-word-count.cs`](./set-page-display-duration-by-word-count.cs) -- Set page display duration by word count
 - [`set-page-display-duration-for-pdf-slideshow.cs`](./set-page-display-duration-for-pdf-slideshow.cs) -- Set page display duration for pdf slideshow
