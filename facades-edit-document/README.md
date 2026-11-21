@@ -1,10 +1,10 @@
 # Facades edit document
 
-> **Facades edit document** in PDF using C# / .NET -- **206** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades edit document** in PDF using C# / .NET -- **207** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-edit-document`
-- Examples: 206
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 207
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -24,6 +24,7 @@
 - [`add-confidential-text-stamp.cs`](./add-confidential-text-stamp.cs) -- Add confidential text stamp
 - [`add-corporate-branding-xmp-metadata.cs`](./add-corporate-branding-xmp-metadata.cs) -- Add corporate branding xmp metadata
 - [`add-custom-xmp-metadata-projectid.cs`](./add-custom-xmp-metadata-projectid.cs) -- Add custom xmp metadata projectid
+- [`add-dashed-line-annotation-to-pdf.cs`](./add-dashed-line-annotation-to-pdf.cs) -- Add dashed line annotation to pdf
 - [`add-dashed-rectangle-annotation-with-opacity.cs`](./add-dashed-rectangle-annotation-with-opacity.cs) -- Add dashed rectangle annotation with opacity
 - [`add-document-attachment-with-description.cs`](./add-document-attachment-with-description.cs) -- Add document attachment with description
 - [`add-document-attachment-with-error-handling.cs`](./add-document-attachment-with-error-handling.cs) -- Add document attachment with error handling
@@ -38,6 +39,7 @@
 - [`add-file-attachment-with-creation-date.cs`](./add-file-attachment-with-creation-date.cs) -- Add file attachment with creation date
 - [`add-file-attachment-with-custom-mime.cs`](./add-file-attachment-with-custom-mime.cs) -- Add file attachment with custom mime
 - [`add-free-text-annotation-helvetica.cs`](./add-free-text-annotation-helvetica.cs) -- Add free text annotation helvetica
+- [`add-free-text-html-annotation.cs`](./add-free-text-html-annotation.cs) -- Add free text html annotation
 - [`add-green-circle-annotation-to-pdf-page.cs`](./add-green-circle-annotation-to-pdf-page.cs) -- Add green circle annotation to pdf page
 - [`add-green-circle-annotation-to-pdf-page__v2.cs`](./add-green-circle-annotation-to-pdf-page__v2.cs) -- Add green circle annotation to pdf page  v2
 - [`add-highlight-annotation-to-pdf-page.cs`](./add-highlight-annotation-to-pdf-page.cs) -- Add highlight annotation to pdf page
@@ -58,6 +60,7 @@
 - [`add-js-action-change-page-bg-on-mouse-over.cs`](./add-js-action-change-page-bg-on-mouse-over.cs) -- Add js action change page bg on mouse over
 - [`add-large-attachment-to-pdf.cs`](./add-large-attachment-to-pdf.cs) -- Add large attachment to pdf
 - [`add-large-stream-attachment-to-pdf.cs`](./add-large-stream-attachment-to-pdf.cs) -- Add large stream attachment to pdf
+- [`add-line-annotation-with-arrowheads.cs`](./add-line-annotation-with-arrowheads.cs) -- Add line annotation with arrowheads
 - [`add-multiline-right-aligned-text-stamp-page-4.cs`](./add-multiline-right-aligned-text-stamp-page-4.cs) -- Add multiline right aligned text stamp page 4
 - [`add-network-attachment-to-pdf-with-retry.cs`](./add-network-attachment-to-pdf-with-retry.cs) -- Add network attachment to pdf with retry
 - [`add-page-open-javascript-log-page-number.cs`](./add-page-open-javascript-log-page-number.cs) -- Add page open javascript log page number
@@ -65,7 +68,6 @@
 - [`add-popup-annotation-to-pdf__v3.cs`](./add-popup-annotation-to-pdf__v3.cs) -- Add popup annotation to pdf  v3
 - [`add-popup-annotation-with-bullet-list.cs`](./add-popup-annotation-with-bullet-list.cs) -- Add popup annotation with bullet list
 - [`add-rectangle-annotation-light-gray.cs`](./add-rectangle-annotation-light-gray.cs) -- Add rectangle annotation light gray
-- [`add-rectangle-annotation-with-dash-opacity.cs`](./add-rectangle-annotation-with-dash-opacity.cs) -- Add rectangle annotation with dash opacity
 - [`add-red-highlight-annotation-to-pdf.cs`](./add-red-highlight-annotation-to-pdf.cs) -- Add red highlight annotation to pdf
 - [`add-red-rectangle-annotation.cs`](./add-red-rectangle-annotation.cs) -- Add red rectangle annotation
 - [`add-rotated-image-stamp-to-pdf__v2.cs`](./add-rotated-image-stamp-to-pdf__v2.cs) -- Add rotated image stamp to pdf  v2
@@ -86,6 +88,7 @@
 - [`add-underlined-text-stamp-to-page-ten.cs`](./add-underlined-text-stamp-to-page-ten.cs) -- Add underlined text stamp to page ten
 - [`add-unicode-attachment-description-to-pdf.cs`](./add-unicode-attachment-description-to-pdf.cs) -- Add unicode attachment description to pdf
 - [`add-url-bookmark-to-pdf.cs`](./add-url-bookmark-to-pdf.cs) -- Add url bookmark to pdf
+- [`add-watermark-to-pdfs-in-folder.cs`](./add-watermark-to-pdfs-in-folder.cs) -- Add watermark to pdfs in folder
 - [`add-web-link-annotation-to-pdf.cs`](./add-web-link-annotation-to-pdf.cs) -- Add web link annotation to pdf
 - [`add-xmp-department-metadata-to-pdf.cs`](./add-xmp-department-metadata-to-pdf.cs) -- Add xmp department metadata to pdf
 - [`add-xmp-metadata-author-title.cs`](./add-xmp-metadata-author-title.cs) -- Add xmp metadata author title
@@ -100,7 +103,6 @@
 - [`batch-add-annotations-from-json.cs`](./batch-add-annotations-from-json.cs) -- Batch add annotations from json
 - [`batch-add-password-protection-to-pdfs.cs`](./batch-add-password-protection-to-pdfs.cs) -- Batch add password protection to pdfs
 - [`batch-add-red-rectangle-annotation.cs`](./batch-add-red-rectangle-annotation.cs) -- Batch add red rectangle annotation
-- [`batch-apply-js-alert-to-rectangle-annotations.cs`](./batch-apply-js-alert-to-rectangle-annotations.cs) -- Batch apply js alert to rectangle annotations
 - [`batch-extract-images-from-pdfs__v2.cs`](./batch-extract-images-from-pdfs__v2.cs) -- Batch extract images from pdfs  v2
 - [`batch-remove-attachments-add-disclaimer.cs`](./batch-remove-attachments-add-disclaimer.cs) -- Batch remove attachments add disclaimer
 - [`batch-replace-confidential-with-public.cs`](./batch-replace-confidential-with-public.cs) -- Batch replace confidential with public
@@ -116,7 +118,6 @@
 - [`convert-pdf-pages-to-bmp.cs`](./convert-pdf-pages-to-bmp.cs) -- Convert pdf pages to bmp
 - [`convert-pdf-pages-to-png-transparent.cs`](./convert-pdf-pages-to-png-transparent.cs) -- Convert pdf pages to png transparent
 - [`convert-pdf-pages-to-transparent-png.cs`](./convert-pdf-pages-to-transparent-png.cs) -- Convert pdf pages to transparent png
-- [`convert-pdf-to-jpeg-150-dpi.cs`](./convert-pdf-to-jpeg-150-dpi.cs) -- Convert pdf to jpeg 150 dpi
 - [`convert-pdf-to-multi-page-tiff-lzw.cs`](./convert-pdf-to-multi-page-tiff-lzw.cs) -- Convert pdf to multi page tiff lzw
 - [`convert-pdf-to-png-thumbnails-300-dpi.cs`](./convert-pdf-to-png-thumbnails-300-dpi.cs) -- Convert pdf to png thumbnails 300 dpi
 - [`convert-png-to-multi-page-pdf.cs`](./convert-png-to-multi-page-pdf.cs) -- Convert png to multi page pdf
@@ -166,9 +167,8 @@
 - [`map-pdf-viewer-preferences-to-toggles.cs`](./map-pdf-viewer-preferences-to-toggles.cs) -- Map pdf viewer preferences to toggles
 - [`move-last-page-to-beginning.cs`](./move-last-page-to-beginning.cs) -- Move last page to beginning
 - [`password-protect-pdf-disable-printing.cs`](./password-protect-pdf-disable-printing.cs) -- Password protect pdf disable printing
-- [`persist-viewer-preferences-after-editing-pdf.cs`](./persist-viewer-preferences-after-editing-pdf.cs) -- Persist viewer preferences after editing pdf
 - [`print-pdf-duplex-collated-copies.cs`](./print-pdf-duplex-collated-copies.cs) -- Print pdf duplex collated copies
-- [`print-pdf-multiple-copies-landscape.cs`](./print-pdf-multiple-copies-landscape.cs) -- Print pdf multiple copies landscape
+- [`print-selected-pdf-pages.cs`](./print-selected-pdf-pages.cs) -- Print selected pdf pages
 - [`refresh-pdf-attachments.cs`](./refresh-pdf-attachments.cs) -- Refresh pdf attachments
 - [`remove-all-attachments-from-pdf.cs`](./remove-all-attachments-from-pdf.cs) -- Remove all attachments from pdf
 - [`remove-all-bookmarks-from-pdf.cs`](./remove-all-bookmarks-from-pdf.cs) -- Remove all bookmarks from pdf
@@ -184,6 +184,7 @@
 - [`replace-text-pdf-using-pdfcontenteditor.cs`](./replace-text-pdf-using-pdfcontenteditor.cs) -- Replace text pdf using pdfcontenteditor
 - [`replace-text-preserve-font-style.cs`](./replace-text-preserve-font-style.cs) -- Replace text preserve font style
 - [`replace-text-preserve-style.cs`](./replace-text-preserve-style.cs) -- Replace text preserve style
+- [`replace-text-using-regular-expressions.cs`](./replace-text-using-regular-expressions.cs) -- Replace text using regular expressions
 - [`reposition-stamp-left-margin.cs`](./reposition-stamp-left-margin.cs) -- Reposition stamp left margin
 - [`reposition-stamp-to-baseline-page-5.cs`](./reposition-stamp-to-baseline-page-5.cs) -- Reposition stamp to baseline page 5
 - [`retrieve-pdf-viewer-preferences-to-xml.cs`](./retrieve-pdf-viewer-preferences-to-xml.cs) -- Retrieve pdf viewer preferences to xml
@@ -203,7 +204,6 @@
 - [`set-pdf-viewer-preference-fullscreen.cs`](./set-pdf-viewer-preference-fullscreen.cs) -- Set pdf viewer preference fullscreen
 - [`set-pdf-viewer-preference-show-outline.cs`](./set-pdf-viewer-preference-show-outline.cs) -- Set pdf viewer preference show outline
 - [`set-pdf-viewer-preference-single-page.cs`](./set-pdf-viewer-preference-single-page.cs) -- Set pdf viewer preference single page
-- [`set-pdf-viewer-preferences-fit-width.cs`](./set-pdf-viewer-preferences-fit-width.cs) -- Set pdf viewer preferences fit width
 - [`set-radio-button-value-in-pdf-acroform.cs`](./set-radio-button-value-in-pdf-acroform.cs) -- Set radio button value in pdf acroform
 - [`silently-print-pdf-to-network-printer.cs`](./silently-print-pdf-to-network-printer.cs) -- Silently print pdf to network printer
 - [`simple-pdf-editing-wrapper.cs`](./simple-pdf-editing-wrapper.cs) -- Simple pdf editing wrapper
@@ -213,6 +213,7 @@
 - [`update-pdf-xmp-creator-metadata.cs`](./update-pdf-xmp-creator-metadata.cs) -- Update pdf xmp creator metadata
 - [`update-pdf-xmp-metadata-custom-project-schema.cs`](./update-pdf-xmp-metadata-custom-project-schema.cs) -- Update pdf xmp metadata custom project schema
 - [`validate-pdf-integrity-sha256.cs`](./validate-pdf-integrity-sha256.cs) -- Validate pdf integrity sha256
+- [`verify-pdf-attachment-after-save.cs`](./verify-pdf-attachment-after-save.cs) -- Verify pdf attachment after save
 - [`verify-text-annotation-position.cs`](./verify-text-annotation-position.cs) -- Verify text annotation position
 
 ## See Also

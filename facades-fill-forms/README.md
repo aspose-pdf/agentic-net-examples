@@ -1,14 +1,15 @@
 # Facades fill forms
 
-> **Facades fill forms** in PDF using C# / .NET -- **33** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades fill forms** in PDF using C# / .NET -- **35** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-fill-forms`
-- Examples: 33
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 35
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
 - [`add-date-header-to-pdf-pages.cs`](./add-date-header-to-pdf-pages.cs) -- Add date header to pdf pages
+- [`add-watermark-to-pdf-after-form-filling.cs`](./add-watermark-to-pdf-after-form-filling.cs) -- Add watermark to pdf after form filling
 - [`apply-password-protection-to-filled-pdf.cs`](./apply-password-protection-to-filled-pdf.cs) -- Apply password protection to filled pdf
 - [`async-fill-pdf-form-from-data-table.cs`](./async-fill-pdf-form-from-data-table.cs) -- Async fill pdf form from data table
 - [`batch-fill-pdf-forms-from-large-csv.cs`](./batch-fill-pdf-forms-from-large-csv.cs) -- Batch fill pdf forms from large csv
@@ -16,6 +17,7 @@
 - [`bind-pdf-form-to-autofiller.cs`](./bind-pdf-form-to-autofiller.cs) -- Bind pdf form to autofiller
 - [`convert-in-memory-pdf-to-byte-array.cs`](./convert-in-memory-pdf-to-byte-array.cs) -- Convert in memory pdf to byte array
 - [`convert-large-pdf-to-excel-with-temp-folder.cs`](./convert-large-pdf-to-excel-with-temp-folder.cs) -- Convert large pdf to excel with temp folder
+- [`export-filtered-datatable-to-pdf-merge-template.cs`](./export-filtered-datatable-to-pdf-merge-template.cs) -- Export filtered datatable to pdf merge template
 - [`extract-pdf-pages-with-custom-names.cs`](./extract-pdf-pages-with-custom-names.cs) -- Extract pdf pages with custom names
 - [`fill-pdf-form-field-preserve-layout.cs`](./fill-pdf-form-field-preserve-layout.cs) -- Fill pdf form field preserve layout
 - [`fill-pdf-form-from-csv-with-mapping.cs`](./fill-pdf-form-from-csv-with-mapping.cs) -- Fill pdf form from csv with mapping
@@ -40,7 +42,7 @@
 - [`retry-autofiller-import-transient-errors.cs`](./retry-autofiller-import-transient-errors.cs) -- Retry autofiller import transient errors
 - [`split-filled-pdf-into-single-page-pdfs.cs`](./split-filled-pdf-into-single-page-pdfs.cs) -- Split filled pdf into single page pdfs
 - [`validate-filled-pdf-fields-against-datatable-values.cs`](./validate-filled-pdf-fields-against-datatable-values.cs) -- Validate filled pdf fields against datatable values
-- [`validate-required-pdf-form-fields.cs`](./validate-required-pdf-form-fields.cs) -- Validate required pdf form fields
+- [`validate-required-pdf-form-fields__v2.cs`](./validate-required-pdf-form-fields__v2.cs) -- Validate required pdf form fields  v2
 
 ## See Also
 

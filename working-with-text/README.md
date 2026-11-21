@@ -1,10 +1,10 @@
 # Working with text
 
-> **Working with text** in PDF using C# / .NET -- **76** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with text** in PDF using C# / .NET -- **76** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-text`
 - Examples: 76
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -20,7 +20,7 @@
 - [`add-rotated-text-bottom-right-last-page.cs`](./add-rotated-text-bottom-right-last-page.cs) -- Add rotated text bottom right last page
 - [`add-rotated-text-watermark-to-pdf-pages.cs`](./add-rotated-text-watermark-to-pdf-pages.cs) -- Add rotated text watermark to pdf pages
 - [`add-semi-transparent-text-to-pdf.cs`](./add-semi-transparent-text-to-pdf.cs) -- Add semi transparent text to pdf
-- [`add-semi-transparent-text-watermark.cs`](./add-semi-transparent-text-watermark.cs) -- Add semi transparent text watermark
+- [`add-semi-transparent-text-watermark__v2.cs`](./add-semi-transparent-text-watermark__v2.cs) -- Add semi transparent text watermark  v2
 - [`add-styled-html-fragment-to-pdf-page.cs`](./add-styled-html-fragment-to-pdf-page.cs) -- Add styled html fragment to pdf page
 - [`add-table-to-pdf-footnote.cs`](./add-table-to-pdf-footnote.cs) -- Add table to pdf footnote
 - [`add-text-and-encrypt-pdf.cs`](./add-text-and-encrypt-pdf.cs) -- Add text and encrypt pdf
@@ -49,8 +49,7 @@
 - [`extract-line-break-positions-from-pdf.cs`](./extract-line-break-positions-from-pdf.cs) -- Extract line break positions from pdf
 - [`extract-page-word-count-to-csv.cs`](./extract-page-word-count-to-csv.cs) -- Extract page word count to csv
 - [`extract-pdf-text-sentences-per-page.cs`](./extract-pdf-text-sentences-per-page.cs) -- Extract pdf text sentences per page
-- [`extract-text-fragments-and-positions.cs`](./extract-text-fragments-and-positions.cs) -- Extract text fragments and positions
-- [`extract-text-from-pdf-to-utf8-file.cs`](./extract-text-from-pdf-to-utf8-file.cs) -- Extract text from pdf to utf8 file
+- [`extract-text-from-pdf-to-utf8-file__v2.cs`](./extract-text-from-pdf-to-utf8-file__v2.cs) -- Extract text from pdf to utf8 file  v2
 - [`find-dates-in-pdf-using-regex.cs`](./find-dates-in-pdf-using-regex.cs) -- Find dates in pdf using regex
 - [`find-phrase-occurrences-with-textabsorber.cs`](./find-phrase-occurrences-with-textabsorber.cs) -- Find phrase occurrences with textabsorber
 - [`highlight-keyword-occurrences-pdf.cs`](./highlight-keyword-occurrences-pdf.cs) -- Highlight keyword occurrences pdf
@@ -78,6 +77,7 @@
 - [`rotate-pdf-title-text-45-degrees.cs`](./rotate-pdf-title-text-45-degrees.cs) -- Rotate pdf title text 45 degrees
 - [`rotate-specific-text-fragment.cs`](./rotate-specific-text-fragment.cs) -- Rotate specific text fragment
 - [`rotate-table-cell-text.cs`](./rotate-table-cell-text.cs) -- Rotate table cell text
+- [`rotate-text-box-form-field.cs`](./rotate-text-box-form-field.cs) -- Rotate text box form field
 - [`search-text-pdf-with-logging.cs`](./search-text-pdf-with-logging.cs) -- Search text pdf with logging
 - [`set-character-spacing-pdf.cs`](./set-character-spacing-pdf.cs) -- Set character spacing pdf
 - [`set-custom-line-height-pdf-text.cs`](./set-custom-line-height-pdf-text.cs) -- Set custom line height pdf text

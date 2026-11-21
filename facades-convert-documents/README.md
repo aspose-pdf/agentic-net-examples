@@ -1,10 +1,10 @@
 # Facades convert documents
 
-> **Facades convert documents** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades convert documents** in PDF using C# / .NET -- **40** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-convert-documents`
 - Examples: 40
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 

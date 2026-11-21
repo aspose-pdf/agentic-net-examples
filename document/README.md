@@ -1,10 +1,10 @@
 # Document
 
-> **Document** in PDF using C# / .NET -- **119** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Document** in PDF using C# / .NET -- **117** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `document`
-- Examples: 119
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 117
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -60,6 +60,7 @@
 - [`create-pdf-multiple-sections-different-page-sizes.cs`](./create-pdf-multiple-sections-different-page-sizes.cs) -- Create pdf multiple sections different page sizes
 - [`create-pdf-numbered-headings-sanitize.cs`](./create-pdf-numbered-headings-sanitize.cs) -- Create pdf numbered headings sanitize
 - [`create-pdf-portfolio.cs`](./create-pdf-portfolio.cs) -- Create pdf portfolio
+- [`create-pdf-radio-button-group.cs`](./create-pdf-radio-button-group.cs) -- Create pdf radio button group
 - [`create-pdf-table-with-rich-text.cs`](./create-pdf-table-with-rich-text.cs) -- Create pdf table with rich text
 - [`create-pdf-toc-with-dot-leaders.cs`](./create-pdf-toc-with-dot-leaders.cs) -- Create pdf toc with dot leaders
 - [`create-pdf-with-background-template.cs`](./create-pdf-with-background-template.cs) -- Create pdf with background template
@@ -73,6 +74,7 @@
 - [`create-searchable-pdf-from-scanned-images.cs`](./create-searchable-pdf-from-scanned-images.cs) -- Create searchable pdf from scanned images
 - [`create-zugferd-compliant-pdf-invoice.cs`](./create-zugferd-compliant-pdf-invoice.cs) -- Create zugferd compliant pdf invoice
 - [`customize-crash-report-filename-message.cs`](./customize-crash-report-filename-message.cs) -- Customize crash report filename message
+- [`customize-toc-formatting.cs`](./customize-toc-formatting.cs) -- Customize toc formatting
 - [`digitally-sign-pdf-with-timestamp.cs`](./digitally-sign-pdf-with-timestamp.cs) -- Digitally sign pdf with timestamp
 - [`embed-zugferd-xml-into-pdf.cs`](./embed-zugferd-xml-into-pdf.cs) -- Embed zugferd xml into pdf
 - [`encrypt-pdf-aes256-restrict-permissions.cs`](./encrypt-pdf-aes256-restrict-permissions.cs) -- Encrypt pdf aes256 restrict permissions
@@ -85,7 +87,6 @@
 - [`extract-xmp-metadata-from-pdf.cs`](./extract-xmp-metadata-from-pdf.cs) -- Extract xmp metadata from pdf
 - [`flatten-pdf-form-fields.cs`](./flatten-pdf-form-fields.cs) -- Flatten pdf form fields
 - [`generate-crash-report-pdf.cs`](./generate-crash-report-pdf.cs) -- Generate crash report pdf
-- [`generate-crash-report-to-network-share.cs`](./generate-crash-report-to-network-share.cs) -- Generate crash report to network share
 - [`generate-crash-report-with-custom-output-directory.cs`](./generate-crash-report-with-custom-output-directory.cs) -- Generate crash report with custom output directory
 - [`generate-dynamic-pdf-table.cs`](./generate-dynamic-pdf-table.cs) -- Generate dynamic pdf table
 - [`generate-pdf-crash-report.cs`](./generate-pdf-crash-report.cs) -- Generate pdf crash report
@@ -100,12 +101,10 @@
 - [`magazine-pdf-creator.cs`](./magazine-pdf-creator.cs) -- Magazine pdf creator
 - [`merge-pdfs-with-bookmarks.cs`](./merge-pdfs-with-bookmarks.cs) -- Merge pdfs with bookmarks
 - [`pdf-processing-with-crash-report.cs`](./pdf-processing-with-crash-report.cs) -- Pdf processing with crash report
-- [`pdf-sanitizer-service.cs`](./pdf-sanitizer-service.cs) -- Pdf sanitizer service
 - [`print-pdf-using-default-handler.cs`](./print-pdf-using-default-handler.cs) -- Print pdf using default handler
 - [`remove-all-annotations-from-pdf.cs`](./remove-all-annotations-from-pdf.cs) -- Remove all annotations from pdf
 - [`remove-all-annotations-from-pdf__v2.cs`](./remove-all-annotations-from-pdf__v2.cs) -- Remove all annotations from pdf  v2
 - [`remove-annotations-and-attachments.cs`](./remove-annotations-and-attachments.cs) -- Remove annotations and attachments
-- [`remove-hidden-data-rebuild-headings-pdf.cs`](./remove-hidden-data-rebuild-headings-pdf.cs) -- Remove hidden data rebuild headings pdf
 - [`remove-javascript-from-pdf.cs`](./remove-javascript-from-pdf.cs) -- Remove javascript from pdf
 - [`remove-metadata-javascript-embedded-files-pdf.cs`](./remove-metadata-javascript-embedded-files-pdf.cs) -- Remove metadata javascript embedded files pdf
 - [`remove-page-from-pdf.cs`](./remove-page-from-pdf.cs) -- Remove page from pdf
@@ -119,7 +118,6 @@
 - [`sanitize-pdf-remove-hidden-data.cs`](./sanitize-pdf-remove-hidden-data.cs) -- Sanitize pdf remove hidden data
 - [`sanitize-pdf-remove-metadata-private-info.cs`](./sanitize-pdf-remove-metadata-private-info.cs) -- Sanitize pdf remove metadata private info
 - [`sanitize-pdfs-remove-metadata.cs`](./sanitize-pdfs-remove-metadata.cs) -- Sanitize pdfs remove metadata
-- [`selective-page-rasterization-hidden-data-sanitizer.cs`](./selective-page-rasterization-hidden-data-sanitizer.cs) -- Selective page rasterization hidden data sanitizer
 - [`set-pdf-document-metadata.cs`](./set-pdf-document-metadata.cs) -- Set pdf document metadata
 - [`set-pdf-expiration-date.cs`](./set-pdf-expiration-date.cs) -- Set pdf expiration date
 - [`set-pdf-page-rotation-90-degrees.cs`](./set-pdf-page-rotation-90-degrees.cs) -- Set pdf page rotation 90 degrees

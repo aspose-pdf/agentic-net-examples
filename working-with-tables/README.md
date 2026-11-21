@@ -1,10 +1,10 @@
 # Working with tables
 
-> **Working with tables** in PDF using C# / .NET -- **99** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Working with tables** in PDF using C# / .NET -- **99** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `working-with-tables`
 - Examples: 99
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -20,6 +20,7 @@
 - [`add-solid-border-to-pdf-table.cs`](./add-solid-border-to-pdf-table.cs) -- Add solid border to pdf table
 - [`add-table-footer-to-pdf.cs`](./add-table-footer-to-pdf.cs) -- Add table footer to pdf
 - [`add-table-to-specific-pdf-page.cs`](./add-table-to-specific-pdf-page.cs) -- Add table to specific pdf page
+- [`add-table-with-background-color.cs`](./add-table-with-background-color.cs) -- Add table with background color
 - [`add-table-with-semi-transparent-background.cs`](./add-table-with-semi-transparent-background.cs) -- Add table with semi transparent background
 - [`add-text-fragment-to-table-cell.cs`](./add-text-fragment-to-table-cell.cs) -- Add text fragment to table cell
 - [`adjust-table-column-widths-proportionally.cs`](./adjust-table-column-widths-proportionally.cs) -- Adjust table column widths proportionally
@@ -28,6 +29,7 @@
 - [`auto-fit-table-columns-to-content.cs`](./auto-fit-table-columns-to-content.cs) -- Auto fit table columns to content
 - [`auto-fit-table-row-height.cs`](./auto-fit-table-row-height.cs) -- Auto fit table row height
 - [`batch-add-table-with-logo-to-pdfs.cs`](./batch-add-table-with-logo-to-pdfs.cs) -- Batch add table with logo to pdfs
+- [`batch-replace-tables-in-multiple-pdfs.cs`](./batch-replace-tables-in-multiple-pdfs.cs) -- Batch replace tables in multiple pdfs
 - [`calculate-remaining-page-space-add-table.cs`](./calculate-remaining-page-space-add-table.cs) -- Calculate remaining page space add table
 - [`center-table-horizontally.cs`](./center-table-horizontally.cs) -- Center table horizontally
 - [`check-table-break-across-pages.cs`](./check-table-break-across-pages.cs) -- Check table break across pages
@@ -47,7 +49,7 @@
 - [`embed-html-in-table-cell.cs`](./embed-html-in-table-cell.cs) -- Embed html in table cell
 - [`export-pdf-table-structure-to-json.cs`](./export-pdf-table-structure-to-json.cs) -- Export pdf table structure to json
 - [`export-pdf-table-to-csv.cs`](./export-pdf-table-to-csv.cs) -- Export pdf table to csv
-- [`extract-pdf-tables-to-csv.cs`](./extract-pdf-tables-to-csv.cs) -- Extract pdf tables to csv
+- [`extract-pdf-tables-to-csv__v2.cs`](./extract-pdf-tables-to-csv__v2.cs) -- Extract pdf tables to csv  v2
 - [`extract-pdf-tables-to-datatable.cs`](./extract-pdf-tables-to-datatable.cs) -- Extract pdf tables to datatable
 - [`extract-table-coordinates-from-pdf.cs`](./extract-table-coordinates-from-pdf.cs) -- Extract table coordinates from pdf
 - [`extract-tables-from-pdf.cs`](./extract-tables-from-pdf.cs) -- Extract tables from pdf
@@ -55,7 +57,6 @@
 - [`get-rendered-table-width-after-layout.cs`](./get-rendered-table-width-after-layout.cs) -- Get rendered table width after layout
 - [`import-datatable-into-pdf-table.cs`](./import-datatable-into-pdf-table.cs) -- Import datatable into pdf table
 - [`import-filtered-dataview-into-pdf-table.cs`](./import-filtered-dataview-into-pdf-table.cs) -- Import filtered dataview into pdf table
-- [`import-images-from-datatable-into-pdf-table.cs`](./import-images-from-datatable-into-pdf-table.cs) -- Import images from datatable into pdf table
 - [`insert-hyperlink-into-table-cell.cs`](./insert-hyperlink-into-table-cell.cs) -- Insert hyperlink into table cell
 - [`insert-image-into-pdf-table-cell.cs`](./insert-image-into-pdf-table-cell.cs) -- Insert image into pdf table cell
 - [`insert-image-into-table-cell.cs`](./insert-image-into-table-cell.cs) -- Insert image into table cell
@@ -67,7 +68,6 @@
 - [`insert-table-before-first-image.cs`](./insert-table-before-first-image.cs) -- Insert table before first image
 - [`insert-table-into-paragraph-collection.cs`](./insert-table-into-paragraph-collection.cs) -- Insert table into paragraph collection
 - [`insert-table-into-pdf.cs`](./insert-table-into-pdf.cs) -- Insert table into pdf
-- [`insert-table-into-textbox-form-field.cs`](./insert-table-into-textbox-form-field.cs) -- Insert table into textbox form field
 - [`map-datatable-columns-to-pdf-table.cs`](./map-datatable-columns-to-pdf-table.cs) -- Map datatable columns to pdf table
 - [`mark-table-header-enable-column-repeat.cs`](./mark-table-header-enable-column-repeat.cs) -- Mark table header enable column repeat
 - [`merge-table-cells-colspan.cs`](./merge-table-cells-colspan.cs) -- Merge table cells colspan

@@ -1,10 +1,10 @@
 # Facades bookmarks
 
-> **Facades bookmarks** in PDF using C# / .NET -- **34** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades bookmarks** in PDF using C# / .NET -- **35** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `facades-bookmarks`
-- Examples: 34
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 35
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -15,6 +15,7 @@
 - [`add-subbookmarks-to-pdf-chapter.cs`](./add-subbookmarks-to-pdf-chapter.cs) -- Add subbookmarks to pdf chapter
 - [`add-toc-bookmark-to-pdfs-batch.cs`](./add-toc-bookmark-to-pdfs-batch.cs) -- Add toc bookmark to pdfs batch
 - [`add-top-level-blue-bookmark-to-pdf.cs`](./add-top-level-blue-bookmark-to-pdf.cs) -- Add top level blue bookmark to pdf
+- [`adjust-pdf-bookmarks-after-inserting-pages.cs`](./adjust-pdf-bookmarks-after-inserting-pages.cs) -- Adjust pdf bookmarks after inserting pages
 - [`batch-add-reviewed-bookmark-to-pdfs.cs`](./batch-add-reviewed-bookmark-to-pdfs.cs) -- Batch add reviewed bookmark to pdfs
 - [`batch-delete-bookmarks-from-encrypted-pdfs.cs`](./batch-delete-bookmarks-from-encrypted-pdfs.cs) -- Batch delete bookmarks from encrypted pdfs
 - [`collapse-specific-pdf-bookmarks.cs`](./collapse-specific-pdf-bookmarks.cs) -- Collapse specific pdf bookmarks

@@ -1,10 +1,10 @@
 # Stamping
 
-> **Stamping** in PDF using C# / .NET -- **50** verified, compile-tested examples for **Aspose.PDF for .NET** 26.9.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Stamping** in PDF using C# / .NET -- **48** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 - Category: `stamping`
-- Examples: 50
-- NuGet: `Aspose.PDF 26.9.0` -- target `net10.0`
+- Examples: 48
+- NuGet: `Aspose.PDF 26.10.0` -- target `net10.0`
 
 ## Examples
 
@@ -22,7 +22,6 @@
 - [`add-image-stamp-alt-text-pdfa.cs`](./add-image-stamp-alt-text-pdfa.cs) -- Add image stamp alt text pdfa
 - [`add-image-stamp-annotation-to-pdf.cs`](./add-image-stamp-annotation-to-pdf.cs) -- Add image stamp annotation to pdf
 - [`add-image-stamp-flatten-annotations.cs`](./add-image-stamp-flatten-annotations.cs) -- Add image stamp flatten annotations
-- [`add-image-stamp-floatingbox-page-4.cs`](./add-image-stamp-floatingbox-page-4.cs) -- Add image stamp floatingbox page 4
 - [`add-image-stamp-from-memory-stream-to-pdf.cs`](./add-image-stamp-from-memory-stream-to-pdf.cs) -- Add image stamp from memory stream to pdf
 - [`add-image-stamp-percentage-position.cs`](./add-image-stamp-percentage-position.cs) -- Add image stamp percentage position
 - [`add-image-stamp-preserve-acroform-fields.cs`](./add-image-stamp-preserve-acroform-fields.cs) -- Add image stamp preserve acroform fields
@@ -47,7 +46,6 @@
 - [`add-rotated-text-watermark.cs`](./add-rotated-text-watermark.cs) -- Add rotated text watermark
 - [`add-rtl-text-stamp-to-pdf.cs`](./add-rtl-text-stamp-to-pdf.cs) -- Add rtl text stamp to pdf
 - [`add-semi-transparent-logo-stamp-to-pdf.cs`](./add-semi-transparent-logo-stamp-to-pdf.cs) -- Add semi transparent logo stamp to pdf
-- [`add-text-stamp-auto-adjust-font.cs`](./add-text-stamp-auto-adjust-font.cs) -- Add text stamp auto adjust font
 - [`add-text-stamp-with-background-box.cs`](./add-text-stamp-with-background-box.cs) -- Add text stamp with background box
 - [`add-upside-down-image-stamp.cs`](./add-upside-down-image-stamp.cs) -- Add upside down image stamp
 - [`align-image-stamp-top-right-margin.cs`](./align-image-stamp-top-right-margin.cs) -- Align image stamp top right margin
