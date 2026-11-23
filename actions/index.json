@@ -1,0 +1,123 @@
+{
+  "category": "actions",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-23T09:45:40Z",
+  "examples": {
+    "remove-open-action-from-pdf": {
+      "title": "Remove Open Action from PDF",
+      "filename": "remove-open-action-from-pdf.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, clear the document's OpenAction to prevent any automatic action on opening, and save the modified file.",
+      "tags": [
+        "open-action",
+        "pdf",
+        "aspose-pdf",
+        "csharp",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Dispose",
+        "Aspose.Pdf.Document(string)"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:45:40Z",
+      "status": "verified",
+      "task_id": "73651"
+    },
+    "set-openaction-goto-page-xyz-destination": {
+      "title": "Set OpenAction to GoTo Page 10 with XYZ Destination",
+      "filename": "set-openaction-goto-page-xyz-destination.cs",
+      "description": "Loads a PDF, creates an explicit XYZ destination on page 10, wraps it in a GoToAction, assigns it to the document's OpenAction, and saves the modified file.",
+      "tags": [
+        "openaction",
+        "gotoaction",
+        "xyzdestination",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:45:40Z",
+      "status": "verified",
+      "task_id": "73652"
+    },
+    "set-openaction-goto-page-12": {
+      "title": "Set OpenAction to GoTo Page 12",
+      "filename": "set-openaction-goto-page-12.cs",
+      "description": "Loads a PDF, creates a GoToAction with an XYZExplicitDestination pointing to page 12, replaces the document's OpenAction, and saves the result.",
+      "tags": [
+        "openaction",
+        "gotoaction",
+        "pdf",
+        "pages",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:45:40Z",
+      "status": "verified",
+      "task_id": "73653"
+    },
+    "set-open-action-goto-page-3": {
+      "title": "Set PDF Open Action to GoTo Page 3 with XYZ Destination",
+      "filename": "set-open-action-goto-page-3.cs",
+      "description": "Demonstrates loading a PDF, creating an XYZExplicitDestination for page three, assigning it to a GoToAction, setting the document's OpenAction, and saving the modified file.",
+      "tags": [
+        "open-action",
+        "goto-action",
+        "pdf",
+        "aspose-pdf",
+        "destination"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.GoToAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:45:40Z",
+      "status": "verified",
+      "task_id": "73654"
+    },
+    "set-open-action-navigate-to-page-five": {
+      "title": "Set Open Action to Navigate to Page Five",
+      "filename": "set-open-action-navigate-to-page-five.cs",
+      "description": "Demonstrates how to load a PDF, create an XYZ explicit destination for page five, assign it to a GoTo action, set it as the document's open action, and save the file.",
+      "tags": [
+        "open-action",
+        "goto-action",
+        "destination",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.GoToAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:45:40Z",
+      "status": "verified",
+      "task_id": "73655"
+    }
+  }
+}
