@@ -1,0 +1,705 @@
+{
+  "category": "backgrounds",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-23T11:12:43Z",
+  "examples": {
+    "set-page-background-image-from-stream": {
+      "title": "Set PDF Page Background Image from Stream",
+      "filename": "set-page-background-image-from-stream.cs",
+      "description": "Demonstrates how to create a PDF, add a page, load an image from a file stream, assign it as the page background, and save the document using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75765"
+    },
+    "add-background-image-to-pdf-page": {
+      "title": "Add Background Image to PDF Page from Stream",
+      "filename": "add-background-image-to-pdf-page.cs",
+      "description": "Demonstrates how to add a new page to a PDF, set its background image using a file stream, and save the document.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose-pdf",
+        "stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Image",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75766"
+    },
+    "add-background-image-to-pdf-page__v2": {
+      "title": "Add Background Image to PDF Page",
+      "filename": "add-background-image-to-pdf-page__v2.cs",
+      "description": "Demonstrates how to load an image stream, create a BackgroundArtifact, assign the image as a background, attach it to the first page, and save the PDF using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose-pdf",
+        "artifact"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Resources.Images.Add",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75767"
+    },
+    "add-background-image-to-pdf-page__v3": {
+      "title": "Add Background Image to PDF Page",
+      "filename": "add-background-image-to-pdf-page__v3.cs",
+      "description": "Demonstrates creating a BackgroundArtifact, assigning an image stream as its background, attaching it to the second page of a PDF, and saving the document.",
+      "tags": [
+        "background",
+        "artifact",
+        "image",
+        "pdf",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75768"
+    },
+    "add-background-image-to-pdf-page__v4": {
+      "title": "Add Background Image to PDF Page Using a Stream",
+      "filename": "add-background-image-to-pdf-page__v4.cs",
+      "description": "Demonstrates how to create a BackgroundArtifact, set its BackgroundImage from a file stream, attach it to the third page of a PDF, and save the modified document.",
+      "tags": [
+        "background",
+        "artifact",
+        "pdf",
+        "image",
+        "stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.ArtifactCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75769"
+    },
+    "add-background-image-to-pdf-page__v5": {
+      "title": "Add Background Image to a PDF Page",
+      "filename": "add-background-image-to-pdf-page__v5.cs",
+      "description": "Shows how to load an image stream, configure a BackgroundArtifact, attach it to the fourth page of a PDF, and save the updated document.",
+      "tags": [
+        "background",
+        "artifact",
+        "pdf",
+        "image",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75770"
+    },
+    "add-background-image-to-pdf-page__v6": {
+      "title": "Add Background Image to PDF Page Using Stream",
+      "filename": "add-background-image-to-pdf-page__v6.cs",
+      "description": "Demonstrates creating a BackgroundArtifact, assigning an image stream as its BackgroundImage, attaching it to the fifth page of a PDF, and saving the document.",
+      "tags": [
+        "background",
+        "artifact",
+        "image",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75771"
+    },
+    "add-background-image-to-pdf-page__v7": {
+      "title": "Add Background Image to PDF Page",
+      "filename": "add-background-image-to-pdf-page__v7.cs",
+      "description": "Shows how to create a BackgroundArtifact, set its BackgroundImage from a memory stream, attach it to a specific page (page 6) of a PDF, and save the document with the background applied.",
+      "tags": [
+        "background",
+        "artifact",
+        "page",
+        "image",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75772"
+    },
+    "add-different-background-images-to-pdf-pages": {
+      "title": "Add Different Background Images to PDF Pages",
+      "filename": "add-different-background-images-to-pdf-pages.cs",
+      "description": "Shows how to load image streams, create BackgroundArtifact objects for each, assign them to separate PDF pages, and save the resulting document.",
+      "tags": [
+        "background",
+        "artifact",
+        "pdf",
+        "image",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75773"
+    },
+    "create-pdf-unique-background-per-page": {
+      "title": "Create PDF with Unique Background Image per Page",
+      "filename": "create-pdf-unique-background-per-page.cs",
+      "description": "Shows how to generate a PDF, add five pages, set a different background image on each page, and save the file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "background-image",
+        "pages",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75774"
+    },
+    "set-different-background-images-for-pdf-pages": {
+      "title": "Set Different Background Images for PDF Pages",
+      "filename": "set-different-background-images-for-pdf-pages.cs",
+      "description": "Demonstrates how to add three pages to a PDF and assign a distinct background image to each page using image streams.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "pages",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Image.ImageStream",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75775"
+    },
+    "set-different-background-colors-for-pdf-pages": {
+      "title": "Set Different Background Colors for PDF Pages",
+      "filename": "set-different-background-colors-for-pdf-pages.cs",
+      "description": "Shows how to create a PDF document, add two pages, and assign distinct background colors to each page using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "page",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.Background",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75776"
+    },
+    "apply-background-image-to-first-three-pdf-pages": {
+      "title": "Apply Background Image to First Three PDF Pages",
+      "filename": "apply-background-image-to-first-three-pdf-pages.cs",
+      "description": "Demonstrates how to attach a background image to the first three pages of a PDF document and save the modified file using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "stamp",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.ImageStamp.Background",
+        "Aspose.Pdf.ImageStamp.Opacity"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75777"
+    },
+    "add-background-image-to-last-page": {
+      "title": "Add Background Image to Last Page of PDF",
+      "filename": "add-background-image-to-last-page.cs",
+      "description": "Demonstrates how to attach a background image to the final page of a six‑page PDF using Aspose.Pdf and save the modified document.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "stamp",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75778"
+    },
+    "add-background-image-first-page-blank-page": {
+      "title": "Add Background Image to First Page and Append Blank Page",
+      "filename": "add-background-image-first-page-blank-page.cs",
+      "description": "Loads an existing PDF (or creates a new one), applies a background image to the first page using an ImageStamp, adds a blank page, and saves the modified document.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose.pdf",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75779"
+    },
+    "add-image-background-to-pdf-pages": {
+      "title": "Add Image Background to PDF Pages",
+      "filename": "add-image-background-to-pdf-pages.cs",
+      "description": "Shows how to load an image into memory, create BackgroundArtifact objects, assign them as page backgrounds for multiple pages, and save the resulting PDF using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "Aspose.Pdf",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Artifacts"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75780"
+    },
+    "add-different-background-images-to-pdf-pages__v2": {
+      "title": "Add Different Background Images to PDF Pages",
+      "filename": "add-different-background-images-to-pdf-pages__v2.cs",
+      "description": "Shows how to load image files as BackgroundArtifact objects, assign each to a separate PDF page, and save the document.",
+      "tags": [
+        "background",
+        "artifact",
+        "pdf",
+        "image",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.BackgroundArtifact.SetImage",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75781"
+    },
+    "add-different-background-images-to-pdf-pages__v3": {
+      "title": "Add Different Background Images to PDF Pages",
+      "filename": "add-different-background-images-to-pdf-pages__v3.cs",
+      "description": "Shows how to apply a background image to the first page and a different background image to the second page of an existing PDF using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "stamp",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75782"
+    },
+    "add-background-image-to-page-three": {
+      "title": "Add Background Image to Specific PDF Page",
+      "filename": "add-background-image-to-page-three.cs",
+      "description": "Shows how to place a background image on the third page of an existing PDF while keeping all other pages unchanged using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose",
+        "stamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75783"
+    },
+    "add-background-image-to-pdf-page__v8": {
+      "title": "Add Background Image to PDF Page",
+      "filename": "add-background-image-to-pdf-page__v8.cs",
+      "description": "Demonstrates how to open an existing PDF, attach a background image to the third page using a BackgroundArtifact, and save the modified document.",
+      "tags": [
+        "background",
+        "artifact",
+        "pdf",
+        "image",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75784"
+    },
+    "set-page-background-image": {
+      "title": "Set Page Background Image in PDF",
+      "filename": "set-page-background-image.cs",
+      "description": "Demonstrates loading an image file and assigning it as the background image of a PDF page using Aspose.PDF, then saving the document.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Image",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75785"
+    },
+    "add-background-image-to-first-pdf-page": {
+      "title": "Add Background Image to First PDF Page",
+      "filename": "add-background-image-to-first-pdf-page.cs",
+      "description": "Shows how to place a full‑page background image on the first page of a newly created PDF document using Aspose.Pdf and then save the file.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose",
+        "stamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.PageInfo",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75786"
+    },
+    "add-decorative-background-image-to-pdf-page": {
+      "title": "Add Decorative Background Image to PDF Page",
+      "filename": "add-decorative-background-image-to-pdf-page.cs",
+      "description": "Demonstrates how to place an image as a background on the first page of a PDF using Aspose.Pdf and then save the document.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75787"
+    },
+    "add-background-image-watermark-to-pdf": {
+      "title": "Add Background Image Watermark to PDF Pages",
+      "filename": "add-background-image-watermark-to-pdf.cs",
+      "description": "Demonstrates how to apply a background image as a watermark to each page of a PDF using Aspose.Pdf and save the modified document.",
+      "tags": [
+        "watermark",
+        "background",
+        "image",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75788"
+    },
+    "add-background-image-to-first-pdf-page__v2": {
+      "title": "Add Background Image to First PDF Page",
+      "filename": "add-background-image-to-first-pdf-page__v2.cs",
+      "description": "Demonstrates loading an image stream, creating a BackgroundArtifact, assigning it to the first page of a PDF, and saving the document with only that page having a background.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose-pdf",
+        "page-artifact"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Artifacts.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75789"
+    },
+    "set-pdf-page-background-image-from-stream": {
+      "title": "Set PDF Page Background Image from Stream",
+      "filename": "set-pdf-page-background-image-from-stream.cs",
+      "description": "Shows how to open an image file as a stream, assign it to a page's BackgroundImage property, and keep the stream open until the PDF is saved.",
+      "tags": [
+        "background",
+        "image",
+        "stream",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Image",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75790"
+    },
+    "set-page-background-image__v2": {
+      "title": "Set Page Background Image with BackgroundArtifact",
+      "filename": "set-page-background-image__v2.cs",
+      "description": "Demonstrates how to load an image stream, create a BackgroundArtifact, assign the image as a page background, and save the PDF using Aspose.Pdf.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose-pdf",
+        "artifact"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75791"
+    },
+    "set-page-background-image-from-stream__v2": {
+      "title": "Set Page Background Image from Stream",
+      "filename": "set-page-background-image-from-stream__v2.cs",
+      "description": "Shows how to create a PDF document, add a page, load an image from a file stream and assign it as the page's background, then save the PDF.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Image",
+        "Aspose.Pdf.Page.BackgroundImage",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75792"
+    },
+    "create-pdf-with-image-background": {
+      "title": "Create PDF with Image Background Using BackgroundArtifact",
+      "filename": "create-pdf-with-image-background.cs",
+      "description": "Shows how to load an image into a memory stream, create BackgroundArtifact objects, apply the same background to multiple PDF pages, and save the document.",
+      "tags": [
+        "background",
+        "image",
+        "pdf",
+        "aspose",
+        "memorystream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Artifacts"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75793"
+    },
+    "add-same-background-image-to-multiple-pdf-pages": {
+      "title": "Add Same Background Image to Multiple PDF Pages",
+      "filename": "add-same-background-image-to-multiple-pdf-pages.cs",
+      "description": "Demonstrates creating a three‑page PDF and attaching the same background image to each page using a BackgroundArtifact.",
+      "tags": [
+        "background",
+        "artifact",
+        "pdf",
+        "image",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:12:43Z",
+      "status": "verified",
+      "task_id": "75794"
+    }
+  }
+}
