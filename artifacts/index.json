@@ -1,0 +1,453 @@
+{
+  "category": "artifacts",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-23T09:57:29Z",
+  "examples": {
+    "add-background-image-artifact": {
+      "title": "Add Background Image Artifact to PDF Page",
+      "filename": "add-background-image-artifact.cs",
+      "description": "Shows how to load a PDF, create a BackgroundArtifact from an image stream, add it to the first page, and save the updated document.",
+      "tags": [
+        "pdf",
+        "background",
+        "artifact",
+        "image",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74104"
+    },
+    "add-semi-transparent-text-watermark__v4": {
+      "title": "Add Semi-Transparent Text Watermark to All PDF Pages",
+      "filename": "add-semi-transparent-text-watermark__v4.cs",
+      "description": "Shows how to load a PDF, create a WatermarkArtifact with styled, semi‑transparent text, attach it to every page, and save the watermarked document.",
+      "tags": [
+        "watermark",
+        "pdf",
+        "artifact",
+        "text",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Artifacts.WatermarkArtifact",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74105"
+    },
+    "extract-watermark-texts-to-csv": {
+      "title": "Extract Watermark Texts from PDF Page to CSV",
+      "filename": "extract-watermark-texts-to-csv.cs",
+      "description": "Loads a PDF, reads all WatermarkArtifact texts from the first page, and writes them into a CSV file.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "artifact",
+        "csv",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74106"
+    },
+    "list-watermark-artifact-rectangles-page-2": {
+      "title": "List Watermark Artifact Rectangles on PDF Page 2",
+      "filename": "list-watermark-artifact-rectangles-page-2.cs",
+      "description": "The example loads a PDF, verifies that a second page exists, enumerates WatermarkArtifact objects on that page, and writes each artifact's rectangle coordinates to a text file.",
+      "tags": [
+        "watermark",
+        "artifact",
+        "pdf",
+        "coordinates",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Facades.WatermarkArtifact",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74107"
+    },
+    "set-watermark-opacity-first-page": {
+      "title": "Set Watermark Opacity on First PDF Page",
+      "filename": "set-watermark-opacity-first-page.cs",
+      "description": "Loads a PDF, iterates over WatermarkArtifact objects on the first page, sets their opacity to 0.5, and saves the modified document.",
+      "tags": [
+        "watermark",
+        "opacity",
+        "artifact",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74108"
+    },
+    "extract-background-images-from-pdf-page": {
+      "title": "Extract Background Images from PDF Page",
+      "filename": "extract-background-images-from-pdf-page.cs",
+      "description": "Loads a PDF, accesses page three, iterates its artifacts, extracts any BackgroundArtifact images, and saves them as PNG files to a specified folder.",
+      "tags": [
+        "pdf",
+        "background",
+        "artifact",
+        "image-extraction",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.XImage.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74109"
+    },
+    "add-multiple-watermark-artifacts-to-pdf-page": {
+      "title": "Add Multiple Watermark Artifacts to a PDF Page",
+      "filename": "add-multiple-watermark-artifacts-to-pdf-page.cs",
+      "description": "The example loads a PDF, accesses page five, adds two WatermarkArtifact objects to the page's ArtifactCollection, and saves the modified document.",
+      "tags": [
+        "watermark",
+        "artifact",
+        "pdf",
+        "page",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ArtifactCollection",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74110"
+    },
+    "add-footer-pagination-artifact": {
+      "title": "Add Footer Pagination Artifact to PDF Page",
+      "filename": "add-footer-pagination-artifact.cs",
+      "description": "Loads a PDF, creates a pagination footer artifact containing the page number, adds it to page six, and saves the modified document.",
+      "tags": [
+        "artifact",
+        "footer",
+        "pagination",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.FooterArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74111"
+    },
+    "count-background-artifacts-per-pdf-page": {
+      "title": "Count Background Artifacts per PDF Page",
+      "filename": "count-background-artifacts-per-pdf-page.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, iterating through its pages, counting BackgroundArtifact objects on each page, and writing a summary to a text file.",
+      "tags": [
+        "pdf",
+        "artifacts",
+        "background",
+        "summary",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.PageCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74112"
+    },
+    "add-bates-numbering-to-pdf-pages__v3": {
+      "title": "Add Bates Numbering to PDF Pages",
+      "filename": "add-bates-numbering-to-pdf-pages__v3.cs",
+      "description": "Shows how to load a PDF, generate sequential Bates numbers, apply them as TextStamp artifacts on each page, and save the updated document.",
+      "tags": [
+        "bates-numbering",
+        "text-stamp",
+        "pdf",
+        "aspose-pdf",
+        "artifacts"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74113"
+    },
+    "add-bates-numbering-to-pdf": {
+      "title": "Add Bates Numbering to PDF Pages",
+      "filename": "add-bates-numbering-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, applying a batch of custom Bates numbering artifacts to each page using TextFragment, and saving the modified document.",
+      "tags": [
+        "bates-numbering",
+        "pagination",
+        "pdf",
+        "textfragment",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Position",
+        "Aspose.Pdf.Page"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74114"
+    },
+    "remove-bates-numbering-artifacts": {
+      "title": "Remove Bates Numbering Artifacts from PDF",
+      "filename": "remove-bates-numbering-artifacts.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, iterate through each page's artifact collection, delete any Bates numbering artifacts, and save the cleaned document.",
+      "tags": [
+        "bates-numbering",
+        "artifacts",
+        "pdf",
+        "aspose-pdf",
+        "remove"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ArtifactCollection",
+        "Aspose.Pdf.BatesNArtifact",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74115"
+    },
+    "export-page2-artifact-rectangles-to-csv": {
+      "title": "Export Page 2 Artifact Rectangles to CSV",
+      "filename": "export-page2-artifact-rectangles-to-csv.cs",
+      "description": "Loads a PDF, extracts the rectangle bounds of all artifacts on the second page, and writes them to a CSV file.",
+      "tags": [
+        "pdf",
+        "artifacts",
+        "csv",
+        "rectangle",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page.Artifacts"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74116"
+    },
+    "replace-page-background-image": {
+      "title": "Replace Background Image of a PDF Page",
+      "filename": "replace-page-background-image.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, locate or create a BackgroundArtifact on page two, replace its background image with a new image, and save the updated document.",
+      "tags": [
+        "pdf",
+        "background-artifact",
+        "image-replacement",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74117"
+    },
+    "add-rotated-watermark-artifact-to-pdf-page": {
+      "title": "Add Rotated Watermark Artifact to PDF Page",
+      "filename": "add-rotated-watermark-artifact-to-pdf-page.cs",
+      "description": "Demonstrates loading a PDF, creating a WatermarkArtifact with a 45° rotation, adding it to the third page, and saving the updated document.",
+      "tags": [
+        "watermark",
+        "artifact",
+        "rotation",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.FontRepository.FindFont",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Page.Artifacts.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74118"
+    },
+    "export-page7-background-artifact-images-to-csv": {
+      "title": "Export Background Artifact Image Names from Page 7 to CSV",
+      "filename": "export-page7-background-artifact-images-to-csv.cs",
+      "description": "Loads a PDF, extracts BackgroundArtifact objects from the seventh page, and writes their internal image names to a CSV file.",
+      "tags": [
+        "pdf",
+        "artifact",
+        "background",
+        "csv",
+        "image"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.BackgroundArtifact",
+        "Aspose.Pdf.XImage",
+        "Aspose.Pdf.Page.Artifacts"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74119"
+    },
+    "count-pdf-pagination-artifacts": {
+      "title": "Count PDF Pagination Artifacts and Save to JSON",
+      "filename": "count-pdf-pagination-artifacts.cs",
+      "description": "Loads a PDF using Aspose.Pdf, counts the total number of pages (pagination artifacts), and writes the count to a JSON file.",
+      "tags": [
+        "pdf",
+        "pagination",
+        "count",
+        "json",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74120"
+    },
+    "extract-artifact-subtypes-page9-csv": {
+      "title": "Extract Artifact Subtypes from PDF Page 9 to CSV",
+      "filename": "extract-artifact-subtypes-page9-csv.cs",
+      "description": "Loads a PDF, accesses the ninth page, iterates through its artifacts, and writes each artifact's Subtype to a CSV file.",
+      "tags": [
+        "pdf",
+        "artifacts",
+        "csv",
+        "aspose",
+        "extraction"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Artifact",
+        "Aspose.Pdf.Artifact.Subtype"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74121"
+    },
+    "count-watermark-artifacts-per-page": {
+      "title": "Count WatermarkArtifacts per PDF Page and Generate Report",
+      "filename": "count-watermark-artifacts-per-page.cs",
+      "description": "Loads a PDF, iterates through each page, counts the WatermarkArtifact objects using LINQ, and writes a summary report to a text file.",
+      "tags": [
+        "pdf",
+        "watermark",
+        "artifact",
+        "linq",
+        "report"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.WatermarkArtifact",
+        "Aspose.Pdf.Page.Artifacts",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T09:57:29Z",
+      "status": "verified",
+      "task_id": "74122"
+    }
+  }
+}
