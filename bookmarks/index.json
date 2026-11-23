@@ -1,0 +1,817 @@
+{
+  "category": "bookmarks",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-23T11:50:57Z",
+  "examples": {
+    "add-top-level-bookmark-to-pdf": {
+      "title": "Add Top-Level Bookmark to PDF",
+      "filename": "add-top-level-bookmark-to-pdf.cs",
+      "description": "Loads a PDF, creates a top‑level bookmark named \"Introduction\" that points to the first page, and saves the updated document as a new file.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "Aspose.Pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.FitExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73663"
+    },
+    "add-chapter-one-bookmark-to-pdf": {
+      "title": "Add Chapter One Bookmark to PDF",
+      "filename": "add-chapter-one-bookmark-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a top‑level bookmark that points to page 5, and saving the updated document.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "csharp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73664"
+    },
+    "add-child-bookmark-to-pdf": {
+      "title": "Add Child Bookmark to Existing PDF",
+      "filename": "add-child-bookmark-to-pdf.cs",
+      "description": "Loads a PDF, finds the \"Chapter One\" outline item, creates a child bookmark \"Section 1.1\" that jumps to page 6, and saves the result as a new file.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "Aspose.Pdf",
+        "GoToAction",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73665"
+    },
+    "remove-all-bookmarks-from-pdf__v2": {
+      "title": "Remove All Bookmarks from a PDF",
+      "filename": "remove-all-bookmarks-from-pdf__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, clear its outline collection to delete all bookmarks, and save the modified document.",
+      "tags": [
+        "bookmarks",
+        "outlines",
+        "pdf",
+        "delete",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineCollection.Clear",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73666"
+    },
+    "delete-pdf-bookmark-by-title": {
+      "title": "Delete a PDF Bookmark by Title",
+      "filename": "delete-pdf-bookmark-by-title.cs",
+      "description": "Shows how to load a PDF, remove a bookmark with a specific title using OutlineCollection.Delete, and save the modified document.",
+      "tags": [
+        "bookmark",
+        "delete",
+        "outline",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineCollection.Delete",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73667"
+    },
+    "extract-pdf-bookmark-titles": {
+      "title": "Extract PDF Bookmark Titles to Text File",
+      "filename": "extract-pdf-bookmark-titles.cs",
+      "description": "Loads a PDF, recursively traverses its outline (bookmarks) and writes each bookmark title to a text file while leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "extract",
+        "Aspose.Pdf",
+        "text-file"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.OutlineItemCollection.Title",
+        "Aspose.Pdf.OutlineItemCollection.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73668"
+    },
+    "retrieve-bookmark-destination-page-number": {
+      "title": "Retrieve Bookmark Destination Page Number and Save to Text File",
+      "filename": "retrieve-bookmark-destination-page-number.cs",
+      "description": "Loads a PDF, searches for the bookmark named \"Chapter One\", extracts its destination page number (handling explicit and action‑based destinations), and writes the page number to a text file without modifying the PDF.",
+      "tags": [
+        "bookmarks",
+        "destination",
+        "page-number",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.FitExplicitDestination",
+        "Aspose.Pdf.Annotations.GoToAction"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73669"
+    },
+    "extract-child-bookmarks": {
+      "title": "Extract Child Bookmarks of a Specific Parent",
+      "filename": "extract-child-bookmarks.cs",
+      "description": "Loads a PDF, locates the bookmark named \"Introduction\" and writes the titles of its direct child bookmarks to a text file, leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "Aspose.Pdf",
+        "extract",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.OutlineItemCollection.Title"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73670"
+    },
+    "update-pdf-bookmark-title__v2": {
+      "title": "Update PDF Bookmark Title",
+      "filename": "update-pdf-bookmark-title__v2.cs",
+      "description": "Loads a PDF, retrieves the first top‑level bookmark, changes its title to \"Preface\", and saves the modified document.",
+      "tags": [
+        "bookmarks",
+        "title",
+        "update",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItem",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73671"
+    },
+    "update-bookmark-destination": {
+      "title": "Modify PDF Bookmark Destination",
+      "filename": "update-bookmark-destination.cs",
+      "description": "Demonstrates loading a PDF, accessing a bookmark by its index, changing its destination to a specific page using XYZExplicitDestination, and saving the updated document.",
+      "tags": [
+        "bookmark",
+        "destination",
+        "outline",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73672"
+    },
+    "update-first-section-title": {
+      "title": "Update First Section Title Under Chapter One in a Tagged PDF",
+      "filename": "update-first-section-title.cs",
+      "description": "Loads a tagged PDF, finds the header element \"Chapter One\", changes the text of its first child element, and saves the document as a new file.",
+      "tags": [
+        "tagged-pdf",
+        "structure-tree",
+        "header-element",
+        "text-modification",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.HeaderElement",
+        "Aspose.Pdf.Tagged.Element",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73673"
+    },
+    "expand-all-bookmarks": {
+      "title": "Expand All Bookmarks in a PDF",
+      "filename": "expand-all-bookmarks.cs",
+      "description": "Loads a PDF, recursively sets the Open property of every bookmark (outline) to true, and saves the result as a new file with all bookmarks expanded.",
+      "tags": [
+        "bookmarks",
+        "outlines",
+        "expand",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73674"
+    },
+    "add-top-level-bookmarks-to-pdf": {
+      "title": "Add Top-Level Bookmarks to PDF",
+      "filename": "add-top-level-bookmarks-to-pdf.cs",
+      "description": "The example loads an existing PDF, creates three top‑level outline items (bookmarks) that navigate to pages 3, 15, and 27, and saves the modified document as a new file.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "pdf",
+        "pages",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73675"
+    },
+    "add-figure-bookmark-under-appendix-a": {
+      "title": "Add Figure Bookmark under Appendix A",
+      "filename": "add-figure-bookmark-under-appendix-a.cs",
+      "description": "Loads a PDF, ensures a parent bookmark named \"Appendix A\" exists, adds a child bookmark \"Figure 1\" that points to page 23, and saves the modified file.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "csharp",
+        "page-destination"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.FitExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73676"
+    },
+    "reset-pdf-bookmarks-add-new-bookmark": {
+      "title": "Reset PDF Bookmarks and Add a New Top-Level Bookmark",
+      "filename": "reset-pdf-bookmarks-add-new-bookmark.cs",
+      "description": "The example loads a PDF, removes all existing bookmarks (outlines), creates a new top-level bookmark pointing to page 1, and saves the result as a new file.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "pdf",
+        "Aspose.Pdf",
+        "reset"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.FitExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73677"
+    },
+    "replace-bookmark-add-child": {
+      "title": "Replace a Bookmark and Add a Child Bookmark in PDF",
+      "filename": "replace-bookmark-add-child.cs",
+      "description": "Loads a PDF, removes an existing bookmark, then creates a new child bookmark under a parent outline that points to page 4, and saves the modified document.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "pdf-modification",
+        "aspose",
+        "page-navigation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Outlines"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73678"
+    },
+    "export-pdf-bookmarks-to-json__v2": {
+      "title": "Export PDF Bookmarks to JSON",
+      "filename": "export-pdf-bookmarks-to-json__v2.cs",
+      "description": "Loads a PDF, traverses its outline (bookmarks) to collect each title and destination, and writes the data to a JSON file while leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "json",
+        "export",
+        "outline",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.OutlineItemCollection.Title",
+        "Aspose.Pdf.OutlineItemCollection.Destination"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73679"
+    },
+    "add-glossary-bookmark-to-pdf": {
+      "title": "Add Glossary Bookmark to PDF",
+      "filename": "add-glossary-bookmark-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a top‑level bookmark that points to page 45, setting it to open on launch, and saving the result.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73680"
+    },
+    "add-parent-child-bookmarks-to-pdf": {
+      "title": "Add Parent-Child Bookmarks to PDF",
+      "filename": "add-parent-child-bookmarks-to-pdf.cs",
+      "description": "Loads a PDF, verifies it has at least 51 pages, creates a parent bookmark \"Index\" on page 50 and a child bookmark \"A-Z\" on page 51 using XYZExplicitDestination, and saves the result as index.pdf.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "pdf",
+        "Aspose.Pdf",
+        "parent-child"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73681"
+    },
+    "count-top-level-bookmarks": {
+      "title": "Count Top-Level Bookmarks in PDF",
+      "filename": "count-top-level-bookmarks.cs",
+      "description": "Loads a PDF file, retrieves the number of top‑level bookmarks (outlines) and writes that count to a text file while leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "pdf",
+        "count",
+        "Aspose.Pdf",
+        "file-output"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineCollection.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73682"
+    },
+    "retrieve-child-bookmark-count": {
+      "title": "Retrieve Child Bookmark Count from PDF",
+      "filename": "retrieve-child-bookmark-count.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, locating a top‑level bookmark named \"Chapter One\", counting its direct child bookmarks, and writing the count to a text file while leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "count",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.OutlineItemCollection.Title",
+        "Aspose.Pdf.OutlineItemCollection.Count"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73683"
+    },
+    "add-expanded-child-bookmark-under-introduction": {
+      "title": "Add Expanded Child Bookmark under Introduction",
+      "filename": "add-expanded-child-bookmark-under-introduction.cs",
+      "description": "Loads a PDF, finds the \"Introduction\" bookmark, adds a child bookmark named \"Note\" with the Open property set to true, and saves the result as a new file.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "Aspose.Pdf",
+        "C#",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineItemCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73684"
+    },
+    "update-pdf-bookmark-destination": {
+      "title": "Update PDF Bookmark Destination",
+      "filename": "update-pdf-bookmark-destination.cs",
+      "description": "Loads a PDF, finds a bookmark named \"References\", changes its destination to page 48, and saves the modified file.",
+      "tags": [
+        "bookmark",
+        "destination",
+        "pdf",
+        "outline",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73685"
+    },
+    "rename-child-bookmark-pdf": {
+      "title": "Rename a Child Bookmark in a PDF",
+      "filename": "rename-child-bookmark-pdf.cs",
+      "description": "Demonstrates how to load a PDF, locate a top‑level bookmark and its child, rename the child bookmark, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "bookmarks",
+        "rename",
+        "pdf",
+        "outline",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.OutlineItemCollection.Title"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73686"
+    },
+    "expand-bookmarks-delete-appendix-a": {
+      "title": "Expand All Bookmarks and Delete a Specific Bookmark",
+      "filename": "expand-bookmarks-delete-appendix-a.cs",
+      "description": "The example loads a PDF, expands every bookmark in the outline tree, removes the bookmark titled \"Appendix A\", and saves the result as a new file.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "delete",
+        "expand",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineCollection",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.OutlineItemCollection.Open",
+        "Aspose.Pdf.OutlineItemCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73687"
+    },
+    "add-top-level-bookmark-to-pdf__v2": {
+      "title": "Add Top-Level Bookmark to PDF",
+      "filename": "add-top-level-bookmark-to-pdf__v2.cs",
+      "description": "Loads a PDF, creates a top‑level bookmark named \"Chapter Three\" that points to page 60, and saves the result as a new file.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "page",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73688"
+    },
+    "add-child-bookmark-to-pdf-outline": {
+      "title": "Add Child Bookmark to PDF Outline",
+      "filename": "add-child-bookmark-to-pdf-outline.cs",
+      "description": "Shows how to locate an existing bookmark in a PDF, create a child bookmark that points to a specific page, set it to be expanded, and save the updated document.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "child-bookmark",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Outlines"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73689"
+    },
+    "extract-top-level-bookmark-page-numbers": {
+      "title": "Extract Top-Level Bookmark Page Numbers from PDF",
+      "filename": "extract-top-level-bookmark-page-numbers.cs",
+      "description": "Loads a PDF, reads the page number of each top‑level bookmark (outline) and writes those numbers to a text file while leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "page-numbers",
+        "outlines",
+        "Aspose.Pdf",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.FitExplicitDestination",
+        "Aspose.Pdf.Annotations.FitHExplicitDestination",
+        "Aspose.Pdf.Annotations.FitVExplicitDestination",
+        "Aspose.Pdf.Annotations.FitRExplicitDestination"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73690"
+    },
+    "add-delete-top-level-bookmark": {
+      "title": "Add and Delete a Top-Level PDF Bookmark",
+      "filename": "add-delete-top-level-bookmark.cs",
+      "description": "Demonstrates loading a PDF, creating a top‑level bookmark on a specific page with the Open flag set, removing the same bookmark, and saving the modified document.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "aspnet",
+        "delete"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineCollection.Add",
+        "Aspose.Pdf.OutlineCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73691"
+    },
+    "add-top-level-bookmark-export-outline": {
+      "title": "Add Top-Level Bookmark and Export Outline Hierarchy",
+      "filename": "add-top-level-bookmark-export-outline.cs",
+      "description": "Demonstrates how to add a top‑level bookmark pointing to page 2, set it to open on document load, and export the entire bookmark hierarchy to a text file.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "export",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73692"
+    },
+    "add-update-top-level-bookmark": {
+      "title": "Add and Update a Top-Level Bookmark in a PDF",
+      "filename": "add-update-top-level-bookmark.cs",
+      "description": "Demonstrates how to create a top‑level bookmark (outline) on the first page of a PDF, modify its title, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "Aspose.Pdf",
+        "update"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73693"
+    },
+    "delete-add-pdf-bookmark": {
+      "title": "Delete and Add Top-Level Bookmark in PDF",
+      "filename": "delete-add-pdf-bookmark.cs",
+      "description": "Demonstrates how to load a PDF, remove an existing bookmark, create a new top‑level bookmark that points to the first page, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "bookmark",
+        "pdf",
+        "outline",
+        "delete",
+        "add"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73694"
+    },
+    "open-child-bookmarks-under-chapter-one": {
+      "title": "Open Child Bookmarks Under a Specific Bookmark",
+      "filename": "open-child-bookmarks-under-chapter-one.cs",
+      "description": "Loads a PDF, finds the bookmark titled \"Chapter One\", sets the Open property of all its direct child bookmarks to true, and saves the result as a new file.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "open",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.OutlineItemCollection.Open"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73695"
+    },
+    "count-pdf-bookmarks": {
+      "title": "Count PDF Bookmarks and Save Total",
+      "filename": "count-pdf-bookmarks.cs",
+      "description": "Loads a PDF, recursively counts all outline bookmarks, and writes the total number to a text file while leaving the PDF unchanged.",
+      "tags": [
+        "bookmarks",
+        "outline",
+        "count",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.OutlineItemCollection"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73696"
+    },
+    "add-top-level-bookmark-to-pdf__v3": {
+      "title": "Add Top-Level Bookmark to PDF",
+      "filename": "add-top-level-bookmark-to-pdf__v3.cs",
+      "description": "Shows how to load a PDF, create a top‑level bookmark that navigates to page 1, and save the modified document.",
+      "tags": [
+        "bookmark",
+        "outline",
+        "pdf",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.OutlineItemCollection",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.Outlines",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T11:50:57Z",
+      "status": "verified",
+      "task_id": "73697"
+    }
+  }
+}
