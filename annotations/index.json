@@ -1,0 +1,3992 @@
+{
+  "category": "annotations",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-23T04:48:19Z",
+  "examples": {
+    "add-text-annotation-to-pdf-page__v3": {
+      "title": "Add Text Annotation to PDF Page",
+      "filename": "add-text-annotation-to-pdf-page__v3.cs",
+      "description": "Shows how to load a PDF, create a text annotation on the first page, and save the modified document.",
+      "tags": [
+        "annotation",
+        "text",
+        "pdf",
+        "Aspose",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73838"
+    },
+    "highlight-text-on-pdf-page": {
+      "title": "Highlight Text on PDF Page",
+      "filename": "highlight-text-on-pdf-page.cs",
+      "description": "Loads a PDF, searches for a specific text string on page 2, creates a yellow highlight annotation over the found text, and saves the modified document.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "text-search",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73839"
+    },
+    "add-figure-annotation-to-pdf-page-3": {
+      "title": "Add Figure Annotation to PDF Page 3",
+      "filename": "add-figure-annotation-to-pdf-page-3.cs",
+      "description": "Demonstrates loading a PDF, creating a square (figure) annotation with a colored border on page 3, and saving the modified document.",
+      "tags": [
+        "annotation",
+        "square",
+        "pdf",
+        "page3",
+        "border"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73840"
+    },
+    "add-video-rich-media-annotation": {
+      "title": "Add Video Rich Media Annotation to PDF Page",
+      "filename": "add-video-rich-media-annotation.cs",
+      "description": "Demonstrates loading a PDF, embedding a video as a Rich Media annotation on page 4, and saving the updated document.",
+      "tags": [
+        "richmedia",
+        "video",
+        "annotation",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaContent",
+        "Aspose.Pdf.Annotations.RichMediaAsset",
+        "Aspose.Pdf.Annotations.RichMediaSettings",
+        "Aspose.Pdf.Annotations.RichMediaActivation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73841"
+    },
+    "add-sticky-note-annotation-to-pdf__v2": {
+      "title": "Add Sticky Note Annotation to PDF Page",
+      "filename": "add-sticky-note-annotation-to-pdf__v2.cs",
+      "description": "Demonstrates loading a PDF, creating a sticky‑note (text) annotation on a specific page, and saving the modified document.",
+      "tags": [
+        "annotation",
+        "sticky-note",
+        "pdf",
+        "Aspose.Pdf",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73842"
+    },
+    "add-custom-annotation-to-pdf-page-7": {
+      "title": "Add Custom Text Annotation to PDF Page 7",
+      "filename": "add-custom-annotation-to-pdf-page-7.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, adding a custom text annotation to page 7, and saving the modified document.",
+      "tags": [
+        "annotation",
+        "pdf",
+        "aspose-pdf",
+        "text-annotation",
+        "page-7"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73843"
+    },
+    "add-text-and-highlight-annotations-to-pdf-page": {
+      "title": "Add Text and Highlight Annotations to a PDF Page",
+      "filename": "add-text-and-highlight-annotations-to-pdf-page.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, add a text annotation and a highlight annotation to page 8, and save the modified document.",
+      "tags": [
+        "annotations",
+        "text-annotation",
+        "highlight",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73844"
+    },
+    "add-figure-and-rich-media-annotation": {
+      "title": "Add Figure and Rich Media Annotation to a PDF",
+      "filename": "add-figure-and-rich-media-annotation.cs",
+      "description": "Demonstrates how to load a PDF, insert a tagged Figure element for accessibility, and place a Rich Media (multimedia) annotation on page 9, then save the updated document.",
+      "tags": [
+        "figure",
+        "rich-media",
+        "annotation",
+        "tagged-pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Annotations.RichMediaContent",
+        "Aspose.Pdf.Annotations.RichMediaConfiguration",
+        "Aspose.Pdf.Annotations.RichMediaActivation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73845"
+    },
+    "add-sticky-note-annotation": {
+      "title": "Add Sticky Note Annotation to PDF",
+      "filename": "add-sticky-note-annotation.cs",
+      "description": "Demonstrates loading a PDF, creating a TextAnnotation (sticky note) on the first page, retrieving its contents, and saving the updated document.",
+      "tags": [
+        "annotation",
+        "sticky-note",
+        "pdf",
+        "textannotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73846"
+    },
+    "add-delete-link-annotation": {
+      "title": "Add and Delete Link Annotation in PDF",
+      "filename": "add-delete-link-annotation.cs",
+      "description": "Shows how to load a PDF, add a link annotation to a page, remove it by its index, and save the modified document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "link",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Page.Annotations.Add",
+        "Page.Annotations.Delete",
+        "Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73847"
+    },
+    "add-text-annotation-export-xfdf": {
+      "title": "Add Text Annotation and Export to XFDF",
+      "filename": "add-text-annotation-export-xfdf.cs",
+      "description": "Shows how to load a PDF, add a text annotation to the first page, export all text annotations to an XFDF file via a FileStream, and save the modified PDF.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "xfdf",
+        "export",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73848"
+    },
+    "add-highlight-annotation-export-xfdf": {
+      "title": "Add Highlight Annotation and Export to XFDF",
+      "filename": "add-highlight-annotation-export-xfdf.cs",
+      "description": "Demonstrates loading a PDF, adding a yellow highlight annotation to the first page, exporting all annotations to XFDF using a MemoryStream, and saving the modified document.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "xfdf",
+        "pdf",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73849"
+    },
+    "add-multimedia-annotation-export-xfdf": {
+      "title": "Add Multimedia Annotation and Export Annotations to XFDF",
+      "filename": "add-multimedia-annotation-export-xfdf.cs",
+      "description": "Demonstrates loading a PDF, adding a screen (video/audio) annotation, exporting all annotations to XFDF using a MemoryStream, and saving the updated PDF.",
+      "tags": [
+        "annotation",
+        "multimedia",
+        "xfdf",
+        "screen-annotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.ScreenAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73850"
+    },
+    "add-sticky-annotation-export-xfdf": {
+      "title": "Add Sticky Annotation and Export Annotations to XFDF",
+      "filename": "add-sticky-annotation-export-xfdf.cs",
+      "description": "Demonstrates loading a PDF, adding a sticky note (text annotation) to the first page, exporting all annotations to an XFDF file via a FileStream, and saving the updated PDF.",
+      "tags": [
+        "annotation",
+        "sticky-note",
+        "xfdf",
+        "export",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73851"
+    },
+    "add-link-annotation-export-xfdf": {
+      "title": "Add Link Annotation and Export Annotations to XFDF",
+      "filename": "add-link-annotation-export-xfdf.cs",
+      "description": "Demonstrates loading a PDF, adding a clickable link annotation to the first page, exporting all link annotations to XFDF using a MemoryStream, and saving the modified PDF.",
+      "tags": [
+        "link-annotation",
+        "xfdf",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73852"
+    },
+    "add-text-highlight-sticky-annotations-xfdf": {
+      "title": "Add Text, Highlight and Sticky Note Annotations and Export to XFDF",
+      "filename": "add-text-highlight-sticky-annotations-xfdf.cs",
+      "description": "The example loads a PDF, adds a text fragment, a highlight annotation and a sticky note, exports all annotations to XFDF using a MemoryStream, and saves the updated PDF.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "xfdf",
+        "highlight",
+        "text"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73853"
+    },
+    "export-text-annotations-to-xfdf": {
+      "title": "Export Text Annotations to XFDF and Remove Them",
+      "filename": "export-text-annotations-to-xfdf.cs",
+      "description": "The example loads a PDF, adds a text annotation, exports all text annotations to XFDF using a MemoryStream, deletes the added annotation, and saves the modified PDF.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "xfdf",
+        "export",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Annotations.PageAnnotations.Add",
+        "Aspose.Pdf.Annotations.PageAnnotations.Delete"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73857"
+    },
+    "add-rich-media-annotation-export-xfdf": {
+      "title": "Add Rich Media Annotation and Export Annotations to XFDF",
+      "filename": "add-rich-media-annotation-export-xfdf.cs",
+      "description": "The example loads a PDF, creates a RichMedia (multimedia) annotation using reflection for version compatibility, adds it to the first page, exports all annotations to XFDF via a MemoryStream, and saves the updated PDF.",
+      "tags": [
+        "richmedia",
+        "annotation",
+        "xfdf",
+        "pdf",
+        "multimedia"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Annotations.RichMediaContent",
+        "Aspose.Pdf.Annotations.RichMediaSettings",
+        "Aspose.Pdf.Annotations.RichMediaActivation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73858"
+    },
+    "add-retrieve-delete-sticky-note-annotation": {
+      "title": "Add, Retrieve, and Delete Sticky Note Annotation in PDF",
+      "filename": "add-retrieve-delete-sticky-note-annotation.cs",
+      "description": "Shows how to load a PDF, add a text (sticky note) annotation, read its contents, remove it, and save the updated document.",
+      "tags": [
+        "annotation",
+        "sticky-note",
+        "pdf",
+        "text-annotation",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Page.Annotations.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73859"
+    },
+    "add-link-annotation-export-xfdf__v2": {
+      "title": "Add Link Annotation and Export to XFDF",
+      "filename": "add-link-annotation-export-xfdf__v2.cs",
+      "description": "Demonstrates loading a PDF, adding a clickable link annotation to the first page, exporting all link annotations to an XFDF file, and saving the updated PDF.",
+      "tags": [
+        "link-annotation",
+        "xfdf",
+        "pdf",
+        "annotations",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73860"
+    },
+    "import-xfdf-annotations-add-text-annotation": {
+      "title": "Import XFDF Annotations and Add Text Annotation to PDF",
+      "filename": "import-xfdf-annotations-add-text-annotation.cs",
+      "description": "The example loads a PDF, adds a manual text annotation, imports additional annotations from an XFDF string via a MemoryStream, and saves the updated document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "xfdf",
+        "import",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Annotations.TextIcon"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73861"
+    },
+    "add-text-highlight-figure-annotation-delete-highlight": {
+      "title": "Add Text, Highlight and Figure Annotations and Delete Highlight in PDF",
+      "filename": "add-text-highlight-figure-annotation-delete-highlight.cs",
+      "description": "The example loads a PDF, adds a text fragment, a highlight annotation and a square (figure) annotation, then removes the highlight by its index and saves the modified document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "highlight",
+        "text",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73862"
+    },
+    "add-rich-media-and-sticky-note-annotations": {
+      "title": "Add Rich Media and Sticky Note Annotations, Then Remove Sticky Note",
+      "filename": "add-rich-media-and-sticky-note-annotations.cs",
+      "description": "The example loads a PDF, adds a Rich Media annotation with embedded video (using reflection for version‑independent support) and a sticky‑note annotation, then removes the sticky note and saves the document.",
+      "tags": [
+        "rich-media",
+        "annotation",
+        "sticky-note",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Page.Annotations.Remove",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73863"
+    },
+    "add-link-and-text-annotations": {
+      "title": "Add Link and Text Annotations and Retrieve Link Destination",
+      "filename": "add-link-and-text-annotations.cs",
+      "description": "Demonstrates loading a PDF, adding a link annotation that navigates to another page, adding a text annotation, reading the link's destination, and saving the modified document.",
+      "tags": [
+        "link-annotation",
+        "text-annotation",
+        "pdf-annotations",
+        "aspose-pdf",
+        "go-to-action"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73864"
+    },
+    "add-highlight-annotation-export-xfdf__v2": {
+      "title": "Add Highlight Annotation and Export to XFDF",
+      "filename": "add-highlight-annotation-export-xfdf__v2.cs",
+      "description": "Demonstrates loading a PDF, adding a highlight annotation, exporting all highlight annotations to an XFDF file via a stream, and saving the modified PDF.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "xfdf",
+        "export",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73865"
+    },
+    "add-figure-annotation-export-xfdf": {
+      "title": "Add Figure Annotation and Export to XFDF",
+      "filename": "add-figure-annotation-export-xfdf.cs",
+      "description": "Demonstrates loading a PDF, adding a square (figure) annotation, exporting all annotations to XFDF via a MemoryStream, and saving the modified PDF.",
+      "tags": [
+        "annotation",
+        "xfdf",
+        "pdf",
+        "aspose",
+        "export"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Document.ExportAnnotationsToXfdf",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73866"
+    },
+    "add-sticky-note-and-export-xfdf": {
+      "title": "Add Sticky Note Annotation and Export to XFDF",
+      "filename": "add-sticky-note-and-export-xfdf.cs",
+      "description": "Demonstrates how to add a text (sticky note) annotation to a PDF, save the document, and then export the annotations to XFDF using a memory stream.",
+      "tags": [
+        "annotations",
+        "sticky-note",
+        "xfdf",
+        "export",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.ExportAnnotationsToXfdf"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73867"
+    },
+    "add-text-annotation-to-pdf-page__v4": {
+      "title": "Add Text Annotation to PDF Page",
+      "filename": "add-text-annotation-to-pdf-page__v4.cs",
+      "description": "Demonstrates how to create a TextAnnotation with a title and contents, add it to the first page of a PDF, and save the modified document.",
+      "tags": [
+        "text-annotation",
+        "pdf",
+        "annotations",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73868"
+    },
+    "add-linked-popup-annotation-to-text-annotation": {
+      "title": "Add Popup Annotation Linked to Text Annotation",
+      "filename": "add-linked-popup-annotation-to-text-annotation.cs",
+      "description": "The example opens an existing PDF, creates a TextAnnotation on page 2, adds a PopupAnnotation linked to it, and saves the modified document.",
+      "tags": [
+        "annotation",
+        "popup",
+        "text",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73869"
+    },
+    "create-freetext-callout-annotation": {
+      "title": "Create FreeText Callout Annotation on PDF Page",
+      "filename": "create-freetext-callout-annotation.cs",
+      "description": "Demonstrates how to add a FreeText annotation with a callout line, custom font, color, and border to the third page of a PDF using Aspose.Pdf, then saves the document.",
+      "tags": [
+        "freetext",
+        "callout",
+        "annotation",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Text.DefaultAppearance",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.FreeTextIntent"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73870"
+    },
+    "create-invisible-freetext-annotation": {
+      "title": "Create Invisible FreeText Annotation in PDF",
+      "filename": "create-invisible-freetext-annotation.cs",
+      "description": "Demonstrates how to add a FreeTextAnnotation to a PDF, set its Flags to Print | NoView so it is not shown in viewers but still printable, and save the document.",
+      "tags": [
+        "free-text",
+        "annotation",
+        "invisible",
+        "flags",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73871"
+    },
+    "add-strikeout-annotation-to-found-text": {
+      "title": "Add StrikeOut Annotation to Found Text in PDF",
+      "filename": "add-strikeout-annotation-to-found-text.cs",
+      "description": "Demonstrates how to locate a specific text fragment using TextFragmentAbsorber, create a StrikeOutAnnotation at the fragment's coordinates, and save the updated PDF.",
+      "tags": [
+        "annotation",
+        "search",
+        "strikeout",
+        "pdf",
+        "text"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.StrikeOutAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73872"
+    },
+    "delete-all-annotations-from-page-4": {
+      "title": "Delete All Annotations from Page 4",
+      "filename": "delete-all-annotations-from-page-4.cs",
+      "description": "Shows how to remove every annotation on a specific PDF page using Aspose.Pdf and then save the modified document.",
+      "tags": [
+        "annotations",
+        "pdf",
+        "delete",
+        "page",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations",
+        "Aspose.Pdf.Annotations.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73873"
+    },
+    "delete-annotation-by-index": {
+      "title": "Delete Annotation by Index on Specific PDF Page",
+      "filename": "delete-annotation-by-index.cs",
+      "description": "Shows how to open a PDF, validate a page and annotation index, delete a specific annotation on page 2, and save the updated document.",
+      "tags": [
+        "annotation",
+        "delete",
+        "pdf",
+        "page",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.AnnotationCollection",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73874"
+    },
+    "summary-textannotation-from-page-5-annotations": {
+      "title": "Create Summary TextAnnotation from Page 5 Annotations",
+      "filename": "summary-textannotation-from-page-5-annotations.cs",
+      "description": "The example loads a PDF, extracts the titles of all markup annotations on page five, and adds a new TextAnnotation that summarizes those titles.",
+      "tags": [
+        "annotations",
+        "textannotation",
+        "summary",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.MarkupAnnotation",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73875"
+    },
+    "duplicate-annotation-page-3-to-page-6": {
+      "title": "Copy Annotation from Page 3 to Page 6",
+      "filename": "duplicate-annotation-page-3-to-page-6.cs",
+      "description": "The example loads a PDF, retrieves an annotation by its index on page three, duplicates its contents onto page six (handling TextAnnotation specially), and saves the modified document.",
+      "tags": [
+        "annotation",
+        "copy",
+        "pdf",
+        "Aspose.Pdf",
+        "page"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73876"
+    },
+    "import-annotations-from-xfdf": {
+      "title": "Import Annotations from XFDF into a PDF",
+      "filename": "import-annotations-from-xfdf.cs",
+      "description": "Demonstrates how to load a PDF, import annotations from an XFDF string via a memory stream, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "pdf",
+        "import",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73877"
+    },
+    "add-freetext-callout-annotation-xfdf": {
+      "title": "Add FreeText Callout Annotation via XFDF",
+      "filename": "add-freetext-callout-annotation-xfdf.cs",
+      "description": "Demonstrates creating an XFDF string that defines a FreeText annotation with a callout line, importing it into a PDF document, and saving the updated file.",
+      "tags": [
+        "xfdf",
+        "freetext",
+        "annotation",
+        "callout",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73878"
+    },
+    "add-freetext-annotation-default-appearance": {
+      "title": "Add FreeText Annotation with Default Appearance to PDF",
+      "filename": "add-freetext-annotation-default-appearance.cs",
+      "description": "Demonstrates how to create a FreeTextAnnotation, set its DefaultAppearance (font name, size, color), add it to a PDF page, and save the document using Aspose.Pdf.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "default-appearance",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73879"
+    },
+    "add-line-annotation-with-popup": {
+      "title": "Add Line Annotation with Popup to PDF",
+      "filename": "add-line-annotation-with-popup.cs",
+      "description": "Demonstrates how to create a LineAnnotation, attach a PopupAnnotation to it, add both to a PDF page, and save the document using Aspose.Pdf.",
+      "tags": [
+        "line-annotation",
+        "popup",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73880"
+    },
+    "add-freetext-annotation-at-text-position": {
+      "title": "Add FreeText Annotation at Located Text Position",
+      "filename": "add-freetext-annotation-at-text-position.cs",
+      "description": "The example searches for a specific string in a PDF using TextFragmentAbsorber, then places a FreeTextAnnotation over the found text and saves the modified document.",
+      "tags": [
+        "text-search",
+        "freetext-annotation",
+        "pdf-modification",
+        "Aspose.Pdf",
+        "annotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73881"
+    },
+    "add-multiple-text-annotations-to-pdf": {
+      "title": "Add Multiple Text Annotations to PDF Pages",
+      "filename": "add-multiple-text-annotations-to-pdf.cs",
+      "description": "Demonstrates how to create and add several TextAnnotation objects with titles and contents to different pages of a PDF document and then save the annotated file.",
+      "tags": [
+        "text-annotation",
+        "pdf",
+        "annotations",
+        "pages",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73883"
+    },
+    "create-freetext-callout-annotation__v2": {
+      "title": "Create FreeText Callout Annotation with Arrow",
+      "filename": "create-freetext-callout-annotation__v2.cs",
+      "description": "Demonstrates how to add a FreeText annotation with a callout intent and an arrow ending style to a PDF page using Aspose.Pdf, then save the document.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "callout",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.FreeTextIntent",
+        "Aspose.Pdf.Annotations.LineEnding",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73884"
+    },
+    "import-freetext-callout-annotations-from-xfdf": {
+      "title": "Import FreeText Callout Annotations from XFDF into PDF",
+      "filename": "import-freetext-callout-annotations-from-xfdf.cs",
+      "description": "Shows how to load a PDF, import FreeTextAnnotation callout lines from an XFDF stream, and save the updated document.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "import",
+        "freetext",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73885"
+    },
+    "add-embedded-media-summary-annotation": {
+      "title": "Add Summary of Embedded Media as FreeText Annotation",
+      "filename": "add-embedded-media-summary-annotation.cs",
+      "description": "The example loads a PDF, extracts the list of embedded files (media resources), builds a textual summary, and adds it as a FreeTextAnnotation on the first page before saving the document.",
+      "tags": [
+        "embedded-files",
+        "freetext-annotation",
+        "pdf-annotation",
+        "summary",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.FreeTextAnnotation",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73886"
+    },
+    "add-open-text-annotation-to-pdf": {
+      "title": "Add Open Text Annotation to PDF",
+      "filename": "add-open-text-annotation-to-pdf.cs",
+      "description": "Demonstrates how to add a TextAnnotation with the Open property set to true on a PDF page and save the updated document.",
+      "tags": [
+        "text-annotation",
+        "open",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73887"
+    },
+    "add-text-annotation-with-custom-icon-and-border": {
+      "title": "Add Text Annotation with Custom Icon and Border to PDF Page",
+      "filename": "add-text-annotation-with-custom-icon-and-border.cs",
+      "description": "Demonstrates how to add a TextAnnotation to a specific PDF page, configure a custom icon, color, and border style, and then save the modified document using Aspose.Pdf.",
+      "tags": [
+        "text-annotation",
+        "custom-icon",
+        "border",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73888"
+    },
+    "add-centered-freetext-annotation": {
+      "title": "Add Centered FreeText Annotation to PDF",
+      "filename": "add-centered-freetext-annotation.cs",
+      "description": "Demonstrates how to create a FreeTextAnnotation, set its text alignment to centered, and save the modified PDF document.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "centered",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.Justification",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73889"
+    },
+    "add-strikeout-annotation-to-specific-word": {
+      "title": "Add StrikeOut Annotation to Specific Word in PDF",
+      "filename": "add-strikeout-annotation-to-specific-word.cs",
+      "description": "Shows how to locate a specific word in a PDF using TextFragmentAbsorber and apply a strike‑out annotation to each occurrence before saving the document.",
+      "tags": [
+        "strikeout",
+        "annotation",
+        "text-search",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.StrikeOutAnnotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73891"
+    },
+    "remove-annotations-add-freetext": {
+      "title": "Remove All Annotations and Add a FreeText Annotation",
+      "filename": "remove-annotations-add-freetext.cs",
+      "description": "Demonstrates how to clear all annotations from the first page of a PDF, create a FreeTextAnnotation with custom appearance, add it to the page, and save the document.",
+      "tags": [
+        "annotations",
+        "freetext",
+        "pdf",
+        "Aspose.Pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73892"
+    },
+    "create-summary-freetext-annotation": {
+      "title": "Create Summary FreeTextAnnotation from Page Annotations",
+      "filename": "create-summary-freetext-annotation.cs",
+      "description": "The example reads all annotations on the second page of a PDF, extracts their titles or contents, builds a summary string, and adds it as a FreeTextAnnotation to the same page before saving.",
+      "tags": [
+        "annotations",
+        "freetext",
+        "summary",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.AnnotationCollection",
+        "Aspose.Pdf.Annotations.MarkupAnnotation",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Text.DefaultAppearance",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73893"
+    },
+    "add-text-annotation-to-pdf-page-3__v2": {
+      "title": "Add Text Annotation to PDF Page 3",
+      "filename": "add-text-annotation-to-pdf-page-3__v2.cs",
+      "description": "Demonstrates how to load a PDF, create a TextAnnotation with title, subject, and contents, place it on page three, and save the modified document using Aspose.Pdf.",
+      "tags": [
+        "text-annotation",
+        "pdf",
+        "aspose-pdf",
+        "page-3",
+        "annotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73894"
+    },
+    "import-xfdf-freetext-annotation": {
+      "title": "Import XFDF FreeText Annotation with Callout into PDF",
+      "filename": "import-xfdf-freetext-annotation.cs",
+      "description": "Demonstrates loading a PDF, importing a FreeText annotation (including a callout line) from an XFDF file, and saving the updated document.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "freetext",
+        "import",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73895"
+    },
+    "add-popup-annotation-to-line-annotation": {
+      "title": "Add Popup Annotation to a Line Annotation",
+      "filename": "add-popup-annotation-to-line-annotation.cs",
+      "description": "Loads a PDF, creates a line annotation, attaches a popup annotation with custom contents, and saves the updated document.",
+      "tags": [
+        "line-annotation",
+        "popup-annotation",
+        "pdf",
+        "aspose-pdf",
+        "annotations"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73896"
+    },
+    "create-freetext-callout-annotation__v3": {
+      "title": "Create FreeText Callout Annotation in PDF",
+      "filename": "create-freetext-callout-annotation__v3.cs",
+      "description": "Demonstrates how to add a FreeText annotation with callout lines, custom appearance, border, and arrow tip to a PDF page using Aspose.Pdf.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "callout",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Annotations.FreeTextIntent"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73897"
+    },
+    "add-strikeout-annotations-to-phrase-occurrences": {
+      "title": "Add StrikeOut Annotations to All Phrase Occurrences",
+      "filename": "add-strikeout-annotations-to-phrase-occurrences.cs",
+      "description": "Shows how to locate a specific text phrase in a PDF with TextFragmentAbsorber, apply a StrikeOutAnnotation to each found fragment, and save the updated document.",
+      "tags": [
+        "text-search",
+        "strikeout",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.StrikeOutAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73898"
+    },
+    "extract-annotation-mime-types-add-freetext": {
+      "title": "Extract Annotation MIME Types and Add FreeText Summary",
+      "filename": "extract-annotation-mime-types-add-freetext.cs",
+      "description": "Loads a PDF, scans its annotations to collect MIME types from file attachments and rich media, creates a FreeText annotation on the first page listing those types, and saves the updated document.",
+      "tags": [
+        "annotations",
+        "mime-type",
+        "freetext",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.FileAttachmentAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73899"
+    },
+    "add-text-annotation-custom-border-page-5": {
+      "title": "Add Text Annotation with Custom Border to Page 5",
+      "filename": "add-text-annotation-custom-border-page-5.cs",
+      "description": "Loads a PDF, creates a TextAnnotation on page 5 with a red border of custom width, and saves the updated document.",
+      "tags": [
+        "text-annotation",
+        "custom-border",
+        "pdf",
+        "Aspose.Pdf",
+        "page-5"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73901"
+    },
+    "create-freetext-callout-annotation__v4": {
+      "title": "Create FreeText Callout Annotation with Arrow",
+      "filename": "create-freetext-callout-annotation__v4.cs",
+      "description": "Demonstrates how to add a FreeText annotation of type Callout to a PDF page, set its intent to FreeTextCallout, define an OpenArrow ending style, and save the document.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "callout",
+        "arrow",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.FreeTextIntent",
+        "Aspose.Pdf.Annotations.LineEnding",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73902"
+    },
+    "add-line-annotation-with-popup-note": {
+      "title": "Add Line Annotation with Popup Note to PDF",
+      "filename": "add-line-annotation-with-popup-note.cs",
+      "description": "Demonstrates creating a line annotation, linking a popup annotation with detailed notes, and saving the modified PDF using Aspose.Pdf.",
+      "tags": [
+        "line-annotation",
+        "popup-annotation",
+        "pdf-annotations",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73903"
+    },
+    "import-xfdf-annotations-into-pdf__v4": {
+      "title": "Import XFDF Annotations (FreeText with Callouts) into PDF",
+      "filename": "import-xfdf-annotations-into-pdf__v4.cs",
+      "description": "Demonstrates loading a PDF, importing all annotations from an XFDF file—including FreeText annotations with callout lines—and saving the updated document.",
+      "tags": [
+        "xfdf",
+        "annotations",
+        "import",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73904"
+    },
+    "summarize-annotation-titles-page-3": {
+      "title": "Summarize Annotation Titles on Page 3",
+      "filename": "summarize-annotation-titles-page-3.cs",
+      "description": "Loads a PDF, extracts the Title property from all markup annotations on the third page, creates a FreeTextAnnotation containing those titles, and saves the updated document.",
+      "tags": [
+        "annotations",
+        "freetext",
+        "markup",
+        "pdf",
+        "summary"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.MarkupAnnotation",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.DefaultAppearance",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Justification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73905"
+    },
+    "add-invisible-freetext-annotation": {
+      "title": "Add Invisible FreeTextAnnotation to PDF",
+      "filename": "add-invisible-freetext-annotation.cs",
+      "description": "Demonstrates how to create a FreeTextAnnotation with invisible flags (Print | NoView) on a PDF page and save the modified document using Aspose.Pdf.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "invisible",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73906"
+    },
+    "add-comment-text-annotation-to-pdf": {
+      "title": "Add Comment Text Annotation to PDF",
+      "filename": "add-comment-text-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a TextAnnotation with the Comment icon, adding it to the first page, and saving the modified document.",
+      "tags": [
+        "text-annotation",
+        "comment-icon",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73907"
+    },
+    "create-freetext-annotation-with-custom-appearance": {
+      "title": "Create FreeText Annotation with Custom Appearance",
+      "filename": "create-freetext-annotation-with-custom-appearance.cs",
+      "description": "Shows how to add a FreeTextAnnotation to a PDF, configure its DefaultAppearance (font name, size, and color), optionally style its border, and save the document.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "appearance",
+        "font",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73908"
+    },
+    "add-strikeout-annotation-to-confidential-words": {
+      "title": "Add StrikeOut Annotations to Confidential Words in PDF",
+      "filename": "add-strikeout-annotation-to-confidential-words.cs",
+      "description": "Demonstrates how to locate the word 'confidential' in a PDF using TextFragmentAbsorber and apply a strike‑out annotation to each occurrence, then save the modified document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "strikeout",
+        "text-search",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextExtractionOptions",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.StrikeOutAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73909"
+    },
+    "delete-annotation-by-index-on-pdf-page": {
+      "title": "Delete Annotation by Index on PDF Page",
+      "filename": "delete-annotation-by-index-on-pdf-page.cs",
+      "description": "The example loads a PDF, verifies that page 4 exists, removes the annotation at zero‑based index 2 from that page, and saves the modified document.",
+      "tags": [
+        "annotations",
+        "delete",
+        "pdf",
+        "page",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.AnnotationCollection",
+        "Aspose.Pdf.AnnotationCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73910"
+    },
+    "add-text-annotation-key-icon": {
+      "title": "Add Text Annotation with Key Icon to PDF",
+      "filename": "add-text-annotation-key-icon.cs",
+      "description": "Shows how to create a TextAnnotation, set its Open property to false and its Icon to Key, add it to a PDF page, and save the modified document.",
+      "tags": [
+        "text-annotation",
+        "key-icon",
+        "pdf",
+        "aspose-pdf",
+        "annotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.TextAnnotation",
+        "Aspose.Pdf.Annotations.TextIcon"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73911"
+    },
+    "add-centered-freetext-annotation__v2": {
+      "title": "Add Centered FreeText Annotation to PDF",
+      "filename": "add-centered-freetext-annotation__v2.cs",
+      "description": "Demonstrates how to create a FreeTextAnnotation, set its text alignment to center, add it to a PDF page, and save the updated document.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "center-alignment",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Annotations.TextStyle",
+        "Aspose.Pdf.Annotations.HorizontalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73912"
+    },
+    "add-summary-annotation-count-to-page-6": {
+      "title": "Add Summary FreeTextAnnotation with Annotation Count to Page 6",
+      "filename": "add-summary-annotation-count-to-page-6.cs",
+      "description": "The example loads a PDF, counts the existing annotations on page six, creates a FreeTextAnnotation summarizing that count, adds it to the page, and saves the document.",
+      "tags": [
+        "annotations",
+        "free-text",
+        "page-six",
+        "summary",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.DefaultAppearance",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73913"
+    },
+    "add-invisible-freetext-annotation__v2": {
+      "title": "Add Invisible FreeText Annotation with Custom Font Size",
+      "filename": "add-invisible-freetext-annotation__v2.cs",
+      "description": "Demonstrates how to create a FreeTextAnnotation with an invisible flag and a custom font size, add it to a PDF page, and save the modified document using Aspose.Pdf.",
+      "tags": [
+        "free-text",
+        "annotation",
+        "invisible",
+        "font-size",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Text.DefaultAppearance",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73914"
+    },
+    "add-line-annotation-with-popup__v2": {
+      "title": "Add Line Annotation with Popup to PDF",
+      "filename": "add-line-annotation-with-popup__v2.cs",
+      "description": "Demonstrates creating a line annotation, attaching a popup annotation with custom contents, and saving the modified PDF using Aspose.Pdf.",
+      "tags": [
+        "line-annotation",
+        "popup",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73916"
+    },
+    "create-freetext-annotation-callout": {
+      "title": "Create FreeText Annotation with Callout",
+      "filename": "create-freetext-annotation-callout.cs",
+      "description": "Demonstrates how to add a FreeText annotation with a callout leader line to a PDF page using Aspose.Pdf, including setting appearance, intent, and callout points, then saving the document.",
+      "tags": [
+        "freetext",
+        "annotation",
+        "callout",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation",
+        "Aspose.Pdf.Annotations.FreeTextIntent",
+        "Aspose.Pdf.Annotations.LineEnding",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73917"
+    },
+    "import-freetext-annotation-from-xfdf": {
+      "title": "Import FreeText Annotation with Callout from XFDF",
+      "filename": "import-freetext-annotation-from-xfdf.cs",
+      "description": "Shows how to import a FreeText annotation that includes a callout line from an XFDF string into an existing PDF document and then save the updated file.",
+      "tags": [
+        "xfdf",
+        "annotation",
+        "freetext",
+        "callout",
+        "import"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ImportAnnotationsFromXfdf",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Annotations.FreeTextAnnotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73918"
+    },
+    "add-highlight-annotation-to-pdf": {
+      "title": "Add Highlight Annotation to PDF",
+      "filename": "add-highlight-annotation-to-pdf.cs",
+      "description": "Loads a PDF, creates a HighlightAnnotation with a custom title and color on the first page, and saves the modified document as HighlightedInvoice.pdf.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "pdf",
+        "color",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73919"
+    },
+    "add-strikeout-annotation-to-pdf": {
+      "title": "Add StrikeOut Annotation with Opacity to PDF",
+      "filename": "add-strikeout-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a strike‑out annotation with author, opacity, title and contents, adding it to the first page, and saving the result.",
+      "tags": [
+        "annotation",
+        "strikeout",
+        "pdf",
+        "opacity",
+        "author"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.StrikeOutAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73920"
+    },
+    "add-blue-underline-annotation": {
+      "title": "Add Blue Underline Annotation to PDF",
+      "filename": "add-blue-underline-annotation.cs",
+      "description": "Loads a PDF, creates an underline annotation titled \"Review\" with a blue color on the first page, and saves the result as DraftUnderlined.pdf.",
+      "tags": [
+        "underline",
+        "annotation",
+        "pdf",
+        "color",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.UnderlineAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73921"
+    },
+    "add-squiggly-annotation-opacity": {
+      "title": "Add Squiggly Annotation with Opacity to PDF",
+      "filename": "add-squiggly-annotation-opacity.cs",
+      "description": "Demonstrates loading a PDF, creating a SquigglyAnnotation, setting its opacity, adding it to a page, and saving the modified document.",
+      "tags": [
+        "squiggly",
+        "annotation",
+        "opacity",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquigglyAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73922"
+    },
+    "add-line-annotation-with-arrow": {
+      "title": "Add Line Annotation with Arrow to PDF",
+      "filename": "add-line-annotation-with-arrow.cs",
+      "description": "Demonstrates loading a PDF, creating a line annotation with a start arrow, setting its width and color, and saving the modified document.",
+      "tags": [
+        "line-annotation",
+        "arrow",
+        "pdf",
+        "border",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.LineEnding",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73923"
+    },
+    "add-circle-annotation-to-pdf": {
+      "title": "Create Circle Annotation in PDF",
+      "filename": "add-circle-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, adding a red circle annotation with a specific radius, color, and opacity, and saving the modified document.",
+      "tags": [
+        "annotation",
+        "circle",
+        "pdf",
+        "Aspose.Pdf",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.CircleAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73924"
+    },
+    "add-styled-square-annotation": {
+      "title": "Add Styled Square Annotation to PDF",
+      "filename": "add-styled-square-annotation.cs",
+      "description": "Shows how to load a PDF, create a square annotation with a yellow interior and black border, set the border width, and save the modified document as SquareStyled.pdf.",
+      "tags": [
+        "square-annotation",
+        "border",
+        "fill-color",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.BorderStyle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73925"
+    },
+    "add-polygon-annotation-to-pdf": {
+      "title": "Add Polygon Annotation to PDF",
+      "filename": "add-polygon-annotation-to-pdf.cs",
+      "description": "Shows how to load a PDF, create a polygon annotation with specific vertices, set its title and border color, and save the modified document.",
+      "tags": [
+        "polygon",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.PolygonAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73926"
+    },
+    "add-polyline-annotation-to-pdf": {
+      "title": "Add Polyline Annotation with Opacity to PDF",
+      "filename": "add-polyline-annotation-to-pdf.cs",
+      "description": "Demonstrates loading an existing PDF, creating a polyline annotation with specified vertices, subject, and opacity, adding it to the first page, and saving the result.",
+      "tags": [
+        "polyline",
+        "annotation",
+        "pdf",
+        "aspose",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Annotations.PolylineAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73927"
+    },
+    "add-ink-annotation-multiple-strokes": {
+      "title": "Add Ink Annotation with Multiple Strokes to PDF",
+      "filename": "add-ink-annotation-multiple-strokes.cs",
+      "description": "Demonstrates how to load a PDF, create an InkAnnotation with two separate stroke point arrays, configure a solid border of width 2, and save the result as a new PDF file.",
+      "tags": [
+        "ink-annotation",
+        "pdf",
+        "border",
+        "strokes",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.InkAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.BorderStyle",
+        "Aspose.Pdf.Point"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73928"
+    },
+    "link-popup-to-highlight-annotation": {
+      "title": "Link a Popup Annotation to a Highlight Annotation",
+      "filename": "link-popup-to-highlight-annotation.cs",
+      "description": "Demonstrates how to locate an existing HighlightAnnotation in a PDF, create a PopupAnnotation with custom contents, link it to the highlight, and save the updated document.",
+      "tags": [
+        "popup",
+        "highlight",
+        "annotation",
+        "pdf",
+        "link"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73929"
+    },
+    "change-highlight-color-on-pdf-page": {
+      "title": "Change Highlight Annotation Color on a PDF Page",
+      "filename": "change-highlight-color-on-pdf-page.cs",
+      "description": "Demonstrates loading a PDF, locating highlight annotations on page two, changing their color to orange, and saving the modified document.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "color",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73930"
+    },
+    "increase-ink-annotation-border-width": {
+      "title": "Increase Ink Annotation Border Width on PDF Page",
+      "filename": "increase-ink-annotation-border-width.cs",
+      "description": "Shows how to load a PDF, locate InkAnnotations on page three, set their border width to 3 points, and save the modified document.",
+      "tags": [
+        "ink-annotation",
+        "border-width",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.InkAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73931"
+    },
+    "remove-square-annotations-from-pdf-page": {
+      "title": "Remove Square Annotations from PDF Page",
+      "filename": "remove-square-annotations-from-pdf-page.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, find all SquareAnnotation objects on page 4, delete them, and save the modified document.",
+      "tags": [
+        "square-annotation",
+        "pdf",
+        "aspose-pdf",
+        "annotation",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73932"
+    },
+    "add-circle-annotation-with-popup": {
+      "title": "Add Circle Annotation with Popup to PDF",
+      "filename": "add-circle-annotation-with-popup.cs",
+      "description": "Demonstrates loading a PDF, creating a circle annotation with a light‑gray interior, semi‑transparent fill, and a popup note, then saving the modified document.",
+      "tags": [
+        "annotation",
+        "circle",
+        "popup",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.CircleAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73933"
+    },
+    "add-polygon-annotation-to-pdf__v2": {
+      "title": "Add Polygon Annotation to PDF",
+      "filename": "add-polygon-annotation-to-pdf__v2.cs",
+      "description": "Demonstrates loading a PDF, creating a polygon annotation with a title, border and fill colors, opacity, and saving the result as a new file.",
+      "tags": [
+        "polygon",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.PolygonAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73934"
+    },
+    "highlight-signature-word-in-pdf": {
+      "title": "Highlight 'Signature' Word in PDF with Annotation",
+      "filename": "highlight-signature-word-in-pdf.cs",
+      "description": "The example loads a PDF, searches for the word \"Signature\" on all pages, adds a highlight annotation with author Alice and 0.9 opacity over each occurrence, and saves the result as HighlightedSignature.pdf.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "text-search",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73935"
+    },
+    "change-line-annotation-starting-style": {
+      "title": "Change Starting Style of Line Annotations to Square",
+      "filename": "change-line-annotation-starting-style.cs",
+      "description": "Demonstrates loading a PDF, locating line annotations on page 8, setting their starting line style to a square, and saving the modified document.",
+      "tags": [
+        "line-annotation",
+        "starting-style",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.LineEnding"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73936"
+    },
+    "add-magenta-underline-annotation-to-confidential": {
+      "title": "Add Magenta Underline Annotation to the Word \"Confidential\"",
+      "filename": "add-magenta-underline-annotation-to-confidential.cs",
+      "description": "Loads a PDF, searches for the word \"Confidential\", adds a magenta underline annotation with author information, and saves the modified document.",
+      "tags": [
+        "underline",
+        "annotation",
+        "text-search",
+        "color",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.UnderlineAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73937"
+    },
+    "add-polyline-annotation-to-pdf__v2": {
+      "title": "Add Polyline Annotation to PDF",
+      "filename": "add-polyline-annotation-to-pdf__v2.cs",
+      "description": "Demonstrates loading a PDF, creating an orange polyline annotation titled \"Route\" with 70% opacity, adding it to the first page, and saving the result as a new file.",
+      "tags": [
+        "polyline",
+        "annotation",
+        "pdf",
+        "color",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Annotations.PolylineAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73938"
+    },
+    "set-strikeout-annotation-color-red": {
+      "title": "Set StrikeOut Annotation Color to Red on a Specific PDF Page",
+      "filename": "set-strikeout-annotation-color-red.cs",
+      "description": "Loads a PDF, finds all StrikeOut annotations on page 9, changes their color to red, and saves the updated document.",
+      "tags": [
+        "strikeout",
+        "annotation",
+        "color",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.StrikeOutAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73939"
+    },
+    "add-diagonal-line-annotation": {
+      "title": "Add Diagonal Line Annotation with Arrow to PDF",
+      "filename": "add-diagonal-line-annotation.cs",
+      "description": "Loads an existing PDF, creates a line annotation from (50,50) to (400,400) with an open arrow at the end, and saves the result as DiagonalLine.pdf.",
+      "tags": [
+        "line-annotation",
+        "arrow",
+        "pdf",
+        "aspose-pdf",
+        "annotation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Annotations.LineEnding",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Point",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73940"
+    },
+    "add-circle-annotation-with-popup-note": {
+      "title": "Add Circle Annotation with Popup Note to PDF",
+      "filename": "add-circle-annotation-with-popup-note.cs",
+      "description": "Shows how to load a PDF, create a red semi‑transparent circle annotation, attach a popup annotation containing the text \"Check figure\", and save the modified document.",
+      "tags": [
+        "circle-annotation",
+        "popup-note",
+        "pdf",
+        "annotations",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.CircleAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73941"
+    },
+    "add-square-annotation-to-pdf-page-12": {
+      "title": "Add Square Annotation to PDF Page 12",
+      "filename": "add-square-annotation-to-pdf-page-12.cs",
+      "description": "Demonstrates loading a PDF, verifying it has at least twelve pages, and adding a navy‑colored square annotation with a title and subject to page 12 before saving the result.",
+      "tags": [
+        "square-annotation",
+        "pdf",
+        "annotation",
+        "color",
+        "page-12"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73942"
+    },
+    "add-star-polygon-annotation-to-pdf": {
+      "title": "Add Star Polygon Annotation to PDF Page",
+      "filename": "add-star-polygon-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a gold‑filled star using a PolygonAnnotation on page 13, and saving the modified document.",
+      "tags": [
+        "polygon",
+        "annotation",
+        "star",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.PolygonAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73943"
+    },
+    "add-highlight-annotation-to-pdf__v2": {
+      "title": "Add Highlight Annotation to PDF Text",
+      "filename": "add-highlight-annotation-to-pdf__v2.cs",
+      "description": "The example loads a PDF, searches for the phrase \"Terms and Conditions\" using a TextFragmentAbsorber, creates a HighlightAnnotation over the found text, sets author and opacity, and saves the result as HighlightedTerms.pdf.",
+      "tags": [
+        "highlight",
+        "annotation",
+        "text-search",
+        "pdf",
+        "Aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.HighlightAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73944"
+    },
+    "add-pink-squiggly-annotation-page-15": {
+      "title": "Add Pink Squiggly Annotation to Page 15",
+      "filename": "add-pink-squiggly-annotation-page-15.cs",
+      "description": "Shows how to load a PDF, create a pink squiggly underline annotation with 0.6 opacity on page 15, and save the modified document as SquigglyStyled.pdf.",
+      "tags": [
+        "annotation",
+        "squiggly",
+        "pdf",
+        "color",
+        "opacity"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquigglyAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73945"
+    },
+    "add-thick-teal-line-annotation-page-16": {
+      "title": "Add Thick Teal Line Annotation to PDF Page 16",
+      "filename": "add-thick-teal-line-annotation-page-16.cs",
+      "description": "Demonstrates loading a PDF, adding a 5‑point teal line annotation on page 16, and saving the modified document.",
+      "tags": [
+        "line-annotation",
+        "pdf",
+        "teal",
+        "border-width",
+        "page-16"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LineAnnotation",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Border",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73946"
+    },
+    "fade-circle-annotations-page-17": {
+      "title": "Fade Circle Annotations on Page 17",
+      "filename": "fade-circle-annotations-page-17.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, locating CircleAnnotation objects on page 17, setting their opacity to 0.3, and saving the modified document.",
+      "tags": [
+        "circle-annotation",
+        "opacity",
+        "pdf",
+        "aspose-pdf",
+        "page-17"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.CircleAnnotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73947"
+    },
+    "add-polyline-annotation-to-pdf__v3": {
+      "title": "Add Polyline Annotation to PDF",
+      "filename": "add-polyline-annotation-to-pdf__v3.cs",
+      "description": "Loads an existing PDF, creates a brown polyline annotation titled \"Boundary\" with a custom line width, adds it to the first page, and saves the result as a new PDF.",
+      "tags": [
+        "polyline",
+        "annotation",
+        "border",
+        "color",
+        "pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Text.Point",
+        "Aspose.Pdf.Annotations.PolylineAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color.FromRgb",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73948"
+    },
+    "create-ink-annotation-multiple-strokes": {
+      "title": "Create Ink Annotation with Multiple Strokes",
+      "filename": "create-ink-annotation-multiple-strokes.cs",
+      "description": "Loads a PDF, builds an InkAnnotation containing three separate stroke arrays on page 18, sets a border width of 1, and saves the modified document.",
+      "tags": [
+        "ink",
+        "annotation",
+        "multiple-strokes",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.InkAnnotation",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73949"
+    },
+    "add-popup-note-to-square-annotation": {
+      "title": "Add Popup Note to a Square Annotation in a PDF",
+      "filename": "add-popup-note-to-square-annotation.cs",
+      "description": "Demonstrates how to create a square annotation, attach a popup note to it, and save the modified PDF using Aspose.Pdf.",
+      "tags": [
+        "annotation",
+        "popup",
+        "square",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73950"
+    },
+    "add-swf-screen-annotation-to-pdf": {
+      "title": "Add SWF Screen Annotation to PDF",
+      "filename": "add-swf-screen-annotation-to-pdf.cs",
+      "description": "Demonstrates how to load an existing PDF, create a ScreenAnnotation that references a local SWF file, place it on the first page, and save the updated document.",
+      "tags": [
+        "screen-annotation",
+        "swf",
+        "pdf",
+        "annotations",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.ScreenAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73951"
+    },
+    "add-sound-annotation-with-popup": {
+      "title": "Add Sound Annotation with Popup to PDF Page",
+      "filename": "add-sound-annotation-with-popup.cs",
+      "description": "Shows how to load a PDF, embed a WAV file as a SoundAnnotation on page 2, set a custom color and title, attach a PopupAnnotation, and save the updated document.",
+      "tags": [
+        "sound-annotation",
+        "popup",
+        "pdf",
+        "aspose-pdf",
+        "annotations"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SoundAnnotation",
+        "Aspose.Pdf.Annotations.PopupAnnotation",
+        "Aspose.Pdf.Text.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73952"
+    },
+    "add-rich-media-annotation-with-custom-player": {
+      "title": "Add Rich Media Annotation with Custom Player to PDF",
+      "filename": "add-rich-media-annotation-with-custom-player.cs",
+      "description": "Shows how to place a RichMediaAnnotation on a specific PDF page and attach a custom SWF player, using reflection to handle version differences.",
+      "tags": [
+        "richmedia",
+        "annotation",
+        "custom-player",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaContent",
+        "Aspose.Pdf.Annotations.RichMediaConfiguration",
+        "Aspose.Pdf.Annotations.RichMediaConfigurationType",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73953"
+    },
+    "add-rich-media-annotation-with-custom-flash-variables": {
+      "title": "Add Rich Media Annotation with Custom Flash Variables to PDF",
+      "filename": "add-rich-media-annotation-with-custom-flash-variables.cs",
+      "description": "Demonstrates loading a PDF, creating a RichMediaAnnotation on page 3, setting custom Flash variables (using reflection for version compatibility), updating the annotation, and saving the modified document.",
+      "tags": [
+        "richmedia",
+        "annotation",
+        "flash",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaSettings",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation.Update",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73954"
+    },
+    "add-rich-media-annotation-with-poster": {
+      "title": "Add Rich Media Annotation with Poster Image to PDF",
+      "filename": "add-rich-media-annotation-with-poster.cs",
+      "description": "Demonstrates loading a PDF, creating a RichMediaAnnotation on page 3, assigning a poster image, updating the annotation, and saving the modified document.",
+      "tags": [
+        "richmedia",
+        "annotation",
+        "pdf",
+        "poster",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation.SetPoster",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation.Update",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73955"
+    },
+    "extract-screen-annotation-references": {
+      "title": "Extract Screen Annotation File References from PDF Page",
+      "filename": "extract-screen-annotation-references.cs",
+      "description": "Loads a PDF, accesses page 4, collects the file references stored in ScreenAnnotation objects, and writes them to a text file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "screen-annotation",
+        "file-references",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.ScreenAnnotation",
+        "Aspose.Pdf.Document.Pages"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73956"
+    },
+    "extract-sound-annotation-titles-to-csv": {
+      "title": "Extract Sound Annotation Titles from PDF Page to CSV",
+      "filename": "extract-sound-annotation-titles-to-csv.cs",
+      "description": "Loads a PDF, retrieves all SoundAnnotation objects on page 5, and writes their titles into a CSV file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "sound",
+        "csv",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.SoundAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73957"
+    },
+    "remove-richmedia-annotations-from-pdf-page": {
+      "title": "Remove RichMedia Annotations from a PDF Page",
+      "filename": "remove-richmedia-annotations-from-pdf-page.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, access page 6, delete all RichMediaAnnotation objects, and save the modified document.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "richmedia",
+        "aspose-pdf",
+        "remove"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Remove",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73958"
+    },
+    "add-3d-u3d-annotation-to-pdf": {
+      "title": "Add 3D U3D Annotation to PDF Page",
+      "filename": "add-3d-u3d-annotation-to-pdf.cs",
+      "description": "Shows how to load a PDF, embed a U3D model as a PDF3DAnnotation on page 7, configure a view and border, and save the updated document.",
+      "tags": [
+        "3d",
+        "annotation",
+        "u3d",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.PDF3DContent",
+        "Aspose.Pdf.Annotations.PDF3DArtwork",
+        "Aspose.Pdf.Annotations.PDF3DView",
+        "Aspose.Pdf.Annotations.PDF3DAnnotation",
+        "Aspose.Pdf.Annotations.PDF3DStream",
+        "Aspose.Pdf.Drawing.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73959"
+    },
+    "add-3d-annotation-with-custom-lighting": {
+      "title": "Add 3D Annotation with Custom Lighting to PDF Page",
+      "filename": "add-3d-annotation-with-custom-lighting.cs",
+      "description": "Demonstrates loading a PDF, creating a PDF3DAnnotation with a lighting scheme and render mode, placing it on page 8, and saving the modified document.",
+      "tags": [
+        "pdf3d",
+        "annotation",
+        "lighting",
+        "render-mode",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.PDF3DContent",
+        "Aspose.Pdf.Annotations.PDF3DLightingScheme",
+        "Aspose.Pdf.Annotations.PDF3DRenderMode",
+        "Aspose.Pdf.Annotations.PDF3DArtwork",
+        "Aspose.Pdf.Annotations.PDF3DView",
+        "Aspose.Pdf.Annotations.PDF3DAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73960"
+    },
+    "add-watermark-annotation-to-pdf-page": {
+      "title": "Add Watermark Annotation with Opacity to PDF Page",
+      "filename": "add-watermark-annotation-to-pdf-page.cs",
+      "description": "Demonstrates loading a PDF, creating a WatermarkAnnotation with 50% opacity and custom text on page 9, and saving the modified document.",
+      "tags": [
+        "watermark",
+        "annotation",
+        "pdf",
+        "opacity",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73961"
+    },
+    "reuse-single-image-across-multiple-pdf-pages": {
+      "title": "Reuse Single Image Across Multiple PDF Pages",
+      "filename": "reuse-single-image-across-multiple-pdf-pages.cs",
+      "description": "Shows how to load an existing PDF, ensure it has at least three pages, and place the same image on each of the first three pages using XImageCollection.Add, then save the updated document.",
+      "tags": [
+        "pdf",
+        "image",
+        "reuse",
+        "aspose-pdf",
+        "pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Resources.Images.Add",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73963"
+    },
+    "add-page-navigation-buttons-to-pdf": {
+      "title": "Add Page Navigation Buttons to PDF",
+      "filename": "add-page-navigation-buttons-to-pdf.cs",
+      "description": "Loads a PDF, creates LinkAnnotation buttons on page 12 for First, Previous, Next, and Last page navigation, and saves the updated document.",
+      "tags": [
+        "annotations",
+        "linkannotation",
+        "navigation",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73966"
+    },
+    "enumerate-annotations-on-pdf-page": {
+      "title": "Enumerate Annotations on a PDF Page",
+      "filename": "enumerate-annotations-on-pdf-page.cs",
+      "description": "Loads a PDF, verifies it has at least 14 pages, accesses page 14, iterates over any annotations on that page, and saves the (unchanged) document.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "aspose-pdf",
+        "csharp",
+        "page-access"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73967"
+    },
+    "add-blue-text-watermark-to-pdf-page-15": {
+      "title": "Add Blue Text Watermark to PDF Page 15",
+      "filename": "add-blue-text-watermark-to-pdf-page-15.cs",
+      "description": "The example loads a PDF, creates a WatermarkAnnotation with blue 24‑point text on page 15, and saves the modified document.",
+      "tags": [
+        "watermark",
+        "annotation",
+        "pdf",
+        "text",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73968"
+    },
+    "add-sound-annotation-with-popup__v2": {
+      "title": "Add Sound Annotation with Popup to PDF Page",
+      "filename": "add-sound-annotation-with-popup__v2.cs",
+      "description": "Demonstrates loading a PDF, creating a SoundAnnotation titled \"Background Music\" with a popup window on page 2, and saving the modified document.",
+      "tags": [
+        "sound-annotation",
+        "popup",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SoundAnnotation",
+        "Aspose.Pdf.Annotations.SoundIcon",
+        "Aspose.Pdf.Annotations.PopupAnnotation"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73969"
+    },
+    "add-rich-media-annotation-to-pdf": {
+      "title": "Add Rich Media Annotation to PDF Page",
+      "filename": "add-rich-media-annotation-to-pdf.cs",
+      "description": "Shows how to load a PDF, create a RichMediaAnnotation on page 16, attach a SWF media file and a poster image using reflection for version‑agnostic support, and save the modified document.",
+      "tags": [
+        "richmedia",
+        "annotation",
+        "pdf",
+        "aspose",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaContent",
+        "Aspose.Pdf.Annotations.RichMediaConfiguration",
+        "Aspose.Pdf.Annotations.RichMediaAsset",
+        "Aspose.Pdf.Annotations.RichMediaPoster"
+      ],
+      "difficulty": "advanced",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73970"
+    },
+    "extract-embedded-media-from-richmedia-annotations": {
+      "title": "Extract Embedded Media from RichMedia Annotations",
+      "filename": "extract-embedded-media-from-richmedia-annotations.cs",
+      "description": "Loads a PDF, locates RichMediaAnnotation objects on a specific page, and extracts each embedded media stream to separate files on disk.",
+      "tags": [
+        "richmedia",
+        "annotation",
+        "pdf",
+        "extraction",
+        "media"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.RichMediaAnnotation",
+        "Aspose.Pdf.Annotations.RichMediaContent"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73971"
+    },
+    "remove-watermark-annotations-from-page": {
+      "title": "Remove Watermark Annotations from a Specific PDF Page",
+      "filename": "remove-watermark-annotations-from-page.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, locate WatermarkAnnotation objects on a given page, delete them, and save the modified document.",
+      "tags": [
+        "watermark",
+        "annotation",
+        "pdf",
+        "delete",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Page.Annotations.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73972"
+    },
+    "add-watermark-annotations-varying-opacity": {
+      "title": "Add Watermark Annotations with Varying Opacity to PDF Pages",
+      "filename": "add-watermark-annotations-varying-opacity.cs",
+      "description": "Demonstrates loading a PDF, creating WatermarkAnnotation objects with different opacity values for pages 18‑20, and saving the modified document.",
+      "tags": [
+        "watermark",
+        "annotation",
+        "opacity",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Text.TextState",
+        "Aspose.Pdf.Annotations.WatermarkAnnotation.SetTextAndState",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73973"
+    },
+    "add-3d-annotation-to-pdf-page": {
+      "title": "Add 3D Annotation to PDF Page",
+      "filename": "add-3d-annotation-to-pdf-page.cs",
+      "description": "Demonstrates how to embed a U3D/PRC 3‑D model into a PDF as a PDF3DAnnotation on a specific page using Aspose.Pdf.",
+      "tags": [
+        "3d",
+        "annotation",
+        "pdf",
+        "aspose-pdf",
+        "u3d"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.PDF3DContent",
+        "Aspose.Pdf.Annotations.PDF3DLightingScheme",
+        "Aspose.Pdf.Annotations.PDF3DRenderMode",
+        "Aspose.Pdf.Annotations.PDF3DArtwork",
+        "Aspose.Pdf.Annotations.PDF3DAnnotation",
+        "Aspose.Pdf.Annotations.PDF3DStream"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73974"
+    },
+    "add-image-watermark-to-page-24": {
+      "title": "Add Image Watermark to Specific PDF Page",
+      "filename": "add-image-watermark-to-page-24.cs",
+      "description": "Shows how to load a PDF, verify it has at least 24 pages, and apply an image watermark with 30% opacity to page 24 using Aspose.Pdf.",
+      "tags": [
+        "watermark",
+        "image",
+        "pdf",
+        "page24",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73976"
+    },
+    "reuse-image-across-multiple-pdf-pages": {
+      "title": "Reuse Image Across Multiple PDF Pages",
+      "filename": "reuse-image-across-multiple-pdf-pages.cs",
+      "description": "Demonstrates loading a PDF, adding an image to the document's resources once, and reusing that shared image on five pages before saving the result.",
+      "tags": [
+        "pdf",
+        "image",
+        "resource",
+        "reuse",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Resources.Images.Add",
+        "Aspose.Pdf.Page.AddImage",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73977"
+    },
+    "add-caret-annotation-to-pdf": {
+      "title": "Add Red Caret Annotation to PDF Page",
+      "filename": "add-caret-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a red caret annotation with a title on the first page, and saving the modified document.",
+      "tags": [
+        "caret",
+        "annotation",
+        "pdf",
+        "color",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73979"
+    },
+    "extract-caret-annotation-rectangles": {
+      "title": "Extract Caret Annotation Rectangles from a PDF Page",
+      "filename": "extract-caret-annotation-rectangles.cs",
+      "description": "Loads a PDF, accesses page 3, filters for CaretAnnotation objects, and writes each annotation's rectangle coordinates to a text file.",
+      "tags": [
+        "caret",
+        "annotation",
+        "pdf",
+        "rectangle",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73980"
+    },
+    "remove-caret-annotation-from-pdf": {
+      "title": "Remove Specific Caret Annotation from PDF",
+      "filename": "remove-caret-annotation-from-pdf.cs",
+      "description": "Shows how to load a PDF, locate a CaretAnnotation titled \"Obsolete\" on a given page, delete it, and save the modified document.",
+      "tags": [
+        "caret-annotation",
+        "delete-annotation",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Page.Annotations.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73981"
+    },
+    "add-hidden-caret-annotation-to-pdf-page-4": {
+      "title": "Add Hidden Caret Annotation to PDF Page 4",
+      "filename": "add-hidden-caret-annotation-to-pdf-page-4.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, creating a CaretAnnotation with a subject and the Hidden flag on page 4, and saving the modified document.",
+      "tags": [
+        "caret-annotation",
+        "hidden-flag",
+        "pdf",
+        "aspose-pdf",
+        "page-4"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Annotations.AnnotationFlags",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73982"
+    },
+    "add-redaction-annotation-gray-fill": {
+      "title": "Add Redaction Annotation with Gray Fill and Black Border",
+      "filename": "add-redaction-annotation-gray-fill.cs",
+      "description": "Loads a PDF, creates a redaction annotation with a gray fill and black border on page 5, adds it to the page, and saves the updated document.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "pdf",
+        "gray-fill",
+        "border-color"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73983"
+    },
+    "apply-redaction-annotation-with-overlay-text": {
+      "title": "Redact PDF Area with Overlay Text",
+      "filename": "apply-redaction-annotation-with-overlay-text.cs",
+      "description": "Loads a PDF, creates a RedactionAnnotation on a defined rectangle, sets the overlay text to \"Confidential\" with repeat enabled, adds it to the first page, and saves the redacted document.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "overlay-text",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73984"
+    },
+    "redact-pdf-with-redaction-annotation": {
+      "title": "Redact PDF Using RedactionAnnotation",
+      "filename": "redact-pdf-with-redaction-annotation.cs",
+      "description": "Loads a PDF, adds a redaction annotation to a page, applies the redaction, and saves the redacted document.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Annotations.RedactionAnnotation.Redact",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73985"
+    },
+    "add-goto-link-annotation-to-pdf": {
+      "title": "Add GoTo Link Annotation to PDF",
+      "filename": "add-goto-link-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating an XYZ explicit destination on page 2, adding a LinkAnnotation with a GoToAction on page 1, and saving the modified document.",
+      "tags": [
+        "link-annotation",
+        "goto-action",
+        "pdf",
+        "aspose-pdf",
+        "destination"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73987"
+    },
+    "add-remote-link-annotation": {
+      "title": "Add Remote GoTo Link Annotation to PDF",
+      "filename": "add-remote-link-annotation.cs",
+      "description": "Demonstrates loading a PDF, creating a LinkAnnotation that uses a GoToRemoteAction to open another PDF at a specific page, and saving the modified document.",
+      "tags": [
+        "link-annotation",
+        "goto-remote",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToRemoteAction",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73988"
+    },
+    "add-mailto-link-annotation": {
+      "title": "Add Mailto Link Annotation to PDF",
+      "filename": "add-mailto-link-annotation.cs",
+      "description": "Demonstrates loading a PDF, creating a LinkAnnotation with a GoToURIAction that opens a mailto link, and saving the updated document.",
+      "tags": [
+        "link",
+        "annotation",
+        "mailto",
+        "pdf",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Page.Annotations.Add"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73989"
+    },
+    "add-dashed-border-to-link-annotation": {
+      "title": "Create Link Annotation with Dashed Border",
+      "filename": "add-dashed-border-to-link-annotation.cs",
+      "description": "The example loads a PDF, adds a link annotation that points to a URL, sets its border to a 1‑point dashed pattern [3,2], and saves the modified document.",
+      "tags": [
+        "link-annotation",
+        "border",
+        "dash",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.Dash"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73990"
+    },
+    "extract-uris-from-pdf-link-annotations": {
+      "title": "Extract URIs from PDF Link Annotations",
+      "filename": "extract-uris-from-pdf-link-annotations.cs",
+      "description": "Loads a PDF, iterates through all pages, finds LinkAnnotation objects with a GoToURIAction, collects their URI values, and writes the list to a JSON file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "link",
+        "uri",
+        "json"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73991"
+    },
+    "extract-text-from-link-annotations": {
+      "title": "Extract Text from Link Annotations in PDF",
+      "filename": "extract-text-from-link-annotations.cs",
+      "description": "Loads a PDF, iterates through each page's link annotations, extracts the text inside the annotation rectangle using TextAbsorber, and saves the results to a text file.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "link",
+        "text-extraction",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Text.TextAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73992"
+    },
+    "remove-link-annotations-from-page": {
+      "title": "Remove Link Annotations from a Specific PDF Page",
+      "filename": "remove-link-annotations-from-page.cs",
+      "description": "Demonstrates how to load a PDF, locate page 4, collect all LinkAnnotation objects on that page, delete them, and save the cleaned document.",
+      "tags": [
+        "pdf",
+        "annotations",
+        "link",
+        "remove",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Page.Annotations",
+        "Aspose.Pdf.Annotations.AnnotationCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73993"
+    },
+    "add-named-destination-and-link-annotation": {
+      "title": "Add Named Destination and Link Annotation to PDF",
+      "filename": "add-named-destination-and-link-annotation.cs",
+      "description": "Demonstrates how to create a named destination on a specific page, attach a GoToAction link annotation to it, and save the updated PDF using Aspose.Pdf.",
+      "tags": [
+        "named-destination",
+        "link-annotation",
+        "go-to-action",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.HighlightingMode",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73994"
+    },
+    "set-link-annotation-color-blue-page-7": {
+      "title": "Set Link Annotation Color to Blue on Page 7",
+      "filename": "set-link-annotation-color-blue-page-7.cs",
+      "description": "Loads a PDF, finds the first LinkAnnotation on page 7, changes its color to blue, and saves the modified document.",
+      "tags": [
+        "link-annotation",
+        "color",
+        "pdf",
+        "aspose-pdf",
+        "page-7"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73995"
+    },
+    "add-caret-annotations-to-multiple-pdf-pages": {
+      "title": "Add Caret Annotations to Multiple PDF Pages",
+      "filename": "add-caret-annotations-to-multiple-pdf-pages.cs",
+      "description": "Shows how to load a PDF, create distinct CaretAnnotation objects on pages 1, 2 and 3 with unique titles and contents, and save the modified document.",
+      "tags": [
+        "caret-annotation",
+        "pdf",
+        "annotations",
+        "pages",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73996"
+    },
+    "update-caret-annotation-titles": {
+      "title": "Update Caret Annotation Titles in PDF",
+      "filename": "update-caret-annotation-titles.cs",
+      "description": "Loads a PDF, iterates through its pages to find CaretAnnotation objects, prepends \"Updated-\" to each annotation's Title, and saves the modified document.",
+      "tags": [
+        "caret-annotation",
+        "pdf",
+        "annotations",
+        "title",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73997"
+    },
+    "redact-entire-page-8": {
+      "title": "Redact Entire Page 8 in PDF",
+      "filename": "redact-entire-page-8.cs",
+      "description": "Demonstrates loading a PDF, creating a RedactionAnnotation that covers the whole of page 8, disabling repeat, applying the redaction, and saving the result.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "pdf",
+        "page",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Annotations.RedactionAnnotation.Redact",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73998"
+    },
+    "apply-redaction-annotation-overlay-text": {
+      "title": "Redact PDF Page with Overlay Text",
+      "filename": "apply-redaction-annotation-overlay-text.cs",
+      "description": "Demonstrates loading a PDF, adding a RedactionAnnotation with overlay text \"Top Secret\" on page 9, applying the redaction, and saving the result.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "overlay-text",
+        "pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Annotations.RedactionAnnotation.Redact",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "73999"
+    },
+    "add-goto-link-annotation-xyz-destination": {
+      "title": "Create GoTo Link Annotation with XYZ Destination",
+      "filename": "add-goto-link-annotation-xyz-destination.cs",
+      "description": "The example loads an existing PDF, adds a link annotation on the first page that navigates to a specific XYZ destination with a 150% zoom, and saves the updated document.",
+      "tags": [
+        "link-annotation",
+        "goto-action",
+        "xyz-destination",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74001"
+    },
+    "add-remote-link-annotation-to-pdf": {
+      "title": "Add Remote Link Annotation to PDF",
+      "filename": "add-remote-link-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a LinkAnnotation with a GoToRemoteAction that opens an external PDF at a specific page, and saving the modified document.",
+      "tags": [
+        "link-annotation",
+        "goto-remote",
+        "pdf",
+        "annotation",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.GoToRemoteAction",
+        "Aspose.Pdf.Annotations.LinkAnnotation"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74002"
+    },
+    "add-https-link-annotation-to-pdf": {
+      "title": "Add HTTPS Link Annotation to PDF",
+      "filename": "add-https-link-annotation-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a LinkAnnotation with a GoToURIAction that points to a secure HTTPS URL, and saving the updated document.",
+      "tags": [
+        "link-annotation",
+        "goto-uri",
+        "pdf",
+        "aspose-pdf",
+        "https"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToURIAction",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74003"
+    },
+    "set-link-annotation-border-width": {
+      "title": "Set Link Annotation Border Width on Page 5",
+      "filename": "set-link-annotation-border-width.cs",
+      "description": "Loads a PDF, finds the first LinkAnnotation on page 5, changes its border width to 2 points, and saves the updated document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "linkannotation",
+        "border",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74004"
+    },
+    "export-dashed-link-annotations-to-csv": {
+      "title": "Export Dashed Link Annotations to CSV",
+      "filename": "export-dashed-link-annotations-to-csv.cs",
+      "description": "Loads a PDF, finds LinkAnnotation objects whose border style is dashed, and writes their rectangle coordinates to a CSV file.",
+      "tags": [
+        "link-annotation",
+        "border-style",
+        "csv-export",
+        "aspose-pdf",
+        "annotations"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.BorderStyle",
+        "Aspose.Pdf.Rectangle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74005"
+    },
+    "extract-text-from-link-annotations-page-10": {
+      "title": "Extract Text from Link Annotations on a Specific PDF Page",
+      "filename": "extract-text-from-link-annotations-page-10.cs",
+      "description": "Loads a PDF, iterates over all LinkAnnotation rectangles on page 10, extracts the text inside each rectangle using a TextFragmentAbsorber, and saves the collected text to a file.",
+      "tags": [
+        "link-annotation",
+        "text-extraction",
+        "pdf",
+        "aspose-pdf",
+        "page-10"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Text.TextFragmentAbsorber",
+        "Aspose.Pdf.Text.TextSearchOptions",
+        "Aspose.Pdf.Text.TextExtractionOptions"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74006"
+    },
+    "export-redaction-fill-colors-csv": {
+      "title": "Export Redaction Annotation Fill Colors to CSV",
+      "filename": "export-redaction-fill-colors-csv.cs",
+      "description": "Loads a PDF, extracts all RedactionAnnotation objects, reads their FillColor values, and writes a CSV report with page number, annotation index, and RGB components.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "csv",
+        "color",
+        "aspdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74007"
+    },
+    "add-redaction-annotation-red-border-page-11": {
+      "title": "Add Redaction Annotation with Red Border to PDF Page 11",
+      "filename": "add-redaction-annotation-red-border-page-11.cs",
+      "description": "The example loads a PDF, creates a RedactionAnnotation on page 11 with only the border color set to red, adds it to the page, and saves the modified document.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "border-color",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Page.Annotations.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74008"
+    },
+    "redact-multiple-pdf-pages-annotations": {
+      "title": "Redact Multiple PDF Pages Using Annotations",
+      "filename": "redact-multiple-pdf-pages-annotations.cs",
+      "description": "Loads a PDF, adds redaction annotations on different pages, invokes Redact() for each annotation, and saves the redacted document.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "pdf",
+        "Aspose.Pdf",
+        "multiple-pages"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Annotations.RedactionAnnotation.Redact",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74009"
+    },
+    "extract-caret-annotation-flags-to-csv": {
+      "title": "Extract Caret Annotation Flags to CSV",
+      "filename": "extract-caret-annotation-flags-to-csv.cs",
+      "description": "Loads a PDF, iterates through all pages, extracts every CaretAnnotation, reads its Flags bitmask, and writes the page number, annotation index and flag value to a CSV report.",
+      "tags": [
+        "caret-annotation",
+        "pdf",
+        "csv",
+        "annotations",
+        "report"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.CaretAnnotation",
+        "Aspose.Pdf.Annotations.Annotation.Flags"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74011"
+    },
+    "redact-pdf-area-light-blue": {
+      "title": "Redact PDF Area with Light Blue Fill",
+      "filename": "redact-pdf-area-light-blue.cs",
+      "description": "Loads a PDF, adds a RedactionAnnotation with a light‑blue fill color, applies the redaction, and saves the result.",
+      "tags": [
+        "redaction",
+        "annotation",
+        "fillcolor",
+        "pdf",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.RedactionAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74012"
+    },
+    "add-goto-link-annotation-dashed-border": {
+      "title": "Add GoTo Link Annotation with Dashed Border to PDF",
+      "filename": "add-goto-link-annotation-dashed-border.cs",
+      "description": "Demonstrates loading a PDF, creating a LinkAnnotation that navigates to another page using GoToAction, applying a dashed border of width 1, and saving the modified document.",
+      "tags": [
+        "link-annotation",
+        "goto-action",
+        "border",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.BorderStyle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74013"
+    },
+    "set-link-annotation-color-to-green": {
+      "title": "Set Link Annotation Color to Green",
+      "filename": "set-link-annotation-color-to-green.cs",
+      "description": "Loads a PDF, iterates through its pages to find link annotations, changes each annotation's color to green, and saves the updated document.",
+      "tags": [
+        "link-annotation",
+        "color",
+        "pdf",
+        "annotations",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Color",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "74014"
+    },
+    "flatten-pdf-annotations__v3": {
+      "title": "Flatten PDF Annotations",
+      "filename": "flatten-pdf-annotations__v3.cs",
+      "description": "Opens a PDF, iterates through each page's annotations, flattens them into the page content, and saves the result as AnnotationsFlattened.pdf.",
+      "tags": [
+        "annotations",
+        "flatten",
+        "pdf",
+        "Aspose.Pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.Annotation.Flatten()",
+        "Aspose.Pdf.Document.Save()"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "75821"
+    },
+    "flatten-all-annotations-in-pdf": {
+      "title": "Flatten All Annotations in a PDF",
+      "filename": "flatten-all-annotations-in-pdf.cs",
+      "description": "Loads a PDF, iterates through each page, flattens every annotation using Annotation.Flatten(), and saves the result as a new PDF.",
+      "tags": [
+        "annotations",
+        "flatten",
+        "pdf",
+        "Aspose.Pdf",
+        "document-processing"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Annotations.Annotation",
+        "Aspose.Pdf.Annotations.Annotation.Flatten()",
+        "Aspose.Pdf.Document.Save()"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-23T04:48:19Z",
+      "status": "verified",
+      "task_id": "75831"
+    }
+  }
+}
