@@ -1,0 +1,740 @@
+{
+  "category": "encryption",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-26T06:58:22Z",
+  "examples": {
+    "encrypt-pdf-rc4-40-forbid-all": {
+      "title": "Encrypt PDF with RC4 40‑bit and forbid all permissions",
+      "filename": "encrypt-pdf-rc4-40-forbid-all.cs",
+      "description": "The example loads a PDF, applies encryption using RC4 40‑bit with user and owner passwords, forbids all permissions, and saves the encrypted file.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "rc4",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Security.Permissions"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71634"
+    },
+    "encrypt-pdf-aes256-no-permissions": {
+      "title": "Encrypt PDF with AES‑256 and No Permissions",
+      "filename": "encrypt-pdf-aes256-no-permissions.cs",
+      "description": "Demonstrates loading a PDF, applying AES‑256 encryption with user and owner passwords, forbidding all permissions, and saving the encrypted document.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "aes256",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71635"
+    },
+    "encrypt-pdf-with-screen-reader-permission": {
+      "title": "Encrypt PDF with User/Owner Passwords and Screen Reader Permission",
+      "filename": "encrypt-pdf-with-screen-reader-permission.cs",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf by setting user and owner passwords, enabling the screen‑reader permission, applying the RC4 128‑bit algorithm, and saving the protected document.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "rc4",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71636"
+    },
+    "encrypt-pdf-aes128-screen-reader-permission": {
+      "title": "Encrypt PDF with AES‑128 and Screen Reader Permission",
+      "filename": "encrypt-pdf-aes128-screen-reader-permission.cs",
+      "description": "Loads a PDF, encrypts it using AES‑128 with user and owner passwords, enables the screen‑reader permission, and saves the encrypted document.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "aes128",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71637"
+    },
+    "change-pdf-passwords": {
+      "title": "Change PDF Passwords Using Aspose.Pdf",
+      "filename": "change-pdf-passwords.cs",
+      "description": "Demonstrates encrypting a PDF with initial user/owner passwords, then opening it with the owner password to change to new passwords and re‑save the document.",
+      "tags": [
+        "encryption",
+        "password",
+        "pdf-security",
+        "aspose-pdf",
+        "re-encrypt"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71644"
+    },
+    "re-encrypt-pdf-aes128-preserve-passwords": {
+      "title": "Re‑encrypt PDF with AES‑128 while preserving passwords",
+      "filename": "re-encrypt-pdf-aes128-preserve-passwords.cs",
+      "description": "Loads an encrypted PDF using the user password, applies new AES‑128 encryption with the same passwords and specific permissions, and saves the re‑encrypted document.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "aes-128",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71648"
+    },
+    "change-pdf-passwords__v2": {
+      "title": "Change PDF User and Owner Passwords with Aspose.Pdf",
+      "filename": "change-pdf-passwords__v2.cs",
+      "description": "Demonstrates opening a password‑protected PDF using the owner password, updating both the user and owner passwords, and saving the re‑encrypted document.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "password",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ChangePasswords",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71688"
+    },
+    "encrypt-pdf-forbid-all-permissions-aes128": {
+      "title": "Encrypt PDF, Forbid All Permissions, Enable Screen Reader (PDF/UA)",
+      "filename": "encrypt-pdf-forbid-all-permissions-aes128.cs",
+      "description": "Demonstrates opening a PDF with the owner password, disabling all user permissions, enabling PDF/UA screen‑reader support, encrypting the document with AES‑128, and saving the result.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "aes128",
+        "screen-reader"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71689"
+    },
+    "re-encrypt-pdf-rc4x128": {
+      "title": "Re‑encrypt PDF with Owner Password Using RC4x128",
+      "filename": "re-encrypt-pdf-rc4x128.cs",
+      "description": "Demonstrates opening an already encrypted PDF with its owner password, applying new user and owner passwords, setting permissions, and re‑encrypting the document using the RC4x128 algorithm.",
+      "tags": [
+        "pdf-encryption",
+        "rc4",
+        "owner-password",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71690"
+    },
+    "identify-pdf-password-type-report": {
+      "title": "Identify PDF Password Type and Create a Report",
+      "filename": "identify-pdf-password-type-report.cs",
+      "description": "The example opens encrypted PDF files with supplied user and owner passwords, determines which password grants access, and writes a plain‑text report of the password type for each file.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "password",
+        "report",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.InvalidPasswordException",
+        "Aspose.Pdf.Document.Permissions",
+        "Aspose.Pdf.Document..ctor(string,string)"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71694"
+    },
+    "encrypt-pdf-with-owner-password-no-permissions": {
+      "title": "Encrypt PDF with Owner Password and No Permissions",
+      "filename": "encrypt-pdf-with-owner-password-no-permissions.cs",
+      "description": "Shows how to open a PDF protected by an owner password, apply new encryption with user and owner passwords, forbid all permissions, and save the encrypted file.",
+      "tags": [
+        "encryption",
+        "owner password",
+        "permissions",
+        "Aspose.Pdf",
+        "AES-256"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor(string, string)",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71701"
+    },
+    "check-pdf-encryption-and-generate-json-report": {
+      "title": "Check PDF Encryption and Generate JSON Report",
+      "filename": "check-pdf-encryption-and-generate-json-report.cs",
+      "description": "The example opens a PDF using Aspose.Pdf, determines whether it is encrypted, and writes a formatted JSON report containing the file name and encryption flag.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "json",
+        "report",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.IsEncrypted",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71704"
+    },
+    "check-pdf-requires-open-password": {
+      "title": "Check if PDF Requires an Open Password",
+      "filename": "check-pdf-requires-open-password.cs",
+      "description": "Loads a PDF using Aspose.Pdf, determines whether an open password is required, and writes the boolean result to a JSON file.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "password",
+        "validation",
+        "json"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71710"
+    },
+    "encrypt-pdf-aes128-with-permissions": {
+      "title": "Encrypt PDF with AES‑128 and Set Permissions",
+      "filename": "encrypt-pdf-aes128-with-permissions.cs",
+      "description": "Shows how to encrypt a PDF using Aspose.Pdf with a user password, an owner password, AES‑128 encryption, and allow content extraction for screen readers, then save the encrypted file.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "aes128",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71717"
+    },
+    "encrypt-pdf-rc4x128-no-permissions": {
+      "title": "Encrypt PDF with RC4 128‑bit and No Permissions",
+      "filename": "encrypt-pdf-rc4x128-no-permissions.cs",
+      "description": "Loads a PDF, applies 128‑bit RC4 encryption with a user and owner password, revokes all permissions, and saves the encrypted document.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "rc4",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71718"
+    },
+    "change-pdf-passwords__v3": {
+      "title": "Change PDF Owner and User Passwords",
+      "filename": "change-pdf-passwords__v3.cs",
+      "description": "Opens an encrypted PDF with the owner password, re‑encrypts it using new user and owner passwords, and saves the updated file.",
+      "tags": [
+        "encryption",
+        "password",
+        "pdf",
+        "Aspose.Pdf",
+        "re-encrypt"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Security.InvalidPasswordException"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71720"
+    },
+    "check-pdf-encryption-status": {
+      "title": "Check PDF Encryption Status and Write to File",
+      "filename": "check-pdf-encryption-status.cs",
+      "description": "Shows how to load a PDF using Aspose.Pdf, detect if it is encrypted, and write the encryption status to a text file.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "status",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71721"
+    },
+    "encrypt-pdf-allow-screen-readers": {
+      "title": "Encrypt PDF Allowing Screen Readers (AES‑128)",
+      "filename": "encrypt-pdf-allow-screen-readers.cs",
+      "description": "Demonstrates how to create a PDF, add a blank page, set permissions that enable screen‑reader access, encrypt the document with user and owner passwords using AES‑128, and save it.",
+      "tags": [
+        "encryption",
+        "permissions",
+        "screen-reader",
+        "AES-128",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection.Add",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71725"
+    },
+    "create-pdf-no-permissions-rc4-128": {
+      "title": "Create PDF with No Permissions and RC4 128-bit Encryption",
+      "filename": "create-pdf-no-permissions-rc4-128.cs",
+      "description": "Demonstrates creating an empty PDF, applying RC4 128‑bit encryption with user and owner passwords, forbidding all permissions, and saving the document.",
+      "tags": [
+        "encryption",
+        "permissions",
+        "RC4",
+        "Aspose.Pdf",
+        "PDF"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71726"
+    },
+    "re-encrypt-pdf-with-new-passwords": {
+      "title": "Re‑encrypt PDF with New User and Owner Passwords (AES‑128)",
+      "filename": "re-encrypt-pdf-with-new-passwords.cs",
+      "description": "The example opens an existing password‑protected PDF, applies new user and owner passwords using AES‑128 encryption, sets basic permissions, and saves the re‑encrypted document.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "password",
+        "aes",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71727"
+    },
+    "encrypt-pdf-aes128-no-privileges": {
+      "title": "Encrypt PDF with AES‑128 without Changing Permissions",
+      "filename": "encrypt-pdf-aes128-no-privileges.cs",
+      "description": "Demonstrates loading a PDF, applying AES‑128 encryption with user and owner passwords while preserving default permissions, and saving the encrypted file.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "aes-128",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71731"
+    },
+    "encrypt-pdf-rc4-no-privileges": {
+      "title": "Encrypt PDF with RC4 128-bit and No Restrictions",
+      "filename": "encrypt-pdf-rc4-no-privileges.cs",
+      "description": "Demonstrates how to encrypt a PDF using RC4 128‑bit with user and owner passwords while granting all permissions, then saving the encrypted file.",
+      "tags": [
+        "encryption",
+        "RC4",
+        "Aspose.Pdf",
+        "PDF security",
+        "permissions"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71732"
+    },
+    "encrypt-pdf-aes128-forbid-all": {
+      "title": "Encrypt PDF with AES‑128 and Forbid All Permissions",
+      "filename": "encrypt-pdf-aes128-forbid-all.cs",
+      "description": "Opens an unprotected PDF, applies AES‑128 encryption with no user or owner passwords, and disables all document operations using DocumentPrivilege.ForbidAll. The result is saved as a new encrypted PDF.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "aes128",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71733"
+    },
+    "encrypt-pdf-rc4-allow-screen-readers": {
+      "title": "Encrypt PDF with RC4 and Enable Screen Reader Permission",
+      "filename": "encrypt-pdf-rc4-allow-screen-readers.cs",
+      "description": "The example opens an existing PDF without a password, applies RC4 128‑bit encryption, enables the ExtractContentWithDisabilities permission (allowing screen readers), and saves the result as a new file.",
+      "tags": [
+        "encryption",
+        "rc4",
+        "permissions",
+        "screen-reader",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71734"
+    },
+    "encrypt-pdf-with-user-owner-passwords": {
+      "title": "Encrypt PDF with User and Owner Passwords and Screen Reader Permission",
+      "filename": "encrypt-pdf-with-user-owner-passwords.cs",
+      "description": "Demonstrates how to encrypt a PDF using AES‑128 with a user password, an owner password, and a permission that only allows screen readers, then saves the encrypted file.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "permissions",
+        "aes",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71738"
+    },
+    "encrypt-pdf-rc4-128-forbid-all": {
+      "title": "Encrypt PDF with RC4 128‑bit and forbid all permissions",
+      "filename": "encrypt-pdf-rc4-128-forbid-all.cs",
+      "description": "Demonstrates loading a PDF, applying RC4‑128 encryption with user password \"beta\" and owner password \"gamma\", and disabling all document permissions before saving the encrypted file.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "rc4",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71739"
+    },
+    "re-encrypt-pdf-new-owner-aes128": {
+      "title": "Re‑encrypt PDF with New Owner Password (AES‑128)",
+      "filename": "re-encrypt-pdf-new-owner-aes128.cs",
+      "description": "Opens an existing password‑protected PDF, changes the owner password while keeping the user password, applies AES‑128 encryption and saves the result.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "owner-password",
+        "aes-128",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71740"
+    },
+    "re-encrypt-pdf-rc4-128": {
+      "title": "Re‑encrypt PDF with New Passwords Using RC4‑128",
+      "filename": "re-encrypt-pdf-rc4-128.cs",
+      "description": "Opens a password‑protected PDF using the owner password, sets new user and owner passwords, applies RC4‑128 encryption with specific permissions, and saves the result.",
+      "tags": [
+        "pdf",
+        "encryption",
+        "rc4",
+        "password",
+        "permissions"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71741"
+    },
+    "encrypt-pdf-aes128-forbid-all__v2": {
+      "title": "Encrypt PDF with AES‑128 and forbid all permissions",
+      "filename": "encrypt-pdf-aes128-forbid-all__v2.cs",
+      "description": "Demonstrates how to load a PDF, apply AES‑128 encryption with a user and owner password, disable all permissions, and save the protected document using Aspose.Pdf.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "aes",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71744"
+    },
+    "encrypt-pdf-rc4-128-screen-reader-permission": {
+      "title": "Encrypt PDF with RC4 128-bit and Screen Reader Permission",
+      "filename": "encrypt-pdf-rc4-128-screen-reader-permission.cs",
+      "description": "The example loads a PDF, applies RC4 128‑bit encryption with a user and owner password, enables the 'Allow screen readers' privilege, and saves the protected document.",
+      "tags": [
+        "encryption",
+        "pdf",
+        "rc4",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.CryptoAlgorithm"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71745"
+    },
+    "encrypt-pdf-aes128-no-permissions": {
+      "title": "Encrypt PDF with AES‑128 and No Permissions",
+      "filename": "encrypt-pdf-aes128-no-permissions.cs",
+      "description": "Shows how to open a PDF protected with a user password, apply AES‑128 encryption with no permissions, and save the encrypted file.",
+      "tags": [
+        "pdf encryption",
+        "aes-128",
+        "user password",
+        "no permissions",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71746"
+    },
+    "encrypt-pdf-rc4-no-permissions": {
+      "title": "Encrypt PDF with RC4 128‑bit and No Permissions",
+      "filename": "encrypt-pdf-rc4-no-permissions.cs",
+      "description": "The example opens an existing PDF using a user password, applies RC4 128‑bit encryption with all privileges disabled, and saves the encrypted file as a new PDF.",
+      "tags": [
+        "encryption",
+        "rc4",
+        "pdf",
+        "permissions",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document..ctor(string, string)",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Security.CryptoAlgorithm",
+        "Aspose.Pdf.Security.Permissions",
+        "Aspose.Pdf.Security.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:58:22Z",
+      "status": "verified",
+      "task_id": "71747"
+    }
+  }
+}
