@@ -1,12 +1,46 @@
-// URL-STABILITY STUB
-//
-// convert pdf to pptx with progress
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/conversion/convert-pdf-to-pptx-with-logo.cs
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "minutes.pdf";
+        const string outputPath = "minutes_progress.pptx";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        try
+        {
+            using (Document pdfDoc = new Document(inputPath))
+            {
+                // Configure PPTX save options with a custom progress handler
+                var pptxOptions = new PptxSaveOptions();
+
+                // The CustomProgressHandler delegate receives a ProgressEventHandlerInfo object.
+                // Use it to report conversion progress (e.g., TotalProgress events).
+                pptxOptions.CustomProgressHandler = info =>
+                {
+                    if (info.EventType == ProgressEventType.TotalProgress)
+                    {
+                        Console.WriteLine($"Conversion progress: {info.Value}%");
+                    }
+                };
+
+                // Save the PDF as PPTX while reporting progress
+                pdfDoc.Save(outputPath, pptxOptions);
+            }
+
+            Console.WriteLine($"Conversion completed: {outputPath}");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error: {ex.Message}");
+        }
+    }
+}

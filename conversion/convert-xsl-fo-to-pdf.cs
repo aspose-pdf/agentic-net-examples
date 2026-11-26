@@ -1,12 +1,30 @@
-// URL-STABILITY STUB
-//
-// convert xsl fo to pdf
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/blob/main/conversion/convert-xslfo-to-pdf.cs
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string inputPath  = "input.fo";   // XSL‑FO XML file
+        const string outputPath = "output.pdf"; // Resulting PDF file
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        // Load the XSL‑FO document with default settings
+        XslFoLoadOptions loadOptions = new XslFoLoadOptions(); // defaults
+
+        // Ensure the Document is disposed properly
+        using (Document doc = new Document(inputPath, loadOptions))
+        {
+            // Save as PDF (default format)
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"PDF successfully saved to '{outputPath}'.");
+    }
+}

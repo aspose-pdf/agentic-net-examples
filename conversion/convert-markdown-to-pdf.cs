@@ -1,12 +1,27 @@
-// URL-STABILITY STUB
-//
-// convert markdown to pdf
-//
-// This example has been consolidated or moved. Current location:
-//   https://github.com/aspose-pdf/agentic-net-examples/tree/main/conversion
-//
-// This stub keeps the original URL live for existing bookmarks,
-// search-engine indexes, and blog-post links. See the canonical
-// location above for the current, maintained implementation.
+using System;
+using System.IO;
+using Aspose.Pdf;
 
-class Program { static void Main() { } }
+class Program
+{
+    static void Main()
+    {
+        const string markdownPath = "input.md";
+        const string pdfPath      = "output.pdf";
+
+        if (!File.Exists(markdownPath))
+        {
+            Console.Error.WriteLine($"File not found: {markdownPath}");
+            return;
+        }
+
+        // Load the Markdown file using MdLoadOptions and convert it to a PDF document.
+        using (Document doc = new Document(markdownPath, new MdLoadOptions()))
+        {
+            // Save the resulting document as PDF. No SaveOptions are needed for PDF output.
+            doc.Save(pdfPath);
+        }
+
+        Console.WriteLine($"Markdown converted to PDF: '{pdfPath}'");
+    }
+}
