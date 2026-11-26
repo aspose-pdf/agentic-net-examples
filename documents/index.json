@@ -1,0 +1,708 @@
+{
+  "category": "documents",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-26T06:10:58Z",
+  "examples": {
+    "create-pdf-add-textfragment": {
+      "title": "Create PDF and Add TextFragment",
+      "filename": "create-pdf-add-textfragment.cs",
+      "description": "Demonstrates how to create a new PDF document, add a blank page, insert a TextFragment with custom text, and save the file using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "aspose",
+        "textfragment",
+        "csharp",
+        "document-creation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page.Paragraphs",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71374"
+    },
+    "create-multi-page-pdf-with-text-fragments": {
+      "title": "Create Multi‑Page PDF with Text Fragments",
+      "filename": "create-multi-page-pdf-with-text-fragments.cs",
+      "description": "Demonstrates how to create a PDF, add multiple pages, place a TextFragment on each page, and save the document.",
+      "tags": [
+        "pdf",
+        "multipage",
+        "textfragment",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Page.Paragraphs.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71375"
+    },
+    "set-pdf-centered-window": {
+      "title": "Set PDF to Open with Centered Window",
+      "filename": "set-pdf-centered-window.cs",
+      "description": "Loads an existing PDF, enables the CenterWindow flag so the document opens with the viewer window centered, and saves the modified file.",
+      "tags": [
+        "pdf",
+        "center-window",
+        "aspose.pdf",
+        "csharp",
+        "document-settings"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71376"
+    },
+    "set-pdf-reading-direction-ltr": {
+      "title": "Set PDF Reading Direction to Left-to-Right",
+      "filename": "set-pdf-reading-direction-ltr.cs",
+      "description": "Loads a PDF file, changes its reading direction to left‑to‑right, and saves the modified document as a new file.",
+      "tags": [
+        "pdf",
+        "reading-direction",
+        "ltr",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Direction",
+        "Aspose.Pdf.Direction",
+        "Aspose.Pdf.Document.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71377"
+    },
+    "enable-display-doc-title": {
+      "title": "Enable DisplayDocTitle and Save PDF",
+      "filename": "enable-display-doc-title.cs",
+      "description": "Loads a PDF with Aspose.Pdf, sets the DisplayDocTitle flag so PDF viewers show the document title, and saves the updated file as TitleDisplayed.pdf.",
+      "tags": [
+        "pdf",
+        "displaydoctitle",
+        "aspose",
+        "csharp",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.DisplayDocTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71378"
+    },
+    "set-pdf-open-zoom-150": {
+      "title": "Set PDF Open Zoom to 150% Using XYZExplicitDestination",
+      "filename": "set-pdf-open-zoom-150.cs",
+      "description": "Shows how to create a PDF, define an XYZ explicit destination with a 1.5 zoom factor, assign it as the document's OpenAction, and save the result.",
+      "tags": [
+        "open-action",
+        "zoom",
+        "xyz-destination",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.GoToAction"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71382"
+    },
+    "extract-zoom-factor-from-openaction": {
+      "title": "Extract Zoom Factor from PDF OpenAction",
+      "filename": "extract-zoom-factor-from-openaction.cs",
+      "description": "Loads a PDF, checks its OpenAction for a GoToAction, reads the zoom factor from an XYZ explicit destination, writes the value to a text file, and optionally re‑saves the PDF.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "openaction",
+        "gotoaction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.FitExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71383"
+    },
+    "create-pdf-duplex-long-edge": {
+      "title": "Create PDF with Duplex Long Edge Printing",
+      "filename": "create-pdf-duplex-long-edge.cs",
+      "description": "Demonstrates how to create a PDF, add simple text, set the duplex printing mode to flip on the long edge, and save the document.",
+      "tags": [
+        "pdf",
+        "duplex",
+        "printing",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.PrintDuplex",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71384"
+    },
+    "set-pdf-duplex-long-edge": {
+      "title": "Set PDF Duplex Printing Mode to Long Edge",
+      "filename": "set-pdf-duplex-long-edge.cs",
+      "description": "The example loads a PDF file, configures its duplex printing mode to flip on the long edge, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "duplex",
+        "printing",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PrintDuplex",
+        "Aspose.Pdf.Document.Duplex",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71385"
+    },
+    "create-tagged-pdf-with-span-elements": {
+      "title": "Create Tagged PDF with Span Elements for Paragraphs",
+      "filename": "create-tagged-pdf-with-span-elements.cs",
+      "description": "Demonstrates how to create a PDF, add paragraphs, and tag each paragraph with a Span element using Aspose.Pdf's Tagged PDF API, then save the document.",
+      "tags": [
+        "pdf",
+        "tagged-pdf",
+        "span",
+        "paragraph",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetTitle",
+        "Aspose.Pdf.LogicalStructure.SpanElement",
+        "Aspose.Pdf.LogicalStructure.SpanElement.SetText",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71389"
+    },
+    "set-pdf-window-centering-rtl": {
+      "title": "Set PDF Window Centering and RTL Reading Direction",
+      "filename": "set-pdf-window-centering-rtl.cs",
+      "description": "Demonstrates how to load a PDF, enable CenterWindow, set the document direction to right‑to‑left, and save the result as a new file.",
+      "tags": [
+        "center-window",
+        "rtl",
+        "pdf",
+        "aspose-pdf",
+        "document-settings"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.Direction",
+        "Aspose.Pdf.Direction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71390"
+    },
+    "create-pdf-enable-displaydoctitle": {
+      "title": "Create PDF and Enable DisplayDocTitle",
+      "filename": "create-pdf-enable-displaydoctitle.cs",
+      "description": "Demonstrates how to create a new PDF, add a blank page, enable the DisplayDocTitle flag so viewers show the document title, set the title metadata, and save the file.",
+      "tags": [
+        "pdf",
+        "displaydoctitle",
+        "metadata",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.DisplayDocTitle",
+        "Aspose.Pdf.Document.Info.Title",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71391"
+    },
+    "set-pdf-openaction-zoom-2x": {
+      "title": "Set PDF OpenAction Zoom to 200% Using GoToAction",
+      "filename": "set-pdf-openaction-zoom-2x.cs",
+      "description": "Loads a PDF, creates a GoToAction with an XYZExplicitDestination that sets a 2.0 (200%) zoom level, assigns it as the document's OpenAction, and saves the result.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "openaction",
+        "gotoaction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Pages",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71392"
+    },
+    "add-tagged-span-to-pdf": {
+      "title": "Add a Tagged Span to a PDF for Accessibility",
+      "filename": "add-tagged-span-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, enabling tagged content, creating a Span element with accessibility text, attaching it to the document structure, and saving the modified file.",
+      "tags": [
+        "tagged-pdf",
+        "accessibility",
+        "span",
+        "aspdf",
+        "pdf-tagging"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.SpanElement",
+        "Aspose.Pdf.Tagged.TaggedContent.CreateSpanElement",
+        "Aspose.Pdf.Tagged.TaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.TaggedContent.SetTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71395"
+    },
+    "set-duplex-printing-and-center-window": {
+      "title": "Configure Duplex Printing and Center Window in PDF",
+      "filename": "set-duplex-printing-and-center-window.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, set the duplex printing mode to flip on the long edge, enable window centering, and save the modified document.",
+      "tags": [
+        "duplex",
+        "center-window",
+        "pdf",
+        "printing",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PrintDuplex",
+        "Aspose.Pdf.Document.Duplex",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71397"
+    },
+    "set-default-zoom-pdf-open-action": {
+      "title": "Set Default Zoom for PDF on Open",
+      "filename": "set-default-zoom-pdf-open-action.cs",
+      "description": "Demonstrates how to create a PDF, add a page, and set an OpenAction that opens the document at a specific location with a 100% zoom using a GoToAction with XYZExplicitDestination.",
+      "tags": [
+        "pdf",
+        "open-action",
+        "zoom",
+        "gotoaction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71402"
+    },
+    "disable-pdf-window-title-and-centering": {
+      "title": "Disable PDF Window Title and Centering",
+      "filename": "disable-pdf-window-title-and-centering.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, turn off the CenterWindow and DisplayDocTitle options, and save the result as a new file.",
+      "tags": [
+        "pdf",
+        "aspose.pdf",
+        "window-options",
+        "csharp",
+        "document-properties"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.DisplayDocTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71403"
+    },
+    "tag-paragraph-with-span": {
+      "title": "Tag a Paragraph with a Span in a PDF",
+      "filename": "tag-paragraph-with-span.cs",
+      "description": "Shows how to load a PDF, use the TaggedContent API to create a paragraph and a span, attach them to the document's structure tree, and save the result as a tagged PDF.",
+      "tags": [
+        "pdf",
+        "tagged-content",
+        "paragraph",
+        "span",
+        "structure"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ITaggedContent",
+        "Aspose.Pdf.Tagged.ITaggedContent.SetLanguage",
+        "Aspose.Pdf.Tagged.ITaggedContent.CreateParagraphElement",
+        "Aspose.Pdf.Tagged.ITaggedContent.CreateSpanElement",
+        "Aspose.Pdf.LogicalStructure.ParagraphElement",
+        "Aspose.Pdf.LogicalStructure.SpanElement",
+        "Aspose.Pdf.StructureElement.AppendChild",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71407"
+    },
+    "configure-duplex-printing-and-zoom-open-action": {
+      "title": "Configure Duplex Printing and Zoom Open Action for a PDF",
+      "filename": "configure-duplex-printing-and-zoom-open-action.cs",
+      "description": "Demonstrates how to load a PDF, set the duplex printing mode to flip on the long edge, define an open action that zooms to 125% on the first page, and save the result.",
+      "tags": [
+        "duplex",
+        "zoom",
+        "open-action",
+        "printing",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PrintDuplex",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71409"
+    },
+    "create-pdf-centered-window-title": {
+      "title": "Create PDF with Centered Window and Document Title",
+      "filename": "create-pdf-centered-window-title.cs",
+      "description": "Demonstrates how to create a new PDF, add a blank page, set the window to open centered and display the document title in the title bar, and save the file.",
+      "tags": [
+        "pdf",
+        "center-window",
+        "display-title",
+        "aspose-pdf",
+        "document-creation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.DisplayDocTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71414"
+    },
+    "set-pdf-openaction-zoom-75": {
+      "title": "Set PDF OpenAction Zoom to 75%",
+      "filename": "set-pdf-openaction-zoom-75.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, assign a GoToAction as the document's OpenAction with a 75% zoom using XYZExplicitDestination, and save the modified file.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "open-action",
+        "goto-action",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71415"
+    },
+    "create-rtl-tagged-pdf-with-span": {
+      "title": "Create RTL Tagged PDF with Span Element",
+      "filename": "create-rtl-tagged-pdf-with-span.cs",
+      "description": "Demonstrates how to generate a PDF with right‑to‑left reading direction, add Arabic text, and use the tagged‑content API to insert a Span element (BDC/EMC operators) for accessibility.",
+      "tags": [
+        "pdf",
+        "rtl",
+        "tagged",
+        "span",
+        "accessibility"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.Tagged.StructureElement",
+        "Aspose.Pdf.Tagged.SpanElement"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71418"
+    },
+    "create-pdf-set-open-zoom-180": {
+      "title": "Create PDF and Set Open Action Zoom to 180%",
+      "filename": "create-pdf-set-open-zoom-180.cs",
+      "description": "Demonstrates how to create a PDF, add a page with text, set the document's OpenAction to a 1.8 (180%) zoom using XYZExplicitDestination, and save the file.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "open-action",
+        "textfragment",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71420"
+    },
+    "set-pdf-center-window-and-duplex": {
+      "title": "Set PDF Viewer Center Window and Duplex Printing Mode",
+      "filename": "set-pdf-center-window-and-duplex.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, enable the CenterWindow option so the viewer opens centered, set the duplex printing mode to flip long edge, and save the modified document.",
+      "tags": [
+        "pdf",
+        "viewer",
+        "duplex",
+        "print",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PrintDuplex",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.Duplex",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71421"
+    },
+    "set-rtl-direction-and-display-title": {
+      "title": "Set PDF Reading Direction to RTL and Display Document Title",
+      "filename": "set-rtl-direction-and-display-title.cs",
+      "description": "The example loads an existing PDF, changes its reading direction to right‑to‑left, enables the document title to be shown in the viewer, and saves the result as RTLTitle.pdf.",
+      "tags": [
+        "rtl",
+        "reading-direction",
+        "display-title",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Direction",
+        "Aspose.Pdf.Document.Direction",
+        "Aspose.Pdf.Document.DisplayDocTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71425"
+    },
+    "set-pdf-openaction-zoom-2-5": {
+      "title": "Set PDF OpenAction Zoom Level Using GoToAction",
+      "filename": "set-pdf-openaction-zoom-2-5.cs",
+      "description": "Demonstrates how to load a PDF, assign an OpenAction with a GoToAction that uses an XYZ explicit destination to set the initial zoom factor to 2.5, and save the result.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "openaction",
+        "gotoaction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71427"
+    },
+    "create-pdf-centered-window-ltr": {
+      "title": "Create PDF with Centered Viewer Window and LTR Direction",
+      "filename": "create-pdf-centered-window-ltr.cs",
+      "description": "Demonstrates how to create a PDF, add a blank page, set the viewer window to open centered, specify left‑to‑right reading direction, and save the document.",
+      "tags": [
+        "pdf",
+        "center-window",
+        "ltr",
+        "aspose-pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.Direction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71430"
+    },
+    "create-tagged-pdf-with-zoomed-openaction": {
+      "title": "Create Tagged PDF with Zoomed OpenAction",
+      "filename": "create-tagged-pdf-with-zoomed-openaction.cs",
+      "description": "Demonstrates how to generate a PDF, add a tagged Span element, set the document language, and define an OpenAction that opens the first page at 130% zoom.",
+      "tags": [
+        "pdf",
+        "tagging",
+        "zoom",
+        "openaction",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Tagged.ITaggedContent",
+        "Aspose.Pdf.LogicalStructure.StructureElement",
+        "Aspose.Pdf.Tagged.SpanElement",
+        "Aspose.Pdf.Annotations.GoToAction",
+        "Aspose.Pdf.Annotations.XYZExplicitDestination"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71433"
+    },
+    "set-zoom-and-hide-doc-title": {
+      "title": "Set PDF OpenAction Zoom and Hide Document Title",
+      "filename": "set-zoom-and-hide-doc-title.cs",
+      "description": "Demonstrates how to load a PDF, set an OpenAction with a 100% zoom using a GoToAction, disable the display of the document title, and save the result.",
+      "tags": [
+        "pdf",
+        "zoom",
+        "openaction",
+        "displaydoctitle",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.XYZExplicitDestination",
+        "Aspose.Pdf.GoToAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.DisplayDocTitle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71434"
+    },
+    "set-pdf-fullscreen-mode": {
+      "title": "Set PDF to Open in Full‑Screen Mode",
+      "filename": "set-pdf-fullscreen-mode.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, setting the document's PageMode to FullScreen, and saving the modified file.",
+      "tags": [
+        "pdf",
+        "fullscreen",
+        "pagemode",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageMode",
+        "Aspose.Pdf.Document.PageMode",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.Dispose"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T06:10:58Z",
+      "status": "verified",
+      "task_id": "71494"
+    }
+  }
+}
