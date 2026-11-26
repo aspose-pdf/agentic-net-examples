@@ -1,0 +1,140 @@
+{
+  "category": "decryption",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-26T04:43:31Z",
+  "examples": {
+    "decrypt-pdf-with-owner-password__v2": {
+      "title": "Decrypt PDF with Owner Password using Aspose.Pdf",
+      "filename": "decrypt-pdf-with-owner-password__v2.cs",
+      "description": "Shows how to open an encrypted PDF with the owner password, decrypt it using Aspose.Pdf, and save the unprotected document.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "owner-password",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException",
+        "Aspose.Pdf.Document(Document, string)"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T04:43:31Z",
+      "status": "verified",
+      "task_id": "71642"
+    },
+    "decrypt-pdf-using-owner-password": {
+      "title": "Decrypt PDF Using Owner Password with Aspose.Pdf",
+      "filename": "decrypt-pdf-using-owner-password.cs",
+      "description": "Shows how to open an encrypted PDF with the owner password, remove its encryption using Document.Decrypt, and save the resulting unprotected PDF.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "owner-password",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T04:43:31Z",
+      "status": "verified",
+      "task_id": "71643"
+    },
+    "decrypt-encrypted-pdf-using-owner-password": {
+      "title": "Decrypt Encrypted PDF Using Owner Password",
+      "filename": "decrypt-encrypted-pdf-using-owner-password.cs",
+      "description": "Shows how to open an encrypted PDF with the owner password, decrypt it using Document.Decrypt(), and save the unprotected PDF.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "owner-password",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T04:43:31Z",
+      "status": "verified",
+      "task_id": "71682"
+    },
+    "decrypt-pdf-if-encrypted": {
+      "title": "Decrypt PDF if Encrypted and Save",
+      "filename": "decrypt-pdf-if-encrypted.cs",
+      "description": "Loads a PDF file, checks whether it is encrypted, decrypts it when needed, and saves the resulting document.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "aspose-pdf",
+        "document",
+        "password"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.IsEncrypted",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.InvalidPasswordException"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T04:43:31Z",
+      "status": "verified",
+      "task_id": "71691"
+    },
+    "decrypt-pdf-with-owner-password__v3": {
+      "title": "Decrypt PDF with Owner Password",
+      "filename": "decrypt-pdf-with-owner-password__v3.cs",
+      "description": "Shows how to open an encrypted PDF using the owner password, remove its security restrictions, and save an unprotected copy with Aspose.Pdf for .NET.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "owner-password",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-26T04:43:31Z",
+      "status": "verified",
+      "task_id": "71719"
+    },
+    "decrypt-pdf-change-passwords": {
+      "title": "Decrypt PDF and Change Passwords",
+      "filename": "decrypt-pdf-change-passwords.cs",
+      "description": "Demonstrates opening an encrypted PDF with the owner password, decrypting it, then re‑encrypting with new user and owner passwords and saving the result.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "encryption",
+        "password",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Decrypt",
+        "Aspose.Pdf.Document.Encrypt",
+        "Aspose.Pdf.Permissions",
+        "Aspose.Pdf.CryptoAlgorithm"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-26T04:43:31Z",
+      "status": "verified",
+      "task_id": "71735"
+    }
+  }
+}
