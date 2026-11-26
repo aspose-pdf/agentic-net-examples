@@ -1,0 +1,33 @@
+using System;
+using System.IO;
+using Aspose.Pdf;
+
+class Program
+{
+    static void Main()
+    {
+        const string inputPath = "input.pdf";
+        const string outputPath = "DuplexCentered.pdf";
+
+        if (!File.Exists(inputPath))
+        {
+            Console.Error.WriteLine($"Input file not found: {inputPath}");
+            return;
+        }
+
+        // Load the PDF document inside a using block for deterministic disposal
+        using (Document doc = new Document(inputPath))
+        {
+            // Set duplex printing mode to flip on the long edge using the correct enum
+            doc.Duplex = PrintDuplex.DuplexFlipLongEdge;
+
+            // Center the PDF viewer window when opened
+            doc.CenterWindow = true;
+
+            // Save the modified document
+            doc.Save(outputPath);
+        }
+
+        Console.WriteLine($"Saved modified PDF to '{outputPath}'.");
+    }
+}
