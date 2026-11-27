@@ -1,0 +1,51 @@
+{
+  "category": "facades-decryption",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-27T18:17:25Z",
+  "examples": {
+    "decrypt-pdf-using-owner-password__v2": {
+      "title": "Decrypt PDF Using Owner Password with Aspose.Pdf",
+      "filename": "decrypt-pdf-using-owner-password__v2.cs",
+      "description": "Demonstrates how to load an encrypted PDF by providing the owner password, decrypt it in memory, and save the unencrypted version using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "owner-password",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T18:17:25Z",
+      "status": "verified",
+      "task_id": "71683"
+    },
+    "decrypt-encrypted-pdf-save-to-folder": {
+      "title": "Decrypt Encrypted PDF and Save to Folder",
+      "filename": "decrypt-encrypted-pdf-save-to-folder.cs",
+      "description": "The example checks if a PDF is encrypted, decrypts it using the owner password with Aspose.Pdf.Facades, and saves the decrypted file to a specified output folder.",
+      "tags": [
+        "pdf",
+        "decryption",
+        "aspose",
+        "file-io",
+        "security"
+      ],
+      "apis_used": [
+        "PdfFileInfo",
+        "PdfFileInfo.IsEncrypted",
+        "PdfFileSecurity",
+        "PdfFileSecurity.BindPdf",
+        "PdfFileSecurity.DecryptFile",
+        "PdfFileSecurity.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T18:17:25Z",
+      "status": "verified",
+      "task_id": "71715"
+    }
+  }
+}
