@@ -1,7 +1,7 @@
 {
   "category": "facades-documents",
-  "nuget_version": "26.10.0",
-  "last_updated": "2026-11-06T16:11:13Z",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-27T19:46:07Z",
   "examples": {
     "insert-page-range-into-pdf": {
       "title": "Insert Page Range from One PDF into Another",
@@ -2208,6 +2208,1231 @@
       "generated_at": "2026-11-06T16:11:13Z",
       "status": "verified",
       "task_id": "21346"
+    },
+    "hide-pdf-toolbar": {
+      "title": "Hide PDF Toolbar Using PdfContentEditor",
+      "filename": "hide-pdf-toolbar.cs",
+      "description": "Shows how to load a PDF, set the viewer preference to hide the toolbar, and save the modified document.",
+      "tags": [
+        "pdf",
+        "toolbar",
+        "viewer-preference",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71386"
+    },
+    "hide-pdf-toolbar-using-viewer-preference": {
+      "title": "Hide PDF Toolbar Using Viewer Preference",
+      "filename": "hide-pdf-toolbar-using-viewer-preference.cs",
+      "description": "Creates a PDF, adds a blank page, then uses PdfContentEditor to set the viewer preference that hides the toolbar and saves the file as ToolbarHidden.pdf.",
+      "tags": [
+        "pdf",
+        "toolbar",
+        "viewer-preference",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document.Pages.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71394"
+    },
+    "hide-pdf-scrollbars": {
+      "title": "Hide PDF Scrollbars Using ViewerPreferences",
+      "filename": "hide-pdf-scrollbars.cs",
+      "description": "Demonstrates loading a PDF, binding it with PdfContentEditor, setting the ViewerPreferences.HideScrollbars property (using dynamic for version compatibility), and saving the result.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "scrollbars",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideScrollbars"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71401"
+    },
+    "hide-toolbar-menubar-pdf": {
+      "title": "Hide Toolbar and Menubar in PDF",
+      "filename": "hide-toolbar-menubar-pdf.cs",
+      "description": "Demonstrates how to create a PDF, add a page with text, and use PdfContentEditor to hide the viewer toolbar and menubar before saving the final document.",
+      "tags": [
+        "pdf",
+        "viewer-preference",
+        "toolbar",
+        "menubar",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Text.TextFragment",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71406"
+    },
+    "hide-pdf-toolbar__v2": {
+      "title": "Hide PDF Toolbar Using PdfContentEditor",
+      "filename": "hide-pdf-toolbar__v2.cs",
+      "description": "Demonstrates how to load a PDF, bind it to a PdfContentEditor, hide the viewer toolbar via ChangeViewerPreference, and save the result.",
+      "tags": [
+        "pdf",
+        "toolbar",
+        "viewer-preference",
+        "Aspose.Pdf",
+        "PdfContentEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71411"
+    },
+    "hide-toolbar-center-window-pdf": {
+      "title": "Hide Toolbar and Center PDF Window Using PdfContentEditor",
+      "filename": "hide-toolbar-center-window-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfContentEditor, hiding the viewer toolbar, centering the window on open, and saving the modified document.",
+      "tags": [
+        "pdf",
+        "toolbar",
+        "center-window",
+        "viewer-preference",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.ChangeViewerPreference",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.ViewerPreference"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71417"
+    },
+    "hide-pdf-scrollbars__v2": {
+      "title": "Hide PDF Scrollbars Using ViewerPreferences",
+      "filename": "hide-pdf-scrollbars__v2.cs",
+      "description": "The example loads a PDF, binds it with PdfContentEditor, sets the ViewerPreferences.HideScrollbars flag to true, and saves the document without scrollbars.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "scrollbars",
+        "aspose-pdf",
+        "content-editor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideScrollbars"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71423"
+    },
+    "hide-toolbar-scrollbars-in-pdf": {
+      "title": "Hide Toolbar and Scrollbars in PDF Viewer",
+      "filename": "hide-toolbar-scrollbars-in-pdf.cs",
+      "description": "Loads a PDF, sets viewer preferences to hide the toolbar and window UI (scrollbars), and saves the modified document as ToolbarScrollHidden.pdf.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "hide-toolbar",
+        "hide-scrollbars",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ViewerPreferences",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71432"
+    },
+    "insert-pdf-page-at-specific-position": {
+      "title": "Insert PDF Page into Another PDF at Specific Position",
+      "filename": "insert-pdf-page-at-specific-position.cs",
+      "description": "Demonstrates how to insert all pages from a source PDF into a destination PDF at page number five using Aspose.Pdf's page collection insertion.",
+      "tags": [
+        "pdf",
+        "insert-page",
+        "aspose-pdf",
+        "csharp",
+        "document-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71440"
+    },
+    "delete-specific-pages-from-pdf__v2": {
+      "title": "Delete Specific Pages from PDF",
+      "filename": "delete-specific-pages-from-pdf__v2.cs",
+      "description": "Demonstrates how to remove selected pages (pages 2 and 4) from an existing PDF file using Aspose.Pdf's PdfFileEditor and save the modified document.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "aspose-pdf",
+        "facade",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71443"
+    },
+    "delete-specific-pages-from-pdf__v3": {
+      "title": "Delete Specific Pages from PDF",
+      "filename": "delete-specific-pages-from-pdf__v3.cs",
+      "description": "Shows how to remove a range of pages (10‑15) from a PDF file using Aspose.Pdf.Facades.PdfFileEditor.Delete.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "aspose-pdf",
+        "facades",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71444"
+    },
+    "insert-page-from-one-pdf-into-another": {
+      "title": "Insert Page from One PDF into Another",
+      "filename": "insert-page-from-one-pdf-into-another.cs",
+      "description": "Demonstrates copying page 2 from a source PDF and inserting it into a target PDF using Aspose.Pdf's Document and Pages.Insert, then saving the modified file.",
+      "tags": [
+        "pdf",
+        "page-insertion",
+        "aspose.pdf",
+        "document-manipulation",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.PageCollection.Count",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71461"
+    },
+    "delete-specific-pages-from-pdf__v4": {
+      "title": "Delete Specific Pages from PDF",
+      "filename": "delete-specific-pages-from-pdf__v4.cs",
+      "description": "Demonstrates how to remove non‑contiguous pages (3, 6, 9) from a PDF using Aspose.Pdf's PdfFileEditor.Delete method.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "aspose-pdf",
+        "file-editor",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71462"
+    },
+    "insert-cover-page-into-pdf": {
+      "title": "Insert Cover Page into PDF",
+      "filename": "insert-cover-page-into-pdf.cs",
+      "description": "Demonstrates how to prepend a cover PDF to an existing document using Aspose.Pdf by loading both files, inserting the cover pages at position 1, and saving the merged result.",
+      "tags": [
+        "pdf",
+        "cover-page",
+        "insert",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71466"
+    },
+    "delete-last-five-pages-from-pdf": {
+      "title": "Delete Last Five Pages from PDF",
+      "filename": "delete-last-five-pages-from-pdf.cs",
+      "description": "Demonstrates how to remove the final five pages of a PDF using Aspose.Pdf's PdfFileEditor.Delete method, handling documents with fewer than five pages gracefully.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "aspose-pdf",
+        "file-editor",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete",
+        "Aspose.Pdf.PageCollection.Count"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71468"
+    },
+    "insert-pages-at-specific-position": {
+      "title": "Insert Pages from Another PDF at Specific Position",
+      "filename": "insert-pages-at-specific-position.cs",
+      "description": "Shows how to insert page(s) from an external PDF into a target PDF at a given 1‑based position using Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "page-insertion",
+        "Aspose.Pdf",
+        "C#",
+        "document-manipulation"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Pages",
+        "Aspose.Pdf.PageCollection.Insert",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71472"
+    },
+    "delete-specific-pages-from-pdf__v5": {
+      "title": "Delete Specific Pages from PDF",
+      "filename": "delete-specific-pages-from-pdf__v5.cs",
+      "description": "Demonstrates how to remove a range of pages (15‑22) from an existing PDF using Aspose.Pdf.Facades.PdfFileEditor and save the trimmed document.",
+      "tags": [
+        "pdf",
+        "delete-pages",
+        "aspose-pdf",
+        "file-editing",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.Delete"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71474"
+    },
+    "extract-pdf-viewer-preferences": {
+      "title": "Extract PDF Viewer Preferences and Write to Text File",
+      "filename": "extract-pdf-viewer-preferences.cs",
+      "description": "Demonstrates how to bind a PDF with PdfContentEditor, retrieve its ViewerPreferences via dynamic access, and save the preferences to a text file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "aspose",
+        "export",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71491"
+    },
+    "set-pdf-viewer-preference-centerwindow": {
+      "title": "Set PDF Viewer Preference CenterWindow with PdfContentEditor",
+      "filename": "set-pdf-viewer-preference-centerwindow.cs",
+      "description": "Shows how to bind a PDF using PdfContentEditor, set the ViewerPreferences.CenterWindow flag (with reflection/dynamic fallback for version compatibility), and save the modified file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "centerwindow",
+        "aspose.pdf",
+        "c#"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Save",
+        "PdfContentEditor.Document",
+        "ViewerPreferences.CenterWindow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71492"
+    },
+    "hide-pdf-menu-bar": {
+      "title": "Hide PDF Menu Bar Using PdfContentEditor",
+      "filename": "hide-pdf-menu-bar.cs",
+      "description": "Shows how to bind a PDF with PdfContentEditor, hide the viewer's menu bar via ViewerPreferences, and save the modified document.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "hide-menubar",
+        "aspose",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Facades.PdfContentEditor.ViewerPreferences",
+        "Aspose.Pdf.Facades.PdfContentEditor.ViewerPreferences.HideMenubar"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71493"
+    },
+    "set-pdf-viewer-preferences": {
+      "title": "Set PDF Viewer Preferences (Center Window & Hide Menu Bar)",
+      "filename": "set-pdf-viewer-preferences.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, changing viewer preferences to center the window and hide the menu bar, and saving the customized document.",
+      "tags": [
+        "viewer-preferences",
+        "center-window",
+        "hide-menubar",
+        "pdf",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71496"
+    },
+    "set-pdf-viewer-preferences-center-window": {
+      "title": "Set PDF Viewer Preferences: Hide Side Panel and Center Window",
+      "filename": "set-pdf-viewer-preferences-center-window.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, configure viewer preferences to disable side panels (PageMode.UseNone) and center the viewer window, then save the modified document.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "pagemode",
+        "centerwindow",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.PageMode",
+        "Aspose.Pdf.Document.PageMode",
+        "Aspose.Pdf.Document.CenterWindow",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71497"
+    },
+    "extract-pdf-viewer-preferences__v2": {
+      "title": "Extract PDF Viewer Preferences and Save as JSON",
+      "filename": "extract-pdf-viewer-preferences__v2.cs",
+      "description": "Demonstrates how to bind a PDF with PdfContentEditor, retrieve its viewer preferences, and serialize them to a JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71506"
+    },
+    "set-pdf-viewer-preferences__v2": {
+      "title": "Set PDF Viewer Preferences (Center Window, Hide Menubar)",
+      "filename": "set-pdf-viewer-preferences__v2.cs",
+      "description": "Loads a PDF with Aspose.Pdf, optionally sets viewer preferences such as CenterWindow and HideMenubar, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "aspose.pdf",
+        "document",
+        "c#"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.CenterWindow",
+        "Aspose.Pdf.ViewerPreferences.HideMenubar"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71507"
+    },
+    "set-pdf-viewer-pagemode-usenone": {
+      "title": "Set PDF Viewer PageMode to UseNone with PdfContentEditor",
+      "filename": "set-pdf-viewer-pagemode-usenone.cs",
+      "description": "Demonstrates how to bind a PDF with PdfContentEditor, use reflection to set the ViewerPreferences.PageMode to UseNone for full‑screen mode, and save the result.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "fullscreen",
+        "reflection",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71508"
+    },
+    "read-centerwindow-viewer-preference": {
+      "title": "Read CenterWindow Viewer Preference from PDF using PdfContentEditor",
+      "filename": "read-centerwindow-viewer-preference.cs",
+      "description": "Demonstrates loading a PDF with PdfContentEditor, accessing the ViewerPreferences.CenterWindow flag, and writing the result to a text file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "centerwindow",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.CenterWindow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71509"
+    },
+    "extract-hide-menubar-viewer-preference": {
+      "title": "Extract HideMenuBar Viewer Preference from PDF and Save as JSON",
+      "filename": "extract-hide-menubar-viewer-preference.cs",
+      "description": "Shows how to open a PDF with PdfContentEditor, read the HideMenuBar viewer preference using GetViewerPreference, and write the result to a formatted JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preference",
+        "json",
+        "aspose.pdf",
+        "pdfcontenteditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference.HideMenubar"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71510"
+    },
+    "read-hide-toolbar-to-csv": {
+      "title": "Read HideToolbar Preference from PDF and Export to CSV",
+      "filename": "read-hide-toolbar-to-csv.cs",
+      "description": "Shows how to load a PDF with PdfContentEditor, obtain the ViewerPreferences.HideToolbar flag (using dynamic for version‑agnostic access), and write the filename and flag value to a CSV file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "csv",
+        "aspose-pdf",
+        "pdfcontenteditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideToolbar"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71511"
+    },
+    "read-pdf-fitwindow-xml-report": {
+      "title": "Read PDF FitWindow Viewer Preference and Generate XML Report",
+      "filename": "read-pdf-fitwindow-xml-report.cs",
+      "description": "Loads a PDF using Aspose.Pdf, retrieves the FitWindow viewer‑preference flag, and writes the boolean result to an XML report file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "fitwindow",
+        "xml-report",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.FitWindow"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71512"
+    },
+    "read-displaydoctitle-summary": {
+      "title": "Read DisplayDocTitle Preference and Write Summary",
+      "filename": "read-displaydoctitle-summary.cs",
+      "description": "Demonstrates opening a PDF with PdfContentEditor, retrieving the DisplayDocTitle viewer preference (using dynamic for version‑agnostic access), and writing the status to a plain‑text summary file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "displaydoctitle",
+        "aspose.pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Document",
+        "Document.ViewerPreferences",
+        "ViewerPreferences.DisplayDocTitle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71513"
+    },
+    "extract-pdf-viewer-preferences__v3": {
+      "title": "Extract PDF Viewer Preferences to JSON",
+      "filename": "extract-pdf-viewer-preferences__v3.cs",
+      "description": "Loads a PDF with PdfContentEditor, reads the ViewerPreferences object via dynamic access, and writes all available viewer preference properties to a formatted JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "metadata",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Document",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71514"
+    },
+    "export-pdf-viewer-preferences-to-markdown": {
+      "title": "Export PDF Viewer Preferences to Markdown",
+      "filename": "export-pdf-viewer-preferences-to-markdown.cs",
+      "description": "Loads a PDF, reads its ViewerPreferences (using reflection for version compatibility), and writes each preference and its value into a markdown table.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "markdown",
+        "aspose",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71515"
+    },
+    "extract-pdf-viewer-preferences__v4": {
+      "title": "Extract PDF Viewer Preferences and Save to Text Files",
+      "filename": "extract-pdf-viewer-preferences__v4.cs",
+      "description": "Demonstrates how to open a PDF with PdfContentEditor, retrieve its viewer preferences (handling both new and legacy Aspose.Pdf versions), and write each setting to separate text files.",
+      "tags": [
+        "pdf",
+        "viewer-preference",
+        "facade",
+        "reflection",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.GetViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference",
+        "Aspose.Pdf.Facades.ViewerPreference (properties via reflection)"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71516"
+    },
+    "read-pdf-viewer-preferences-to-csv": {
+      "title": "Read PDF Viewer Preferences (CenterWindow, FitWindow) and Export to CSV",
+      "filename": "read-pdf-viewer-preferences-to-csv.cs",
+      "description": "Loads a PDF with PdfContentEditor, reads the CenterWindow and FitWindow viewer preference flags via reflection, and writes the two boolean values to a single CSV line.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "csv",
+        "aspose",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.CenterWindow",
+        "Aspose.Pdf.ViewerPreferences.FitWindow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71517"
+    },
+    "export-pdf-viewer-preferences-to-json": {
+      "title": "Export PDF Viewer Preferences to JSON",
+      "filename": "export-pdf-viewer-preferences-to-json.cs",
+      "description": "Opens a PDF with PdfContentEditor, reads the HideMenuBar and HideToolbar viewer preferences, and writes them to a formatted JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideMenuBar",
+        "Aspose.Pdf.ViewerPreferences.HideToolbar"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71518"
+    },
+    "export-pdf-viewer-preferences-to-xml__v2": {
+      "title": "Export PDF Viewer Preferences to XML",
+      "filename": "export-pdf-viewer-preferences-to-xml__v2.cs",
+      "description": "Loads a PDF with Aspose.Pdf, reads the ViewerPreferences (CenterWindow, HideMenuBar, HideToolbar) and writes those values to an XML file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "xml",
+        "aspose.pdf",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.CenterWindow",
+        "Aspose.Pdf.ViewerPreferences.HideMenuBar",
+        "Aspose.Pdf.ViewerPreferences.HideToolbar"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71519"
+    },
+    "extract-pdf-viewer-preferences-to-yaml": {
+      "title": "Extract PDF Viewer Preferences and Save to YAML",
+      "filename": "extract-pdf-viewer-preferences-to-yaml.cs",
+      "description": "Shows how to load a PDF with PdfContentEditor, read the FitWindow and DisplayDocTitle viewer preferences (using dynamic for version‑compatibility), and write those settings to a YAML configuration file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "yaml",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Document",
+        "Aspose.Pdf.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.FitWindow",
+        "Aspose.Pdf.ViewerPreferences.DisplayDocTitle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71520"
+    },
+    "generate-viewer-preferences-report": {
+      "title": "Generate Viewer Preferences Report from PDF",
+      "filename": "generate-viewer-preferences-report.cs",
+      "description": "Opens a PDF with Aspose.Pdf, retrieves the ViewerPreferences settings (using dynamic access with a fallback for older library versions), and writes a formatted plain‑text report summarizing each preference.",
+      "tags": [
+        "viewer-preferences",
+        "pdf",
+        "aspose-pdf",
+        "reflection",
+        "dynamic"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71521"
+    },
+    "read-hide-toolbar-from-pdf": {
+      "title": "Read HideToolbar Viewer Preference from PDF using PdfContentEditor",
+      "filename": "read-hide-toolbar-from-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfContentEditor, reading the ViewerPreferences.HideToolbar flag via dynamic binding, and writing the boolean result to a text file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "hide-toolbar",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Document",
+        "Document",
+        "Document.ViewerPreferences",
+        "ViewerPreferences.HideToolbar"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71522"
+    },
+    "read-pdf-viewer-preferences-to-json": {
+      "title": "Read PDF Viewer Preferences and Export to JSON",
+      "filename": "read-pdf-viewer-preferences-to-json.cs",
+      "description": "Loads a PDF using PdfContentEditor, extracts the CenterWindow, FitWindow, and DisplayDocTitle viewer preferences, and saves them as a formatted JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71523"
+    },
+    "read-hide-menu-bar-to-ini": {
+      "title": "Extract HideMenuBar Preference and Write to INI",
+      "filename": "read-hide-menu-bar-to-ini.cs",
+      "description": "Shows how to open a PDF with PdfContentEditor, read the ViewerPreferences.HideMenuBar setting via dynamic access, and store the result in an INI‑style configuration file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "ini",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Document",
+        "Document.ViewerPreferences",
+        "ViewerPreferences.HideMenuBar"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71524"
+    },
+    "export-pdf-viewer-preferences-to-csv": {
+      "title": "Export PDF Viewer Preferences to CSV",
+      "filename": "export-pdf-viewer-preferences-to-csv.cs",
+      "description": "Loads a PDF, accesses its ViewerPreferences via dynamic binding, and writes all boolean viewer‑preference settings to a CSV file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "csv",
+        "reflection",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71525"
+    },
+    "read-pdf-viewer-preferences-html": {
+      "title": "Read PDF Viewer Preferences and Export to HTML",
+      "filename": "read-pdf-viewer-preferences-html.cs",
+      "description": "Loads a PDF with Aspose.Pdf, reads its ViewerPreferences settings via dynamic access, and creates a simple HTML page that lists each preference value.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "html",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideToolbar",
+        "Aspose.Pdf.ViewerPreferences.FitWindow",
+        "Aspose.Pdf.ViewerPreferences.DisplayDocTitle"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71526"
+    },
+    "read-fitwindow-flag-to-text": {
+      "title": "Read PDF FitWindow Viewer Preference and Save to Text",
+      "filename": "read-fitwindow-flag-to-text.cs",
+      "description": "The example opens a PDF with Aspose.Pdf, reads the ViewerPreferences.FitWindow flag (using dynamic for version compatibility), and writes the result to a plain‑text file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "fitwindow",
+        "aspose.pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ViewerPreferences",
+        "Aspose.Pdf.Document.ViewerPreferences"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71527"
+    },
+    "extract-pdf-viewer-preferences__v5": {
+      "title": "Extract PDF Viewer Preferences and Save to JSON",
+      "filename": "extract-pdf-viewer-preferences__v5.cs",
+      "description": "Demonstrates loading a PDF with PdfContentEditor, reading the HideToolbar and DisplayDocTitle viewer preference values, and writing them to a JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71528"
+    },
+    "read-centerwindow-preference-to-csv": {
+      "title": "Read CenterWindow Viewer Preference from PDF and Export to CSV",
+      "filename": "read-centerwindow-preference-to-csv.cs",
+      "description": "Shows how to load a PDF with PdfContentEditor, retrieve the CenterWindow viewer preference (using dynamic for version compatibility), and write the result to a CSV file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "csv",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Document",
+        "Document.ViewerPreferences",
+        "ViewerPreferences.CenterWindow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71529"
+    },
+    "extract-pdf-viewer-preferences__v6": {
+      "title": "Extract PDF Viewer Preferences and Save to Binary File",
+      "filename": "extract-pdf-viewer-preferences__v6.cs",
+      "description": "Shows how to open a PDF with Aspose.Pdf, read the ViewerPreferences flag (using reflection for version compatibility), and serialize the integer value to a binary file for later use.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "serialization",
+        "aspose-pdf",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71530"
+    },
+    "read-pdf-viewer-preferences-hide-menubar-fitwindow": {
+      "title": "Read PDF Viewer Preferences (HideMenuBar, FitWindow) with PdfContentEditor",
+      "filename": "read-pdf-viewer-preferences-hide-menubar-fitwindow.cs",
+      "description": "Demonstrates loading a PDF using PdfContentEditor, accessing ViewerPreferences to read the HideMenuBar and FitWindow flags, and outputting the values as a markdown table.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "aspose-pdf",
+        "markdown",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Document",
+        "ViewerPreferences.HideMenuBar",
+        "ViewerPreferences.FitWindow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71531"
+    },
+    "using-pdfcontenteditor-read-a-pdf-use-getviewerpreference-to-get-viewerpreference-and-write-each-property-to-se-51dd6487": {
+      "title": "Using Pdfcontenteditor Read A Pdf Use Getviewerpreference To Get Viewerpreference And Write Each Property To Se 51Dd6487",
+      "filename": "using-pdfcontenteditor-read-a-pdf-use-getviewerpreference-to-get-viewerpreference-and-write-each-property-to-se-51dd6487.cs",
+      "description": "",
+      "tags": [],
+      "apis_used": [],
+      "difficulty": "",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71532"
+    },
+    "extract-displaydoctitle-flag": {
+      "title": "Extract DisplayDocTitle Flag from PDF and Save to Config",
+      "filename": "extract-displaydoctitle-flag.cs",
+      "description": "Shows how to open a PDF with Aspose.Pdf, read the ViewerPreferences.DisplayDocTitle flag (using dynamic for version‑agnostic access), and write the result to a simple text configuration file.",
+      "tags": [
+        "pdf",
+        "aspose",
+        "viewerpreferences",
+        "displaydoctitle",
+        "config"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ViewerPreferences",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.Document.Load",
+        "Aspose.Pdf.Document.Dispose"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71533"
+    },
+    "export-pdf-viewer-preferences-to-csv__v2": {
+      "title": "Export PDF Viewer Preferences to CSV",
+      "filename": "export-pdf-viewer-preferences-to-csv__v2.cs",
+      "description": "Loads a PDF using PdfContentEditor, accesses the ViewerPreferences via dynamic Document, and writes each boolean preference to a CSV file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "csv",
+        "aspose",
+        "reflection"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "Document",
+        "Document.ViewerPreferences",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Document"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71534"
+    },
+    "export-pdf-viewer-preferences-to-xml__v3": {
+      "title": "Export PDF Viewer Preferences to XML",
+      "filename": "export-pdf-viewer-preferences-to-xml__v3.cs",
+      "description": "Loads a PDF with Aspose.Pdf, reads its ViewerPreferences (using dynamic for version safety), and writes each preference and its value to an XML file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "xml",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideToolbar",
+        "Aspose.Pdf.ViewerPreferences.HideMenubar",
+        "Aspose.Pdf.ViewerPreferences.FitWindow"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71535"
+    },
+    "read-pdf-viewer-preferences-to-json__v2": {
+      "title": "Read PDF Viewer Preferences and Export to JSON",
+      "filename": "read-pdf-viewer-preferences-to-json__v2.cs",
+      "description": "Opens a PDF, reads the HideToolbar and HideMenuBar viewer preference flags, and writes the values to a JSON file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "json",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences.HideToolbar",
+        "Aspose.Pdf.ViewerPreferences.HideMenuBar"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71536"
+    },
+    "extract-pdf-viewer-preferences-to-yaml__v2": {
+      "title": "Extract PDF Viewer Preferences to YAML",
+      "filename": "extract-pdf-viewer-preferences-to-yaml__v2.cs",
+      "description": "Loads a PDF using Aspose.Pdf, reads the CenterWindow, FitWindow, and DisplayDocTitle viewer preference flags, and writes them to a YAML file.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "yaml",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.ViewerPreferences",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71537"
+    },
+    "generate-viewer-preferences-report__v2": {
+      "title": "Generate Viewer Preferences Report from PDF",
+      "filename": "generate-viewer-preferences-report__v2.cs",
+      "description": "Loads a PDF using Aspose.Pdf, retrieves the ViewerPreferences settings via reflection, and writes a formatted plain‑text report for auditing.",
+      "tags": [
+        "pdf",
+        "viewer-preferences",
+        "audit",
+        "report",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ViewerPreferences"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T19:46:07Z",
+      "status": "verified",
+      "task_id": "71538"
     }
   }
 }
