@@ -1,0 +1,569 @@
+{
+  "category": "facades-attachments",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-27T10:19:39Z",
+  "examples": {
+    "add-file-attachment-to-pdf__v8": {
+      "title": "Add File Attachment to PDF with Aspose.Pdf",
+      "filename": "add-file-attachment-to-pdf__v8.cs",
+      "description": "Shows how to load a PDF, create a FileSpecification for an external file, embed it as an attachment, and save the updated document.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "aspose-pdf",
+        "embedded-file",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFiles.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "71487"
+    },
+    "remove-pdf-attachment": {
+      "title": "Remove PDF Attachment Using Aspose.Pdf",
+      "filename": "remove-pdf-attachment.cs",
+      "description": "Shows how to load a PDF, detect embedded file attachments, delete the first attachment, and save the cleaned document with Aspose.Pdf.",
+      "tags": [
+        "pdf",
+        "attachment",
+        "remove",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFile",
+        "Aspose.Pdf.EmbeddedFilesCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "71488"
+    },
+    "add-multiple-attachments-to-pdf__v2": {
+      "title": "Add Multiple Attachments to a PDF using Aspose.Pdf",
+      "filename": "add-multiple-attachments-to-pdf__v2.cs",
+      "description": "Shows how to load an existing PDF, embed several files as attachments, and save the resulting document with the new embedded files.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose.pdf",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "71503"
+    },
+    "remove-all-attachments-from-pdf__v3": {
+      "title": "Remove All Attachments from PDF",
+      "filename": "remove-all-attachments-from-pdf__v3.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, iterate over its embedded file attachments, delete each one, and save the cleaned document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "remove",
+        "aspose-pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.FileSpecification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "71504"
+    },
+    "add-file-attachment-to-pdf__v9": {
+      "title": "Add File Attachment to PDF using Aspose.Pdf",
+      "filename": "add-file-attachment-to-pdf__v9.cs",
+      "description": "Shows how to load a PDF, create a FileSpecification for an external file, embed it as an attachment, and save the updated document.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "aspose",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.EmbeddedFiles.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74262"
+    },
+    "add-attachment-to-pdf": {
+      "title": "Add Attachment to PDF with Aspose.Pdf",
+      "filename": "add-attachment-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a file specification from a stream, embedding the file as an attachment, and saving the updated document using Aspose.Pdf.",
+      "tags": [
+        "attachment",
+        "pdf",
+        "aspose-pdf",
+        "embedded-file",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74263"
+    },
+    "remove-all-attachments-from-pdf__v4": {
+      "title": "Remove All Attachments from a PDF",
+      "filename": "remove-all-attachments-from-pdf__v4.cs",
+      "description": "Demonstrates how to load a PDF with Aspose.Pdf, delete every embedded file attachment, and save the cleaned document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "delete",
+        "Aspose.Pdf",
+        "content-editor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PdfContentEditor"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74264"
+    },
+    "add-multiple-file-attachments-to-pdf__v2": {
+      "title": "Add Multiple File Attachments to a PDF",
+      "filename": "add-multiple-file-attachments-to-pdf__v2.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, embedding several files as attachments, and saving the updated document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose",
+        "file-embedding",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFilesCollection",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74265"
+    },
+    "add-multiple-attachments-to-pdf__v3": {
+      "title": "Add Multiple Attachments to PDF using Aspose.Pdf",
+      "filename": "add-multiple-attachments-to-pdf__v3.cs",
+      "description": "Shows how to load a PDF, embed three files from streams as attachments, and save the modified document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.EmbeddedFiles.Add"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74266"
+    },
+    "add-file-attachments-to-pdf__v2": {
+      "title": "Add File Attachments to PDF Using Aspose.Pdf",
+      "filename": "add-file-attachments-to-pdf__v2.cs",
+      "description": "Shows how to load a PDF, create file specifications from streams with distinct descriptions, embed them as attachments, and save the updated document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose-pdf",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74272"
+    },
+    "remove-all-attachments-from-pdf__v5": {
+      "title": "Remove All Attachments from PDF",
+      "filename": "remove-all-attachments-from-pdf__v5.cs",
+      "description": "Demonstrates how to open a PDF with Aspose.Pdf.Facades, delete every embedded attachment, and save the cleaned document.",
+      "tags": [
+        "pdf",
+        "attachments",
+        "delete",
+        "aspose",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.DeleteAttachments",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74273"
+    },
+    "manage-pdf-attachments-with-pdfcontenteditor": {
+      "title": "Manage PDF Attachments with PdfContentEditor",
+      "filename": "manage-pdf-attachments-with-pdfcontenteditor.cs",
+      "description": "The example demonstrates binding a PDF with PdfContentEditor, removing all existing embedded file attachments, adding a new attachment from a file stream, and saving the updated PDF.",
+      "tags": [
+        "attachments",
+        "PdfContentEditor",
+        "Aspose.Pdf",
+        "stream",
+        "delete"
+      ],
+      "apis_used": [
+        "PdfContentEditor",
+        "PdfContentEditor.BindPdf",
+        "PdfContentEditor.Save",
+        "Document",
+        "Document.EmbeddedFiles",
+        "FileSpecification",
+        "EmbeddedFiles.Add",
+        "EmbeddedFiles.Delete"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74275"
+    },
+    "add-and-delete-pdf-file-attachments": {
+      "title": "Add and Delete File Attachments in PDF",
+      "filename": "add-and-delete-pdf-file-attachments.cs",
+      "description": "The example loads an existing PDF, adds three file attachments via the Document.EmbeddedFiles collection, then removes all attachments and saves the resulting PDF.",
+      "tags": [
+        "attachments",
+        "embedded-files",
+        "pdf",
+        "aspose-pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.EmbeddedFilesCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74276"
+    },
+    "add-file-attachment-to-pdf__v10": {
+      "title": "Add File Attachment to PDF and Verify Embedded Files",
+      "filename": "add-file-attachment-to-pdf__v10.cs",
+      "description": "Demonstrates how to embed a file attachment into a PDF using Aspose.Pdf, save the document, and then enumerate the EmbeddedFiles collection to confirm the attachment.",
+      "tags": [
+        "attachment",
+        "embedded-files",
+        "pdf",
+        "aspose-pdf",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74279"
+    },
+    "remove-and-add-pdf-attachments": {
+      "title": "Remove Existing Attachments and Add New Stream Attachments to PDF",
+      "filename": "remove-and-add-pdf-attachments.cs",
+      "description": "Demonstrates how to load a PDF, delete all embedded file attachments, and then add new attachments from memory streams or files before saving the document.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose-pdf",
+        "embedded-files",
+        "stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.EmbeddedFileCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74282"
+    },
+    "replace-pdf-attachments-with-new-file": {
+      "title": "Replace PDF Attachments with a New File",
+      "filename": "replace-pdf-attachments-with-new-file.cs",
+      "description": "Shows how to load a PDF, remove all embedded file attachments, add a new file attachment, and save the updated document using Aspose.Pdf.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose",
+        "file-specification",
+        "embedded-files"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFileCollection",
+        "Aspose.Pdf.EmbeddedFileCollection.Add",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74284"
+    },
+    "add-multiple-stream-attachments-to-pdf": {
+      "title": "Add Multiple Stream Attachments to PDF and List Embedded Files",
+      "filename": "add-multiple-stream-attachments-to-pdf.cs",
+      "description": "Demonstrates how to embed several in‑memory text files into a PDF using Aspose.Pdf, save the document, and then enumerate the embedded files to display a summary.",
+      "tags": [
+        "attachments",
+        "embedded-files",
+        "pdf",
+        "aspose-pdf",
+        "stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74286"
+    },
+    "delete-attachments-add-new-files": {
+      "title": "Delete All PDF Attachments and Add New Files",
+      "filename": "delete-attachments-add-new-files.cs",
+      "description": "Demonstrates how to remove every attachment from a PDF using PdfContentEditor, then add new file attachments with the Document API and save the result.",
+      "tags": [
+        "attachments",
+        "delete",
+        "add",
+        "pdf",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.DeleteAttachments",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.FileSpecification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74288"
+    },
+    "add-file-attachment-to-pdf__v11": {
+      "title": "Add File Attachment to PDF using Aspose.Pdf",
+      "filename": "add-file-attachment-to-pdf__v11.cs",
+      "description": "Demonstrates loading a PDF, creating an embedded file from a memory stream with a description, adding it to the document's EmbeddedFiles collection, and saving the modified PDF.",
+      "tags": [
+        "attachment",
+        "embedded-file",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFilesCollection",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74289"
+    },
+    "manage-pdf-attachments-with-pdfcontenteditor__v2": {
+      "title": "Manage PDF Attachments with PdfContentEditor",
+      "filename": "manage-pdf-attachments-with-pdfcontenteditor__v2.cs",
+      "description": "The example shows how to bind a PDF using PdfContentEditor, add file attachments via the Document API, delete all attachments, and save the modified PDF.",
+      "tags": [
+        "attachments",
+        "pdfcontenteditor",
+        "aspose.pdf",
+        "embedded-files",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.EmbeddedFileCollection.Add",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74290"
+    },
+    "replace-pdf-attachments-with-new-files": {
+      "title": "Replace PDF Attachments with New Files",
+      "filename": "replace-pdf-attachments-with-new-files.cs",
+      "description": "The example loads a PDF, removes any existing embedded file attachments, adds three new file attachments, and saves the updated document.",
+      "tags": [
+        "attachments",
+        "embedded-files",
+        "pdf",
+        "aspose-pdf",
+        "file-attachment"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFileCollection.Add",
+        "Aspose.Pdf.EmbeddedFileCollection.Delete",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74293"
+    },
+    "add-attachment-to-pdf-and-list-embedded-files": {
+      "title": "Add Attachment to PDF and List Embedded Files",
+      "filename": "add-attachment-to-pdf-and-list-embedded-files.cs",
+      "description": "Shows how to open an existing PDF, embed a file as an attachment using FileSpecification, enumerate all embedded files, and save the updated document.",
+      "tags": [
+        "attachment",
+        "embedded-files",
+        "pdf",
+        "aspose-pdf",
+        "file-specification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.EmbeddedFilesCollection.Add",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74295"
+    },
+    "delete-attachments-add-new-pdf-attachments": {
+      "title": "Delete Existing Attachments and Add New File Attachments to PDF",
+      "filename": "delete-attachments-add-new-pdf-attachments.cs",
+      "description": "Demonstrates how to remove all existing attachments from a PDF using PdfContentEditor.DeleteAttachments, then add new file attachments with the Document API and save the result.",
+      "tags": [
+        "attachments",
+        "pdf",
+        "aspose-pdf",
+        "delete",
+        "add"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.DeleteAttachments",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Document.EmbeddedFiles.Add",
+        "Aspose.Pdf.FileSpecification"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74297"
+    },
+    "add-file-attachment-to-pdf-and-list-embedded-files": {
+      "title": "Add File Attachment to PDF and List Embedded Files",
+      "filename": "add-file-attachment-to-pdf-and-list-embedded-files.cs",
+      "description": "The example loads an existing PDF, attaches a text file as an embedded file with a description, saves the modified PDF, and then enumerates all embedded attachments.",
+      "tags": [
+        "attachment",
+        "embedded-files",
+        "pdf",
+        "aspose-pdf",
+        "file-specification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.FileSpecification",
+        "Aspose.Pdf.Document.EmbeddedFiles",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.FileSpecification.Contents"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-27T10:19:39Z",
+      "status": "verified",
+      "task_id": "74298"
+    }
+  }
+}
