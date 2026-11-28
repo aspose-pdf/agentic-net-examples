@@ -1,0 +1,36 @@
+using System;
+using System.IO;
+using Aspose.Pdf.Facades;
+
+class Program
+{
+    static void Main()
+    {
+        const string sourcePath = "source.pdf";
+        const string outputPath = "spaced_pages.pdf";
+
+        // Verify the source file exists
+        if (!File.Exists(sourcePath))
+        {
+            Console.Error.WriteLine($"Source file not found: {sourcePath}");
+            return;
+        }
+
+        // Pages to extract (1‑based indexing)
+        int[] pagesToExtract = new int[] { 5, 15, 25, 35 };
+
+        // PdfFileEditor does NOT implement IDisposable; do NOT wrap in using
+        PdfFileEditor editor = new PdfFileEditor();
+
+        try
+        {
+            // Correct argument order: source file, pages array, destination file
+            editor.Extract(sourcePath, pagesToExtract, outputPath);
+            Console.WriteLine($"Pages {string.Join(", ", pagesToExtract)} extracted to '{outputPath}'.");
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error during extraction: {ex.Message}");
+        }
+    }
+}
