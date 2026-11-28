@@ -1,0 +1,825 @@
+{
+  "category": "facades-headers-and-footers",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-28T08:40:03Z",
+  "examples": {
+    "add-red-header-to-pdf": {
+      "title": "Add Red Header to PDF Using PdfFileStamp",
+      "filename": "add-red-header-to-pdf.cs",
+      "description": "Shows how to bind a PDF with PdfFileStamp, create a red Arial header via FormattedText, add it with a 20‑point top margin, and save the stamped document.",
+      "tags": [
+        "pdf",
+        "header",
+        "Aspose.Pdf",
+        "PdfFileStamp",
+        "FormattedText"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Text.EncodingType",
+        "Aspose.Pdf.Facades.FontStyle"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75329"
+    },
+    "add-image-header-to-pdf": {
+      "title": "Add Image Header to PDF Using PdfFileStamp",
+      "filename": "add-image-header-to-pdf.cs",
+      "description": "Shows how to bind a PDF, load a logo image via FileStream, configure its size and top‑margin placement as a header, and save the stamped document using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "stamp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "PdfFileStamp.BindPdf",
+        "Stamp.BindImage",
+        "Stamp.SetImageSize",
+        "Stamp.SetOrigin",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75330"
+    },
+    "add-blue-times-new-roman-footer": {
+      "title": "Add Blue Times New Roman Footer to PDF",
+      "filename": "add-blue-times-new-roman-footer.cs",
+      "description": "Demonstrates binding an existing PDF with PdfFileStamp, creating a blue Times New Roman footer using FormattedText, adding it to each page with a 30‑point bottom margin, and saving the result.",
+      "tags": [
+        "footer",
+        "PdfFileStamp",
+        "FormattedText",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "PdfFileStamp.AddFooter",
+        "PdfFileStamp.Save",
+        "PdfFileStamp.Close",
+        "FormattedText",
+        "FontStyle",
+        "EncodingType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75331"
+    },
+    "add-green-helvetica-header-to-pdf": {
+      "title": "Add Green Helvetica Header to PDF using PdfFileStamp",
+      "filename": "add-green-helvetica-header-to-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfFileStamp, creating a green Helvetica header using FormattedText with a top margin, and saving the modified document.",
+      "tags": [
+        "header",
+        "pdf",
+        "aspose",
+        "facade",
+        "formattedtext"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75332"
+    },
+    "add-gray-helvetica-footer-to-pdf": {
+      "title": "Add Gray Helvetica Footer to PDF Using PdfFileStamp",
+      "filename": "add-gray-helvetica-footer-to-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfFileStamp, creating a gray Helvetica footer via FormattedText, applying it with a 10‑point bottom margin, and saving the result.",
+      "tags": [
+        "footer",
+        "pdf",
+        "Aspose.Pdf",
+        "FormattedText",
+        "PdfFileStamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.FontStyle",
+        "Aspose.Pdf.Facades.EncodingType",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddFooter",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75333"
+    },
+    "add-image-header-to-pdf__v2": {
+      "title": "Add Image Header to PDF with ImageStamp",
+      "filename": "add-image-header-to-pdf__v2.cs",
+      "description": "Shows how to load a PDF, create an ImageStamp from a logo file using a FileStream, set a top margin, apply it as a header on each page, and save the stamped document.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75334"
+    },
+    "add-image-footer-to-pdf": {
+      "title": "Add Image Footer to PDF Using PdfFileStamp",
+      "filename": "add-image-footer-to-pdf.cs",
+      "description": "Shows how to bind a PDF, create an image stamp from a FileStream, position it 40 points above the bottom edge as a footer, and save the stamped document.",
+      "tags": [
+        "pdf",
+        "footer",
+        "image-stamp",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindImage",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75335"
+    },
+    "add-red-confidential-header-to-pdf": {
+      "title": "Add Red Confidential Header to PDF Using PdfFileStamp",
+      "filename": "add-red-confidential-header-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a red \"Confidential\" header with FormattedText, positioning it with a 5‑point top margin using a Stamp, and saving the result via PdfFileStamp.",
+      "tags": [
+        "header",
+        "confidential",
+        "formattedtext",
+        "pdf-stamp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin",
+        "Aspose.Pdf.Facades.Stamp.BindLogo",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75336"
+    },
+    "add-page-footer-with-pdffilemend": {
+      "title": "Add Page Footer with Formatted Text Using PdfFileMend",
+      "filename": "add-page-footer-with-pdffilemend.cs",
+      "description": "Shows how to load a PDF, create a blue \"Page 1 of 10\" footer with FormattedText, add it to all pages using PdfFileMend, and save the result.",
+      "tags": [
+        "footer",
+        "pdf",
+        "formatted-text",
+        "aspose-pdf",
+        "pdffilemend"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileMend.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileMend.AddText",
+        "Aspose.Pdf.Facades.PdfFileMend.Save",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.FontStyle",
+        "Aspose.Pdf.Facades.EncodingType"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75337"
+    },
+    "add-header-image-to-pdf": {
+      "title": "Add Header Image to PDF Using PdfFileStamp",
+      "filename": "add-header-image-to-pdf.cs",
+      "description": "Demonstrates binding a PDF, inserting a header image from a FileStream with a top margin, and saving the stamped document using Aspose.Pdf.Facades.PdfFileStamp.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75338"
+    },
+    "add-confidential-footer-to-pdf": {
+      "title": "Add Confidential Footer to PDF using TextStamp",
+      "filename": "add-confidential-footer-to-pdf.cs",
+      "description": "Shows how to load a PDF, create a black \"Company Confidential\" footer with a 20‑point bottom margin using TextStamp, apply it to every page, and save the modified document.",
+      "tags": [
+        "pdf",
+        "footer",
+        "textstamp",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.TextStamp",
+        "Aspose.Pdf.Text.FontRepository.FindFont",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Color"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75339"
+    },
+    "add-green-times-new-roman-header": {
+      "title": "Add Green Times New Roman Header to PDF",
+      "filename": "add-green-times-new-roman-header.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, create a green Times New Roman header using FormattedText, add it as a header with a 12‑point top margin, and save the modified document.",
+      "tags": [
+        "header",
+        "formattedtext",
+        "pdf",
+        "aspose",
+        "stamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75340"
+    },
+    "add-orange-arial-footer-to-pdf": {
+      "title": "Add Orange Arial Footer to PDF",
+      "filename": "add-orange-arial-footer-to-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfFileStamp, creating an orange Arial footer using FormattedText, applying it to all pages with an 8‑point bottom margin, and saving the stamped document.",
+      "tags": [
+        "footer",
+        "pdf",
+        "aspose",
+        "formattedtext",
+        "stamp"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "FormattedText",
+        "EncodingType",
+        "PdfFileStamp.AddFooter",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75341"
+    },
+    "add-image-header-to-pdf__v3": {
+      "title": "Add Image Header to PDF Using ImageStamp",
+      "filename": "add-image-header-to-pdf__v3.cs",
+      "description": "Demonstrates loading a PDF, creating an ImageStamp from a PNG, positioning it as a top header with a 5‑point margin, applying it to all pages, and saving the result.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "stamp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75342"
+    },
+    "add-magenta-draft-footer-to-pdf": {
+      "title": "Add Magenta Draft Footer to PDF with PdfFileStamp",
+      "filename": "add-magenta-draft-footer-to-pdf.cs",
+      "description": "Demonstrates how to bind an existing PDF, create a magenta \"Draft\" footer using FormattedText, add it with a bottom margin, and save the stamped document.",
+      "tags": [
+        "pdf",
+        "footer",
+        "formattedtext",
+        "aspose-pdf",
+        "stamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddFooter",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Facades.EncodingType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75343"
+    },
+    "add-header-image-to-pdf__v2": {
+      "title": "Add Header Image to PDF Pages",
+      "filename": "add-header-image-to-pdf__v2.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, creating an ImageStamp for a header image, applying it to every page, and saving the modified document.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "stamp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Drawing.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75344"
+    },
+    "add-footer-image-to-pdf": {
+      "title": "Add Footer Image to PDF Using ImageStamp",
+      "filename": "add-footer-image-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating an ImageStamp positioned at the bottom center with zero margin, applying it to every page, and saving the result.",
+      "tags": [
+        "footer",
+        "image-stamp",
+        "pdf",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.HorizontalAlignment",
+        "Aspose.Pdf.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75345"
+    },
+    "add-header-to-pdf-using-pdffilestamp": {
+      "title": "Add Header to PDF Using PdfFileStamp",
+      "filename": "add-header-to-pdf-using-pdffilestamp.cs",
+      "description": "Demonstrates how to bind an existing PDF, create formatted header lines with specific margins, add them as headers, and save the stamped PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "header",
+        "pdf",
+        "aspose",
+        "facades",
+        "formatted-text"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "PdfFileStamp.AddHeader",
+        "PdfFileStamp.Save",
+        "PdfFileStamp.Close",
+        "FormattedText",
+        "EncodingType"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75346"
+    },
+    "add-footer-to-pdf-using-pdffilestamp": {
+      "title": "Add Footer to PDF Using PdfFileStamp",
+      "filename": "add-footer-to-pdf-using-pdffilestamp.cs",
+      "description": "Shows how to bind an existing PDF, create a multi‑line formatted footer, add it with a bottom margin, and save the updated document using Aspose.Pdf.Facades.",
+      "tags": [
+        "footer",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfFileStamp",
+        "FormattedText"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddFooter",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Facades.FormattedText",
+        "Aspose.Pdf.Text.EncodingType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75347"
+    },
+    "add-japanese-header-to-pdf": {
+      "title": "Add Japanese Header to PDF with PdfFileStamp",
+      "filename": "add-japanese-header-to-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a FormattedText header containing Japanese characters, applying it as a top header using PdfFileStamp, and saving the result.",
+      "tags": [
+        "header",
+        "japanese",
+        "pdf",
+        "aspose-pdf",
+        "formattedtext"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75348"
+    },
+    "add-arabic-footer-to-pdf": {
+      "title": "Add Arabic Footer to PDF with PdfFileStamp",
+      "filename": "add-arabic-footer-to-pdf.cs",
+      "description": "Demonstrates loading a PDF using PdfFileStamp, creating a FormattedText object with Arabic characters, adding it as a footer with a bottom margin, and saving the result.",
+      "tags": [
+        "footer",
+        "arabic",
+        "pdf",
+        "aspose-pdf",
+        "formattedtext"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "FormattedText",
+        "PdfFileStamp.AddFooter",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75349"
+    },
+    "add-svg-header-to-pdf": {
+      "title": "Add SVG Header Image to PDF Using ImageStamp",
+      "filename": "add-svg-header-to-pdf.cs",
+      "description": "Shows how to load a PDF, create an ImageStamp from an SVG file via FileStream, set a top margin of 25 points, apply the stamp as a centered header on every page, and save the modified document.",
+      "tags": [
+        "pdf",
+        "header",
+        "svg",
+        "imagestamp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75350"
+    },
+    "add-footer-image-to-pdf__v2": {
+      "title": "Add Footer Image to PDF Using PdfFileStamp",
+      "filename": "add-footer-image-to-pdf__v2.cs",
+      "description": "Demonstrates binding a PDF, creating a stamp from an image stream, positioning it 30 points above the bottom edge, and saving the stamped document.",
+      "tags": [
+        "pdf",
+        "footer",
+        "stamp",
+        "image",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "PdfFileStamp.BindPdf",
+        "Stamp",
+        "Stamp.BindImage",
+        "Stamp.SetOrigin",
+        "PdfFileStamp.AddStamp",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75351"
+    },
+    "add-navy-calibri-header-to-pdf": {
+      "title": "Add Navy Calibri Header to PDF",
+      "filename": "add-navy-calibri-header-to-pdf.cs",
+      "description": "Loads an existing PDF, creates a navy Calibri header using FormattedText, adds it with a top margin of 18 points via PdfFileStamp, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "header",
+        "formattedtext",
+        "pdffilestamp",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Facades.FontStyle",
+        "Aspose.Pdf.Text.EncodingType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75352"
+    },
+    "add-maroon-verdana-footer-to-pdf": {
+      "title": "Add Maroon Verdana Footer to PDF using PdfFileStamp",
+      "filename": "add-maroon-verdana-footer-to-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfFileStamp, creating a maroon Verdana footer via FormattedText, applying it with a 22‑point bottom margin, and saving the result.",
+      "tags": [
+        "footer",
+        "PdfFileStamp",
+        "FormattedText",
+        "Aspose.Pdf",
+        "C#"
+      ],
+      "apis_used": [
+        "PdfFileStamp",
+        "FormattedText",
+        "PdfFileStamp.BindPdf",
+        "PdfFileStamp.AddFooter",
+        "PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75353"
+    },
+    "add-header-image-to-pdf__v3": {
+      "title": "Add Header Image to PDF Using PdfFileStamp",
+      "filename": "add-header-image-to-pdf__v3.cs",
+      "description": "Shows how to bind a PDF, create a header stamp from an image stream with a top margin, apply it to all pages, and save the stamped document using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "stamp",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Facades.PdfFileStamp.Close",
+        "Aspose.Pdf.Facades.Stamp",
+        "Aspose.Pdf.Facades.Stamp.BindImage",
+        "Aspose.Pdf.Facades.Stamp.SetOrigin"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75354"
+    },
+    "add-orange-symbol-header-pdf": {
+      "title": "Add Orange Symbol Header to PDF with PdfFileStamp",
+      "filename": "add-orange-symbol-header-pdf.cs",
+      "description": "Demonstrates loading a PDF, creating a formatted orange \"Symbol\" header using FormattedText, adding it with a top margin via PdfFileStamp, and saving the result.",
+      "tags": [
+        "header",
+        "pdf",
+        "aspose",
+        "formattedtext",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75356"
+    },
+    "add-teal-footer-to-pdf": {
+      "title": "Add Teal Footer to PDF Using PdfFileStamp",
+      "filename": "add-teal-footer-to-pdf.cs",
+      "description": "Demonstrates loading a PDF with PdfFileStamp, creating a teal Courier New footer via FormattedText, adding it to each page with a bottom margin, and saving the modified document.",
+      "tags": [
+        "footer",
+        "pdf",
+        "Aspose.Pdf",
+        "FormattedText",
+        "PdfFileStamp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddFooter",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Text.EncodingType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75357"
+    },
+    "add-header-image-to-pdf__v4": {
+      "title": "Add Header Image to PDF Using ImageStamp",
+      "filename": "add-header-image-to-pdf__v4.cs",
+      "description": "Loads a PDF, creates an ImageStamp from a FileStream, positions it as a top‑centered header with a 3‑point margin, applies it to every page, and saves the result.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "stamp",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Drawing.HorizontalAlignment",
+        "Aspose.Pdf.Drawing.VerticalAlignment"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75358"
+    },
+    "add-footer-image-to-pdf__v3": {
+      "title": "Add Footer Image to PDF Using ImageStamp",
+      "filename": "add-footer-image-to-pdf__v3.cs",
+      "description": "Demonstrates how to load a PDF, create an ImageStamp from a file stream, position it as a bottom‑center footer with a 3‑point margin, apply it to all pages, and save the result.",
+      "tags": [
+        "pdf",
+        "footer",
+        "image-stamp",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.ImageStamp",
+        "Aspose.Pdf.Page.AddStamp",
+        "Aspose.Pdf.ImageStamp.HorizontalAlignment",
+        "Aspose.Pdf.ImageStamp.VerticalAlignment",
+        "Aspose.Pdf.ImageStamp.BottomMargin",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75359"
+    },
+    "add-dark-green-georgia-header": {
+      "title": "Add Dark Green Georgia Header to PDF using PdfFileStamp",
+      "filename": "add-dark-green-georgia-header.cs",
+      "description": "Demonstrates loading a PDF with PdfFileStamp, creating a FormattedText header in dark‑green Georgia font, adding it with a top margin of 14 points, and saving the modified document.",
+      "tags": [
+        "header",
+        "formattedtext",
+        "pdfstamp",
+        "georgia",
+        "aspnet"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Text.EncodingType"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75360"
+    },
+    "add-dark-red-footer-pdffilestamp": {
+      "title": "Add Dark Red Footer to PDF with PdfFileStamp",
+      "filename": "add-dark-red-footer-pdffilestamp.cs",
+      "description": "Shows how to load a PDF, create a dark‑red FormattedText footer with a 14‑point bottom margin, and stamp it onto every page using PdfFileStamp.",
+      "tags": [
+        "pdf",
+        "footer",
+        "aspose",
+        "pdffilestamp",
+        "formattedtext"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Text.FormattedText",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddFooter",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75361"
+    },
+    "add-header-image-to-pdf-using-pdffilestamp": {
+      "title": "Add Header Image to PDF Using PdfFileStamp",
+      "filename": "add-header-image-to-pdf-using-pdffilestamp.cs",
+      "description": "Shows how to bind an existing PDF, insert a header image from a TIFF file via a FileStream with a top margin, and save the stamped PDF using Aspose.Pdf.Facades.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75362"
+    },
+    "add-header-image-to-pdf-using-pdffilestamp__v2": {
+      "title": "Add Header Image to PDF Using PdfFileStamp",
+      "filename": "add-header-image-to-pdf-using-pdffilestamp__v2.cs",
+      "description": "Demonstrates how to bind a PDF, add a header image from a TIFF file via FileStream with a top margin, and save the stamped document using Aspose.Pdf.Facades.PdfFileStamp.",
+      "tags": [
+        "pdf",
+        "header",
+        "image",
+        "aspose",
+        "csharp"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileStamp",
+        "Aspose.Pdf.Facades.PdfFileStamp.BindPdf",
+        "Aspose.Pdf.Facades.PdfFileStamp.AddHeader",
+        "Aspose.Pdf.Facades.PdfFileStamp.Save"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T08:40:03Z",
+      "status": "verified",
+      "task_id": "75363"
+    }
+  }
+}
