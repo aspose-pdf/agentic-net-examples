@@ -1,0 +1,939 @@
+{
+  "category": "facades-layouts",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-28T11:32:55Z",
+  "examples": {
+    "create-booklet-pdf__v2": {
+      "title": "Create Booklet PDF from Existing Document",
+      "filename": "create-booklet-pdf__v2.cs",
+      "description": "Demonstrates how to generate a booklet layout from an existing PDF file using Aspose.Pdf's PdfFileEditor and save the result as a new PDF.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "layout",
+        "Aspose.Pdf",
+        "editor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71449"
+    },
+    "create-2x2-nup-pdf": {
+      "title": "Create 2×2 N‑up PDF Layout",
+      "filename": "create-2x2-nup-pdf.cs",
+      "description": "Shows how to generate a PDF with a 2‑by‑2 N‑up layout (2 rows, 2 columns) using Aspose.Pdf.Facades.PdfFileEditor.MakeNUp.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71450"
+    },
+    "create-3x3-nup-pdf-layout": {
+      "title": "Create 3x3 N-up PDF Layout",
+      "filename": "create-3x3-nup-pdf-layout.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to combine nine pages into a single page arranged in three rows and three columns with the MakeNUp method.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71451"
+    },
+    "create-4x4-nup-pdf-layout": {
+      "title": "Create 4x4 N-up PDF Layout",
+      "filename": "create-4x4-nup-pdf-layout.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileEditor to generate a PDF with a 4‑by‑4 N‑up layout (four rows and four columns) from an existing document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71464"
+    },
+    "create-booklet-layout": {
+      "title": "Create Booklet Layout for Double‑Sided Printing",
+      "filename": "create-booklet-layout.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfFileEditor to generate a booklet layout suitable for double‑sided printing with a single API call.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "layout",
+        "double-sided",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71470"
+    },
+    "create-2x3-nup-pdf-layout": {
+      "title": "Create 2x3 N-up PDF Layout",
+      "filename": "create-2x3-nup-pdf-layout.cs",
+      "description": "Demonstrates how to generate a PDF where each page contains two rows and three columns of the original pages using Aspose.Pdf's PdfFileEditor.MakeNUp method.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71471"
+    },
+    "create-5x5-nup-pdf-layout": {
+      "title": "Create 5x5 N-up PDF Layout",
+      "filename": "create-5x5-nup-pdf-layout.cs",
+      "description": "Demonstrates how to generate a 5‑by‑5 N‑up PDF using Aspose.Pdf.Facades.PdfFileEditor to place 25 original pages on each output page.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "71477"
+    },
+    "create-booklet-pdf-default": {
+      "title": "Create Booklet PDF with Default Settings",
+      "filename": "create-booklet-pdf-default.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to convert an existing PDF into a booklet using the default settings.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfFileEditor",
+        "layout"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75909"
+    },
+    "create-a5-booklet-pdf": {
+      "title": "Create A5 Booklet PDF",
+      "filename": "create-a5-booklet-pdf.cs",
+      "description": "Demonstrates how to generate a booklet PDF with A5 page size from an existing PDF using Aspose.Pdf's PdfFileEditor.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "aspose-pdf",
+        "pagesize",
+        "a5"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75910"
+    },
+    "create-booklet-pdf-with-pdffileeditor": {
+      "title": "Create Booklet PDF Using PdfFileEditor",
+      "filename": "create-booklet-pdf-with-pdffileeditor.cs",
+      "description": "Demonstrates how to load a PDF, specify left‑ and right‑hand page arrays, and generate a booklet PDF using Aspose.Pdf's PdfFileEditor.MakeBooklet method.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "Aspose.Pdf",
+        "PdfFileEditor",
+        "page-arrays"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75911"
+    },
+    "create-custom-booklet-pdf-a5": {
+      "title": "Create Custom Booklet PDF with A5 Page Size",
+      "filename": "create-custom-booklet-pdf-a5.cs",
+      "description": "Shows how to load a PDF, define custom left/right page ordering, and use PdfFileEditor.MakeBooklet to generate a booklet with A5 pages.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "Aspose.Pdf",
+        "A5",
+        "custom-order"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75912"
+    },
+    "create-booklet-pdf-using-pdffileeditor-streams": {
+      "title": "Create Booklet PDF Using PdfFileEditor Streams",
+      "filename": "create-booklet-pdf-using-pdffileeditor-streams.cs",
+      "description": "Demonstrates how to use Aspose.Pdf's PdfFileEditor to convert an existing PDF into a booklet layout by reading and writing through FileStream objects.",
+      "tags": [
+        "pdf",
+        "booklet",
+        "stream",
+        "Aspose.Pdf",
+        "PdfFileEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75913"
+    },
+    "create-booklet-pdf-a5-stream": {
+      "title": "Create Booklet PDF with A5 Page Size Using Streams",
+      "filename": "create-booklet-pdf-a5-stream.cs",
+      "description": "Demonstrates opening a PDF via FileStream, using Aspose.Pdf.Facades.PdfFileEditor to generate a booklet with A5 page size, and saving the result to a new file.",
+      "tags": [
+        "pdf",
+        "booklet",
+        "streams",
+        "Aspose.Pdf",
+        "page-size"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75914"
+    },
+    "create-booklet-pdf-left-right-pages": {
+      "title": "Create Booklet PDF Using Left/Right Page Arrays",
+      "filename": "create-booklet-pdf-left-right-pages.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileEditor to generate a booklet PDF by providing custom left‑hand and right‑hand page order through FileStream objects.",
+      "tags": [
+        "booklet",
+        "pdf",
+        "aspose",
+        "pages",
+        "stream"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75915"
+    },
+    "create-a5-booklet-pdf__v2": {
+      "title": "Create A5 Booklet PDF Using PdfFileEditor",
+      "filename": "create-a5-booklet-pdf__v2.cs",
+      "description": "Shows how to open a PDF via FileStream and use Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet to generate an A5 booklet saved as a new PDF file.",
+      "tags": [
+        "pdf",
+        "booklet",
+        "aspose.pdf",
+        "file-stream",
+        "layout"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeBooklet"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75916"
+    },
+    "create-2x2-nup-pdf__v2": {
+      "title": "Create 2×2 N‑up PDF using PdfFileEditor",
+      "filename": "create-2x2-nup-pdf__v2.cs",
+      "description": "Loads a PDF, applies a 2×2 N‑up layout with Aspose.Pdf.Facades.PdfFileEditor, and saves the combined document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "Aspose.Pdf",
+        "PdfFileEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75917"
+    },
+    "create-3x2-nup-pdf": {
+      "title": "Create 3x2 N‑up PDF with PdfFileEditor",
+      "filename": "create-3x2-nup-pdf.cs",
+      "description": "Shows how to load a PDF, apply a 3 rows × 2 columns N‑up layout using A4 page size with Aspose.Pdf.Facades.PdfFileEditor, and save the resulting document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75918"
+    },
+    "create-2x3-nup-pdf": {
+      "title": "Create 2×3 N-up PDF with PdfFileEditor",
+      "filename": "create-2x3-nup-pdf.cs",
+      "description": "Shows how to load a PDF, generate a 2×3 N‑up layout using Aspose.Pdf.Facades.PdfFileEditor, and save the resulting document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75919"
+    },
+    "create-2x4-nup-pdf": {
+      "title": "Create 2x4 N-up PDF with PdfFileEditor",
+      "filename": "create-2x4-nup-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileEditor to generate a 2‑by‑4 N‑up layout from an existing PDF and save the result.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75920"
+    },
+    "create-4x4-nup-pdf": {
+      "title": "Create 4x4 N‑up PDF using PdfFileEditor",
+      "filename": "create-4x4-nup-pdf.cs",
+      "description": "Loads a PDF, arranges its pages in a 4×4 N‑up layout with PdfFileEditor, and saves the result as a new PDF.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "Aspose.Pdf",
+        "PdfFileEditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75921"
+    },
+    "create-5x1-nup-pdf": {
+      "title": "Create 5×1 N-up PDF using PdfFileEditor",
+      "filename": "create-5x1-nup-pdf.cs",
+      "description": "Loads a PDF file, applies a 5‑by‑1 N‑up layout with Aspose.Pdf.Facades.PdfFileEditor, and saves the combined document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75922"
+    },
+    "create-1x5-nup-pdf": {
+      "title": "Create 1×5 N-up PDF with PdfFileEditor",
+      "filename": "create-1x5-nup-pdf.cs",
+      "description": "Shows how to generate a 1‑by‑5 N‑up layout PDF from a source file using Aspose.Pdf.Facades.PdfFileEditor.MakeNUp.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75923"
+    },
+    "create-3x3-nup-pdf": {
+      "title": "Create 3×3 N-up PDF using PdfFileEditor",
+      "filename": "create-3x3-nup-pdf.cs",
+      "description": "Shows how to load a PDF and use Aspose.Pdf.Facades.PdfFileEditor to generate a 3×3 N‑up layout saved as a new PDF file.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75924"
+    },
+    "create-4x2-nup-pdf": {
+      "title": "Create 4×2 N-up PDF with PdfFileEditor",
+      "filename": "create-4x2-nup-pdf.cs",
+      "description": "Loads a source PDF, generates a 4‑row by 2‑column N‑up layout using Aspose.Pdf.Facades.PdfFileEditor, and saves the combined document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75925"
+    },
+    "create-6x2-nup-pdf": {
+      "title": "Create 6×2 N‑up PDF with PdfFileEditor",
+      "filename": "create-6x2-nup-pdf.cs",
+      "description": "Loads a source PDF, arranges its pages in a 6‑by‑2 N‑up layout using Aspose.Pdf.Facades, and saves the combined document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75926"
+    },
+    "create-2x6-nup-pdf": {
+      "title": "Create 2×6 N-up PDF with PdfFileEditor",
+      "filename": "create-2x6-nup-pdf.cs",
+      "description": "Shows how to load a PDF and use Aspose.Pdf.Facades.PdfFileEditor.MakeNUp to produce a 2×6 N‑up layout saved as a new PDF file.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75927"
+    },
+    "create-7x1-nup-pdf": {
+      "title": "Create 7×1 N-up PDF with PdfFileEditor",
+      "filename": "create-7x1-nup-pdf.cs",
+      "description": "Shows how to generate a 7‑by‑1 N‑up layout from a single PDF file using Aspose.Pdf.Facades.PdfFileEditor and save the result.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75928"
+    },
+    "create-1x7-nup-pdf": {
+      "title": "Create 1×7 N-up PDF using PdfFileEditor",
+      "filename": "create-1x7-nup-pdf.cs",
+      "description": "Demonstrates loading a PDF, applying a 1‑by‑7 N‑up layout with PdfFileEditor, and saving the resulting document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75929"
+    },
+    "create-6x6-nup-pdf": {
+      "title": "Create 6×6 N-up PDF using PdfFileEditor",
+      "filename": "create-6x6-nup-pdf.cs",
+      "description": "Demonstrates how to generate a 6‑by‑6 N‑up layout from a single PDF file using Aspose.Pdf.Facades.PdfFileEditor.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75930"
+    },
+    "create-5x5-nup-pdf-layout__v2": {
+      "title": "Create 5x5 N-up PDF Layout",
+      "filename": "create-5x5-nup-pdf-layout__v2.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to generate a 5×5 N‑up layout from a single PDF and save it as a new document.",
+      "tags": [
+        "nup",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "csharp"
+      ],
+      "apis_used": [
+        "PdfFileEditor",
+        "PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75931"
+    },
+    "create-2x2-nup-a5-pdf": {
+      "title": "Create 2×2 N-up PDF with A5 Page Size",
+      "filename": "create-2x2-nup-a5-pdf.cs",
+      "description": "Shows how to generate a 2‑by‑2 N‑up layout from a source PDF and then set each resulting page to A5 size using Aspose.Pdf.",
+      "tags": [
+        "n-up",
+        "page-size",
+        "pdf",
+        "aspose",
+        "layout"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75932"
+    },
+    "create-3x2-nup-a5-pdf": {
+      "title": "Create 3×2 N‑up PDF on A5 Page",
+      "filename": "create-3x2-nup-a5-pdf.cs",
+      "description": "Demonstrates using Aspose.Pdf.Facades.PdfFileEditor to generate a 3×2 N‑up layout on an A5‑sized page from an existing PDF file.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "a5",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75933"
+    },
+    "create-2x3-nup-a5-pdf": {
+      "title": "Create 2×3 N‑up PDF with A5 Page Size",
+      "filename": "create-2x3-nup-a5-pdf.cs",
+      "description": "Demonstrates how to use Aspose.Pdf.Facades.PdfFileEditor to generate an N‑up PDF (2 columns × 3 rows) from a source document, saving the result as an A5‑sized PDF.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "page-size"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75934"
+    },
+    "create-2x4-nup-a5-pdf": {
+      "title": "Create 2×4 N-up PDF with A5 Page Size",
+      "filename": "create-2x4-nup-a5-pdf.cs",
+      "description": "Demonstrates how to generate a 2×4 N‑up layout from an existing PDF and resize the resulting pages to A5 using Aspose.Pdf.",
+      "tags": [
+        "n-up",
+        "a5",
+        "pdf",
+        "layout",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75935"
+    },
+    "create-4x4-nup-a5-pdf": {
+      "title": "Create 4×4 N‑up PDF with A5 Page Size",
+      "filename": "create-4x4-nup-a5-pdf.cs",
+      "description": "Demonstrates how to generate a 4×4 N‑up layout from a source PDF and resize the resulting pages to A5 using Aspose.Pdf's PdfFileEditor and Document classes.",
+      "tags": [
+        "n-up",
+        "a5",
+        "pdf",
+        "layout",
+        "aspose"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.PageSize",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75936"
+    },
+    "create-5x1-a5-nup-pdf": {
+      "title": "Create 5×1 A5 N-up PDF with PdfFileEditor",
+      "filename": "create-5x1-a5-nup-pdf.cs",
+      "description": "Loads a PDF, applies a 5×1 N-up layout using A5 page size via PdfFileEditor, and saves the resulting document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose.pdf",
+        "pdffileeditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75937"
+    },
+    "create-1x5-nup-a5": {
+      "title": "Create 1×5 N-up PDF with A5 Page Size",
+      "filename": "create-1x5-nup-a5.cs",
+      "description": "Shows how to generate a 1×5 N‑up layout from a PDF and resize each resulting page to A5 using Aspose.Pdf.",
+      "tags": [
+        "n-up",
+        "a5",
+        "page-size",
+        "pdf",
+        "layout"
+      ],
+      "apis_used": [
+        "PdfFileEditor",
+        "PdfFileEditor.MakeNUp",
+        "Document",
+        "Page",
+        "PageInfo",
+        "PageSize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75938"
+    },
+    "create-3x3-nup-a5-pdf": {
+      "title": "Create 3×3 N-up PDF with A5 Page Size",
+      "filename": "create-3x3-nup-a5-pdf.cs",
+      "description": "Demonstrates how to generate a 3×3 N‑up layout PDF on an A5 page using Aspose.Pdf's PdfFileEditor, with reflection to support older library versions and a fallback overload.",
+      "tags": [
+        "n-up",
+        "layout",
+        "pdf",
+        "aspose.pdf",
+        "reflection"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Facades.NUpOptions",
+        "Aspose.Pdf.PageSize",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp (fallback overload)"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75939"
+    },
+    "create-4x2-nup-a5-pdf": {
+      "title": "Create 4×2 N-up PDF with A5 Page Size",
+      "filename": "create-4x2-nup-a5-pdf.cs",
+      "description": "Shows how to generate a 4×2 N‑up layout from a source PDF and then set each resulting page to A5 size using Aspose.Pdf.",
+      "tags": [
+        "n-up",
+        "page-size",
+        "pdf",
+        "layout",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75940"
+    },
+    "create-6x2-nup-pdf-a5": {
+      "title": "Create 6x2 N-up PDF on A5 Pages",
+      "filename": "create-6x2-nup-pdf-a5.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileEditor to generate a 6‑by‑2 N‑up layout on A5 sized pages and save the result.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "a5",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75941"
+    },
+    "create-2x6-nup-a5-pdf": {
+      "title": "Create 2×6 N‑up PDF with A5 Page Size",
+      "filename": "create-2x6-nup-a5-pdf.cs",
+      "description": "Demonstrates how to generate a 2 × 6 N‑up layout PDF on A5 pages using the Aspose.Pdf.Facades PdfFileEditor class.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "facades"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75942"
+    },
+    "create-7x1-nup-a5-pdf": {
+      "title": "Create 7×1 N‑up PDF with A5 Page Size",
+      "filename": "create-7x1-nup-a5-pdf.cs",
+      "description": "Shows how to generate a 7‑by‑1 N‑up layout from a source PDF and then resize each resulting page to A5 using Aspose.Pdf.",
+      "tags": [
+        "n-up",
+        "a5",
+        "pdf",
+        "layout",
+        "facade"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page.SetPageSize",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75943"
+    },
+    "create-1x7-nup-a5-pdf": {
+      "title": "Create 1×7 N-up PDF with A5 Page Size",
+      "filename": "create-1x7-nup-a5-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileEditor to generate a 1×7 N‑up PDF in A5 size from an existing document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "aspose-pdf",
+        "a5"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75944"
+    },
+    "create-6x6-nup-a5-pdf": {
+      "title": "Create 6×6 N-up PDF on A5 Pages",
+      "filename": "create-6x6-nup-a5-pdf.cs",
+      "description": "Shows how to load a PDF, apply a 6×6 N‑up layout on A5 sized pages using PdfFileEditor, and save the resulting document.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "a5",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp",
+        "Aspose.Pdf.PageSize"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75945"
+    },
+    "create-5x5-nup-a5-pdf": {
+      "title": "Create 5×5 N-up PDF on A5 Pages",
+      "filename": "create-5x5-nup-a5-pdf.cs",
+      "description": "Shows how to use Aspose.Pdf.Facades.PdfFileEditor to generate a 5‑by‑5 N‑up layout on A5‑sized pages and save the resulting PDF.",
+      "tags": [
+        "n-up",
+        "pdf",
+        "layout",
+        "a5",
+        "aspose.pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Facades.PdfFileEditor",
+        "Aspose.Pdf.Facades.PdfFileEditor.MakeNUp"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T11:32:55Z",
+      "status": "verified",
+      "task_id": "75946"
+    }
+  }
+}
