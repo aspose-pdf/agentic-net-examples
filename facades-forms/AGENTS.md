@@ -8,7 +8,7 @@ parent: ../agents.md
 
 # AGENTS - facades-forms
 
-> **Facades forms** in PDF using C# / .NET -- **86** verified, compile-tested examples for **Aspose.PDF for .NET** 26.10.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
+> **Facades forms** in PDF using C# / .NET -- **339** verified, compile-tested examples for **Aspose.PDF for .NET** 26.11.0. Each `.cs` file is a standalone, build-validated console example, generated and runtime-checked by an AI agent before publishing.
 
 ## Persona
 
@@ -23,20 +23,22 @@ See the root [agents.md](../agents.md) for repository-wide conventions and bound
 
 ## Required Namespaces
 
-- `using Aspose.Pdf;` (61/86 files) ← category-specific
-- `using Aspose.Pdf.Facades;` (59/86 files) ← category-specific
-- `using Aspose.Pdf.Forms;` (32/86 files)
-- `using Aspose.Pdf.Annotations;` (15/86 files)
-- `using Aspose.Pdf.Text;` (2/86 files)
-- `using System;` (86/86 files)
-- `using System.IO;` (85/86 files)
-- `using System.Collections.Generic;` (11/86 files)
-- `using System.Linq;` (9/86 files)
-- `using System.Drawing;` (5/86 files)
-- `using System.Text.Json;` (4/86 files)
-- `using System.Globalization;` (1/86 files)
-- `using System.Security.Cryptography;` (1/86 files)
-- `using System.Text;` (1/86 files)
+- `using Aspose.Pdf.Facades;` (278/339 files) ← category-specific
+- `using Aspose.Pdf;` (192/339 files) ← category-specific
+- `using Aspose.Pdf.Forms;` (77/339 files)
+- `using Aspose.Pdf.Annotations;` (46/339 files)
+- `using Aspose.Pdf.Text;` (7/339 files)
+- `using System;` (339/339 files)
+- `using System.IO;` (337/339 files)
+- `using System.Drawing;` (37/339 files)
+- `using System.Linq;` (33/339 files)
+- `using System.Collections.Generic;` (18/339 files)
+- `using System.Data;` (11/339 files)
+- `using System.Text.Json;` (6/339 files)
+- `using System.Globalization;` (1/339 files)
+- `using System.Security.Cryptography;` (1/339 files)
+- `using System.Text;` (1/339 files)
+- `using System.Xml.Linq;` (1/339 files)
 
 ## Common Code Pattern
 
@@ -54,10 +56,14 @@ using (Document doc = new Document("input.pdf"))
 
 | File | Title | Key APIs | Description |
 |------|-------|----------|-------------|
+| [add-border-to-pdf-signature-field](./add-border-to-pdf-signature-field.cs) | Add Border and Decoration to PDF Signature Field | `FormEditor`, `FormFieldFacade`, `BindPdf` | Shows how to bind a PDF with Aspose.Pdf.Facades.FormEditor, configure a FormFieldFacade to increa... |
 | [add-confirmation-dialog-to-pdf-submit-button](./add-confirmation-dialog-to-pdf-submit-button.cs) | Add Confirmation Dialog to Submit Button in PDF Form | `Document`, `ButtonField`, `JavascriptAction` | Demonstrates locating a button field in a PDF form and attaching a JavaScript action that shows a... |
 | [add-digital-signature-field-and-sign-pdf](./add-digital-signature-field-and-sign-pdf.cs) | Add Digital Signature Field and Sign PDF | `Document`, `SignatureField`, `Rectangle` | Shows how to create a signature field named "DigitalSignature" in a PDF and then sign the documen... |
+| [add-disclaimer-field-to-pdf](./add-disclaimer-field-to-pdf.cs) | Add Disclaimer TextBox Field to PDF | `Document`, `TextBoxField`, `Rectangle` | Shows how to load a PDF with Aspose.Pdf, create a TextBoxField at the top of the first page, set ... |
+| [add-email-text-field-to-pdf-page](./add-email-text-field-to-pdf-page.cs) | Add Email Address Text Field to PDF Page with FormEditor | `FormEditor`, `BindPdf`, `AddField` | Shows how to bind an existing PDF, add a text form field named EmailAddress on page 2 at specific... |
 | [add-email-validation-javascript-to-pdf-form-field](./add-email-validation-javascript-to-pdf-form-field.cs) | Add Email Validation JavaScript to PDF Form Field | `FormEditor`, `BindPdf`, `AddFieldScript` | Demonstrates how to attach a JavaScript blur‑event script to an "Email" form field in a PDF using... |
 | [add-email-validation-to-pdf-form-field](./add-email-validation-to-pdf-form-field.cs) | Add Email Regex Validation to PDF Form Field | `FormEditor`, `BindPdf`, `SetFieldScript` | Demonstrates how to apply a JavaScript regular‑expression validation script to an "Email" form fi... |
+| [add-footer-text-field-to-pdf-pages](./add-footer-text-field-to-pdf-pages.cs) | Add Footer Text Field to Each PDF Page | `Document`, `FormEditor`, `BindPdf` | Demonstrates how to bind an existing PDF with Aspose.Pdf.Facades.FormEditor, add a single‑line fo... |
 | [add-form-load-javascript-to-pdf](./add-form-load-javascript-to-pdf.cs) | Add JavaScript to Populate Date Field on PDF Open | `Document`, `JavascriptAction`, `OpenAction` | Demonstrates how to attach a JavaScript action to a PDF document using Aspose.Pdf so that the "Da... |
 | [add-gender-radio-button-group](./add-gender-radio-button-group.cs) | Add Gender Radio Button Group to PDF Form | `Document`, `Page`, `RadioButtonField` | Shows how to create a 'Gender' radio button group with Male, Female, and Other options, set a def... |
 | [add-hidden-authtoken-field-to-pdf](./add-hidden-authtoken-field-to-pdf.cs) | Add Hidden AuthToken to PDF Pages | `Document`, `Page`, `TextFragment` | Shows how to generate a secure random token and embed it as invisible text on every page of a PDF... |
@@ -65,29 +71,25 @@ using (Document doc = new Document("input.pdf"))
 | [add-hidden-version-field-to-pdf](./add-hidden-version-field-to-pdf.cs) | Add Hidden Numeric Field to PDF Form | `Document`, `NumberField`, `Rectangle` | Shows how to create a hidden numeric form field named "Version" with a value of 2 in a PDF docume... |
 | [add-javascript-alert-to-push-button](./add-javascript-alert-to-push-button.cs) | Attach JavaScript Alert to PDF Push Button | `FormEditor`, `BindPdf`, `AddFieldScript` | Shows how to bind an existing PDF, add a JavaScript alert to a push button named "ShowInfo", and ... |
 | [add-list-box-field-to-pdf-form](./add-list-box-field-to-pdf-form.cs) | Add List Box Field with Default Selection to PDF | `Document`, `FormEditor`, `AddField` | Demonstrates how to create a ListBox form field in a PDF, populate it with items, and set a defau... |
+| [add-list-box-to-pdf-using-formeditor](./add-list-box-to-pdf-using-formeditor.cs) | Add List Box to PDF Using FormEditor | `FormEditor`, `BindPdf`, `AddField` | Demonstrates how to bind an existing PDF, set list items, add a ListBox field on a specific page,... |
 | [add-list-item-to-pdf-dropdown](./add-list-item-to-pdf-dropdown.cs) | Add List Item to Dropdown Field in PDF | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates how to use Aspose.Pdf.Facades.FormEditor to add a new option to an existing dropdown... |
-| [add-print-button-to-pdf](./add-print-button-to-pdf.cs) | Add Print Button to PDF Form | `FormEditor`, `BindPdf`, `AddField` | Shows how to insert a push‑button field into an existing PDF and attach JavaScript that opens the... |
-| [add-radio-button-group-to-pdf-form](./add-radio-button-group-to-pdf-form.cs) | Add Radio Button Group to PDF Form | `Document`, `Page`, `RadioButtonField` | Shows how to insert a radio button group named PaymentMethod with "Credit" and "PayPal" options o... |
-| [add-reset-form-button-to-pdf](./add-reset-form-button-to-pdf.cs) | Add Reset Form Button to PDF | `Document`, `ButtonField`, `DefaultAppearance` | Shows how to create a push button in a PDF that clears all form fields when clicked, using Aspose... |
-| [add-state-combobox-to-pdf](./add-state-combobox-to-pdf.cs) | Add State Combo Box to PDF Form | `FormEditor`, `BindPdf`, `AddField` | Shows how to insert a combo box field named "State" into an existing PDF and fill it with US stat... |
-| [add-submit-button-to-pdf-form__v2](./add-submit-button-to-pdf-form__v2.cs) | Add Submit Button to PDF Form | `Document`, `FormEditor`, `BindPdf` | Shows how to insert a push‑button field on the first page of a PDF and configure it to post form ... |
-| [add-text-field-to-pdf-page](./add-text-field-to-pdf-page.cs) | Add Text Field to PDF Page Using FormEditor | `FormEditor`, `BindPdf`, `AddField` | Demonstrates how to add a text form field named 'CustomerName' to page 1 of an existing PDF using... |
-| [add-unchecked-checkbox-field-to-pdf](./add-unchecked-checkbox-field-to-pdf.cs) | Add Unchecked Checkbox Field to PDF Form | `FormEditor`, `BindPdf`, `AddField` | Shows how to insert an unchecked checkbox named "AgreeTerms" on page 2 of an existing PDF using t... |
-| [apply-custom-font-to-pdf-form-text-fields](./apply-custom-font-to-pdf-form-text-fields.cs) | Apply Custom Font to PDF Form Text Fields | `Document`, `Field`, `TextBoxField` | Shows how to load a PDF, iterate over its form fields, and set the Arial Bold font for all text b... |
-| [apply-default-decoration-to-text-fields](./apply-default-decoration-to-text-fields.cs) | Apply Default Decoration to All Text Fields in a PDF | `Document`, `FormEditor`, `BindPdf` | The example loads a PDF, configures default font, colors, border, and alignment via FormEditor’s ... |
-| [apply-phone-number-input-mask](./apply-phone-number-input-mask.cs) | Set Input Mask on PDF Form Field | `FormEditor`, `BindPdf`, `SetFieldScript` | Demonstrates how to apply an input mask to a PDF form field by attaching a JavaScript snippet usi... |
-| [attach-javascript-clear-discountcode-field](./attach-javascript-clear-discountcode-field.cs) | Attach JavaScript to PDF Form Field | `FormEditor`, `BindPdf`, `AddFieldScript` | Shows how to use Aspose.Pdf's FormEditor facade to add a JavaScript action that clears a form fie... |
-| [attach-javascript-to-pdf-form-field](./attach-javascript-to-pdf-form-field.cs) | Attach JavaScript to Update Total Price from Quantity Field | `Document`, `FormEditor`, `BindPdf` | Shows how to bind a PDF with FormEditor, add a JavaScript action to the "Quantity" field that cal... |
-| [attach-javascript-validation-to-pdf-form-field](./attach-javascript-validation-to-pdf-form-field.cs) | Attach JavaScript Validation to PDF Form Field | `FormEditor`, `BindPdf`, `AddFieldScript` | Shows how to load a PDF, attach a JavaScript script to the "Age" form field that alerts when the ... |
-| [attach-js-resetform-clear-hidden-fields](./attach-js-resetform-clear-hidden-fields.cs) | Attach Js Resetform Clear Hidden Fields | `FormEditor` | Attach Js Resetform Clear Hidden Fields |
-| [attach-js-validation-to-pdf-submit-button](./attach-js-validation-to-pdf-submit-button.cs) | Add JavaScript Validation to PDF Submit Button | `FormEditor`, `BindPdf`, `AddField` | Demonstrates how to add a push‑button to a PDF and attach JavaScript that validates required fiel... |
-| [batch-add-hidden-guid-field-to-pdfs](./batch-add-hidden-guid-field-to-pdfs.cs) | Batch Add Hidden ProcessedDate Field to PDFs | `Document`, `Page`, `TextBoxField` | Demonstrates how to iterate over PDF files in a folder, add a hidden TextBoxField named "Processe... |
-| [batch-add-selectall-checkbox-to-pdf](./batch-add-selectall-checkbox-to-pdf.cs) | Add SelectAll Checkbox to PDF First Page | `Document`, `Page`, `Rectangle` | Demonstrates how to iterate through a folder of PDF files, add a checkbox form field named "Selec... |
-| [batch-rename-pdf-form-fields](./batch-rename-pdf-form-fields.cs) | Batch Rename PDF Form Fields with Prefix | `Form`, `FormEditor`, `BindPdf` | Demonstrates how to retrieve all form field names from a PDF and rename those that start with "Ol... |
-| ... | | | *and 56 more files* |
+| [add-list-item-to-pdf-form-field](./add-list-item-to-pdf-form-field.cs) | Add List Item to PDF Form Field | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates how to bind a PDF document with Aspose.Pdf.Facades.FormEditor, add a new item to a l... |
+| [add-list-item-to-pdf-form-field__v2](./add-list-item-to-pdf-form-field__v2.cs) | Add List Item to PDF Form Field | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates how to bind a PDF to the FormEditor, add a new item to a list-type form field, and s... |
+| [add-list-item-to-pdf-form-field__v3](./add-list-item-to-pdf-form-field__v3.cs) | Add List Item to PDF Form Field and Apply Decoration | `FormEditor`, `FormFieldFacade`, `BindPdf` | Shows how to open a PDF with FormEditor, add a new list item "Extra" to an existing list/combobox... |
+| [add-list-item-to-pdf-form-listbox](./add-list-item-to-pdf-form-listbox.cs) | Add List Item to PDF Form ListBox | `FormEditor`, `BindPdf`, `AddListItem` | Shows how to open an existing PDF, bind a FormEditor, add a new list item to a ListBox form field... |
+| [add-list-item-to-pdf-form-listbox__v2](./add-list-item-to-pdf-form-listbox__v2.cs) | Add List Item to PDF Form ListBox | `Document`, `FormEditor`, `BindPdf` | Shows how to open a PDF, bind a FormEditor, add a new list item to a ListBox form field, and save... |
+| [add-list-item-to-pdf-form-listbox__v3](./add-list-item-to-pdf-form-listbox__v3.cs) | Add List Item to PDF Form ListBox | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates loading a PDF, binding a FormEditor, adding a new item to a ListBox form field, and ... |
+| [add-list-item-to-pdf-form](./add-list-item-to-pdf-form.cs) | Add List Item to PDF Form and Set Default Selection | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates binding a PDF with FormEditor, adding a new list item to a form field, then using Fo... |
+| [add-list-item-to-pdf-list-box](./add-list-item-to-pdf-list-box.cs) | Add List Item to PDF List Box using FormEditor | `FormEditor`, `BindPdf`, `AddListItem` | Shows how to bind an existing PDF, add a new item (Germany) to a list‑box field named CountryList... |
+| [add-list-item-to-pdf-listbox](./add-list-item-to-pdf-listbox.cs) | Add List Item to PDF ListBox using FormEditor | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates how to bind a PDF with FormEditor, add a new option to a ListBox form field, and sav... |
+| [add-list-item-to-pdf-listbox__v2](./add-list-item-to-pdf-listbox__v2.cs) | Add List Item to PDF ListBox using FormEditor | `FormEditor`, `BindPdf`, `AddListItem` | Shows how to bind an existing PDF, add a new entry to a ListBox form field, and save the modified... |
+| [add-list-item-to-pdf-listbox__v3](./add-list-item-to-pdf-listbox__v3.cs) | Add List Item to PDF ListBox with FormEditor | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates loading a PDF form, binding it with FormEditor, adding a new list item "Morning" to ... |
+| [add-list-items-to-listbox-in-pdf-form](./add-list-items-to-listbox-in-pdf-form.cs) | Add List Items to a ListBox and Set Default Value in PDF For... | `FormEditor`, `BindPdf`, `AddListItem` | Demonstrates binding a PDF, adding items to a ListBox field with FormEditor, setting a default se... |
+| [add-list-items-to-pdf-form-listbox](./add-list-items-to-pdf-form-listbox.cs) | Add List Items to a PDF Form ListBox | `FormEditor`, `BindPdf`, `AddListItem` | Shows how to bind an existing PDF, add "Morning" and "Afternoon" entries to a ListBox form field ... |
+| ... | | | *and 309 more files* |
 
 ## Category Statistics
-- Total examples: 86
+- Total examples: 339
 
 ## Category-Specific Tips
 
@@ -131,5 +133,5 @@ using (Document doc = new Document("input.pdf"))
 - Review code examples in this folder for facades-forms patterns
 
 <!-- AUTOGENERATED:START -->
-Updated: 2026-11-10 | Run: `20261110_222211_3400ad`
+Updated: 2026-11-27 | Run: `20261127_220449_128ac6`
 <!-- AUTOGENERATED:END -->
