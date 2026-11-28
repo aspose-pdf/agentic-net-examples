@@ -1,0 +1,252 @@
+{
+  "category": "facades-javascript",
+  "nuget_version": "26.11.0",
+  "last_updated": "2026-11-28T10:54:46Z",
+  "examples": {
+    "add-javascript-open-action-to-pdf__v2": {
+      "title": "Add JavaScript Open Action to PDF",
+      "filename": "add-javascript-open-action-to-pdf__v2.cs",
+      "description": "Shows how to load a PDF with Aspose.Pdf, attach a JavaScript action that runs when the document is opened, and save the updated file.",
+      "tags": [
+        "javascript",
+        "open-action",
+        "pdf",
+        "aspose-pdf",
+        "document-modification"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.JavascriptAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Annotations"
+      ],
+      "difficulty": "beginner",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "71482"
+    },
+    "add-multiple-javascript-actions-to-pdf": {
+      "title": "Add Multiple JavaScript Actions to PDF",
+      "filename": "add-multiple-javascript-actions-to-pdf.cs",
+      "description": "Shows how to combine several JavaScript statements into a single OpenAction for a PDF document using Aspose.Pdf and save the modified file.",
+      "tags": [
+        "javascript",
+        "openaction",
+        "pdf",
+        "aspose",
+        "document"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save",
+        "Aspose.Pdf.Document..ctor"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "71498"
+    },
+    "add-clickable-rectangle-with-javascript-alert": {
+      "title": "Add Clickable Rectangle with JavaScript Alert to PDF",
+      "filename": "add-clickable-rectangle-with-javascript-alert.cs",
+      "description": "Loads a PDF, draws a visible rectangle on the first page, and attaches a JavaScript action that shows an alert when the rectangle is clicked, then saves the result.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "javascript",
+        "rectangle",
+        "link"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73510"
+    },
+    "draw-polygon-add-javascript-link": {
+      "title": "Draw Polygon and Attach JavaScript Link in PDF",
+      "filename": "draw-polygon-add-javascript-link.cs",
+      "description": "Loads an existing PDF, draws a blue polygon using the low‑level Graph API, and adds a clickable area that runs JavaScript to set a variable, then saves the result.",
+      "tags": [
+        "polygon",
+        "javascript",
+        "link",
+        "annotation",
+        "Aspose.Pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Line",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73511"
+    },
+    "add-javascript-open-actions-to-pdf": {
+      "title": "Add JavaScript Open Actions to PDF Document and Pages",
+      "filename": "add-javascript-open-actions-to-pdf.cs",
+      "description": "Demonstrates loading a PDF with Aspose.Pdf, adding a document‑level JavaScript action that runs on opening the file, attaching page‑level JavaScript actions for each page, and saving the modified document.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "open-action",
+        "aspose-pdf",
+        "document-events"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.JavascriptAction",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Actions",
+        "Aspose.Pdf.Document.OpenAction",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73512"
+    },
+    "add-rectangle-and-js-submit-link-to-pdf": {
+      "title": "Add Rectangle and JavaScript Submit Link to PDF",
+      "filename": "add-rectangle-and-js-submit-link-to-pdf.cs",
+      "description": "Loads a PDF, draws a visible black rectangle on page two using a SquareAnnotation, overlays a JavaScript link that submits form data to a URL, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "javascript",
+        "rectangle",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Annotations.Border"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73519"
+    },
+    "add-javascript-linked-rectangles-to-pdf": {
+      "title": "Add JavaScript-Linked Rectangles to PDF using PdfContentEditor",
+      "filename": "add-javascript-linked-rectangles-to-pdf.cs",
+      "description": "Shows how to load a PDF, draw visible rectangles on specific pages, attach JavaScript actions to those rectangles with PdfContentEditor, and save the modified document.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "annotation",
+        "rectangle",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateSquareCircle",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateJavaScriptLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73525"
+    },
+    "draw-rectangle-add-javascript-mailto-link": {
+      "title": "Draw Rectangle and Add JavaScript Mailto Link to PDF",
+      "filename": "draw-rectangle-add-javascript-mailto-link.cs",
+      "description": "Loads an existing PDF, draws a rectangular annotation on the first page, attaches a JavaScript action that opens a mailto URL when clicked, and saves the modified document.",
+      "tags": [
+        "pdf",
+        "annotation",
+        "javascript",
+        "mailto",
+        "aspose-pdf"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Rectangle",
+        "Aspose.Pdf.Annotations.SquareAnnotation",
+        "Aspose.Pdf.Annotations.LinkAnnotation",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Annotations.Border",
+        "Aspose.Pdf.Document.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73536"
+    },
+    "add-rectangle-with-javascript-action": {
+      "title": "Add Rectangle with JavaScript Action to PDF",
+      "filename": "add-rectangle-with-javascript-action.cs",
+      "description": "Shows how to load a PDF, draw a styled rectangle on a page, attach a JavaScript link to the same area using PdfContentEditor, and save the modified document.",
+      "tags": [
+        "pdf",
+        "rectangle",
+        "javascript",
+        "aspose-pdf",
+        "content-editor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Drawing.Graph",
+        "Aspose.Pdf.Drawing.Rectangle",
+        "Aspose.Pdf.Facades.PdfContentEditor",
+        "Aspose.Pdf.Facades.PdfContentEditor.CreateJavaScriptLink",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73540"
+    },
+    "add-javascript-action-on-pdf-page-open": {
+      "title": "Add JavaScript Action on PDF Page Open",
+      "filename": "add-javascript-action-on-pdf-page-open.cs",
+      "description": "Demonstrates loading a PDF, attaching a JavaScript alert to each page's Open action, and saving the document using PdfContentEditor to preserve the actions.",
+      "tags": [
+        "pdf",
+        "javascript",
+        "page-action",
+        "aspose-pdf",
+        "pdfcontenteditor"
+      ],
+      "apis_used": [
+        "Aspose.Pdf.Document",
+        "Aspose.Pdf.Page",
+        "Aspose.Pdf.Page.Actions",
+        "Aspose.Pdf.Annotations.JavascriptAction",
+        "Aspose.Pdf.Facades.PdfContentEditor.BindPdf",
+        "Aspose.Pdf.Facades.PdfContentEditor.Save"
+      ],
+      "difficulty": "intermediate",
+      "generated_at": "2026-11-28T10:54:46Z",
+      "status": "verified",
+      "task_id": "73544"
+    }
+  }
+}
